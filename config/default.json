@@ -1,0 +1,10 @@
+{
+  "PORT": 4005,
+  "HOST": "0.0.0.0",
+  "PARTICIPANT_ID": "sdk-pisp-schema-adapter",
+  "INSPECT": {
+    "DEPTH": 4,
+    "SHOW_HIDDEN": false,
+    "COLOR": true
+  }
+}
