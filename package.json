@@ -11,6 +11,7 @@
     "audit:resolve": "SHELL=sh resolve-audit",
     "audit:check": "SHELL=sh check-audit",
     "build": "tsc",
+    "build:openapi": "swagger-cli bundle -o ./src/interface/api.yaml -t yaml ./src/interface/api-template.yaml && swagger-cli validate ./src/interface/api.yaml",
     "docker:build": "docker build -t sdk-pisp-scheme-adapter:local -f ./Dockerfile ./",
     "docker:run": "docker run -p 4005:4005 sdk-pisp-scheme-adapter:local",
     "lint": "eslint ./src/**/*.ts *.js",
@@ -59,6 +60,7 @@
     "@hapi/hapi": "^19.1.1",
     "@hapi/inert": "^6.0.1",
     "@hapi/vision": "^6.0.0",
+    "@mojaloop/api-snippets": "^2.0.0",
     "@mojaloop/central-services-error-handling": "^10.6.0",
     "@mojaloop/central-services-health": "^10.6.0",
     "@mojaloop/central-services-logger": "^9.5.1",
@@ -107,6 +109,7 @@
     "npm-check-updates": "6.0.0",
     "source-map-support": "0.5.12",
     "standard-version": "^8.0.2",
+    "swagger-cli": "^4.0.3",
     "ts-jest": "^26.0.0",
     "ts-node": "8.3.0",
     "typescript": "3.9.2"
