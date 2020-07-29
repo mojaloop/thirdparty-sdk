@@ -1,7 +1,7 @@
 {
-  "name": "@mojaloop/repo-name",
+  "name": "@mojaloop/sdk-pisp-scheme-adapter",
   "version": "0.1.0",
-  "description": "Typescript Mojaloop project template",
+  "description": "SDK PISP Scheme Adapter ",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "files": [
@@ -26,22 +26,19 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mojaloop/<repo-name>.git"
+    "url": "git+https://github.com/mojaloop/sdk-pisp-schema-adapter.git"
   },
   "keywords": [
     "metrics",
     "central",
     "services"
   ],
-  "author": "lewisdaly",
-  "contributors": [
-    "Lewis Daly <lewis@vesselstech.com>"
-  ],
+  "author": "Paweł Marzec <pawel.marzec@modusbox.com>",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/mojaloop/<repo-name>/issues"
+    "url": "https://github.com/mojaloop/sdk-pisp-schema-adapter/issues"
   },
-  "homepage": "https://github.com/mojaloop/<repo-name>#readme",
+  "homepage": "https://github.com/mojaloop/sdk-pisp-schema-adapter#readme",
   "dependencies": {},
   "devDependencies": {
     "@istanbuljs/nyc-config-typescript": "0.1.3",
