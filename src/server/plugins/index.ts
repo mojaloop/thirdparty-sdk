@@ -30,14 +30,12 @@ import { Server, ServerRoute } from '@hapi/hapi'
 import ErrorHandling from '@mojaloop/central-services-error-handling'
 import { Util } from '@mojaloop/central-services-shared'
 import Good from './good'
-import Swagger from './swagger'
 import OpenAPI from './openAPI'
 
 async function register (server: Server): Promise<Server> {
   const openapiBackend = await OpenAPI.initialize()
   const plugins = [
     Util.Hapi.OpenapiBackendValidator,
-    Swagger,
     Good,
     openapiBackend,
     Inert,
@@ -54,17 +52,18 @@ async function register (server: Server): Promise<Server> {
   server.route({
     method: ['GET', 'POST', 'PUT', 'DELETE'],
     path: '/{path*}',
-    handler: (req, h): ServerRoute => openapiBackend.options.openapi.handleRequest(
-      {
-        method: req.method,
-        path: req.path,
-        body: req.payload,
-        query: req.query,
-        headers: req.headers
-      },
-      req,
-      h
-    )
+    handler: (req, h): ServerRoute =>
+      openapiBackend.options.openapi.handleRequest(
+        {
+          method: req.method,
+          path: req.path,
+          body: req.payload,
+          query: req.query,
+          headers: req.headers
+        },
+        req,
+        h
+      )
   // TODO: follow instructions
   // https://github.com/anttiviljami/openapi-backend/blob/master/DOCS.md#postresponsehandler-handler
   })
