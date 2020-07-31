@@ -16,21 +16,43 @@
  their names indented and be marked with a '-'. Email address can be added
  optionally within square brackets <email>.
  * Gates Foundation
- - Name Surname <name.surname@gatesfoundation.com>
 
- - Paweł Marzec <pawel.marzec@modusbox.com>
+ * Paweł Marzec <pawel.marzec@modusbox.com>
+
  --------------
  ******/
 
-// for mojaloop there is lack for @types files
-// to stop typescript complains, we have to declare some modules here
-declare module '@mojaloop/central-services-error-handling'{
-  export function validateRoutes(options?: object): object
-}
-declare module '@mojaloop/central-services-logger'
-declare module '@mojaloop/central-services-shared'
+import logger from '@mojaloop/central-services-logger'
+import inspect from './inspect'
+import { Request, ResponseObject } from '@hapi/hapi'
 
-declare module '@hapi/good'
-declare module 'hapi-openapi'
-declare module 'blipp'
-declare module 'convict-commander'
+interface RequestLogged extends Request {
+  response: ResponseLogged;
+}
+
+interface ResponseLogged extends ResponseObject {
+  source: string;
+  statusCode: number;
+}
+
+function logResponse (request: RequestLogged): void {
+  if (request && request.response) {
+    let response
+    try {
+      response = JSON.stringify(request.response.source)
+    } catch (e) {
+      response = inspect(request.response.source)
+    }
+    if (!response) {
+      logger.info(`AS-Trace - Response: ${request.response}`)
+    } else {
+      logger.info(`AS-Trace - Response: ${response} Status: ${request.response.statusCode}`)
+    }
+  }
+}
+
+export {
+  logResponse,
+  RequestLogged,
+  ResponseLogged
+}

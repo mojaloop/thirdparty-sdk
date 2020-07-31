@@ -18,19 +18,32 @@
  * Gates Foundation
  - Name Surname <name.surname@gatesfoundation.com>
 
- - Paweł Marzec <pawel.marzec@modusbox.com>
+ * Paweł Marzec <pawel.marzec@modusbox.com>
  --------------
  ******/
+import inspect from '../../../src/shared/inspect'
+import config from '../../../src/shared/config'
+import util from 'util'
 
-// for mojaloop there is lack for @types files
-// to stop typescript complains, we have to declare some modules here
-declare module '@mojaloop/central-services-error-handling'{
-  export function validateRoutes(options?: object): object
-}
-declare module '@mojaloop/central-services-logger'
-declare module '@mojaloop/central-services-shared'
+// const inspectSpy = jest.spyOn(util, 'inspect')
+// jest.mock('util')
 
-declare module '@hapi/good'
-declare module 'hapi-openapi'
-declare module 'blipp'
-declare module 'convict-commander'
+describe('shared/inspect', (): void => {
+  it('should properly call util.inspect', (): void => {
+    const inspectSpy = jest.spyOn(util, 'inspect')
+    const result = inspect({})
+    expect(result).toEqual('{}')
+    expect(inspectSpy).toHaveBeenCalledWith({}, false, 4, true)
+  })
+
+  it('should call util.inspect with defaults', (): void => {
+    // remove config.INSPECT so defaults will be used
+    delete config.INSPECT
+    const inspectSpy = jest.spyOn(util, 'inspect')
+    const result = inspect({})
+
+    expect(config).toBeDefined()
+    expect(result).toEqual('{}')
+    expect(inspectSpy).toHaveBeenCalledWith({}, false, 4, true)
+  })
+})

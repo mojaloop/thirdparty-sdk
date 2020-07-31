@@ -1,3 +1,5 @@
+#!./node_modules/.bin/ts-node
+
 /*****
  License
  --------------
@@ -22,15 +24,24 @@
  --------------
  ******/
 
-// for mojaloop there is lack for @types files
-// to stop typescript complains, we have to declare some modules here
-declare module '@mojaloop/central-services-error-handling'{
-  export function validateRoutes(options?: object): object
-}
-declare module '@mojaloop/central-services-logger'
-declare module '@mojaloop/central-services-shared'
+import { Command } from 'commander'
+import config, { PACKAGE } from './shared/config'
+import ServiceServer from './server'
 
-declare module '@hapi/good'
-declare module 'hapi-openapi'
-declare module 'blipp'
-declare module 'convict-commander'
+// handle script parameters
+const program = new Command(PACKAGE.name)
+
+// process parameters
+program
+  .version(PACKAGE.version)
+  .description('auth-service cli')
+  .option('-p, --port <number>', 'listen on port', config.PORT.toString())
+  .option('-H, --host <string>', 'listen on host', config.HOST)
+  .parse(process.argv)
+
+// update also config from program parameters
+config.PORT = parseInt(program.port)
+config.HOST = program.host
+
+// setup & start @hapi server
+ServiceServer.run(config)

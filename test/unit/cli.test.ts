@@ -18,19 +18,27 @@
  * Gates Foundation
  - Name Surname <name.surname@gatesfoundation.com>
 
- - Paweł Marzec <pawel.marzec@modusbox.com>
+ * Paweł Marzec <pawel.marzec@modusbox.com>
  --------------
  ******/
+import Config from '../../src/shared/config'
+import server from '../../src/server'
+jest.mock('../../src/server')
 
-// for mojaloop there is lack for @types files
-// to stop typescript complains, we have to declare some modules here
-declare module '@mojaloop/central-services-error-handling'{
-  export function validateRoutes(options?: object): object
-}
-declare module '@mojaloop/central-services-logger'
-declare module '@mojaloop/central-services-shared'
-
-declare module '@hapi/good'
-declare module 'hapi-openapi'
-declare module 'blipp'
-declare module 'convict-commander'
+describe('cli', (): void => {
+  it('should use default port & host', async (): Promise<void> => {
+    process.argv = ['cli.ts']
+    const cli = await import('../../src/cli')
+    expect(cli).toBeDefined()
+    expect(server.run).toHaveBeenCalledWith({
+      ENV: 'test',
+      PORT: Config.PORT,
+      HOST: Config.HOST,
+      INSPECT: {
+        DEPTH: 4,
+        SHOW_HIDDEN: false,
+        COLOR: true
+      }
+    })
+  })
+})

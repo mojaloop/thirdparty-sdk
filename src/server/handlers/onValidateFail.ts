@@ -16,21 +16,15 @@
  their names indented and be marked with a '-'. Email address can be added
  optionally within square brackets <email>.
  * Gates Foundation
- - Name Surname <name.surname@gatesfoundation.com>
 
- - Paweł Marzec <pawel.marzec@modusbox.com>
+ * Paweł Marzec <pawel.marzec@modusbox.com>
+
  --------------
  ******/
 
-// for mojaloop there is lack for @types files
-// to stop typescript complains, we have to declare some modules here
-declare module '@mojaloop/central-services-error-handling'{
-  export function validateRoutes(options?: object): object
-}
-declare module '@mojaloop/central-services-logger'
-declare module '@mojaloop/central-services-shared'
+import Boom from '@hapi/boom'
+import { Request, Lifecycle, ResponseToolkit } from '@hapi/hapi'
 
-declare module '@hapi/good'
-declare module 'hapi-openapi'
-declare module 'blipp'
-declare module 'convict-commander'
+export default function onValidateFail (_request: Request, _h: ResponseToolkit, err?: Error | undefined): Lifecycle.ReturnValue {
+  throw Boom.boomify(err as Error)
+}

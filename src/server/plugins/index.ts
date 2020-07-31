@@ -22,15 +22,56 @@
  --------------
  ******/
 
-// for mojaloop there is lack for @types files
-// to stop typescript complains, we have to declare some modules here
-declare module '@mojaloop/central-services-error-handling'{
-  export function validateRoutes(options?: object): object
-}
-declare module '@mojaloop/central-services-logger'
-declare module '@mojaloop/central-services-shared'
+import Inert from '@hapi/inert'
+import Vision from '@hapi/vision'
+import Blip from 'blipp'
+import { Server, ServerRoute } from '@hapi/hapi'
 
-declare module '@hapi/good'
-declare module 'hapi-openapi'
-declare module 'blipp'
-declare module 'convict-commander'
+import ErrorHandling from '@mojaloop/central-services-error-handling'
+import { Util } from '@mojaloop/central-services-shared'
+import Good from './good'
+import Swagger from './swagger'
+import OpenAPI from './openAPI'
+
+async function register (server: Server): Promise<Server> {
+  const openapiBackend = await OpenAPI.initialize()
+  const plugins = [
+    Util.Hapi.OpenapiBackendValidator,
+    Swagger,
+    Good,
+    openapiBackend,
+    Inert,
+    Vision,
+    Blip,
+    ErrorHandling,
+    Util.Hapi.HapiEventPlugin,
+    Util.Hapi.FSPIOPHeaderValidation
+  ]
+
+  await server.register(plugins)
+
+  // use as a catch-all handler
+  server.route({
+    method: ['GET', 'POST', 'PUT', 'DELETE'],
+    path: '/{path*}',
+    handler: (req, h): ServerRoute => openapiBackend.options.openapi.handleRequest(
+      {
+        method: req.method,
+        path: req.path,
+        body: req.payload,
+        query: req.query,
+        headers: req.headers
+      },
+      req,
+      h
+    )
+  // TODO: follow instructions
+  // https://github.com/anttiviljami/openapi-backend/blob/master/DOCS.md#postresponsehandler-handler
+  })
+
+  return server
+}
+
+export default {
+  register
+}

@@ -16,21 +16,27 @@
  their names indented and be marked with a '-'. Email address can be added
  optionally within square brackets <email>.
  * Gates Foundation
- - Name Surname <name.surname@gatesfoundation.com>
 
- - Paweł Marzec <pawel.marzec@modusbox.com>
+ * Paweł Marzec <pawel.marzec@modusbox.com>
+
  --------------
  ******/
+import Boom from '@hapi/boom'
+import { Request, ResponseToolkit } from '@hapi/hapi'
 
-// for mojaloop there is lack for @types files
-// to stop typescript complains, we have to declare some modules here
-declare module '@mojaloop/central-services-error-handling'{
-  export function validateRoutes(options?: object): object
-}
-declare module '@mojaloop/central-services-logger'
-declare module '@mojaloop/central-services-shared'
+import onValidateFail from '../../../../src/server/handlers/onValidateFail'
 
-declare module '@hapi/good'
-declare module 'hapi-openapi'
-declare module 'blipp'
-declare module 'convict-commander'
+describe('server/handlers/onValidateFail', (): void => {
+  it('should throw error from Boom.boomify', (): void => {
+    const spyBoomify = jest.spyOn(Boom, 'boomify')
+    const err = new Error('sample error')
+    expect((): void => {
+      onValidateFail(
+        null as unknown as Request,
+        null as unknown as ResponseToolkit,
+        err
+      )
+    }).toThrowError(err)
+    expect(spyBoomify).toBeCalledWith(err)
+  })
+})

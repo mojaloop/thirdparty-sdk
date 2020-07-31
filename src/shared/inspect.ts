@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /*****
  License
  --------------
@@ -21,16 +22,20 @@
  - Paweł Marzec <pawel.marzec@modusbox.com>
  --------------
  ******/
+import util from 'util'
+import config from './config'
 
-// for mojaloop there is lack for @types files
-// to stop typescript complains, we have to declare some modules here
-declare module '@mojaloop/central-services-error-handling'{
-  export function validateRoutes(options?: object): object
+export const defaults = {
+  SHOW_HIDDEN: false,
+  DEPTH: 5,
+  COLOR: true
 }
-declare module '@mojaloop/central-services-logger'
-declare module '@mojaloop/central-services-shared'
 
-declare module '@hapi/good'
-declare module 'hapi-openapi'
-declare module 'blipp'
-declare module 'convict-commander'
+export default function inspect (subject: any): string {
+  return util.inspect(
+    subject,
+    (config.INSPECT && config.INSPECT.SHOW_HIDDEN) || defaults.SHOW_HIDDEN,
+    (config.INSPECT && config.INSPECT.DEPTH) || defaults.DEPTH,
+    (config.INSPECT && config.INSPECT.COLOR) || defaults.COLOR
+  )
+}
