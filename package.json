@@ -68,9 +68,12 @@
     "@mojaloop/central-services-shared": "^10.6.2",
     "@mojaloop/sdk-standard-components": "^10.6.3",
     "@types/convict": "^5.2.1",
+    "ajv": "^6.12.3",
+    "ajv-keywords": "^3.5.2",
     "blipp": "^4.0.1",
     "commander": "^5.1.0",
     "convict": "^6.0.0",
+    "openapi-backend": "^3.5.1",
     "path": "^0.12.7"
   },
   "devDependencies": {
