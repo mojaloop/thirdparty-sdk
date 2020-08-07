@@ -6,7 +6,7 @@
 - [plugins](plugins/README.md) the module with plugins
 - `create.ts` the server instance creation
 - `extensions.ts` the server extensions
-- `run.ts` creates and registers plugins and extensions and finally starts the server
+- `setupAndStart.ts` creates and registers plugins and extensions and finally starts the server
 - `start.ts` to start the server to listening 
 
 simplified usage:
@@ -16,5 +16,5 @@ import { Server } from '@hapi/hapi'
 import config from 'src/shared/config'
 import AuthService from 'src/server'
 
-const runningServer = await AuthService.run(config) 
+const runningServer = await AuthService.setupAndStart(config) 
 ```
