@@ -24,13 +24,10 @@
 import inspect from '../../../src/shared/inspect'
 import config from '../../../src/shared/config'
 import util from 'util'
-
-// const inspectSpy = jest.spyOn(util, 'inspect')
-// jest.mock('util')
+const inspectSpy = jest.spyOn(util, 'inspect')
 
 describe('shared/inspect', (): void => {
   it('should properly call util.inspect', (): void => {
-    const inspectSpy = jest.spyOn(util, 'inspect')
     const result = inspect({})
     expect(result).toEqual('{}')
     expect(inspectSpy).toHaveBeenCalledWith({}, false, 4, true)
@@ -38,12 +35,17 @@ describe('shared/inspect', (): void => {
 
   it('should call util.inspect with defaults', (): void => {
     // remove config.INSPECT so defaults will be used
+    const storeBeforeDelete = config.INSPECT
     delete config.INSPECT
+
     const inspectSpy = jest.spyOn(util, 'inspect')
     const result = inspect({})
 
     expect(config).toBeDefined()
     expect(result).toEqual('{}')
-    expect(inspectSpy).toHaveBeenCalledWith({}, false, 4, true)
+    expect(inspectSpy).toHaveBeenCalledWith({}, false, 5, true)
+
+    // restore INSPECT to not interfere other tests
+    config.INSPECT = storeBeforeDelete
   })
 })
