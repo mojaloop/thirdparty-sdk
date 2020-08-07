@@ -21,16 +21,18 @@
  * Paweł Marzec <pawel.marzec@modusbox.com>
  --------------
  ******/
+import { Server } from '@hapi/hapi'
 import Config from '../../src/shared/config'
 import server from '../../src/server'
-jest.mock('../../src/server')
+const setupAndStartSpy = jest.spyOn(server, 'setupAndStart')
 
 describe('cli', (): void => {
   it('should use default port & host', async (): Promise<void> => {
+    setupAndStartSpy.mockResolvedValue({ Iam: 'mocked-server' } as unknown as Server)
     process.argv = ['cli.ts']
     const cli = await import('../../src/cli')
     expect(cli).toBeDefined()
-    expect(server.run).toHaveBeenCalledWith({
+    expect(server.setupAndStart).toHaveBeenCalledWith({
       ENV: 'test',
       PORT: Config.PORT,
       HOST: Config.HOST,

@@ -44,4 +44,4 @@ config.PORT = parseInt(program.port)
 config.HOST = program.host
 
 // setup & start @hapi server
-ServiceServer.run(config)
+ServiceServer.setupAndStart(config)

@@ -30,14 +30,14 @@ import { Server } from '@hapi/hapi'
 describe('index', (): void => {
   it('should have proper layout', (): void => {
     expect(typeof index.server).toBeDefined()
-    expect(typeof index.server.run).toEqual('function')
+    expect(typeof index.server.setupAndStart).toEqual('function')
   })
 
   describe('api routes', (): void => {
     let server: Server
 
     beforeAll(async (): Promise<Server> => {
-      server = await index.server.run(Config)
+      server = await index.server.setupAndStart(Config)
       return server
     })
 

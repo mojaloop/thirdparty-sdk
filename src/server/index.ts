@@ -24,8 +24,8 @@
  --------------
  ******/
 
-import run from './run'
+import setupAndStart from './setupAndStart'
 
 export default {
-  run
+  setupAndStart
 }

@@ -25,9 +25,10 @@
 
 import { Server } from '@hapi/hapi'
 import Logger from '@mojaloop/central-services-logger'
+import { PACKAGE } from '../shared/config'
 
 export default async function start (server: Server): Promise<Server> {
   await server.start()
-  Logger.info(`auth-service is running @ ${server.info.uri}`)
+  Logger.info(`Service '${PACKAGE.name}' is running @ ${server.info.uri}`)
   return server
 }
