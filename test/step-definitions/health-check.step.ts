@@ -3,7 +3,7 @@ import { loadFeature, defineFeature } from 'jest-cucumber'
 import { Server, ServerInjectResponse } from '@hapi/hapi'
 import Config from '../../src/shared/config'
 
-import AuthService from '../../src/server'
+import Service from '../../src/server'
 
 const apiPath = path.resolve(__dirname, '../../src/interface/api.yaml')
 const featurePath = path.resolve(__dirname, '../features/health-check.scenario.feature')
@@ -20,7 +20,7 @@ defineFeature(feature, (test): void => {
 
   test('Health Check', ({ given, when, then }): void => {
     given('auth-service server', async (): Promise<Server> => {
-      server = await AuthService.setupAndStart(Config, apiPath)
+      server = await Service.setupAndStart(Config, apiPath)
       return server
     })
 
