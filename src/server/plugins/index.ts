@@ -32,8 +32,8 @@ import { Util } from '@mojaloop/central-services-shared'
 import Good from './good'
 import OpenAPI from './openAPI'
 
-async function register (server: Server): Promise<Server> {
-  const openapiBackend = await OpenAPI.initialize()
+async function register (server: Server, apiPath: string): Promise<Server> {
+  const openapiBackend = await OpenAPI.initialize(apiPath)
   const plugins = [
     Util.Hapi.OpenapiBackendValidator,
     Good,
