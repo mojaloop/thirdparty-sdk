@@ -18,64 +18,29 @@
  * Gates Foundation
  - Name Surname <name.surname@gatesfoundation.com>
 
- * Lewis Daly <lewis@vesselstech.com>
  * Paweł Marzec <pawel.marzec@modusbox.com>
  --------------
  ******/
-
-import index from '../../src/index'
-import Config from '../../src/shared/config'
 import { Server } from '@hapi/hapi'
+import Config from '../../src/shared/config'
+import server from '../../src/server'
+const setupAndStartSpy = jest.spyOn(server, 'setupAndStart')
 
-describe('index', (): void => {
-  it('should have proper layout', (): void => {
-    expect(typeof index.server).toBeDefined()
-    expect(typeof index.server.setupAndStart).toEqual('function')
-  })
-
-  describe('api routes', (): void => {
-    let server: Server
-
-    beforeAll(async (): Promise<Server> => {
-      server = await index.server.setupAndStart(Config)
-      return server
-    })
-
-    afterAll(async (done): Promise<void> => {
-      server.events.on('stop', done)
-      await server.stop()
-    })
-
-    it('/health', async (): Promise<void> => {
-      interface HealthResponse {
-        status: string;
-        uptime: number;
-        startTime: string;
-        versionNumber: string;
+describe('cli', (): void => {
+  it('should use default port & host', async (): Promise<void> => {
+    setupAndStartSpy.mockResolvedValue({ Iam: 'mocked-server' } as unknown as Server)
+    process.argv = ['cli.ts']
+    const cli = await import('../../src/cli')
+    expect(cli).toBeDefined()
+    expect(server.setupAndStart).toHaveBeenCalledWith({
+      ENV: 'test',
+      PORT: Config.PORT,
+      HOST: Config.HOST,
+      INSPECT: {
+        DEPTH: 4,
+        SHOW_HIDDEN: false,
+        COLOR: true
       }
-
-      const request = {
-        method: 'GET',
-        url: '/health'
-      }
-
-      const response = await server.inject(request)
-      expect(response.statusCode).toBe(200)
-      expect(response.result).toBeDefined()
-
-      const result = response.result as HealthResponse
-      expect(result.status).toEqual('OK')
-      expect(result.uptime).toBeGreaterThan(1.0)
-    })
-
-    it('/metrics', async (): Promise<void> => {
-      const request = {
-        method: 'GET',
-        url: '/metrics'
-      }
-
-      const response = await server.inject(request)
-      expect(response.statusCode).toBe(200)
     })
   })
 })
