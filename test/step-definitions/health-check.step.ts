@@ -5,7 +5,8 @@ import Config from '../../src/shared/config'
 
 import AuthService from '../../src/server'
 
-const featurePath = path.join(__dirname, '../features/health-check.scenario.feature')
+const apiPath = path.resolve(__dirname, '../../src/interface/api.yaml')
+const featurePath = path.resolve(__dirname, '../features/health-check.scenario.feature')
 const feature = loadFeature(featurePath)
 
 defineFeature(feature, (test): void => {
@@ -19,7 +20,7 @@ defineFeature(feature, (test): void => {
 
   test('Health Check', ({ given, when, then }): void => {
     given('auth-service server', async (): Promise<Server> => {
-      server = await AuthService.setupAndStart(Config)
+      server = await AuthService.setupAndStart(Config, apiPath)
       return server
     })
 

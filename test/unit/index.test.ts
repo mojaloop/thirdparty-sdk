@@ -29,7 +29,7 @@
 import index from '../../src/index'
 import Config from '../../src/shared/config'
 import { Server } from '@hapi/hapi'
-
+import path from 'path'
 describe('index', (): void => {
   it('should have proper layout', (): void => {
     expect(typeof index.server).toBeDefined()
@@ -40,7 +40,8 @@ describe('index', (): void => {
     let server: Server
 
     beforeAll(async (): Promise<Server> => {
-      server = await index.server.setupAndStart(Config)
+      const apiPath = path.resolve(__dirname, '../../src/interface/api.yaml')
+      server = await index.server.setupAndStart(Config, apiPath)
       return server
     })
 

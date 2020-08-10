@@ -33,9 +33,9 @@ import start from './start'
 import extensions from './extensions'
 import plugins from './plugins'
 
-export default async function setupAndStart (config: ServiceConfig): Promise<Server> {
+export default async function setupAndStart (config: ServiceConfig, apiPath: string): Promise<Server> {
   const server = await create(config)
-  await plugins.register(server)
+  await plugins.register(server, apiPath)
   await extensions.register(server)
   await start(server)
   return server

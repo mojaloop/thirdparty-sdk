@@ -25,7 +25,7 @@
  - Paweł Marzec <pawel.marzec@modusbox.com>
  --------------
  ******/
-
+import path from 'path'
 import { Command } from 'commander'
 import config, { PACKAGE } from './shared/config'
 import ServiceServer from './server'
@@ -45,5 +45,6 @@ program
 config.PORT = parseInt(program.port)
 config.HOST = program.host
 
+const apiPath = path.resolve(__dirname, '../src/interface/api.yaml')
 // setup & start @hapi server
-ServiceServer.setupAndStart(config)
+ServiceServer.setupAndStart(config, apiPath)

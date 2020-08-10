@@ -25,6 +25,7 @@
  --------------
  ******/
 import { Server } from '@hapi/hapi'
+import path from 'path'
 import Config from '../../src/shared/config'
 import server from '../../src/server'
 const setupAndStartSpy = jest.spyOn(server, 'setupAndStart')
@@ -44,6 +45,7 @@ describe('cli', (): void => {
         SHOW_HIDDEN: false,
         COLOR: true
       }
-    })
+    },
+    path.resolve(__dirname, '../../src/interface/api.yaml'))
   })
 })
