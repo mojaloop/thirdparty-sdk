@@ -1,9 +1,9 @@
 import path from 'path'
 import { loadFeature, defineFeature } from 'jest-cucumber'
 import { Server, ServerInjectResponse } from '@hapi/hapi'
-import Config from '../../src/shared/config'
+import Config from '~/shared/config'
 
-import Service from '../../src/server'
+import Service from '~/server'
 
 const apiPath = path.resolve(__dirname, '../../src/interface/api.yaml')
 const featurePath = path.resolve(__dirname, '../features/health-check.scenario.feature')

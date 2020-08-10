@@ -1,5 +1,8 @@
 'use strict'
-
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { pathsToModuleNameMapper } = require('ts-jest/utils')
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { compilerOptions } = require('./tsconfig')
 module.exports = {
   verbose: true,
   preset: 'ts-jest',
@@ -16,5 +19,8 @@ module.exports = {
       lines: 90
     }
   },
+  moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, {
+    prefix: '<rootDir>/'
+  }),
   reporters: ['jest-junit', 'default']
 }

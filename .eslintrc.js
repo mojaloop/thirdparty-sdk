@@ -33,7 +33,14 @@ module.exports = {
     'cucumber/expression-type': 2,
     'cucumber/no-restricted-tags': [2, 'wip', 'broken', 'foo'],
     'cucumber/no-arrow-functions': 2,
+    'import/default': 'warn',
+    'import/extensions': 'off',
     'max-len': ["warn", { "code": 120 }]
+  },
+  settings: {
+    "import/resolver": {
+      typescript: {} // this loads <rootdir>/tsconfig.json to eslint
+    },
   },
   overrides: [
     {
@@ -44,6 +51,14 @@ module.exports = {
       rules: {
         '@typescript-eslint/explicit-function-return-type': 'off',
       },
+    },
+    {
+      files: [
+        '*.js'
+      ],
+      rules: {
+        '@typescript-eslint/no-var-requires': 'off',
+      }
     },
   ],
 };

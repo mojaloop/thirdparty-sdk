@@ -25,16 +25,16 @@
  --------------
  ******/
 import { Server } from '@hapi/hapi'
+import Config from '~/shared/config'
+import server from '~/server'
 import path from 'path'
-import Config from '../../src/shared/config'
-import server from '../../src/server'
 const setupAndStartSpy = jest.spyOn(server, 'setupAndStart')
 
 describe('cli', (): void => {
   it('should use default port & host', async (): Promise<void> => {
     setupAndStartSpy.mockResolvedValue({ Iam: 'mocked-server' } as unknown as Server)
     process.argv = ['cli.ts']
-    const cli = await import('../../src/cli')
+    const cli = await import('~/cli')
     expect(cli).toBeDefined()
     expect(server.setupAndStart).toHaveBeenCalledWith({
       ENV: 'test',
