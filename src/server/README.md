@@ -14,7 +14,7 @@ simplified usage:
 ```typescript
 import { Server } from '@hapi/hapi'
 import config from 'src/shared/config'
-import AuthService from 'src/server'
+import Service from 'src/server'
 
-const runningServer = await AuthService.setupAndStart(config) 
+const runningServer = await Service.setupAndStart(config) 
 ```
