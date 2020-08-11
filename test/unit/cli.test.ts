@@ -24,6 +24,7 @@
  * Paweł Marzec <pawel.marzec@modusbox.com>
  --------------
  ******/
+
 import { Server } from '@hapi/hapi'
 import Config from '~/shared/config'
 import server from '~/server'
