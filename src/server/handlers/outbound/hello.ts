@@ -26,22 +26,13 @@
  --------------
  ******/
 
-import { Server } from '@hapi/hapi'
-import { Handler } from 'openapi-backend'
+import { Request, ResponseToolkit, ResponseObject } from '@hapi/hapi'
 
-import create, { ServerConfig } from './create'
-import start from './start'
-import extensions from './extensions'
-import plugins from './plugins'
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function get (_context: any, _request: Request, h: ResponseToolkit): ResponseObject {
+  return h.response({ hello: 'outbound' }).code(200)
+}
 
-export default async function setupAndStart (
-  config: ServerConfig,
-  apiPath: string,
-  handlers: { [handler: string]: Handler }
-): Promise<Server> {
-  const server = await create(config)
-  await plugins.register(server, apiPath, handlers)
-  await extensions.register(server)
-  await start(server)
-  return server
+export default {
+  get
 }

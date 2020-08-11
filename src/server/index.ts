@@ -25,9 +25,9 @@
 
  --------------
  ******/
-
+import Handlers from './handlers'
 import setupAndStart from './setupAndStart'
 
-export default {
-  setupAndStart
-}
+export { Server } from '@hapi/hapi'
+export { ServerConfig } from './create'
+export { Handlers, setupAndStart }

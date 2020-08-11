@@ -18,27 +18,17 @@
  Gates Foundation organization for an example). Those individuals should have
  their names indented and be marked with a '-'. Email address can be added
  optionally within square brackets <email>.
+ * Gates Foundation
 
- - Paweł Marzec <pawel.marzec@modusbox.com>
+ * Paweł Marzec <pawel.marzec@modusbox.com>
 
  --------------
  ******/
-import Boom from '@hapi/boom'
-import { Request, ResponseToolkit } from '@hapi/hapi'
 
-import onValidateFail from '~/server/handlers/onValidateFail'
+import { ResponseToolkit, Request } from '@hapi/hapi'
+import { logResponse, RequestLogged } from '~/shared/logger'
 
-describe('server/handlers/onValidateFail', (): void => {
-  it('should throw error from Boom.boomify', (): void => {
-    const spyBoomify = jest.spyOn(Boom, 'boomify')
-    const err = new Error('sample error')
-    expect((): void => {
-      onValidateFail(
-        null as unknown as Request,
-        null as unknown as ResponseToolkit,
-        err
-      )
-    }).toThrowError(err)
-    expect(spyBoomify).toBeCalledWith(err)
-  })
-})
+export default async function onPreHandler (request: Request, h: ResponseToolkit): Promise<symbol> {
+  logResponse(request as RequestLogged)
+  return h.continue
+}

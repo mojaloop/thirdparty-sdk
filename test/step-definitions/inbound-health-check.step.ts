@@ -29,11 +29,26 @@ import { loadFeature, defineFeature } from 'jest-cucumber'
 import { Server, ServerInjectResponse } from '@hapi/hapi'
 import Config from '~/shared/config'
 
-import Service from '~/server'
+import { ServerConfig } from '~/server/create'
+import { Handlers } from '~/server'
+import index from '~/index'
 
-const apiPath = path.resolve(__dirname, '../../src/interface/api.yaml')
-const featurePath = path.resolve(__dirname, '../features/health-check.scenario.feature')
+const apiPath = path.resolve(__dirname, '../../src/interface/api-inbound.yaml')
+const featurePath = path.resolve(__dirname, '../features/inbound-health-check.scenario.feature')
 const feature = loadFeature(featurePath)
+
+async function prepareInboundAPIServer (): Promise<Server> {
+  const serverConfig: ServerConfig = {
+    port: Config.INBOUND.PORT,
+    host: Config.INBOUND.HOST,
+    api: 'outbound'
+  }
+  const serverHandlers = {
+    ...Handlers.Shared,
+    ...Handlers.Inbound
+  }
+  return index.server.setupAndStart(serverConfig, apiPath, serverHandlers)
+}
 
 defineFeature(feature, (test): void => {
   let server: Server
@@ -45,9 +60,8 @@ defineFeature(feature, (test): void => {
   })
 
   test('Health Check', ({ given, when, then }): void => {
-    given('auth-service server', async (): Promise<Server> => {
-      server = await Service.setupAndStart(Config, apiPath)
-      return server
+    given('Inbound API server', async (): Promise<void> => {
+      server = await prepareInboundAPIServer()
     })
 
     when('I get \'Health Check\' response', async (): Promise<ServerInjectResponse> => {
@@ -70,6 +84,31 @@ defineFeature(feature, (test): void => {
       expect(response.statusCode).toBe(200)
       expect(healthResponse.status).toEqual('OK')
       expect(healthResponse.uptime).toBeGreaterThan(1.0)
+    })
+  })
+
+  test('Hello Check', ({ given, when, then }): void => {
+    given('Inbound API server', async (): Promise<void> => {
+      server = await prepareInboundAPIServer()
+    })
+
+    when('I get \'Hello\' response', async (): Promise<ServerInjectResponse> => {
+      const request = {
+        method: 'GET',
+        url: '/hello'
+      }
+      response = await server.inject(request)
+      return response
+    })
+
+    interface HelloResponse {
+      hello: string;
+    }
+
+    then('The \'hello\' property should be \'inbound\'', (): void => {
+      const healthResponse = response.result as HelloResponse
+      expect(response.statusCode).toBe(200)
+      expect(healthResponse.hello).toEqual('inbound')
     })
   })
 })

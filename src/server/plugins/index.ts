@@ -34,9 +34,14 @@ import ErrorHandling from '@mojaloop/central-services-error-handling'
 import { Util } from '@mojaloop/central-services-shared'
 import Good from './good'
 import OpenAPI from './openAPI'
+import { Handler } from 'openapi-backend'
 
-async function register (server: Server, apiPath: string): Promise<Server> {
-  const openapiBackend = await OpenAPI.initialize(apiPath)
+async function register (
+  server: Server,
+  apiPath: string,
+  handlers: { [handler: string]: Handler }
+): Promise<Server> {
+  const openapiBackend = await OpenAPI.initialize(apiPath, handlers)
   const plugins = [
     Util.Hapi.OpenapiBackendValidator,
     Good,

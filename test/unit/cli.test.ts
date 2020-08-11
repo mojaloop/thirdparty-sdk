@@ -27,26 +27,29 @@
 
 import { Server } from '@hapi/hapi'
 import Config from '~/shared/config'
-import server from '~/server'
+import { Handlers } from '~/server'
+import index from '~/index'
 import path from 'path'
-const setupAndStartSpy = jest.spyOn(server, 'setupAndStart')
+const setupAndStartSpy = jest.spyOn(index.server, 'setupAndStart')
 
 describe('cli', (): void => {
-  it('should use default port & host', async (): Promise<void> => {
+  it('should use default port & host for inbound', async (): Promise<void> => {
     setupAndStartSpy.mockResolvedValue({ Iam: 'mocked-server' } as unknown as Server)
-    process.argv = ['cli.ts']
+    process.argv = ['jest', 'cli.ts', 'inbound']
     const cli = await import('~/cli')
     expect(cli).toBeDefined()
-    expect(server.setupAndStart).toHaveBeenCalledWith({
-      ENV: 'test',
-      PORT: Config.PORT,
-      HOST: Config.HOST,
-      INSPECT: {
-        DEPTH: 4,
-        SHOW_HIDDEN: false,
-        COLOR: true
+    // eslint-disable-next-line import/no-named-as-default-member
+    expect(setupAndStartSpy).toHaveBeenCalledWith(
+      {
+        port: Config.INBOUND.PORT,
+        host: Config.INBOUND.HOST,
+        api: 'inbound'
+      },
+      path.resolve(__dirname, '../../src/interface/api-inbound.yaml'),
+      {
+        ...Handlers.Shared,
+        ...Handlers.Inbound
       }
-    },
-    path.resolve(__dirname, '../../src/interface/api.yaml'))
+    )
   })
 })

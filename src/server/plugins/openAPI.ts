@@ -28,12 +28,15 @@
 
 import { Server, ServerRegisterPluginObject } from '@hapi/hapi'
 import { Util } from '@mojaloop/central-services-shared'
-import Handlers from '../handlers'
+import { Handler } from 'openapi-backend'
 
 const OpenapiBackend = Util.OpenapiBackend
 
+async function initialize (
+  apiPath: string,
+  handlers: { [handler: string]: Handler }
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function initialize (apiPath: string): Promise<ServerRegisterPluginObject<any>> {
+): Promise<ServerRegisterPluginObject<any>> {
   return {
     plugin: {
       name: 'openapi',
@@ -46,7 +49,7 @@ async function initialize (apiPath: string): Promise<ServerRegisterPluginObject<
     options: {
       openapi: await OpenapiBackend.initialise(
         apiPath,
-        Handlers
+        handlers
       )
     }
   }

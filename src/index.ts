@@ -22,8 +22,9 @@
  --------------
  ******/
 
-import server from './server'
-
+import { setupAndStart } from './server'
 export default {
-  server
+  server: {
+    setupAndStart
+  }
 }

@@ -1,8 +1,8 @@
 openapi: 3.0.1
 info:
-  title: Mojaloop SDK PISP Schema Adapter
+  title: Mojaloop Thirdparty Inbound Scheme Adapter
   version: '0.1.0'
-  description: SDK PISP Schema Adapter
+  description: Thirdparty Inbound Scheme Adapter
   license:
     name: Open API for FSP Interoperability (FSPIOP) (Implementation Friendly Version)
 servers: 

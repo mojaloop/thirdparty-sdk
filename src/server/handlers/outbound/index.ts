@@ -25,23 +25,8 @@
 
  --------------
  ******/
+import Hello from './hello'
 
-import { Server } from '@hapi/hapi'
-import { Handler } from 'openapi-backend'
-
-import create, { ServerConfig } from './create'
-import start from './start'
-import extensions from './extensions'
-import plugins from './plugins'
-
-export default async function setupAndStart (
-  config: ServerConfig,
-  apiPath: string,
-  handlers: { [handler: string]: Handler }
-): Promise<Server> {
-  const server = await create(config)
-  await plugins.register(server, apiPath, handlers)
-  await extensions.register(server)
-  await start(server)
-  return server
+export default {
+  HelloGet: Hello.get
 }

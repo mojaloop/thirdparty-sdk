@@ -18,30 +18,27 @@
  Gates Foundation organization for an example). Those individuals should have
  their names indented and be marked with a '-'. Email address can be added
  optionally within square brackets <email>.
- * Gates Foundation
- - Name Surname <name.surname@gatesfoundation.com>
 
  - Paweł Marzec <pawel.marzec@modusbox.com>
 
  --------------
  ******/
+import Boom from '@hapi/boom'
+import { Request, ResponseToolkit } from '@hapi/hapi'
 
-import { Server } from '@hapi/hapi'
-import { Handler } from 'openapi-backend'
+import onValidateFail from '~/server/handlers/shared/onValidateFail'
 
-import create, { ServerConfig } from './create'
-import start from './start'
-import extensions from './extensions'
-import plugins from './plugins'
-
-export default async function setupAndStart (
-  config: ServerConfig,
-  apiPath: string,
-  handlers: { [handler: string]: Handler }
-): Promise<Server> {
-  const server = await create(config)
-  await plugins.register(server, apiPath, handlers)
-  await extensions.register(server)
-  await start(server)
-  return server
-}
+describe('server/handlers/onValidateFail', (): void => {
+  it('should throw error from Boom.boomify', (): void => {
+    const spyBoomify = jest.spyOn(Boom, 'boomify')
+    const err = new Error('sample error')
+    expect((): void => {
+      onValidateFail(
+        null as unknown as Request,
+        null as unknown as ResponseToolkit,
+        err
+      )
+    }).toThrowError(err)
+    expect(spyBoomify).toBeCalledWith(err)
+  })
+})

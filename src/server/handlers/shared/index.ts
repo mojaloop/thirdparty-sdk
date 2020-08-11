@@ -19,16 +19,21 @@
  their names indented and be marked with a '-'. Email address can be added
  optionally within square brackets <email>.
  * Gates Foundation
+ - Name Surname <name.surname@gatesfoundation.com>
 
- * Paweł Marzec <pawel.marzec@modusbox.com>
+ - Paweł Marzec <pawel.marzec@modusbox.com>
 
  --------------
  ******/
+import { Util } from '@mojaloop/central-services-shared'
+import Health from './health'
+import Metrics from './metrics'
+const OpenapiBackend = Util.OpenapiBackend
 
-import { logResponse, RequestLogged } from '../../shared/logger'
-import { ResponseToolkit, Request } from '@hapi/hapi'
-
-export default async function onPreHandler (request: Request, h: ResponseToolkit): Promise<symbol> {
-  logResponse(request as RequestLogged)
-  return h.continue
+export default {
+  HealthGet: Health.get,
+  MetricsGet: Metrics.get,
+  validationFail: OpenapiBackend.validationFail,
+  notFound: OpenapiBackend.notFound,
+  methodNotAllowed: OpenapiBackend.methodNotAllowed
 }

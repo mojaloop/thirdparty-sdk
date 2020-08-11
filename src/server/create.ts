@@ -26,18 +26,30 @@
 
 import { validateRoutes } from '@mojaloop/central-services-error-handling'
 import { Server } from '@hapi/hapi'
-import { ServiceConfig } from '../shared/config'
-import onValidateFail from './handlers/onValidateFail'
+import onValidateFail from './handlers/shared/onValidateFail'
 
-export default async function create (config: ServiceConfig): Promise<Server> {
+export interface ServerConfig {
+  host: string;
+  port: number;
+  api: string; // the api text descriptor, for example 'inbound', 'outbound'
+}
+
+export interface ServerApp {
+  api: string;
+}
+
+export default async function create (config: ServerConfig): Promise<Server> {
   const server: Server = await new Server({
-    host: config.HOST,
-    port: config.PORT,
+    host: config.host,
+    port: config.port,
     routes: {
       validate: {
         options: validateRoutes(),
         failAction: onValidateFail
       }
+    },
+    app: {
+      api: config.api
     }
   })
   return server
