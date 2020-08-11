@@ -1,7 +1,6 @@
 'use strict'
 const { pathsToModuleNameMapper } = require('ts-jest/utils')
 const { compilerOptions } = require('./tsconfig')
-
 module.exports = {
   verbose: true,
   preset: 'ts-jest',
