@@ -1,19 +1,23 @@
 {
   "include": [
     "src",
-    "ambient.d.ts"
+    "test",
+    "ambient.d.ts",
+    "jest.bdd.config.js",
+    "jest.config.js"
   ],
   "exclude": [
     "node_modules",
-    "**/*.spec.ts",
-    "**/*.test.ts",
-    "test",
-    "lib",
+    "dist",
     "coverage"
   ],
   "compilerOptions": {
     "target": "es2018",
     "module": "commonjs",
+    "rootDirs": [
+      "src",
+      "test"
+    ],
     "lib": [
       "esnext"
     ],
@@ -36,9 +40,11 @@
     "moduleResolution": "node",
     "baseUrl": "./",
     "paths": {
-      "*": [
-        "src/*",
-        "node_modules/*"
+      "~/*": [
+        "src/*"
+      ],
+      "test/*": [
+        "test/*"
       ]
     },
     "esModuleInterop": true,

@@ -67,7 +67,6 @@
     "@mojaloop/central-services-metrics": "^9.5.0",
     "@mojaloop/central-services-shared": "^10.6.2",
     "@mojaloop/sdk-standard-components": "^10.6.8",
-    "@types/convict": "^5.2.1",
     "ajv": "^6.12.3",
     "ajv-keywords": "^3.5.2",
     "blipp": "^4.0.1",
@@ -77,6 +76,7 @@
     "path": "^0.12.7"
   },
   "devDependencies": {
+    "@types/convict": "^5.2.1",
     "@types/hapi": "^18.0.3",
     "@types/hapi__hapi": "^19.0.3",
     "@types/hapi__inert": "^5.2.0",
@@ -89,6 +89,7 @@
     "add": "^2.0.6",
     "eslint": "6.8.0",
     "eslint-config-standard": "14.1.1",
+    "eslint-import-resolver-typescript": "^2.2.0",
     "eslint-plugin-cucumber": "^1.4.0",
     "eslint-plugin-import": "2.20.2",
     "eslint-plugin-node": "11.1.0",
