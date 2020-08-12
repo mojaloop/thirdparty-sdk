@@ -31,8 +31,7 @@ import path from 'path'
 
 import index from '~/index'
 import Config from '~/shared/config'
-import { ServerConfig } from '~/server/create'
-import { Handlers } from '~/server'
+import { Handlers, ServerConfig, ServerAPI } from '~/server'
 
 describe('Inbound API routes', (): void => {
   let server: Server
@@ -42,7 +41,7 @@ describe('Inbound API routes', (): void => {
     const serverConfig: ServerConfig = {
       port: Config.OUTBOUND.PORT,
       host: Config.OUTBOUND.HOST,
-      api: 'outbound'
+      api: ServerAPI.outbound
     }
     const serverHandlers = {
       ...Handlers.Shared,

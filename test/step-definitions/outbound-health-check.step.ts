@@ -29,8 +29,7 @@ import { loadFeature, defineFeature } from 'jest-cucumber'
 import { Server, ServerInjectResponse } from '@hapi/hapi'
 import Config from '~/shared/config'
 
-import { ServerConfig } from '~/server/create'
-import { Handlers } from '~/server'
+import { Handlers, ServerAPI, ServerConfig } from '~/server'
 import index from '~/index'
 
 const apiPath = path.resolve(__dirname, '../../src/interface/api-outbound.yaml')
@@ -41,7 +40,7 @@ async function prepareOutboundAPIServer (): Promise<Server> {
   const serverConfig: ServerConfig = {
     port: Config.OUTBOUND.PORT,
     host: Config.OUTBOUND.HOST,
-    api: 'outbound'
+    api: ServerAPI.outbound
   }
   const serverHandlers = {
     ...Handlers.Shared,

@@ -29,7 +29,7 @@ import path from 'path'
 import { Command } from 'commander'
 import { Handler } from 'openapi-backend'
 import { PACKAGE, ConvictConfig } from './shared/config'
-import { ServerConfig, Handlers } from './server'
+import { ServerConfig, Handlers, ServerAPI } from './server'
 import index from './index'
 
 // handle script parameters
@@ -40,7 +40,7 @@ const program = new Command(PACKAGE.name)
  * @param handlers { { [handler: string]: Handler } } dictionary with api handlers, will be joined with Handlers.Shared
  * @returns () => Promise<void> asynchronous commander action to start api
  */
-function mkStartAPI (api: string, handlers: { [handler: string]: Handler }): () => Promise<void> {
+function mkStartAPI (api: ServerAPI, handlers: { [handler: string]: Handler }): () => Promise<void> {
   return async (): Promise<void> => {
     // update config from program parameters,
     // so setupAndStart will know on which PORT/HOST bind the server
@@ -65,8 +65,8 @@ function mkStartAPI (api: string, handlers: { [handler: string]: Handler }): () 
   }
 }
 
-const startInboundAPI = mkStartAPI('inbound', Handlers.Inbound)
-const startOutboundAPI = mkStartAPI('outbound', Handlers.Outbound)
+const startInboundAPI = mkStartAPI(ServerAPI.inbound, Handlers.Inbound)
+const startOutboundAPI = mkStartAPI(ServerAPI.outbound, Handlers.Outbound)
 
 // setup cli program
 program

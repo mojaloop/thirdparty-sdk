@@ -28,14 +28,22 @@ import { validateRoutes } from '@mojaloop/central-services-error-handling'
 import { Server } from '@hapi/hapi'
 import onValidateFail from './handlers/shared/onValidateFail'
 
+// distinguish APIs exposed
+export enum ServerAPI {
+  inbound = 'inbound',
+  outbound = 'outbound'
+}
+// minimal server configuration
 export interface ServerConfig {
   host: string;
   port: number;
-  api: string; // the api text descriptor, for example 'inbound', 'outbound'
+  // the exposed api descriptor
+  api: ServerAPI;
 }
-
+// server app interface accessible in handlers and plugins via settings.app[key]
 export interface ServerApp {
-  api: string;
+  // specify which API is exposed
+  api: ServerAPI;
 }
 
 export default async function create (config: ServerConfig): Promise<Server> {
