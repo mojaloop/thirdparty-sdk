@@ -26,35 +26,13 @@
  --------------
  ******/
 
-import { Server, ServerRegisterPluginObject } from '@hapi/hapi'
-import { Handler } from 'openapi-backend'
-import { Util } from '@mojaloop/central-services-shared'
+import { Request, ResponseObject, ResponseToolkit } from '@hapi/hapi'
 
-const OpenapiBackend = Util.OpenapiBackend
-
-async function initialize (
-  apiPath: string,
-  handlers: { [handler: string]: Handler }
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-): Promise<ServerRegisterPluginObject<any>> {
-  return {
-    plugin: {
-      name: 'openapi',
-      version: '1.0.0',
-      multiple: true,
-      register: function (server: Server, options: {[index: string]: string | object}): void {
-        server.expose('openapi', options.openapi)
-      }
-    },
-    options: {
-      openapi: await OpenapiBackend.initialise(
-        apiPath,
-        handlers
-      )
-    }
-  }
+function get (_context: any, _request: Request, h: ResponseToolkit): ResponseObject {
+  return h.response({ hello: 'outbound' }).code(200)
 }
 
 export default {
-  initialize
+  get
 }

@@ -25,9 +25,9 @@
  --------------
  ******/
 
-import logger from '@mojaloop/central-services-logger'
-import inspect from './inspect'
 import { Request, ResponseObject } from '@hapi/hapi'
+import inspect from './inspect'
+import logger from '@mojaloop/central-services-logger'
 
 interface RequestLogged extends Request {
   response: ResponseLogged;

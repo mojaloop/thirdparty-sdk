@@ -27,58 +27,9 @@
  ******/
 
 import index from '~/index'
-import Config from '~/shared/config'
-import { Server } from '@hapi/hapi'
-
 describe('index', (): void => {
   it('should have proper layout', (): void => {
     expect(typeof index.server).toBeDefined()
     expect(typeof index.server.setupAndStart).toEqual('function')
-  })
-
-  describe('api routes', (): void => {
-    let server: Server
-
-    beforeAll(async (): Promise<Server> => {
-      server = await index.server.setupAndStart(Config)
-      return server
-    })
-
-    afterAll(async (done): Promise<void> => {
-      server.events.on('stop', done)
-      await server.stop()
-    })
-
-    it('/health', async (): Promise<void> => {
-      interface HealthResponse {
-        status: string;
-        uptime: number;
-        startTime: string;
-        versionNumber: string;
-      }
-
-      const request = {
-        method: 'GET',
-        url: '/health'
-      }
-
-      const response = await server.inject(request)
-      expect(response.statusCode).toBe(200)
-      expect(response.result).toBeDefined()
-
-      const result = response.result as HealthResponse
-      expect(result.status).toEqual('OK')
-      expect(result.uptime).toBeGreaterThan(1.0)
-    })
-
-    it('/metrics', async (): Promise<void> => {
-      const request = {
-        method: 'GET',
-        url: '/metrics'
-      }
-
-      const response = await server.inject(request)
-      expect(response.statusCode).toBe(200)
-    })
   })
 })

@@ -24,8 +24,8 @@
  * Paweł Marzec <pawel.marzec@modusbox.com>
  --------------
  ******/
-import inspect from '~/shared/inspect'
 import config from '~/shared/config'
+import inspect from '~/shared/inspect'
 import util from 'util'
 const inspectSpy = jest.spyOn(util, 'inspect')
 

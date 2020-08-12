@@ -1,6 +1,12 @@
 {
-  "PORT": 4005,
-  "HOST": "0.0.0.0",
+  "INBOUND": {
+    "PORT": 4005,
+    "HOST": "0.0.0.0"
+  },
+  "OUTBOUND": {
+    "PORT": 4006,
+    "HOST": "0.0.0.0"
+  },
   "INSPECT": {
     "DEPTH": 4,
     "SHOW_HIDDEN": false,

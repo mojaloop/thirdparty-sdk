@@ -25,36 +25,15 @@
 
  --------------
  ******/
-
-import { Server, ServerRegisterPluginObject } from '@hapi/hapi'
-import { Handler } from 'openapi-backend'
+import Health from './health'
+import Metrics from './metrics'
 import { Util } from '@mojaloop/central-services-shared'
-
 const OpenapiBackend = Util.OpenapiBackend
 
-async function initialize (
-  apiPath: string,
-  handlers: { [handler: string]: Handler }
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-): Promise<ServerRegisterPluginObject<any>> {
-  return {
-    plugin: {
-      name: 'openapi',
-      version: '1.0.0',
-      multiple: true,
-      register: function (server: Server, options: {[index: string]: string | object}): void {
-        server.expose('openapi', options.openapi)
-      }
-    },
-    options: {
-      openapi: await OpenapiBackend.initialise(
-        apiPath,
-        handlers
-      )
-    }
-  }
-}
-
 export default {
-  initialize
+  HealthGet: Health.get,
+  MetricsGet: Metrics.get,
+  validationFail: OpenapiBackend.validationFail,
+  notFound: OpenapiBackend.notFound,
+  methodNotAllowed: OpenapiBackend.methodNotAllowed
 }

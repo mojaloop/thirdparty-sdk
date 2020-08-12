@@ -26,12 +26,14 @@
  --------------
  ******/
 
-import { Server } from '@hapi/hapi'
 import Logger from '@mojaloop/central-services-logger'
 import { PACKAGE } from '../shared/config'
+import { Server } from '@hapi/hapi'
+import { ServerApp } from './create'
 
 export default async function start (server: Server): Promise<Server> {
   await server.start()
-  Logger.info(`Service '${PACKAGE.name}' is running @ ${server.info.uri}`)
+  const serverApp = server.settings.app as ServerApp
+  Logger.info(`Service '${PACKAGE.name}' is running '${serverApp.api} API' @ ${server.info.uri}`)
   return server
 }

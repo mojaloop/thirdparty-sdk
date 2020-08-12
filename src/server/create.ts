@@ -24,20 +24,40 @@
  --------------
  ******/
 
-import { validateRoutes } from '@mojaloop/central-services-error-handling'
 import { Server } from '@hapi/hapi'
-import { ServiceConfig } from '../shared/config'
-import onValidateFail from './handlers/onValidateFail'
+import onValidateFail from './handlers/shared/onValidateFail'
+import { validateRoutes } from '@mojaloop/central-services-error-handling'
 
-export default async function create (config: ServiceConfig): Promise<Server> {
+// distinguish APIs exposed
+export enum ServerAPI {
+  inbound = 'inbound',
+  outbound = 'outbound'
+}
+// minimal server configuration
+export interface ServerConfig {
+  host: string;
+  port: number;
+  // the exposed api descriptor
+  api: ServerAPI;
+}
+// server app interface accessible in handlers and plugins via settings.app[key]
+export interface ServerApp {
+  // specify which API is exposed
+  api: ServerAPI;
+}
+
+export default async function create (config: ServerConfig): Promise<Server> {
   const server: Server = await new Server({
-    host: config.HOST,
-    port: config.PORT,
+    host: config.host,
+    port: config.port,
     routes: {
       validate: {
         options: validateRoutes(),
         failAction: onValidateFail
       }
+    },
+    app: {
+      api: config.api
     }
   })
   return server
