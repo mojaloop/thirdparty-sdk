@@ -35,7 +35,8 @@ module.exports = {
     'cucumber/no-arrow-functions': 2,
     'import/default': 'warn',
     'import/extensions': 'off',
-    'max-len': ["warn", { "code": 120 }]
+    'max-len': ["warn", { "code": 120 }],
+    'sort-imports': 'error'
   },
   settings: {
     "import/resolver": {

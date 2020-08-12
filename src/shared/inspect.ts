@@ -24,8 +24,8 @@
  - Paweł Marzec <pawel.marzec@modusbox.com>
  --------------
  ******/
-import util from 'util'
 import config from './config'
+import util from 'util'
 
 export const defaults = {
   SHOW_HIDDEN: false,

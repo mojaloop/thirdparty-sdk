@@ -26,13 +26,12 @@
  --------------
  ******/
 
-import { Server } from '@hapi/hapi'
-import { Handler } from 'openapi-backend'
-
 import create, { ServerConfig } from './create'
-import start from './start'
+import { Handler } from 'openapi-backend'
+import { Server } from '@hapi/hapi'
 import extensions from './extensions'
 import plugins from './plugins'
+import start from './start'
 
 export default async function setupAndStart (
   config: ServerConfig,

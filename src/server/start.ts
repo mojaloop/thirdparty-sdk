@@ -26,9 +26,9 @@
  --------------
  ******/
 
-import { Server } from '@hapi/hapi'
 import Logger from '@mojaloop/central-services-logger'
 import { PACKAGE } from '../shared/config'
+import { Server } from '@hapi/hapi'
 import { ServerApp } from './create'
 
 export default async function start (server: Server): Promise<Server> {
