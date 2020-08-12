@@ -24,9 +24,9 @@
  --------------
  ******/
 
-import { logResponse, RequestLogged } from '~/shared/logger'
-import logger from '@mojaloop/central-services-logger'
+import { RequestLogged, logResponse } from '~/shared/logger'
 import inspect from '~/shared/inspect'
+import logger from '@mojaloop/central-services-logger'
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 jest.mock('@mojaloop/central-services-logger', () => ({

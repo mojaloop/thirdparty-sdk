@@ -25,9 +25,9 @@
 
  --------------
  ******/
-import { Util } from '@mojaloop/central-services-shared'
 import Health from './health'
 import Metrics from './metrics'
+import { Util } from '@mojaloop/central-services-shared'
 const OpenapiBackend = Util.OpenapiBackend
 
 export default {

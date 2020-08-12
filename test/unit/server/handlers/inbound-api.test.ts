@@ -26,12 +26,11 @@
  --------------
  ******/
 
-import { Server } from '@hapi/hapi'
-import path from 'path'
-
-import index from '~/index'
+import { Handlers, ServerAPI, ServerConfig } from '~/server'
 import Config from '~/shared/config'
-import { Handlers, ServerConfig, ServerAPI } from '~/server'
+import { Server } from '@hapi/hapi'
+import index from '~/index'
+import path from 'path'
 
 describe('Inbound API routes', (): void => {
   let server: Server

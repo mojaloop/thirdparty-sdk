@@ -25,8 +25,8 @@
  --------------
  ******/
 
+import { Lifecycle, Request, ResponseToolkit } from '@hapi/hapi'
 import { boomify } from '@hapi/boom'
-import { Request, Lifecycle, ResponseToolkit } from '@hapi/hapi'
 
 export default function onValidateFail (
   _request: Request,

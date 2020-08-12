@@ -25,16 +25,15 @@
  --------------
  ******/
 
-import Inert from '@hapi/inert'
-import Vision from '@hapi/vision'
-import Blip from 'blipp'
 import { Server, ServerRoute } from '@hapi/hapi'
-
+import Blip from 'blipp'
 import ErrorHandling from '@mojaloop/central-services-error-handling'
-import { Util } from '@mojaloop/central-services-shared'
 import Good from './good'
-import OpenAPI from './openAPI'
 import { Handler } from 'openapi-backend'
+import Inert from '@hapi/inert'
+import OpenAPI from './openAPI'
+import { Util } from '@mojaloop/central-services-shared'
+import Vision from '@hapi/vision'
 
 async function register (
   server: Server,

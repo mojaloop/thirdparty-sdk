@@ -26,9 +26,9 @@
  --------------
  ******/
 
-import Shared from '@mojaloop/central-services-shared'
+import { Request, ResponseObject, ResponseToolkit } from '@hapi/hapi'
 import { PACKAGE } from '../../../shared/config'
-import { Request, ResponseToolkit, ResponseObject } from '@hapi/hapi'
+import Shared from '@mojaloop/central-services-shared'
 
 const healthCheck = new Shared.HealthCheck.HealthCheck(PACKAGE, [])
 

@@ -25,9 +25,9 @@
 
  --------------
  ******/
-import Shared from './shared'
 import Inbound from './inbound'
 import Outbound from './outbound'
+import Shared from './shared'
 
 export default {
   Shared,

@@ -27,8 +27,8 @@
  ******/
 
 import { Server, ServerRegisterPluginObject } from '@hapi/hapi'
-import { Util } from '@mojaloop/central-services-shared'
 import { Handler } from 'openapi-backend'
+import { Util } from '@mojaloop/central-services-shared'
 
 const OpenapiBackend = Util.OpenapiBackend
 

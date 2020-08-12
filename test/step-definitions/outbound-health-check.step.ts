@@ -24,13 +24,12 @@
  --------------
  ******/
 
-import path from 'path'
-import { loadFeature, defineFeature } from 'jest-cucumber'
-import { Server, ServerInjectResponse } from '@hapi/hapi'
-import Config from '~/shared/config'
-
 import { Handlers, ServerAPI, ServerConfig } from '~/server'
+import { Server, ServerInjectResponse } from '@hapi/hapi'
+import { defineFeature, loadFeature } from 'jest-cucumber'
+import Config from '~/shared/config'
 import index from '~/index'
+import path from 'path'
 
 const apiPath = path.resolve(__dirname, '../../src/interface/api-outbound.yaml')
 const featurePath = path.resolve(__dirname, '../features/outbound-health-check.scenario.feature')
