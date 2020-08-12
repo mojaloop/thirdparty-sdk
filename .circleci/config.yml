@@ -476,7 +476,7 @@ workflows:
             - test-unit
             - test-bdd
             - test-coverage
-            - test-integration
+            # - test-integration
             - linting-check
             - vulnerability-check
             - audit-licenses
