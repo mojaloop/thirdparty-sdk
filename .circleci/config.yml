@@ -164,7 +164,7 @@ jobs:
             fi
 
 
-  # TODO: wait4.js & integration tests
+  # TODO: Dockerfile & wait4.js & integration tests
   # test-integration:
   #   executor: default-machine
   #   steps:
@@ -453,7 +453,7 @@ workflows:
           requires:
             - setup
          
-      # TODO: wait4.js & integration scripts
+      # TODO: Dockerfile & wait4.js & integration tests
       # - test-integration:
       #     context: org-global
       #     requires:
@@ -476,6 +476,7 @@ workflows:
             - test-unit
             - test-bdd
             - test-coverage
+            # TODO: Dockerfile & wait4.js & integration tests
             # - test-integration
             - linting-check
             - vulnerability-check
