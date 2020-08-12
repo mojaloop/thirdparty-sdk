@@ -163,6 +163,7 @@ jobs:
                 echo "Not a release (env CIRCLE_BRANCH != 'master'), skipping sending lcov.info to SonarQube."
             fi
 
+
   # TODO: wait4.js & integration tests
   # test-integration:
   #   executor: default-machine
