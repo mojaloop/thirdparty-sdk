@@ -1,0 +1,65 @@
+version: "3.7"
+
+networks:
+  mojaloop-net:
+    name: mojaloop-net
+
+services:
+  inbound-thirdparty-scheme-adapter:
+    container_name: inbound-thirdparty-scheme-adapter
+    build:
+      context: ./
+      dockerfile: ./docker/Dockerfile.Inbound
+    command: sh -c "/opt/inbound-thirdparty-scheme-adapter/wait4/wait4.js inbound-thirdparty-scheme-adapter && npm run start:inbound"
+    volumes:
+      - ./docker/wait4:/opt/inbound-thirdparty-scheme-adapter/wait4
+    environment:
+      - NODE_ENV=test
+    networks:
+      - mojaloop-net
+    ports:
+      - "4005:4005"
+    depends_on:
+      - redis
+    extra_hosts:
+      - "redis:172.17.0.1"
+    healthcheck:
+      test: wget -q http://172.17.0.1:4005/health -O /dev/null || exit 1
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+      interval: 30s
+
+  outbound-thirdparty-scheme-adapter:
+    container_name: outbound-thirdparty-scheme-adapter
+    build:
+      context: ./
+      dockerfile: ./docker/Dockerfile.Outbound
+    command: sh -c "/opt/outbound-thirdparty-scheme-adapter/wait4/wait4.js outbound-thirdparty-scheme-adapter && npm run start:outbound"
+    volumes:
+      - ./docker/wait4:/opt/outbound-thirdparty-scheme-adapter/wait4
+    environment:
+      - NODE_ENV=test
+    networks:
+      - mojaloop-net
+    ports:
+      - "4006:4006"
+    depends_on:
+      - redis
+    extra_hosts:
+      - "redis:172.17.0.1"
+    healthcheck:
+      test: wget -q http://172.17.0.1:4006/health -O /dev/null || exit 1
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+      interval: 30s
+  
+  redis:
+    container_name: redis
+    image: "redis:5.0.4-alpine"
+    networks:
+      - mojaloop-net
+    ports:
+      - "6379:6379"
+    restart: always
