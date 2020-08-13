@@ -18,17 +18,17 @@ module.exports = {
       wait4: [
         {
           description: 'Inbound API',
-          uri: 'inbound-thirdparty-scheme-adapter:4005',
+          uri: 'localhost:4005',
           method: 'ncat'
         },
         {
           description: 'Outbound API',
-          uri: 'outbound-thirdparty-scheme-adapter:4006',
+          uri: 'localhost:4006',
           method: 'ncat'
         },
         {
           description: 'Redis Cache',
-          uri: 'redis:6379',
+          uri: 'localhost:6379',
           method: 'ncat'
         }
       ]
