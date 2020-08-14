@@ -26,7 +26,7 @@
  ******/
 
 import Config from '~/shared/config'
-import { Handlers } from '~/server'
+import Handlers from '~/handlers'
 import { Server } from '@hapi/hapi'
 import index from '~/index'
 import path from 'path'
