@@ -1,20 +1,62 @@
 # Contributing
 
+We strive for stability and security.  
 Pull Requests and contributions in general are welcome as long as  
 they don't compromise those goals and follow the [Mojaloop Contributors Guide](https://docs.mojaloop.io/documentation/contributors-guide/)
 
 ## Code style
-Coding style is `standard` described through the EditorConfig [.editorconfig](./.editorconfig) file and enforced by ESLint through the [.eslintrc.js](./.eslintrc.js) file. 
+Coding style is `standard` described through the EditorConfig [.editorconfig](./.editorconfig) file  
+and enforced by ESLint through the [.eslintrc.js](./.eslintrc.js) file. 
 
-## Pre-commit hooks
+## Code Audit
+There are two `npm script` commands dedicated to code audit:
+
+
+`audit:check` is used to check vulnerability in code dependencies
+```bash
+npm run audit:check
+```
+This command is run as guard in CI/CD pipeline to ensure our code is not vulnerable.
+
+
+`audit:resolve` should be used to resolve audit problems.  
+Generated `audit-resolve.json` file should be committed,  
+elsewhere CI/CD pipeline will stop with error in case of any audit problems.
+```bash
+npm run audit:resolve
+```
+
+## Pre-commit hook
 > Pull Requests with broken code will not be accepted to merge.
 
-Pre-commit hooks are used to reject untested and unlinted code. Before every commit we run `jest run test:unit` and we lint all staged files. If any file is bad formatted or any unit test is broken the commit is rejected.
+Pre-commit hook is used to reject untested and unlinted code.  
+Before every commit we run `npm test` and we lint all staged files.  
+If any file is bad formatted or any unit test is broken the commit is rejected.
 
 In case you need commit broken code use `no-verify` flag
 ```bash
 git commit -m '<your commit message>' --no-verify
 ```
+
+## Pre-push hook
+Pre-push hook is used to reject untested code.  
+It also enforce to have fresh and actual dependencies.  
+Before every push we run `npm test` and `npm run updates:check`  
+In case you need push broken code use `no-verify` flag
+
+## Always fresh code dependencies
+There is a need to have always fresh code dependencies.  
+It is realized by [npm-check-updates](https://github.com/raineorshine/npm-check-updates).  
+```bash
+npm run updates:check
+```
+In case of outdated dependencies run
+```bash
+npm run updates:update
+```
+It will update `package.json`, install all dependencies and regenerate `package-lock.json`.  
+All tests should be run successfully after updating the dependencies.  
+Both package files should be then committed. 
 
 ## Testing
 > All testing scripts are invoked via `npm run test<type>` defined in [package.json](./package.json)
@@ -39,10 +81,12 @@ Unit tests implementation is located in [test/unit](./test/unit) folder
 ```bash
 npm run test:bdd
 ```
-BDD tests are specified using `Gherkin` language and are located in [test/features](./test/features) folder, whereas their mappings to `Jest` tests are located in [test/step-definitions](./test/step-definitions)
+BDD tests are specified using `Gherkin` language and are located in [test/features](./test/features) folder,  
+whereas their mappings to `Jest` tests are located in [test/step-definitions](./test/step-definitions)
 
 ### Integration tests
-> To run locally integration tests there is a need to build and start containers with both API services with their dependencies services: (Redis as a cache & PUB/SUB notification engine). 
+> To run locally integration tests there is a need to build and start containers  
+> with both API services with their dependencies services: (Redis as a cache & PUB/SUB notification engine). 
 
 **Open two terminals.**  
 In first:
@@ -150,5 +194,9 @@ Actual schema is defined in [src/shared/config.ts](./src/shared/config.ts)
 }
 ```
 
-# CI/CD
+## CI/CD
+[![CircleCI](https://circleci.com/gh/mojaloop/thirdparty-scheme-adapter.svg?style=svg)](https://circleci.com/gh/mojaloop/thirdparty-scheme-adapter)
+
 CircleCI pipeline: [https://app.circleci.com/pipelines/github/mojaloop/thirdparty-scheme-adapter](https://app.circleci.com/pipelines/github/mojaloop/thirdparty-scheme-adapter)
+
+

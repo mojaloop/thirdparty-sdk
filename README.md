@@ -44,4 +44,4 @@ This package exemplifies the use of the Mojaloop SDK Standard Components for TLS
   Its responsibility is to transform asynchronous Mojaloop API native interface's set of calls to a synchronous call.
 
 # Contribution
-Read the [CONTRIBUTION.md](./CONTRIBUTION.md) doc
+Read the [contributing.md](./contributing.md) doc
