@@ -1,4 +1,6 @@
-# Changelog: [mojaloop/sdk-pisp-schema-adapter](https://github.com/mojaloop/sdk-pisp-schema-adapter)
+# Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+### [11.0.3](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.0.2...v11.0.3) (2020-08-14)
+
 ### 11.0.2 (2020-08-14)
 
 
