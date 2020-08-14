@@ -8,6 +8,17 @@ they don't compromise those goals and follow the [Mojaloop Contributors Guide](h
 Coding style is `standard` described through the EditorConfig [.editorconfig](./.editorconfig) file  
 and enforced by ESLint through the [.eslintrc.js](./.eslintrc.js) file. 
 
+```bash
+npm run lint
+```
+to validate source code format
+
+## Code release
+```bash
+npm run release
+```
+before pushing changes to remote repository. The [CHANGELOG.md](CHANGELOG.md) file will be generated.
+
 ## Code Audit
 There are two `npm script` commands dedicated to code audit:
 

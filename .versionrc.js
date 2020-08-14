@@ -1,5 +1,5 @@
 module.exports = {
-  header: '# Changelog: [mojaloop/sdk-pisp-schema-adapter](https://github.com/mojaloop/sdk-pisp-schema-adapter)',
+  header: '# Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)',
   types: [
     { type: 'feat', section: 'Features' },
     { type: 'fix', section: 'Bug Fixes' },
