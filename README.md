@@ -1,41 +1,47 @@
-# Typescript Project Template
-[![Git Commit](https://img.shields.io/github/last-commit/mojaloop/sdk-pisp-schema-adapter.svg?style=flat)](https://github.com/mojaloop/sdk-pisp-schema-adapter/commits/master)
-[![Git Releases](https://img.shields.io/github/release/mojaloop/sdk-pisp-schema-adapter.svg?style=flat)](https://github.com/mojaloop/sdk-pisp-schema-adapter/releases)
-[![Npm Version](https://img.shields.io/npm/v/@mojaloop/sdk-pisp-schema-adapter.svg?style=flat)](https://www.npmjs.com/package/@mojaloop/sdk-pisp-schema-adapter)
-[![NPM Vulnerabilities](https://img.shields.io/snyk/vulnerabilities/npm/@mojaloop/sdk-pisp-schema-adapter.svg?style=flat)](https://www.npmjs.com/package/@mojaloop/sdk-pisp-schema-adapter)
-[![CircleCI](https://circleci.com/gh/mojaloop/sdk-pisp-schema-adapter.svg?style=svg)](https://circleci.com/gh/mojaloop/sdk-pisp-schema-adapter)
+# Mojaloop ThirdParty Scheme Adapter
+[![Git Commit](https://img.shields.io/github/last-commit/mojaloop/thirdparty-scheme-adapter.svg?style=flat)](https://github.com/mojaloop/thirdparty-scheme-adapter/commits/master)
+[![Git Releases](https://img.shields.io/github/release/mojaloop/thirdparty-scheme-adapter.svg?style=flat)](https://github.com/mojaloop/thirdparty-scheme-adapter/releases)
+[![CircleCI](https://circleci.com/gh/mojaloop/thirdparty-scheme-adapter.svg?style=svg)](https://circleci.com/gh/mojaloop/thirdparty-scheme-adapter)
 
-A project template for new mojaloop services and libraries that uses Typescript.
+> This package provides a ThirdParty (PISP) scheme adapter that interfaces between a Mojaloop API compliant switch and a ThirdParty backend platform that does not natively implement the Mojaloop API.
 
-## Setup
+The API between the scheme adapter and the ThirdParty backend is synchronous HTTP while the interface between the scheme adapter and the switch is native Mojaloop API.
 
-This project provides a decent starting point for a new mojaloop library using typescript.
-
-<!-- TODO: add setup steps for this repo -->
-1. Go to https://github.com/new to create a new repo
-2. Select the "mojaloop/template-typescript-public" template
-3. Find and replace all instances of `sdk-pisp-schema-adapter` globally across the whole project with your new project's name 
-4. Update the package name and version to match in `package.json`:
-```json
-  "name": "@mojaloop/repo-name",
-  "version": "0.1.0", 
-  ...
-```
-
-5. Copy the necessary circle ci config from the templates.
-
-If the project is a **Library**:
-
-```bash
-cp ./.circleci/config.example.library.yml ./.circleci/config.yml
-rm -f ./.circleci/config.example.*
-```
-
-If the project is a **Service**:
-
-```bash
-cp ./.circleci/config.example.service.yml ./.circleci/config.yml
-rm -f ./.circleci/config.example.*
-```
+This package exemplifies the use of the Mojaloop SDK Standard Components for TLS, JWS and ILP and is should be use together with [mojaloop/sdk-scheme-adapter](https://github.com/mojaloop/sdk-scheme-adapter)
 
 
+## Quick Start
+> The steps shown below illustrate setting up the Mojaloop ThirdParty Scheme Adapter locally and how to run Inbound  and Outbound API services listening on `localhost`
+
+1. Clone repo
+   ```bash
+   git clone git@github.com:mojaloop/thirdparty-api-adapter.git
+   ```
+2. Install dependencies
+   ```bash
+   npm install
+   ```
+3. Start Inbound API server 
+   ```bash
+   npm run start:inbound
+   ```
+    then visit in your web browser http://localhost:4005/health
+4. Start Outbound API server
+   ```bash
+   npm run start:outbound
+   ```
+    then visit in your web browser http://localhost:4006/health
+
+## Inbound & Outbound API
+> This package delivers implementation Inbound and Outbound API services which will be used by ThirdParty to integrate with `Mojaloop Switch`
+
+### Inbound API
+  `Inbound API` service is called by `Mojaloop Switch`.  
+  Its responsibility is to forward calls to `ThirdParty Backend` or help to deliver synchronous response for calls initiated by `ThirdParty backend` on `Outbound API`
+
+### Outbound API
+  `Outbound API` service is used by `ThirdParty backend` to make a call to `Mojaloop Switch`  
+  Its responsibility is to transform asynchronous Mojaloop API native interface's set of calls to a synchronous call.
+
+# Contribution
+Read the [CONTRIBUTION.md](./CONTRIBUTION.md) doc

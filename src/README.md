@@ -1,14 +1,16 @@
-# sdk-pisp-scheme-adapter/src #
+# thirdparty-scheme-adapter/src #
 > all tests are located in [/test](../test/README.md) folder
 
 ## Source Code layout ##
 
-- `src/` _sdk-pisp-schema-adapter_ dedicated Typescript source code.
+- `src/` _sdk-pisp-scheme-adapter_ dedicated Typescript source code.
   > there is one extra file kept outside! : `/ambient.d.ts`. More info about below.
 
 - `src/interface` is where the OpenAPI v3 definitions reside
 - `src/domain` is used to separate business logic
 - `src/model` is used to separate the data model code
+- [`handlers`](handlers/README.md) the module with resource handlers
+
 - `src/server` the HTTP @hapi server setup 
   > [/src/server/README.md](server/README.md)
 - `src/shared` all utilities and helper code 
@@ -17,7 +19,7 @@
 ## sdk-pisp-schema-adapter command line interface CLI
 
 ### Separation of concerns
-The purpose of creating `/src/cli.ts` is the separation of sdk-pisp-schema-adapter management from @hapi server setup. 
+The purpose of creating `/src/cli.ts` is the separation of thirdparty-scheme-adapter management from @hapi server setup. 
 
 
 ### Parameters
@@ -39,4 +41,4 @@ there is a need to specify module declarations.
 
 The perfect solution would be to request a dependency module maintainers to deliver `.d.ts` declaration files. 
 
-Instead, to unlock the use of these dependencies, we have the special `/ambient.d.ts` file where we can keep temporary module declarations. This file intentionally is kept outside the main source code folder, so we don't pollute _sdk-pisp-schema-adapter_ source code with this temporary workaround.
+Instead, to unlock the use of these dependencies, we have the special `/ambient.d.ts` file where we can keep temporary module declarations. This file intentionally is kept outside the main source code folder, so we don't pollute _thirdparty-scheme-adapter_ source code with this temporary workaround.

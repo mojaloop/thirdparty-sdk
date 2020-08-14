@@ -2,7 +2,6 @@
 [@hapi](https://hapi.dev/) server setup
 
 
-- [handlers](handlers/README.md) the module with resource handlers
 - [plugins](plugins/README.md) the module with plugins
 - `create.ts` the server instance creation
 - `extensions.ts` the server extensions
