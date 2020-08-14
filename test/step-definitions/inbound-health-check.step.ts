@@ -24,10 +24,11 @@
  --------------
  ******/
 
-import { Handlers, ServerAPI, ServerConfig } from '~/server'
 import { Server, ServerInjectResponse } from '@hapi/hapi'
+import { ServerAPI, ServerConfig } from '~/server'
 import { defineFeature, loadFeature } from 'jest-cucumber'
 import Config from '~/shared/config'
+import Handlers from '~/handlers'
 import index from '~/index'
 import path from 'path'
 

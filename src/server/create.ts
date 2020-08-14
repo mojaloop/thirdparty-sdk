@@ -25,7 +25,7 @@
  ******/
 
 import { Server } from '@hapi/hapi'
-import onValidateFail from './handlers/shared/onValidateFail'
+import onValidateFail from '~/handlers/shared/onValidateFail'
 import { validateRoutes } from '@mojaloop/central-services-error-handling'
 
 // distinguish APIs exposed

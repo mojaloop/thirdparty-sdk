@@ -36,7 +36,7 @@ describe('Inbound API routes', (): void => {
   let server: Server
 
   beforeAll(async (): Promise<void> => {
-    const apiPath = path.resolve(__dirname, '../../../../src/interface/api-inbound.yaml')
+    const apiPath = path.resolve(__dirname, '../../../src/interface/api-inbound.yaml')
     const serverConfig: ServerConfig = {
       port: Config.INBOUND.PORT,
       host: Config.INBOUND.HOST,

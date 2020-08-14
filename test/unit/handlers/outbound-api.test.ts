@@ -26,8 +26,9 @@
  --------------
  ******/
 
-import { Handlers, ServerAPI, ServerConfig } from '~/server'
+import { ServerAPI, ServerConfig } from '~/server'
 import Config from '~/shared/config'
+import Handlers from '~/handlers'
 import { Server } from '@hapi/hapi'
 import index from '~/index'
 import path from 'path'
@@ -36,7 +37,7 @@ describe('Inbound API routes', (): void => {
   let server: Server
 
   beforeAll(async (): Promise<void> => {
-    const apiPath = path.resolve(__dirname, '../../../../src/interface/api-outbound.yaml')
+    const apiPath = path.resolve(__dirname, '../../../src/interface/api-outbound.yaml')
     const serverConfig: ServerConfig = {
       port: Config.OUTBOUND.PORT,
       host: Config.OUTBOUND.HOST,

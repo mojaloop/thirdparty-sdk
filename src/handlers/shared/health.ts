@@ -18,27 +18,36 @@
  Gates Foundation organization for an example). Those individuals should have
  their names indented and be marked with a '-'. Email address can be added
  optionally within square brackets <email>.
+ * Gates Foundation
+ - Name Surname <name.surname@gatesfoundation.com>
 
  - Paweł Marzec <pawel.marzec@modusbox.com>
 
  --------------
  ******/
-import Boom from '@hapi/boom'
-import { Request, ResponseToolkit } from '@hapi/hapi'
 
-import onValidateFail from '~/server/handlers/shared/onValidateFail'
+import { Request, ResponseObject, ResponseToolkit } from '@hapi/hapi'
+import { PACKAGE } from '~/shared/config'
+import Shared from '@mojaloop/central-services-shared'
 
-describe('server/handlers/onValidateFail', (): void => {
-  it('should throw error from Boom.boomify', (): void => {
-    const spyBoomify = jest.spyOn(Boom, 'boomify')
-    const err = new Error('sample error')
-    expect((): void => {
-      onValidateFail(
-        null as unknown as Request,
-        null as unknown as ResponseToolkit,
-        err
-      )
-    }).toThrowError(err)
-    expect(spyBoomify).toBeCalledWith(err)
-  })
-})
+const healthCheck = new Shared.HealthCheck.HealthCheck(PACKAGE, [])
+
+/**
+ * Operations on /health
+ */
+
+/**
+ * summary: Get Server
+ * description: The HTTP request GET /health is used to return the current status of the API.
+ * parameters:
+ * produces: application/json
+ * responses: 200, 400, 401, 403, 404, 405, 406, 501, 503
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const get = async (_context: any, _request: Request, h: ResponseToolkit): Promise<ResponseObject> => {
+  return h.response(await healthCheck.getHealth()).code(200)
+}
+
+export default {
+  get
+}

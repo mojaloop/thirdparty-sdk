@@ -25,7 +25,7 @@
 
  --------------
  ******/
-import Handlers from './handlers'
+import Handlers from '~/handlers'
 import setupAndStart from './setupAndStart'
 
 export { Server } from '@hapi/hapi'

@@ -25,9 +25,9 @@
  --------------
  ******/
 
-import { Server } from '@hapi/hapi'
 import Config from '~/shared/config'
-import { Handlers } from '~/server'
+import Handlers from '~/handlers'
+import { Server } from '@hapi/hapi'
 import index from '~/index'
 import path from 'path'
 const setupAndStartSpy = jest.spyOn(index.server, 'setupAndStart')

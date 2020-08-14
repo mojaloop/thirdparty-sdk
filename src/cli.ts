@@ -25,12 +25,13 @@
  - Paweł Marzec <pawel.marzec@modusbox.com>
  --------------
  ******/
-import path from 'path'
+import { ConvictConfig, PACKAGE } from '~/shared/config'
+import { ServerAPI, ServerConfig } from '~/server'
 import { Command } from 'commander'
 import { Handler } from 'openapi-backend'
-import { PACKAGE, ConvictConfig } from './shared/config'
-import { ServerConfig, Handlers, ServerAPI } from './server'
+import Handlers from '~/handlers'
 import index from './index'
+import path from 'path'
 
 // handle script parameters
 const program = new Command(PACKAGE.name)
