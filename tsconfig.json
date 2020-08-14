@@ -4,7 +4,8 @@
     "test",
     "ambient.d.ts",
     "jest.bdd.config.js",
-    "jest.config.js"
+    "jest.config.js",
+    "jest.integration.config.js"
   ],
   "exclude": [
     "node_modules",
