@@ -36,15 +36,15 @@ describe('Inbound API routes', (): void => {
   let server: Server
 
   beforeAll(async (): Promise<void> => {
-    const apiPath = path.resolve(__dirname, '../../../../src/interface/api-outbound.yaml')
+    const apiPath = path.resolve(__dirname, '../../../src/interface/api-inbound.yaml')
     const serverConfig: ServerConfig = {
-      port: Config.OUTBOUND.PORT,
-      host: Config.OUTBOUND.HOST,
-      api: ServerAPI.outbound
+      port: Config.INBOUND.PORT,
+      host: Config.INBOUND.HOST,
+      api: ServerAPI.inbound
     }
     const serverHandlers = {
       ...Handlers.Shared,
-      ...Handlers.Outbound
+      ...Handlers.Inbound
     }
     server = await index.server.setupAndStart(serverConfig, apiPath, serverHandlers)
   })
@@ -95,7 +95,7 @@ describe('Inbound API routes', (): void => {
     const response = await server.inject(request)
     expect(response.statusCode).toBe(200)
     expect(JSON.parse(response.payload)).toEqual({
-      hello: 'outbound'
+      hello: 'inbound'
     })
   })
 })
