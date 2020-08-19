@@ -42,7 +42,7 @@ async function initialize (
       name: 'openapi',
       version: '1.0.0',
       multiple: true,
-      register: function (server: Server, options: {[index: string]: string | object}): void {
+      register: function (server: Server, options: {[index: string]: string | Record<string, unknown>}): void {
         server.expose('openapi', options.openapi)
       }
     },
