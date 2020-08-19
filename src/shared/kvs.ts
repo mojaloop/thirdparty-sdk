@@ -28,16 +28,34 @@
 import { RedisConnection } from './redis-connection'
 import { promisify } from 'util'
 
+export class InvalidKeyError extends Error {
+  constructor () {
+    super('key should be non empty string')
+  }
+
+  static throwIfInvalid (key: string): void {
+    if (!(key?.length > 0)) {
+      throw new InvalidKeyError()
+    }
+  }
+}
+
 export class KVS extends RedisConnection {
   async get<T> (key: string): Promise<T|null> {
+    InvalidKeyError.throwIfInvalid(key)
+
     const asyncGet = promisify(this.client.get)
     const value: string | null = await asyncGet.call(this.client, key)
-    return (value == null) || JSON.parse(value)
+
+    return (value == null) ? value : JSON.parse(value)
   }
 
   async set<T> (key: string, value: T): Promise<boolean> {
+    InvalidKeyError.throwIfInvalid(key)
+
     const asyncSet = promisify(this.client.set)
-    const jsonifed = JSON.stringify(value)
-    return asyncSet.call(this.client, key, jsonifed) as Promise<boolean>
+    const stringified = JSON.stringify(value)
+
+    return asyncSet.call(this.client, key, stringified) as Promise<boolean>
   }
 }
