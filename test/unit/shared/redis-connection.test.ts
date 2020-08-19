@@ -26,10 +26,9 @@
  ******/
 
 import {
-  AlreadyConnectedError,
-  NotConnectedError,
   RedisConnection,
-  RedisConnectionConfig
+  RedisConnectionConfig,
+  RedisConnectionError
 } from '~/shared/redis-connection'
 
 import mockLogger from '../mockLogger'
@@ -57,17 +56,10 @@ describe('RedisConnection', () => {
     expect(config.logger.info).toBeCalledWith(`Connected to REDIS at: ${config.host}:${config.port}`)
   })
 
-  it('should throw if trying to connect when already connected', async (): Promise<void> => {
-    const redis = new RedisConnection(config)
-    await redis.connect()
-    expect(redis.isConnected).toBeTruthy()
-    expect(redis.connect()).rejects.toEqual(new AlreadyConnectedError(config.port, config.host))
-  })
-
   it('should throw if trying to access \'client\' property when not connected ', async (): Promise<void> => {
     const redis = new RedisConnection(config)
     expect(redis.isConnected).toBeFalsy()
-    expect(() => redis.client).toThrowError(new NotConnectedError(config.port, config.host))
+    expect(() => redis.client).toThrowError(new RedisConnectionError(config.port, config.host))
   })
 
   it('should disconnect when connected', async (): Promise<void> => {

@@ -34,14 +34,11 @@ export class RedisConnectionError extends Error {
   public readonly port: number
 
   constructor (port: number, host: string) {
-    super()
+    super(`can not connect to ${host}:${port}`)
     this.host = host
     this.port = port
   }
 }
-
-export class AlreadyConnectedError extends RedisConnectionError {}
-export class NotConnectedError extends RedisConnectionError {}
 
 export interface RedisConnectionConfig {
   host: string;
@@ -60,7 +57,7 @@ export class RedisConnection {
 
   get client (): RedisClient {
     if (!this.isConnected) {
-      throw new NotConnectedError(this.port, this.host)
+      throw new RedisConnectionError(this.port, this.host)
     }
     return this.redisClient
   }
@@ -82,18 +79,26 @@ export class RedisConnection {
   }
 
   async connect (): Promise<void> {
+    // do nothing if already connected
     if (this.isConnected) {
-      return Promise.reject(new AlreadyConnectedError(this.port, this.host))
+      return
     }
+
+    // connect to redis
     this.redisClient = await this.createClient()
   }
 
   async disconnect (): Promise<void> {
+    // do nothing if already disconnected
     if (!this.isConnected) {
       return
     }
+
+    // disconnect from redis
     const asyncQuit = promisify(this.client.quit)
     await asyncQuit.call(this.client)
+
+    // cleanup
     this.redisClient = null as unknown as RedisClient
   }
 
@@ -103,7 +108,7 @@ export class RedisConnection {
 
       client.on('error', (err) => {
         this.logger.push({ err })
-        this.logger.error('Error from REDIS client getting subscriber')
+        this.logger.error('Error from REDIS client')
         return reject(err)
       })
 
