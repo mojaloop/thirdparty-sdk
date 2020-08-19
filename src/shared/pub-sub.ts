@@ -54,22 +54,28 @@ export class InvalidChannelNameError extends Error {
   }
 }
 
-export type Message = Record<string, unknown>
+// Message is send via redis publish to NotificationCallbacks
+// Message should fully survive the JSON stringify/parse cycle
+export type Message = string | number | Record<string, unknown>
+
+// NotificationCallback handles the Message
 export type NotificationCallback = (channel: string, message: Message, id: number) => void
 
 export class PubSub extends RedisConnection {
+  // map where channels with registered notification callbacks are kept
   private callbacks = new Map<string, Map<number, NotificationCallback>>()
+
+  // counter used to generate callback registration id
   private callbackId = 0
 
+  // overload RedisConnection.connect to add listener on messages
   async connect (): Promise<void> {
     await super.connect()
-    this.client.on('message', this.broadcastNotification.bind(this))
+    this.client.on('message', this.broadcastMessage.bind(this))
   }
 
-  protected broadcastNotification (channel: string, stringified: string): void {
-    // deserialize message
-    const message: Message = JSON.parse(stringified)
-
+  // realize message broadcast over the channel to all registered notification callbacks
+  protected broadcastMessage (channel: string, stringified: string): void {
     const callbacksForChannel = this.callbacks.get(channel)
 
     // do nothing if channel doesn't exist
@@ -77,16 +83,22 @@ export class PubSub extends RedisConnection {
       return
     }
 
+    // deserialize Message
+    // it is 'publish' duty to always send to channel well serialized Messages
+    const message: Message = JSON.parse(stringified)
+
     // broadcast message by calling all callbacks
     callbacksForChannel.forEach(
       (callback: NotificationCallback, id: number): void => callback(channel, message, id)
     )
   }
 
+  // generate next callback id to be used as reference for unregister
   get nextCallbackId (): number {
     return ++this.callbackId
   }
 
+  // subscribe notification callback to message channel
   subscribe (channel: string, callback: NotificationCallback): number {
     InvalidChannelNameError.throwIfInvalid(channel)
 
@@ -111,6 +123,7 @@ export class PubSub extends RedisConnection {
     return id
   }
 
+  // unsubscribe from channel the notification callback for given callbackId reference
   unsubscribe (channel: string, callbackId: number): void {
     // input parameters validation
     InvalidChannelNameError.throwIfInvalid(channel)
@@ -131,11 +144,14 @@ export class PubSub extends RedisConnection {
     callbacksForChannel.delete(callbackId)
   }
 
+  // publish a message to the given channel
+  // Message should fully survive the JSON stringify/parse cycle
   async publish (channel: string, message: Message): Promise<void> {
     InvalidChannelNameError.throwIfInvalid(channel)
 
-    const jsonified = JSON.stringify(message)
+    // serialized Messages should be properly deserialized by broadcastMessage
+    const stringified = JSON.stringify(message)
     const asyncPublish = promisify(this.client.publish)
-    await asyncPublish.call(this.client, channel, jsonified)
+    await asyncPublish.call(this.client, channel, stringified)
   }
 }
