@@ -45,7 +45,7 @@ describe('RedisConnection', () => {
     logger: mockLogger()
   }
 
-  beforeEach(() => jest.restoreAllMocks())
+  beforeEach(() => jest.resetAllMocks())
 
   it('should be well constructed', () => {
     const redis = new RedisConnection(config)
