@@ -56,6 +56,7 @@ export class RedisConnection {
   }
 
   get client (): RedisClient {
+    // protect against any attempt to work with not connected redis client
     if (!this.isConnected) {
       throw new RedisConnectionError(this.port, this.host)
     }
@@ -104,16 +105,43 @@ export class RedisConnection {
 
   private async createClient (): Promise<RedisClient> {
     return new Promise((resolve, reject) => {
+      // the newly created redis client
       const client = createClient(this.port, this.host)
 
+      // flags to protect against multiple reject/resolve
+      let rejectCalled = false
+      let resolveCalled = false
+
+      // let listen on all redis errors and log them
       client.on('error', (err) => {
         this.logger.push({ err })
         this.logger.error('Error from REDIS client')
+
+        // do nothing if promise already resolved or rejected
+        if (rejectCalled || resolveCalled) {
+          return
+        }
+
+        // remember that we reject the promise
+        rejectCalled = true
+
+        // do rejection only one
         return reject(err)
       })
 
+      // let listen on ready message and resolve promise only one
       client.on('ready', () => {
         this.logger.info(`Connected to REDIS at: ${this.host}:${this.port}`)
+
+        // do nothing if promise already resolved or rejected
+        if (rejectCalled || resolveCalled) {
+          return
+        }
+
+        // remember we resolve the promise
+        resolveCalled = true
+
+        // do resolve
         return resolve(client)
       })
     })
