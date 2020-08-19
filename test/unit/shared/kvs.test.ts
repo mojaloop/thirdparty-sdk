@@ -26,7 +26,7 @@
  ******/
 
 import { Callback } from 'redis'
-import { KVS } from '~/shared/kvs'
+import { InvalidKeyError, KVS } from '~/shared/kvs'
 import { RedisConnectionConfig } from '~/shared/redis-connection'
 import mockLogger from '../mockLogger'
 jest.mock('redis')
@@ -58,29 +58,89 @@ describe('KVS: Key Value Storage', () => {
         return true
       }
     )
-    const result: Record<string, string> | null = await kvs.get('the-key')
+    const result: Record<string, string> | undefined = await kvs.get('the-key')
     expect(result).toEqual({ am: 'the-value' })
     expect(getSpy).toBeCalledTimes(1)
     expect(getSpy.mock.calls[0][0]).toEqual('the-key')
+  })
+
+  it('should validate empty key for GET', async (): Promise<void> => {
+    const kvs = new KVS(config)
+    await kvs.connect()
+    try {
+      await kvs.get('')
+    } catch (error) {
+      expect(error).toEqual(new InvalidKeyError())
+    }
+  })
+
+  it('should validate invalid key for GET', async (): Promise<void> => {
+    const kvs = new KVS(config)
+    await kvs.connect()
+    try {
+      await kvs.get(null as unknown as string)
+    } catch (error) {
+      expect(error).toEqual(new InvalidKeyError())
+    }
+  })
+
+  it('should return undefined if there is no value for key', async (): Promise<void> => {
+    const kvs = new KVS(config)
+    await kvs.connect()
+
+    // simulate returning null from kvs.client.get
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    kvs.client.get = jest.fn((key, cb) => cb(null, null))
+    const result = await kvs.get('not-existing-key')
+    expect(result).toBeUndefined()
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    expect(kvs.client.get.mock.calls[0][0]).toEqual('not-existing-key')
   })
 
   it('should SET value', async (): Promise<void> => {
     const kvs = new KVS(config)
     await kvs.connect()
 
-    const setSpy = jest.spyOn(kvs.client, 'set').mockImplementationOnce(
-      (_key: string, _value: string, mode: string, _duration: number, _flag: string, _cb?: Callback<'OK' | undefined>): boolean => {
-        if (mode) {
-          const ccb = mode as unknown as Callback<'OK' | undefined>
-          ccb(null, 'OK')
-        }
-        return true
+    const setSpy = jest.spyOn(kvs.client, 'set').mockImplementationOnce((
+      _key: string,
+      _value: string,
+      mode: string,
+      _duration: number,
+      _flag: string,
+      _cb?: Callback<'OK' | undefined>
+    ): boolean => {
+      if (mode) {
+        const ccb = mode as unknown as Callback<'OK' | undefined>
+        ccb(null, 'OK')
       }
-    )
+      return true
+    })
     const result = await kvs.set('the-key', { am: 'the-value' })
     expect(result).toEqual('OK')
     expect(setSpy).toBeCalledTimes(1)
     expect(setSpy.mock.calls[0][0]).toEqual('the-key')
     expect(setSpy.mock.calls[0][1]).toEqual(JSON.stringify({ am: 'the-value' }))
+  })
+
+  it('should validate empty key empty for SET', async (): Promise<void> => {
+    const kvs = new KVS(config)
+    await kvs.connect()
+    try {
+      await kvs.set('', true)
+    } catch (error) {
+      expect(error).toEqual(new InvalidKeyError())
+    }
+  })
+
+  it('should validate invalid key for SET', async (): Promise<void> => {
+    const kvs = new KVS(config)
+    await kvs.connect()
+    try {
+      await kvs.set(null as unknown as string, true)
+    } catch (error) {
+      expect(error).toEqual(new InvalidKeyError())
+    }
   })
 })
