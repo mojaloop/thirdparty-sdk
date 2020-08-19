@@ -58,7 +58,7 @@ export class InvalidChannelNameError extends Error {
 
 // Message is send via redis publish to NotificationCallbacks
 // Message should fully survive the JSON stringify/parse cycle
-export type Message = string | number | Record<string, unknown>
+export type Message = string | number | boolean | Record<string, unknown>
 
 // NotificationCallback handles the Message
 export type NotificationCallback = (channel: string, message: Message, id: number) => void
@@ -127,7 +127,7 @@ export class PubSub extends RedisConnection {
   }
 
   // unsubscribe from channel the notification callback for given callbackId reference
-  unsubscribe (channel: string, callbackId: number): void {
+  unsubscribe (channel: string, callbackId: number): boolean {
     // input parameters validation
     InvalidChannelNameError.throwIfInvalid(channel)
     InvalidCallbackIdError.throwIfInvalid(callbackId)
@@ -135,16 +135,17 @@ export class PubSub extends RedisConnection {
     // do nothing if there is no channel
     const callbacksForChannel = this.callbacks.get(channel)
     if (!callbacksForChannel) {
-      return
+      return false
     }
 
     // do nothing if there is no callback for registration id
     if (!callbacksForChannel.has(callbackId)) {
-      return
+      return false
     }
 
     // unregister callback
     callbacksForChannel.delete(callbackId)
+    return true
   }
 
   // publish a message to the given channel
