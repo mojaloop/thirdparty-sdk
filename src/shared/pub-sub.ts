@@ -61,6 +61,7 @@ export type Message = string | number | Record<string, unknown>
 // NotificationCallback handles the Message
 export type NotificationCallback = (channel: string, message: Message, id: number) => void
 
+// PubSub class delivers Message broadcast via Redis PUB/SUB mechanism to registered NotificationHandlers
 export class PubSub extends RedisConnection {
   // map where channels with registered notification callbacks are kept
   private callbacks = new Map<string, Map<number, NotificationCallback>>()
@@ -94,7 +95,7 @@ export class PubSub extends RedisConnection {
   }
 
   // generate next callback id to be used as reference for unregister
-  get nextCallbackId (): number {
+  protected get nextCallbackId (): number {
     return ++this.callbackId
   }
 
