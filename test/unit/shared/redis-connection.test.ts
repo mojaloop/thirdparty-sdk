@@ -26,11 +26,15 @@
  ******/
 
 import {
+  InvalidHostError,
+  InvalidLoggerError,
+  InvalidPortError,
   RedisConnection,
   RedisConnectionConfig,
   RedisConnectionError
 } from '~/shared/redis-connection'
-
+import { Logger as WinstonLogger } from 'winston'
+import Redis from 'redis'
 import mockLogger from '../mockLogger'
 jest.mock('redis')
 
@@ -41,6 +45,8 @@ describe('RedisConnection', () => {
     logger: mockLogger()
   }
 
+  beforeEach(() => jest.restoreAllMocks())
+
   it('should be well constructed', () => {
     const redis = new RedisConnection(config)
     expect(redis.port).toBe(config.port)
@@ -49,8 +55,37 @@ describe('RedisConnection', () => {
     expect(redis.isConnected).toBeFalsy()
   })
 
+  it('should do input validation for port', () => {
+    const invalidPort = { ...config }
+    invalidPort.port = -1
+    expect(() => new RedisConnection(invalidPort)).toThrowError(new InvalidPortError())
+  })
+
+  it('should do input validation for host', () => {
+    const invalidHost = { ...config }
+    invalidHost.host = ''
+    expect(() => new RedisConnection(invalidHost)).toThrowError(new InvalidHostError())
+    invalidHost.host = null as unknown as string
+    expect(() => new RedisConnection(invalidHost)).toThrowError(new InvalidHostError())
+  })
+
+  it('should do input validation for logger', () => {
+    const invalidLogger = { ...config }
+    invalidLogger.logger = null as unknown as WinstonLogger
+    expect(() => new RedisConnection(invalidLogger)).toThrowError(new InvalidLoggerError())
+  })
+
   it('should connect', async (): Promise<void> => {
     const redis = new RedisConnection(config)
+    await redis.connect()
+    expect(redis.isConnected).toBeTruthy()
+    expect(config.logger.info).toBeCalledWith(`Connected to REDIS at: ${config.host}:${config.port}`)
+  })
+
+  it('should connect if already connected', async (): Promise<void> => {
+    const redis = new RedisConnection(config)
+    await redis.connect()
+    expect(redis.isConnected).toBeTruthy()
     await redis.connect()
     expect(redis.isConnected).toBeTruthy()
     expect(config.logger.info).toBeCalledWith(`Connected to REDIS at: ${config.host}:${config.port}`)
@@ -75,5 +110,68 @@ describe('RedisConnection', () => {
     expect(redis.isConnected).toBeFalsy()
     await redis.disconnect()
     expect(redis.isConnected).toBeFalsy()
+  })
+
+  it('should handle redis errors', async (): Promise<void> => {
+    const createClientSpy = jest.spyOn(Redis, 'createClient')
+    createClientSpy.mockImplementationOnce(() => (
+      {
+        // simulate sending notification on error
+        on: jest.fn((msg: string, cb: (err: Error | null) => void): void => {
+          // do nothing on ready because we want to enforce error to reject promise
+          if (msg === 'ready') {
+            setTimeout(() => {
+              expect(config.logger.info).toHaveBeenCalledTimes(1)
+              cb(null)
+              expect(config.logger.info).toHaveBeenCalledTimes(1)
+            }, 10)
+          }
+          if (msg === 'error') {
+            setImmediate(() => cb(new Error('emitted')))
+          }
+        })
+      } as unknown as Redis.RedisClient
+    ))
+    const redis = new RedisConnection(config)
+    try {
+      await redis.connect()
+    } catch (error) {
+      expect(error).toEqual(new Error('emitted'))
+      expect(config.logger.push).toHaveBeenCalledWith({ err: new Error('emitted') })
+      expect(config.logger.error).toHaveBeenCalledWith('Error from REDIS client')
+    }
+  })
+
+  it('should protected against multiple rejection when ready but log errors', (done): void => {
+    const createClientSpy = jest.spyOn(Redis, 'createClient')
+    createClientSpy.mockImplementationOnce(() => (
+      {
+        // simulate sending notification on error
+        on: jest.fn((msg: string, cb: (err: Error | null) => void): void => {
+          // invoke ready so promise resolve
+          if (msg === 'ready') {
+            setImmediate(() => {
+              expect(config.logger.info).toHaveBeenCalledTimes(0)
+              cb(null)
+              expect(config.logger.info).toHaveBeenCalledWith(`Connected to REDIS at: ${config.host}:${config.port}`)
+            })
+          }
+          // after invoke ready trigger error to check the promise wasn't rejected
+          if (msg === 'error') {
+            setTimeout(() => {
+              cb(new Error('emitted'))
+              expect(config.logger.push).toHaveBeenCalledWith({ err: new Error('emitted') })
+              expect(config.logger.error).toHaveBeenCalledWith('Error from REDIS client')
+              done()
+            }, 10)
+          }
+        })
+      } as unknown as Redis.RedisClient
+    ))
+    const redis = new RedisConnection(config)
+    redis.connect()
+      .catch((err) => {
+        expect(err).toBe('promise should not be rejected')
+      })
   })
 })

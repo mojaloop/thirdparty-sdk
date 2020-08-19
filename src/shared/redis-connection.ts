@@ -40,6 +40,42 @@ export class RedisConnectionError extends Error {
   }
 }
 
+export class InvalidPortError extends Error {
+  constructor () {
+    super('port should be non negative number')
+  }
+
+  static throwIfInvalid (port: number): void {
+    if (!(port > 0)) {
+      throw new InvalidPortError()
+    }
+  }
+}
+
+export class InvalidLoggerError extends Error {
+  constructor () {
+    super('logger should be valid')
+  }
+
+  static throwIfInvalid (logger: Logger): void {
+    if (!(logger)) {
+      throw new InvalidLoggerError()
+    }
+  }
+}
+
+export class InvalidHostError extends Error {
+  constructor () {
+    super('host should be non empty string')
+  }
+
+  static throwIfInvalid (host: string): void {
+    if (!(host?.length > 0)) {
+      throw new InvalidHostError()
+    }
+  }
+}
+
 export interface RedisConnectionConfig {
   host: string;
   port: number;
@@ -52,6 +88,12 @@ export class RedisConnection {
   private redisClient: RedisClient = null as unknown as RedisClient
 
   constructor (config: RedisConnectionConfig) {
+    // input validation
+    InvalidHostError.throwIfInvalid(config.host)
+    InvalidPortError.throwIfInvalid(config.port)
+    InvalidLoggerError.throwIfInvalid(config.logger)
+
+    // keep a flat copy of config
     this.config = { ...config }
   }
 
@@ -112,8 +154,24 @@ export class RedisConnection {
       let rejectCalled = false
       let resolveCalled = false
 
+      // let listen on ready message and resolve promise only one time
+      client.on('ready', (): void => {
+        // do nothing if promise already resolved or rejected
+        if (rejectCalled || resolveCalled) {
+          return
+        }
+
+        this.logger.info(`Connected to REDIS at: ${this.host}:${this.port}`)
+
+        // remember we resolve the promise
+        resolveCalled = true
+
+        // do resolve
+        resolve(client)
+      })
+
       // let listen on all redis errors and log them
-      client.on('error', (err) => {
+      client.on('error', (err): void => {
         this.logger.push({ err })
         this.logger.error('Error from REDIS client')
 
@@ -126,23 +184,7 @@ export class RedisConnection {
         rejectCalled = true
 
         // do rejection only one
-        return reject(err)
-      })
-
-      // let listen on ready message and resolve promise only one
-      client.on('ready', () => {
-        this.logger.info(`Connected to REDIS at: ${this.host}:${this.port}`)
-
-        // do nothing if promise already resolved or rejected
-        if (rejectCalled || resolveCalled) {
-          return
-        }
-
-        // remember we resolve the promise
-        resolveCalled = true
-
-        // do resolve
-        return resolve(client)
+        reject(err)
       })
     })
   }
