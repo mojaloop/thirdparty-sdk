@@ -21,7 +21,9 @@
  * Gates Foundation
  - Name Surname <name.surname@gatesfoundation.com>
 
- - Mob
+ - Paweł Marzec <pawel.marzec@modusbox.com>
+ - Lewis Daly <lewis@vesselstech.com>
+ - Kevin Leyow <kleyow@gmail.com>
  --------------
  ******/
 
