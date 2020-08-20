@@ -44,6 +44,7 @@ export interface ServiceConfig {
   REDIS: {
     HOST: string;
     PORT: number;
+    TIMEOUT: number;
   };
   INSPECT: {
     DEPTH: number;
@@ -100,6 +101,12 @@ export const ConvictConfig = Convict<ServiceConfig>({
       format: 'port',
       default: 6379,
       env: 'REDIS_PORT'
+    },
+    TIMEOUT: {
+      doc: 'The Redis connection timeout',
+      format: 'nat',
+      default: 100,
+      env: 'REDIS_TIMEOUT'
     }
   },
   INSPECT: {
