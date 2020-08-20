@@ -1,4 +1,21 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+## 11.1.0 (2020-08-20)
+
+
+### Features
+
+* RedisConnection & KVS & PubSub ([#12](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/12)) ([1f847b5](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/1f847b508eee4b77235f673ef621cd9456e04339))
+
+
+### Code Refactor
+
+* move handlers out from server folder ([#9](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/9)) ([dfadd43](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/dfadd43c6d78b7b3a96094274593c7d829ec6ca1))
+
+
+### Maintenance
+
+* **package:** update dependencies ([#11](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/11)) ([a5ade13](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/a5ade13a463c656c8df35ae648ce66b61ac23084))
+
 ### [11.0.5](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.0.4...v11.0.5) (2020-08-14)
 
 
