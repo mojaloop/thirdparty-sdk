@@ -7,6 +7,10 @@
     "PORT": 4006,
     "HOST": "0.0.0.0"
   },
+  "REDIS": {
+    "PORT": 6379,
+    "HOST": "localhost"
+  },
   "INSPECT": {
     "DEPTH": 4,
     "SHOW_HIDDEN": false,

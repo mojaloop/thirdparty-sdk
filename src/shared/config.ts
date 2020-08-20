@@ -41,6 +41,10 @@ export interface ServiceConfig {
     HOST: string;
     PORT: number;
   };
+  REDIS: {
+    HOST: string;
+    PORT: number;
+  };
   INSPECT: {
     DEPTH: number;
     SHOW_HIDDEN: boolean;
@@ -84,6 +88,20 @@ export const ConvictConfig = Convict<ServiceConfig>({
       env: 'OUTBOUND_PORT'
     }
   },
+  REDIS: {
+    HOST: {
+      doc: 'The Redis Hostname/IP address to connect.',
+      format: '*',
+      default: 'localhost',
+      env: 'REDIS_HOST'
+    },
+    PORT: {
+      doc: 'The Redis port to connect.',
+      format: 'port',
+      default: 6379,
+      env: 'REDIS_PORT'
+    }
+  },
   INSPECT: {
     DEPTH: {
       doc: 'Inspection depth',
@@ -116,6 +134,7 @@ const config: ServiceConfig = {
   ENV: ConvictConfig.get('ENV'),
   INBOUND: ConvictConfig.get('INBOUND'),
   OUTBOUND: ConvictConfig.get('OUTBOUND'),
+  REDIS: ConvictConfig.get('REDIS'),
   INSPECT: ConvictConfig.get('INSPECT')
 }
 
