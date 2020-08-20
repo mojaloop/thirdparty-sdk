@@ -22,39 +22,44 @@
  - Name Surname <name.surname@gatesfoundation.com>
 
  - Paweł Marzec <pawel.marzec@modusbox.com>
-
  --------------
  ******/
 
-import { Server, ServerRegisterPluginObject } from '@hapi/hapi'
-import { Handler } from 'openapi-backend'
-import { Util } from '@mojaloop/central-services-shared'
+import { RedisConnection } from './redis-connection'
+import { promisify } from 'util'
 
-const OpenapiBackend = Util.OpenapiBackend
+export class InvalidKeyError extends Error {
+  constructor () {
+    super('key should be non empty string')
+  }
 
-async function initialize (
-  apiPath: string,
-  handlers: { [handler: string]: Handler }
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-): Promise<ServerRegisterPluginObject<any>> {
-  return {
-    plugin: {
-      name: 'openapi',
-      version: '1.0.0',
-      multiple: true,
-      register: function (server: Server, options: {[index: string]: string | Record<string, unknown>}): void {
-        server.expose('openapi', options.openapi)
-      }
-    },
-    options: {
-      openapi: await OpenapiBackend.initialise(
-        apiPath,
-        handlers
-      )
+  static throwIfInvalid (key: string): void {
+    if (!(key?.length > 0)) {
+      throw new InvalidKeyError()
     }
   }
 }
 
-export default {
-  initialize
+// KVS class deliver simple key - value storage backed by Redis
+export class KVS extends RedisConnection {
+  // retrieve the value for given key
+  // if there is no value for given key 'undefined' is returned
+  async get<T> (key: string): Promise<T|undefined> {
+    InvalidKeyError.throwIfInvalid(key)
+
+    const asyncGet = promisify(this.client.get)
+    const value: string | null | undefined = await asyncGet.call(this.client, key)
+
+    return typeof value === 'string' ? JSON.parse(value) : undefined
+  }
+
+  // store the value for given key
+  async set<T> (key: string, value: T): Promise<boolean> {
+    InvalidKeyError.throwIfInvalid(key)
+
+    const asyncSet = promisify(this.client.set)
+    const stringified = JSON.stringify(value)
+
+    return asyncSet.call(this.client, key, stringified) as Promise<boolean>
+  }
 }

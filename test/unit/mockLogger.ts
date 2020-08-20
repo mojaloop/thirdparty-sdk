@@ -22,39 +22,21 @@
  - Name Surname <name.surname@gatesfoundation.com>
 
  - Paweł Marzec <pawel.marzec@modusbox.com>
-
  --------------
  ******/
 
-import { Server, ServerRegisterPluginObject } from '@hapi/hapi'
-import { Handler } from 'openapi-backend'
-import { Util } from '@mojaloop/central-services-shared'
+import Logger from '@mojaloop/central-services-logger'
+import { Logger as WinstonLogger } from 'winston'
 
-const OpenapiBackend = Util.OpenapiBackend
-
-async function initialize (
-  apiPath: string,
-  handlers: { [handler: string]: Handler }
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-): Promise<ServerRegisterPluginObject<any>> {
-  return {
-    plugin: {
-      name: 'openapi',
-      version: '1.0.0',
-      multiple: true,
-      register: function (server: Server, options: {[index: string]: string | Record<string, unknown>}): void {
-        server.expose('openapi', options.openapi)
-      }
-    },
-    options: {
-      openapi: await OpenapiBackend.initialise(
-        apiPath,
-        handlers
-      )
-    }
+export default function mockLogger (keepQuiet = true): WinstonLogger {
+  if (keepQuiet) {
+    return {
+      log: jest.fn(),
+      info: jest.fn(),
+      error: jest.fn(),
+      push: jest.fn()
+    } as unknown as WinstonLogger
   }
-}
-
-export default {
-  initialize
+  // let be elaborative and log to console
+  return Logger
 }

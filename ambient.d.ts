@@ -1,3 +1,4 @@
+/* eslint-disable sort-imports */
 /*****
  License
  --------------
@@ -29,7 +30,7 @@
 // to stop typescript complains, we have to declare some modules here
 
 declare module '@mojaloop/central-services-error-handling'{
-  export function validateRoutes(options?: object): object
+  export function validateRoutes(options?: Record<string, unknown>): Record<string, unknown>
   interface APIError {
     errorInformation: {
       errorCode: string | number;
@@ -38,7 +39,7 @@ declare module '@mojaloop/central-services-error-handling'{
   }
   class FSPIOPError {
     public toString(): string;
-    public toApiErrorObject(options: { includeCauseExtension?: boolean; truncateExtensions?: boolean }): APIError
+    public toApiErrorRecord<string, unknown>(options: { includeCauseExtension?: boolean; truncateExtensions?: boolean }): APIError
   }
   interface FactoryI {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -127,22 +128,27 @@ declare module '@mojaloop/central-services-error-handling'{
     };
   }
   export function ReformatFSPIOPError(
-    error: object,
+    error: Record<string, unknown>,
     apiErrorCode?: FSPIOPErrorCode,
     replyTo?: string,
-    extensions?: object
+    extensions?: Record<string, unknown>
   ): FSPIOPError
 
   export function CreateFSPIOPError(
     apiErrorCode?: FSPIOPErrorCode,
     message?: string,
-    cause?: object,
+    cause?: Record<string, unknown>,
     replyTo?: string,
-    extensions?: object,
+    extensions?: Record<string, unknown>,
     useDescriptionAsMessage?: boolean
   ): FSPIOPError
 }
-declare module '@mojaloop/central-services-logger'
+declare module '@mojaloop/central-services-logger' {
+  import { Logger as WinstonLogger } from 'winston'
+  const Logger: WinstonLogger
+  export default Logger
+}
+
 declare module '@mojaloop/central-services-shared' {
   interface ReturnCode {
     CODE: number;
@@ -305,14 +311,16 @@ declare module '@mojaloop/central-services-shared' {
       options?: {[id: string]: string | number | boolean }
     ): Promise<string>
 
-    public initializeCache(policyOptions: object): Promise<boolean>
+    public initializeCache(policyOptions: Record<string, unknown>): Promise<boolean>
   }
   interface Span {
     getChild (id: string): Span;
     setTags (tags: {[id: string]: string}): void;
   }
 
+  import OpenAPIBackend, { Context, Handler } from 'openapi-backend'
   import { SpawnSyncOptions } from 'child_process'
+  import Ajv from 'ajv'
 
   class Request {
     public sendRequest(
@@ -321,7 +329,7 @@ declare module '@mojaloop/central-services-shared' {
       source: string,
       destination: string,
       method?: string,
-      payload?: object,
+      payload?: Record<string, unknown>,
       responseType?: string,
       span?: SpawnSyncOptions,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -329,8 +337,6 @@ declare module '@mojaloop/central-services-shared' {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ): Promise<any>
   }
-  import OpenAPIBackend, { Handler, Context } from 'openapi-backend'
-  import Ajv from 'ajv'
 
   interface Util {
     Endpoints: Endpoints;

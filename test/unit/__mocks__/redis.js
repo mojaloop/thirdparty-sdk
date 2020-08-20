@@ -21,40 +21,38 @@
  * Gates Foundation
  - Name Surname <name.surname@gatesfoundation.com>
 
- - Paweł Marzec <pawel.marzec@modusbox.com>
-
+ - James Bush - james.bush@modusbox.com
  --------------
  ******/
 
-import { Server, ServerRegisterPluginObject } from '@hapi/hapi'
-import { Handler } from 'openapi-backend'
-import { Util } from '@mojaloop/central-services-shared'
+const redisMock = require('redis-mock')
 
-const OpenapiBackend = Util.OpenapiBackend
-
-async function initialize (
-  apiPath: string,
-  handlers: { [handler: string]: Handler }
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-): Promise<ServerRegisterPluginObject<any>> {
-  return {
-    plugin: {
-      name: 'openapi',
-      version: '1.0.0',
-      multiple: true,
-      register: function (server: Server, options: {[index: string]: string | Record<string, unknown>}): void {
-        server.expose('openapi', options.openapi)
-      }
-    },
-    options: {
-      openapi: await OpenapiBackend.initialise(
-        apiPath,
-        handlers
-      )
+// redis-mock currently ignores callback argument, the following class fix this
+class RedisClient extends redisMock.RedisClient {
+  _executeCallback (...args) {
+    if (typeof args[args.length - 1] === 'function') {
+      const callback = args[args.length - 1]
+      const argList = Array.prototype.slice.call(args, 0, args.length - 1)
+      callback(null, argList)
     }
+  }
+
+  subscribe (...args) {
+    super.subscribe(...args)
+    this._executeCallback(...args)
+  }
+
+  publish (...args) {
+    super.publish(...args)
+    this._executeCallback(...args)
+  }
+
+  set (...args) {
+    super.set(...args)
+    this._executeCallback(...args)
   }
 }
 
-export default {
-  initialize
+module.exports = {
+  createClient: () => new RedisClient()
 }
