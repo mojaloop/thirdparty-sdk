@@ -22,13 +22,27 @@
  - Name Surname <name.surname@gatesfoundation.com>
 
  - Paweł Marzec <pawel.marzec@modusbox.com>
+ - Kevin Leyow <kevin.leyow@modusbox.com>
  --------------
  ******/
 
 // https://github.com/mozilla/node-convict
 import Convict from 'convict'
 import PACKAGE from '../../package.json'
+import fs, { PathLike } from 'fs'
+
 export { PACKAGE }
+
+function getFileContent (path: PathLike): Buffer {
+  if (!fs.existsSync(path)) {
+    throw new Error('File doesn\'t exist')
+  }
+  return fs.readFileSync(path)
+}
+
+function getFileListContent (pathList: string): Array<Buffer> {
+  return pathList.split(',').map((path) => getFileContent(path))
+}
 
 // interface to represent service configuration
 export interface ServiceConfig {
@@ -51,6 +65,55 @@ export interface ServiceConfig {
     SHOW_HIDDEN: boolean;
     COLOR: boolean;
   };
+  SHARED: {
+    PEER_ENDPOINT: string;
+    ALS_ENDPOINT: string;
+    QUOTES_ENDPOINT: string;
+    TRANSFERS_ENDPOINT: string;
+    BULK_TRANSFERS_ENDPOINT: string;
+    DFSP_ID: string;
+    JWS_SIGN: boolean;
+    JWS_SIGNING_KEY: PathLike | Buffer;
+    WSO2_AUTH: {
+      staticToken: string;
+      tokenEndpoint: string;
+      clientKey: string;
+      clientSecret: string;
+      refreshSeconds: number;
+    };
+    TLS: {
+      inbound: {
+        mutualTLS: {
+          enabled: boolean;
+        },
+        creds: {
+          ca: string | Array<Buffer>;
+          cert: string | Array<Buffer>;
+          key: string | Array<Buffer>;
+        }
+      },
+      outbound: {
+        mutualTLS: {
+          enabled: boolean;
+        },
+        creds: {
+          ca: string | Array<Buffer>;
+          cert: string | Array<Buffer>;
+          key: string | Array<Buffer>;
+        }
+      },
+      test: {
+        mutualTLS: {
+          enabled: boolean;
+        },
+        creds: {
+          ca: string | Array<Buffer>;
+          cert: string | Array<Buffer>;
+          key: string | Array<Buffer>;
+        }
+      }
+    }
+  }
 }
 
 // Declare configuration schema, default values and bindings to environment variables
@@ -126,6 +189,56 @@ export const ConvictConfig = Convict<ServiceConfig>({
       format: 'Boolean',
       default: true
     }
+  },
+  SHARED: {
+    PEER_ENDPOINT: '0.0.0.0:4003',
+    ALS_ENDPOINT: '0.0.0.0:4002',
+    QUOTES_ENDPOINT: '0.0.0.0:3002',
+    TRANSFERS_ENDPOINT: '0.0.0.0:3000',
+    BULK_TRANSFERS_ENDPOINT: '',
+    DFSP_ID: 'dfsp_a',
+    JWS_SIGN: false,
+    JWS_SIGNING_KEY: '',
+    WSO2_AUTH: {
+      staticToken: '',
+      tokenEndpoint: '',
+      clientKey: '',
+      clientSecret: '',
+      refreshSeconds: 60
+    },
+    // Todo: Investigate proper key setup
+    TLS: {
+      inbound: {
+        mutualTLS: {
+          enabled: false
+        },
+        creds: {
+          ca: '',
+          cert: '',
+          key: ''
+        }
+      },
+      outbound: {
+        mutualTLS: {
+          enabled: false
+        },
+        creds: {
+          ca: '',
+          cert: '',
+          key: ''
+        }
+      },
+      test: {
+        mutualTLS: {
+          enabled: false
+        },
+        creds: {
+          ca: '',
+          cert: '',
+          key: ''
+        }
+      }
+    }
   }
 })
 
@@ -136,13 +249,30 @@ ConvictConfig.loadFile(`${__dirname}/../../config/${env}.json`)
 // Perform configuration validation
 ConvictConfig.validate({ allowed: 'strict' })
 
+// Load file contents for keys and secrets
+ConvictConfig.set('SHARED.JWS_SIGNING_KEY', getFileContent(ConvictConfig.get('SHARED').JWS_SIGNING_KEY))
+
+// Note: Have not seen these be comma seperated value strings. mimicing sdk-scheme-adapter for now
+ConvictConfig.set('SHARED.TLS.inbound.creds.ca', getFileListContent(<string> ConvictConfig.get('SHARED').TLS.inbound.creds.ca))
+ConvictConfig.set('SHARED.TLS.inbound.creds.cert', getFileListContent(<string> ConvictConfig.get('SHARED').TLS.inbound.creds.cert))
+ConvictConfig.set('SHARED.TLS.inbound.creds.key', getFileListContent(<string> ConvictConfig.get('SHARED').TLS.inbound.creds.key))
+
+ConvictConfig.set('SHARED.TLS.outbound.creds.ca', getFileListContent(<string> ConvictConfig.get('SHARED').TLS.outbound.creds.ca))
+ConvictConfig.set('SHARED.TLS.outbound.creds.cert', getFileListContent(<string> ConvictConfig.get('SHARED').TLS.outbound.creds.cert))
+ConvictConfig.set('SHARED.TLS.outbound.creds.key', getFileListContent(<string> ConvictConfig.get('SHARED').TLS.outbound.creds.key))
+
+ConvictConfig.set('SHARED.TLS.test.creds.ca', getFileListContent(<string> ConvictConfig.get('SHARED').TLS.test.creds.ca))
+ConvictConfig.set('SHARED.TLS.test.creds.cert', getFileListContent(<string> ConvictConfig.get('SHARED').TLS.test.creds.cert))
+ConvictConfig.set('SHARED.TLS.test.creds.key', getFileListContent(<string> ConvictConfig.get('SHARED').TLS.test.creds.key))
+
 // extract simplified config from Convict object
 const config: ServiceConfig = {
   ENV: ConvictConfig.get('ENV'),
   INBOUND: ConvictConfig.get('INBOUND'),
   OUTBOUND: ConvictConfig.get('OUTBOUND'),
   REDIS: ConvictConfig.get('REDIS'),
-  INSPECT: ConvictConfig.get('INSPECT')
+  INSPECT: ConvictConfig.get('INSPECT'),
+  SHARED: ConvictConfig.get('SHARED')
 }
 
 export default config
