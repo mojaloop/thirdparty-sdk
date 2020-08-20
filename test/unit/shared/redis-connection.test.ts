@@ -39,10 +39,12 @@ import mockLogger from '../mockLogger'
 jest.mock('redis')
 
 describe('RedisConnection', () => {
+  const defaultTimeout = 100
   const config: RedisConnectionConfig = {
     port: 6789,
     host: 'localhost',
-    logger: mockLogger()
+    logger: mockLogger(),
+    timeout: defaultTimeout
   }
 
   beforeEach(() => jest.resetAllMocks())
@@ -53,6 +55,7 @@ describe('RedisConnection', () => {
     expect(redis.host).toEqual(config.host)
     expect(redis.logger).toEqual(config.logger)
     expect(redis.isConnected).toBeFalsy()
+    expect(redis.timeout).toBe(defaultTimeout)
   })
 
   it('should do input validation for port', () => {
@@ -79,7 +82,7 @@ describe('RedisConnection', () => {
     const redis = new RedisConnection(config)
     await redis.connect()
     expect(redis.isConnected).toBeTruthy()
-    expect(config.logger.info).toBeCalledWith(`Connected to REDIS at: ${config.host}:${config.port}`)
+    expect(config.logger.info).toBeCalledWith(`createClient: Connected to REDIS at: ${config.host}:${config.port}`)
   })
 
   it('should connect if already connected', async (): Promise<void> => {
@@ -88,7 +91,7 @@ describe('RedisConnection', () => {
     expect(redis.isConnected).toBeTruthy()
     await redis.connect()
     expect(redis.isConnected).toBeTruthy()
-    expect(config.logger.info).toBeCalledWith(`Connected to REDIS at: ${config.host}:${config.port}`)
+    expect(config.logger.info).toBeCalledWith(`createClient: Connected to REDIS at: ${config.host}:${config.port}`)
   })
 
   it('should throw if trying to access \'client\' property when not connected ', async (): Promise<void> => {
@@ -112,19 +115,34 @@ describe('RedisConnection', () => {
     expect(redis.isConnected).toBeFalsy()
   })
 
+  it('should connect without timeout specified', async (): Promise<void> => {
+    const configNoTimeout = { ...config }
+    configNoTimeout.timeout = undefined
+
+    const redis = new RedisConnection(configNoTimeout)
+    await redis.connect()
+    expect(redis.timeout).toEqual(RedisConnection.defaultTimeout)
+  })
+
+  it('should PING', async (): Promise<void> => {
+    const redis = new RedisConnection(config)
+    await redis.connect()
+    const pong = await redis.ping()
+    expect(pong).toBe(true)
+  })
+
   it('should handle redis errors', async (): Promise<void> => {
     const createClientSpy = jest.spyOn(Redis, 'createClient')
     createClientSpy.mockImplementationOnce(() => (
       {
+        quit: jest.fn(),
         // simulate sending notification on error
         on: jest.fn((msg: string, cb: (err: Error | null) => void): void => {
           // do nothing on ready because we want to enforce error to reject promise
           if (msg === 'ready') {
             setTimeout(() => {
-              expect(config.logger.info).toHaveBeenCalledTimes(1)
               cb(null)
-              expect(config.logger.info).toHaveBeenCalledTimes(1)
-            }, 10)
+            }, defaultTimeout + 10)
           }
           if (msg === 'error') {
             setImmediate(() => cb(new Error('emitted')))
@@ -138,7 +156,36 @@ describe('RedisConnection', () => {
     } catch (error) {
       expect(error).toEqual(new Error('emitted'))
       expect(config.logger.push).toHaveBeenCalledWith({ err: new Error('emitted') })
-      expect(config.logger.error).toHaveBeenCalledWith('Error from REDIS client')
+      expect(config.logger.error).toHaveBeenCalledWith('createClient: Error from REDIS client')
+    }
+  })
+
+  it('should not reject if reconnection successful', async (): Promise<void> => {
+    const createClientSpy = jest.spyOn(Redis, 'createClient')
+    createClientSpy.mockImplementationOnce(() => (
+      {
+        quit: jest.fn(),
+        // simulate sending notification on error
+        on: jest.fn((msg: string, cb: (err: Error | null) => void): void => {
+          // do nothing on ready because we want to enforce error to reject promise
+          if (msg === 'ready') {
+            setTimeout(() => {
+              cb(null)
+            }, defaultTimeout - 10)
+          }
+          if (msg === 'error') {
+            setImmediate(() => cb(new Error('emitted')))
+          }
+        })
+      } as unknown as Redis.RedisClient
+    ))
+    const redis = new RedisConnection(config)
+    try {
+      await redis.connect()
+    } catch (error) {
+      expect(error).toEqual(new Error('emitted'))
+      expect(config.logger.push).toHaveBeenCalledWith({ err: new Error('emitted') })
+      expect(config.logger.error).toHaveBeenCalledWith('createClient: Error from REDIS client')
     }
   })
 
@@ -146,6 +193,7 @@ describe('RedisConnection', () => {
     const createClientSpy = jest.spyOn(Redis, 'createClient')
     createClientSpy.mockImplementationOnce(() => (
       {
+        quit: jest.fn(),
         // simulate sending notification on error
         on: jest.fn((msg: string, cb: (err: Error | null) => void): void => {
           // invoke ready so promise resolve
@@ -153,7 +201,9 @@ describe('RedisConnection', () => {
             setImmediate(() => {
               expect(config.logger.info).toHaveBeenCalledTimes(0)
               cb(null)
-              expect(config.logger.info).toHaveBeenCalledWith(`Connected to REDIS at: ${config.host}:${config.port}`)
+              expect(config.logger.info).toHaveBeenCalledWith(
+                `createClient: Connected to REDIS at: ${config.host}:${config.port}`
+              )
             })
           }
           // after invoke ready trigger error to check the promise wasn't rejected
@@ -161,7 +211,7 @@ describe('RedisConnection', () => {
             setTimeout(() => {
               cb(new Error('emitted'))
               expect(config.logger.push).toHaveBeenCalledWith({ err: new Error('emitted') })
-              expect(config.logger.error).toHaveBeenCalledWith('Error from REDIS client')
+              expect(config.logger.error).toHaveBeenCalledWith('createClient: Error from REDIS client')
               done()
             }, 10)
           }
