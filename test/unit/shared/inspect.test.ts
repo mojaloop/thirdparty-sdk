@@ -39,6 +39,9 @@ describe('shared/inspect', (): void => {
   it('should call util.inspect with defaults', (): void => {
     // remove config.INSPECT so defaults will be used
     const storeBeforeDelete = config.INSPECT
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     delete config.INSPECT
 
     const inspectSpy = jest.spyOn(util, 'inspect')
