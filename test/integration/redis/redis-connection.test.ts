@@ -21,37 +21,45 @@
  * Gates Foundation
  - Name Surname <name.surname@gatesfoundation.com>
 
- * Paweł Marzec <pawel.marzec@modusbox.com>
+ - Paweł Marzec <pawel.marzec@modusbox.com>
  --------------
  ******/
-import config from '~/shared/config'
-import inspect from '~/shared/inspect'
-import util from 'util'
-const inspectSpy = jest.spyOn(util, 'inspect')
 
-describe('shared/inspect', (): void => {
-  it('should properly call util.inspect', (): void => {
-    const result = inspect({})
-    expect(result).toEqual('{}')
-    expect(inspectSpy).toHaveBeenCalledWith({}, false, 4, true)
+import { RedisConnection, RedisConnectionConfig } from '~/shared/redis-connection'
+import Logger from '@mojaloop/central-services-logger'
+import Config from '~/shared/config'
+
+describe('RedisConnection', () => {
+  const config: RedisConnectionConfig = {
+    host: Config.REDIS.HOST,
+    port: Config.REDIS.PORT,
+    logger: Logger,
+    timeout: Config.REDIS.TIMEOUT
+  }
+  let rc: RedisConnection
+
+  beforeAll(async (): Promise<void> => {
+    rc = new RedisConnection(config)
+    await rc.connect()
   })
 
-  it('should call util.inspect with defaults', (): void => {
-    // remove config.INSPECT so defaults will be used
-    const storeBeforeDelete = config.INSPECT
+  afterAll(async (): Promise<void> => {
+    await rc.disconnect()
+  })
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    delete config.INSPECT
+  it('should be connected', async (): Promise<void> => {
+    expect(rc.isConnected).toBeTruthy()
+    const result = await rc.ping()
+    expect(result).toEqual(true)
+  })
 
-    const inspectSpy = jest.spyOn(util, 'inspect')
-    const result = inspect({})
-
-    expect(config).toBeDefined()
-    expect(result).toEqual('{}')
-    expect(inspectSpy).toHaveBeenCalledWith({}, false, 5, true)
-
-    // restore INSPECT to not interfere other tests
-    config.INSPECT = storeBeforeDelete
+  it('should throw error if can\'t connect', async (): Promise<void> => {
+    const invalidPort = { ...config, timeout: 200 }
+    invalidPort.port = 8080
+    const invalidRC = new RedisConnection(invalidPort)
+    expect(invalidRC.connect()).rejects.toThrowError(
+      new Error('Redis connection to localhost:8080 failed - connect ECONNREFUSED 127.0.0.1:8080')
+    )
+    expect(invalidRC.isConnected).toBeFalsy()
   })
 })

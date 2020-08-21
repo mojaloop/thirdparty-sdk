@@ -28,7 +28,6 @@
 import { RedisClient, createClient } from 'redis'
 import { Logger } from 'winston'
 import { promisify } from 'util'
-
 export class RedisConnectionError extends Error {
   public readonly host: string
   public readonly port: number
@@ -80,6 +79,7 @@ export interface RedisConnectionConfig {
   host: string;
   port: number;
   logger: Logger;
+  timeout?: number
 }
 
 export class RedisConnection {
@@ -87,14 +87,16 @@ export class RedisConnection {
 
   private redisClient: RedisClient = null as unknown as RedisClient
 
+  static readonly defaultTimeout = 3000
+
   constructor (config: RedisConnectionConfig) {
     // input validation
     InvalidHostError.throwIfInvalid(config.host)
     InvalidPortError.throwIfInvalid(config.port)
     InvalidLoggerError.throwIfInvalid(config.logger)
 
-    // keep a flat copy of config
-    this.config = { ...config }
+    // keep a flat copy of config with default timeout
+    this.config = { timeout: RedisConnection.defaultTimeout, ...config }
   }
 
   get client (): RedisClient {
@@ -117,6 +119,10 @@ export class RedisConnection {
     return this.config.logger
   }
 
+  get timeout (): number {
+    return this.config.timeout || RedisConnection.defaultTimeout
+  }
+
   get isConnected (): boolean {
     return this.redisClient && this.redisClient.connected
   }
@@ -133,7 +139,7 @@ export class RedisConnection {
 
   async disconnect (): Promise<void> {
     // do nothing if already disconnected
-    if (!this.isConnected) {
+    if (!(this.isConnected)) {
       return
     }
 
@@ -145,6 +151,12 @@ export class RedisConnection {
     this.redisClient = null as unknown as RedisClient
   }
 
+  async ping (): Promise<boolean> {
+    const asyncPing = promisify(this.client.ping)
+    const response: string = await asyncPing.call(this.client) as string
+    return response === 'PONG'
+  }
+
   private async createClient (): Promise<RedisClient> {
     return new Promise((resolve, reject) => {
       // the newly created redis client
@@ -153,6 +165,7 @@ export class RedisConnection {
       // flags to protect against multiple reject/resolve
       let rejectCalled = false
       let resolveCalled = false
+      let timeoutStarted = false
 
       // let listen on ready message and resolve promise only one time
       client.on('ready', (): void => {
@@ -161,7 +174,7 @@ export class RedisConnection {
           return
         }
 
-        this.logger.info(`Connected to REDIS at: ${this.host}:${this.port}`)
+        this.logger.info(`createClient: Connected to REDIS at: ${this.host}:${this.port}`)
 
         // remember we resolve the promise
         resolveCalled = true
@@ -173,18 +186,28 @@ export class RedisConnection {
       // let listen on all redis errors and log them
       client.on('error', (err): void => {
         this.logger.push({ err })
-        this.logger.error('Error from REDIS client')
+        this.logger.error('createClient: Error from REDIS client')
 
-        // do nothing if promise already resolved or rejected
-        if (rejectCalled || resolveCalled) {
+        // do nothing if promise is already resolved or rejected
+        if (resolveCalled || timeoutStarted || rejectCalled) {
           return
         }
 
-        // remember that we reject the promise
-        rejectCalled = true
+        timeoutStarted = true
+        // give a chance to reconnect in `this.timeout` milliseconds
+        setTimeout(() => {
+          // reconnection was success
+          if (resolveCalled || rejectCalled) {
+            return
+          }
 
-        // do rejection only one
-        reject(err)
+          // if we can't connect let quit - reconnection was a failure
+          client.quit(() => null)
+
+          // remember that we reject the promise
+          rejectCalled = true
+          reject(err)
+        }, this.timeout)
       })
     })
   }
