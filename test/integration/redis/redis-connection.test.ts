@@ -33,7 +33,8 @@ describe('RedisConnection', () => {
   const config: RedisConnectionConfig = {
     host: Config.REDIS.HOST,
     port: Config.REDIS.PORT,
-    logger: Logger
+    logger: Logger,
+    timeout: Config.REDIS.TIMEOUT
   }
   let rc: RedisConnection
 
