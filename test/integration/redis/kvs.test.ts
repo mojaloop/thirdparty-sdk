@@ -61,11 +61,10 @@ describe('KVS', () => {
       123,
       'the-string'
     ]
-    const counter = 1
+
     for (const value in values) {
-      const key = `key-${counter}`
-      await kvs.set(key, value)
-      const retrieved = await kvs.get(key)
+      await kvs.set('key', value)
+      const retrieved = await kvs.get('key')
       expect(retrieved).toEqual(value)
     }
   })
