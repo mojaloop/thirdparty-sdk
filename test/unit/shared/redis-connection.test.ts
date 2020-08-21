@@ -133,9 +133,10 @@ describe('RedisConnection', () => {
 
   it('should handle redis errors', async (): Promise<void> => {
     const createClientSpy = jest.spyOn(Redis, 'createClient')
+    const mockQuit = jest.fn()
     createClientSpy.mockImplementationOnce(() => (
       {
-        quit: jest.fn(),
+        quit: mockQuit,
         // simulate sending notification on error
         on: jest.fn((msg: string, cb: (err: Error | null) => void): void => {
           // do nothing on ready because we want to enforce error to reject promise
@@ -150,6 +151,7 @@ describe('RedisConnection', () => {
         })
       } as unknown as Redis.RedisClient
     ))
+
     const redis = new RedisConnection(config)
     try {
       await redis.connect()
@@ -157,14 +159,16 @@ describe('RedisConnection', () => {
       expect(error).toEqual(new Error('emitted'))
       expect(config.logger.push).toHaveBeenCalledWith({ err: new Error('emitted') })
       expect(config.logger.error).toHaveBeenCalledWith('createClient: Error from REDIS client')
+      expect(mockQuit).toBeCalledTimes(1)
     }
   })
 
   it('should not reject if reconnection successful', async (): Promise<void> => {
     const createClientSpy = jest.spyOn(Redis, 'createClient')
+    const mockQuit = jest.fn()
     createClientSpy.mockImplementationOnce(() => (
       {
-        quit: jest.fn(),
+        quit: mockQuit,
         // simulate sending notification on error
         on: jest.fn((msg: string, cb: (err: Error | null) => void): void => {
           // do nothing on ready because we want to enforce error to reject promise
@@ -186,14 +190,16 @@ describe('RedisConnection', () => {
       expect(error).toEqual(new Error('emitted'))
       expect(config.logger.push).toHaveBeenCalledWith({ err: new Error('emitted') })
       expect(config.logger.error).toHaveBeenCalledWith('createClient: Error from REDIS client')
+      expect(mockQuit).toBeCalledTimes(1)
     }
   })
 
   it('should protected against multiple rejection when ready but log errors', (done): void => {
     const createClientSpy = jest.spyOn(Redis, 'createClient')
+    const mockQuit = jest.fn()
     createClientSpy.mockImplementationOnce(() => (
       {
-        quit: jest.fn(),
+        quit: mockQuit,
         // simulate sending notification on error
         on: jest.fn((msg: string, cb: (err: Error | null) => void): void => {
           // invoke ready so promise resolve
@@ -212,6 +218,8 @@ describe('RedisConnection', () => {
               cb(new Error('emitted'))
               expect(config.logger.push).toHaveBeenCalledWith({ err: new Error('emitted') })
               expect(config.logger.error).toHaveBeenCalledWith('createClient: Error from REDIS client')
+              // if promise wasn't reject the quit shouldn't be called
+              expect(mockQuit).not.toBeCalled()
               done()
             }, 10)
           }
@@ -220,8 +228,10 @@ describe('RedisConnection', () => {
     ))
     const redis = new RedisConnection(config)
     redis.connect()
-      .catch((err) => {
-        expect(err).toBe('promise should not be rejected')
+      .catch(() => {
+        // fail test if this line is reached
+        // so proof that multiple rejection doesn't happen
+        expect(true).toBe(false)
       })
   })
 })
