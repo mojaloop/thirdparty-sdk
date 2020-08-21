@@ -367,23 +367,23 @@ declare module '@hapi/good'
 declare module 'blipp'
 declare module 'convict-commander'
 declare module 'javascript-state-machine' {
-  export type Method = (...args: unknown[]) => void | Promise<void>
-  export type Data = Record<string, string | number | boolean | unknown>
+  type Method = (...args: unknown[]) => void | Promise<void>
+  type Data = Record<string, string | number | boolean | unknown>
 
-  export interface StateMachineSpec {
+  interface StateMachineSpec {
     init: string;
     data: Data;
     methods: Record<string, Method>
   }
 
-  export interface Transition {
+  interface Transition {
     transition: string;
     from: string;
     to: string;
   }
 
   export default class StateMachine implements Record<string, unknown> {
-    // constructor(spec: StateMachineSpec)
+    constructor(spec: StateMachineSpec)
     [x: string]: unknown
   }
 }
