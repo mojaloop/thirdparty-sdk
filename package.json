@@ -83,6 +83,7 @@
     "blipp": "^4.0.1",
     "commander": "^6.0.0",
     "convict": "^6.0.0",
+    "javascript-state-machine": "^3.1.0",
     "openapi-backend": "^3.5.1",
     "path": "^0.12.7",
     "redis": "^3.0.2"

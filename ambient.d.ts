@@ -366,3 +366,24 @@ declare module '@mojaloop/central-services-shared' {
 declare module '@hapi/good'
 declare module 'blipp'
 declare module 'convict-commander'
+declare module 'javascript-state-machine' {
+  export type Method = (...args: unknown[]) => void | Promise<void>
+  export type Data = Record<string, string | number | boolean | unknown>
+
+  export interface StateMachineSpec {
+    init: string;
+    data: Data;
+    methods: Record<string, Method>
+  }
+
+  export interface Transition {
+    transition: string;
+    from: string;
+    to: string;
+  }
+
+  export default class StateMachine implements Record<string, unknown> {
+    // constructor(spec: StateMachineSpec)
+    [x: string]: unknown
+  }
+}
