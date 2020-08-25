@@ -96,32 +96,32 @@ describe('Persistent State Machine', () => {
         { name: 'middle2End', from: 'middle', to: 'end' }
       ],
       methods: {
-        onStart2End: () => {
+        onStart2End: jest.fn(() => {
           return new Promise<void>((resolve) => {
             setTimeout(() => {
               console.log('onStart2End')
               resolve()
             }, 50)
           })
-        },
-        onStart2Middle: () => {
+        }),
+        onStart2Middle: jest.fn(() => {
           return new Promise<void>((resolve) => {
             setTimeout(() => {
               resolve()
             }, 100)
           })
-        },
-        onMiddle2End: () => {
+        }),
+        onMiddle2End: jest.fn(() => {
           return new Promise<void>((resolve) => {
             setTimeout(() => {
               console.log('onMiddle2End')
               resolve()
             }, 100)
           })
-        },
-        onError: () => {
+        }),
+        onError: jest.fn(() => {
           console.error('onError')
-        }
+        })
       }
     }
 
@@ -186,7 +186,17 @@ describe('Persistent State Machine', () => {
     const pm = await PersistentModel.create<TestStateMachine>(data, kvs, key, config.logger, smConfig)
     checkPSMLayout(pm, { currentState: 'start' })
   })
+  describe('transition notifications', () => {
+    it('should call notification handlers', async () => {
+      const pm = await PersistentModel.create<TestStateMachine>(data, kvs, key, config.logger, smConfig)
+      checkPSMLayout(pm, { currentState: 'start' })
 
+      await pm.jsm.start2Middle()
+      expect(smConfig.methods!.onStart2Middle).toBeCalledTimes(1)
+      await pm.jsm.middle2End()
+      expect(smConfig.methods!.onMiddle2End).toBeCalledTimes(1)
+    })
+  })
   describe('onPendingTransition', () => {
     it('should throw error if not `error` transition', async () => {
       const pm = new PersistentModel<TestStateMachine>(data, kvs, key, config.logger, smConfig)
@@ -213,9 +223,9 @@ describe('Persistent State Machine', () => {
   })
 
   describe('loadFromKVS', () => {
-    it('should properly call cache.get, get expected data in `context.data` and setup state of machine', async () => {
+    it('should properly call `KVS.get`, get expected data in `context.data` and setup state of machine', async () => {
       const dataFromCache = { this_is: 'data from cache', currentState: 'end' }
-      mocked(kvs.get).mockImplementationOnce(jest.fn(async () => dataFromCache))
+      mocked(kvs.get).mockImplementationOnce(async () => dataFromCache)
       const pm = await PersistentModel.loadFromKVS<TestStateMachine>(kvs, key, config.logger, smConfig)
       checkPSMLayout(pm, dataFromCache)
 
@@ -226,8 +236,8 @@ describe('Persistent State Machine', () => {
       expect(pm.data).toEqual(dataFromCache)
     })
 
-    it('should throw when received invalid data from `cache.get`', async () => {
-      mocked(kvs.get).mockImplementationOnce(jest.fn(async () => null))
+    it('should throw when received invalid data from `KVS.get`', async () => {
+      mocked(kvs.get).mockImplementationOnce(async () => null)
       try {
         await PersistentModel.loadFromKVS<TestStateMachine>(kvs, key, config.logger, smConfig)
         shouldNotBeExecuted()
@@ -236,10 +246,32 @@ describe('Persistent State Machine', () => {
       }
     })
 
-    it('should propagate error received from `cache.get`', async () => {
-      mocked(kvs.get).mockImplementationOnce(jest.fn(async () => { throw new Error('error from cache.get') }))
+    it('should propagate error received from `KVS.get`', async () => {
+      mocked(kvs.get).mockImplementationOnce(jest.fn(async () => { throw new Error('error from KVS.get') }))
       expect(() => PersistentModel.loadFromKVS<TestStateMachine>(kvs, key, config.logger, smConfig))
-        .rejects.toEqual(new Error('error from cache.get'))
+        .rejects.toEqual(new Error('error from KVS.get'))
+    })
+  })
+  describe('saveToKVS', () => {
+    it('should store using KVS.set', async () => {
+      mocked(kvs.set).mockImplementationOnce(() => Promise.resolve(true))
+
+      const pm = await PersistentModel.create<TestStateMachine>(data, kvs, key, config.logger, smConfig)
+      checkPSMLayout(pm)
+
+      // transition `init` should encounter exception when saving `context.data`
+      expect(() => pm.saveToKVS()).rejects.toEqual(new Error('error from KVS.set'))
+      expect(mocked(kvs.set)).toBeCalledWith(pm.key, pm.data)
+    })
+    it('should propaget error from KVS.set', async () => {
+      mocked(kvs.set).mockImplementationOnce(() => { throw new Error('error from KVS.set') })
+
+      const pm = await PersistentModel.create<TestStateMachine>(data, kvs, key, config.logger, smConfig)
+      checkPSMLayout(pm)
+
+      // transition `init` should encounter exception when saving `context.data`
+      expect(() => pm.saveToKVS()).rejects.toEqual(new Error('error from KVS.set'))
+      expect(mocked(kvs.set)).toBeCalledWith(pm.key, pm.data)
     })
   })
 })
