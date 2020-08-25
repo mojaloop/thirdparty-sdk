@@ -43,15 +43,19 @@ export interface ControlledStateMachine extends StateMachineInterface {
   onError: Method;
 }
 
-export class PersistentModel<JSM extends ControlledStateMachine> {
+export interface StateData extends Record<string, unknown> {
+  currentState: string
+}
+
+export class PersistentModel<JSM extends ControlledStateMachine, Data extends StateData> {
   public readonly jsm: JSM
-  public readonly data: Record<string, unknown>
+  public readonly data: Data
   public readonly kvs: KVS
   public readonly key: string
   public readonly logger: WinstonLogger
 
   constructor (
-    data: Record<string, unknown>,
+    data: Data,
     kvs: KVS,
     key: string,
     logger: WinstonLogger,
@@ -103,32 +107,32 @@ export class PersistentModel<JSM extends ControlledStateMachine> {
     }
   }
 
-  static async create<JSM extends ControlledStateMachine> (
-    data: Record<string, unknown>,
+  static async create<JSM extends ControlledStateMachine, Data extends StateData> (
+    data: Data,
     kvs: KVS,
     key: string,
     logger: WinstonLogger,
     spec: StateMachineConfig
-  ): Promise <PersistentModel<JSM>> {
-    const model = new PersistentModel<JSM>(data, kvs, key, logger, spec)
+  ): Promise <PersistentModel<JSM, Data>> {
+    const model = new PersistentModel<JSM, Data>(data, kvs, key, logger, spec)
     await model.jsm.state
     return model
   }
 
-  static async loadFromKVS<JSM extends ControlledStateMachine> (
+  static async loadFromKVS<JSM extends ControlledStateMachine, Data extends StateData> (
     kvs: KVS,
     key: string,
     logger: WinstonLogger,
     spec: StateMachineConfig
-  ): Promise <PersistentModel<JSM>> {
+  ): Promise <PersistentModel<JSM, Data>> {
     try {
-      const data = await kvs.get<Record<string, unknown>>(key)
+      const data = await kvs.get<Data>(key)
       if (!data) {
         throw new Error(`No data found in KVS for: ${key}`)
       }
       logger.push({ data })
       logger.info('data loaded from KVS')
-      return new PersistentModel<JSM>(data, kvs, key, logger, spec)
+      return new PersistentModel<JSM, Data>(data, kvs, key, logger, spec)
     } catch (err) {
       logger.push({ err })
       logger.info(`Error loading data from KVS for key: ${key}`)
