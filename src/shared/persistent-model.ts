@@ -47,27 +47,29 @@ export interface StateData extends Record<string, unknown> {
   currentState: string
 }
 
+export interface PersistentModelConfig {
+  key: string;
+  kvs: KVS;
+  logger: WinstonLogger;
+}
+
 export class PersistentModel<JSM extends ControlledStateMachine, Data extends StateData> {
-  public readonly jsm: JSM
+  public readonly fsm: JSM
   public readonly data: Data
-  public readonly kvs: KVS
-  public readonly key: string
-  public readonly logger: WinstonLogger
+
+  protected readonly config: PersistentModelConfig
 
   constructor (
     data: Data,
-    kvs: KVS,
-    key: string,
-    logger: WinstonLogger,
+    config: PersistentModelConfig,
     specOrig: StateMachineConfig
   ) {
     this.data = { ...data }
-    this.kvs = kvs
-    this.key = key
-    this.logger = logger
+    this.config = { ...config }
 
     const spec = { ...specOrig }
 
+    // inject basic methods
     spec.methods = {
       onAfterTransition: this.onAfterTransition.bind(this) as Method,
       onPendingTransition: this.onPendingTransition.bind(this) as Method,
@@ -79,15 +81,33 @@ export class PersistentModel<JSM extends ControlledStateMachine, Data extends St
       { name: 'error', from: '*', to: 'errored' }
     ]
 
+    // propagete sate from data.currentState, then spec.init and use 'none' as default
     spec.init = (data.currentState || spec.init || 'none') as string
-    this.jsm = new StateMachine(spec) as JSM
+
+    // create a new state machine and store it
+    this.fsm = new StateMachine(spec) as JSM
   }
 
+  // accessors to config properties
+  get logger (): WinstonLogger {
+    return this.config.logger
+  }
+
+  get key (): string {
+    return this.config.key
+  }
+
+  get kvs (): KVS {
+    return this.config.kvs
+  }
+
+  // it is called on after every transition and updates data.currentState
   async onAfterTransition (event: TransitionEvent<JSM>): Promise<void> {
     this.logger.info(`State machine transitioned '${event.transition}': ${event.from} -> ${event.to}`)
     this.data.currentState = event.to
   }
 
+  // it allows to call `error` transition even if there is pending transition
   onPendingTransition (transition: string): void {
     // allow transitions to 'error' state while other transitions are in progress
     if (transition !== 'error') {
@@ -95,6 +115,7 @@ export class PersistentModel<JSM extends ControlledStateMachine, Data extends St
     }
   }
 
+  // stores state data in KVS
   async saveToKVS (): Promise<void> {
     try {
       const res = await this.kvs.set(this.key, this.data)
@@ -107,35 +128,36 @@ export class PersistentModel<JSM extends ControlledStateMachine, Data extends St
     }
   }
 
+  // creates a PersistentModel instance
   static async create<JSM extends ControlledStateMachine, Data extends StateData> (
     data: Data,
-    kvs: KVS,
-    key: string,
-    logger: WinstonLogger,
+    config: PersistentModelConfig,
     spec: StateMachineConfig
   ): Promise <PersistentModel<JSM, Data>> {
-    const model = new PersistentModel<JSM, Data>(data, kvs, key, logger, spec)
-    await model.jsm.state
+    // create a new model
+    const model = new PersistentModel<JSM, Data>(data, config, spec)
+
+    // enforce to finish any transition to state specified by data.currentState or spec.init
+    await model.fsm.state
     return model
   }
 
+  // loads PersistentModel from KVS storage using given `config` and `spec`
   static async loadFromKVS<JSM extends ControlledStateMachine, Data extends StateData> (
-    kvs: KVS,
-    key: string,
-    logger: WinstonLogger,
+    config: PersistentModelConfig,
     spec: StateMachineConfig
   ): Promise <PersistentModel<JSM, Data>> {
     try {
-      const data = await kvs.get<Data>(key)
+      const data = await config.kvs.get<Data>(config.key)
       if (!data) {
-        throw new Error(`No data found in KVS for: ${key}`)
+        throw new Error(`No data found in KVS for: ${config.key}`)
       }
-      logger.push({ data })
-      logger.info('data loaded from KVS')
-      return new PersistentModel<JSM, Data>(data, kvs, key, logger, spec)
+      config.logger.push({ data })
+      config.logger.info('data loaded from KVS')
+      return new PersistentModel<JSM, Data>(data, config, spec)
     } catch (err) {
-      logger.push({ err })
-      logger.info(`Error loading data from KVS for key: ${key}`)
+      config.logger.push({ err })
+      config.logger.info(`Error loading data from KVS for key: ${config.key}`)
       throw err
     }
   }
