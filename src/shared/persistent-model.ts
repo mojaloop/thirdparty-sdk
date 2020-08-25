@@ -35,11 +35,15 @@ import { KVS } from './kvs'
 import { Logger as WinstonLogger } from 'winston'
 
 export interface ControlledStateMachine extends StateMachineInterface {
+  init: Method
+  error: Method
+
   onAfterTransition: Method;
   onPendingTransition: Method;
+  onError: Method;
 }
 
-export class PersistentModel<JSM extends StateMachineInterface> {
+export class PersistentModel<JSM extends ControlledStateMachine> {
   public readonly jsm: JSM
   public readonly data: Record<string, unknown>
   public readonly kvs: KVS
@@ -53,26 +57,25 @@ export class PersistentModel<JSM extends StateMachineInterface> {
     logger: WinstonLogger,
     specOrig: StateMachineConfig
   ) {
-    this.data = data
+    this.data = { ...data }
     this.kvs = kvs
     this.key = key
     this.logger = logger
 
     const spec = { ...specOrig }
-    let initState = spec.init || 'init'
-
-    if (data?.currentState) {
-      initState = spec.init = data.currentState as string
-    } else {
-      data.currentState = initState
-    }
 
     spec.methods = {
       onAfterTransition: this.onAfterTransition.bind(this) as Method,
       onPendingTransition: this.onPendingTransition.bind(this) as Method,
       ...spec.methods
     }
+    // inject error transition
+    spec.transitions = [
+      ...spec.transitions,
+      { name: 'error', from: '*', to: 'errored' }
+    ]
 
+    spec.init = (data.currentState || spec.init || 'none') as string
     this.jsm = new StateMachine(spec) as JSM
   }
 
@@ -100,7 +103,19 @@ export class PersistentModel<JSM extends StateMachineInterface> {
     }
   }
 
-  static async loadFromKVS<JSM extends StateMachine> (
+  static async create<JSM extends ControlledStateMachine> (
+    data: Record<string, unknown>,
+    kvs: KVS,
+    key: string,
+    logger: WinstonLogger,
+    spec: StateMachineConfig
+  ): Promise <PersistentModel<JSM>> {
+    const model = new PersistentModel<JSM>(data, kvs, key, logger, spec)
+    await model.jsm.state
+    return model
+  }
+
+  static async loadFromKVS<JSM extends ControlledStateMachine> (
     kvs: KVS,
     key: string,
     logger: WinstonLogger,
@@ -109,14 +124,14 @@ export class PersistentModel<JSM extends StateMachineInterface> {
     try {
       const data = await kvs.get<Record<string, unknown>>(key)
       if (!data) {
-        throw new Error(`No cached data found for: ${key}`)
+        throw new Error(`No data found in KVS for: ${key}`)
       }
       logger.push({ data })
-      logger.info('data loaded from cache')
+      logger.info('data loaded from KVS')
       return new PersistentModel<JSM>(data, kvs, key, logger, spec)
     } catch (err) {
       logger.push({ err })
-      logger.info(`Error loading data: ${key}`)
+      logger.info(`Error loading data from KVS for key: ${key}`)
       throw err
     }
   }
