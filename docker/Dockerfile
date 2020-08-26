@@ -9,6 +9,7 @@ RUN apk add --no-cache -t build-dependencies git make gcc g++ python libtool aut
 
 COPY package.json package-lock.json* /opt/thirdparty-scheme-adapter/
 RUN npm ci
+RUN npm prune --production
 
 COPY . /opt/thirdparty-scheme-adapter
 
