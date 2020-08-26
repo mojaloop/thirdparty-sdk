@@ -418,7 +418,7 @@ jobs:
           at: /tmp
       - run:
           name: Load the pre-built docker image from workspace
-          command: docker load -i /tmp/docker-imagetar
+          command: docker load -i /tmp/docker-image.tar
       - run:
           name: Download the mojaloop/ci-config repo
           command: |
