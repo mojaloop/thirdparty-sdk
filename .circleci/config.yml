@@ -177,6 +177,12 @@ jobs:
             nvm install v10.15.3
             nvm alias default v10.15.3
       - run:
+          name: install modules
+          command: |
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            node --version
+            npm ci
+      - run:
           name: Create dir for test results
           command: | 
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
@@ -184,7 +190,7 @@ jobs:
       - run:
           name: Build docker images
           command: |
-           [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             docker-compose build
             docker-compose up -d 
             chmod +x ./docker/wait4/wait4.js
@@ -193,8 +199,9 @@ jobs:
           name: Execute integration tests
           command: |
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            cd ~/project/
+            npm ci
             npm -s run test:integration
-          no_output_timeout: 25m
       - run:
           name: Prepare test results
           command: |
