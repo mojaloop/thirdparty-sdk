@@ -414,7 +414,7 @@ declare module 'javascript-state-machine' {
 
     // return list of all possible states
     allStates(): string []
-
+  }
   export default class StateMachine {
     constructor(config: StateMachineConfig)
 
