@@ -38,9 +38,10 @@
   },
   "husky": {
     "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
       "pre-commit": "lint-staged && npm test",
       "post-commit": "git update-index --again",
-      "pre-push": "npm test && npm run updates:check"
+      "pre-push": "npm test && npm run updates:check && npm audit:check"
     }
   },
   "lint-staged": {
@@ -89,6 +90,8 @@
     "redis": "^3.0.2"
   },
   "devDependencies": {
+    "@commitlint/cli": "^9.1.2",
+    "@commitlint/config-conventional": "^10.0.0",
     "@types/convict": "^5.2.1",
     "@types/hapi": "^18.0.3",
     "@types/hapi__hapi": "^20.0.0",

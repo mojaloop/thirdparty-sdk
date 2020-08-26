@@ -24,6 +24,10 @@
       "decision": "ignore",
       "madeAt": 1597229255683,
       "expiresAt": 1599821230434
+    },
+    "1213|@commitlint/config-conventional>conventional-changelog-conventionalcommits>compare-func>dot-prop": {
+      "decision": "fix",
+      "madeAt": 1598437977681
     }
   },
   "rules": {},
