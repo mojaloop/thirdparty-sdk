@@ -83,6 +83,7 @@
     "blipp": "^4.0.1",
     "commander": "^6.0.0",
     "convict": "^6.0.0",
+    "javascript-state-machine": "^3.1.0",
     "openapi-backend": "^3.5.1",
     "path": "^0.12.7",
     "redis": "^3.0.2"
@@ -93,6 +94,7 @@
     "@types/hapi__hapi": "^20.0.0",
     "@types/hapi__inert": "^5.2.0",
     "@types/hapi__vision": "^5.5.1",
+    "@types/javascript-state-machine": "^2.4.2",
     "@types/jest": "26.0.10",
     "@types/node": "^14.6.0",
     "@types/rc": "^1.1.0",
@@ -121,7 +123,7 @@
     "source-map-support": "0.5.19",
     "standard-version": "^9.0.0",
     "swagger-cli": "^4.0.4",
-    "ts-jest": "^26.2.0",
+    "ts-jest": "^26.3.0",
     "ts-node": "^9.0.0",
     "tsconfig-paths": "^3.9.0",
     "typescript": "4.0.2"
