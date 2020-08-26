@@ -1,4 +1,12 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+## [11.2.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.1.1...v11.2.0) (2020-08-26)
+
+
+### Features
+
+* add env variables needed for MojaloopRequests ([aa33204](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/aa332047e9953e3cb37066c415c2de7191fc2a50))
+* KVS & PubSub integration tests ([#15](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/15)) ([add5d79](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/add5d79e69af72ecb726a1ddd11f4550737e1ae3))
+
 ### [11.1.1](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.1.0...v11.1.1) (2020-08-21)
 
 ## 11.1.0 (2020-08-20)
