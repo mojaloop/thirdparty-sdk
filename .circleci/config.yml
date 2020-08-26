@@ -271,7 +271,7 @@ jobs:
       - persist_to_workspace:
           root: /tmp
           paths:
-            - ./docker-image-inbound.tar
+            - docker-image-inbound.tar
   build-outbound-local:
     executor: default-machine
     steps:
@@ -292,7 +292,7 @@ jobs:
       - persist_to_workspace:
           root: /tmp
           paths:
-            - ./docker-image-outbound.tar
+            - docker-image-outbound.tar
   release:
     executor: default-docker
     steps:
