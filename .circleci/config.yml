@@ -170,6 +170,13 @@ jobs:
       - restore_cache:
           key: dependency-cache-{{ checksum "package-lock.json" }}
       - run:
+          name: Set up NVM
+          command: |
+            echo ${NVM_DIR}
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            nvm install v10.15.3
+            nvm alias default v10.15.3
+      - run:
           name: Create dir for test results
           command: | 
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
@@ -177,6 +184,7 @@ jobs:
       - run:
           name: Build docker images
           command: |
+           [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             docker-compose build
             docker-compose up -d 
             chmod +x ./docker/wait4/wait4.js
@@ -184,6 +192,7 @@ jobs:
       - run:
           name: Execute integration tests
           command: |
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             npm -s run test:integration
           no_output_timeout: 25m
       - run:
@@ -267,7 +276,7 @@ jobs:
             docker build -t $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME/inbound:local -f ./docker/Dockerfile.Inbound ./
       - run:
           name: Save docker image to workspace
-          command: docker save -o /tmp/docker-inbound-image.tar $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME/inbound:local
+          command: docker save -o /tmp/docker-image-inbound.tar $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME/inbound:local
       - persist_to_workspace:
           root: /tmp
           paths:
@@ -288,7 +297,7 @@ jobs:
             docker build -t $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME/outbound:local -f ./docker/Dockerfile.Outbound ./
       - run:
           name: Save docker image to workspace
-          command: docker save -o /tmp/docker-outbound-image.tar $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME/outbound:local
+          command: docker save -o /tmp/docker-image-outbound.tar $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME/outbound:local
       - persist_to_workspace:
           root: /tmp
           paths:
