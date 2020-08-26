@@ -41,7 +41,7 @@
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
       "pre-commit": "lint-staged && npm test",
       "post-commit": "git update-index --again",
-      "pre-push": "npm test && npm run updates:check && npm audit:check"
+      "pre-push": "npm test && npm run updates:check && npm check:audit"
     }
   },
   "lint-staged": {
