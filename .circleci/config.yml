@@ -727,8 +727,10 @@ workflows:
       - publish-inbound:
           context: org-global
           requires:
-            - license-scan
-            - image-scan
+            - license-scan-inbound
+            - image-scan-inbound
+            - license-scan-outbound
+            - image-scan-outbound
             - test-unit
             - test-coverage
           filters:
@@ -740,8 +742,10 @@ workflows:
       - publish-outbound:
           context: org-global
           requires:
-            - license-scan
-            - image-scan
+            - license-scan-inbound
+            - image-scan-inbound
+            - license-scan-outbound
+            - image-scan-outbound
             - test-unit
             - test-coverage
           filters:
