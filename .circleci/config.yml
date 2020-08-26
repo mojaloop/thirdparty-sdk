@@ -277,13 +277,13 @@ jobs:
             echo 'export DOCKER_ORG=`cat package.json | jq -r .name | sed s/@// | sed s/$/-inbound/ | sed s/\\\\/.*//`' >> $BASH_ENV
             echo 'export CIRCLE_PROJECT_REPONAME=`cat package.json | jq -r .name | sed s/@// | sed s/$/-inbound/ | sed s/\.*\\\\///`' >> $BASH_ENV
       - run:
-          name: Build Docker inbound:local
+          name: Build Docker docker-image-inbound.tar
           command: |
             echo "Building Docker image-inbound: local"
-            docker build -t $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME/inbound:local -f ./docker/Dockerfile.Inbound ./
+            docker build -t $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:inbound.local -f ./docker/Dockerfile.Inbound ./
       - run:
           name: Save docker image to workspace
-          command: docker save -o /tmp/docker-image-inbound.tar $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME/inbound:local
+          command: docker save -o /tmp/docker-image-inbound.tar $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:inbound.local
       - persist_to_workspace:
           root: /tmp
           paths:
@@ -298,13 +298,13 @@ jobs:
             echo 'export DOCKER_ORG=`cat package.json | jq -r .name | sed s/@// | sed s/$/-outbound/ | sed s/\\\\/.*//`' >> $BASH_ENV
             echo 'export CIRCLE_PROJECT_REPONAME=`cat package.json | jq -r .name | sed s/@// | sed s/$/-outbound/ | sed s/\.*\\\\///`' >> $BASH_ENV
       - run:
-          name: Build Docker outbound:local
+          name: Build Docker docker-image-outbound.tar
           command: |
             echo "Building Docker image-outbound: local"
-            docker build -t $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME/outbound:local -f ./docker/Dockerfile.Outbound ./
+            docker build -t $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:outbound.local -f ./docker/Dockerfile.Outbound ./
       - run:
           name: Save docker image to workspace
-          command: docker save -o /tmp/docker-image-outbound.tar $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME/outbound:local
+          command: docker save -o /tmp/docker-image-outbound.tar $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:outbound.local
       - persist_to_workspace:
           root: /tmp
           paths:
@@ -391,19 +391,19 @@ jobs:
       - run:
           name: Re-tag pre built image
           command: |
-            docker tag $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME/inbound:local $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME/inbound:latest
-            docker tag $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME/inbound:local $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME/inbound:${CIRCLE_TAG}
+            docker tag $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:inbound.local $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:inbound.latest
+            docker tag $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:inbound.local $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:inbound.${CIRCLE_TAG}
       - run:
           name: Publish Docker image latest tag to Docker Hub
           command: |
-            echo "Publishing $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME/inbound:latest"
-            docker push $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME/inbound:latest
-            echo "Publishing $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME/inbound:${CIRCLE_TAG}"
-            docker push $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME/inbound:${CIRCLE_TAG}
+            echo "Publishing $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:inbound.latest"
+            docker push $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:inbound.latest
+            echo "Publishing $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:inbound.${CIRCLE_TAG}"
+            docker push $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:inbound.${CIRCLE_TAG}
       - slack/status:
           fail_only: true
           webhook: "$SLACK_WEBHOOK_ANNOUNCMENT_CI_CD"
-          failure_message: 'Publishing docker image failed for: \`"${DOCKER_ORG}/${CIRCLE_PROJECT_REPONAME}/inbound:${CIRCLE_TAG}"\`'
+          failure_message: 'Publishing docker image failed for: \`"${DOCKER_ORG}/${CIRCLE_PROJECT_REPONAME}:inbound.${CIRCLE_TAG}"\`'
 
   publish-outbound:
     executor: default-machine
@@ -424,19 +424,19 @@ jobs:
       - run:
           name: Re-tag pre built image
           command: |
-            docker tag $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME/outbound:local $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME/outbound:latest
-            docker tag $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME/outbound:local $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME/outbound:${CIRCLE_TAG}
+            docker tag $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:outbound.local $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:outbound.latest
+            docker tag $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:outbound.local $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:outbound.${CIRCLE_TAG}
       - run:
           name: Publish Docker image latest tag to Docker Hub
           command: |
-            echo "Publishing $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME/outbound:latest"
-            docker push $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME/outbound:latest
-            echo "Publishing $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME/outbound:${CIRCLE_TAG}"
-            docker push $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME/outbound:${CIRCLE_TAG}
+            echo "Publishing $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:outbound.latest"
+            docker push $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:outbound.latest
+            echo "Publishing $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:outbound.${CIRCLE_TAG}"
+            docker push $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:outbound.${CIRCLE_TAG}
       - slack/status:
           fail_only: true
           webhook: "$SLACK_WEBHOOK_ANNOUNCMENT_CI_CD"
-          failure_message: 'Publishing docker image failed for: \`"${DOCKER_ORG}/${CIRCLE_PROJECT_REPONAME}/outbound:${CIRCLE_TAG}"\`'
+          failure_message: 'Publishing docker image failed for: \`"${DOCKER_ORG}/${CIRCLE_PROJECT_REPONAME}:outbound.${CIRCLE_TAG}"\`'
 
   license-scan-inbound:
     executor: default-machine
@@ -444,13 +444,13 @@ jobs:
       - attach_workspace:
           at: /tmp
       - run:
-          name: Load the pre-built docker inbound:local image from workspace
+          name: Load the pre-built docker-image-inbound.tar local image from workspace
           command: docker load -i /tmp/docker-image-inbound.tar
       - run:
           <<: *defaults_license_scanner
       - run:
           name: Run the license-scanner
-          command: cd /tmp/license-scanner && mode=docker dockerImages=$DOCKER_ORG/$CIRCLE_PROJECT_REPONAME/inbound:local make run
+          command: cd /tmp/license-scanner && mode=docker dockerImages=$DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:inbound.local make run
       - store_artifacts:
           path: /tmp/license-scanner/results
           prefix: licenses
@@ -467,7 +467,7 @@ jobs:
           <<: *defaults_license_scanner
       - run:
           name: Run the license-scanner
-          command: cd /tmp/license-scanner && mode=docker dockerImages=$DOCKER_ORG/$CIRCLE_PROJECT_REPONAME/outbound:local make run
+          command: cd /tmp/license-scanner && mode=docker dockerImages=$DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:outbound.local make run
       - store_artifacts:
           path: /tmp/license-scanner/results
           prefix: licenses
@@ -504,7 +504,7 @@ jobs:
       - anchore/analyze_local_image:
           # Force the older version, version 0.7.0 was just published, and is broken
           anchore_version: v0.6.1
-          image_name: "docker.io/node:12.16.1-alpine $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME/inbound:local"
+          image_name: "docker.io/node:12.16.1-alpine $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:inbound.local"
           policy_failure: false
           timeout: '1000'
           # Note: if the generated policy is invalid, this will fallback to the default policy, which we don't want!
@@ -521,7 +521,7 @@ jobs:
       - slack/status:
           fail_only: true
           webhook: "$SLACK_WEBHOOK_ANNOUNCMENT_CI_CD"
-          failure_message: 'Anchore Image Scan failed  for: \`"${DOCKER_ORG}/${CIRCLE_PROJECT_REPONAME}/inbound:${CIRCLE_TAG}"\`'
+          failure_message: 'Anchore Image Scan failed  for: \`"${DOCKER_ORG}/${CIRCLE_PROJECT_REPONAME}:inbound.${CIRCLE_TAG}"\`'
       - store_artifacts:
           path: anchore-reports
 
@@ -557,7 +557,7 @@ jobs:
       - anchore/analyze_local_image:
           # Force the older version, version 0.7.0 was just published, and is broken
           anchore_version: v0.6.1
-          image_name: "docker.io/node:12.16.1-alpine $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME/outbound:local"
+          image_name: "docker.io/node:12.16.1-alpine $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:outbound.local"
           policy_failure: false
           timeout: '1000'
           # Note: if the generated policy is invalid, this will fallback to the default policy, which we don't want!
@@ -574,7 +574,7 @@ jobs:
       - slack/status:
           fail_only: true
           webhook: "$SLACK_WEBHOOK_ANNOUNCMENT_CI_CD"
-          failure_message: 'Anchore Image Scan failed  for: \`"${DOCKER_ORG}/${CIRCLE_PROJECT_REPONAME}/outbound:${CIRCLE_TAG}"\`'
+          failure_message: 'Anchore Image Scan failed  for: \`"${DOCKER_ORG}/${CIRCLE_PROJECT_REPONAME}:outbound.${CIRCLE_TAG}"\`'
       - store_artifacts:
           path: anchore-reports
 
