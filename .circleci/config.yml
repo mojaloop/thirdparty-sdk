@@ -659,6 +659,7 @@ workflows:
             branches:
               only:
                 - master
+    
       - license-scan-outbound:
           context: org-global
           requires:
@@ -703,8 +704,10 @@ workflows:
             - audit-licenses
             - linting-check
             - vulnerability-check
-            - image-scan
-            - license-scan
+            - image-scan-inbound
+            - license-scan-inbound
+            - image-scan-outbound
+            - license-scan-outbound
           filters:
             branches:
               only:
