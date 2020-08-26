@@ -5,7 +5,7 @@ info:
   description: Thirdparty Inbound Scheme Adapter
   license:
     name: Open API for FSP Interoperability (FSPIOP) (Implementation Friendly Version)
-servers: 
+servers:
   - url: /
 paths:
   /health:
@@ -13,7 +13,7 @@ paths:
       tags:
         - health
       responses:
-        '200':  
+        '200':
           $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/200'
         '400':
           $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/400'
@@ -86,3 +86,141 @@ paths:
       operationId: HelloGet
       summary: example get
       description: The HTTP request GET /hello is used to return some example json.
+  /thirdpartyRequests/transactions:
+    #parameters:
+    #  - $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Accept.yaml'
+    #  - $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Content-Length.yaml'
+    #  - $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Content-Type.yaml'
+    #  - $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Date.yaml'
+    #  - $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/X-Forwarded-For.yaml'
+    #  - $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Source.yaml'
+    #  - $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Destination.yaml'
+    #  - $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Encryption.yaml'
+    #  - $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Signature.yaml'
+    #  - $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-URI.yaml'
+    #  - $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-HTTP-Method.yaml'
+    post:
+      requestBody:
+        description: Transaction request to be created.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ThirdpartyTransactionRequest'
+            example:
+              transactionRequestId: '8d34f91d-d078-4077-8263-2c047876fcf6'
+              sourceAccountId: 'dfspa.alice.1234'
+              consentId: '111'
+              payee:
+                partyIdInfo:
+                  partyIdType: 'MSISDN'
+                  partyIdentifier: '+44 1234 5678'
+                  fspId: 'dfspb'
+              payer:
+                personalInfo:
+                  complexName:
+                    firstName: 'Alice'
+                    lastName: 'K'
+                partyIdInfo:
+                  partyIdType: 'MSISDN'
+                  partyIdentifier: '+44 8765 4321'
+                  fspId: 'dfspa'
+              amountType: 'SEND'
+              amount:
+                amount: '100'
+                currency: 'USD'
+              transactionType:
+                scenario: 'TRANSFER'
+                initiator: 'PAYER'
+                initiatorType: 'CONSUMER'
+              expiration: '2020-07-15T22:17:28.985-01:00'
+      responses:
+        '200':
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/200'
+        '400':
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/400'
+        '401':
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/401'
+        '403':
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/403'
+        '404':
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/404'
+        '405':
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/405'
+        '406':
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/406'
+        '501':
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/501'
+        '503':
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/503'
+      operationId: ThirdpartyRequestsTransactionsPost
+      summary: example get
+      description: The HTTP request GET /hello is used to return some example json.
+components:
+  responses:
+    $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml'
+  schemas:
+    AccountId:
+      type: string
+      description: >
+        A long-lived account identifier provided by the DFSP
+        this MUST NOT be Bank Account Number or anything that
+        may expose a User's private bank account information
+    ThirdpartyTransactionRequest:
+      title: ThirdpartyTransactionRequest
+      type: object
+      description: The object sent in the POST /thirdpartyRequests/transactions request.
+      properties:
+        transactionRequestId:
+          allOf:
+            - $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/CorrelationId.yaml'
+          description: >
+            Common ID between the FSPs for the transaction request object.
+            The ID should be reused for resends of the same transaction request.
+            A new ID should be generated for each new transaction request.
+        sourceAccountId:
+          allOf:
+            - $ref: '#/components/schemas/AccountId'
+          description: DFSP specific account identifiers, e.g. `dfspa.alice.1234`
+        consentId:
+          allOf:
+            - $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/CorrelationId.yaml'
+          description: >
+            Common ID between the PISP and FSP for the Consent object
+            This tells DFSP and auth-service which constent allows the PISP to initiate transaction.
+        payee:
+          allOf:
+            - $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/Party.yaml'
+          description: Information about the Payee in the proposed financial transaction.
+        payer:
+          allOf:
+            - $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/Party.yaml'
+          description: Information about the Payer in the proposed financial transaction.
+        amountType:
+          allOf:
+            - $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/AmountType.yaml'
+          description: SEND for sendAmount, RECEIVE for receiveAmount.
+        amount:
+          allOf:
+            - $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/Money.yaml'
+          description: Requested amount to be transferred from the Payer to Payee.
+        transactionType:
+          allOf:
+            - $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/TransactionType.yaml'
+          description: Type of transaction.
+        expiration:
+          type: string
+          description: >
+            Date and time until when the transaction request is valid.
+            It can be set to get a quick failure in case the peer FSP takes too long to respond.
+          example: '2016-05-24T08:38:08.699-04:00'
+      required:
+        - transactionRequestId
+        - sourceAccountId
+        - consentId
+        - payee
+        - payer
+        - amountType
+        - amount
+        - transactionType
+        - expiration
