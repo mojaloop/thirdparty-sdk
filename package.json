@@ -86,7 +86,8 @@
     "javascript-state-machine": "^3.1.0",
     "openapi-backend": "^3.5.1",
     "path": "^0.12.7",
-    "redis": "^3.0.2"
+    "redis": "^3.0.2",
+    "uuidv4": "^6.2.3"
   },
   "devDependencies": {
     "@types/convict": "^5.2.1",
