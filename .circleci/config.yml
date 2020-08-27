@@ -344,7 +344,7 @@ jobs:
           command: |
             echo "Changes are: ${RELEASE_CHANGES}"
       - github-release/create:
-          github-token-variable: ${GITHUB_RELEASE_TOKEN}
+          github-token-variable: ${GITHUB_TOKEN}
           tag: v${RELEASE_TAG}
           title: v${RELEASE_TAG} Release
           description: ${RELEASE_CHANGES}
