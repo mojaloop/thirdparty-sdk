@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+### [11.4.4](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.4.3...v11.4.4) (2020-08-27)
+
+
+### CI/CD
+
+* use GITHUB_TOKEN and setup mojaloopci user with Mantain access ([1f76c94](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/1f76c94775a726ff17f082d5375a156a0bba6fc4))
+
 ### [11.4.3](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.4.2...v11.4.3) (2020-08-27)
 
 
