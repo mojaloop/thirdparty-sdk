@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+### [11.4.3](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.4.2...v11.4.3) (2020-08-27)
+
+
+### CI/CD
+
+* use GITHUB_RELEASE_TOKEN ([242d1fb](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/242d1fbd3ed2d27317446bf0a1ebb6c3c5b32800))
+
 ### [11.4.2](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.4.1...v11.4.2) (2020-08-27)
 
 
