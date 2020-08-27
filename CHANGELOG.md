@@ -1,4 +1,23 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+## [11.4.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.3.0...v11.4.0) (2020-08-27)
+
+
+### Features
+
+* automated releasing ([#18](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/18)) ([959a342](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/959a342f33f89f0a1d659e57ac9f36f42f894aa6))
+
+
+### Maintenance
+
+* **package:** setup update policy for audit related dependencies ([213d7ac](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/213d7ac15dfe5441e2a036baec7c1fb7f99aecab))
+
+
+### CI/CD
+
+* disable image-scan ([635ad2a](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/635ad2af9700bafb425801fb6888fd473ac66fc5))
+* fix image-scan ([c95c4bc](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/c95c4bcfedeb6af73a39bae3fd7b1f57314d311a))
+* prune --production ([a727fb4](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/a727fb4afb8b08c3aa9e4e19352e4d8f6bd6d3e4))
+
 ## [11.3.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.2.0...v11.3.0) (2020-08-26)
 
 
