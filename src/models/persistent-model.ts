@@ -31,7 +31,7 @@ import StateMachine, {
   StateMachineInterface,
   TransitionEvent
 } from 'javascript-state-machine'
-import { KVS } from './kvs'
+import { KVS } from '~/shared/kvs'
 import { Logger as WinstonLogger } from 'winston'
 
 export interface ControlledStateMachine extends StateMachineInterface {

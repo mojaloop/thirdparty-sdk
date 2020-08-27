@@ -28,7 +28,7 @@
 import { KVS } from '~/shared/kvs'
 import { RedisConnectionConfig } from '~/shared/redis-connection'
 import { StateMachineConfig, Method } from 'javascript-state-machine'
-import { ControlledStateMachine, PersistentModel, PersistentModelConfig, StateData } from '~/shared/persistent-model'
+import { ControlledStateMachine, PersistentModel, PersistentModelConfig, StateData } from '~/models/persistent-model'
 import { mocked } from 'ts-jest/utils'
 import mockLogger from '../mockLogger'
 
