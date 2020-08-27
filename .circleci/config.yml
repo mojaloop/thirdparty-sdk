@@ -308,6 +308,7 @@ jobs:
             mkdir -p ~/.ssh
             ssh-keyscan -p 443 ssh.github.com >> ~/.ssh/known_hosts
             ssh-keyscan github.com >> ~/.ssh/known_hosts
+            chmod 0200 ~/.ssh/*
       - run:
           name: Generate changelog and bump package version
           command: npm run release
@@ -343,7 +344,7 @@ jobs:
           command: |
             echo "Changes are: ${RELEASE_CHANGES}"
       - github-release/create:
-          github-token-variable: ${GITHUB_TOKEN}
+          github-token-variable: ${GITHUB_RELEASE_TOKEN}
           tag: v${RELEASE_TAG}
           title: v${RELEASE_TAG} Release
           description: ${RELEASE_CHANGES}
