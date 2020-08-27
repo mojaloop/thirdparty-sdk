@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+### [11.4.2](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.4.1...v11.4.2) (2020-08-27)
+
+
+### CI/CD
+
+* release command generates commit witch doesn't trigger build ([c3302cb](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/c3302cbf7e444e917961ea3816f0cc1973cb88e4))
+
 ### [11.4.1](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.4.0...v11.4.1) (2020-08-27)
 
 ## [11.4.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.3.0...v11.4.0) (2020-08-27)
