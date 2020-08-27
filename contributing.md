@@ -118,14 +118,14 @@ npm run test:integration
 
 ## Inbound API
 ```bash
-npm run docker:build:inbound
+npm run docker:build
 npm run docker:start:inbound
 ```
 `Inboound API` Dockerfile: [docker/Docker.Inbound](./docker/Docker.Inbound)
 
 ## Outbound API
 ```bash
-npm run docker:build:outbound
+npm run docker:build
 npm run docker:run:outbound
 ```
 `Outboound API` Dockerfile: [docker/Docker.Outbound](./docker/Docker.Outbound)
