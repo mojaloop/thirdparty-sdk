@@ -96,7 +96,6 @@ export class OutboundAuthorizationsModel
     const spec: StateMachineConfig = {
       init: 'start',
       transitions: [
-        { name: 'init', from: 'none', to: 'start' },
         { name: 'requestAuthorization', from: 'start', to: 'succeeded' }
       ],
       methods: {
@@ -253,7 +252,7 @@ export async function loadFromKVS (
     }
     config.logger.push({ data })
     config.logger.info('data loaded from KVS')
-    return new OutboundAuthorizationsModel(data, config)
+    return create(data, config)
   } catch (err) {
     config.logger.push({ err })
     config.logger.info(`Error loading data from KVS for key: ${config.key}`)
