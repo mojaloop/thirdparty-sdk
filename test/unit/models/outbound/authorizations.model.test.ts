@@ -107,20 +107,23 @@ describe('OutboundAuthorizationsModel', () => {
   })
 
   describe('request authorization flow', () => {
-    it('Happy Flow: should give response properly populated from notification channel', async () => {
-      let handler: NotificationCallback
+    const subId = 1
+    let handler: NotificationCallback
+    let data: OutboundAuthorizationData
+    let putResponse: PutAuthorizationsResponse
+    beforeEach(() => {
       mocked(modelConfig.pubSub.subscribe).mockImplementationOnce(
         (_channel: string, cb: NotificationCallback) => {
           handler = cb
-          return 1
+          return subId
         }
       )
 
       mocked(modelConfig.pubSub.publish).mockImplementationOnce(
-        async (channel: string, message: Message) => handler(channel, message, 1)
+        async (channel: string, message: Message) => handler(channel, message, subId)
       )
 
-      const data: OutboundAuthorizationData = {
+      data = {
         toParticipantId: '123',
         request: {
           transactionRequestId: '1'
@@ -128,7 +131,7 @@ describe('OutboundAuthorizationsModel', () => {
         currentState: 'start'
       }
 
-      const putResponse: PutAuthorizationsResponse = {
+      putResponse = {
         authenticationInfo: {
           authentication: AuthenticationType.U2F,
           authenticationValue: {
@@ -138,13 +141,17 @@ describe('OutboundAuthorizationsModel', () => {
         },
         responseType: AuthorizationResponse.ENTERED
       }
+    })
+
+    it('Happy Flow: should give response properly populated from notification channel', async () => {
       const model = await create(data, modelConfig)
 
       // defer publication to notification channel
-      setTimeout(() => model.pubSub.publish(
+      setImmediate(() => model.pubSub.publish(
         'some-channel',
         putResponse as unknown as Message // TODO: think about generic Message so casting will not be necessary
-      ), 10)
+      ))
+      // do a request and await on published Message
       await model.fsm.requestAuthorization()
 
       const result = model.getResponse()
@@ -152,6 +159,9 @@ describe('OutboundAuthorizationsModel', () => {
         ...putResponse,
         currentState: OutboundAuthorizationsModelState.succeeded
       })
+      expect(mocked(modelConfig.pubSub.subscribe)).toBeCalledTimes(1)
+      expect(mocked(modelConfig.pubSub.unsubscribe)).toBeCalledWith('some-channel', subId)
+      expect(mocked(modelConfig.pubSub.publish)).toBeCalledWith('some-channel', putResponse)
     })
   })
 
