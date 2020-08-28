@@ -25,14 +25,20 @@
  --------------
  ******/
 import { KVS } from '~/shared/kvs'
+import { Message, NotificationCallback, PubSub } from '~/shared/pub-sub'
+
 import {
+  AuthenticationType,
+  AuthorizationResponse,
   OutboundAuthorizationData,
   OutboundAuthorizationsModel,
   OutboundAuthorizationsModelConfig,
+  OutboundAuthorizationsModelState,
+  PutAuthorizationsResponse,
   create,
   loadFromKVS
 } from '~/models/outbound/authorizations.model'
-import { PubSub } from '~/shared/pub-sub'
+
 import { PostAuthorizationsRequest, ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
 import { RedisConnectionConfig } from '~/shared/redis-connection'
 import { mocked } from 'ts-jest/utils'
@@ -100,6 +106,55 @@ describe('OutboundAuthorizationsModel', () => {
     expect(typeof create).toEqual('function')
   })
 
+  describe('request authorization flow', () => {
+    it('Happy Flow: should give response properly populated from notification channel', async () => {
+      let handler: NotificationCallback
+      mocked(modelConfig.pubSub.subscribe).mockImplementationOnce(
+        (_channel: string, cb: NotificationCallback) => {
+          handler = cb
+          return 1
+        }
+      )
+
+      mocked(modelConfig.pubSub.publish).mockImplementationOnce(
+        async (channel: string, message: Message) => handler(channel, message, 1)
+      )
+
+      const data: OutboundAuthorizationData = {
+        toParticipantId: '123',
+        request: {
+          transactionRequestId: '1'
+        } as unknown as PostAuthorizationsRequest, // minimal request body
+        currentState: 'start'
+      }
+
+      const putResponse: PutAuthorizationsResponse = {
+        authenticationInfo: {
+          authentication: AuthenticationType.U2F,
+          authenticationValue: {
+            pinValue: 'the-mocked-pin-value',
+            counter: '1'
+          }
+        },
+        responseType: AuthorizationResponse.ENTERED
+      }
+      const model = await create(data, modelConfig)
+
+      // defer publication to notification channel
+      setTimeout(() => model.pubSub.publish(
+        'some-channel',
+        putResponse as unknown as Message // TODO: think about generic Message so casting will not be necessary
+      ), 10)
+      await model.fsm.requestAuthorization()
+
+      const result = model.getResponse()
+      expect(result).toEqual({
+        ...putResponse,
+        currentState: OutboundAuthorizationsModelState.succeeded
+      })
+    })
+  })
+
   describe('loadFromKVS', () => {
     it('should properly call `KVS.get`, get expected data in `context.data` and setup state of machine', async () => {
       const dataFromCache: OutboundAuthorizationData = {
@@ -132,6 +187,38 @@ describe('OutboundAuthorizationsModel', () => {
       mocked(modelConfig.kvs.get).mockImplementationOnce(jest.fn(async () => { throw new Error('error from KVS.get') }))
       expect(() => loadFromKVS(modelConfig))
         .rejects.toEqual(new Error('error from KVS.get'))
+    })
+  })
+
+  describe('saveToKVS', () => {
+    it('should store using KVS.set', async () => {
+      mocked(modelConfig.kvs.set).mockImplementationOnce(() => Promise.resolve(true))
+      const data: OutboundAuthorizationData = {
+        toParticipantId: '123',
+        request: { mocked: true } as unknown as PostAuthorizationsRequest,
+        currentState: 'succeeded'
+      }
+      const am = await create(data, modelConfig)
+      checkOAMLayout(am, data)
+
+      // transition `init` should encounter exception when saving `context.data`
+      await am.saveToKVS()
+      expect(mocked(modelConfig.kvs.set)).toBeCalledWith(am.key, am.data)
+    })
+
+    it('should propagate error from KVS.set', async () => {
+      mocked(modelConfig.kvs.set).mockImplementationOnce(() => { throw new Error('error from KVS.set') })
+      const data: OutboundAuthorizationData = {
+        toParticipantId: '123',
+        request: { mocked: true } as unknown as PostAuthorizationsRequest,
+        currentState: 'succeeded'
+      }
+      const am = await create(data, modelConfig)
+      checkOAMLayout(am, data)
+
+      // transition `init` should encounter exception when saving `context.data`
+      expect(() => am.saveToKVS()).rejects.toEqual(new Error('error from KVS.set'))
+      expect(mocked(modelConfig.kvs.set)).toBeCalledWith(am.key, am.data)
     })
   })
 })

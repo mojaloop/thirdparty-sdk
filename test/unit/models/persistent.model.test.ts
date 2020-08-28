@@ -273,7 +273,7 @@ describe('Persistent State Machine', () => {
       expect(() => pm.saveToKVS()).rejects.toEqual(new Error('error from KVS.set'))
       expect(mocked(modelConfig.kvs.set)).toBeCalledWith(pm.key, pm.data)
     })
-    it('should propaget error from KVS.set', async () => {
+    it('should propagate error from KVS.set', async () => {
       mocked(modelConfig.kvs.set).mockImplementationOnce(() => { throw new Error('error from KVS.set') })
 
       const pm = await create<TestStateMachine, TestData>(data, modelConfig, smConfig)
