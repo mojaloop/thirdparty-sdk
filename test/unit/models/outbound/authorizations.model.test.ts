@@ -107,7 +107,8 @@ describe('OutboundAuthorizationsModel', () => {
   })
 
   describe('request authorization flow', () => {
-    const subId = 1
+    let subId = 0
+    let channel: string
     let handler: NotificationCallback
     let data: OutboundAuthorizationData
     let putResponse: PutAuthorizationsResponse
@@ -115,7 +116,7 @@ describe('OutboundAuthorizationsModel', () => {
       mocked(modelConfig.pubSub.subscribe).mockImplementationOnce(
         (_channel: string, cb: NotificationCallback) => {
           handler = cb
-          return subId
+          return ++subId
         }
       )
 
@@ -131,6 +132,8 @@ describe('OutboundAuthorizationsModel', () => {
         currentState: 'start'
       }
 
+      channel = OutboundAuthorizationsModel.notificationChannel(data.request.transactionRequestId)
+
       putResponse = {
         authenticationInfo: {
           authentication: AuthenticationType.U2F,
@@ -145,10 +148,9 @@ describe('OutboundAuthorizationsModel', () => {
 
     it('Happy Flow: should give response properly populated from notification channel', async () => {
       const model = await create(data, modelConfig)
-
       // defer publication to notification channel
       setImmediate(() => model.pubSub.publish(
-        'some-channel',
+        channel,
         putResponse as unknown as Message // TODO: think about generic Message so casting will not be necessary
       ))
       // do a request and await on published Message
@@ -159,9 +161,30 @@ describe('OutboundAuthorizationsModel', () => {
         ...putResponse,
         currentState: OutboundAuthorizationsModelState.succeeded
       })
+      expect(mocked(modelConfig.requests.postAuthorizations)).toHaveBeenCalledWith(
+        model.data.request, model.data.toParticipantId
+      )
       expect(mocked(modelConfig.pubSub.subscribe)).toBeCalledTimes(1)
-      expect(mocked(modelConfig.pubSub.unsubscribe)).toBeCalledWith('some-channel', subId)
-      expect(mocked(modelConfig.pubSub.publish)).toBeCalledWith('some-channel', putResponse)
+      expect(mocked(modelConfig.pubSub.unsubscribe)).toBeCalledWith(channel, subId)
+      expect(mocked(modelConfig.pubSub.publish)).toBeCalledWith(channel, putResponse)
+    })
+
+    it('should properly handle error from requests.postAuthorizations', async () => {
+      mocked(modelConfig.requests.postAuthorizations).mockImplementationOnce(
+        () => { throw new Error('error from requests.postAuthorizations') }
+      )
+      const model = await create(data, modelConfig)
+
+      // do a request and await on published Message
+      try {
+        await model.fsm.requestAuthorization()
+      } catch (err) {
+        expect(err).toEqual(new Error('error from requests.postAuthorizations'))
+        const result = model.getResponse()
+        expect(result).toBeUndefined()
+        expect(mocked(modelConfig.pubSub.subscribe)).toBeCalledTimes(1)
+        expect(mocked(modelConfig.pubSub.unsubscribe)).toBeCalledWith(channel, subId)
+      }
     })
   })
 
