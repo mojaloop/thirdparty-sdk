@@ -38,6 +38,8 @@ import {
 } from '~/models/persistent.model'
 import { mocked } from 'ts-jest/utils'
 import mockLogger from 'test/unit/mockLogger'
+import shouldNotBeExecuted from 'test/unit/shouldNotBeExecuted'
+import sortedArray from 'test/unit/sortedArray'
 
 // mock KVS default exported class
 jest.mock('~/shared/kvs')
@@ -67,11 +69,6 @@ describe('Persistent State Machine', () => {
 
   let data: TestData
 
-  function sortedArray (a: string[]): string[] {
-    const b = [...a]
-    b.sort()
-    return b
-  }
   function checkPSMLayout (pm: PersistentModel<TestStateMachine, TestData>, optData?: TestData) {
     expect(pm).toBeTruthy()
     expect(pm.fsm.state).toEqual(optData?.currentState || smConfig.init || 'none')
@@ -93,10 +90,6 @@ describe('Persistent State Machine', () => {
     expect(typeof pm.fsm.error).toEqual('function')
     expect(sortedArray(pm.fsm.allStates())).toEqual(['end', 'errored', 'middle', 'none', 'start'])
     expect(sortedArray(pm.fsm.allTransitions())).toEqual(['error', 'init', 'middle2End', 'start2End', 'start2Middle'])
-  }
-
-  function shouldNotBeExecuted () {
-    throw new Error('test failure enforced: this code should never be executed')
   }
 
   beforeEach(async () => {
@@ -249,7 +242,7 @@ describe('Persistent State Machine', () => {
       // to get value from cache proper key should be used
       expect(mocked(modelConfig.kvs.get)).toHaveBeenCalledWith(modelConfig.key)
 
-      // check what has been stored in `context.data`
+      // check what has been stored in `data`
       expect(pm.data).toEqual(dataFromCache)
     })
 
