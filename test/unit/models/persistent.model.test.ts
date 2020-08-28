@@ -264,7 +264,7 @@ describe('Persistent State Machine', () => {
   })
   describe('saveToKVS', () => {
     it('should store using KVS.set', async () => {
-      mocked(modelConfig.kvs.set).mockImplementationOnce(() => Promise.resolve(true))
+      mocked(modelConfig.kvs.set).mockImplementationOnce(() => { throw new Error('error from KVS.set') })
 
       const pm = await create<TestStateMachine, TestData>(data, modelConfig, smConfig)
       checkPSMLayout(pm)
