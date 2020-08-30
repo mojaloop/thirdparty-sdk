@@ -87,6 +87,7 @@ paths:
       summary: example get
       description: The HTTP request GET /hello is used to return some example json.
   /thirdpartyRequests/transactions:
+    # todo: uncomment parameters after header middleware simalar to `sdk-scheme-adapter` is checked in
     #parameters:
     #  - $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Accept.yaml'
     #  - $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Content-Length.yaml'

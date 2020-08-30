@@ -68,18 +68,18 @@ export async function forwardPostQuoteRequestToPayee (request: ThirdpartyTransac
 }
 
 // todo: create dfsp outbound calls for these checks.
-export function verifyConsentId (_consentId: string): boolean {
+export async function verifyConsentId (_consentId: string): Promise<boolean> {
   return true
 }
 
-export function verifySourceAccountId (_sourceAccountId: string): boolean {
+export async function verifySourceAccountId (_sourceAccountId: string): Promise<boolean> {
   return true
 }
 
-export function verifyPispId (_pispId: string): boolean {
+export async function verifyPispId (_pispId: string): Promise<boolean> {
   return true
 }
 
-export function validateGrantedConsent (_consentId: string): boolean {
+export async function validateGrantedConsent (_consentId: string): Promise<boolean> {
   return true
 }

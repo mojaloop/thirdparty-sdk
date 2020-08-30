@@ -45,10 +45,10 @@ async function post (_context: Context, request: Request, h: ResponseToolkit): P
   const transactionRequest = request.payload as ThirdpartyTransactionRequest
 
   // todo: this might need to be a state machine in the future
-  if (!verifyConsentId(transactionRequest.consentId) ||
-      !verifyPispId(request.headers['FSPIOP-Source']) ||
-      !verifySourceAccountId(transactionRequest.sourceAccountId) ||
-      !validateGrantedConsent(transactionRequest.consentId)) {
+  if (!(await verifyConsentId(transactionRequest.consentId)) ||
+      !(await verifyPispId(request.headers['FSPIOP-Source'])) ||
+      !(await verifySourceAccountId(transactionRequest.sourceAccountId)) ||
+      !(await validateGrantedConsent(transactionRequest.consentId))) {
     // todo: change to a thirdparty specific error code here
     return h.response(Enums.FSPIOPErrorCodes.CLIENT_ERROR).code(Enum.Http.ReturnCodes.BADREQUEST.CODE)
   }

@@ -87,23 +87,23 @@ describe('thirdpartyRequests/transactions', (): void => {
     expect(__postQuotes).toBeCalledWith(quoteRequest, quoteRequest.payee.partyIdInfo.fspId)
   })
 
-  it('verifyConsentId should resolve', (): void => {
-    expect(verifyConsentId('ddab7438-a8a8-2dc0-b6bf-25c8e28a7561'))
+  it('verifyConsentId should resolve', async (): Promise<void> => {
+    expect(await verifyConsentId('ddab7438-a8a8-2dc0-b6bf-25c8e28a7561'))
       .toEqual(true)
   })
 
-  it('verifySourceAccountId should resolve', (): void => {
-    expect(verifySourceAccountId('dfspa.alice.1234'))
+  it('verifySourceAccountId should resolve', async (): Promise<void> => {
+    expect(await verifySourceAccountId('dfspa.alice.1234'))
       .toEqual(true)
   })
 
-  it('verifyPispId should resolve', (): void => {
-    expect(verifyPispId('pispa'))
+  it('verifyPispId should resolve', async (): Promise<void> => {
+    expect(await verifyPispId('pispa'))
       .toEqual(true)
   })
 
-  it('validateGrantedConsent should resolve', (): void => {
-    expect(validateGrantedConsent('ddab7438-a8a8-2dc0-b6bf-25c8e28a7561'))
+  it('validateGrantedConsent should resolve', async (): Promise<void> => {
+    expect(await validateGrantedConsent('ddab7438-a8a8-2dc0-b6bf-25c8e28a7561'))
       .toEqual(true)
   })
 })
