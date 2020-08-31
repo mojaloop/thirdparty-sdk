@@ -1,0 +1,88 @@
+{
+  "postThirdpartyRequestsTransactionRequest": {
+    "headers": {
+      "fspiop-source": "pispA",
+      "fspiop-destination": "dfspA"
+    },
+    "params": {},
+    "payload": {
+      "transactionRequestId": "7d34f91d-d078-4077-8263-2c047876fcf6",
+      "sourceAccountId": "dfspa.alice.1234",
+      "consentId": "8e34f91d-d078-4077-8263-2c047876fcf6",
+      "payee": {
+        "partyIdInfo": {
+          "partyIdType": "MSISDN",
+          "partyIdentifier": "+44 1234 5678",
+          "fspId": "dfspb"
+        }
+      },
+      "payer": {
+        "personalInfo": {
+          "complexName": {
+            "firstName": "Alice",
+            "lastName": "K"
+          }
+        },
+        "partyIdInfo": {
+          "partyIdType": "MSISDN",
+          "partyIdentifier": "+44 8765 4321",
+          "fspId": "dfspa"
+        }
+      },
+      "amountType": "SEND",
+      "amount": {
+        "amount": "100",
+        "currency": "USD"
+      },
+      "transactionType": {
+        "scenario": "TRANSFER",
+        "initiator": "PAYER",
+        "initiatorType": "CONSUMER"
+      },
+      "expiration": "2020-07-15T22:17:28.985-01:00"
+    }
+  },
+  "postQuotesRequest": {
+    "headers": {
+      "fspiop-source": "dfspA",
+      "fspiop-destination": "dfspB"
+    },
+    "params": {},
+    "payload": {
+      "quoteId":"1e8beca7-2f72-4d3b-b775-fc1a6470e1de",
+      "transactionId":"c1e7bfc3-f5f5-45d3-a255-6bb3c9e22869",
+      "note":"",
+      "transactionRequestId": "7d34f91d-d078-4077-8263-2c047876fcf6",
+      "payee": {
+        "partyIdInfo": {
+          "partyIdType": "MSISDN",
+          "partyIdentifier": "+44 1234 5678",
+          "fspId": "dfspb"
+        }
+      },
+      "payer": {
+        "personalInfo": {
+          "complexName": {
+            "firstName": "Alice",
+            "lastName": "K"
+          }
+        },
+        "partyIdInfo": {
+          "partyIdType": "MSISDN",
+          "partyIdentifier": "+44 8765 4321",
+          "fspId": "dfspa"
+        }
+      },
+      "amountType": "SEND",
+      "amount": {
+        "amount": "100",
+        "currency": "USD"
+      },
+      "transactionType": {
+        "scenario": "TRANSFER",
+        "initiator": "PAYER",
+        "initiatorType": "CONSUMER"
+      }
+    }
+  }
+}
