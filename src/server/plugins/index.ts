@@ -49,8 +49,9 @@ async function register (
     Vision,
     Blip,
     ErrorHandling,
-    Util.Hapi.HapiEventPlugin,
-    Util.Hapi.FSPIOPHeaderValidation
+    Util.Hapi.HapiEventPlugin
+    // TODO: check do we really need this headers validation for Outbound/Inbound services
+    // Util.Hapi.FSPIOPHeaderValidation
   ]
 
   await server.register(plugins)
