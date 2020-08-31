@@ -27,14 +27,21 @@
  ******/
 
 import { ServerAPI, ServerConfig } from '~/server'
+import {
+  AuthorizationResponse,
+  AuthenticationType,
+  InboundAuthorizationsPutRequest,
+  OutboundAuthorizationsModelState
+} from '~/models/authorizations.interface'
+import { Server } from '@hapi/hapi'
 import Config from '~/shared/config'
 import Handlers from '~/handlers'
-import { Server } from '@hapi/hapi'
 import index from '~/index'
 import path from 'path'
 
 describe('Inbound API routes', (): void => {
   let server: Server
+  let putResponse: InboundAuthorizationsPutRequest
 
   beforeAll(async (): Promise<void> => {
     const apiPath = path.resolve(__dirname, '../../../src/interface/api-outbound.yaml')
@@ -48,6 +55,18 @@ describe('Inbound API routes', (): void => {
       ...Handlers.Outbound
     }
     server = await index.server.setupAndStart(serverConfig, apiPath, serverHandlers)
+  })
+  beforeEach(() => {
+    putResponse = {
+      authenticationInfo: {
+        authentication: AuthenticationType.U2F,
+        authenticationValue: {
+          pinValue: 'the-mocked-pin-value',
+          counter: '1'
+        }
+      },
+      responseType: AuthorizationResponse.ENTERED
+    }
   })
 
   afterAll(async (done): Promise<void> => {
@@ -97,6 +116,43 @@ describe('Inbound API routes', (): void => {
     expect(response.statusCode).toBe(200)
     expect(JSON.parse(response.payload)).toEqual({
       hello: 'outbound'
+    })
+  })
+
+  it('/authorizations', async (): Promise<void> => {
+    const request = {
+      method: 'POST',
+      url: '/authorizations',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      payload: {
+        toParticipantId: 'pisp',
+        authenticationType: 'U2F',
+        retriesLeft: '1',
+        amount: {
+          currency: 'USD',
+          amount: '100'
+        },
+        transactionId: 'c87e9f61-e0d1-4a1c-a992-002718daf402',
+        transactionRequestId: 'aca279be-60c6-42ff-aab5-901d61b5e35c',
+        quote: {
+          transferAmount: {
+            currency: 'USD',
+            amount: '105'
+          },
+          expiration: '2020-07-15T09:48:54.961Z',
+          ilpPacket: 'ilp-packet-value',
+          condition: 'condition-000000000-111111111-222222222-abc'
+        }
+      }
+    }
+
+    const response = await server.inject(request)
+    expect(response.statusCode).toBe(200)
+    expect(response.result).toEqual({
+      ...putResponse,
+      currentState: OutboundAuthorizationsModelState.succeeded
     })
   })
 })
