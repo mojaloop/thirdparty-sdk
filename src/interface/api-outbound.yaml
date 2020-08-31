@@ -19,10 +19,10 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#components/schemas/OutboundAuthorizationsPostRequest'
+              $ref: '#/components/schemas/OutboundAuthorizationsPostRequest'
       responses:
-        '200':
-          $ref: '#components/schemas/OutboundAuthorizationsPostResponse'
+        '202':
+          $ref: '#/components/responses/OutboundAuthorizationsPostResponse'
         '400':
           $ref: '#/paths/~1hello/get/responses/400'
         '401':
@@ -133,7 +133,7 @@ paths:
                         description: Error description string.
                         example: This is an error description.
                       extensionList:
-                        $ref: '#/components/schemas/OutboundAuthorizationsPostRequest/properties/quote/properties/extensionList'
+                        $ref: '#/paths/~1authorizations/post/requestBody/content/application~1json/schema/properties/quote/properties/extensionList'
                     required:
                       - errorCode
                       - errorDescription
@@ -600,58 +600,62 @@ components:
         - transactionRequestId
         - quote
       additionalProperties: false
+  responses:
     OutboundAuthorizationsPostResponse:
-      title: OutboundAuthorizationsPostResponse
       description: |
         response body of POST/authorizations 
         derived from AuthorizationsIDPutResponse by Inbound Service via Pub/Sub channel
-      type: object
-      required:
-        - responseType
-      additionalProperties: false
-      properties:
-        authenticationInfo:
-          title: AuthenticationInfo
-          type: object
-          description: Data model for the complex type AuthenticationInfo.
-          properties:
-            authentication:
-              $ref: '#/components/schemas/OutboundAuthorizationsPostRequest/properties/authenticationType'
-            authenticationValue:
-              title: AuthenticationValue
-              oneOf:
-                - title: OtpValue
-                  type: string
-                  pattern: '^\d{3,10}$'
-                  description: |
-                    The API data type OtpValue is a JSON String of 3 to 10 characters,
-                    consisting of digits only. Negative numbers are not allowed.
-                    One or more leading zeros are allowed.
-                - title: QRCODE
-                  type: string
-                  minLength: 1
-                  maxLength: 64
-                  description: QR code used as a One Time Password.
-              pattern: '^\d{3,10}$|^\S{1,64}$'
-              description: |
-                Contains the authentication value. The format depends on the authentication
-                type used in the AuthenticationInfo complex type.
-              example: 1234
-          required:
-            - authentication
-            - authenticationValue
-        responseType:
-          title: AuthorizationResponse
-          type: string
-          enum:
-            - ENTERED
-            - REJECTED
-            - RESEND
-          description: |
-            Below are the allowed values for the enumeration.
-            - ENTERED - Consumer entered the authentication value.
-            - REJECTED - Consumer rejected the transaction.
-            - RESEND - Consumer requested to resend the authentication value.
-          example: ENTERED
-        currentState:
-          $ref: '#/components/schemas/AuthorizationsState'
+      content:
+        application/json:
+          schema:
+            title: OutboundAuthorizationsPostResponse
+            type: object
+            required:
+              - responseType
+            additionalProperties: false
+            properties:
+              authenticationInfo:
+                title: AuthenticationInfo
+                type: object
+                description: Data model for the complex type AuthenticationInfo.
+                properties:
+                  authentication:
+                    $ref: '#/components/schemas/OutboundAuthorizationsPostRequest/properties/authenticationType'
+                  authenticationValue:
+                    title: AuthenticationValue
+                    oneOf:
+                      - title: OtpValue
+                        type: string
+                        pattern: '^\d{3,10}$'
+                        description: |
+                          The API data type OtpValue is a JSON String of 3 to 10 characters,
+                          consisting of digits only. Negative numbers are not allowed.
+                          One or more leading zeros are allowed.
+                      - title: QRCODE
+                        type: string
+                        minLength: 1
+                        maxLength: 64
+                        description: QR code used as a One Time Password.
+                    pattern: '^\d{3,10}$|^\S{1,64}$'
+                    description: |
+                      Contains the authentication value. The format depends on the authentication
+                      type used in the AuthenticationInfo complex type.
+                    example: 1234
+                required:
+                  - authentication
+                  - authenticationValue
+              responseType:
+                title: AuthorizationResponse
+                type: string
+                enum:
+                  - ENTERED
+                  - REJECTED
+                  - RESEND
+                description: |
+                  Below are the allowed values for the enumeration.
+                  - ENTERED - Consumer entered the authentication value.
+                  - REJECTED - Consumer rejected the transaction.
+                  - RESEND - Consumer requested to resend the authentication value.
+                example: ENTERED
+              currentState:
+                $ref: '#/components/schemas/AuthorizationsState'

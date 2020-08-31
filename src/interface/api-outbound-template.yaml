@@ -19,10 +19,10 @@ paths:
         content:
           application/json:
             schema: 
-              $ref: '#components/schemas/OutboundAuthorizationsPostRequest'
+              $ref: '#/components/schemas/OutboundAuthorizationsPostRequest'
       responses:
-        '200':
-          $ref: '#components/schemas/OutboundAuthorizationsPostResponse'
+        '202':
+          $ref: '#/components/responses/OutboundAuthorizationsPostResponse'
         '400':
           $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/400'
         '401':
@@ -165,19 +165,24 @@ components:
         - transactionRequestId
         - quote
       additionalProperties: false
+
+  responses:
     OutboundAuthorizationsPostResponse:
-        title: OutboundAuthorizationsPostResponse
         description: |
           response body of POST/authorizations 
           derived from AuthorizationsIDPutResponse by Inbound Service via Pub/Sub channel
-        type: object
-        required:
-          - responseType
-        additionalProperties: false
-        properties:
-          authenticationInfo:
-            $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/AuthenticationInfo.yaml'
-          responseType:
-            $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/AuthorizationResponse.yaml'
-          currentState:
-            $ref: '#/components/schemas/AuthorizationsState'
+        content:
+          application/json:
+            schema:
+              title: OutboundAuthorizationsPostResponse
+              type: object
+              required:
+                - responseType
+              additionalProperties: false
+              properties:
+                authenticationInfo:
+                  $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/AuthenticationInfo.yaml'
+                responseType:
+                  $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/AuthorizationResponse.yaml'
+                currentState:
+                  $ref: '#/components/schemas/AuthorizationsState'
