@@ -34,6 +34,7 @@ import {
   OutboundAuthorizationsModel,
   OutboundAuthorizationsModelConfig,
   OutboundAuthorizationsModelState,
+  // PostAuthorizationsResponse,
   PutAuthorizationsResponse,
   create,
   loadFromKVS
@@ -106,6 +107,19 @@ describe('OutboundAuthorizationsModel', () => {
     expect(typeof create).toEqual('function')
   })
 
+  describe('notificationChannel', () => {
+    it('should generate proper channel name', () => {
+      const id = '123'
+      expect(OutboundAuthorizationsModel.notificationChannel(id)).toEqual('authorizations_123')
+    })
+
+    it('input validation', () => {
+      expect(
+        () => OutboundAuthorizationsModel.notificationChannel(null as unknown as string)
+      ).toThrow()
+    })
+  })
+
   describe('request authorization flow', () => {
     let subId = 0
     let channel: string
@@ -146,7 +160,7 @@ describe('OutboundAuthorizationsModel', () => {
       }
     })
 
-    it('Happy Flow: should give response properly populated from notification channel', async () => {
+    it('should give response properly populated from notification channel', async () => {
       const model = await create(data, modelConfig)
       // defer publication to notification channel
       setImmediate(() => model.pubSub.publish(
@@ -156,7 +170,10 @@ describe('OutboundAuthorizationsModel', () => {
       // do a request and await on published Message
       await model.fsm.requestAuthorization()
 
+      // retrieve the request
       const result = model.getResponse()
+
+      // Assertions
       expect(result).toEqual({
         ...putResponse,
         currentState: OutboundAuthorizationsModelState.succeeded
@@ -178,6 +195,7 @@ describe('OutboundAuthorizationsModel', () => {
       // do a request and await on published Message
       try {
         await model.fsm.requestAuthorization()
+        shouldNotBeExecuted()
       } catch (err) {
         expect(err).toEqual(new Error('error from requests.postAuthorizations'))
         const result = model.getResponse()
@@ -185,6 +203,66 @@ describe('OutboundAuthorizationsModel', () => {
         expect(mocked(modelConfig.pubSub.subscribe)).toBeCalledTimes(1)
         expect(mocked(modelConfig.pubSub.unsubscribe)).toBeCalledWith(channel, subId)
       }
+    })
+
+    describe('run workflow', () => {
+      it('start', async () => {
+        const model = await create(data, modelConfig)
+
+        // defer publication to notification channel
+        setImmediate(() => model.pubSub.publish(
+          channel,
+          putResponse as unknown as Message // TODO: think about generic Message so casting will not be necessary
+        ))
+
+        const result = await model.run()
+
+        expect(result).toEqual({
+          ...putResponse,
+          currentState: OutboundAuthorizationsModelState.succeeded
+        })
+        expect(mocked(modelConfig.requests.postAuthorizations)).toHaveBeenCalledWith(
+          model.data.request, model.data.toParticipantId
+        )
+        expect(mocked(modelConfig.pubSub.subscribe)).toBeCalledTimes(1)
+        expect(mocked(modelConfig.pubSub.unsubscribe)).toBeCalledWith(channel, subId)
+        expect(mocked(modelConfig.pubSub.publish)).toBeCalledWith(channel, putResponse)
+
+        expect(mocked(modelConfig.logger.info)).toBeCalledWith('Authorization completed successfully')
+        mocked(modelConfig.logger.info).mockReset()
+
+        // check retrieving state from 'succeeded'
+        expect(model.data.currentState).toEqual('succeeded')
+
+        // run workflow again
+        const newResult = await model.run()
+
+        expect(newResult).toEqual(result)
+
+        expect(mocked(modelConfig.logger.info)).toBeCalledWith('Authorization completed successfully')
+      })
+
+      it('errored', async () => {
+        const model = await create({ ...data, currentState: 'errored' }, modelConfig)
+
+        const result = await model.run()
+
+        expect(mocked(modelConfig.logger.info)).toBeCalledWith('State machine in errored state')
+
+        expect(result).toBeUndefined()
+      })
+
+      it('exceptions', async () => {
+        const error = { message: 'error from requests.postAuthorizations', authorizationState: 'broken' }
+        mocked(modelConfig.requests.postAuthorizations).mockImplementationOnce(
+          () => {
+            throw error
+          }
+        )
+        const model = await create(data, modelConfig)
+
+        expect(async () => await model.run()).rejects.toEqual(error)
+      })
     })
   })
 
@@ -231,12 +309,12 @@ describe('OutboundAuthorizationsModel', () => {
         request: { mocked: true } as unknown as PostAuthorizationsRequest,
         currentState: 'succeeded'
       }
-      const am = await create(data, modelConfig)
-      checkOAMLayout(am, data)
+      const model = await create(data, modelConfig)
+      checkOAMLayout(model, data)
 
       // transition `init` should encounter exception when saving `context.data`
-      await am.saveToKVS()
-      expect(mocked(modelConfig.kvs.set)).toBeCalledWith(am.key, am.data)
+      await model.saveToKVS()
+      expect(mocked(modelConfig.kvs.set)).toBeCalledWith(model.key, model.data)
     })
 
     it('should propagate error from KVS.set', async () => {
