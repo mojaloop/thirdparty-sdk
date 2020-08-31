@@ -28,14 +28,16 @@ import { KVS } from '~/shared/kvs'
 import { Message, NotificationCallback, PubSub } from '~/shared/pub-sub'
 
 import {
-  AuthenticationType,
   AuthorizationResponse,
+  AuthenticationType,
   OutboundAuthorizationData,
-  OutboundAuthorizationsModel,
   OutboundAuthorizationsModelConfig,
   OutboundAuthorizationsModelState,
-  // PostAuthorizationsResponse,
-  PutAuthorizationsResponse,
+  InboundAuthorizationsPutRequest
+} from '~/models/authorizations.interface'
+
+import {
+  OutboundAuthorizationsModel,
   create,
   loadFromKVS
 } from '~/models/outbound/authorizations.model'
@@ -125,7 +127,7 @@ describe('OutboundAuthorizationsModel', () => {
     let channel: string
     let handler: NotificationCallback
     let data: OutboundAuthorizationData
-    let putResponse: PutAuthorizationsResponse
+    let putResponse: InboundAuthorizationsPutRequest
     beforeEach(() => {
       mocked(modelConfig.pubSub.subscribe).mockImplementationOnce(
         (_channel: string, cb: NotificationCallback) => {

@@ -1,4 +1,3 @@
-
 /*****
  License
  --------------
@@ -26,64 +25,20 @@
  --------------
  ******/
 
-import { ControlledStateMachine, PersistentModel, PersistentModelConfig, StateData } from '~/models/persistent.model'
-import { Method, StateMachineConfig } from 'javascript-state-machine'
+import {
+  InboundAuthorizationsPutRequest,
+  OutboundAuthorizationsPostResponse,
+  OutboundAuthorizationsModelConfig,
+  OutboundAuthorizationsModelState,
+  OutboundAuthorizationData,
+  OutboundAuthorizationStateMachine
+} from '~/models/authorizations.interface'
+
+import { PersistentModel } from '~/models/persistent.model'
+import { StateMachineConfig } from 'javascript-state-machine'
 import { Message, PubSub } from '~/shared/pub-sub'
-import { PostAuthorizationsRequest, ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
+import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
 import inspect from '~/shared/inspect'
-
-export interface OutboundAuthorizationStateMachine extends ControlledStateMachine {
-  requestAuthorization: Method
-  onRequestAuthorization: Method
-}
-
-export interface OutboundAuthorizationsModelConfig extends PersistentModelConfig {
-  pubSub: PubSub
-  requests: ThirdpartyRequests
-}
-
-export enum OutboundAuthorizationsModelState {
-  start = 'WAITING_FOR_AUTHORIZATION_REQUEST',
-  succeeded = 'COMPLETED',
-  errored = 'ERROR_OCCURRED'
-}
-
-export enum AuthenticationType {
-  OTP = 'OTP',
-  QRCODE = 'QRCODE',
-  U2F = 'U2F'
-}
-
-export interface AuthenticationValue {
-  pinValue: string
-  counter: string
-}
-
-export interface AuthenticationInfo {
-  authentication: AuthenticationType
-  authenticationValue: AuthenticationValue | string
-}
-
-export enum AuthorizationResponse {
-  ENTERED = 'ENTERED',
-  REJECTED = 'REJECTED',
-  RESEND = 'RESEND'
-}
-
-export interface PutAuthorizationsResponse {
-  authenticationInfo: AuthenticationInfo;
-  responseType: AuthorizationResponse;
-}
-
-export interface PostAuthorizationsResponse extends PutAuthorizationsResponse {
-  currentState: OutboundAuthorizationsModelState;
-}
-
-export interface OutboundAuthorizationData extends StateData {
-  toParticipantId: string
-  request: PostAuthorizationsRequest
-  response?: PostAuthorizationsResponse
-}
 
 export class OutboundAuthorizationsModel
   extends PersistentModel<OutboundAuthorizationStateMachine, OutboundAuthorizationData> {
@@ -93,6 +48,7 @@ export class OutboundAuthorizationsModel
     data: OutboundAuthorizationData,
     config: OutboundAuthorizationsModelConfig
   ) {
+    // request authorization state machine model
     const spec: StateMachineConfig = {
       init: 'start',
       transitions: [
@@ -107,6 +63,7 @@ export class OutboundAuthorizationsModel
     this.config = { ...config }
   }
 
+  // getters
   get pubSub (): PubSub {
     return this.config.pubSub
   }
@@ -115,6 +72,7 @@ export class OutboundAuthorizationsModel
     return this.config.requests
   }
 
+  // generate the name of notification channel dedicated for authorizations requests
   static notificationChannel (id: string): string {
     // mvp validation
     if (!(id && id.toString().length > 0)) {
@@ -147,7 +105,7 @@ export class OutboundAuthorizationsModel
 
           // TODO: investigate PubSub subscribe method and callback
           // should be a generic so casting here would be not necessary...
-          const putResponse = { ...message as unknown as PutAuthorizationsResponse }
+          const putResponse = { ...message as unknown as InboundAuthorizationsPutRequest }
 
           // store response which will be returned by 'getResponse' method in workflow 'run'
           this.data.response = {
@@ -179,14 +137,14 @@ export class OutboundAuthorizationsModel
    *
    * @returns {object} - Response representing the result of the authorization process
    */
-  getResponse (): PostAuthorizationsResponse | void {
+  getResponse (): OutboundAuthorizationsPostResponse | void {
     return this.data.response
   }
 
   /**
    * runs the workflow
    */
-  async run (): Promise<PostAuthorizationsResponse | void> {
+  async run (): Promise<OutboundAuthorizationsPostResponse | void> {
     const data = this.data
     try {
       // run transitions based on incoming state
