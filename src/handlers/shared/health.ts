@@ -49,6 +49,7 @@ const get = async (_context: any, _request: Request, h: StateResponseToolkit): P
   const response = await healthCheck.getHealth()
   response.KVSConnected = h.getKVS().isConnected
   response.PubSubConnected = h.getPubSub().isConnected
+  response.LoggerPresent = typeof h.getLogger() !== 'undefined'
   return h.response(response).code(200)
 }
 

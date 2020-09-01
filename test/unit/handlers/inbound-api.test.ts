@@ -81,6 +81,7 @@ describe('Inbound API routes', (): void => {
       versionNumber: string;
       KVSConnected: boolean;
       PubSubConnected: boolean;
+      LoggerPresent: boolean;
     }
 
     const request = {
@@ -97,6 +98,7 @@ describe('Inbound API routes', (): void => {
     expect(result.uptime).toBeGreaterThan(1.0)
     expect(result.KVSConnected).toBeTruthy()
     expect(result.PubSubConnected).toBeTruthy()
+    expect(result.LoggerPresent).toBeTruthy()
   })
 
   it('/metrics', async (): Promise<void> => {

@@ -63,6 +63,8 @@ describe('StatePlugin', () => {
     expect(ServerMock.decorate.mock.calls[0][1]).toEqual('getKVS')
     expect(ServerMock.decorate.mock.calls[1][0]).toEqual('toolkit')
     expect(ServerMock.decorate.mock.calls[1][1]).toEqual('getPubSub')
+    expect(ServerMock.decorate.mock.calls[2][0]).toEqual('toolkit')
+    expect(ServerMock.decorate.mock.calls[2][1]).toEqual('getLogger')
 
     // check listener registration on 'stop' event
     expect(ServerMock.events.on).toBeCalledTimes(1)

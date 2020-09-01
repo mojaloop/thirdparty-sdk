@@ -28,15 +28,17 @@
 
 import config from '~/shared/config'
 
-import { ResponseToolkit, Server } from '@hapi/hapi'
+import { Logger as WinstonLogger } from 'winston'
 import { KVS } from '~/shared/kvs'
 import { PubSub } from '~/shared/pub-sub'
+import { ResponseToolkit, Server } from '@hapi/hapi'
 import Logger from '@mojaloop/central-services-logger'
 import { RedisConnectionConfig } from '~/shared/redis-connection'
 
 export interface StateResponseToolkit extends ResponseToolkit {
   getKVS: () => KVS
   getPubSub: () => PubSub
+  getLogger: () => WinstonLogger
 }
 
 export const StatePlugin = {
@@ -65,6 +67,7 @@ export const StatePlugin = {
       // prepare toolkit accessors
       server.decorate('toolkit', 'getKVS', (): KVS => kvs)
       server.decorate('toolkit', 'getPubSub', (): PubSub => pubSub)
+      server.decorate('toolkit', 'getLogger', (): WinstonLogger => Logger)
 
       // disconnect from redis when server is stopped
       server.events.on('stop', async () => {
