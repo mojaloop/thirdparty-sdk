@@ -11,6 +11,8 @@ describe('GET /health', (): void => {
       // Assert
       expect(response.status).toEqual(200)
       expect(response.data.status).toEqual('OK')
+      expect(response.data.KVSConnected).toBeTruthy()
+      expect(response.data.PubSubConnected).toBeTruthy()
     })
   })
 
@@ -23,6 +25,8 @@ describe('GET /health', (): void => {
       // Assert
       expect(response.status).toEqual(200)
       expect(response.data.status).toEqual('OK')
+      expect(response.data.KVSConnected).toBeTruthy()
+      expect(response.data.PubSubConnected).toBeTruthy()
     })
   })
 })
