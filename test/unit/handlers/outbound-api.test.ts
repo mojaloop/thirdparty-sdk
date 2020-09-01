@@ -39,6 +39,12 @@ import Handlers from '~/handlers'
 import index from '~/index'
 import path from 'path'
 
+// mock KVS default exported class
+jest.mock('~/shared/kvs')
+
+// mock PubSub default exported class
+jest.mock('~/shared/pub-sub')
+
 describe('Inbound API routes', (): void => {
   let server: Server
   let putResponse: InboundAuthorizationsPutRequest

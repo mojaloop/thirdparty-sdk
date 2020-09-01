@@ -26,10 +26,60 @@
  --------------
  ******/
 
+import config from '~/shared/config'
+import { KVS } from '~/shared/kvs'
+import { Message, NotificationCallback, PubSub } from '~/shared/pub-sub'
+import {
+  OutboundAuthorizationsModelConfig,
+  OutboundAuthorizationData,
+  OutboundAuthorizationsPostRequest
+} from '~/models/authorizations.interface'
+import {
+  OutboundAuthorizationsModel
+} from '~/models/outbound/authorizations.model'
+import {
+  PostAuthorizationsRequest,
+  TMoney,
+  ThirdpartyRequests,
+  TQuotesIDPutResponse,
+  WSO2Auth
+} from '@mojaloop/sdk-standard-components'
+import { RedisConnectionConfig } from '~/shared/redis-connection'
 import { Request, ResponseObject, ResponseToolkit } from '@hapi/hapi'
 
+import Logger from '@mojaloop/central-services-logger'
+
+const connectionConfig = {
+  port: config.REDIS.PORT,
+  host: config.REDIS.HOST,
+  logger: Logger
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function post (_context: any, _request: Request, h: ResponseToolkit): ResponseObject {
+async function post (_context: any, request: Request, h: ResponseToolkit): Promise<ResponseObject> {
+  const payload = request.payload as OutboundAuthorizationsPostRequest
+
+  const data: OutboundAuthorizationData = {
+    toParticipantId: payload.toParticipantId,
+    request: {
+      authenticationType: payload.authenticationType as 'U2F',
+      retriesLeft: payload.retriesLeft,
+      transactionId: payload.transactionId,
+      transactionRequestId: payload.transactionRequestId,
+      amount: payload.amount as TMoney,
+      quote: payload.quote as unknown as TQuotesIDPutResponse
+    },
+    currentState: 'start'
+  }
+
+  const modelConfig: OutboundAuthorizationsModelConfig = {
+    kvs: new KVS(connectionConfig),
+    pubSub: new PubSub(connectionConfig),
+    key: OutboundAuthorizationsModel.notificationChannel(data.request.transactionRequestId),
+    logger: Logger,
+    requests = new ThirdpartyRequests()
+  }
+
   return h.response({}).code(200)
 }
 
