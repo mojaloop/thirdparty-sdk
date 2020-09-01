@@ -51,7 +51,8 @@ describe('Inbound API routes', (): void => {
   })
 
   afterAll(async (done): Promise<void> => {
-    server.events.on('stop', done)
+    // StatePlugin is waiting on stop event so give it a chance to close the redis connections
+    server.events.on('stop', () => setTimeout(done, 100))
     await server.stop()
   })
 
@@ -61,6 +62,8 @@ describe('Inbound API routes', (): void => {
       uptime: number;
       startTime: string;
       versionNumber: string;
+      KVSConnected: boolean;
+      PubSubConnected: boolean;
     }
 
     const request = {
@@ -75,6 +78,8 @@ describe('Inbound API routes', (): void => {
     const result = response.result as HealthResponse
     expect(result.status).toEqual('OK')
     expect(result.uptime).toBeGreaterThan(1.0)
+    expect(result.KVSConnected).toBeTruthy()
+    expect(result.PubSubConnected).toBeTruthy()
   })
 
   it('/metrics', async (): Promise<void> => {

@@ -32,6 +32,7 @@ import Good from './good'
 import { Handler } from 'openapi-backend'
 import Inert from '@hapi/inert'
 import OpenAPI from './openAPI'
+import { StatePlugin } from './state'
 import { Util } from '@mojaloop/central-services-shared'
 import Vision from '@hapi/vision'
 
@@ -42,6 +43,7 @@ async function register (
 ): Promise<Server> {
   const openapiBackend = await OpenAPI.initialize(apiPath, handlers)
   const plugins = [
+    StatePlugin,
     Util.Hapi.OpenapiBackendValidator,
     Good,
     openapiBackend,
