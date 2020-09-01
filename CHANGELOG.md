@@ -1,4 +1,18 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+## [11.5.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.4.4...v11.5.0) (2020-08-31)
+
+
+### Features
+
+* add inbound POST thirdpartyRequests/transaction handling ([#19](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/19)) ([9e9ab97](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/9e9ab9768fb710e5dce7dc021a99c9484d134b72))
+
+### [11.4.4](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.4.3...v11.4.4) (2020-08-27)
+
+
+### CI/CD
+
+* use GITHUB_TOKEN and setup mojaloopci user with Mantain access ([1f76c94](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/1f76c94775a726ff17f082d5375a156a0bba6fc4))
+
 ### [11.4.3](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.4.2...v11.4.3) (2020-08-27)
 
 
