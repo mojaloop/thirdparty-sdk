@@ -31,7 +31,7 @@ import StateMachine, {
   StateMachineInterface,
   TransitionEvent
 } from 'javascript-state-machine'
-import { KVS } from './kvs'
+import { KVS } from '~/shared/kvs'
 import { Logger as WinstonLogger } from 'winston'
 
 export interface ControlledStateMachine extends StateMachineInterface {
@@ -54,10 +54,10 @@ export interface PersistentModelConfig {
 }
 
 export class PersistentModel<JSM extends ControlledStateMachine, Data extends StateData> {
-  public readonly fsm: JSM
-  public readonly data: Data
-
   protected readonly config: PersistentModelConfig
+  public readonly fsm: JSM
+
+  public data: Data
 
   constructor (
     data: Data,
@@ -127,38 +127,38 @@ export class PersistentModel<JSM extends ControlledStateMachine, Data extends St
       throw err
     }
   }
+}
 
-  // creates a PersistentModel instance
-  static async create<JSM extends ControlledStateMachine, Data extends StateData> (
-    data: Data,
-    config: PersistentModelConfig,
-    spec: StateMachineConfig
-  ): Promise <PersistentModel<JSM, Data>> {
-    // create a new model
-    const model = new PersistentModel<JSM, Data>(data, config, spec)
+// creates a PersistentModel instance
+export async function create<JSM extends ControlledStateMachine, Data extends StateData> (
+  data: Data,
+  config: PersistentModelConfig,
+  spec: StateMachineConfig
+): Promise <PersistentModel<JSM, Data>> {
+  // create a new model
+  const model = new PersistentModel<JSM, Data>(data, config, spec)
 
-    // enforce to finish any transition to state specified by data.currentState or spec.init
-    await model.fsm.state
-    return model
-  }
+  // enforce to finish any transition to state specified by data.currentState or spec.init
+  await model.fsm.state
+  return model
+}
 
-  // loads PersistentModel from KVS storage using given `config` and `spec`
-  static async loadFromKVS<JSM extends ControlledStateMachine, Data extends StateData> (
-    config: PersistentModelConfig,
-    spec: StateMachineConfig
-  ): Promise <PersistentModel<JSM, Data>> {
-    try {
-      const data = await config.kvs.get<Data>(config.key)
-      if (!data) {
-        throw new Error(`No data found in KVS for: ${config.key}`)
-      }
-      config.logger.push({ data })
-      config.logger.info('data loaded from KVS')
-      return new PersistentModel<JSM, Data>(data, config, spec)
-    } catch (err) {
-      config.logger.push({ err })
-      config.logger.info(`Error loading data from KVS for key: ${config.key}`)
-      throw err
+// loads PersistentModel from KVS storage using given `config` and `spec`
+export async function loadFromKVS<JSM extends ControlledStateMachine, Data extends StateData> (
+  config: PersistentModelConfig,
+  spec: StateMachineConfig
+): Promise <PersistentModel<JSM, Data>> {
+  try {
+    const data = await config.kvs.get<Data>(config.key)
+    if (!data) {
+      throw new Error(`No data found in KVS for: ${config.key}`)
     }
+    config.logger.push({ data })
+    config.logger.info('data loaded from KVS')
+    return new PersistentModel<JSM, Data>(data, config, spec)
+  } catch (err) {
+    config.logger.push({ err })
+    config.logger.info(`Error loading data from KVS for key: ${config.key}`)
+    throw err
   }
 }
