@@ -6,7 +6,8 @@ module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
   collectCoverage: true,
-  collectCoverageFrom: ['./src/**/*.ts'],
+  // TODO: when interface/types.ts will be used collect the coverage for this file
+  collectCoverageFrom: ['./src/**/*.ts', '!./src/interface/types.ts'],
   coverageReporters: ['json', 'lcov', 'text'],
   clearMocks: true,
   coverageThreshold: {
