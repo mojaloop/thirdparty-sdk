@@ -27,17 +27,18 @@
 
 import { Request, ResponseObject } from '@hapi/hapi'
 import inspect from './inspect'
+import { Logger as WinstonLogger } from 'winston'
 import logger from '@mojaloop/central-services-logger'
 
-interface ResponseLogged extends ResponseObject {
+export interface ResponseLogged extends ResponseObject {
   source: string;
   statusCode: number;
 }
-interface RequestLogged extends Request {
+export interface RequestLogged extends Request {
   response: ResponseLogged;
 }
 
-function logResponse (request: RequestLogged): void {
+export function logResponse (request: RequestLogged): void {
   if (request && request.response) {
     let response
     try {
@@ -53,8 +54,37 @@ function logResponse (request: RequestLogged): void {
   }
 }
 
-export {
-  logResponse,
-  RequestLogged,
-  ResponseLogged
+/**
+ * simplified migration of logger from sdk-scheme adapter
+ * using WinstonLogger which isn't compatible
+ * with code in sdk-standard-components
+ */
+
+export class SchemeLogger {
+  private logger: WinstonLogger
+  private context: Record<string, unknown>
+  constructor (logger: WinstonLogger, context: Record<string, unknown> = {}) {
+    this.logger = logger
+    this.context = context
+  }
+
+  push (context: Record<string, unknown>): SchemeLogger {
+    return new SchemeLogger(this.logger, { ...this.context, ...context })
+  }
+
+  log (message: unknown, level?: string): void {
+    this.logger.log(level || this.logger.level, { ...this.context, msg: message })
+  }
+
+  info (message: string): void {
+    this.log(message, 'info')
+  }
+
+  error (message: string): void {
+    this.log(message, 'error')
+  }
+
+  debug (message: string): void {
+    this.log(message, 'debug')
+  }
 }
