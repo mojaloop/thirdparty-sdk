@@ -28,8 +28,6 @@
 import { ThirdpartyTransactionRequest, QuoteRequest } from '../../interface/types'
 import { uuid } from 'uuidv4'
 import SDK from '@mojaloop/sdk-standard-components'
-import config from '~/shared/config'
-import Logger from '@mojaloop/central-services-logger'
 
 export function buildPayeeQuoteRequestFromTptRequest (request: ThirdpartyTransactionRequest): QuoteRequest {
   const quoteRequest = {
@@ -47,22 +45,11 @@ export function buildPayeeQuoteRequestFromTptRequest (request: ThirdpartyTransac
   return quoteRequest
 }
 
-export async function forwardPostQuoteRequestToPayee (request: ThirdpartyTransactionRequest): Promise<void> {
+export async function forwardPostQuoteRequestToPayee (
+  request: ThirdpartyTransactionRequest,
+  mojaloopRequests: SDK.MojaloopRequests
+): Promise<void> {
   const quote = buildPayeeQuoteRequestFromTptRequest(request)
-
-  // TODO: use toolkit.getMojaloopRequests instead of creation of requests object for every requests
-  const mojaloopRequests = new SDK.MojaloopRequests({
-    logger: Logger,
-    peerEndpoint: config.SHARED.PEER_ENDPOINT,
-    alsEndpoint: config.SHARED.ALS_ENDPOINT,
-    quotesEndpoint: config.SHARED.QUOTES_ENDPOINT,
-    transfersEndpoint: config.SHARED.TRANSFERS_ENDPOINT,
-    bulkTransfersEndpoint: config.SHARED.BULK_TRANSFERS_ENDPOINT,
-    dfspId: config.SHARED.DFSP_ID,
-    tls: config.SHARED.TLS,
-    jwsSign: config.SHARED.JWS_SIGN,
-    jwsSigningKey: <Buffer> config.SHARED.JWS_SIGNING_KEY
-  })
 
   // payee fspid should be defined due to a prior GET /parties call.
   mojaloopRequests.postQuotes(quote as unknown as SDK.PostQuoteRequest, <string> quote.payee.partyIdInfo.fspId)
