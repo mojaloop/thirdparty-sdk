@@ -24,13 +24,18 @@
  --------------
  ******/
 
-import { RequestLogged, logResponse } from '~/shared/logger'
+import { RequestLogged, logResponse, SchemeLogger } from '~/shared/logger'
 import inspect from '~/shared/inspect'
 import logger from '@mojaloop/central-services-logger'
+import { mocked } from 'ts-jest/utils'
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 jest.mock('@mojaloop/central-services-logger', () => ({
-  info: jest.fn()
+  level: 'info',
+  error: jest.fn(),
+  info: jest.fn(),
+  log: jest.fn(),
+  debug: jest.fn()
 }))
 
 describe('shared/logger', (): void => {
@@ -66,5 +71,38 @@ describe('shared/logger', (): void => {
     logResponse(request as RequestLogged)
     expect(spyStringify).toBeCalled()
     expect(logger.info).toBeCalledWith(`AS-Trace - Response: ${request.response.toString()}`)
+  })
+
+  describe('SchemeLogger', () => {
+    let schemeLogger: SchemeLogger
+    beforeEach(() => {
+      schemeLogger = new SchemeLogger(logger)
+    })
+
+    it('should be well created', () => {
+      expect(schemeLogger).toBeTruthy()
+    })
+
+    it('should log properly', () => {
+      schemeLogger.log('something')
+      expect(mocked(logger.log)).toBeCalledWith(logger.level, { msg: 'something' })
+    })
+    it('should info properly', () => {
+      schemeLogger.info('something')
+      expect(mocked(logger.log)).toBeCalledWith('info', { msg: 'something' })
+    })
+    it('should error properly', () => {
+      schemeLogger.error('something')
+      expect(mocked(logger.log)).toBeCalledWith('error', { msg: 'something' })
+    })
+    it('should debug properly', () => {
+      schemeLogger.debug('something')
+      expect(mocked(logger.log)).toBeCalledWith('debug', { msg: 'something' })
+    })
+    it('should push context properly', () => {
+      const pushed = schemeLogger.push({ the: 'context' })
+      pushed.info('something')
+      expect(mocked(logger.log)).toBeCalledWith(logger.level, { ...{ the: 'context' }, msg: 'something' })
+    })
   })
 })
