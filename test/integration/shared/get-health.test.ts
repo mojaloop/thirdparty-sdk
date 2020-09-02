@@ -11,6 +11,11 @@ describe('GET /health', (): void => {
       // Assert
       expect(response.status).toEqual(200)
       expect(response.data.status).toEqual('OK')
+      expect(response.data.KVSConnected).toBeTruthy()
+      expect(response.data.PubSubConnected).toBeTruthy()
+      expect(response.data.LoggerPresent).toBeTruthy()
+      expect(response.data.MojaloopRequestsPresent).toBeTruthy()
+      expect(response.data.ThirdpartyRequestsPresent).toBeTruthy()
     })
   })
 
@@ -23,6 +28,11 @@ describe('GET /health', (): void => {
       // Assert
       expect(response.status).toEqual(200)
       expect(response.data.status).toEqual('OK')
+      expect(response.data.KVSConnected).toBeTruthy()
+      expect(response.data.PubSubConnected).toBeTruthy()
+      expect(response.data.LoggerPresent).toBeTruthy()
+      expect(response.data.MojaloopRequestsPresent).toBeTruthy()
+      expect(response.data.ThirdpartyRequestsPresent).toBeTruthy()
     })
   })
 })
