@@ -34,15 +34,26 @@ import { KVS } from '~/shared/kvs'
 import { PubSub } from '~/shared/pub-sub'
 import { ResponseToolkit, Server } from '@hapi/hapi'
 import { RedisConnectionConfig } from '~/shared/redis-connection'
-
 import Logger from '@mojaloop/central-services-logger'
-
 export interface StateResponseToolkit extends ResponseToolkit {
   getKVS: () => KVS
   getPubSub: () => PubSub
   getLogger: () => WinstonLogger
   getMojaloopRequests: () => SDK.MojaloopRequests
   getThirdpartyRequests: () => SDK.ThirdpartyRequests
+  getWSO2Auth: () => SDK.WSO2Auth
+}
+
+// wrapper for WSO2Auth Logger
+// TODO: investigate any differences of Logger used in sdk-scheme-adapter and central-services-logger
+interface SDKLogger {
+  log: (message: string) => void
+}
+
+function wrapLogger (logger: WinstonLogger): SDKLogger {
+  return {
+    log: (message: string) => logger.info(message)
+  }
 }
 
 export const StatePlugin = {
@@ -62,6 +73,13 @@ export const StatePlugin = {
     // prepare redis connection instances
     const kvs = new KVS(connection)
     const pubSub = new PubSub(connection)
+
+    // prepare WSO2Auth
+    const wso2Auth = new SDK.WSO2Auth({
+      ...config.WSO2_AUTH,
+      logger: wrapLogger(Logger),
+      tlsCreds: config.SHARED.TLS.outbound.mutualTLS.enabled && config.SHARED.TLS.outbound.creds
+    })
 
     // prepare Requests instances
     const mojaloopRequests = new SDK.MojaloopRequests({
@@ -101,6 +119,7 @@ export const StatePlugin = {
       server.decorate('toolkit', 'getLogger', (): WinstonLogger => Logger)
       server.decorate('toolkit', 'getMojaloopRequests', (): SDK.MojaloopRequests => mojaloopRequests)
       server.decorate('toolkit', 'getThirdpartyRequests', (): SDK.ThirdpartyRequests => thirdpartyRequest)
+      server.decorate('toolkit', 'getWSO2Auth', (): SDK.WSO2Auth => wso2Auth)
 
       // disconnect from redis when server is stopped
       server.events.on('stop', async () => {

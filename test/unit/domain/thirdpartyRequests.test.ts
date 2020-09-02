@@ -31,6 +31,7 @@ import {
 } from '~/domain/thirdpartyRequests/transactions'
 import TestData from 'test/unit/data/mockData.json'
 import { resetUuid } from 'test/unit/__mocks__/uuidv4'
+import { MojaloopRequests, BaseRequestConfigType } from '@mojaloop/sdk-standard-components'
 
 const mockData = JSON.parse(JSON.stringify(TestData))
 const postThirdpartyRequestsTransactionRequest = mockData.postThirdpartyRequestsTransactionRequest
@@ -43,7 +44,8 @@ jest.mock('@mojaloop/sdk-standard-components', () => {
       return {
         postQuotes: __postQuotes
       }
-    })
+    }),
+    ThirdpartyRequests: jest.fn()
   }
 })
 
@@ -81,7 +83,8 @@ describe('thirdpartyRequests/transactions', (): void => {
     resetUuid()
 
     forwardPostQuoteRequestToPayee(
-      postThirdpartyRequestsTransactionRequest.payload
+      postThirdpartyRequestsTransactionRequest.payload,
+      new MojaloopRequests({} as unknown as BaseRequestConfigType)
     )
 
     expect(__postQuotes).toBeCalledWith(quoteRequest, quoteRequest.payee.partyIdInfo.fspId)

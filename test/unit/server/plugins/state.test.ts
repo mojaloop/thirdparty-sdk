@@ -32,7 +32,7 @@ import { StatePlugin } from '~/server/plugins/state'
 import { mocked } from 'ts-jest/utils'
 import { Server } from '@hapi/hapi'
 import { mockProcessExit } from 'jest-mock-process'
-
+import { ServerAPI } from '~/server/create'
 jest.mock('~/shared/kvs')
 jest.mock('~/shared/pub-sub')
 
@@ -41,7 +41,10 @@ describe('StatePlugin', () => {
     events: {
       on: jest.fn()
     },
-    decorate: jest.fn()
+    decorate: jest.fn(),
+    settings: {
+      app: ServerAPI.inbound
+    }
   }
 
   it('should have proper layout', () => {
@@ -69,6 +72,8 @@ describe('StatePlugin', () => {
     expect(ServerMock.decorate.mock.calls[3][1]).toEqual('getMojaloopRequests')
     expect(ServerMock.decorate.mock.calls[4][0]).toEqual('toolkit')
     expect(ServerMock.decorate.mock.calls[4][1]).toEqual('getThirdpartyRequests')
+    expect(ServerMock.decorate.mock.calls[5][0]).toEqual('toolkit')
+    expect(ServerMock.decorate.mock.calls[5][1]).toEqual('getWSO2Auth')
 
     // check listener registration on 'stop' event
     expect(ServerMock.events.on).toBeCalledTimes(1)
