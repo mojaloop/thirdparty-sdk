@@ -48,7 +48,8 @@ jest.mock('@mojaloop/sdk-standard-components', () => {
         postQuotes: __postQuotes
       }
     }),
-    ThirdpartyRequests: jest.fn()
+    ThirdpartyRequests: jest.fn(),
+    WSO2Auth: jest.fn()
   }
 })
 

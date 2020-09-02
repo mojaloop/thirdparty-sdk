@@ -34,15 +34,16 @@ import { KVS } from '~/shared/kvs'
 import { PubSub } from '~/shared/pub-sub'
 import { ResponseToolkit, Server } from '@hapi/hapi'
 import { RedisConnectionConfig } from '~/shared/redis-connection'
-
 import Logger from '@mojaloop/central-services-logger'
-
+import { SchemeLogger } from '~/shared/logger'
 export interface StateResponseToolkit extends ResponseToolkit {
   getKVS: () => KVS
   getPubSub: () => PubSub
   getLogger: () => WinstonLogger
+  getSchemeLogger: () => SchemeLogger
   getMojaloopRequests: () => SDK.MojaloopRequests
   getThirdpartyRequests: () => SDK.ThirdpartyRequests
+  getWSO2Auth: () => SDK.WSO2Auth
 }
 
 export const StatePlugin = {
@@ -51,6 +52,8 @@ export const StatePlugin = {
   once: true,
 
   register: async (server: Server): Promise<void> => {
+    const schemeLogger = new SchemeLogger(Logger)
+
     // KVS & PubSub are using the same Redis instance
     const connection: RedisConnectionConfig = {
       host: config.REDIS.HOST,
@@ -63,9 +66,16 @@ export const StatePlugin = {
     const kvs = new KVS(connection)
     const pubSub = new PubSub(connection)
 
+    // prepare WSO2Auth
+    const wso2Auth = new SDK.WSO2Auth({
+      ...config.WSO2_AUTH,
+      logger: schemeLogger,
+      tlsCreds: config.SHARED.TLS.outbound.mutualTLS.enabled && config.SHARED.TLS.outbound.creds
+    })
+
     // prepare Requests instances
     const mojaloopRequests = new SDK.MojaloopRequests({
-      logger: Logger,
+      logger: schemeLogger,
       peerEndpoint: config.SHARED.PEER_ENDPOINT,
       alsEndpoint: config.SHARED.ALS_ENDPOINT,
       quotesEndpoint: config.SHARED.QUOTES_ENDPOINT,
@@ -78,7 +88,7 @@ export const StatePlugin = {
     })
 
     const thirdpartyRequest = new SDK.ThirdpartyRequests({
-      logger: Logger,
+      logger: schemeLogger,
       peerEndpoint: config.SHARED.PEER_ENDPOINT,
       alsEndpoint: config.SHARED.ALS_ENDPOINT,
       quotesEndpoint: config.SHARED.QUOTES_ENDPOINT,
@@ -101,6 +111,8 @@ export const StatePlugin = {
       server.decorate('toolkit', 'getLogger', (): WinstonLogger => Logger)
       server.decorate('toolkit', 'getMojaloopRequests', (): SDK.MojaloopRequests => mojaloopRequests)
       server.decorate('toolkit', 'getThirdpartyRequests', (): SDK.ThirdpartyRequests => thirdpartyRequest)
+      server.decorate('toolkit', 'getWSO2Auth', (): SDK.WSO2Auth => wso2Auth)
+      server.decorate('toolkit', 'getSchemeLogger', (): SchemeLogger => schemeLogger)
 
       // disconnect from redis when server is stopped
       server.events.on('stop', async () => {

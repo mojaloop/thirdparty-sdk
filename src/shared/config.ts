@@ -44,72 +44,70 @@ function getFileListContent (pathList: string): Array<Buffer> {
   return pathList.split(',').map((path) => getFileContent(path))
 }
 
+export interface InOutConfig {
+  HOST: string
+  PORT: number
+}
 // interface to represent service configuration
 export interface ServiceConfig {
-  ENV: string;
-  INBOUND: {
-    HOST: string;
-    PORT: number;
-  };
-  OUTBOUND: {
-    HOST: string;
-    PORT: number;
-  };
+  ENV: string
+  INBOUND: InOutConfig
+  OUTBOUND: InOutConfig
+  WSO2_AUTH: {
+    staticToken: string
+    tokenEndpoint: string
+    clientKey: string
+    clientSecret: string
+    refreshSeconds: number
+  }
   REDIS: {
-    HOST: string;
-    PORT: number;
-    TIMEOUT: number;
-  };
+    HOST: string
+    PORT: number
+    TIMEOUT: number
+  }
   INSPECT: {
-    DEPTH: number;
-    SHOW_HIDDEN: boolean;
-    COLOR: boolean;
-  };
+    DEPTH: number
+    SHOW_HIDDEN: boolean
+    COLOR: boolean
+  }
   SHARED: {
-    PEER_ENDPOINT: string;
-    ALS_ENDPOINT: string;
-    QUOTES_ENDPOINT: string;
-    TRANSFERS_ENDPOINT: string;
-    BULK_TRANSFERS_ENDPOINT: string;
-    DFSP_ID: string;
-    JWS_SIGN: boolean;
-    JWS_SIGNING_KEY: PathLike | Buffer;
-    WSO2_AUTH: {
-      staticToken: string;
-      tokenEndpoint: string;
-      clientKey: string;
-      clientSecret: string;
-      refreshSeconds: number;
-    };
+    PEER_ENDPOINT: string
+    ALS_ENDPOINT: string
+    QUOTES_ENDPOINT: string
+    TRANSFERS_ENDPOINT: string
+    BULK_TRANSFERS_ENDPOINT: string
+    DFSP_ID: string
+    JWS_SIGN: boolean
+    JWS_SIGNING_KEY: PathLike | Buffer
     TLS: {
       inbound: {
         mutualTLS: {
-          enabled: boolean;
+          enabled: boolean
         },
         creds: {
-          ca: string | Array<Buffer>;
-          cert: string | Array<Buffer>;
-          key: string | Array<Buffer>;
+          ca: string | Array<Buffer>
+          cert: string | Array<Buffer>
+          key: string | Array<Buffer>
         }
       },
       outbound: {
         mutualTLS: {
-          enabled: boolean;
+          enabled: boolean
         },
         creds: {
-          ca: string | Array<Buffer>;
-          cert: string | Array<Buffer>;
-          key: string | Array<Buffer>;
+          ca: string | Array<Buffer>
+          cert: string | Array<Buffer>
+          key: string | Array<Buffer>
         }
       },
       test: {
         mutualTLS: {
-          enabled: boolean;
+          enabled: boolean
         },
         creds: {
-          ca: string | Array<Buffer>;
-          cert: string | Array<Buffer>;
-          key: string | Array<Buffer>;
+          ca: string | Array<Buffer>
+          cert: string | Array<Buffer>
+          key: string | Array<Buffer>
         }
       }
     }
@@ -150,6 +148,38 @@ export const ConvictConfig = Convict<ServiceConfig>({
       format: 'port',
       default: 3002,
       env: 'OUTBOUND_PORT'
+    }
+  },
+  WSO2_AUTH: {
+    staticToken: {
+      doc: 'The statically defined token',
+      format: '*',
+      env: 'WSO2_BEARER_TOKEN',
+      default: ''
+    },
+    tokenEndpoint: {
+      doc: 'The OAuth server endpoint',
+      format: '*',
+      env: 'OAUTH_TOKEN_ENDPOINT',
+      default: ''
+    },
+    clientKey: {
+      doc: 'The OAuth client KEY',
+      format: '*',
+      env: 'OAUTH_CLIENT_KEY',
+      default: ''
+    },
+    clientSecret: {
+      doc: 'The OAuth client SECRET',
+      format: '*',
+      env: 'OAUTH_CLIENT_SECRET',
+      default: ''
+    },
+    refreshSeconds: {
+      doc: 'The token refresh timeout',
+      format: 'nat',
+      env: 'OAUTH_REFRESH_SECONDS',
+      default: 60
     }
   },
   REDIS: {
@@ -199,13 +229,6 @@ export const ConvictConfig = Convict<ServiceConfig>({
     DFSP_ID: 'dfsp_a',
     JWS_SIGN: false,
     JWS_SIGNING_KEY: '',
-    WSO2_AUTH: {
-      staticToken: '',
-      tokenEndpoint: '',
-      clientKey: '',
-      clientSecret: '',
-      refreshSeconds: 60
-    },
     // Todo: Investigate proper key setup
     TLS: {
       inbound: {
@@ -253,23 +276,51 @@ ConvictConfig.validate({ allowed: 'strict' })
 ConvictConfig.set('SHARED.JWS_SIGNING_KEY', getFileContent(ConvictConfig.get('SHARED').JWS_SIGNING_KEY))
 
 // Note: Have not seen these be comma seperated value strings. mimicing sdk-scheme-adapter for now
-ConvictConfig.set('SHARED.TLS.inbound.creds.ca', getFileListContent(<string> ConvictConfig.get('SHARED').TLS.inbound.creds.ca))
-ConvictConfig.set('SHARED.TLS.inbound.creds.cert', getFileListContent(<string> ConvictConfig.get('SHARED').TLS.inbound.creds.cert))
-ConvictConfig.set('SHARED.TLS.inbound.creds.key', getFileListContent(<string> ConvictConfig.get('SHARED').TLS.inbound.creds.key))
+ConvictConfig.set(
+  'SHARED.TLS.inbound.creds.ca',
+  getFileListContent(<string> ConvictConfig.get('SHARED').TLS.inbound.creds.ca)
+)
+ConvictConfig.set(
+  'SHARED.TLS.inbound.creds.cert',
+  getFileListContent(<string> ConvictConfig.get('SHARED').TLS.inbound.creds.cert)
+)
+ConvictConfig.set(
+  'SHARED.TLS.inbound.creds.key',
+  getFileListContent(<string> ConvictConfig.get('SHARED').TLS.inbound.creds.key)
+)
 
-ConvictConfig.set('SHARED.TLS.outbound.creds.ca', getFileListContent(<string> ConvictConfig.get('SHARED').TLS.outbound.creds.ca))
-ConvictConfig.set('SHARED.TLS.outbound.creds.cert', getFileListContent(<string> ConvictConfig.get('SHARED').TLS.outbound.creds.cert))
-ConvictConfig.set('SHARED.TLS.outbound.creds.key', getFileListContent(<string> ConvictConfig.get('SHARED').TLS.outbound.creds.key))
+ConvictConfig.set(
+  'SHARED.TLS.outbound.creds.ca',
+  getFileListContent(<string> ConvictConfig.get('SHARED').TLS.outbound.creds.ca)
+)
+ConvictConfig.set(
+  'SHARED.TLS.outbound.creds.cert',
+  getFileListContent(<string> ConvictConfig.get('SHARED').TLS.outbound.creds.cert)
+)
+ConvictConfig.set(
+  'SHARED.TLS.outbound.creds.key',
+  getFileListContent(<string> ConvictConfig.get('SHARED').TLS.outbound.creds.key)
+)
 
-ConvictConfig.set('SHARED.TLS.test.creds.ca', getFileListContent(<string> ConvictConfig.get('SHARED').TLS.test.creds.ca))
-ConvictConfig.set('SHARED.TLS.test.creds.cert', getFileListContent(<string> ConvictConfig.get('SHARED').TLS.test.creds.cert))
-ConvictConfig.set('SHARED.TLS.test.creds.key', getFileListContent(<string> ConvictConfig.get('SHARED').TLS.test.creds.key))
+ConvictConfig.set(
+  'SHARED.TLS.test.creds.ca',
+  getFileListContent(<string> ConvictConfig.get('SHARED').TLS.test.creds.ca)
+)
+ConvictConfig.set(
+  'SHARED.TLS.test.creds.cert',
+  getFileListContent(<string> ConvictConfig.get('SHARED').TLS.test.creds.cert)
+)
+ConvictConfig.set(
+  'SHARED.TLS.test.creds.key',
+  getFileListContent(<string> ConvictConfig.get('SHARED').TLS.test.creds.key)
+)
 
 // extract simplified config from Convict object
 const config: ServiceConfig = {
   ENV: ConvictConfig.get('ENV'),
   INBOUND: ConvictConfig.get('INBOUND'),
   OUTBOUND: ConvictConfig.get('OUTBOUND'),
+  WSO2_AUTH: ConvictConfig.get('WSO2_AUTH'),
   REDIS: ConvictConfig.get('REDIS'),
   INSPECT: ConvictConfig.get('INSPECT'),
   SHARED: ConvictConfig.get('SHARED')

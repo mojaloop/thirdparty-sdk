@@ -32,16 +32,17 @@ import {
   verifySourceAccountId,
   validateGrantedConsent
 } from '~/domain/thirdpartyRequests/transactions'
-import { Enum } from '@mojaloop/central-services-shared'
-import { Request, ResponseObject, ResponseToolkit } from '@hapi/hapi'
-import { ThirdpartyTransactionRequest } from '~/interface/types'
-import { Enums } from '@mojaloop/central-services-error-handling'
 import { Context } from 'openapi-backend'
+import { Enums } from '@mojaloop/central-services-error-handling'
+import { Enum } from '@mojaloop/central-services-shared'
+import { Request, ResponseObject } from '@hapi/hapi'
+import { StateResponseToolkit } from '~/server/plugins/state'
+import { ThirdpartyTransactionRequest } from '~/interface/types'
 
 /**
  * Handles a DFSP inbound POST /thirdpartyRequests/transaction request
  */
-async function post (_context: Context, request: Request, h: ResponseToolkit): Promise<ResponseObject> {
+async function post (_context: Context, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const transactionRequest = request.payload as ThirdpartyTransactionRequest
 
   // todo: this might need to be a state machine in the future
@@ -53,7 +54,7 @@ async function post (_context: Context, request: Request, h: ResponseToolkit): P
     return h.response(Enums.FSPIOPErrorCodes.CLIENT_ERROR).code(Enum.Http.ReturnCodes.BADREQUEST.CODE)
   }
 
-  forwardPostQuoteRequestToPayee(transactionRequest)
+  forwardPostQuoteRequestToPayee(transactionRequest, h.getMojaloopRequests())
 
   return h.response({}).code(Enum.Http.ReturnCodes.ACCEPTED.CODE)
 }
