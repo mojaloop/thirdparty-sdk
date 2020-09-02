@@ -26,37 +26,26 @@
  --------------
  ******/
 
-import config from '~/shared/config'
-import { KVS } from '~/shared/kvs'
-import { Message, NotificationCallback, PubSub } from '~/shared/pub-sub'
+import { StateResponseToolkit } from '~/server/plugins/state'
 import {
   OutboundAuthorizationsModelConfig,
   OutboundAuthorizationData,
   OutboundAuthorizationsPostRequest
 } from '~/models/authorizations.interface'
 import {
-  OutboundAuthorizationsModel
+  OutboundAuthorizationsModel,
+  create
 } from '~/models/outbound/authorizations.model'
 import {
-  PostAuthorizationsRequest,
   TMoney,
-  ThirdpartyRequests,
   TQuotesIDPutResponse,
-  WSO2Auth
 } from '@mojaloop/sdk-standard-components'
-import { RedisConnectionConfig } from '~/shared/redis-connection'
-import { Request, ResponseObject, ResponseToolkit } from '@hapi/hapi'
+import { Request, ResponseObject } from '@hapi/hapi'
 
 import Logger from '@mojaloop/central-services-logger'
 
-const connectionConfig = {
-  port: config.REDIS.PORT,
-  host: config.REDIS.HOST,
-  logger: Logger
-}
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function post (_context: any, request: Request, h: ResponseToolkit): Promise<ResponseObject> {
+async function post (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const payload = request.payload as OutboundAuthorizationsPostRequest
 
   const data: OutboundAuthorizationData = {
@@ -73,14 +62,20 @@ async function post (_context: any, request: Request, h: ResponseToolkit): Promi
   }
 
   const modelConfig: OutboundAuthorizationsModelConfig = {
-    kvs: new KVS(connectionConfig),
-    pubSub: new PubSub(connectionConfig),
+    kvs: h.getKVS(),
+    pubSub: h.getPubSub(),
     key: OutboundAuthorizationsModel.notificationChannel(data.request.transactionRequestId),
     logger: Logger,
-    requests = new ThirdpartyRequests()
+    requests: h.getThirdpartyRequests()
   }
 
-  return h.response({}).code(200)
+  const model: OutboundAuthorizationsModel = await create(data, modelConfig)
+  const result = await model.run()
+  if (!result) {
+    Logger.error('outbound POST /authorizations unexpected result from workflow')
+    return h.response({}).code(500)
+  }
+  return h.response(result).code(200)
 }
 
 export default {
