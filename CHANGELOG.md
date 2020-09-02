@@ -1,4 +1,23 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+## [11.7.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.6.0...v11.7.0) (2020-09-02)
+
+
+### Features
+
+* 423 state plugin ([#22](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/22)) ([2bebf01](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/2bebf01300d6f460548f8a1a3d16f32d85a31d84))
+
+## [11.6.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.5.0...v11.6.0) (2020-09-01)
+
+
+### Features
+
+* authorization outbound model ([#20](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/20)) ([985ac41](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/985ac41f2f2dec84dde44db28865584298ee5313))
+
+
+### Tests
+
+* tmp. exclude interface types from coverage ([#21](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/21)) ([d1490ac](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/d1490ac8e0639f1eec20792fc007e41c60477a18))
+
 ## [11.5.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.4.4...v11.5.0) (2020-08-31)
 
 

@@ -26,6 +26,7 @@
  --------------
  ******/
 
+import { HealthResponse } from '~/interface/types'
 import { ServerAPI, ServerConfig } from '~/server'
 import {
   AuthorizationResponse,
@@ -45,7 +46,7 @@ jest.mock('~/shared/kvs')
 // mock PubSub default exported class
 jest.mock('~/shared/pub-sub')
 
-describe('Inbound API routes', (): void => {
+describe('Outbound API routes', (): void => {
   let server: Server
   let putResponse: InboundAuthorizationsPutRequest
 
@@ -76,18 +77,12 @@ describe('Inbound API routes', (): void => {
   })
 
   afterAll(async (done): Promise<void> => {
-    server.events.on('stop', done)
+    // StatePlugin is waiting on stop event so give it a chance to close the redis connections
+    server.events.on('stop', () => setTimeout(done, 100))
     await server.stop()
   })
 
   it('/health', async (): Promise<void> => {
-    interface HealthResponse {
-      status: string;
-      uptime: number;
-      startTime: string;
-      versionNumber: string;
-    }
-
     const request = {
       method: 'GET',
       url: '/health'
@@ -100,8 +95,12 @@ describe('Inbound API routes', (): void => {
     const result = response.result as HealthResponse
     expect(result.status).toEqual('OK')
     expect(result.uptime).toBeGreaterThan(1.0)
+    expect(result.KVSConnected).toBeTruthy()
+    expect(result.PubSubConnected).toBeTruthy()
+    expect(result.LoggerPresent).toBeTruthy()
+    expect(result.MojaloopRequestsPresent).toBeTruthy()
+    expect(result.ThirdpartyRequestsPresent).toBeTruthy()
   })
-
   it('/metrics', async (): Promise<void> => {
     const request = {
       method: 'GET',
