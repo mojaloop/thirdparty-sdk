@@ -27,13 +27,15 @@
  ******/
 
 import { Handlers, ServerAPI, ServerConfig } from '~/server'
-import Config from '~/shared/config'
+import { HealthResponse } from '~/interface/types'
 import { Server } from '@hapi/hapi'
-import index from '~/index'
-import path from 'path'
-import TestData from 'test/unit/data/mockData.json'
 import { buildPayeeQuoteRequestFromTptRequest } from '~/domain/thirdpartyRequests/transactions'
 import { resetUuid } from '../__mocks__/uuidv4'
+
+import Config from '~/shared/config'
+import TestData from 'test/unit/data/mockData.json'
+import index from '~/index'
+import path from 'path'
 
 const mockData = JSON.parse(JSON.stringify(TestData))
 const postThirdpartyRequestsTransactionRequest = mockData.postThirdpartyRequestsTransactionRequest
@@ -45,7 +47,8 @@ jest.mock('@mojaloop/sdk-standard-components', () => {
       return {
         postQuotes: __postQuotes
       }
-    })
+    }),
+    ThirdpartyRequests: jest.fn()
   }
 })
 
@@ -74,16 +77,6 @@ describe('Inbound API routes', (): void => {
   })
 
   it('/health', async (): Promise<void> => {
-    interface HealthResponse {
-      status: string;
-      uptime: number;
-      startTime: string;
-      versionNumber: string;
-      KVSConnected: boolean;
-      PubSubConnected: boolean;
-      LoggerPresent: boolean;
-    }
-
     const request = {
       method: 'GET',
       url: '/health'
@@ -99,6 +92,8 @@ describe('Inbound API routes', (): void => {
     expect(result.KVSConnected).toBeTruthy()
     expect(result.PubSubConnected).toBeTruthy()
     expect(result.LoggerPresent).toBeTruthy()
+    expect(result.MojaloopRequestsPresent).toBeTruthy()
+    expect(result.ThirdpartyRequestsPresent).toBeTruthy()
   })
 
   it('/metrics', async (): Promise<void> => {

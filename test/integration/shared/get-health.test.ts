@@ -14,6 +14,8 @@ describe('GET /health', (): void => {
       expect(response.data.KVSConnected).toBeTruthy()
       expect(response.data.PubSubConnected).toBeTruthy()
       expect(response.data.LoggerPresent).toBeTruthy()
+      expect(response.data.MojaloopRequestsPresent).toBeTruthy()
+      expect(response.data.ThirdpartyRequestsPresent).toBeTruthy()
     })
   })
 
@@ -29,6 +31,8 @@ describe('GET /health', (): void => {
       expect(response.data.KVSConnected).toBeTruthy()
       expect(response.data.PubSubConnected).toBeTruthy()
       expect(response.data.LoggerPresent).toBeTruthy()
+      expect(response.data.MojaloopRequestsPresent).toBeTruthy()
+      expect(response.data.ThirdpartyRequestsPresent).toBeTruthy()
     })
   })
 })

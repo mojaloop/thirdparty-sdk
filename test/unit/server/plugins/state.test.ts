@@ -65,6 +65,10 @@ describe('StatePlugin', () => {
     expect(ServerMock.decorate.mock.calls[1][1]).toEqual('getPubSub')
     expect(ServerMock.decorate.mock.calls[2][0]).toEqual('toolkit')
     expect(ServerMock.decorate.mock.calls[2][1]).toEqual('getLogger')
+    expect(ServerMock.decorate.mock.calls[3][0]).toEqual('toolkit')
+    expect(ServerMock.decorate.mock.calls[3][1]).toEqual('getMojaloopRequests')
+    expect(ServerMock.decorate.mock.calls[4][0]).toEqual('toolkit')
+    expect(ServerMock.decorate.mock.calls[4][1]).toEqual('getThirdpartyRequests')
 
     // check listener registration on 'stop' event
     expect(ServerMock.events.on).toBeCalledTimes(1)

@@ -29,16 +29,20 @@
 import config from '~/shared/config'
 
 import { Logger as WinstonLogger } from 'winston'
+import SDK from '@mojaloop/sdk-standard-components'
 import { KVS } from '~/shared/kvs'
 import { PubSub } from '~/shared/pub-sub'
 import { ResponseToolkit, Server } from '@hapi/hapi'
-import Logger from '@mojaloop/central-services-logger'
 import { RedisConnectionConfig } from '~/shared/redis-connection'
+
+import Logger from '@mojaloop/central-services-logger'
 
 export interface StateResponseToolkit extends ResponseToolkit {
   getKVS: () => KVS
   getPubSub: () => PubSub
   getLogger: () => WinstonLogger
+  getMojaloopRequests: () => SDK.MojaloopRequests
+  getThirdpartyRequests: () => SDK.ThirdpartyRequests
 }
 
 export const StatePlugin = {
@@ -59,6 +63,33 @@ export const StatePlugin = {
     const kvs = new KVS(connection)
     const pubSub = new PubSub(connection)
 
+    // prepare Requests instances
+    const mojaloopRequests = new SDK.MojaloopRequests({
+      logger: Logger,
+      peerEndpoint: config.SHARED.PEER_ENDPOINT,
+      alsEndpoint: config.SHARED.ALS_ENDPOINT,
+      quotesEndpoint: config.SHARED.QUOTES_ENDPOINT,
+      transfersEndpoint: config.SHARED.TRANSFERS_ENDPOINT,
+      bulkTransfersEndpoint: config.SHARED.BULK_TRANSFERS_ENDPOINT,
+      dfspId: config.SHARED.DFSP_ID,
+      tls: config.SHARED.TLS,
+      jwsSign: config.SHARED.JWS_SIGN,
+      jwsSigningKey: <Buffer> config.SHARED.JWS_SIGNING_KEY
+    })
+
+    const thirdpartyRequest = new SDK.ThirdpartyRequests({
+      logger: Logger,
+      peerEndpoint: config.SHARED.PEER_ENDPOINT,
+      alsEndpoint: config.SHARED.ALS_ENDPOINT,
+      quotesEndpoint: config.SHARED.QUOTES_ENDPOINT,
+      transfersEndpoint: config.SHARED.TRANSFERS_ENDPOINT,
+      bulkTransfersEndpoint: config.SHARED.BULK_TRANSFERS_ENDPOINT,
+      dfspId: config.SHARED.DFSP_ID,
+      tls: config.SHARED.TLS,
+      jwsSign: config.SHARED.JWS_SIGN,
+      jwsSigningKey: <Buffer> config.SHARED.JWS_SIGNING_KEY
+    })
+
     try {
       // connect them all to Redis instance
       await Promise.all([kvs.connect(), pubSub.connect()])
@@ -68,6 +99,8 @@ export const StatePlugin = {
       server.decorate('toolkit', 'getKVS', (): KVS => kvs)
       server.decorate('toolkit', 'getPubSub', (): PubSub => pubSub)
       server.decorate('toolkit', 'getLogger', (): WinstonLogger => Logger)
+      server.decorate('toolkit', 'getMojaloopRequests', (): SDK.MojaloopRequests => mojaloopRequests)
+      server.decorate('toolkit', 'getThirdpartyRequests', (): SDK.ThirdpartyRequests => thirdpartyRequest)
 
       // disconnect from redis when server is stopped
       server.events.on('stop', async () => {

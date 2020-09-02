@@ -1,3 +1,4 @@
+import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
 /*****
  License
  --------------
@@ -21,7 +22,6 @@
  - Kevin Leyow <kevin.leyow@modusbox.com>
  --------------
  ******/
-'use strict'
 
 /**
  * This is used for personal information
@@ -115,4 +115,16 @@ export interface QuoteRequest {
   amount: Money;
   transactionType: TransactionType;
   note: string;
+}
+
+export interface HealthResponse {
+  status: string
+  uptime: number
+  startTime: string
+  versionNumber: string
+  KVSConnected: boolean
+  PubSubConnected: boolean
+  LoggerPresent: boolean
+  MojaloopRequestsPresent: boolean
+  ThirdpartyRequestsPresent: boolean
 }

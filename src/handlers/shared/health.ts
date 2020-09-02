@@ -50,6 +50,8 @@ const get = async (_context: any, _request: Request, h: StateResponseToolkit): P
   response.KVSConnected = h.getKVS().isConnected
   response.PubSubConnected = h.getPubSub().isConnected
   response.LoggerPresent = typeof h.getLogger() !== 'undefined'
+  response.ThirdpartyRequestsPresent = typeof h.getThirdpartyRequests() !== 'undefined'
+  response.MojaloopRequestsPresent = typeof h.getMojaloopRequests() !== 'undefined'
   return h.response(response).code(200)
 }
 

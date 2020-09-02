@@ -26,6 +26,7 @@
  --------------
  ******/
 
+import { HealthResponse } from '~/interface/types'
 import { ServerAPI, ServerConfig } from '~/server'
 import Config from '~/shared/config'
 import Handlers from '~/handlers'
@@ -33,7 +34,7 @@ import { Server } from '@hapi/hapi'
 import index from '~/index'
 import path from 'path'
 
-describe('Inbound API routes', (): void => {
+describe('Outbound API routes', (): void => {
   let server: Server
 
   beforeAll(async (): Promise<void> => {
@@ -57,16 +58,6 @@ describe('Inbound API routes', (): void => {
   })
 
   it('/health', async (): Promise<void> => {
-    interface HealthResponse {
-      status: string;
-      uptime: number;
-      startTime: string;
-      versionNumber: string;
-      KVSConnected: boolean;
-      PubSubConnected: boolean;
-      LoggerPresent: boolean;
-    }
-
     const request = {
       method: 'GET',
       url: '/health'
@@ -82,6 +73,8 @@ describe('Inbound API routes', (): void => {
     expect(result.KVSConnected).toBeTruthy()
     expect(result.PubSubConnected).toBeTruthy()
     expect(result.LoggerPresent).toBeTruthy()
+    expect(result.MojaloopRequestsPresent).toBeTruthy()
+    expect(result.ThirdpartyRequestsPresent).toBeTruthy()
   })
   it('/metrics', async (): Promise<void> => {
     const request = {
