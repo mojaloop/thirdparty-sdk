@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+## [11.8.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.7.0...v11.8.0) (2020-09-02)
+
+
+### Features
+
+* **state-plugin:** 423 getWSO2Auth ([#23](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/23)) ([56fef96](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/56fef963047eaa26856b6349c516246c0e635b03))
+
 ## [11.7.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.6.0...v11.7.0) (2020-09-02)
 
 
