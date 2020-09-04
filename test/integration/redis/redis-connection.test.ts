@@ -26,14 +26,14 @@
  ******/
 
 import { RedisConnection, RedisConnectionConfig } from '~/shared/redis-connection'
-import Logger from '@mojaloop/central-services-logger'
+import mockLogger from '../../unit/mockLogger'
 import Config from '~/shared/config'
 
 describe('RedisConnection', () => {
   const config: RedisConnectionConfig = {
     host: Config.REDIS.HOST,
     port: Config.REDIS.PORT,
-    logger: Logger,
+    logger: mockLogger(),
     timeout: Config.REDIS.TIMEOUT
   }
   let rc: RedisConnection

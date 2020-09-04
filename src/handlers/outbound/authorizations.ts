@@ -38,11 +38,9 @@ import {
 } from '~/models/outbound/authorizations.model'
 import {
   TMoney,
-  TQuotesIDPutResponse,
+  TQuotesIDPutResponse
 } from '@mojaloop/sdk-standard-components'
 import { Request, ResponseObject } from '@hapi/hapi'
-
-import Logger from '@mojaloop/central-services-logger'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function post (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
@@ -65,14 +63,14 @@ async function post (_context: any, request: Request, h: StateResponseToolkit): 
     kvs: h.getKVS(),
     pubSub: h.getPubSub(),
     key: OutboundAuthorizationsModel.notificationChannel(data.request.transactionRequestId),
-    logger: Logger,
+    logger: h.getLogger(),
     requests: h.getThirdpartyRequests()
   }
 
   const model: OutboundAuthorizationsModel = await create(data, modelConfig)
   const result = await model.run()
   if (!result) {
-    Logger.error('outbound POST /authorizations unexpected result from workflow')
+    h.getLogger().error('outbound POST /authorizations unexpected result from workflow')
     return h.response({}).code(500)
   }
   return h.response(result).code(200)

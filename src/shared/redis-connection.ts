@@ -26,8 +26,9 @@
  ******/
 
 import { RedisClient, createClient } from 'redis'
-import { Logger } from 'winston'
 import { promisify } from 'util'
+import { Logger as SDKLogger } from '@mojaloop/sdk-standard-components'
+
 export class RedisConnectionError extends Error {
   public readonly host: string
   public readonly port: number
@@ -56,7 +57,7 @@ export class InvalidLoggerError extends Error {
     super('logger should be valid')
   }
 
-  static throwIfInvalid (logger: Logger): void {
+  static throwIfInvalid (logger: SDKLogger.Logger): void {
     if (!(logger)) {
       throw new InvalidLoggerError()
     }
@@ -78,7 +79,7 @@ export class InvalidHostError extends Error {
 export interface RedisConnectionConfig {
   host: string;
   port: number;
-  logger: Logger;
+  logger: SDKLogger.Logger;
   timeout?: number
 }
 
@@ -115,7 +116,7 @@ export class RedisConnection {
     return this.config.port
   }
 
-  get logger (): Logger {
+  get logger (): SDKLogger.Logger {
     return this.config.logger
   }
 

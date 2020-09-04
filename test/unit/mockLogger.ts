@@ -25,18 +25,17 @@
  --------------
  ******/
 
-import Logger from '@mojaloop/central-services-logger'
-import { Logger as WinstonLogger } from 'winston'
+import { Logger as SDKLogger } from '@mojaloop/sdk-standard-components'
 
-export default function mockLogger (keepQuiet = true): WinstonLogger {
+export default function mockLogger (keepQuiet = true): SDKLogger.Logger {
   if (keepQuiet) {
     return {
       log: jest.fn(),
       info: jest.fn(),
       error: jest.fn(),
       push: jest.fn()
-    } as unknown as WinstonLogger
+    } as unknown as SDKLogger.Logger
   }
   // let be elaborative and log to console
-  return Logger
+  return new SDKLogger.Logger()
 }

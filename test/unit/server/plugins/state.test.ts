@@ -35,7 +35,7 @@ import { mockProcessExit } from 'jest-mock-process'
 import { ServerAPI } from '~/server/create'
 jest.mock('~/shared/kvs')
 jest.mock('~/shared/pub-sub')
-
+jest.mock('~/shared/logger')
 describe('StatePlugin', () => {
   const ServerMock = {
     events: {

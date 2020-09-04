@@ -104,7 +104,6 @@ describe('Persistent State Machine', () => {
         onStart2End: jest.fn(() => {
           return new Promise<void>((resolve) => {
             setTimeout(() => {
-              console.log('onStart2End')
               resolve()
             }, 50)
           })
@@ -119,7 +118,6 @@ describe('Persistent State Machine', () => {
         onMiddle2End: jest.fn(() => {
           return new Promise<void>((resolve) => {
             setTimeout(() => {
-              console.log('onMiddle2End')
               resolve()
             }, 100)
           })

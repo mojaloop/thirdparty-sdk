@@ -27,6 +27,7 @@
  ******/
 
 import { HealthResponse } from '~/interface/types'
+import { NotificationCallback, Message, PubSub } from '~/shared/pub-sub'
 import { ServerAPI, ServerConfig } from '~/server'
 import {
   AuthorizationResponse,
@@ -39,16 +40,74 @@ import Config from '~/shared/config'
 import Handlers from '~/handlers'
 import index from '~/index'
 import path from 'path'
+import { RedisConnectionConfig } from '~/shared/redis-connection'
 
-// mock KVS default exported class
-jest.mock('~/shared/kvs')
+const putResponse: InboundAuthorizationsPutRequest = {
+  authenticationInfo: {
+    authentication: AuthenticationType.U2F,
+    authenticationValue: {
+      pinValue: 'the-mocked-pin-value',
+      counter: '1'
+    }
+  },
+  responseType: AuthorizationResponse.ENTERED
+}
+jest.mock('redis')
+jest.mock('@mojaloop/sdk-standard-components', () => {
+  return {
+    MojaloopRequests: jest.fn(),
+    ThirdpartyRequests: jest.fn(() => ({
+      postAuthorizations: jest.fn(() => Promise.resolve(putResponse))
+    })),
+    WSO2Auth: jest.fn(),
+    Logger: {
+      Logger: jest.fn(() => ({
+        push: jest.fn(),
+        configure: jest.fn(),
 
-// mock PubSub default exported class
-jest.mock('~/shared/pub-sub')
+        // log methods
+        log: jest.fn(),
+
+        // generated methods from default levels
+        verbose: jest.fn(),
+        debug: jest.fn(),
+        warn: jest.fn(),
+        error: jest.fn(),
+        trace: jest.fn(),
+        info: jest.fn(),
+        fatal: jest.fn()
+      })),
+      buildStringify: jest.fn()
+    }
+  }
+})
+
+jest.mock('~/shared/pub-sub', () => {
+  let handler: NotificationCallback
+  let subId = 0
+  return {
+    PubSub: jest.fn(() => ({
+      isConnected: true,
+      subscribe: jest.fn(
+        (_channel: string, cb: NotificationCallback) => {
+          handler = cb
+          return ++subId
+        }
+      ),
+      unsubscribe: jest.fn(),
+      publish: jest.fn(
+        async (channel: string, message: Message) => {
+          return handler(channel, message, subId)
+        }
+      ),
+      connect: jest.fn(() => Promise.resolve()),
+      disconnect: jest.fn()
+    }))
+  }
+})
 
 describe('Outbound API routes', (): void => {
   let server: Server
-  let putResponse: InboundAuthorizationsPutRequest
 
   beforeAll(async (): Promise<void> => {
     const apiPath = path.resolve(__dirname, '../../../src/interface/api-outbound.yaml')
@@ -62,18 +121,6 @@ describe('Outbound API routes', (): void => {
       ...Handlers.Outbound
     }
     server = await index.server.setupAndStart(serverConfig, apiPath, serverHandlers)
-  })
-  beforeEach(() => {
-    putResponse = {
-      authenticationInfo: {
-        authentication: AuthenticationType.U2F,
-        authenticationValue: {
-          pinValue: 'the-mocked-pin-value',
-          counter: '1'
-        }
-      },
-      responseType: AuthorizationResponse.ENTERED
-    }
   })
 
   afterAll(async (done): Promise<void> => {
@@ -152,7 +199,12 @@ describe('Outbound API routes', (): void => {
         }
       }
     }
-
+    const pubSub = new PubSub({} as RedisConnectionConfig)
+    // defer publication to notification channel
+    setTimeout(() => pubSub.publish(
+      'some-channel',
+      putResponse as unknown as Message // TODO: think about generic Message so casting will not be necessary
+    ), 10)
     const response = await server.inject(request)
     expect(response.statusCode).toBe(200)
     expect(response.result).toEqual({

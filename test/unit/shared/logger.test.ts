@@ -24,22 +24,38 @@
  --------------
  ******/
 
-import { RequestLogged, logResponse, SchemeLogger } from '~/shared/logger'
+import { RequestLogged, logResponse, logger, createLogger } from '~/shared/logger'
+// import { Logger as SDKLogger } from '@mojaloop/sdk-standard-components'
 import inspect from '~/shared/inspect'
-import logger from '@mojaloop/central-services-logger'
-import { mocked } from 'ts-jest/utils'
+// import Logger from '@mojaloop/central-services-logger'
+// import SDK from '@mojaloop/sdk-standard-components'
+// import { mocked } from 'ts-jest/utils'
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-jest.mock('@mojaloop/central-services-logger', () => ({
-  level: 'info',
-  error: jest.fn(),
-  info: jest.fn(),
-  log: jest.fn(),
-  debug: jest.fn()
-}))
+jest.mock('@mojaloop/sdk-standard-components',
+  jest.fn(() => ({
+    Logger: {
+      Logger: jest.fn(() => ({
+        push: jest.fn(),
+        configure: jest.fn(),
+
+        // log methods
+        log: jest.fn(),
+
+        // generated methods from default levels
+        verbose: jest.fn(),
+        debug: jest.fn(),
+        warn: jest.fn(),
+        error: jest.fn(),
+        trace: jest.fn(),
+        info: jest.fn(),
+        fatal: jest.fn()
+      })),
+      buildStringify: jest.fn()
+    }
+  }))
+)
 
 describe('shared/logger', (): void => {
-  afterEach((): typeof jest => jest.clearAllMocks())
   it('should do nothing if no request', (): void => {
     logResponse(null as unknown as RequestLogged)
     expect(logger.info).not.toBeCalled()
@@ -50,59 +66,77 @@ describe('shared/logger', (): void => {
     const request = { response: { source: 'abc', statusCode: 200 } }
     logResponse(request as RequestLogged)
     expect(spyStringify).toBeCalledWith('abc')
-    expect(logger.info).toBeCalledWith(`AS-Trace - Response: ${JSON.stringify(request.response.source)} Status: ${request.response.statusCode}`)
+    expect(logger.info).toBeCalledWith(
+      `AS-Trace - Response: ${JSON.stringify(request.response.source)} Status: ${request.response.statusCode}`
+    )
   })
 
   it('should log response via inspect', (): void => {
     // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
     jest.mock('~/shared/inspect', () => jest.fn())
+
     // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-    const spyStringify = jest.spyOn(JSON, 'stringify').mockImplementationOnce(() => { throw new Error('parse-error') })
+    const spyStringify = jest.spyOn(JSON, 'stringify').mockImplementationOnce(
+      () => { throw new Error('parse-error') }
+    )
+
     const request = { response: { source: 'abc', statusCode: 200 } }
     logResponse(request as RequestLogged)
     expect(spyStringify).toBeCalled()
-    expect(logger.info).toBeCalledWith(`AS-Trace - Response: ${inspect(request.response.source)} Status: ${request.response.statusCode}`)
+    expect(logger.info).toBeCalledWith(
+      `AS-Trace - Response: ${inspect(request.response.source)} Status: ${request.response.statusCode}`
+    )
   })
 
   it('should log if there is no request.response', (): void => {
     // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-    const spyStringify = jest.spyOn(JSON, 'stringify').mockImplementationOnce(() => null as unknown as string)
+    const spyStringify = jest.spyOn(JSON, 'stringify').mockImplementationOnce(
+      () => null as unknown as string
+    )
     const request = { response: { source: 'abc', statusCode: 200 } }
     logResponse(request as RequestLogged)
     expect(spyStringify).toBeCalled()
     expect(logger.info).toBeCalledWith(`AS-Trace - Response: ${request.response.toString()}`)
   })
 
-  describe('SchemeLogger', () => {
-    let schemeLogger: SchemeLogger
-    beforeEach(() => {
-      schemeLogger = new SchemeLogger(logger)
-    })
+  describe('Logger class', () => {
+    it('should be able to create default logger', () => {
+      const log = createLogger()
+      // basic methods
+      expect(typeof log.push).toEqual('function')
+      expect(typeof log.configure).toEqual('function')
 
-    it('should be well created', () => {
-      expect(schemeLogger).toBeTruthy()
-    })
+      // log methods
+      expect(typeof log.log).toEqual('function')
 
-    it('should log properly', () => {
-      schemeLogger.log('something')
-      expect(mocked(logger.log)).toBeCalledWith(logger.level, { msg: 'something' })
+      // generated methods from default levels
+      expect(typeof log.verbose).toEqual('function')
+      expect(typeof log.debug).toEqual('function')
+      expect(typeof log.warn).toEqual('function')
+      expect(typeof log.error).toEqual('function')
+      expect(typeof log.trace).toEqual('function')
+      expect(typeof log.info).toEqual('function')
+      expect(typeof log.fatal).toEqual('function')
     })
-    it('should info properly', () => {
-      schemeLogger.info('something')
-      expect(mocked(logger.log)).toBeCalledWith('info', { msg: 'something' })
-    })
-    it('should error properly', () => {
-      schemeLogger.error('something')
-      expect(mocked(logger.log)).toBeCalledWith('error', { msg: 'something' })
-    })
-    it('should debug properly', () => {
-      schemeLogger.debug('something')
-      expect(mocked(logger.log)).toBeCalledWith('debug', { msg: 'something' })
-    })
-    it('should push context properly', () => {
-      const pushed = schemeLogger.push({ the: 'context' })
-      pushed.info('something')
-      expect(mocked(logger.log)).toBeCalledWith(logger.level, { ...{ the: 'context' }, msg: 'something' })
+  })
+
+  describe('logger default instance', () => {
+    it('should have proper layout', () => {
+      // basic methods
+      expect(typeof logger.push).toEqual('function')
+      expect(typeof logger.configure).toEqual('function')
+
+      // log methods
+      expect(typeof logger.log).toEqual('function')
+
+      // generated methods from default levels
+      expect(typeof logger.verbose).toEqual('function')
+      expect(typeof logger.debug).toEqual('function')
+      expect(typeof logger.warn).toEqual('function')
+      expect(typeof logger.error).toEqual('function')
+      expect(typeof logger.trace).toEqual('function')
+      expect(typeof logger.info).toEqual('function')
+      expect(typeof logger.fatal).toEqual('function')
     })
   })
 })
