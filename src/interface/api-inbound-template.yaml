@@ -8,6 +8,43 @@ info:
 servers:
   - url: /
 paths:
+  /authorizations/{ID}:
+    parameters:
+      - $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/ID.yaml'
+      - $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Content-Type.yaml'
+      - $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Date.yaml'
+      - $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/X-Forwarded-For.yaml'
+      - $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Source.yaml'
+      - $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Destination.yaml'
+      - $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Encryption.yaml'
+      - $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Signature.yaml'
+      - $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-URI.yaml'
+      - $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-HTTP-Method.yaml'
+    put:
+      description: |
+        The callback PUT /authorizations/ is used to inform the client of the
+        result of a previously-requested authorization. The ID in the URI should
+        contain the one that was used in the POST /authorizations/ requestBody.transactionRequestId @ OUTBOUND
+      responses:
+        '200':
+          $ref: '#/components/responses/InboundAuthorizationsIDPutResponse'
+        '400':
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/400'
+        '401':
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/401'
+        '403':
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/403'
+        '404':
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/404'
+        '405':
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/405'
+        '406':
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/406'
+        '501':
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/501'
+        '503':
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/503'
+
   /health:
     get:
       tags:
@@ -34,32 +71,6 @@ paths:
       operationId: HealthGet
       summary: Get Server
       description: The HTTP request GET /health is used to return the current status of the API.
-  /metrics:
-    get:
-      tags:
-        - metrics
-      responses:
-        '200':
-          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/200'
-        '400':
-          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/400'
-        '401':
-          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/401'
-        '403':
-          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/403'
-        '404':
-          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/404'
-        '405':
-          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/405'
-        '406':
-          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/406'
-        '501':
-          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/501'
-        '503':
-          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/503'
-      operationId: MetricsGet
-      summary: Prometheus metrics endpoint
-      description: The HTTP request GET /metrics is used to return metrics for the API.
   /hello:
     get:
       tags:
@@ -86,6 +97,32 @@ paths:
       operationId: HelloGet
       summary: example get
       description: The HTTP request GET /hello is used to return some example json.
+  /metrics:
+    get:
+      tags:
+        - metrics
+      responses:
+        '200':
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/200'
+        '400':
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/400'
+        '401':
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/401'
+        '403':
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/403'
+        '404':
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/404'
+        '405':
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/405'
+        '406':
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/406'
+        '501':
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/501'
+        '503':
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/503'
+      operationId: MetricsGet
+      summary: Prometheus metrics endpoint
+      description: The HTTP request GET /metrics is used to return metrics for the API.
   /thirdpartyRequests/transactions:
     # todo: uncomment parameters after header middleware simalar to `sdk-scheme-adapter` is checked in
     #parameters:
@@ -159,8 +196,38 @@ paths:
       description: The HTTP request GET /hello is used to return some example json.
 components:
   responses:
-    $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml'
+    InboundAuthorizationsIDPutResponse:
+      description: |
+        information about result of required (via POST) /authorization
+      content:
+        application/json:
+          schema: 
+            title: AuthorizationsIDPutResponse
+            type: object
+            description: 'PUT /authorizations/{ID} object'
+            properties:
+              authenticationInfo:
+                  $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/AuthenticationInfo.yaml'
+              responseType:
+                $ref: '#/components/schemas/AuthorizationResponse'
+                description: >-
+                  Enum containing response information; if the customer entered the
+                  authentication value, rejected the transaction, or requested a
+                  resend of the authentication value.
+            required:
+              - responseType 
   schemas:
+    AuthorizationResponse:
+      title: AuthorizationResponse
+      description: >-
+          Enum containing response information; if the customer entered the
+          authentication value, rejected the transaction, or requested a
+          resend of the authentication value.
+      type: string
+      enum:
+        - ENTERED
+        - REJECTED
+        - RESEND
     AccountId:
       type: string
       description: >
