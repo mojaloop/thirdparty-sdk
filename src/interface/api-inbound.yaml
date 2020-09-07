@@ -8,84 +8,263 @@ info:
 servers:
   - url: /
 paths:
+  '/authorizations/{ID}':
+    put:
+      description: |
+        The callback PUT /authorizations/ is used to inform the client of the
+        result of a previously-requested authorization. The ID in the URI should
+        contain the one that was used in the POST /authorizations/ requestBody.transactionRequestId @ OUTBOUND
+      operationId: InboundAuthorizationsIDPutResponse
+      parameters:
+        - name: ID
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          $ref: '#/components/responses/InboundAuthorizationsIDPutResponse'
+        '400':
+          $ref: '#/paths/~1hello/get/responses/400'
+        '401':
+          $ref: '#/paths/~1hello/get/responses/401'
+        '403':
+          $ref: '#/paths/~1hello/get/responses/403'
+        '404':
+          $ref: '#/paths/~1hello/get/responses/404'
+        '405':
+          $ref: '#/paths/~1hello/get/responses/405'
+        '406':
+          $ref: '#/paths/~1hello/get/responses/406'
+        '501':
+          $ref: '#/paths/~1hello/get/responses/501'
+        '503':
+          $ref: '#/paths/~1hello/get/responses/503'
   /health:
     get:
       tags:
         - health
       responses:
         '200':
-          $ref: '#/components/responses/200'
+          $ref: '#/paths/~1hello/get/responses/200'
         '400':
-          $ref: '#/components/responses/400'
+          $ref: '#/paths/~1hello/get/responses/400'
         '401':
-          $ref: '#/components/responses/401'
+          $ref: '#/paths/~1hello/get/responses/401'
         '403':
-          $ref: '#/components/responses/403'
+          $ref: '#/paths/~1hello/get/responses/403'
         '404':
-          $ref: '#/components/responses/404'
+          $ref: '#/paths/~1hello/get/responses/404'
         '405':
-          $ref: '#/components/responses/405'
+          $ref: '#/paths/~1hello/get/responses/405'
         '406':
-          $ref: '#/components/responses/406'
+          $ref: '#/paths/~1hello/get/responses/406'
         '501':
-          $ref: '#/components/responses/501'
+          $ref: '#/paths/~1hello/get/responses/501'
         '503':
-          $ref: '#/components/responses/503'
+          $ref: '#/paths/~1hello/get/responses/503'
       operationId: HealthGet
       summary: Get Server
       description: The HTTP request GET /health is used to return the current status of the API.
-  /metrics:
-    get:
-      tags:
-        - metrics
-      responses:
-        '200':
-          $ref: '#/components/responses/200'
-        '400':
-          $ref: '#/components/responses/400'
-        '401':
-          $ref: '#/components/responses/401'
-        '403':
-          $ref: '#/components/responses/403'
-        '404':
-          $ref: '#/components/responses/404'
-        '405':
-          $ref: '#/components/responses/405'
-        '406':
-          $ref: '#/components/responses/406'
-        '501':
-          $ref: '#/components/responses/501'
-        '503':
-          $ref: '#/components/responses/503'
-      operationId: MetricsGet
-      summary: Prometheus metrics endpoint
-      description: The HTTP request GET /metrics is used to return metrics for the API.
   /hello:
     get:
       tags:
         - metrics
       responses:
         '200':
-          $ref: '#/components/responses/200'
+          description: OK
         '400':
-          $ref: '#/components/responses/400'
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                title: ErrorInformationResponse
+                type: object
+                description: Data model for the complex type object that contains an optional element ErrorInformation used along with 4xx and 5xx responses.
+                properties:
+                  errorInformation:
+                    title: ErrorInformation
+                    type: object
+                    description: Data model for the complex type ErrorInformation.
+                    properties:
+                      errorCode:
+                        title: ErrorCode
+                        type: string
+                        pattern: '^[1-9]\d{3}$'
+                        description: |
+                          The API data type ErrorCode is a JSON String of four characters,
+                          consisting of digits only. Negative numbers are not allowed.
+                          A leading zero is not allowed. Each error code in the API is a
+                          four-digit number, for example, 1234, where the first number
+                          (1 in the example) represents the high-level error category,
+                          the second number (2 in the example) represents the low-level error category,
+                          and the last two numbers (34 in the example) represent the specific error.
+                        example: 5100
+                      errorDescription:
+                        title: ErrorDescription
+                        type: string
+                        minLength: 1
+                        maxLength: 128
+                        description: Error description string.
+                        example: This is an error description.
+                      extensionList:
+                        title: ExtensionList
+                        type: object
+                        description: |
+                          Data model for the complex type ExtensionList.
+                          An optional list of extensions, specific to deployment.
+                        properties:
+                          extension:
+                            type: array
+                            items:
+                              title: Extension
+                              type: object
+                              description: Data model for the complex type Extension.
+                              properties:
+                                key:
+                                  title: ExtensionKey
+                                  type: string
+                                  minLength: 1
+                                  maxLength: 32
+                                  description: Extension key.
+                                value:
+                                  title: ExtensionValue
+                                  type: string
+                                  minLength: 1
+                                  maxLength: 128
+                                  description: Extension value.
+                              required:
+                                - key
+                                - value
+                            minItems: 1
+                            maxItems: 16
+                            description: Number of Extension elements.
+                        required:
+                          - extension
+                    required:
+                      - errorCode
+                      - errorDescription
+          headers:
+            Content-Length:
+              required: false
+              schema:
+                type: integer
+              description: |
+                The `Content-Length` header field indicates the anticipated
+                size of the payload body. Only sent if there is a body.
+                **Note:** The API supports a maximum size of 5242880 bytes
+                (5 Megabytes).
+            Content-Type:
+              schema:
+                type: string
+              required: true
+              description: The `Content-Type` header indicates the specific version of the API used to send the payload body.
         '401':
-          $ref: '#/components/responses/401'
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1hello/get/responses/400/content/application~1json/schema'
+          headers:
+            Content-Length:
+              $ref: '#/paths/~1hello/get/responses/400/headers/Content-Length'
+            Content-Type:
+              $ref: '#/paths/~1hello/get/responses/400/headers/Content-Type'
         '403':
-          $ref: '#/components/responses/403'
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1hello/get/responses/400/content/application~1json/schema'
+          headers:
+            Content-Length:
+              $ref: '#/paths/~1hello/get/responses/400/headers/Content-Length'
+            Content-Type:
+              $ref: '#/paths/~1hello/get/responses/400/headers/Content-Type'
         '404':
-          $ref: '#/components/responses/404'
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1hello/get/responses/400/content/application~1json/schema'
+          headers:
+            Content-Length:
+              $ref: '#/paths/~1hello/get/responses/400/headers/Content-Length'
+            Content-Type:
+              $ref: '#/paths/~1hello/get/responses/400/headers/Content-Type'
         '405':
-          $ref: '#/components/responses/405'
+          description: Method Not Allowed
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1hello/get/responses/400/content/application~1json/schema'
+          headers:
+            Content-Length:
+              $ref: '#/paths/~1hello/get/responses/400/headers/Content-Length'
+            Content-Type:
+              $ref: '#/paths/~1hello/get/responses/400/headers/Content-Type'
         '406':
-          $ref: '#/components/responses/406'
+          description: Not Acceptable
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1hello/get/responses/400/content/application~1json/schema'
+          headers:
+            Content-Length:
+              $ref: '#/paths/~1hello/get/responses/400/headers/Content-Length'
+            Content-Type:
+              $ref: '#/paths/~1hello/get/responses/400/headers/Content-Type'
         '501':
-          $ref: '#/components/responses/501'
+          description: Not Implemented
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1hello/get/responses/400/content/application~1json/schema'
+          headers:
+            Content-Length:
+              $ref: '#/paths/~1hello/get/responses/400/headers/Content-Length'
+            Content-Type:
+              $ref: '#/paths/~1hello/get/responses/400/headers/Content-Type'
         '503':
-          $ref: '#/components/responses/503'
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1hello/get/responses/400/content/application~1json/schema'
+          headers:
+            Content-Length:
+              $ref: '#/paths/~1hello/get/responses/400/headers/Content-Length'
+            Content-Type:
+              $ref: '#/paths/~1hello/get/responses/400/headers/Content-Type'
       operationId: HelloGet
       summary: example get
       description: The HTTP request GET /hello is used to return some example json.
+  /metrics:
+    get:
+      tags:
+        - metrics
+      responses:
+        '200':
+          $ref: '#/paths/~1hello/get/responses/200'
+        '400':
+          $ref: '#/paths/~1hello/get/responses/400'
+        '401':
+          $ref: '#/paths/~1hello/get/responses/401'
+        '403':
+          $ref: '#/paths/~1hello/get/responses/403'
+        '404':
+          $ref: '#/paths/~1hello/get/responses/404'
+        '405':
+          $ref: '#/paths/~1hello/get/responses/405'
+        '406':
+          $ref: '#/paths/~1hello/get/responses/406'
+        '501':
+          $ref: '#/paths/~1hello/get/responses/501'
+        '503':
+          $ref: '#/paths/~1hello/get/responses/503'
+      operationId: MetricsGet
+      summary: Prometheus metrics endpoint
+      description: The HTTP request GET /metrics is used to return metrics for the API.
   /thirdpartyRequests/transactions:
     post:
       requestBody:
@@ -124,195 +303,92 @@ paths:
               expiration: '2020-07-15T22:17:28.985-01:00'
       responses:
         '200':
-          $ref: '#/components/responses/200'
+          $ref: '#/paths/~1hello/get/responses/200'
         '400':
-          $ref: '#/components/responses/400'
+          $ref: '#/paths/~1hello/get/responses/400'
         '401':
-          $ref: '#/components/responses/401'
+          $ref: '#/paths/~1hello/get/responses/401'
         '403':
-          $ref: '#/components/responses/403'
+          $ref: '#/paths/~1hello/get/responses/403'
         '404':
-          $ref: '#/components/responses/404'
+          $ref: '#/paths/~1hello/get/responses/404'
         '405':
-          $ref: '#/components/responses/405'
+          $ref: '#/paths/~1hello/get/responses/405'
         '406':
-          $ref: '#/components/responses/406'
+          $ref: '#/paths/~1hello/get/responses/406'
         '501':
-          $ref: '#/components/responses/501'
+          $ref: '#/paths/~1hello/get/responses/501'
         '503':
-          $ref: '#/components/responses/503'
+          $ref: '#/paths/~1hello/get/responses/503'
       operationId: ThirdpartyRequestsTransactionsPost
       summary: example get
       description: The HTTP request GET /hello is used to return some example json.
 components:
   responses:
-    '200':
-      description: OK
-    '202':
-      description: Accepted
-    '400':
-      description: Bad Request
+    InboundAuthorizationsIDPutResponse:
+      description: |
+        information about result of required (via POST) /authorization
       content:
         application/json:
           schema:
-            title: ErrorInformationResponse
+            title: AuthorizationsIDPutResponse
             type: object
-            description: Data model for the complex type object that contains an optional element ErrorInformation used along with 4xx and 5xx responses.
+            description: 'PUT /authorizations/{ID} object'
             properties:
-              errorInformation:
-                title: ErrorInformation
+              authenticationInfo:
+                title: AuthenticationInfo
                 type: object
-                description: Data model for the complex type ErrorInformation.
+                description: Data model for the complex type AuthenticationInfo.
                 properties:
-                  errorCode:
-                    title: ErrorCode
+                  authentication:
+                    title: AuthenticationType
                     type: string
-                    pattern: '^[1-9]\d{3}$'
+                    enum:
+                      - OTP
+                      - QRCODE
                     description: |
-                      The API data type ErrorCode is a JSON String of four characters,
-                      consisting of digits only. Negative numbers are not allowed.
-                      A leading zero is not allowed. Each error code in the API is a
-                      four-digit number, for example, 1234, where the first number
-                      (1 in the example) represents the high-level error category,
-                      the second number (2 in the example) represents the low-level error category,
-                      and the last two numbers (34 in the example) represent the specific error.
-                    example: 5100
-                  errorDescription:
-                    title: ErrorDescription
-                    type: string
-                    minLength: 1
-                    maxLength: 128
-                    description: Error description string.
-                    example: This is an error description.
-                  extensionList:
-                    title: ExtensionList
-                    type: object
+                      Below are the allowed values for the enumeration AuthenticationType.
+                      - OTP - One-time password generated by the Payer FSP.
+                      - QRCODE - QR code used as One Time Password.
+                    example: OTP
+                  authenticationValue:
+                    title: AuthenticationValue
+                    oneOf:
+                      - title: OtpValue
+                        type: string
+                        pattern: '^\d{3,10}$'
+                        description: |
+                          The API data type OtpValue is a JSON String of 3 to 10 characters,
+                          consisting of digits only. Negative numbers are not allowed.
+                          One or more leading zeros are allowed.
+                      - title: QRCODE
+                        type: string
+                        minLength: 1
+                        maxLength: 64
+                        description: QR code used as a One Time Password.
+                    pattern: '^\d{3,10}$|^\S{1,64}$'
                     description: |
-                      Data model for the complex type ExtensionList.
-                      An optional list of extensions, specific to deployment.
-                    properties:
-                      extension:
-                        type: array
-                        items:
-                          title: Extension
-                          type: object
-                          description: Data model for the complex type Extension.
-                          properties:
-                            key:
-                              title: ExtensionKey
-                              type: string
-                              minLength: 1
-                              maxLength: 32
-                              description: Extension key.
-                            value:
-                              title: ExtensionValue
-                              type: string
-                              minLength: 1
-                              maxLength: 128
-                              description: Extension value.
-                          required:
-                            - key
-                            - value
-                        minItems: 1
-                        maxItems: 16
-                        description: Number of Extension elements.
-                    required:
-                      - extension
+                      Contains the authentication value. The format depends on the authentication
+                      type used in the AuthenticationInfo complex type.
+                    example: 1234
                 required:
-                  - errorCode
-                  - errorDescription
-      headers:
-        Content-Length:
-          required: false
-          schema:
-            type: integer
-          description: |
-            The `Content-Length` header field indicates the anticipated
-            size of the payload body. Only sent if there is a body.
-            **Note:** The API supports a maximum size of 5242880 bytes
-            (5 Megabytes).
-        Content-Type:
-          schema:
-            type: string
-          required: true
-          description: The `Content-Type` header indicates the specific version of the API used to send the payload body.
-    '401':
-      description: Unauthorized
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/responses/400/content/application~1json/schema'
-      headers:
-        Content-Length:
-          $ref: '#/components/responses/400/headers/Content-Length'
-        Content-Type:
-          $ref: '#/components/responses/400/headers/Content-Type'
-    '403':
-      description: Forbidden
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/responses/400/content/application~1json/schema'
-      headers:
-        Content-Length:
-          $ref: '#/components/responses/400/headers/Content-Length'
-        Content-Type:
-          $ref: '#/components/responses/400/headers/Content-Type'
-    '404':
-      description: Not Found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/responses/400/content/application~1json/schema'
-      headers:
-        Content-Length:
-          $ref: '#/components/responses/400/headers/Content-Length'
-        Content-Type:
-          $ref: '#/components/responses/400/headers/Content-Type'
-    '405':
-      description: Method Not Allowed
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/responses/400/content/application~1json/schema'
-      headers:
-        Content-Length:
-          $ref: '#/components/responses/400/headers/Content-Length'
-        Content-Type:
-          $ref: '#/components/responses/400/headers/Content-Type'
-    '406':
-      description: Not Acceptable
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/responses/400/content/application~1json/schema'
-      headers:
-        Content-Length:
-          $ref: '#/components/responses/400/headers/Content-Length'
-        Content-Type:
-          $ref: '#/components/responses/400/headers/Content-Type'
-    '501':
-      description: Not Implemented
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/responses/400/content/application~1json/schema'
-      headers:
-        Content-Length:
-          $ref: '#/components/responses/400/headers/Content-Length'
-        Content-Type:
-          $ref: '#/components/responses/400/headers/Content-Type'
-    '503':
-      description: Service Unavailable
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/responses/400/content/application~1json/schema'
-      headers:
-        Content-Length:
-          $ref: '#/components/responses/400/headers/Content-Length'
-        Content-Type:
-          $ref: '#/components/responses/400/headers/Content-Type'
+                  - authentication
+                  - authenticationValue
+              responseType:
+                title: AuthorizationResponse
+                type: string
+                enum:
+                  - ENTERED
+                  - REJECTED
+                  - RESEND
+                description: |
+                  Below are the allowed values for the enumeration.
+                  - ENTERED - Consumer entered the authentication value.
+                  - REJECTED - Consumer rejected the transaction.
+                  - RESEND - Consumer requested to resend the authentication value.
+                example: ENTERED
+            required:
+              - responseType
   schemas:
     AccountId:
       type: string

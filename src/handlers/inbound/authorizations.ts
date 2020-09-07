@@ -22,15 +22,31 @@
  - Name Surname <name.surname@gatesfoundation.com>
 
  - Paweł Marzec <pawel.marzec@modusbox.com>
- - Kevin Leyow <kevin.leyow@modusbox.com>
 
  --------------
  ******/
-import Hello from './hello'
-import ThirdpartyRequestsTransactions from './thirdpartyRequests/transactions'
-import InboundAuthorizations from './authorizations'
+import { InboundAuthorizationsPutRequest } from '~/models/authorizations.interface'
+import { Message } from '~/shared/pub-sub'
+import {
+  OutboundAuthorizationsModel
+} from '~/models/outbound/authorizations.model'
+import { Request, ResponseObject } from '@hapi/hapi'
+import { StateResponseToolkit } from '~/server/plugins/state'
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function put (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+  const payload = request.payload as unknown as InboundAuthorizationsPutRequest
+  const channel = OutboundAuthorizationsModel.notificationChannel(request.params.ID)
+  const pubSub = h.getPubSub()
+
+  // don't await on promise to resolve
+  // let finish publish in background
+  pubSub.publish(channel, payload as unknown as Message)
+
+  // return asap
+  return h.response().code(200)
+}
+
 export default {
-  HelloGet: Hello.get,
-  ThirdpartyRequestsTransactionsPost: ThirdpartyRequestsTransactions.post,
-  InboundAuthorizationsIDPutResponse: InboundAuthorizations.put
+  put
 }
