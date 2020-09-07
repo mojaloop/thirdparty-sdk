@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+## [11.9.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.8.0...v11.9.0) (2020-09-07)
+
+
+### Features
+
+* 348 authorization post handler ([#24](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/24)) ([ca78e65](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/ca78e6525d957d7d3d75d31b9f73c330aae5b729))
+
 ## [11.8.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.7.0...v11.8.0) (2020-09-02)
 
 
