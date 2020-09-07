@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+### [11.9.1](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.9.0...v11.9.1) (2020-09-07)
+
+
+### Features
+
+* 348 inbound put handler, unit tests ([#25](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/25)) ([c7f2430](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/c7f2430abbca8fe4a60773fe368a9e00369c5b82))
+
 ## [11.9.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.8.0...v11.9.0) (2020-09-07)
 
 
