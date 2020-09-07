@@ -32,7 +32,7 @@ import StateMachine, {
   TransitionEvent
 } from 'javascript-state-machine'
 import { KVS } from '~/shared/kvs'
-import { Logger as WinstonLogger } from 'winston'
+import { Logger as SDKLogger } from '@mojaloop/sdk-standard-components'
 
 export interface ControlledStateMachine extends StateMachineInterface {
   init: Method
@@ -50,7 +50,7 @@ export interface StateData extends Record<string, unknown> {
 export interface PersistentModelConfig {
   key: string;
   kvs: KVS;
-  logger: WinstonLogger;
+  logger: SDKLogger.Logger;
 }
 
 export class PersistentModel<JSM extends ControlledStateMachine, Data extends StateData> {
@@ -89,7 +89,7 @@ export class PersistentModel<JSM extends ControlledStateMachine, Data extends St
   }
 
   // accessors to config properties
-  get logger (): WinstonLogger {
+  get logger (): SDKLogger.Logger {
     return this.config.logger
   }
 
@@ -119,7 +119,7 @@ export class PersistentModel<JSM extends ControlledStateMachine, Data extends St
   async saveToKVS (): Promise<void> {
     try {
       const res = await this.kvs.set(this.key, this.data)
-      this.logger.push({ res })
+      this.logger.info({ res })
       this.logger.info(`Persisted model in cache: ${this.key}`)
     } catch (err) {
       this.logger.push({ err })

@@ -28,32 +28,19 @@
 
 import config from '~/shared/config'
 
-import { Logger as WinstonLogger } from 'winston'
 import SDK from '@mojaloop/sdk-standard-components'
 import { KVS } from '~/shared/kvs'
 import { PubSub } from '~/shared/pub-sub'
 import { ResponseToolkit, Server } from '@hapi/hapi'
 import { RedisConnectionConfig } from '~/shared/redis-connection'
-import Logger from '@mojaloop/central-services-logger'
+import { logger } from '~/shared/logger'
 export interface StateResponseToolkit extends ResponseToolkit {
   getKVS: () => KVS
   getPubSub: () => PubSub
-  getLogger: () => WinstonLogger
+  getLogger: () => SDK.Logger.Logger
   getMojaloopRequests: () => SDK.MojaloopRequests
   getThirdpartyRequests: () => SDK.ThirdpartyRequests
   getWSO2Auth: () => SDK.WSO2Auth
-}
-
-// wrapper for WSO2Auth Logger
-// TODO: investigate any differences of Logger used in sdk-scheme-adapter and central-services-logger
-interface SDKLogger {
-  log: (message: string) => void
-}
-
-function wrapLogger (logger: WinstonLogger): SDKLogger {
-  return {
-    log: (message: string) => logger.info(message)
-  }
 }
 
 export const StatePlugin = {
@@ -67,23 +54,31 @@ export const StatePlugin = {
       host: config.REDIS.HOST,
       port: config.REDIS.PORT,
       timeout: config.REDIS.TIMEOUT,
-      logger: Logger
+      logger
     }
 
     // prepare redis connection instances
     const kvs = new KVS(connection)
     const pubSub = new PubSub(connection)
 
+    // interface to help casting
+    interface TLSCreds {
+      ca: string
+      cert: string
+      key: string
+    }
     // prepare WSO2Auth
     const wso2Auth = new SDK.WSO2Auth({
       ...config.WSO2_AUTH,
-      logger: wrapLogger(Logger),
-      tlsCreds: config.SHARED.TLS.outbound.mutualTLS.enabled && config.SHARED.TLS.outbound.creds
+      logger,
+      tlsCreds: config.SHARED.TLS.outbound.mutualTLS.enabled
+        ? config.SHARED.TLS.outbound.creds as TLSCreds
+        : undefined
     })
 
     // prepare Requests instances
     const mojaloopRequests = new SDK.MojaloopRequests({
-      logger: Logger,
+      logger,
       peerEndpoint: config.SHARED.PEER_ENDPOINT,
       alsEndpoint: config.SHARED.ALS_ENDPOINT,
       quotesEndpoint: config.SHARED.QUOTES_ENDPOINT,
@@ -96,7 +91,7 @@ export const StatePlugin = {
     })
 
     const thirdpartyRequest = new SDK.ThirdpartyRequests({
-      logger: Logger,
+      logger,
       peerEndpoint: config.SHARED.PEER_ENDPOINT,
       alsEndpoint: config.SHARED.ALS_ENDPOINT,
       quotesEndpoint: config.SHARED.QUOTES_ENDPOINT,
@@ -111,12 +106,12 @@ export const StatePlugin = {
     try {
       // connect them all to Redis instance
       await Promise.all([kvs.connect(), pubSub.connect()])
-      Logger.info('StatePlugin: connecting KVS & PubSub')
+      logger.info(`StatePlugin: connecting KVS(${kvs.isConnected}) & PubSub(${pubSub.isConnected}):`)
 
       // prepare toolkit accessors
       server.decorate('toolkit', 'getKVS', (): KVS => kvs)
       server.decorate('toolkit', 'getPubSub', (): PubSub => pubSub)
-      server.decorate('toolkit', 'getLogger', (): WinstonLogger => Logger)
+      server.decorate('toolkit', 'getLogger', (): SDK.Logger.Logger => logger)
       server.decorate('toolkit', 'getMojaloopRequests', (): SDK.MojaloopRequests => mojaloopRequests)
       server.decorate('toolkit', 'getThirdpartyRequests', (): SDK.ThirdpartyRequests => thirdpartyRequest)
       server.decorate('toolkit', 'getWSO2Auth', (): SDK.WSO2Auth => wso2Auth)
@@ -124,12 +119,12 @@ export const StatePlugin = {
       // disconnect from redis when server is stopped
       server.events.on('stop', async () => {
         await Promise.allSettled([kvs.disconnect(), pubSub.disconnect()])
-        Logger.info('StatePlugin: Server stopped -> disconnecting KVS & PubSub')
+        logger.info('StatePlugin: Server stopped -> disconnecting KVS & PubSub')
       })
     } catch (err) {
-      Logger.error('StatePlugin: unexpected exception during plugin registration')
-      Logger.error(err)
-      Logger.error('StatePlugin: exiting process')
+      logger.error('StatePlugin: unexpected exception during plugin registration')
+      logger.error(err)
+      logger.error('StatePlugin: exiting process')
       process.exit(1)
     }
   }

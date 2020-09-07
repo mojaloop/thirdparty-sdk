@@ -27,14 +27,14 @@
 
 import { KVS } from '~/shared/kvs'
 import { RedisConnectionConfig } from '~/shared/redis-connection'
-import Logger from '@mojaloop/central-services-logger'
 import Config from '~/shared/config'
+import mockLogger from '../../unit/mockLogger'
 
 describe('KVS', () => {
   const config: RedisConnectionConfig = {
     host: Config.REDIS.HOST,
     port: Config.REDIS.PORT,
-    logger: Logger,
+    logger: mockLogger(),
     timeout: Config.REDIS.TIMEOUT
   }
   let kvs: KVS

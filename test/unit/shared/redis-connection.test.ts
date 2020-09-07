@@ -33,7 +33,7 @@ import {
   RedisConnectionConfig,
   RedisConnectionError
 } from '~/shared/redis-connection'
-import { Logger as WinstonLogger } from 'winston'
+import { Logger as SDKLogger } from '@mojaloop/sdk-standard-components'
 import Redis from 'redis'
 import mockLogger from '../mockLogger'
 jest.mock('redis')
@@ -74,7 +74,7 @@ describe('RedisConnection', () => {
 
   it('should do input validation for logger', () => {
     const invalidLogger = { ...config }
-    invalidLogger.logger = null as unknown as WinstonLogger
+    invalidLogger.logger = null as unknown as SDKLogger.Logger
     expect(() => new RedisConnection(invalidLogger)).toThrowError(new InvalidLoggerError())
   })
 

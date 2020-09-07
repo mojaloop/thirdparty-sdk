@@ -36,7 +36,6 @@ import Config from '~/shared/config'
 import TestData from 'test/unit/data/mockData.json'
 import index from '~/index'
 import path from 'path'
-
 const mockData = JSON.parse(JSON.stringify(TestData))
 const postThirdpartyRequestsTransactionRequest = mockData.postThirdpartyRequestsTransactionRequest
 const __postQuotes = jest.fn(() => Promise.resolve())
@@ -49,7 +48,26 @@ jest.mock('@mojaloop/sdk-standard-components', () => {
       }
     }),
     ThirdpartyRequests: jest.fn(),
-    WSO2Auth: jest.fn()
+    WSO2Auth: jest.fn(),
+    Logger: {
+      Logger: jest.fn(() => ({
+        push: jest.fn(),
+        configure: jest.fn(),
+
+        // log methods
+        log: jest.fn(),
+
+        // generated methods from default levels
+        verbose: jest.fn(),
+        debug: jest.fn(),
+        warn: jest.fn(),
+        error: jest.fn(),
+        trace: jest.fn(),
+        info: jest.fn(),
+        fatal: jest.fn()
+      })),
+      buildStringify: jest.fn()
+    }
   }
 })
 

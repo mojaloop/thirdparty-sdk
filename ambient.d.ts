@@ -143,12 +143,6 @@ declare module '@mojaloop/central-services-error-handling'{
     useDescriptionAsMessage?: boolean
   ): FSPIOPError
 }
-declare module '@mojaloop/central-services-logger' {
-  import { Logger as WinstonLogger } from 'winston'
-  const Logger: WinstonLogger
-  export default Logger
-}
-
 declare module '@mojaloop/central-services-shared' {
   interface ReturnCode {
     CODE: number;

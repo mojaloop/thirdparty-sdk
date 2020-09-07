@@ -26,7 +26,8 @@
  --------------
  ******/
 import Hello from './hello'
-
+import Authorizations from './authorizations'
 export default {
+  OutboundAuthorizationsPost: Authorizations.post,
   HelloGet: Hello.get
 }
