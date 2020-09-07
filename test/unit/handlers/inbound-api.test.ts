@@ -28,10 +28,21 @@
 
 import { Handlers, ServerAPI, ServerConfig } from '~/server'
 import { HealthResponse } from '~/interface/types'
-import { Server } from '@hapi/hapi'
+import {
+  AuthorizationResponse,
+  AuthenticationType,
+  InboundAuthorizationsPutRequest
+} from '~/models/authorizations.interface'
+
+import InboundAuthorizations from '~/handlers/inbound/authorizations'
+
+import {
+  OutboundAuthorizationsModel
+} from '~/models/outbound/authorizations.model'
+import { Server, Request } from '@hapi/hapi'
+import { StateResponseToolkit } from '~/server/plugins/state'
 import { buildPayeeQuoteRequestFromTptRequest } from '~/domain/thirdpartyRequests/transactions'
 import { resetUuid } from '../__mocks__/uuidv4'
-
 import Config from '~/shared/config'
 import TestData from 'test/unit/data/mockData.json'
 import index from '~/index'
@@ -71,6 +82,28 @@ jest.mock('@mojaloop/sdk-standard-components', () => {
   }
 })
 
+jest.mock('~/shared/pub-sub', () => {
+  return {
+    PubSub: jest.fn(() => ({
+      isConnected: true,
+      publish: jest.fn(),
+      connect: jest.fn(() => Promise.resolve()),
+      disconnect: jest.fn()
+    }))
+  }
+})
+
+const putResponse: InboundAuthorizationsPutRequest = {
+  authenticationInfo: {
+    authentication: AuthenticationType.U2F,
+    authenticationValue: {
+      pinValue: 'the-mocked-pin-value',
+      counter: '1'
+    }
+  },
+  responseType: AuthorizationResponse.ENTERED
+}
+
 describe('Inbound API routes', (): void => {
   let server: Server
 
@@ -95,6 +128,53 @@ describe('Inbound API routes', (): void => {
     await server.stop()
   })
 
+  describe('/authorization', () => {
+    it('handler && pubSub invocation', async (): Promise<void> => {
+      const request = {
+        params: {
+          ID: '123'
+        },
+        payload: putResponse
+      }
+      const pubSubMock = {
+        publish: jest.fn()
+      }
+      const toolkit = {
+        getPubSub: jest.fn(() => pubSubMock),
+        response: jest.fn(() => ({
+          code: jest.fn((code: number) => ({
+            statusCode: code
+          }))
+        }))
+      }
+
+      const result = await InboundAuthorizations.put(
+        {},
+        request as unknown as Request,
+        toolkit as unknown as StateResponseToolkit
+      )
+
+      expect(result.statusCode).toEqual(200)
+      expect(toolkit.getPubSub).toBeCalledTimes(1)
+
+      const channel = OutboundAuthorizationsModel.notificationChannel(request.params.ID)
+      expect(pubSubMock.publish).toBeCalledWith(channel, putResponse)
+    })
+
+    it('PUT /authorizations & input validation', async (): Promise<void> => {
+      const request = {
+        method: 'PUT',
+        url: '/authorizations/123',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        payload: putResponse
+      }
+      const response = await server.inject(request)
+      expect(response.statusCode).toBe(200)
+    })
+  })
+
   it('/health', async (): Promise<void> => {
     const request = {
       method: 'GET',
@@ -115,16 +195,6 @@ describe('Inbound API routes', (): void => {
     expect(result.ThirdpartyRequestsPresent).toBeTruthy()
   })
 
-  it('/metrics', async (): Promise<void> => {
-    const request = {
-      method: 'GET',
-      url: '/metrics'
-    }
-
-    const response = await server.inject(request)
-    expect(response.statusCode).toBe(200)
-  })
-
   it('/hello', async (): Promise<void> => {
     const request = {
       method: 'GET',
@@ -136,6 +206,16 @@ describe('Inbound API routes', (): void => {
     expect(JSON.parse(response.payload)).toEqual({
       hello: 'inbound'
     })
+  })
+
+  it('/metrics', async (): Promise<void> => {
+    const request = {
+      method: 'GET',
+      url: '/metrics'
+    }
+
+    const response = await server.inject(request)
+    expect(response.statusCode).toBe(200)
   })
 
   it('/thirdpartyRequests/transactions should forward quote request to payee', async (): Promise<void> => {
