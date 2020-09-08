@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+## [11.10.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.9.1...v11.10.0) (2020-09-08)
+
+
+### Features
+
+* **endpoints:** Thirdparty inbound and outbound authorizations ([#26](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/26)) ([5ed1c75](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/5ed1c757e4f271635a84d8a2866c29178d2bb320))
+
 ### [11.9.1](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.9.0...v11.9.1) (2020-09-07)
 
 
