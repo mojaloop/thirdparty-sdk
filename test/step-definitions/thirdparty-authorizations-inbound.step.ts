@@ -36,7 +36,7 @@ const apiPath = path.resolve(__dirname, '../../src/interface/api-inbound.yaml')
 const featurePath = path.resolve(__dirname, '../features/thirdparty-authorizations-inbound.feature')
 const feature = loadFeature(featurePath)
 
-async function prepareInboundAPIServer(): Promise<Server> {
+async function prepareInboundAPIServer (): Promise<Server> {
   const serverConfig: ServerConfig = {
     port: Config.INBOUND.PORT,
     host: Config.INBOUND.HOST,
@@ -74,7 +74,7 @@ defineFeature(feature, (test): void => {
         headers: {
           'Content-Type': 'application/json',
           'FSPIOP-Source': 'switch',
-          'Date': 'Thu, 24 Jan 2019 10:22:12 GMT',
+          Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
           'FSPIOP-Destination': 'dfspA'
         },
         payload: {

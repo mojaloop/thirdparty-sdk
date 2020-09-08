@@ -32,18 +32,18 @@ import {
   OutboundThirdpartyAuthorizationsData,
   OutboundThirdpartyAuthorizationStateMachine
 } from '~/models/thirdparty.authorizations.interface'
-
+import { Message, PubSub } from '~/shared/pub-sub'
 import { PersistentModel } from '~/models/persistent.model'
 import { StateMachineConfig } from 'javascript-state-machine'
-import { Message, PubSub } from '~/shared/pub-sub'
 import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
+
 import inspect from '~/shared/inspect'
 
 export class OutboundThirdpartyAuthorizationsModel
   extends PersistentModel<OutboundThirdpartyAuthorizationStateMachine, OutboundThirdpartyAuthorizationsData> {
   protected config: OutboundThirdpartyAuthorizationsModelConfig
 
-  constructor(
+  constructor (
     data: OutboundThirdpartyAuthorizationsData,
     config: OutboundThirdpartyAuthorizationsModelConfig
   ) {
@@ -62,15 +62,15 @@ export class OutboundThirdpartyAuthorizationsModel
   }
 
   // getters
-  get pubSub(): PubSub {
+  get pubSub (): PubSub {
     return this.config.pubSub
   }
 
-  get requests(): ThirdpartyRequests {
+  get requests (): ThirdpartyRequests {
     return this.config.requests
   }
 
-  static notificationChannel(id: string): string {
+  static notificationChannel (id: string): string {
     if (!(id && id.toString().length > 0)) {
       throw new Error('OutboundThirdpartyAuthorizationsModel.notificationChannel: \'id\' parameter is required')
     }
@@ -80,12 +80,12 @@ export class OutboundThirdpartyAuthorizationsModel
 
   /**
    * Requests Thirdparty Authorization
-   * Starts the thirdparty authorization process by sending a 
+   * Starts the thirdparty authorization process by sending a
    * POST /thirdpartyRequests/transactions/${transactionRequestId}/authorizations request to switch
    * than await for a notification on PUT /thirdpartyRequests/transactions/${transactionRequestId}/authorizations
    * from the PubSub that the Authorization has been resolved
    */
-  async onThirdpartyRequestAuthorization(): Promise<void> {
+  async onThirdpartyRequestAuthorization (): Promise<void> {
     const channel = OutboundThirdpartyAuthorizationsModel.notificationChannel(this.config.key)
     const pubSub: PubSub = this.pubSub
 
@@ -111,7 +111,11 @@ export class OutboundThirdpartyAuthorizationsModel
         })
 
         // POST /thirdpartyRequests/transactions/${transactionRequestId}/authorizations request to the switch
-        const res = await this.requests.postThirdpartyRequestsTransactionsAuthorizations(this.data.request, this.config.key, this.data.toParticipantId)
+        const res = await this.requests.postThirdpartyRequestsTransactionsAuthorizations(
+          this.data.request,
+          this.config.key,
+          this.data.toParticipantId
+        )
         this.logger.push({ res })
         this.logger.info('ThirdpartyAuthorizations request sent to peer')
       } catch (error) {
@@ -128,14 +132,14 @@ export class OutboundThirdpartyAuthorizationsModel
    *
    * @returns {object} - Response representing the result of the thirdparty authorization process
    */
-  getResponse(): OutboundThirdpartyAuthorizationsPostResponse | void {
+  getResponse (): OutboundThirdpartyAuthorizationsPostResponse | void {
     return this.data.response
   }
 
   /**
    * runs the workflow
    */
-  async run(): Promise<OutboundThirdpartyAuthorizationsPostResponse | void> {
+  async run (): Promise<OutboundThirdpartyAuthorizationsPostResponse | void> {
     const data = this.data
     try {
       // run transitions based on incoming state
@@ -146,7 +150,7 @@ export class OutboundThirdpartyAuthorizationsModel
           this.logger.info(
             `ThirdpartyAuthorizations requested for ${data.transactionRequestId},  currentState: ${data.currentState}`
           )
-        /* falls through */
+          /* falls through */
 
         case 'succeeded':
           // all steps complete so return
@@ -178,7 +182,7 @@ export class OutboundThirdpartyAuthorizationsModel
   }
 }
 
-export async function create(
+export async function create (
   data: OutboundThirdpartyAuthorizationsData,
   config: OutboundThirdpartyAuthorizationsModelConfig
 ): Promise<OutboundThirdpartyAuthorizationsModel> {
@@ -191,7 +195,7 @@ export async function create(
 }
 
 // loads PersistentModel from KVS storage using given `config` and `spec`
-export async function loadFromKVS(
+export async function loadFromKVS (
   config: OutboundThirdpartyAuthorizationsModelConfig
 ): Promise<OutboundThirdpartyAuthorizationsModel> {
   try {

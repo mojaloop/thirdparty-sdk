@@ -43,7 +43,7 @@ import {
 } from '~/models/thirdparty.authorizations.interface'
 import ThirdpartyAuthorizations from '~/handlers/inbound/thirdpartyRequests/transactions/{ID}/authorizations'
 import {
-  OutboundThirdpartyAuthorizationsModel,
+  OutboundThirdpartyAuthorizationsModel
 } from '~/models/outbound/thirdparty.authorizations.model'
 import { Server, Request } from '@hapi/hapi'
 import { StateResponseToolkit } from '~/server/plugins/state'
@@ -346,7 +346,7 @@ describe('Inbound API routes', (): void => {
         headers: {
           'Content-Type': 'application/json',
           'FSPIOP-Source': 'switch',
-          'Date': 'Thu, 24 Jan 2019 10:22:12 GMT',
+          Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
           'FSPIOP-Destination': 'dfspA'
         },
         payload: putThirdpartyAuthResponse

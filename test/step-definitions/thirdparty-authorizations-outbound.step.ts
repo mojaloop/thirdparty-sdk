@@ -30,8 +30,8 @@ import { defineFeature, loadFeature } from 'jest-cucumber'
 import { NotificationCallback, Message, PubSub } from '~/shared/pub-sub'
 import { RedisConnectionConfig } from '~/shared/redis-connection'
 import {
-    OutboundThirdpartyAuthorizationsModelState,
-    InboundThirdpartyAuthorizationsPutRequest
+  OutboundThirdpartyAuthorizationsModelState,
+  InboundThirdpartyAuthorizationsPutRequest
 } from '~/models/thirdparty.authorizations.interface'
 import Config from '~/shared/config'
 import index from '~/index'
@@ -42,96 +42,96 @@ const featurePath = path.resolve(__dirname, '../features/thirdparty-authorizatio
 const feature = loadFeature(featurePath)
 
 jest.mock('~/shared/pub-sub', () => {
-    let handler: NotificationCallback
-    let subId = 0
-    return {
-        PubSub: jest.fn(() => ({
-            isConnected: true,
-            subscribe: jest.fn(
-                (_channel: string, cb: NotificationCallback) => {
-                    handler = cb
-                    return ++subId
-                }
-            ),
-            unsubscribe: jest.fn(),
-            publish: jest.fn(
-                async (channel: string, message: Message) => {
-                    return handler(channel, message, subId)
-                }
-            ),
-            connect: jest.fn(() => Promise.resolve()),
-            disconnect: jest.fn()
-        }))
-    }
+  let handler: NotificationCallback
+  let subId = 0
+  return {
+    PubSub: jest.fn(() => ({
+      isConnected: true,
+      subscribe: jest.fn(
+        (_channel: string, cb: NotificationCallback) => {
+          handler = cb
+          return ++subId
+        }
+      ),
+      unsubscribe: jest.fn(),
+      publish: jest.fn(
+        async (channel: string, message: Message) => {
+          return handler(channel, message, subId)
+        }
+      ),
+      connect: jest.fn(() => Promise.resolve()),
+      disconnect: jest.fn()
+    }))
+  }
 })
 
 async function prepareOutboundAPIServer (): Promise<Server> {
-    const serverConfig: ServerConfig = {
-        port: Config.OUTBOUND.PORT,
-        host: Config.OUTBOUND.HOST,
-        api: ServerAPI.outbound
-    }
-    const serverHandlers = {
-        ...Handlers.Shared,
-        ...Handlers.Outbound
-    }
-    return index.server.setupAndStart(serverConfig, apiPath, serverHandlers)
+  const serverConfig: ServerConfig = {
+    port: Config.OUTBOUND.PORT,
+    host: Config.OUTBOUND.HOST,
+    api: ServerAPI.outbound
+  }
+  const serverHandlers = {
+    ...Handlers.Shared,
+    ...Handlers.Outbound
+  }
+  return index.server.setupAndStart(serverConfig, apiPath, serverHandlers)
 }
 
 defineFeature(feature, (test): void => {
-    let server: Server
-    let response: ServerInjectResponse
+  let server: Server
+  let response: ServerInjectResponse
 
-    afterEach((done): void => {
-        server.events.on('stop', done)
-        server.stop()
+  afterEach((done): void => {
+    server.events.on('stop', done)
+    server.stop()
+  })
+
+  test('VerifyThirdPartyAuthorization', ({ given, when, then }): void => {
+    const putThirdpartyAuthResponse: InboundThirdpartyAuthorizationsPutRequest = {
+      challenge: 'challenge',
+      consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
+      sourceAccountId: 'dfspa.alice.1234',
+      status: 'VERIFIED',
+      value: 'value'
+    }
+
+    given('Outbound API server', async (): Promise<void> => {
+      server = await prepareOutboundAPIServer()
     })
 
-    test('VerifyThirdPartyAuthorization', ({ given, when, then }): void => {
-        const putThirdpartyAuthResponse: InboundThirdpartyAuthorizationsPutRequest = {
-            challenge: 'challenge',
-            consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
-            sourceAccountId: 'dfspa.alice.1234',
-            status: 'VERIFIED',
-            value: 'value'
+    when('I send a \'VerifyThirdPartyAuthorization\' request', async (): Promise<ServerInjectResponse> => {
+      const request = {
+        method: 'POST',
+        url: '/thirdpartyRequests/transactions/12345/authorizations',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        payload: {
+          toParticipantId: 'dfspA',
+          challenge: 'challenge',
+          consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
+          sourceAccountId: 'dfspa.alice.1234',
+          status: 'PENDING',
+          value: 'value'
         }
-
-        given('Outbound API server', async (): Promise<void> => {
-            server = await prepareOutboundAPIServer()
-        })
-
-        when('I send a \'VerifyThirdPartyAuthorization\' request', async (): Promise<ServerInjectResponse> => {
-            const request = {
-                method: 'POST',
-                url: '/thirdpartyRequests/transactions/12345/authorizations',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                payload: {
-                    toParticipantId: 'dfspA',
-                    challenge: 'challenge',
-                    consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
-                    sourceAccountId: 'dfspa.alice.1234',
-                    status: 'PENDING',
-                    value: 'value',
-                }
-            }
-            const pubSub = new PubSub({} as RedisConnectionConfig)
-            // defer publication to notification channel
-            setTimeout(() => pubSub.publish(
-                'some-channel',
-                putThirdpartyAuthResponse as unknown as Message
-            ), 10)
-            response = await server.inject(request)
-            return response
-        })
-
-        then('I get a response with a status code of \'200\'', (): void => {
-            expect(response.statusCode).toBe(200)
-            expect(response.result).toEqual({
-                ...putThirdpartyAuthResponse,
-                currentState: OutboundThirdpartyAuthorizationsModelState.succeeded
-            })
-        })
+      }
+      const pubSub = new PubSub({} as RedisConnectionConfig)
+      // defer publication to notification channel
+      setTimeout(() => pubSub.publish(
+        'some-channel',
+        putThirdpartyAuthResponse as unknown as Message
+      ), 10)
+      response = await server.inject(request)
+      return response
     })
+
+    then('I get a response with a status code of \'200\'', (): void => {
+      expect(response.statusCode).toBe(200)
+      expect(response.result).toEqual({
+        ...putThirdpartyAuthResponse,
+        currentState: OutboundThirdpartyAuthorizationsModelState.succeeded
+      })
+    })
+  })
 })
