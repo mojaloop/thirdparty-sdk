@@ -47,6 +47,12 @@ async function put (_context: any, request: Request, h: StateResponseToolkit): P
   return h.response().code(200)
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function post (_context: any, _request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+  return h.response({ to: 'be implemented' }).code(202)
+}
+
 export default {
+  post,
   put
 }

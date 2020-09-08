@@ -12,7 +12,7 @@ paths:
     post:
       description: |
         The HTTP request `POST /authorizations` is used to request the Payer to enter the applicable credentials in the PISP system.
-      operationId: InboundAuthorizationsPost
+      operationId: InboundAuthorizationsPostRequest
       requestBody:
         description: Authorization request details
         required: true

@@ -13,7 +13,7 @@ paths:
       description:  >
         The HTTP request `POST /authorizations` is used to request the Payer to enter the
         applicable credentials in the PISP system.
-      operationId: InboundAuthorizationsPost
+      operationId: InboundAuthorizationsPostRequest
         # todo: uncomment parameters after header middleware simalar to `sdk-scheme-adapter` is checked in
         #parameters:
         # - $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/ID.yaml'
