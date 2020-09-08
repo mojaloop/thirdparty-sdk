@@ -232,6 +232,51 @@ paths:
       operationId: HelloGet
       summary: example get
       description: The HTTP request GET /hello is used to return some example json.
+  '/thirdpartyRequests/transactions/{ID}/authorizations':
+    post:
+      operationId: VerifyThirdPartyAuthorization
+      summary: VerifyThirdPartyAuthorization
+      description: |
+        The HTTP request `POST /thirdpartyRequests/transactions/{id}/authorizations` is used by the DFSP to verify a third party authorization.
+      parameters:
+        - name: ID
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The identifier value.
+      requestBody:
+        description: The thirdparty authorization details to verify
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyThirdPartyAuthorizationRequest'
+            example:
+              challenge: <QuoteResponse object>
+              value: <base64 encoded binary - the signed quote response object>
+              consentId: 8d34f91d-d078-4077-8263-2c0498dhbjr
+              sourceAccountId: dfspa.alice.1234
+              status: PENDING
+      responses:
+        '200':
+          $ref: '#/components/responses/ThirdPartyAuthorizationResponse'
+        '400':
+          $ref: '#/paths/~1hello/get/responses/400'
+        '401':
+          $ref: '#/paths/~1hello/get/responses/401'
+        '403':
+          $ref: '#/paths/~1hello/get/responses/403'
+        '404':
+          $ref: '#/paths/~1hello/get/responses/404'
+        '405':
+          $ref: '#/paths/~1hello/get/responses/405'
+        '406':
+          $ref: '#/paths/~1hello/get/responses/406'
+        '501':
+          $ref: '#/paths/~1hello/get/responses/501'
+        '503':
+          $ref: '#/paths/~1hello/get/responses/503'
 components:
   schemas:
     AuthorizationsState:
@@ -604,6 +649,94 @@ components:
         - transactionRequestId
         - quote
       additionalProperties: false
+    AccountId:
+      type: string
+      description: |
+        A long-lived account identifier provided by the DFSP this MUST NOT be Bank Account Number or anything that may expose a User's private bank account information
+    ThirdPartyAuthorizationsState:
+      title: ThirdPartyAuthorizationsState
+      description: Transition state of thirdparty authorizations
+      type: string
+      enum:
+        - WAITING_FOR_AUTHORIZATION_REQUEST
+        - COMPLETED
+        - ERROR_OCCURRED
+    VerifyThirdPartyAuthorizationRequest:
+      title: VerifyThirdPartyAuthorizationRequest
+      type: object
+      description: 'The object sent in the POST /thirdpartyRequests/transactions/{id}/authorizations request.'
+      properties:
+        toParticipantId:
+          type: string
+          description: 'The id of the destination participant, in this case, a DFSP'
+        challenge:
+          type: string
+          description: The original Challenge Object as a JSON string
+        value:
+          allOf:
+            - $ref: '#/components/schemas/ThirdPartyAuthorizationResponse/properties/value/allOf/0'
+          description: Base64 encoded binary string - the signed challenge
+        consentId:
+          allOf:
+            - $ref: '#/components/schemas/OutboundAuthorizationsPostRequest/properties/transactionId'
+          description: |
+            Common ID between the PISP and FSP for the Consent object This tells DFSP and auth-service which constent allows the PISP to initiate transaction.
+        sourceAccountId:
+          allOf:
+            - $ref: '#/components/schemas/AccountId'
+          description: 'DFSP specific account identifiers, e.g. `dfspa.alice.1234`'
+        status:
+          type: string
+          enum:
+            - PENDING
+          description: The status of the authorization. This MUST be PENDING for a POST request
+      required:
+        - challenge
+        - value
+        - consentId
+        - sourceAccountId
+        - status
+    ThirdPartyAuthorizationResponse:
+      title: ThirdPartyAuthorizationResponse
+      type: object
+      description: 'The response for POST /thirdpartyRequests/transactions/{id}/authorizations request.'
+      properties:
+        challenge:
+          type: string
+          description: The original Challenge Object as a JSON string
+        value:
+          allOf:
+            - type: string
+              pattern: '^[A-Za-z0-9-_]+[=]{0,2}$'
+              description: |
+                The API data type BinaryString is a JSON String.
+                The string is a base64url  encoding of a string of raw bytes,
+                where padding (character ‘=’) is added at the end of the data if
+                needed to ensure that the string is a multiple of 4 characters.
+                The length restriction indicates the allowed number of characters.
+          description: Base64 encoded binary string - the signed challenge
+        consentId:
+          allOf:
+            - $ref: '#/components/schemas/OutboundAuthorizationsPostRequest/properties/transactionId'
+          description: |
+            Common ID between the PISP and FSP for the Consent object This tells DFSP and auth-service which constent allows the PISP to initiate transaction.
+        sourceAccountId:
+          allOf:
+            - $ref: '#/components/schemas/AccountId'
+          description: 'DFSP specific account identifiers, e.g. `dfspa.alice.1234`'
+        status:
+          type: string
+          enum:
+            - VERIFIED
+          description: The status of the authorization.
+        currentState:
+          $ref: '#/components/schemas/ThirdPartyAuthorizationsState'
+      required:
+        - challenge
+        - value
+        - consentId
+        - sourceAccountId
+        - status
   responses:
     OutboundAuthorizationsPostResponse:
       description: |
@@ -672,3 +805,9 @@ components:
                 example: ENTERED
               currentState:
                 $ref: '#/components/schemas/AuthorizationsState'
+    ThirdPartyAuthorizationResponse:
+      description: ThirdPartyAuthorizationResponse
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ThirdPartyAuthorizationResponse'

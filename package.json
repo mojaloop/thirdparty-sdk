@@ -26,7 +26,7 @@
     "start:outbound": "ts-node --project ./tsconfig.json --files --require tsconfig-paths/register ./src/cli.ts outbound",
     "dev": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/cli.ts",
     "test": "npm run test:unit",
-    "test:bdd": "jest --config './jest.bdd.config.js' --testMatch '**/test/step-definitions/**/*.step.ts'",
+    "test:bdd": "jest --config './jest.bdd.config.js' --runInBand --testMatch '**/test/step-definitions/**/*.step.ts'",
     "test:coverage": "jest --coverage  --testMatch '**/test/unit/**/*.(test|spec).ts'",
     "test:coverage-check": "jest --coverage --testMatch '**/test/unit/**/*.(test|spec).ts'",
     "test:integration": "jest --config './jest.integration.config.js' --testMatch '**/test/integration/**/*.(test|spec).ts'",

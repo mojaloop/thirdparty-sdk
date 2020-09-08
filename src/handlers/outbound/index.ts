@@ -22,12 +22,15 @@
  - Name Surname <name.surname@gatesfoundation.com>
 
  - Paweł Marzec <pawel.marzec@modusbox.com>
+ - Sridhar Voruganti <sridhar.voruganti@modusbox.com>
 
  --------------
  ******/
 import Hello from './hello'
 import Authorizations from './authorizations'
+import ThirdpartyAuthorizations from './thirdpartyRequests/transactions/{ID}/authorizations'
 export default {
   OutboundAuthorizationsPost: Authorizations.post,
+  VerifyThirdPartyAuthorization: ThirdpartyAuthorizations.post,
   HelloGet: Hello.get
 }
