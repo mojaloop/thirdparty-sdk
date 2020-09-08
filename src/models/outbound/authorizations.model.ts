@@ -100,6 +100,9 @@ export class OutboundAuthorizationsModel
         // in handlers/inbound is implemented putAuthorizationsById handler
         // which publish PutAuthorizationsResponse to channel
         subId = this.pubSub.subscribe(channel, async (channel: string, message: Message, sid: number) => {
+          if (!message) {
+            return reject(new Error('invalid Message'))
+          }
           // first unsubscribe
           pubSub.unsubscribe(channel, sid)
 
@@ -121,11 +124,9 @@ export class OutboundAuthorizationsModel
         // POST /authorization request to the switch
         const res = await this.requests.postAuthorizations(this.data.request, this.data.toParticipantId)
 
-        this.logger.info({ res })
-        this.logger.info('Authorizations request sent to peer')
+        this.logger.push({ res }).info('Authorizations request sent to peer')
       } catch (error) {
-        this.logger.info(error)
-        this.logger.error('Authorization request error')
+        this.logger.push(error).error('Authorization request error')
         pubSub.unsubscribe(channel, subId)
         reject(error)
       }

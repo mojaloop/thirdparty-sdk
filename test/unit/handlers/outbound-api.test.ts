@@ -40,12 +40,12 @@ import {
   OutboundThirdpartyAuthorizationsModelState,
   InboundThirdpartyAuthorizationsPutRequest
 } from '~/models/thirdparty.authorizations.interface'
+import { RedisConnectionConfig } from '~/shared/redis-connection'
 import { Server } from '@hapi/hapi'
 import Config from '~/shared/config'
 import Handlers from '~/handlers'
 import index from '~/index'
 import path from 'path'
-import { RedisConnectionConfig } from '~/shared/redis-connection'
 
 const putResponse: InboundAuthorizationsPutRequest = {
   authenticationInfo: {
@@ -64,6 +64,7 @@ const putThirdpartyAuthResponse: InboundThirdpartyAuthorizationsPutRequest = {
   status: 'VERIFIED',
   value: 'value'
 }
+
 jest.mock('redis')
 jest.mock('@mojaloop/sdk-standard-components', () => {
   return {
@@ -74,23 +75,25 @@ jest.mock('@mojaloop/sdk-standard-components', () => {
     })),
     WSO2Auth: jest.fn(),
     Logger: {
-      Logger: jest.fn(() => ({
-        push: jest.fn(),
-        configure: jest.fn(),
-
-        // log methods
-        log: jest.fn(),
-
-        // generated methods from default levels
-        verbose: jest.fn(),
-        debug: jest.fn(),
-        warn: jest.fn(),
-        error: jest.fn(),
-        trace: jest.fn(),
-        info: jest.fn(),
-        fatal: jest.fn()
-      })),
-      buildStringify: jest.fn()
+      Logger: jest.fn(() => {
+        const methods = {
+          // log methods
+          log: jest.fn(),
+          configure: jest.fn(),
+          // generated methods from default levels
+          verbose: jest.fn(),
+          debug: jest.fn(),
+          warn: jest.fn(),
+          error: jest.fn(),
+          trace: jest.fn(),
+          info: jest.fn(),
+          fatal: jest.fn()
+        }
+        return {
+          ...methods,
+          push: jest.fn(() => methods)
+        }
+      })
     }
   }
 })
@@ -213,6 +216,7 @@ describe('Outbound API routes', (): void => {
       }
     }
     const pubSub = new PubSub({} as RedisConnectionConfig)
+
     // defer publication to notification channel
     setTimeout(() => pubSub.publish(
       'some-channel',
