@@ -24,7 +24,6 @@
  - Paweł Marzec <pawel.marzec@modusbox.com>
  - Kevin Leyow <kevin.leyow@modusbox.com>
  - Sridhar Voruganti <sridhar.voruganti@modusbox.com>
- 
  --------------
  ******/
 import Hello from './hello'

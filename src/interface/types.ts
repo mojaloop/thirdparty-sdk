@@ -1,4 +1,3 @@
-import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
 /*****
  License
  --------------

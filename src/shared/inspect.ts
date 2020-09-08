@@ -33,8 +33,7 @@ export const defaults = {
   COLOR: true
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default function inspect (subject: any): string {
+export default function inspect (subject: unknown): string {
   return util.inspect(
     subject,
     config?.INSPECT?.SHOW_HIDDEN || defaults.SHOW_HIDDEN,
