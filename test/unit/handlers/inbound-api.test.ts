@@ -23,6 +23,7 @@
 
  * Lewis Daly <lewis@vesselstech.com>
  * Paweł Marzec <pawel.marzec@modusbox.com>
+ * Sridhar Voruganti <sridhar.voruganti@modusbox.com>
  --------------
  ******/
 
@@ -33,12 +34,17 @@ import {
   AuthenticationType,
   InboundAuthorizationsPutRequest
 } from '~/models/authorizations.interface'
-
 import InboundAuthorizations from '~/handlers/inbound/authorizations'
-
 import {
   OutboundAuthorizationsModel
 } from '~/models/outbound/authorizations.model'
+import {
+  InboundThirdpartyAuthorizationsPutRequest
+} from '~/models/thirdparty.authorizations.interface'
+import ThirdpartyAuthorizations from '~/handlers/inbound/thirdpartyRequests/transactions/{ID}/authorizations'
+import {
+  OutboundThirdpartyAuthorizationsModel,
+} from '~/models/outbound/thirdparty.authorizations.model'
 import { Server, Request } from '@hapi/hapi'
 import { StateResponseToolkit } from '~/server/plugins/state'
 import { buildPayeeQuoteRequestFromTptRequest } from '~/domain/thirdpartyRequests/transactions'
@@ -47,6 +53,7 @@ import Config from '~/shared/config'
 import TestData from 'test/unit/data/mockData.json'
 import index from '~/index'
 import path from 'path'
+
 const mockData = JSON.parse(JSON.stringify(TestData))
 const postThirdpartyRequestsTransactionRequest = mockData.postThirdpartyRequestsTransactionRequest
 const __postQuotes = jest.fn(() => Promise.resolve())
@@ -102,6 +109,13 @@ const putResponse: InboundAuthorizationsPutRequest = {
     }
   },
   responseType: AuthorizationResponse.ENTERED
+}
+const putThirdpartyAuthResponse: InboundThirdpartyAuthorizationsPutRequest = {
+  challenge: 'challenge',
+  consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
+  sourceAccountId: 'dfspa.alice.1234',
+  status: 'VERIFIED',
+  value: 'value'
 }
 
 describe('Inbound API routes', (): void => {
@@ -290,5 +304,55 @@ describe('Inbound API routes', (): void => {
 
     const response = await server.inject(request)
     expect(response.statusCode).toBe(400)
+  })
+
+  describe('/thirdpartyRequests/transactions/{ID}/authorizations', () => {
+    it('handler && pubSub invocation', async (): Promise<void> => {
+      const request = {
+        params: {
+          ID: '123'
+        },
+        payload: putThirdpartyAuthResponse
+      }
+      const pubSubMock = {
+        publish: jest.fn()
+      }
+      const toolkit = {
+        getPubSub: jest.fn(() => pubSubMock),
+        response: jest.fn(() => ({
+          code: jest.fn((code: number) => ({
+            statusCode: code
+          }))
+        }))
+      }
+
+      const result = await ThirdpartyAuthorizations.put(
+        {},
+        request as unknown as Request,
+        toolkit as unknown as StateResponseToolkit
+      )
+
+      expect(result.statusCode).toEqual(200)
+      expect(toolkit.getPubSub).toBeCalledTimes(1)
+
+      const channel = OutboundThirdpartyAuthorizationsModel.notificationChannel(request.params.ID)
+      expect(pubSubMock.publish).toBeCalledWith(channel, putThirdpartyAuthResponse)
+    })
+
+    it('input validation', async (): Promise<void> => {
+      const request = {
+        method: 'PUT',
+        url: '/thirdpartyRequests/transactions/123/authorizations',
+        headers: {
+          'Content-Type': 'application/json',
+          'FSPIOP-Source': 'switch',
+          'Date': 'Thu, 24 Jan 2019 10:22:12 GMT',
+          'FSPIOP-Destination': 'dfspA'
+        },
+        payload: putThirdpartyAuthResponse
+      }
+      const response = await server.inject(request)
+      expect(response.statusCode).toBe(200)
+    })
   })
 })

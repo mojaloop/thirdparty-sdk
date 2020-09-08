@@ -23,14 +23,17 @@
 
  - Paweł Marzec <pawel.marzec@modusbox.com>
  - Kevin Leyow <kevin.leyow@modusbox.com>
-
+ - Sridhar Voruganti <sridhar.voruganti@modusbox.com>
+ 
  --------------
  ******/
 import Hello from './hello'
 import ThirdpartyRequestsTransactions from './thirdpartyRequests/transactions'
 import InboundAuthorizations from './authorizations'
+import ThirdpartyAuthorizations from './thirdpartyRequests/transactions/{ID}/authorizations'
 export default {
   HelloGet: Hello.get,
   ThirdpartyRequestsTransactionsPost: ThirdpartyRequestsTransactions.post,
-  InboundAuthorizationsIDPutResponse: InboundAuthorizations.put
+  InboundAuthorizationsIDPutResponse: InboundAuthorizations.put,
+  UpdateThirdpartyAuthorization: ThirdpartyAuthorizations.put
 }

@@ -23,6 +23,7 @@
 
  * Lewis Daly <lewis@vesselstech.com>
  * Paweł Marzec <pawel.marzec@modusbox.com>
+ * Sridhar Voruganti <sridhar.voruganti@modusbox.com>
  --------------
  ******/
 
@@ -35,6 +36,10 @@ import {
   InboundAuthorizationsPutRequest,
   OutboundAuthorizationsModelState
 } from '~/models/authorizations.interface'
+import {
+  OutboundThirdpartyAuthorizationsModelState,
+  InboundThirdpartyAuthorizationsPutRequest
+} from '~/models/thirdparty.authorizations.interface'
 import { Server } from '@hapi/hapi'
 import Config from '~/shared/config'
 import Handlers from '~/handlers'
@@ -52,12 +57,20 @@ const putResponse: InboundAuthorizationsPutRequest = {
   },
   responseType: AuthorizationResponse.ENTERED
 }
+const putThirdpartyAuthResponse: InboundThirdpartyAuthorizationsPutRequest = {
+  challenge: 'challenge',
+  consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
+  sourceAccountId: 'dfspa.alice.1234',
+  status: 'VERIFIED',
+  value: 'value'
+}
 jest.mock('redis')
 jest.mock('@mojaloop/sdk-standard-components', () => {
   return {
     MojaloopRequests: jest.fn(),
     ThirdpartyRequests: jest.fn(() => ({
-      postAuthorizations: jest.fn(() => Promise.resolve(putResponse))
+      postAuthorizations: jest.fn(() => Promise.resolve(putResponse)),
+      postThirdpartyRequestsTransactionsAuthorizations: jest.fn(() => Promise.resolve(putThirdpartyAuthResponse))
     })),
     WSO2Auth: jest.fn(),
     Logger: {
@@ -210,6 +223,36 @@ describe('Outbound API routes', (): void => {
     expect(response.result).toEqual({
       ...putResponse,
       currentState: OutboundAuthorizationsModelState.succeeded
+    })
+  })
+
+  it('/thirdpartyRequests/transactions/{ID}/authorizations', async (): Promise<void> => {
+    const request = {
+      method: 'POST',
+      url: '/thirdpartyRequests/transactions/123/authorizations',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      payload: {
+        toParticipantId: 'dfspA',
+        challenge: 'challenge',
+        consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
+        sourceAccountId: 'dfspa.alice.1234',
+        status: 'PENDING',
+        value: 'value'
+      }
+    }
+    const pubSub = new PubSub({} as RedisConnectionConfig)
+    // defer publication to notification channel
+    setTimeout(() => pubSub.publish(
+      'some-channel',
+      putThirdpartyAuthResponse as unknown as Message
+    ), 10)
+    const response = await server.inject(request)
+    expect(response.statusCode).toBe(200)
+    expect(response.result).toEqual({
+      ...putThirdpartyAuthResponse,
+      currentState: OutboundThirdpartyAuthorizationsModelState.succeeded
     })
   })
 })
