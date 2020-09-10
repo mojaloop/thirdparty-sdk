@@ -51,7 +51,6 @@ describe('PUT /authorizations', (): void => {
       responseType: 'ENTERED'
     }
     it('should propagate message via Redis PUB/SUB', async (): Promise<void> => {
-      let response: AxiosResponse
       // eslint-disable-next-line no-async-promise-executor
       return new Promise(async (resolve) => {
         const pubSub = new PubSub(config)
@@ -61,13 +60,15 @@ describe('PUT /authorizations', (): void => {
           expect(channel).toEqual('authorizations_123')
           expect(message).toEqual(payload)
           await pubSub.disconnect()
+          expect(pubSub.isConnected).toBeFalsy()
 
-          // Assert
-          expect(response.status).toEqual(200)
           resolve()
         })
         // Act
-        response = await axios.put(scenarioUri, payload)
+        const response = await axios.put(scenarioUri, payload)
+
+        // Assert
+        expect(response.status).toEqual(200)
       })
     })
   })
