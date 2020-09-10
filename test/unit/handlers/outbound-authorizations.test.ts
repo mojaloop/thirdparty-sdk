@@ -36,6 +36,7 @@ jest.mock('~/models/outbound/authorizations.model', () => ({
     notificationChannel: jest.fn(() => 'the-mocked-channel')
   },
   create: jest.fn(async () => ({
+    // this result will be tested
     run: jest.fn(async () => undefined)
   }))
 }))
