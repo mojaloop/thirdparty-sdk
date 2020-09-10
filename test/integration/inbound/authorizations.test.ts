@@ -27,7 +27,7 @@
 import { RedisConnectionConfig } from '~/shared/redis-connection'
 import { Message, PubSub } from '~/shared/pub-sub'
 import Config from '~/shared/config'
-import axios, { AxiosResponse } from 'axios'
+import axios from 'axios'
 import env from '../env'
 import mockLogger from '../../unit/mockLogger'
 

@@ -209,12 +209,10 @@ export async function loadFromKVS (
     if (!data) {
       throw new Error(`No data found in KVS for: ${config.key}`)
     }
-    config.logger.info({ data })
-    config.logger.info('data loaded from KVS')
+    config.logger.push({ data }).info('data loaded from KVS')
     return create(data, config)
   } catch (err) {
-    config.logger.info({ err })
-    config.logger.info(`Error loading data from KVS for key: ${config.key}`)
+    config.logger.push({ err }).info(`Error loading data from KVS for key: ${config.key}`)
     throw err
   }
 }

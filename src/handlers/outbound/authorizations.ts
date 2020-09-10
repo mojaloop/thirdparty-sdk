@@ -46,6 +46,7 @@ import { Request, ResponseObject } from '@hapi/hapi'
 async function post (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const payload = request.payload as OutboundAuthorizationsPostRequest
 
+  // prepare model data
   const data: OutboundAuthorizationData = {
     toParticipantId: payload.toParticipantId,
     request: {
@@ -59,6 +60,7 @@ async function post (_context: any, request: Request, h: StateResponseToolkit): 
     currentState: 'start'
   }
 
+  // prepare model config
   const modelConfig: OutboundAuthorizationsModelConfig = {
     kvs: h.getKVS(),
     pubSub: h.getPubSub(),
@@ -67,14 +69,19 @@ async function post (_context: any, request: Request, h: StateResponseToolkit): 
     requests: h.getThirdpartyRequests()
   }
 
+  // create model
   const model: OutboundAuthorizationsModel = await create(data, modelConfig)
 
+  // run workflow and await on synchronous PUT response from Switch incoming on Inbound Service
   const result = await model.run()
+
+  // there is a risk the workflow fail and in that case result is undefined
   if (!result) {
     h.getLogger().error('outbound POST /authorizations unexpected result from workflow')
     return h.response({}).code(500)
   }
 
+  // send received response
   return h.response(result).code(200)
 }
 
