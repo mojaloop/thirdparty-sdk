@@ -60,6 +60,20 @@ export class InvalidChannelNameError extends Error {
 // Message should fully survive the JSON stringify/parse cycle
 export type Message = string | number | boolean | Record<string, unknown>
 
+export class InvalidMessageError extends Error {
+  public channel: string
+
+  constructor (channel: string) {
+    super(`message received on channel: '${channel}' is invalid`)
+    this.channel = channel
+  }
+
+  static throwIfInvalid (message: Message, channel: string): void {
+    if (typeof message === 'undefined' || (typeof message === 'object' && !message)) {
+      throw new InvalidMessageError(channel)
+    }
+  }
+}
 // NotificationCallback handles the Message
 export type NotificationCallback = (channel: string, message: Message, id: number) => void
 
@@ -89,6 +103,9 @@ export class PubSub extends RedisConnection {
     // deserialize Message
     // it is 'publish' duty to always send to channel well serialized Messages
     const message: Message = JSON.parse(stringified)
+
+    // do the validation of received Message
+    InvalidMessageError.throwIfInvalid(message, channel)
 
     // broadcast message by calling all callbacks
     callbacksForChannel.forEach(
@@ -152,6 +169,9 @@ export class PubSub extends RedisConnection {
   // Message should fully survive the JSON stringify/parse cycle
   async publish (channel: string, message: Message): Promise<void> {
     InvalidChannelNameError.throwIfInvalid(channel)
+
+    // protect against publishing invalid Messages
+    InvalidMessageError.throwIfInvalid(message, channel)
 
     // serialized Messages should be properly deserialized by broadcastMessage
     const stringified = JSON.stringify(message)

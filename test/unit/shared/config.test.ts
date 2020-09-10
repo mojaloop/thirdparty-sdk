@@ -21,23 +21,15 @@
  * Gates Foundation
  - Name Surname <name.surname@gatesfoundation.com>
 
- - Paweł Marzec <pawel.marzec@modusbox.com>
+ * Paweł Marzec <pawel.marzec@modusbox.com>
  --------------
  ******/
-import config from './config'
-import util from 'util'
 
-export const defaults = {
-  SHOW_HIDDEN: false,
-  DEPTH: 5,
-  COLOR: true
-}
+import { getFileContent } from '~/shared/config'
+import { PathLike } from 'fs'
 
-export default function inspect (subject: unknown): string {
-  return util.inspect(
-    subject,
-    config?.INSPECT?.SHOW_HIDDEN || defaults.SHOW_HIDDEN,
-    config?.INSPECT?.DEPTH || defaults.DEPTH,
-    config?.INSPECT?.COLOR || defaults.COLOR
-  )
-}
+describe('config', () => {
+  it('getFileContent should throw when not existing path', () => {
+    expect(() => getFileContent(undefined as unknown as PathLike)).toThrowError('File doesn\'t exist')
+  })
+})

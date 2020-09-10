@@ -6,6 +6,7 @@ module.exports = {
     { type: 'chore', section: 'Maintenance' },
     { type: 'ci', section: 'CI/CD' },
     { type: 'doc', section: 'Documentation' },
+    { type: 'lint', section: 'Linting' },
     { type: 'style', section: 'Style Improvements' },
     { type: 'refactor', section: 'Code Refactor' },
     { type: 'perf', section: 'Performance' },

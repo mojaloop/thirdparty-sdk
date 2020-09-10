@@ -24,7 +24,6 @@
  - Paweł Marzec <pawel.marzec@modusbox.com>
  - Kevin Leyow <kevin.leyow@modusbox.com>
  - Sridhar Voruganti <sridhar.voruganti@modusbox.com>
- 
  --------------
  ******/
 import Hello from './hello'
@@ -34,6 +33,7 @@ import ThirdpartyAuthorizations from './thirdpartyRequests/transactions/{ID}/aut
 export default {
   HelloGet: Hello.get,
   ThirdpartyRequestsTransactionsPost: ThirdpartyRequestsTransactions.post,
+  InboundAuthorizationsPostRequest: InboundAuthorizations.post,
   InboundAuthorizationsIDPutResponse: InboundAuthorizations.put,
   UpdateThirdpartyAuthorization: ThirdpartyAuthorizations.put
 }

@@ -25,7 +25,6 @@
  ******/
 import { Request, ResponseToolkit } from '@hapi/hapi'
 import Boom from '@hapi/boom'
-
 import onValidateFail from '~/handlers/shared/onValidateFail'
 
 describe('server/handlers/onValidateFail', (): void => {

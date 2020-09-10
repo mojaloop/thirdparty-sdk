@@ -29,11 +29,24 @@ import { Logger as SDKLogger } from '@mojaloop/sdk-standard-components'
 
 export default function mockLogger (keepQuiet = true): SDKLogger.Logger {
   if (keepQuiet) {
-    return {
+    const methods = {
+      // log methods
       log: jest.fn(),
-      info: jest.fn(),
+
+      configure: jest.fn(),
+
+      // generated methods from default levels
+      verbose: jest.fn(),
+      debug: jest.fn(),
+      warn: jest.fn(),
       error: jest.fn(),
-      push: jest.fn()
+      trace: jest.fn(),
+      info: jest.fn(),
+      fatal: jest.fn()
+    }
+    return {
+      ...methods,
+      push: jest.fn(() => methods)
     } as unknown as SDKLogger.Logger
   }
   // let be elaborative and log to console

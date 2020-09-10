@@ -25,7 +25,13 @@
 --------------
 ******/
 
-import { InvalidCallbackIdError, InvalidChannelNameError, PubSub } from '~/shared/pub-sub'
+import {
+  InvalidCallbackIdError,
+  InvalidChannelNameError,
+  InvalidMessageError,
+  Message,
+  PubSub
+} from '~/shared/pub-sub'
 import {
   RedisConnectionConfig
 } from '~/shared/redis-connection'
@@ -130,5 +136,14 @@ describe('PubSub', () => {
     await ps.connect()
 
     expect(ps.publish('', true)).rejects.toEqual(new InvalidChannelNameError())
+  })
+
+  it('publish should do Message validation', async (): Promise<void> => {
+    const ps = new PubSub(config)
+    await ps.connect()
+
+    expect(ps.publish('the-channel', null as unknown as Message)).rejects.toEqual(
+      new InvalidMessageError('the-channel')
+    )
   })
 })

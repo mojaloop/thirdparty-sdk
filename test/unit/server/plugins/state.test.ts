@@ -33,9 +33,15 @@ import { mocked } from 'ts-jest/utils'
 import { Server } from '@hapi/hapi'
 import { mockProcessExit } from 'jest-mock-process'
 import { ServerAPI } from '~/server/create'
+
+import SDK from '@mojaloop/sdk-standard-components'
+import config from '~/shared/config'
+import { logger } from '~/shared/logger'
+
 jest.mock('~/shared/kvs')
 jest.mock('~/shared/pub-sub')
 jest.mock('~/shared/logger')
+
 describe('StatePlugin', () => {
   const ServerMock = {
     events: {
@@ -89,5 +95,23 @@ describe('StatePlugin', () => {
     await StatePlugin.register(ServerMock as unknown as Server)
     expect(mockExit).toBeCalledWith(1)
     mockExit.mockRestore()
+  })
+
+  it('should prepare WSO2Auth with tlsCreds', async () => {
+    const spyWSO2Auth = jest.spyOn(SDK, 'WSO2Auth').mockImplementationOnce(
+      () => ({ Iam: 'mockedWSO2Auth' } as unknown as SDK.WSO2Auth)
+    )
+    config.SHARED.TLS.outbound.mutualTLS.enabled = true
+    config.SHARED.TLS.outbound.creds = {
+      ca: 'mocked ca',
+      cert: 'mocked cert',
+      key: 'mocked key'
+    }
+    await StatePlugin.register(ServerMock as unknown as Server)
+    expect(spyWSO2Auth).toBeCalledWith({
+      ...config.WSO2_AUTH,
+      logger,
+      tlsCreds: config.SHARED.TLS.outbound.creds
+    })
   })
 })

@@ -43,7 +43,7 @@ import {
 } from '~/models/thirdparty.authorizations.interface'
 import ThirdpartyAuthorizations from '~/handlers/inbound/thirdpartyRequests/transactions/{ID}/authorizations'
 import {
-  OutboundThirdpartyAuthorizationsModel,
+  OutboundThirdpartyAuthorizationsModel
 } from '~/models/outbound/thirdparty.authorizations.model'
 import { Server, Request } from '@hapi/hapi'
 import { StateResponseToolkit } from '~/server/plugins/state'
@@ -143,7 +143,7 @@ describe('Inbound API routes', (): void => {
   })
 
   describe('/authorization', () => {
-    it('handler && pubSub invocation', async (): Promise<void> => {
+    it('PUT handler && pubSub invocation', async (): Promise<void> => {
       const request = {
         params: {
           ID: '123'
@@ -175,7 +175,7 @@ describe('Inbound API routes', (): void => {
       expect(pubSubMock.publish).toBeCalledWith(channel, putResponse)
     })
 
-    it('PUT /authorizations & input validation', async (): Promise<void> => {
+    it('PUT success flow', async (): Promise<void> => {
       const request = {
         method: 'PUT',
         url: '/authorizations/123',
@@ -186,6 +186,39 @@ describe('Inbound API routes', (): void => {
       }
       const response = await server.inject(request)
       expect(response.statusCode).toBe(200)
+    })
+
+    it('POST success flow', async (): Promise<void> => {
+      const postRequest = {
+        toParticipantId: 'pisp',
+        authenticationType: 'U2F',
+        retriesLeft: '1',
+        amount: {
+          currency: 'USD',
+          amount: '100'
+        },
+        transactionId: 'c87e9f61-e0d1-4a1c-a992-002718daf402',
+        transactionRequestId: 'aca279be-60c6-42ff-aab5-901d61b5e35c',
+        quote: {
+          transferAmount: {
+            currency: 'USD',
+            amount: '105'
+          },
+          expiration: '2020-07-15T09:48:54.961Z',
+          ilpPacket: 'ilp-packet-value',
+          condition: 'condition-000000000-111111111-222222222-abc'
+        }
+      }
+      const request = {
+        method: 'POST',
+        url: '/authorizations',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        payload: postRequest
+      }
+      const response = await server.inject(request)
+      expect(response.statusCode).toBe(202)
     })
   })
 
@@ -346,7 +379,7 @@ describe('Inbound API routes', (): void => {
         headers: {
           'Content-Type': 'application/json',
           'FSPIOP-Source': 'switch',
-          'Date': 'Thu, 24 Jan 2019 10:22:12 GMT',
+          Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
           'FSPIOP-Destination': 'dfspA'
         },
         payload: putThirdpartyAuthResponse
