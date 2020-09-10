@@ -33,7 +33,7 @@ import fs, { PathLike } from 'fs'
 
 export { PACKAGE }
 
-function getFileContent (path: PathLike): Buffer {
+export function getFileContent (path: PathLike): Buffer {
   if (!fs.existsSync(path)) {
     throw new Error('File doesn\'t exist')
   }

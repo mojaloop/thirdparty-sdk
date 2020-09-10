@@ -25,15 +25,15 @@
 
  --------------
  ******/
-
-import config from '~/shared/config'
-
 import SDK from '@mojaloop/sdk-standard-components'
 import { KVS } from '~/shared/kvs'
 import { PubSub } from '~/shared/pub-sub'
 import { ResponseToolkit, Server } from '@hapi/hapi'
 import { RedisConnectionConfig } from '~/shared/redis-connection'
 import { logger } from '~/shared/logger'
+
+import config from '~/shared/config'
+
 export interface StateResponseToolkit extends ResponseToolkit {
   getKVS: () => KVS
   getPubSub: () => PubSub

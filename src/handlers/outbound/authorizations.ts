@@ -68,11 +68,13 @@ async function post (_context: any, request: Request, h: StateResponseToolkit): 
   }
 
   const model: OutboundAuthorizationsModel = await create(data, modelConfig)
+
   const result = await model.run()
   if (!result) {
     h.getLogger().error('outbound POST /authorizations unexpected result from workflow')
     return h.response({}).code(500)
   }
+
   return h.response(result).code(200)
 }
 
