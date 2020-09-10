@@ -27,7 +27,7 @@
 import { RedisConnectionConfig } from '~/shared/redis-connection'
 import { Message, PubSub } from '~/shared/pub-sub'
 import Config from '~/shared/config'
-import axios from 'axios'
+import axios, { AxiosResponse } from 'axios'
 import env from '../env'
 import mockLogger from '../../unit/mockLogger'
 
@@ -51,22 +51,23 @@ describe('PUT /authorizations', (): void => {
       responseType: 'ENTERED'
     }
     it('should propagate message via Redis PUB/SUB', async (): Promise<void> => {
+      let response: AxiosResponse
       // eslint-disable-next-line no-async-promise-executor
       return new Promise(async (resolve) => {
         const pubSub = new PubSub(config)
         await pubSub.connect()
         expect(pubSub.isConnected).toBeTruthy()
-        pubSub.subscribe('authorizations_123', (channel: string, message: Message, _id: number) => {
+        pubSub.subscribe('authorizations_123', async (channel: string, message: Message, _id: number) => {
           expect(channel).toEqual('authorizations_123')
           expect(message).toEqual(payload)
+          await pubSub.disconnect()
+
+          // Assert
+          expect(response.status).toEqual(200)
           resolve()
         })
-
         // Act
-        const response = await axios.put(scenarioUri, payload)
-
-        // Assert
-        expect(response.status).toEqual(200)
+        response = await axios.put(scenarioUri, payload)
       })
     })
   })
