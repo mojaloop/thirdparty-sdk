@@ -123,7 +123,7 @@
     "multi-file-swagger": "^2.3.0",
     "nodemon": "^2.0.4",
     "npm-audit-resolver": "^2.2.1",
-    "npm-check-updates": "^9.0.0",
+    "npm-check-updates": "^9.0.1",
     "redis-mock": "^0.51.0",
     "source-map-support": "0.5.19",
     "standard-version": "^9.0.0",
