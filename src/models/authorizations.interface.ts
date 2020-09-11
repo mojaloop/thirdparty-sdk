@@ -61,6 +61,25 @@ export interface InboundAuthorizationsPutRequest {
   authenticationInfo: AuthenticationInfo;
   responseType: AuthorizationResponse;
 }
+export interface InboundAuthorizationsPostRequest {
+  authenticationType: string
+  retriesLeft: string
+  amount: {
+    currency: string
+    amount: string
+  },
+  transactionId: string
+  transactionRequestId: string
+  quote: {
+    transferAmount: {
+      currency: string
+      amount: string
+    },
+    expiration: string
+    ilpPacket: string
+    condition: string
+  }
+}
 
 export interface OutboundAuthorizationsPostResponse extends InboundAuthorizationsPutRequest {
   currentState: OutboundAuthorizationsModelState;
