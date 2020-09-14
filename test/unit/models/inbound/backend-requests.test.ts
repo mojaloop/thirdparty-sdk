@@ -26,7 +26,7 @@
  ******/
 
 import { AuthenticationValue, InboundAuthorizationsPostRequest } from '~/models/authorizations.interface'
-import { BackendConfig, BackendRequests } from '~/models/inbound/backendRequests'
+import { BackendConfig, BackendRequests } from '~/models/inbound/backend-requests'
 import { Scheme } from '~/shared/http-scheme'
 import SDK, { RequestResponse } from '@mojaloop/sdk-standard-components'
 import mockLogger from '../../mockLogger'
