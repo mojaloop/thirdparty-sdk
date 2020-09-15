@@ -77,6 +77,8 @@ export interface ServiceConfig {
     TRANSFERS_ENDPOINT: string
     BULK_TRANSFERS_ENDPOINT: string
     DFSP_ID: string
+    DFSP_BACKEND_URI: string
+    DFSP_BACKEND_HTTP_SCHEME: string
     JWS_SIGN: boolean
     JWS_SIGNING_KEY: PathLike | Buffer
     TLS: {
@@ -226,7 +228,21 @@ export const ConvictConfig = Convict<ServiceConfig>({
     QUOTES_ENDPOINT: '0.0.0.0:3002',
     TRANSFERS_ENDPOINT: '0.0.0.0:3000',
     BULK_TRANSFERS_ENDPOINT: '',
-    DFSP_ID: 'dfsp_a',
+    DFSP_ID: {
+      doc: 'Id of DFSP',
+      format: '*',
+      default: 'dfsp_a'
+    },
+    DFSP_BACKEND_URI: {
+      doc: 'host/path address of DFSP\'s ',
+      format: '*',
+      default: 'localhost:9000'
+    },
+    DFSP_BACKEND_HTTP_SCHEME: {
+      doc: 'Http scheme ',
+      format: ['http', 'https'],
+      default: 'http'
+    },
     JWS_SIGN: false,
     JWS_SIGNING_KEY: '',
     // Todo: Investigate proper key setup
