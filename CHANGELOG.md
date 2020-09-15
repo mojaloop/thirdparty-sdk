@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+## [11.14.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.13.0...v11.14.0) (2020-09-15)
+
+
+### Features
+
+* 427 add BackendRequests to shared state plugin ([#30](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/30)) ([6268451](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/6268451ae75b0df0b1865da78ba380751d7c882e))
+
 ## [11.13.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.12.0...v11.13.0) (2020-09-15)
 
 
