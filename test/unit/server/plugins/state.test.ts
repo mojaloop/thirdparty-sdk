@@ -80,6 +80,8 @@ describe('StatePlugin', () => {
     expect(ServerMock.decorate.mock.calls[4][1]).toEqual('getThirdpartyRequests')
     expect(ServerMock.decorate.mock.calls[5][0]).toEqual('toolkit')
     expect(ServerMock.decorate.mock.calls[5][1]).toEqual('getWSO2Auth')
+    expect(ServerMock.decorate.mock.calls[6][0]).toEqual('toolkit')
+    expect(ServerMock.decorate.mock.calls[6][1]).toEqual('getBackendRequests')
 
     // check listener registration on 'stop' event
     expect(ServerMock.events.on).toBeCalledTimes(1)

@@ -33,6 +33,8 @@ import { RedisConnectionConfig } from '~/shared/redis-connection'
 import { logger } from '~/shared/logger'
 
 import config from '~/shared/config'
+import { BackendRequests } from '~/models/inbound/backend-requests'
+import { Scheme } from '~/shared/http-scheme'
 
 export interface StateResponseToolkit extends ResponseToolkit {
   getKVS: () => KVS
@@ -41,6 +43,7 @@ export interface StateResponseToolkit extends ResponseToolkit {
   getMojaloopRequests: () => SDK.MojaloopRequests
   getThirdpartyRequests: () => SDK.ThirdpartyRequests
   getWSO2Auth: () => SDK.WSO2Auth
+  betBackendRequests: () => BackendRequests
 }
 
 export const StatePlugin = {
@@ -103,6 +106,13 @@ export const StatePlugin = {
       jwsSigningKey: <Buffer> config.SHARED.JWS_SIGNING_KEY
     })
 
+    const backendRequests = new BackendRequests({
+      logger,
+      dfspId: config.SHARED.DFSP_ID,
+      uri: config.SHARED.DFSP_BACKEND_URI,
+      scheme: config.SHARED.DFSP_BACKEND_HTTP_SCHEME as Scheme
+    })
+
     try {
       // connect them all to Redis instance
       await Promise.all([kvs.connect(), pubSub.connect()])
@@ -115,6 +125,7 @@ export const StatePlugin = {
       server.decorate('toolkit', 'getMojaloopRequests', (): SDK.MojaloopRequests => mojaloopRequests)
       server.decorate('toolkit', 'getThirdpartyRequests', (): SDK.ThirdpartyRequests => thirdpartyRequest)
       server.decorate('toolkit', 'getWSO2Auth', (): SDK.WSO2Auth => wso2Auth)
+      server.decorate('toolkit', 'getBackendRequests', (): BackendRequests => backendRequests)
 
       // disconnect from redis when server is stopped
       server.events.on('stop', async () => {
