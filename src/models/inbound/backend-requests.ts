@@ -28,6 +28,7 @@
 import { Logger as SDKLogger, RequestOptions, RequestResponse, request } from '@mojaloop/sdk-standard-components'
 import { AuthenticationValue, InboundAuthorizationsPostRequest } from '~/models/authorizations.interface'
 import { PrependFun, Scheme, prepend2Uri } from '~/shared/http-scheme'
+import { throwOrExtractData } from '~/shared/throw-or-extract-data'
 
 import http from 'http'
 
@@ -95,10 +96,10 @@ export class BackendRequests {
   }
 
   // makes the requests with proper logging
-  protected async loggedRequest<Response> (opts: RequestOptions): Promise<RequestResponse<Response>> {
+  protected async loggedRequest<Response> (opts: RequestOptions): Promise<Response | void> {
     try {
       this.logger.push({ opts }).info(`Executing Backend ${this.config.scheme} ${opts.method} request`)
-      return request(opts)
+      return request<Response>(opts).then((res: RequestResponse<Response>) => throwOrExtractData<Response>(res))
     } catch (err) {
       this.logger.push({ err }).error(`Error attempting Backend ${this.config.scheme} ${opts.method} request`)
       throw err
@@ -106,7 +107,7 @@ export class BackendRequests {
   }
 
   // makes a GET to Backend
-  async get<Response> (uri: string): Promise<RequestResponse<Response>> {
+  async get<Response> (uri: string): Promise<Response | void> {
     return this.loggedRequest({
       uri: this.fullUri(uri),
       method: 'GET',
@@ -116,7 +117,7 @@ export class BackendRequests {
   }
 
   // makes a PATCH to Backend
-  async patch<Body, Response> (uri: string, body: Body): Promise<RequestResponse<Response>> {
+  async patch<Body, Response> (uri: string, body: Body): Promise<Response | void> {
     return this.loggedRequest({
       uri: this.fullUri(uri),
       method: 'PATCH',
@@ -127,7 +128,7 @@ export class BackendRequests {
   }
 
   // makes a POST to Backend
-  async post<Body, Response> (uri: string, body: Body): Promise<RequestResponse<Response>> {
+  async post<Body, Response> (uri: string, body: Body): Promise<Response | void> {
     return this.loggedRequest({
       uri: this.fullUri(uri),
       method: 'POST',
@@ -138,7 +139,7 @@ export class BackendRequests {
   }
 
   // makes a PUT to Backend
-  async put<Body, Response> (uri: string, body: Body): Promise<RequestResponse<Response>> {
+  async put<Body, Response> (uri: string, body: Body): Promise<Response | void> {
     return this.loggedRequest({
       uri: this.fullUri(uri),
       method: 'PUT',
@@ -153,7 +154,7 @@ export class BackendRequests {
   // and in response delivers the cryptographic proof of signing in AuthenticationValue.pinValue
   async signAuthorizationRequest (
     inRequest: InboundAuthorizationsPostRequest
-  ): Promise<RequestResponse<AuthenticationValue>> {
+  ): Promise<AuthenticationValue | void> {
     return this.post<InboundAuthorizationsPostRequest, AuthenticationValue>(
       this.fullUri('signAuthorizationRequest'), inRequest
     )
