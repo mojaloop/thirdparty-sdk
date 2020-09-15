@@ -101,23 +101,6 @@ export interface OutboundAuthorizationData extends StateData {
   response?: OutboundAuthorizationsPostResponse
 }
 
-export interface OutboundAuthorizationsPostRequest {
+export interface OutboundAuthorizationsPostRequest extends InboundAuthorizationsPostRequest {
   toParticipantId: string
-  authenticationType: string
-  retriesLeft: string
-  amount: {
-    currency: string
-    amount: string
-  },
-  transactionId: string
-  transactionRequestId: string
-  quote: {
-    transferAmount: {
-      currency: string
-      amount: string
-    },
-    expiration: string
-    ilpPacket: string
-    condition: string
-  }
 }

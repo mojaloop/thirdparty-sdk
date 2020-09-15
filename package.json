@@ -1,6 +1,6 @@
 {
   "name": "@mojaloop/thirdparty-scheme-adapter",
-  "version": "11.12.0",
+  "version": "11.13.0",
   "description": "Thirdparty Scheme Adapter ",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -73,7 +73,7 @@
     "@mojaloop/central-services-health": "^10.6.0",
     "@mojaloop/central-services-metrics": "^9.5.0",
     "@mojaloop/central-services-shared": "^11.3.3",
-    "@mojaloop/sdk-standard-components": "^11.6.0",
+    "@mojaloop/sdk-standard-components": "^11.7.0",
     "@types/axios": "^0.14.0",
     "@types/convict": "^5.2.1",
     "@types/hapi": "^18.0.3",
