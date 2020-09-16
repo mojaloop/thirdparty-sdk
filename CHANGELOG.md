@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+## [11.15.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.14.0...v11.15.0) (2020-09-16)
+
+
+### Features
+
+* 427 post authorizations.model for inbound service ([#31](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/31)) ([a71f3cd](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/a71f3cd8bd50daf59b497835569d8f3c66f332b3))
+
 ## [11.14.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.13.0...v11.14.0) (2020-09-15)
 
 
