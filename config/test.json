@@ -31,6 +31,8 @@
     "TRANSFERS_ENDPOINT": "0.0.0.0:3000",
     "BULK_TRANSFERS_ENDPOINT": "",
     "DFSP_ID": "dfsp_a",
+    "DFSP_BACKEND_URI": "0.0.0.0:9000",
+    "DFSP_BACKEND_HTTP_SCHEME": "http",
     "JWS_SIGN": false,
     "JWS_SIGNING_KEY": "./secrets/jwsSigningKey.key",
     "TLS": {
