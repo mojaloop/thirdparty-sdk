@@ -1,0 +1,147 @@
+@startuml
+
+title PISP Transaction
+
+
+participant "PISP Backend" as PISP
+box "thirdparty-scheme-adapter"
+  participant "outbound-server" as OBS
+  participant "3p-state" as ST8
+  participant "inbound-server" as IBS
+end box
+
+box "Mojaloop"
+    participant Switch
+end box
+
+== Party Lookup ==
+rnote right of PISP #Light
+""POST /thirdpartyTransaction""
+{
+  payee: {
+    partyIdInfo: {
+      partyIdType: "MSISDN",
+      partyIdentifier: "+123456789"
+    }
+  }
+}
+end note
+PISP -> OBS: ""POST /thirdpartyTransaction""
+activate PISP
+activate OBS
+' TODO: line up with state-models.md doc
+OBS -> ST8: ""start()""
+activate ST8
+
+ST8 -> Switch: ""GET /parties/{type}/{id}""
+Switch --> ST8: ""202 Accepted""
+rnote right of ST8: ""state: pendingPartyLookup""
+
+note over Switch
+  Switch performs party lookup... just like normal
+end note
+
+Switch -> IBS: ""PUT /parties/{type}/{id}""
+IBS -> ST8: ""onPartyLookup()""
+IBS --> Switch: ""200 OK""
+rnote right of ST8: ""state: payeeResolved""
+
+ST8 -> OBS: ""something...""
+deactivate ST8
+
+' TODO: party lookup
+OBS --> PISP: ""200 OK""
+deactivate OBS
+deactivate PISP
+
+...User checks the party name, and confirms...
+
+== Initate Transfer ==
+rnote right of PISP #Light
+""POST /thirdpartyTransaction/{id}/acceptParty""
+{
+  sourceAccountId: "dfspa.alice.1234",
+  consentId: "555",
+  amount: {
+    amount: "20.00",
+    currency: "USD"
+  },
+  "amountType": "SEND"
+}
+end note
+PISP -> OBS: ""POST /thirdpartyTransaction/{id}/acceptParty""
+activate PISP
+activate OBS
+' TODO: line up with state-models.md doc
+OBS -> ST8: ""acceptParty()""
+activate ST8
+
+ST8 -> Switch: ""POST /thirdpartyRequests/transactions""
+Switch --> ST8: ""202 Accepted""
+rnote right of ST8: ""state: pendingAuthorization""
+
+
+note over Switch
+  Switch kicks off the transaction - DFSP issues ""POST /authorizations""
+end note
+
+Switch -> IBS: ""POST /authorizations""
+IBS -> ST8: ""onPostAuthorizations()""
+IBS --> Switch: ""200 OK""
+rnote right of ST8: ""state: authorizationReceived""
+
+
+ST8 -> OBS: ""something...""
+deactivate ST8
+
+OBS --> PISP: ""200 OK""
+deactivate OBS
+deactivate PISP
+
+...User signs the challenge...
+
+
+== Approve Transfer ==
+rnote right of PISP #Light
+""POST /thirdpartyTransaction/{id}/signChallenge""
+{
+  authentication: {
+    value: "base64(xxx)"
+  }
+  //TODO: also send the old details? It is a PUT after all...
+}
+end note
+PISP -> OBS: ""POST /thirdpartyTransaction/{id}/signChallenge""
+activate PISP
+activate OBS
+
+OBS -> ST8: ""signChallenge()""
+activate ST8
+
+ST8 -> Switch: ""PUT /authorizations/{id}""
+Switch --> ST8: ""202 Accepted""
+rnote right of ST8: ""state: transactionSigned""
+
+note over Switch
+  1. DFSP checks the authorization with the auth-service, or their own auth-service.
+  2. DFSP is happy, so initiates the ""POST /transfer""
+end note
+
+
+Switch -> IBS: ""PATCH /thirdpartyRequests/transactions/{id}""
+IBS -> ST8: ""onTransactionSuccess()""
+IBS --> Switch: ""200 OK""
+rnote right of ST8: ""state: transactionSuccess""
+
+
+ST8 -> OBS: ""something...""
+deactivate ST8
+
+OBS --> PISP: ""200 OK""
+deactivate OBS
+deactivate PISP
+
+
+
+
+@enduml
