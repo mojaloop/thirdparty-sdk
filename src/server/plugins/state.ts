@@ -43,7 +43,7 @@ export interface StateResponseToolkit extends ResponseToolkit {
   getMojaloopRequests: () => SDK.MojaloopRequests
   getThirdpartyRequests: () => SDK.ThirdpartyRequests
   getWSO2Auth: () => SDK.WSO2Auth
-  betBackendRequests: () => BackendRequests
+  getBackendRequests: () => BackendRequests
 }
 
 export const StatePlugin = {
