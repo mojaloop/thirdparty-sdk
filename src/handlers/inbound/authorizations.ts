@@ -25,11 +25,16 @@
 
  --------------
  ******/
-import { InboundAuthorizationsPutRequest } from '~/models/authorizations.interface'
+import { InboundAuthorizationsPostRequest, InboundAuthorizationsPutRequest } from '~/models/authorizations.interface'
 import { Message } from '~/shared/pub-sub'
 import {
   OutboundAuthorizationsModel
 } from '~/models/outbound/authorizations.model'
+import {
+  InboundAuthorizationsModel,
+  InboundAuthorizationsModelConfig
+} from '~/models/inbound/authorizations.model'
+
 import { Request, ResponseObject } from '@hapi/hapi'
 import { StateResponseToolkit } from '~/server/plugins/state'
 
@@ -48,8 +53,29 @@ async function put (_context: any, request: Request, h: StateResponseToolkit): P
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function post (_context: any, _request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
-  return h.response({ to: 'be implemented' }).code(202)
+async function post (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+  // TODO: this handler will be shared with ThirdpartyRequestTransactionModel so there is a need
+  // to properly handle two different models here - maybe via some configuration flag?
+  const logger = h.getLogger()
+  try {
+    const sourceFspId = request.headers['fspiop-source']
+    const payload = request.payload as InboundAuthorizationsPostRequest
+    const config: InboundAuthorizationsModelConfig = {
+      logger,
+      backendRequests: h.getBackendRequests(),
+      mojaloopRequests: h.getMojaloopRequests()
+    }
+    const model = new InboundAuthorizationsModel(config)
+    const response = await model.postAuthorizations(payload, sourceFspId)
+    logger.push({ response }).info('InboundAuthorizationsModel handled POST /authorizations request')
+  } catch (err) {
+    // nothing we can do if an error gets thrown back to us here apart from log it and continue
+    logger.push({ err }).info('Error handling POST /authorizations request')
+  }
+
+  // Note that we will have passed request validation, JWS etc... by this point
+  // so it is safe to return 202
+  return h.response().code(202)
 }
 
 export default {

@@ -59,6 +59,18 @@ const postThirdpartyRequestsTransactionRequest = mockData.postThirdpartyRequests
 const __postQuotes = jest.fn(() => Promise.resolve())
 
 jest.mock('@mojaloop/sdk-standard-components', () => {
+  const loggerMethods = {
+    log: jest.fn(),
+
+    // generated methods from default levels
+    verbose: jest.fn(),
+    debug: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+    trace: jest.fn(),
+    info: jest.fn(),
+    fatal: jest.fn()
+  }
   return {
     MojaloopRequests: jest.fn(() => {
       return {
@@ -69,20 +81,9 @@ jest.mock('@mojaloop/sdk-standard-components', () => {
     WSO2Auth: jest.fn(),
     Logger: {
       Logger: jest.fn(() => ({
-        push: jest.fn(),
+        push: jest.fn(() => loggerMethods),
         configure: jest.fn(),
-
-        // log methods
-        log: jest.fn(),
-
-        // generated methods from default levels
-        verbose: jest.fn(),
-        debug: jest.fn(),
-        warn: jest.fn(),
-        error: jest.fn(),
-        trace: jest.fn(),
-        info: jest.fn(),
-        fatal: jest.fn()
+        ...loggerMethods
       })),
       buildStringify: jest.fn()
     }
@@ -99,6 +100,13 @@ jest.mock('~/shared/pub-sub', () => {
     }))
   }
 })
+
+const mockInboundPostAuthorization = jest.fn(() => Promise.resolve())
+jest.mock('~/models/inbound/authorizations.model', () => ({
+  InboundAuthorizationsModel: jest.fn(() => ({
+    postAuthorizations: mockInboundPostAuthorization
+  }))
+}))
 
 const putResponse: InboundAuthorizationsPutRequest = {
   authenticationInfo: {
@@ -213,12 +221,14 @@ describe('Inbound API routes', (): void => {
         method: 'POST',
         url: '/authorizations',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'fspiop-source': 'sourceDfspId'
         },
         payload: postRequest
       }
       const response = await server.inject(request)
       expect(response.statusCode).toBe(202)
+      expect(mockInboundPostAuthorization).toBeCalledWith(postRequest, request.headers['fspiop-source'])
     })
   })
 
