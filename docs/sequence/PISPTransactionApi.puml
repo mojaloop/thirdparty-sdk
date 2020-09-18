@@ -16,8 +16,9 @@ end box
 
 == Party Lookup ==
 rnote right of PISP #Light
-""POST /thirdpartyTransaction""
+""POST /thirdpartyTransactions""
 {
+  transactionRequestId: "12345",
   payee: {
     partyIdInfo: {
       partyIdType: "MSISDN",
@@ -26,11 +27,12 @@ rnote right of PISP #Light
   }
 }
 end note
-PISP -> OBS: ""POST /thirdpartyTransaction""
+PISP -> OBS: ""POST /thirdpartyTransactions""
 activate PISP
 activate OBS
 ' TODO: line up with state-models.md doc
-OBS -> ST8: ""start()""
+OBS -> ST8: ""partyLookup()""
+rnote right of ST8: ""state: requestPartyLookup""
 activate ST8
 
 ST8 -> Switch: ""GET /parties/{type}/{id}""
@@ -49,16 +51,16 @@ rnote right of ST8: ""state: payeeResolved""
 ST8 -> OBS: ""something...""
 deactivate ST8
 
-' TODO: party lookup
+' TODO: party lookup details
 OBS --> PISP: ""200 OK""
 deactivate OBS
 deactivate PISP
 
 ...User checks the party name, and confirms...
 
-== Initate Transfer ==
+== Initate Transaction ==
 rnote right of PISP #Light
-""POST /thirdpartyTransaction/{id}/acceptParty""
+""POST /thirdpartyTransactions/{id}/initiate""
 {
   sourceAccountId: "dfspa.alice.1234",
   consentId: "555",
@@ -69,16 +71,18 @@ rnote right of PISP #Light
   "amountType": "SEND"
 }
 end note
-PISP -> OBS: ""POST /thirdpartyTransaction/{id}/acceptParty""
+PISP -> OBS: ""POST /thirdpartyTransactions/{id}/initiate""
 activate PISP
 activate OBS
 ' TODO: line up with state-models.md doc
-OBS -> ST8: ""acceptParty()""
+
+OBS -> ST8: ""initiate()""
 activate ST8
+rnote right of ST8: ""state: requestTransaction""
 
 ST8 -> Switch: ""POST /thirdpartyRequests/transactions""
 Switch --> ST8: ""202 Accepted""
-rnote right of ST8: ""state: pendingAuthorization""
+rnote right of ST8: ""state: pendingTransactionAuthorization""
 
 
 note over Switch
@@ -94,33 +98,33 @@ rnote right of ST8: ""state: authorizationReceived""
 ST8 -> OBS: ""something...""
 deactivate ST8
 
+'TODO: add authorization details
 OBS --> PISP: ""200 OK""
 deactivate OBS
 deactivate PISP
 
-...User signs the challenge...
+...Present quote to be approved\nUser signs the challenge...
 
 
-== Approve Transfer ==
+== Approve Transaction ==
 rnote right of PISP #Light
-""POST /thirdpartyTransaction/{id}/signChallenge""
+""POST /thirdpartyTransactions/{id}/approve""
 {
-  authentication: {
-    value: "base64(xxx)"
-  }
-  //TODO: also send the old details? It is a PUT after all...
+  signedChallenge: "base64(xxx)"
 }
 end note
-PISP -> OBS: ""POST /thirdpartyTransaction/{id}/signChallenge""
+PISP -> OBS: ""POST /thirdpartyTransactions/{id}/approve""
 activate PISP
 activate OBS
 
-OBS -> ST8: ""signChallenge()""
+OBS -> ST8: ""approve()""
 activate ST8
+rnote right of ST8: ""state: approvalReceived""
+
 
 ST8 -> Switch: ""PUT /authorizations/{id}""
 Switch --> ST8: ""202 Accepted""
-rnote right of ST8: ""state: transactionSigned""
+rnote right of ST8: ""state: pendingTransaction""
 
 note over Switch
   1. DFSP checks the authorization with the auth-service, or their own auth-service.

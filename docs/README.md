@@ -10,3 +10,21 @@
 
 - Where external is for communication between the DFSP and the adapter
 - And internal is for communication between the adapter and the adapter
+
+
+
+## TODO:
+
+- timeout design - how do we handle timeouts gracefully?
+  - between redis handlers and http handlers
+  - any given redis handler must listen to 2 events:
+    - http event (happy path)
+    - timeout event 
+
+
+Story breakdown
+
+- outbound-pisp design
+- build out model for all states
+- breakdown into 3 phases
+  - implement one by one
