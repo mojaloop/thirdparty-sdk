@@ -120,7 +120,38 @@ export class PISPTransactionModel
 
     // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (resolve, reject) => {
+      let subId = 0
+      try {
+        // in handlers/inbound is implemented putThirdpartyAuthorizationsById handler
+        // which publish thirdparty authorizations response to channel
+        subId = this.pubSub.subscribe(channel, async (channel: string, message: Message, sid: number) => {
+          // first unsubscribe
+          pubSub.unsubscribe(channel, sid)
 
+          const putResponse = { ...message as unknown as InboundThirdpartyAuthorizationsPutRequest }
+          // store response which will be returned by 'getResponse' method in workflow 'run'
+          this.data.response = {
+            ...putResponse,
+            currentState: OutboundThirdpartyAuthorizationsModelState[
+              this.data.currentState as keyof typeof OutboundThirdpartyAuthorizationsModelState
+            ]
+          }
+          resolve()
+        })
+        // POST /thirdpartyRequests/transactions/${transactionRequestId}/authorizations request to the switch
+        const res = await this.requests.postThirdpartyRequestsTransactionsAuthorizations(
+          this.data.request,
+          this.config.key,
+          this.data.toParticipantId
+        )
+        this.logger.push({ res })
+        this.logger.info('ThirdpartyAuthorizations request sent to peer')
+      } catch (error) {
+        this.logger.push(error)
+        this.logger.error('ThirdpartyAuthorizations request error')
+        pubSub.unsubscribe(channel, subId)
+        reject(error)
+      }
     })
   }
 
