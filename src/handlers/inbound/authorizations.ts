@@ -70,7 +70,7 @@ async function post (_context: any, request: Request, h: StateResponseToolkit): 
     logger.push({ response }).info('InboundAuthorizationsModel handled POST /authorizations request')
   } catch (err) {
     // nothing we can do if an error gets thrown back to us here apart from log it and continue
-    logger.push({ err }).info('Error handling POST /authorizations request')
+    logger.push({ err }).error('Error handling POST /authorizations request')
   }
 
   // Note that we will have passed request validation, JWS etc... by this point
