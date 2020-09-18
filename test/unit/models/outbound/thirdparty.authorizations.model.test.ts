@@ -179,7 +179,7 @@ describe('OutboundThirdpartyAuthorizationsModel', () => {
       // Assertions
       expect(result).toEqual({
         ...putResponse,
-        currentState: OutboundThirdpartyAuthorizationsModelState.succeeded
+        currentState: OutboundThirdpartyAuthorizationsModelState.SUCCEEDED
       })
       expect(mocked(modelConfig.requests.postThirdpartyRequestsTransactionsAuthorizations)).toHaveBeenCalledWith(
         model.data.request, modelConfig.key, model.data.toParticipantId)
@@ -221,7 +221,7 @@ describe('OutboundThirdpartyAuthorizationsModel', () => {
 
         expect(result).toEqual({
           ...putResponse,
-          currentState: OutboundThirdpartyAuthorizationsModelState.succeeded
+          currentState: OutboundThirdpartyAuthorizationsModelState.SUCCEEDED
         })
         expect(mocked(modelConfig.requests.postThirdpartyRequestsTransactionsAuthorizations)).toHaveBeenCalledWith(
           model.data.request, modelConfig.key, model.data.toParticipantId)
