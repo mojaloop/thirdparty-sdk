@@ -346,16 +346,16 @@ paths:
           $ref: '#/paths/~1hello/get/responses/501'
         '503':
           $ref: '#/paths/~1hello/get/responses/503'
-  '/thirdpartyTransactions/{ID}/initiate':
+  /thirdpartyTransactions/initiate:
     post:
       operationId: InitiateThirdpartyTransactions
       summary: Initiates a third party transaction.
       description: |
-        The HTTP request `POST /thirdpartyTransactions/{ID}/initiate` is sent to the Switch to initiate a third party request transaction.
+        The HTTP request `POST /thirdpartyTransactions/initiate` is sent to the Switch to initiate a third party request transaction.
       tags:
         - thirdpartyRequests
       parameters:
-        - $ref: '#/paths/~1thirdpartyTransactions~1%7BID%7D~1approve/post/parameters/0'
+        - $ref: '#/paths/~1thirdpartyTransactions~1approve/post/parameters/0'
       requestBody:
         description: Thirdparty transactions request body.
         required: true
@@ -457,7 +457,7 @@ paths:
                   description: Information about the Payee in the proposed financial transaction.
                 payer:
                   allOf:
-                    - $ref: '#/paths/~1thirdpartyTransactions~1%7BID%7D~1initiate/post/requestBody/content/application~1json/schema/properties/payee/allOf/0'
+                    - $ref: '#/paths/~1thirdpartyTransactions~1initiate/post/requestBody/content/application~1json/schema/properties/payee/allOf/0'
                   description: Information about the Payer in the proposed financial transaction.
                 amountType:
                   allOf:
@@ -613,12 +613,12 @@ paths:
           $ref: '#/paths/~1hello/get/responses/501'
         '503':
           $ref: '#/paths/~1hello/get/responses/503'
-  '/thirdpartyTransactions/{ID}/approve':
+  /thirdpartyTransactions/approve:
     post:
       operationId: ApproveThirdpartyTransactions
       summary: Approve a third party transaction.
       description: |
-        The HTTP request `POST /thirdpartyTransactions/{ID}/approve` is used to approve a third party transaction .
+        The HTTP request `POST /thirdpartyTransactions/approve` is used to approve a third party transaction .
       tags:
         - thirdpartyRequests
       parameters:
@@ -634,24 +634,30 @@ paths:
         content:
           application/json:
             schema:
-              title: AuthorizationsIDPutResponse
               type: object
-              description: 'The object sent in the PUT /authorizations/{ID} callback.'
               properties:
-                authenticationInfo:
-                  $ref: '#/components/responses/OutboundAuthorizationsPostResponse/content/application~1json/schema/properties/authenticationInfo'
-                responseType:
-                  $ref: '#/components/responses/OutboundAuthorizationsPostResponse/content/application~1json/schema/properties/responseType'
-              required:
-                - responseType
+                authorizationResponse:
+                  title: AuthorizationsIDPutResponse
+                  type: object
+                  description: 'The object sent in the PUT /authorizations/{ID} callback.'
+                  properties:
+                    authenticationInfo:
+                      $ref: '#/components/responses/OutboundAuthorizationsPostResponse/content/application~1json/schema/properties/authenticationInfo'
+                    responseType:
+                      $ref: '#/components/responses/OutboundAuthorizationsPostResponse/content/application~1json/schema/properties/responseType'
+                  required:
+                    - responseType
+                transactionRequestId:
+                  $ref: '#/components/schemas/OutboundAuthorizationsPostRequest/properties/transactionId'
             example:
-              application/json:
+              authorizationResponse:
                 authenticationInfo:
                   authentication: U2F
                   authenticationValue:
                     pinValue: '233133331'
                     counter: '1'
                 responseType: ENTERED
+              transactionRequestId: b51ec534-ee48-4575-b6a9-ead2955b8069
       responses:
         '200':
           $ref: '#/components/responses/ThirdpartyTransactionsApproveResponse'
@@ -680,7 +686,7 @@ paths:
       tags:
         - thirdpartyRequests
       parameters:
-        - $ref: '#/paths/~1thirdpartyTransactions~1%7BID%7D~1approve/post/parameters/0'
+        - $ref: '#/paths/~1thirdpartyTransactions~1approve/post/parameters/0'
       requestBody:
         description: The thirdparty authorization details to verify
         required: true
@@ -712,7 +718,7 @@ paths:
                     Common ID between the PISP and FSP for the Consent object This tells DFSP and auth-service which constent allows the PISP to initiate transaction.
                 sourceAccountId:
                   allOf:
-                    - $ref: '#/paths/~1thirdpartyTransactions~1%7BID%7D~1initiate/post/requestBody/content/application~1json/schema/properties/sourceAccountId/allOf/0'
+                    - $ref: '#/paths/~1thirdpartyTransactions~1initiate/post/requestBody/content/application~1json/schema/properties/sourceAccountId/allOf/0'
                   description: 'DFSP specific account identifiers, e.g. `dfspa.alice.1234`'
                 status:
                   type: string
@@ -1225,7 +1231,7 @@ components:
                   Common ID between the PISP and FSP for the Consent object This tells DFSP and auth-service which consent allows the PISP to initiate transaction.
               sourceAccountId:
                 allOf:
-                  - $ref: '#/paths/~1thirdpartyTransactions~1%7BID%7D~1initiate/post/requestBody/content/application~1json/schema/properties/sourceAccountId/allOf/0'
+                  - $ref: '#/paths/~1thirdpartyTransactions~1initiate/post/requestBody/content/application~1json/schema/properties/sourceAccountId/allOf/0'
                 description: 'DFSP specific account identifiers, e.g. `dfspa.alice.1234`'
               status:
                 type: string
@@ -1243,43 +1249,48 @@ components:
       content:
         application/json:
           schema:
-            title: AuthorizationsPostRequest
-            description: POST /authorizations request object.
             type: object
             properties:
-              authenticationType:
-                title: AuthorizationChannelType
-                type: string
-                enum:
-                  - OTP
-                  - QRCODE
-                  - U2F
-                description: |
-                  Below are the allowed values for the enumeration AuthorizationChannelType.
-                  - OTP - One-time password generated by the Payer FSP.
-                  - QRCODE - QR code used as One Time Password.
-                  - U2F - U2F is a new addition isolated to Thirdparty stream.
+              authorization:
+                title: AuthorizationsPostRequest
+                description: POST /authorizations request object.
+                type: object
+                properties:
+                  authenticationType:
+                    title: AuthorizationChannelType
+                    type: string
+                    enum:
+                      - OTP
+                      - QRCODE
+                      - U2F
+                    description: |
+                      Below are the allowed values for the enumeration AuthorizationChannelType.
+                      - OTP - One-time password generated by the Payer FSP.
+                      - QRCODE - QR code used as One Time Password.
+                      - U2F - U2F is a new addition isolated to Thirdparty stream.
 
-                  This is based on FSPIOP `AuthenticationType` with U2F added.
-                example: U2F
-              retriesLeft:
-                $ref: '#/components/schemas/OutboundAuthorizationsPostRequest/properties/retriesLeft'
-              amount:
-                $ref: '#/components/schemas/OutboundAuthorizationsPostRequest/properties/amount'
-              transactionId:
-                $ref: '#/components/schemas/OutboundAuthorizationsPostRequest/properties/transactionId'
-              transactionRequestId:
-                $ref: '#/components/schemas/OutboundAuthorizationsPostRequest/properties/transactionId'
-              quote:
-                $ref: '#/components/schemas/OutboundAuthorizationsPostRequest/properties/quote'
-            required:
-              - authenticationType
-              - retriesLeft
-              - amount
-              - transactionId
-              - transactionRequestId
-              - quote
-            additionalProperties: false
+                      This is based on FSPIOP `AuthenticationType` with U2F added.
+                    example: U2F
+                  retriesLeft:
+                    $ref: '#/components/schemas/OutboundAuthorizationsPostRequest/properties/retriesLeft'
+                  amount:
+                    $ref: '#/components/schemas/OutboundAuthorizationsPostRequest/properties/amount'
+                  transactionId:
+                    $ref: '#/components/schemas/OutboundAuthorizationsPostRequest/properties/transactionId'
+                  transactionRequestId:
+                    $ref: '#/components/schemas/OutboundAuthorizationsPostRequest/properties/transactionId'
+                  quote:
+                    $ref: '#/components/schemas/OutboundAuthorizationsPostRequest/properties/quote'
+                required:
+                  - authenticationType
+                  - retriesLeft
+                  - amount
+                  - transactionId
+                  - transactionRequestId
+                  - quote
+                additionalProperties: false
+              currentState:
+                type: string
     ThirdpartyTransactionsPartyLookupResponse:
       description: Thirdparty transactions party lookup response
       content:

@@ -160,12 +160,12 @@ paths:
           $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/501'
         '503':
           $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/503'      
-  /thirdpartyTransactions/{ID}/initiate:
+  /thirdpartyTransactions/initiate:
     post:
       operationId: InitiateThirdpartyTransactions
       summary: Initiates a third party transaction.
       description: >
-        The HTTP request `POST /thirdpartyTransactions/{ID}/initiate` is sent to the Switch to initiate a third party request transaction.
+        The HTTP request `POST /thirdpartyTransactions/initiate` is sent to the Switch to initiate a third party request transaction.
       tags:
         - thirdpartyRequests
       parameters:
@@ -197,12 +197,12 @@ paths:
           $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/501'
         '503':
           $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/503'
-  /thirdpartyTransactions/{ID}/approve:
+  /thirdpartyTransactions/approve:
     post:
       operationId: ApproveThirdpartyTransactions
       summary: Approve a third party transaction.
       description: >
-        The HTTP request `POST /thirdpartyTransactions/{ID}/approve` is used to approve a third party transaction .
+        The HTTP request `POST /thirdpartyTransactions/approve` is used to approve a third party transaction .
       tags:
         - thirdpartyRequests
       parameters:
@@ -214,15 +214,21 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/AuthorizationsIDPutResponse.yaml'
+              type: object
+              properties:
+                authorizationResponse:
+                  $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/AuthorizationsIDPutResponse.yaml'
+                transactionRequestId: 
+                  $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/CorrelationId.yaml'
             example:
-              application/json:   
+              authorizationResponse:   
                 authenticationInfo:
                   authentication: U2F
                   authenticationValue:
                     pinValue: '233133331'
                     counter: '1'
                 responseType: ENTERED
+              transactionRequestId: b51ec534-ee48-4575-b6a9-ead2955b8069
       responses:
         '200':
           $ref: '#/components/responses/ThirdpartyTransactionsApproveResponse'
@@ -392,7 +398,13 @@ components:
       content:
         application/json:
           schema:
-            $ref: '../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/schemas/AuthorizationPostRequest.yaml'
+            type: object
+            properties:
+              authorization:
+                $ref: '../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/schemas/AuthorizationPostRequest.yaml'
+              currentState: 
+                type: string
+                # TODO: add enumeration for currentState from pispTransaction.interface
     ThirdpartyTransactionsPartyLookupResponse:
       description: Thirdparty transactions party lookup response
       content:
