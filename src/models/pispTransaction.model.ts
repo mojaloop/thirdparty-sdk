@@ -22,23 +22,24 @@
  - Name Surname <name.surname@gatesfoundation.com>
 
  - Sridhar Voruganti <sridhar.voruganti@modusbox.com>
+ - Paweł Marzec <pawel.marzec@modusbox.com>
  --------------
  ******/
-import {
-  InboundThirdpartyAuthorizationsPutRequest,
-  OutboundThirdpartyAuthorizationsPostResponse,
-  OutboundThirdpartyAuthorizationsModelConfig,
-  OutboundThirdpartyAuthorizationsModelState,
-  OutboundThirdpartyAuthorizationsData,
-  OutboundThirdpartyAuthorizationStateMachine
-} from '~/models/thirdparty.authorizations.interface'
 import { Message, PubSub } from '~/shared/pub-sub'
 import { PersistentModel } from '~/models/persistent.model'
 import { StateMachineConfig } from 'javascript-state-machine'
-import { MojaloopRequests, PostThirdPartyRequestTransactionsRequest, ThirdpartyRequests, TParty } from '@mojaloop/sdk-standard-components'
-
-import inspect from '~/shared/inspect'
-import { PISPTransactionData, PISPTransactionModelConfig, PISPTransactionModelState, PISPTransactionPhase, PISPTransactionStateMachine } from './pispTransaction.interface'
+import { MojaloopRequests, ThirdpartyRequests, TParty } from '@mojaloop/sdk-standard-components'
+import {
+  PISPTransactionData,
+  PISPTransactionModelConfig,
+  PISPTransactionModelState,
+  PISPTransactionPhase,
+  PISPTransactionStateMachine,
+  ThirdpartyTransactionApproveResponse,
+  ThirdpartyTransactionInitiateResponse,
+  ThirdpartyTransactionPartyLookupResponse,
+  ThirdpartyTransactionStatus
+} from './pispTransaction.interface'
 import { InboundAuthorizationsPostRequest } from './authorizations.interface'
 
 export class PISPTransactionModel
@@ -53,25 +54,20 @@ export class PISPTransactionModel
       init: 'start',
       transitions: [
         // Party Lookup Phase
-        { name: 'requestPartyLookup', from: 'start', to: 'partyLookup' },
-        { name: 'resolvedPartyLookup', from: 'partyLookup', to: 'partyLookupSuccess' },
+        { name: 'requestPartyLookup', from: 'start', to: 'partyLookupSuccess' },
 
         // Initiate Transaction
-        { name: 'initiate', from: 'partyLookupSuccess', to: 'requestTransaction' },
-        { name: 'requestAuthorization', from: 'requestTransaction', to: 'authorizationReceived' },
+        { name: 'initiate', from: 'partyLookupSuccess', to: 'authorizationReceived' },
 
         // Approve Transaction
-        { name: 'approve', from: 'authorizationReceived', to: 'approvalReceived' },
-        { name: 'notifySuccess', from: 'approvalReceived', to: 'transactionSuccess' }
+        { name: 'approve', from: 'authorizationReceived', to: 'transactionSuccess' }
 
       ],
       methods: {
         // specific transitions handlers methods
         onRequestPartyLookup: () => this.onRequestPartyLookup(),
         onInitiate: () => this.onInitiate(),
-        onRequestAuthorization: () => this.onRequestAuthorization(),
-        onApprove: () => this.onApprove(),
-        onNotifySuccess: () => this.onNotifySuccess()
+        onApprove: () => this.onApprove()
       }
     }
     super(data, config, spec)
@@ -116,9 +112,9 @@ export class PISPTransactionModel
   }
 
   async onRequestPartyLookup (): Promise<void> {
-    const { type: partyType, id: partyId, subId: partySubId } = this.data.payeeRequest
+    const { partyIdType, partyIdentifier, partySubIdOrType } = this.data.payeeRequest
     const channel = PISPTransactionModel.partyNotificationChannel(
-      PISPTransactionPhase.lookup, partyType, partyId, partySubId
+      PISPTransactionPhase.lookup, partyIdType, partyIdentifier, partySubIdOrType
     )
     const pubSub: PubSub = this.pubSub
 
@@ -140,13 +136,15 @@ export class PISPTransactionModel
             ]
           }
           resolve()
+          // state machine should be in partyLookupSuccess state
         })
-        // TODO: add to index.d.ts in sdk-standard-components
+
         const res = await this.mojaloopRequests.getParties(
-          this.data.payeeRequest.type,
-          this.data.payeeRequest.id,
-          this.data.payeeRequest.subId
+          partyIdType,
+          partyIdentifier,
+          partySubIdOrType
         )
+
         this.logger.push({ res })
         this.logger.info('MojaloopRequests.getParties request sent to peer')
       } catch (error) {
@@ -161,7 +159,7 @@ export class PISPTransactionModel
   async onInitiate (): Promise<void> {
     const channel = PISPTransactionModel.notificationChannel(
       PISPTransactionPhase.initiation,
-      this.data.transactionRequestId
+      this.data.initiateRequest.transactionRequestId
     )
     const pubSub: PubSub = this.pubSub
 
@@ -183,13 +181,11 @@ export class PISPTransactionModel
             ]
           }
           resolve()
+          // state machine should be in authorizationReceived state
         })
-        const request: PostThirdPartyRequestTransactionsRequest = {
-          transactionRequestId: this.data.transactionRequestId,
-          ...this.data.initiateRequest
-        }
+
         const res = await this.thirdpartyRequests.postThirdpartyRequestsTransactions(
-          request,
+          this.data.initiateRequest,
           this.data.initiateRequest.payer.partyIdInfo.fspId
         )
         this.logger.push({ res })
@@ -203,70 +199,45 @@ export class PISPTransactionModel
     })
   }
 
-
-  async onRequestAuthorization (): Promise<void> {
-
-  }
-
-  async approve (): Promise<void> {
-
-  }
-
-  async onApprove(): Promise<void> {
-
-  }
-
-  async notifySuccess (): Promise<void> {
-
-  }
-
-  async onNotifySuccess (): Promise<void> {
-
-  }
-
-  /**
-   * Requests Thirdparty Authorization
-   * Starts the thirdparty authorization process by sending a
-   * POST /thirdpartyRequests/transactions/${transactionRequestId}/authorizations request to switch
-   * than await for a notification on PUT /thirdpartyRequests/transactions/${transactionRequestId}/authorizations
-   * from the PubSub that the Authorization has been resolved
-   */
-  async onThirdpartyRequestAuthorization (): Promise<void> {
-    const channel = OutboundThirdpartyAuthorizationsModel.notificationChannel(this.config.key)
+  async onApprove (): Promise<void> {
+    const channel = PISPTransactionModel.notificationChannel(
+      PISPTransactionPhase.approval,
+      this.data.approveRequest.transactionRequestId
+    )
     const pubSub: PubSub = this.pubSub
 
     // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (resolve, reject) => {
       let subId = 0
-      // in handlers/inbound is implemented putThirdpartyAuthorizationsById handler
       try {
-        // which publish thirdparty authorizations response to channel
+        // this handler will be executed when PUT parties/<type>/<id>/<subId> @ Inbound server
         subId = this.pubSub.subscribe(channel, async (channel: string, message: Message, sid: number) => {
           // first unsubscribe
           pubSub.unsubscribe(channel, sid)
 
-          const putResponse = { ...message as unknown as InboundThirdpartyAuthorizationsPutRequest }
+          this.data.transactionStatus = { ...message as unknown as ThirdpartyTransactionStatus }
           // store response which will be returned by 'getResponse' method in workflow 'run'
-          this.data.response = {
-            ...putResponse,
-            currentState: OutboundThirdpartyAuthorizationsModelState[
-              this.data.currentState as keyof typeof OutboundThirdpartyAuthorizationsModelState
+          this.data.approveResponse = {
+            transactionStatus: { ...this.data.transactionStatus },
+            currentState: PISPTransactionModelState[
+              this.data.currentState as keyof typeof PISPTransactionModelState
             ]
           }
           resolve()
+          // state machine should be in transactionSuccess state
         })
 
-        // POST /thirdpartyRequests/transactions/${transactionRequestId}/authorizations request to the switch
-        const res = await this.requests.postThirdpartyRequestsTransactionsAuthorizations(
-          this.data.request,
-          this.config.key,
-          this.data.toParticipantId
+        const res = await this.mojaloopRequests.putAuthorizations(
+          this.data.transactionRequestId,
+          // propagate signed challenge
+          this.data.approveRequest.authorizationResponse,
+          this.data.initiateRequest.payer.partyIdInfo.fspId
         )
         this.logger.push({ res })
-        this.logger.info('ThirdpartyAuthorizations request sent to peer')
+        this.logger.info('ThirdpartyRequests.postThirdpartyRequestsTransactions request sent to peer')
       } catch (error) {
         this.logger.push(error)
-        this.logger.error('ThirdpartyAuthorizations request error')
+        this.logger.error('ThirdpartyRequests.postThirdpartyRequestsTransactions request error')
         pubSub.unsubscribe(channel, subId)
         reject(error)
       }
@@ -274,34 +245,47 @@ export class PISPTransactionModel
   }
 
   /**
-   * Returns an object representing the final state of the thirdparty authorization suitable for the outbound API
-   *
-   * @returns {object} - Response representing the result of the thirdparty authorization process
-   */
-  getResponse (): OutboundThirdpartyAuthorizationsPostResponse | void {
-    return this.data.response
-  }
-
-  /**
    * runs the workflow
    */
-  async run (): Promise<OutboundThirdpartyAuthorizationsPostResponse | void> {
+  async run (): Promise<
+  ThirdpartyTransactionPartyLookupResponse |
+  ThirdpartyTransactionInitiateResponse |
+  ThirdpartyTransactionApproveResponse |
+  void
+  > {
     const data = this.data
     try {
       // run transitions based on incoming state
       switch (data.currentState) {
+        // lookup phase
         case 'start':
-          // the first transition is thirdpartyRequestAuthorization
-          await this.fsm.thirdpartyRequestAuthorization()
           this.logger.info(
-            `ThirdpartyAuthorizations requested for ${data.transactionRequestId},  currentState: ${data.currentState}`
+            `requestPartyLookup requested for ${data.transactionRequestId},  currentState: ${data.currentState}`
           )
-          /* falls through */
+          await this.fsm.requestPartyLookup()
+          this.logger.info('requestPartyLookup completed successfully')
+          await this.saveToKVS()
+          return this.data.partyLookupResponse
 
-        case 'succeeded':
-          // all steps complete so return
-          this.logger.info('ThirdpartyAuthorizations completed successfully')
-          return this.getResponse()
+        // initiate phase
+        case 'partyLookupSuccess':
+          this.logger.info(
+            `initiate requested for ${data.transactionRequestId},  currentState: ${data.currentState}`
+          )
+          await this.fsm.initiate()
+          this.logger.info('initiate completed successfully')
+          await this.saveToKVS()
+          return this.data.initiateResponse
+
+        // approve phase
+        case 'authorizationReceived':
+          this.logger.info(
+            `approve requested for ${data.transactionRequestId},  currentState: ${data.currentState}`
+          )
+          await this.fsm.approve()
+          this.logger.info('initiate completed successfully')
+          await this.saveToKVS()
+          return this.data.approveResponse
 
         case 'errored':
           // stopped in errored state
@@ -309,10 +293,11 @@ export class PISPTransactionModel
           return
       }
     } catch (err) {
-      this.logger.info(`Error running ThirdpartyAuthorizations model: ${inspect(err)}`)
+      // this.logger.info(`Error running ThirdpartyAuthorizations model: ${inspect(err)}`)
 
       // as this function is recursive, we don't want to error the state machine multiple times
       if (data.currentState !== 'errored') {
+        // TODO: fix it
         // err should not have a thirdpartythirdpartyAuthorizationState property here!
         if (err.thirdpartyAuthorizationState) {
           this.logger.info('State machine is broken')
@@ -321,7 +306,8 @@ export class PISPTransactionModel
         await this.fsm.error(err)
 
         // avoid circular ref between thirdpartyAuthorizationState.lastError and err
-        err.thirdpartyAuthorizationState = { ...this.getResponse() }
+        // TODO: fix it
+        // err.thirdpartyAuthorizationState = { ...this.getResponse() }
       }
       throw err
     }
@@ -329,11 +315,11 @@ export class PISPTransactionModel
 }
 
 export async function create (
-  data: OutboundThirdpartyAuthorizationsData,
-  config: OutboundThirdpartyAuthorizationsModelConfig
-): Promise<OutboundThirdpartyAuthorizationsModel> {
+  data: PISPTransactionData,
+  config: PISPTransactionModelConfig
+): Promise<PISPTransactionModel> {
   // create a new model
-  const model = new OutboundThirdpartyAuthorizationsModel(data, config)
+  const model = new PISPTransactionModel(data, config)
 
   // enforce to finish any transition to state specified by data.currentState or spec.init
   await model.fsm.state
@@ -342,16 +328,16 @@ export async function create (
 
 // loads PersistentModel from KVS storage using given `config` and `spec`
 export async function loadFromKVS (
-  config: OutboundThirdpartyAuthorizationsModelConfig
-): Promise<OutboundThirdpartyAuthorizationsModel> {
+  config: PISPTransactionModelConfig
+): Promise<PISPTransactionModel> {
   try {
-    const data = await config.kvs.get<OutboundThirdpartyAuthorizationsData>(config.key)
+    const data = await config.kvs.get<PISPTransactionData>(config.key)
     if (!data) {
       throw new Error(`No data found in KVS for: ${config.key}`)
     }
     config.logger.push({ data })
     config.logger.info('data loaded from KVS')
-    return new OutboundThirdpartyAuthorizationsModel(data, config)
+    return create(data, config)
   } catch (err) {
     config.logger.push({ err })
     config.logger.info(`Error loading data from KVS for key: ${config.key}`)

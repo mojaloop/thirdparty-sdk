@@ -10,11 +10,8 @@ import { InboundAuthorizationsPostRequest, InboundAuthorizationsPutRequest } fro
 
 export enum PISPTransactionModelState {
   start = 'start',
-  partyLookup = 'partyLookup',
   partyLookupSuccess = 'partyLookupSuccess',
-  requestTransaction = 'requestTransaction',
   authorizationReceived = 'authorizationReceived',
-  approvalReceived = 'approvalReceived',
   transactionSuccess = 'transactionSuccess'
 }
 
@@ -28,11 +25,13 @@ export interface PISPTransactionStateMachine extends ControlledStateMachine {
   requestPartyLookup: Method,
   onRequestPartyLookup: Method,
   resolvedPartyLookup: Method,
-  onResolvedPartyLookup: Method,
+  // probably not needed
+  // onResolvedPartyLookup: Method,
   initiate: Method,
   onInitiate: Method,
   requestAuthorization: Method,
-  onRequestAuthorization: Method,
+  // probably not needed
+  // onRequestAuthorization: Method,
   approve: Method,
   onApprove: Method,
   notifySuccess: Method,
@@ -45,10 +44,13 @@ export interface PISPTransactionModelConfig extends PersistentModelConfig {
   mojaloopRequests: MojaloopRequests
 }
 
+// derived from request body specification
+// '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/PartyIdInfo.yaml'
 export interface PayeeLookupRequest {
-  type: string,
-  id: string,
-  subId?: string
+  partyIdType: string,
+  partyIdentifier: string,
+  partySubIdOrType?: string
+  // `fspId` optional field intentionally skipped
 }
 
 // Need to store 2 things -
@@ -63,6 +65,7 @@ export interface ThirdpartyTransactionPartyLookupResponse {
 }
 
 export interface ThirdpartyTransactionInitiateRequest {
+  transactionRequestId: string
   sourceAccountId: string
   consentId: string
   payee: TParty
@@ -78,21 +81,36 @@ export interface ThirdpartyTransactionInitiateResponse {
   currentState: PISPTransactionModelState
 }
 
-export interface ThirdpartyTransactionApproveRequest {
-  signedChallenge: InboundAuthorizationsPutRequest
-}
-
-export interface ThirdpartyTransactionApproveResponse {
+export interface ThirdpartyTransactionStatus {
   transactionId: string
   transactionRequestState: 'RECEIVED' | 'PENDING' | 'ACCEPTED' | 'REJECTED'
 }
 
+export interface ThirdpartyTransactionApproveResponse {
+  transactionStatus: ThirdpartyTransactionStatus
+  currentState: PISPTransactionModelState
+}
+
+export interface ThirdpartyTransactionApproveRequest {
+  authorizationResponse: InboundAuthorizationsPutRequest
+  transactionRequestId: string
+}
+
 export interface PISPTransactionData extends StateData {
   transactionRequestId: string
+
+  // party lookup
   payeeRequest: PayeeLookupRequest
-  partyLookupResponse: ThirdpartyTransactionPartyLookupResponse
   payeeResolved: TParty
+  partyLookupResponse: ThirdpartyTransactionPartyLookupResponse
+
+  // initiate
   initiateRequest: ThirdpartyTransactionInitiateRequest
   authorizationRequest: InboundAuthorizationsPostRequest
   initiateResponse: ThirdpartyTransactionInitiateResponse
+
+  // approve
+  approveRequest: ThirdpartyTransactionApproveRequest
+  transactionStatus: ThirdpartyTransactionStatus
+  approveResponse: ThirdpartyTransactionApproveResponse
 }
