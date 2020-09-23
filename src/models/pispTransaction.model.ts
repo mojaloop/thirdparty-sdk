@@ -28,19 +28,38 @@
 import { Message, PubSub } from '~/shared/pub-sub'
 import { PersistentModel } from '~/models/persistent.model'
 import { StateMachineConfig } from 'javascript-state-machine'
-import { MojaloopRequests, ThirdpartyRequests, TParty } from '@mojaloop/sdk-standard-components'
+import { MojaloopRequests, PutAuthorizationRequest, ThirdpartyRequests, TParty } from '@mojaloop/sdk-standard-components'
 import {
+  PayeeLookupRequest,
   PISPTransactionData,
   PISPTransactionModelConfig,
   PISPTransactionModelState,
   PISPTransactionPhase,
   PISPTransactionStateMachine,
   ThirdpartyTransactionApproveResponse,
+  ThirdpartyTransactionInitiateRequest,
   ThirdpartyTransactionInitiateResponse,
   ThirdpartyTransactionPartyLookupResponse,
   ThirdpartyTransactionStatus
 } from './pispTransaction.interface'
 import { InboundAuthorizationsPostRequest } from './authorizations.interface'
+
+export class InvalidPISPTransactionDataError extends Error {
+  public data: PISPTransactionData
+  public propertyName: string
+  constructor (data: PISPTransactionData, propertyName: string) {
+    super(`invalid ${propertyName} data`)
+    this.data = data
+    this.propertyName = propertyName
+  }
+
+  static throwIfInvalidProperty (data: PISPTransactionData, propertyName: string): void {
+    // eslint-disable-next-line no-prototype-builtins
+    if (!data.hasOwnProperty(propertyName)) {
+      throw new InvalidPISPTransactionDataError(data, propertyName)
+    }
+  }
+}
 
 export class PISPTransactionModel
   extends PersistentModel<PISPTransactionStateMachine, PISPTransactionData> {
@@ -56,10 +75,10 @@ export class PISPTransactionModel
         // Party Lookup Phase
         { name: 'requestPartyLookup', from: 'start', to: 'partyLookupSuccess' },
 
-        // Initiate Transaction
+        // Initiate Transaction Phase
         { name: 'initiate', from: 'partyLookupSuccess', to: 'authorizationReceived' },
 
-        // Approve Transaction
+        // Approve Transaction Phase
         { name: 'approve', from: 'authorizationReceived', to: 'transactionSuccess' }
 
       ],
@@ -97,7 +116,7 @@ export class PISPTransactionModel
   }
 
   static partyNotificationChannel (phase: PISPTransactionPhase, partyType: string, id: string, subId?: string): string {
-    if (!(partyType && id && (typeof subId === 'string' && !subId))) {
+    if (!(partyType && id)) {
       throw new Error(
         'PISPTransactionModel.partyNotificationChannel: \'partyType, id, subId (when specified)\' parameters are required'
       )
@@ -112,7 +131,9 @@ export class PISPTransactionModel
   }
 
   async onRequestPartyLookup (): Promise<void> {
-    const { partyIdType, partyIdentifier, partySubIdOrType } = this.data.payeeRequest
+    InvalidPISPTransactionDataError.throwIfInvalidProperty(this.data, 'payeeRequest')
+
+    const { partyIdType, partyIdentifier, partySubIdOrType } = this.data?.payeeRequest as PayeeLookupRequest
     const channel = PISPTransactionModel.partyNotificationChannel(
       PISPTransactionPhase.lookup, partyIdType, partyIdentifier, partySubIdOrType
     )
@@ -157,9 +178,12 @@ export class PISPTransactionModel
   }
 
   async onInitiate (): Promise<void> {
+    InvalidPISPTransactionDataError.throwIfInvalidProperty(this.data, 'payeeRequest')
+    InvalidPISPTransactionDataError.throwIfInvalidProperty(this.data, 'initiateRequest')
+
     const channel = PISPTransactionModel.notificationChannel(
       PISPTransactionPhase.initiation,
-      this.data.initiateRequest.transactionRequestId
+      this.data.transactionRequestId
     )
     const pubSub: PubSub = this.pubSub
 
@@ -183,10 +207,11 @@ export class PISPTransactionModel
           resolve()
           // state machine should be in authorizationReceived state
         })
+        InvalidPISPTransactionDataError.throwIfInvalidProperty(this.data, 'initiateRequest')
 
         const res = await this.thirdpartyRequests.postThirdpartyRequestsTransactions(
-          this.data.initiateRequest,
-          this.data.initiateRequest.payer.partyIdInfo.fspId
+          this.data.initiateRequest as ThirdpartyTransactionInitiateRequest,
+          this.data.initiateRequest?.payer.partyIdInfo.fspId as string
         )
         this.logger.push({ res })
         this.logger.info('ThirdpartyRequests.postThirdpartyRequestsTransactions request sent to peer')
@@ -200,9 +225,13 @@ export class PISPTransactionModel
   }
 
   async onApprove (): Promise<void> {
+    InvalidPISPTransactionDataError.throwIfInvalidProperty(this.data, 'payeeRequest')
+    InvalidPISPTransactionDataError.throwIfInvalidProperty(this.data, 'initiateRequest')
+    InvalidPISPTransactionDataError.throwIfInvalidProperty(this.data, 'approveRequest')
+
     const channel = PISPTransactionModel.notificationChannel(
       PISPTransactionPhase.approval,
-      this.data.approveRequest.transactionRequestId
+      this.data?.approveRequest?.transactionRequestId as string
     )
     const pubSub: PubSub = this.pubSub
 
@@ -226,12 +255,15 @@ export class PISPTransactionModel
           resolve()
           // state machine should be in transactionSuccess state
         })
+        InvalidPISPTransactionDataError.throwIfInvalidProperty(this.data, 'payeeRequest')
+        InvalidPISPTransactionDataError.throwIfInvalidProperty(this.data, 'initiateRequest')
+        InvalidPISPTransactionDataError.throwIfInvalidProperty(this.data, 'approveRequest')
 
         const res = await this.mojaloopRequests.putAuthorizations(
           this.data.transactionRequestId,
           // propagate signed challenge
-          this.data.approveRequest.authorizationResponse,
-          this.data.initiateRequest.payer.partyIdInfo.fspId
+          this.data?.approveRequest?.authorizationResponse as PutAuthorizationRequest,
+          this.data?.initiateRequest?.payer.partyIdInfo.fspId as string
         )
         this.logger.push({ res })
         this.logger.info('ThirdpartyRequests.postThirdpartyRequestsTransactions request sent to peer')
