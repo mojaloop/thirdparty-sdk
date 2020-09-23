@@ -80,7 +80,7 @@ export class PISPTransactionModel
         { name: 'initiate', from: 'partyLookupSuccess', to: 'authorizationReceived' },
 
         // Approve Transaction Phase
-        { name: 'approve', from: 'authorizationReceived', to: 'transactionSuccess' }
+        { name: 'approve', from: 'authorizationReceived', to: 'transactionStatusReceived' }
 
       ],
       methods: {

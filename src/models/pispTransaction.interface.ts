@@ -12,7 +12,7 @@ export enum PISPTransactionModelState {
   start = 'start',
   partyLookupSuccess = 'partyLookupSuccess',
   authorizationReceived = 'authorizationReceived',
-  transactionSuccess = 'transactionSuccess'
+  transactionStatusReceived = 'transactionStatusReceived'
 }
 
 export enum PISPTransactionPhase {
