@@ -43,6 +43,7 @@ import {
   ThirdpartyTransactionStatus
 } from './pispTransaction.interface'
 import { InboundAuthorizationsPostRequest } from './authorizations.interface'
+import inspect from '~/shared/inspect'
 
 export class InvalidPISPTransactionDataError extends Error {
   public data: PISPTransactionData
@@ -149,7 +150,6 @@ export class PISPTransactionModel
           pubSub.unsubscribe(channel, sid)
 
           this.data.payeeResolved = { ...message as unknown as TParty }
-          // store response which will be returned by 'getResponse' method in workflow 'run'
           this.data.partyLookupResponse = {
             party: { ...this.data.payeeResolved },
             currentState: PISPTransactionModelState[
@@ -165,12 +165,9 @@ export class PISPTransactionModel
           partyIdentifier,
           partySubIdOrType
         )
-
-        this.logger.push({ res })
-        this.logger.info('MojaloopRequests.getParties request sent to peer')
+        this.logger.push({ res }).info('MojaloopRequests.getParties request sent to peer')
       } catch (error) {
-        this.logger.push(error)
-        this.logger.error('MojaloopRequests.getParties request error')
+        this.logger.push(error).error('MojaloopRequests.getParties request error')
         pubSub.unsubscribe(channel, subId)
         reject(error)
       }
@@ -183,7 +180,7 @@ export class PISPTransactionModel
 
     const channel = PISPTransactionModel.notificationChannel(
       PISPTransactionPhase.initiation,
-      this.data.transactionRequestId
+      this.data.transactionRequestId as string
     )
     const pubSub: PubSub = this.pubSub
 
@@ -191,13 +188,12 @@ export class PISPTransactionModel
     return new Promise(async (resolve, reject) => {
       let subId = 0
       try {
-        // this handler will be executed when PUT parties/<type>/<id>/<subId> @ Inbound server
+        // this handler will be executed when POST /authorizations @ Inbound server
         subId = this.pubSub.subscribe(channel, async (channel: string, message: Message, sid: number) => {
           // first unsubscribe
           pubSub.unsubscribe(channel, sid)
 
           this.data.authorizationRequest = { ...message as unknown as InboundAuthorizationsPostRequest }
-          // store response which will be returned by 'getResponse' method in workflow 'run'
           this.data.initiateResponse = {
             authorization: { ...this.data.authorizationRequest },
             currentState: PISPTransactionModelState[
@@ -213,11 +209,9 @@ export class PISPTransactionModel
           this.data.initiateRequest as ThirdpartyTransactionInitiateRequest,
           this.data.initiateRequest?.payer.partyIdInfo.fspId as string
         )
-        this.logger.push({ res })
-        this.logger.info('ThirdpartyRequests.postThirdpartyRequestsTransactions request sent to peer')
+        this.logger.push({ res }).info('ThirdpartyRequests.postThirdpartyRequestsTransactions request sent to peer')
       } catch (error) {
-        this.logger.push(error)
-        this.logger.error('ThirdpartyRequests.postThirdpartyRequestsTransactions request error')
+        this.logger.push(error).error('ThirdpartyRequests.postThirdpartyRequestsTransactions request error')
         pubSub.unsubscribe(channel, subId)
         reject(error)
       }
@@ -239,13 +233,12 @@ export class PISPTransactionModel
     return new Promise(async (resolve, reject) => {
       let subId = 0
       try {
-        // this handler will be executed when PUT parties/<type>/<id>/<subId> @ Inbound server
+        // this handler will be executed when PATCH /thirdpartyRequests/transactions/{ID} @ Inbound server
         subId = this.pubSub.subscribe(channel, async (channel: string, message: Message, sid: number) => {
           // first unsubscribe
           pubSub.unsubscribe(channel, sid)
 
           this.data.transactionStatus = { ...message as unknown as ThirdpartyTransactionStatus }
-          // store response which will be returned by 'getResponse' method in workflow 'run'
           this.data.approveResponse = {
             transactionStatus: { ...this.data.transactionStatus },
             currentState: PISPTransactionModelState[
@@ -260,16 +253,14 @@ export class PISPTransactionModel
         InvalidPISPTransactionDataError.throwIfInvalidProperty(this.data, 'approveRequest')
 
         const res = await this.mojaloopRequests.putAuthorizations(
-          this.data.transactionRequestId,
+          this.data.transactionRequestId!,
           // propagate signed challenge
           this.data?.approveRequest?.authorizationResponse as PutAuthorizationRequest,
           this.data?.initiateRequest?.payer.partyIdInfo.fspId as string
         )
-        this.logger.push({ res })
-        this.logger.info('ThirdpartyRequests.postThirdpartyRequestsTransactions request sent to peer')
+        this.logger.push({ res }).info('ThirdpartyRequests.postThirdpartyRequestsTransactions request sent to peer')
       } catch (error) {
-        this.logger.push(error)
-        this.logger.error('ThirdpartyRequests.postThirdpartyRequestsTransactions request error')
+        this.logger.push(error).error('ThirdpartyRequests.postThirdpartyRequestsTransactions request error')
         pubSub.unsubscribe(channel, subId)
         reject(error)
       }
@@ -315,7 +306,7 @@ export class PISPTransactionModel
             `approve requested for ${data.transactionRequestId},  currentState: ${data.currentState}`
           )
           await this.fsm.approve()
-          this.logger.info('initiate completed successfully')
+          this.logger.info('approve completed successfully')
           await this.saveToKVS()
           return this.data.approveResponse
 
@@ -325,21 +316,20 @@ export class PISPTransactionModel
           return
       }
     } catch (err) {
-      // this.logger.info(`Error running ThirdpartyAuthorizations model: ${inspect(err)}`)
+      this.logger.info(`Error running PISPTransactionModel : ${inspect(err)}`)
 
       // as this function is recursive, we don't want to error the state machine multiple times
       if (data.currentState !== 'errored') {
-        // TODO: fix it
-        // err should not have a thirdpartythirdpartyAuthorizationState property here!
-        if (err.thirdpartyAuthorizationState) {
+        // err should not have a pispTransactionState property here!
+        if (err.pispTransactionState) {
           this.logger.info('State machine is broken')
         }
         // transition to errored state
         await this.fsm.error(err)
 
-        // avoid circular ref between thirdpartyAuthorizationState.lastError and err
-        // TODO: fix it
-        // err.thirdpartyAuthorizationState = { ...this.getResponse() }
+        // avoid circular ref between pispTransactionState.lastError and err
+        // TODO: what to return incase of error
+        err.pispTransactionState = { ...this.data.payeeRequest }
       }
       throw err
     }

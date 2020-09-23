@@ -99,7 +99,7 @@ export interface ThirdpartyTransactionApproveRequest {
 }
 
 export interface PISPTransactionData extends StateData {
-  transactionRequestId: string
+  transactionRequestId?: string
 
   // party lookup
   payeeRequest?: PayeeLookupRequest
