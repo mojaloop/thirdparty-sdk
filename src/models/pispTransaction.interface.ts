@@ -97,20 +97,20 @@ export interface ThirdpartyTransactionApproveRequest {
 }
 
 export interface PISPTransactionData extends StateData {
-  transactionRequestId: string
+  transactionRequestId?: string
 
   // party lookup
-  payeeRequest: PayeeLookupRequest
-  payeeResolved: TParty
-  partyLookupResponse: ThirdpartyTransactionPartyLookupResponse
+  payeeRequest?: PayeeLookupRequest
+  payeeResolved?: TParty
+  partyLookupResponse?: ThirdpartyTransactionPartyLookupResponse
 
   // initiate
-  initiateRequest: ThirdpartyTransactionInitiateRequest
-  authorizationRequest: InboundAuthorizationsPostRequest
-  initiateResponse: ThirdpartyTransactionInitiateResponse
+  initiateRequest?: ThirdpartyTransactionInitiateRequest
+  authorizationRequest?: InboundAuthorizationsPostRequest
+  initiateResponse?: ThirdpartyTransactionInitiateResponse
 
   // approve
-  approveRequest: ThirdpartyTransactionApproveRequest
-  transactionStatus: ThirdpartyTransactionStatus
-  approveResponse: ThirdpartyTransactionApproveResponse
+  approveRequest?: ThirdpartyTransactionApproveRequest
+  transactionStatus?: ThirdpartyTransactionStatus
+  approveResponse?: ThirdpartyTransactionApproveResponse
 }

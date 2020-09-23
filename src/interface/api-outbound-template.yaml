@@ -168,9 +168,6 @@ paths:
         The HTTP request `POST /thirdpartyTransactions/initiate` is sent to the Switch to initiate a third party request transaction.
       tags:
         - thirdpartyRequests
-      parameters:
-        #Path
-        - $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/ID.yaml'
       requestBody:
         description: Thirdparty transactions request body.
         required: true
@@ -205,9 +202,6 @@ paths:
         The HTTP request `POST /thirdpartyTransactions/approve` is used to approve a third party transaction .
       tags:
         - thirdpartyRequests
-      parameters:
-        #Path
-        - $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/ID.yaml'
       requestBody:
         description: Authorization request details
         required: true
@@ -301,6 +295,15 @@ components:
         - WAITING_FOR_AUTHORIZATION_REQUEST
         - COMPLETED
         - ERROR_OCCURRED
+    ThirdpartyTransactionState:
+      title: ThirdpartyTransactionState
+      description: state of thirdparty transaction
+      type: string
+      enum:
+        - start
+        - partyLookupSuccess
+        - authorizationReceived
+        - transactionSuccess
     AuthorizationResponse:
       title: AuthorizationResponse
       description: |
@@ -393,6 +396,17 @@ components:
         application/json:
           schema:
             $ref: '../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/schemas/ThirdpartyAuthorizationIDPutResponse.yaml'
+    ThirdpartyTransactionsPartyLookupResponse:
+      description: Thirdparty transactions party lookup response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              party:
+                $ref: '../../node_modules/@mojaloop/api-snippets/v1.1/openapi3/schemas/Party.yaml'
+              currentState: 
+                $ref: '#/components/schemas/ThirdpartyTransactionState'          
     ThirdpartyTransactionsInitiateResponse:
       description: Thirdparty transactions response
       content:
@@ -402,21 +416,18 @@ components:
             properties:
               authorization:
                 $ref: '../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/schemas/AuthorizationPostRequest.yaml'
-              currentState: 
-                type: string
-                # TODO: add enumeration for currentState from pispTransaction.interface
-    ThirdpartyTransactionsPartyLookupResponse:
-      description: Thirdparty transactions party lookup response
-      content:
-        application/json:
-          schema:
-            $ref: '../../node_modules/@mojaloop/api-snippets/v1.1/openapi3/schemas/Party.yaml'
+              currentState:
+                $ref: '#/components/schemas/ThirdpartyTransactionState'            
     ThirdpartyTransactionsApproveResponse:
       description: Thirdparty transactions approve response
       content:
         application/json:
-            schema:
-              $ref: '../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/schemas/ThirdpartyTransactionIDPutResponse.yaml'
-            example:
-              transactionId: '2f169631-ef99-4cb1-96dc-91e8fc08f539'
-              transactionRequestState: 'ACCEPTED'
+          schema:
+            type: object
+            properties:
+              transactionId:
+                $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/CorrelationId.yaml'
+              transactionRequestState:
+                $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/TransactionRequestState.yaml'
+              currentState:
+                $ref: '#/components/schemas/ThirdpartyTransactionState'
