@@ -256,7 +256,7 @@ describe('Outbound API routes', (): void => {
     expect(response.statusCode).toBe(200)
     expect(response.result).toEqual({
       ...putThirdpartyAuthResponse,
-      currentState: OutboundThirdpartyAuthorizationsModelState.SUCCEEDED
+      currentState: OutboundThirdpartyAuthorizationsModelState.succeeded
     })
   })
 })

@@ -84,7 +84,7 @@ describe('OutboundThirdpartyAuthorizationsModel', () => {
     await modelConfig.pubSub.disconnect()
   })
 
-  function checkThirdpartyAuthorizationsModelLayout(am: OutboundThirdpartyAuthorizationsModel, optData?: OutboundThirdpartyAuthorizationsData) {
+  function checkThirdpartyAuthorizationsModelLayout (am: OutboundThirdpartyAuthorizationsModel, optData?: OutboundThirdpartyAuthorizationsData) {
     expect(am).toBeTruthy()
     expect(am.data).toBeDefined()
     expect(am.fsm.state).toEqual(optData?.currentState || 'start')
@@ -179,7 +179,7 @@ describe('OutboundThirdpartyAuthorizationsModel', () => {
       // Assertions
       expect(result).toEqual({
         ...putResponse,
-        currentState: OutboundThirdpartyAuthorizationsModelState.SUCCEEDED
+        currentState: OutboundThirdpartyAuthorizationsModelState.succeeded
       })
       expect(mocked(modelConfig.requests.postThirdpartyRequestsTransactionsAuthorizations)).toHaveBeenCalledWith(
         model.data.request, modelConfig.key, model.data.toParticipantId)
@@ -221,7 +221,7 @@ describe('OutboundThirdpartyAuthorizationsModel', () => {
 
         expect(result).toEqual({
           ...putResponse,
-          currentState: OutboundThirdpartyAuthorizationsModelState.SUCCEEDED
+          currentState: OutboundThirdpartyAuthorizationsModelState.succeeded
         })
         expect(mocked(modelConfig.requests.postThirdpartyRequestsTransactionsAuthorizations)).toHaveBeenCalledWith(
           model.data.request, modelConfig.key, model.data.toParticipantId)
@@ -244,7 +244,6 @@ describe('OutboundThirdpartyAuthorizationsModel', () => {
       })
 
       it('errored', async () => {
-
         const model = await create({ ...data, currentState: 'errored' }, modelConfig)
 
         const result = await model.run()
