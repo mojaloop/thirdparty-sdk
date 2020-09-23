@@ -35,7 +35,8 @@ import {
   PISPTransactionData,
   PISPTransactionModelConfig,
   // PISPTransactionModelState,
-  PISPTransactionPhase
+  PISPTransactionPhase,
+  ThirdpartyTransactionStatus
   // PISPTransactionStateMachine,
   // ThirdpartyTransactionApproveResponse,
   // ThirdpartyTransactionInitiateResponse,
@@ -53,7 +54,7 @@ import { mocked } from 'ts-jest/utils'
 import mockLogger from 'test/unit/mockLogger'
 import shouldNotBeExecuted from 'test/unit/shouldNotBeExecuted'
 import sortedArray from 'test/unit/sortedArray'
-import { InboundAuthorizationsPostRequest } from '~/models/authorizations.interface'
+import { AuthenticationType, AuthorizationResponse, InboundAuthorizationsPostRequest, InboundAuthorizationsPutRequest } from '~/models/authorizations.interface'
 
 // mock KVS default exported class
 jest.mock('~/shared/kvs')
@@ -82,7 +83,8 @@ describe('pipsTransactionModel', () => {
         postThirdpartyRequestsTransactions: jest.fn(() => Promise.resolve({ statusCode: 202 }))
       } as unknown as ThirdpartyRequests,
       mojaloopRequests: {
-        getParties: jest.fn(() => Promise.resolve({ statusCode: 202 }))
+        getParties: jest.fn(() => Promise.resolve({ statusCode: 202 })),
+        putAuthorizations: jest.fn(() => Promise.resolve({ statusCode: 202 }))
       } as unknown as MojaloopRequests
     }
     mocked(modelConfig.pubSub.subscribe).mockImplementationOnce(
@@ -131,7 +133,7 @@ describe('pipsTransactionModel', () => {
       'none',
       'partyLookupSuccess',
       'start',
-      'transactionSuccess'
+      'transactionStatusReceived'
     ])
     expect(sortedArray(ptm.fsm.allTransitions())).toEqual([
       'approve',
@@ -323,15 +325,120 @@ describe('pipsTransactionModel', () => {
       })
     })
 
-    // describe('Approve Transaction Phase', () => {
-    // })
+    describe('Approve Transaction Phase', () => {
+      let data: PISPTransactionData
+      let channel: string
+
+      const authorizationResponse: InboundAuthorizationsPutRequest = {
+        authenticationInfo: {
+          authentication: AuthenticationType.U2F,
+          authenticationValue: {
+            pinValue: 'pin-value',
+            counter: '1'
+          }
+        },
+        responseType: AuthorizationResponse.ENTERED
+      }
+
+      const transactionStatus: ThirdpartyTransactionStatus = {
+        transactionId: '5678-5678',
+        transactionRequestState: 'ACCEPTED'
+      }
+
+      beforeEach(async () => {
+        data = {
+          transactionRequestId: '1234-1234',
+          currentState: 'authorizationReceived',
+          payeeRequest: {
+            partyIdType: 'party-id-type',
+            partyIdentifier: 'party-identifier'
+          },
+          payeeResolved: party,
+          initiateRequest: {
+            transactionRequestId: '1234-1234',
+            sourceAccountId: 'source-account-id',
+            consentId: 'consent-id',
+            payee: party,
+            payer: {
+              partyIdInfo: {
+                fspId: 'payer-fsp-id',
+                partyIdType: 'payer-party-id-type',
+                partyIdentifier: 'payer-party-identifier'
+              }
+            },
+            amountType: 'SEND' as TAmountType,
+            amount: {
+              amount: '123.00',
+              currency: 'USD'
+            },
+            transactionType: {
+              scenario: 'transaction-type-scenario',
+              initiator: 'transaction-type-initiator',
+              initiatorType: 'transaction-type-initiator-type'
+            },
+            expiration: 'expiration'
+          },
+          approveRequest: {
+            authorizationResponse,
+            transactionRequestId: '1234-1234'
+          }
+        }
+        channel = PISPTransactionModel.notificationChannel(
+          PISPTransactionPhase.approval,
+          '1234-1234'
+        )
+      })
+
+      it('should be well constructed', async () => {
+        const model = await create(data, modelConfig)
+        checkPTMLayout(model, data)
+        expect(channel).toEqual('pisp_transaction_approval_1234-1234')
+      })
+
+      it('should give response properly populated from notification channel', async () => {
+        const model = await create(data, modelConfig)
+        // defer publication to notification channel
+        setImmediate(() => model.pubSub.publish(
+          channel,
+          transactionStatus as unknown as Message
+        ))
+        // let be sure we don't have expected data yet
+        expect(model.data.transactionStatus).toBeFalsy()
+        expect(model.data.approveResponse).toBeFalsy()
+
+        // do a request and await on published Message
+        await model.fsm.approve()
+
+        // check that correct subscription has been done
+        expect(modelConfig.pubSub.subscribe).toBeCalledWith(channel, expect.anything())
+
+        // check that correct unsubscription has been done
+        expect(modelConfig.pubSub.unsubscribe).toBeCalledWith(channel, 1)
+
+        // check we got needed part of response stored
+        expect(model.data.transactionStatus).toEqual(transactionStatus)
+
+        // check we got initiate response phase response stored
+        expect(model.data.approveResponse).toEqual({
+          transactionStatus: { ...transactionStatus },
+          currentState: 'transactionStatusReceived'
+        })
+
+        // check we made a call to mojaloopRequest.putAuthorizations
+        expect(modelConfig.mojaloopRequests.putAuthorizations).toBeCalledWith(
+          data.transactionRequestId,
+          authorizationResponse,
+          data.initiateRequest?.payer.partyIdInfo.fspId
+        )
+      })
+    })
   })
 
   describe('loadFromKVS', () => {
     it('should properly call `KVS.get`, get expected data in `context.data` and setup state of machine', async () => {
       const dataFromCache: PISPTransactionData = {
         transactionRequestId: '1234-1234',
-        currentState: 'transactionSuccess'
+        currentState: 'transactionStatusReceived'
       }
       mocked(modelConfig.kvs.get).mockImplementationOnce(async () => dataFromCache)
       const model = await loadFromKVS(modelConfig)
@@ -366,7 +473,7 @@ describe('pipsTransactionModel', () => {
       mocked(modelConfig.kvs.set).mockImplementationOnce(() => Promise.resolve(true))
       const data: PISPTransactionData = {
         transactionRequestId: '1234-1234',
-        currentState: 'transactionSuccess'
+        currentState: 'transactionStatusReceived'
       }
       const model = await create(data, modelConfig)
       checkPTMLayout(model, data)
@@ -380,7 +487,7 @@ describe('pipsTransactionModel', () => {
     mocked(modelConfig.kvs.set).mockImplementationOnce(() => { throw new Error('error from KVS.set') })
     const data: PISPTransactionData = {
       transactionRequestId: '1234-1234',
-      currentState: 'transactionSuccess'
+      currentState: 'transactionStatusReceived'
     }
     const model = await create(data, modelConfig)
     checkPTMLayout(model, data)
