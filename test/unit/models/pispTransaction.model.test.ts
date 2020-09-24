@@ -36,6 +36,9 @@ import {
   PISPTransactionModelConfig,
   // PISPTransactionModelState,
   PISPTransactionPhase,
+  ThirdpartyTransactionApproveResponse,
+  ThirdpartyTransactionInitiateResponse,
+  ThirdpartyTransactionPartyLookupResponse,
   ThirdpartyTransactionStatus
   // PISPTransactionStateMachine,
   // ThirdpartyTransactionApproveResponse,
@@ -322,6 +325,81 @@ describe('pipsTransactionModel', () => {
           data.initiateRequest,
           data.initiateRequest?.payer.partyIdInfo.fspId
         )
+      })
+    })
+
+    describe('channel names', () => {
+      test('notificationChannel', () => {
+        const phases = [
+          PISPTransactionPhase.lookup,
+          PISPTransactionPhase.initiation,
+          PISPTransactionPhase.approval
+        ]
+
+        phases.forEach((phase) => {
+          expect(PISPTransactionModel.notificationChannel(phase, 'trx-id')).toEqual(`pisp_transaction_${phase}_trx-id`)
+          expect(() => PISPTransactionModel.notificationChannel(phase, '')).toThrowError('PISPTransactionModel.notificationChannel: \'transactionRequestId\' parameter is required')
+          expect(() => PISPTransactionModel.notificationChannel(phase, null as unknown as string)).toThrowError('PISPTransactionModel.notificationChannel: \'transactionRequestId\' parameter is required')
+        })
+      })
+
+      test('partyNotificationChannel', () => {
+        const phases = [
+          PISPTransactionPhase.lookup,
+          PISPTransactionPhase.initiation,
+          PISPTransactionPhase.approval
+        ]
+
+        phases.forEach((phase) => {
+          // standard version
+          expect(PISPTransactionModel.partyNotificationChannel(phase, 'party-type', 'party-id', 'party-sub-id'))
+            .toEqual(`pisp_transaction_${phase}_party-type_party-id_party-sub-id`)
+          // no subId
+          expect(PISPTransactionModel.partyNotificationChannel(phase, 'party-type', 'party-id'))
+            .toEqual(`pisp_transaction_${phase}_party-type_party-id`)
+          // input validation party-type
+          expect(() => PISPTransactionModel.partyNotificationChannel(phase, '', 'party-id', 'party-sub-id'))
+            .toThrowError('PISPTransactionModel.partyNotificationChannel: \'partyType, id, subId (when specified)\' parameters are required')
+          expect(() => PISPTransactionModel.partyNotificationChannel(phase, null as unknown as string, 'party-id', 'party-sub-id'))
+            .toThrowError('PISPTransactionModel.partyNotificationChannel: \'partyType, id, subId (when specified)\' parameters are required')
+          // input validation party-id
+          expect(() => PISPTransactionModel.partyNotificationChannel(phase, 'party-type', '', 'party-sub-id'))
+            .toThrowError('PISPTransactionModel.partyNotificationChannel: \'partyType, id, subId (when specified)\' parameters are required')
+          expect(() => PISPTransactionModel.partyNotificationChannel(phase, 'party-type', null as unknown as string, 'party-sub-id'))
+            .toThrowError('PISPTransactionModel.partyNotificationChannel: \'partyType, id, subId (when specified)\' parameters are required')
+          // input validation party-sub-id
+          expect(() => PISPTransactionModel.partyNotificationChannel(phase, 'party-type', 'party-id', ''))
+            .toThrowError('PISPTransactionModel.partyNotificationChannel: \'partyType, id, subId (when specified)\' parameters are required')
+        })
+      })
+    })
+
+    describe('getResponse', () => {
+      it('should give valid response', async () => {
+        const data = {
+          transactionRequestId: '1234-1234',
+          currentState: 'start'
+        }
+        const model = await create(data, modelConfig)
+
+        // void responses
+        model.data.currentState = 'start'
+        expect(model.getResponse()).toBeUndefined()
+
+        model.data.currentState = 'errored'
+        expect(model.getResponse()).toBeUndefined()
+
+        model.data.currentState = 'partyLookupSuccess'
+        model.data.partyLookupResponse = { am: 'party-lookup-mocked-response' } as unknown as ThirdpartyTransactionPartyLookupResponse
+        expect(model.getResponse()).toEqual({ am: 'party-lookup-mocked-response' })
+
+        model.data.currentState = 'authorizationReceived'
+        model.data.initiateResponse = { am: 'authorization-received-mocked-response' } as unknown as ThirdpartyTransactionInitiateResponse
+        expect(model.getResponse()).toEqual({ am: 'authorization-received-mocked-response' })
+
+        model.data.currentState = 'transactionStatusReceived'
+        model.data.approveResponse = { am: 'transaction-status-mocked-response' } as unknown as ThirdpartyTransactionApproveResponse
+        expect(model.getResponse()).toEqual({ am: 'transaction-status-mocked-response' })
       })
     })
 

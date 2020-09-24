@@ -117,7 +117,7 @@ export class PISPTransactionModel
   }
 
   static partyNotificationChannel (phase: PISPTransactionPhase, partyType: string, id: string, subId?: string): string {
-    if (!(partyType && id)) {
+    if (!(partyType && id) || subId?.length === 0) {
       throw new Error(
         'PISPTransactionModel.partyNotificationChannel: \'partyType, id, subId (when specified)\' parameters are required'
       )
@@ -268,6 +268,24 @@ export class PISPTransactionModel
   }
 
   /**
+   * depending on current state of model returns proper result
+   */
+  getResponse (): ThirdpartyTransactionPartyLookupResponse |
+  ThirdpartyTransactionInitiateResponse |
+  ThirdpartyTransactionApproveResponse |
+  void {
+    switch (this.data.currentState) {
+      case 'partyLookupSuccess':
+        return this.data.partyLookupResponse
+      case 'authorizationReceived':
+        return this.data.initiateResponse
+      case 'transactionStatusReceived':
+        return this.data.approveResponse
+      default:
+    }
+  }
+
+  /**
    * runs the workflow
    */
   async run (): Promise<
@@ -288,7 +306,7 @@ export class PISPTransactionModel
           await this.fsm.requestPartyLookup()
           this.logger.info('requestPartyLookup completed successfully')
           await this.saveToKVS()
-          return this.data.partyLookupResponse
+          return this.getResponse()
 
         // initiate phase
         case 'partyLookupSuccess':
@@ -298,7 +316,7 @@ export class PISPTransactionModel
           await this.fsm.initiate()
           this.logger.info('initiate completed successfully')
           await this.saveToKVS()
-          return this.data.initiateResponse
+          return this.getResponse()
 
         // approve phase
         case 'authorizationReceived':
@@ -308,12 +326,13 @@ export class PISPTransactionModel
           await this.fsm.approve()
           this.logger.info('approve completed successfully')
           await this.saveToKVS()
-          return this.data.approveResponse
+          return this.getResponse()
 
         case 'errored':
+        default:
           // stopped in errored state
           this.logger.info('State machine in errored state')
-          return
+          return this.getResponse()
       }
     } catch (err) {
       this.logger.info(`Error running PISPTransactionModel : ${inspect(err)}`)
