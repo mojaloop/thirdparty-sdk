@@ -100,7 +100,6 @@ describe('pipsTransactionModel', () => {
     mocked(modelConfig.pubSub.publish).mockImplementationOnce(
       async (channel: string, message: Message) => handler(channel, message, subId)
     )
-
     await modelConfig.kvs.connect()
     await modelConfig.pubSub.connect()
   })
@@ -199,7 +198,11 @@ describe('pipsTransactionModel', () => {
         expect(model.data.partyLookupResponse).toBeFalsy()
 
         // do a request and await on published Message
-        await model.fsm.requestPartyLookup()
+        const result = await model.run()
+        expect(result).toEqual({
+          party,
+          currentState: 'partyLookupSuccess'
+        })
 
         // check that correct subscription has been done
         expect(modelConfig.pubSub.subscribe).toBeCalledWith(channel, expect.anything())
@@ -218,6 +221,30 @@ describe('pipsTransactionModel', () => {
 
         // check we made a call to mojaloopRequest.getParties
         expect(modelConfig.mojaloopRequests.getParties).toBeCalledWith('party-id-type', 'party-identifier', undefined)
+      })
+
+      it('should handle error', async () => {
+        mocked(
+          modelConfig.mojaloopRequests.getParties
+        ).mockImplementationOnce(
+          () => {
+            throw new Error('mocked getParties exception')
+          }
+        )
+        const model = await create(lookupData, modelConfig)
+
+        try {
+          await model.run()
+          shouldNotBeExecuted()
+        } catch (err) {
+          expect(err.message).toEqual('mocked getParties exception')
+        }
+
+        // check that correct subscription has been done
+        expect(modelConfig.pubSub.subscribe).toBeCalledWith(channel, expect.anything())
+
+        // check that correct unsubscription has been done
+        expect(modelConfig.pubSub.unsubscribe).toBeCalledWith(channel, 1)
       })
     })
 
@@ -303,7 +330,11 @@ describe('pipsTransactionModel', () => {
         expect(model.data.initiateResponse).toBeFalsy()
 
         // do a request and await on published Message
-        await model.fsm.initiate()
+        const result = await model.run()
+        expect(result).toEqual({
+          authorization: { ...authorizationRequest },
+          currentState: 'authorizationReceived'
+        })
 
         // check that correct subscription has been done
         expect(modelConfig.pubSub.subscribe).toBeCalledWith(channel, expect.anything())
@@ -326,80 +357,29 @@ describe('pipsTransactionModel', () => {
           data.initiateRequest?.payer.partyIdInfo.fspId
         )
       })
-    })
 
-    describe('channel names', () => {
-      test('notificationChannel', () => {
-        const phases = [
-          PISPTransactionPhase.lookup,
-          PISPTransactionPhase.initiation,
-          PISPTransactionPhase.approval
-        ]
-
-        phases.forEach((phase) => {
-          expect(PISPTransactionModel.notificationChannel(phase, 'trx-id')).toEqual(`pisp_transaction_${phase}_trx-id`)
-          expect(() => PISPTransactionModel.notificationChannel(phase, '')).toThrowError('PISPTransactionModel.notificationChannel: \'transactionRequestId\' parameter is required')
-          expect(() => PISPTransactionModel.notificationChannel(phase, null as unknown as string)).toThrowError('PISPTransactionModel.notificationChannel: \'transactionRequestId\' parameter is required')
-        })
-      })
-
-      test('partyNotificationChannel', () => {
-        const phases = [
-          PISPTransactionPhase.lookup,
-          PISPTransactionPhase.initiation,
-          PISPTransactionPhase.approval
-        ]
-
-        phases.forEach((phase) => {
-          // standard version
-          expect(PISPTransactionModel.partyNotificationChannel(phase, 'party-type', 'party-id', 'party-sub-id'))
-            .toEqual(`pisp_transaction_${phase}_party-type_party-id_party-sub-id`)
-          // no subId
-          expect(PISPTransactionModel.partyNotificationChannel(phase, 'party-type', 'party-id'))
-            .toEqual(`pisp_transaction_${phase}_party-type_party-id`)
-          // input validation party-type
-          expect(() => PISPTransactionModel.partyNotificationChannel(phase, '', 'party-id', 'party-sub-id'))
-            .toThrowError('PISPTransactionModel.partyNotificationChannel: \'partyType, id, subId (when specified)\' parameters are required')
-          expect(() => PISPTransactionModel.partyNotificationChannel(phase, null as unknown as string, 'party-id', 'party-sub-id'))
-            .toThrowError('PISPTransactionModel.partyNotificationChannel: \'partyType, id, subId (when specified)\' parameters are required')
-          // input validation party-id
-          expect(() => PISPTransactionModel.partyNotificationChannel(phase, 'party-type', '', 'party-sub-id'))
-            .toThrowError('PISPTransactionModel.partyNotificationChannel: \'partyType, id, subId (when specified)\' parameters are required')
-          expect(() => PISPTransactionModel.partyNotificationChannel(phase, 'party-type', null as unknown as string, 'party-sub-id'))
-            .toThrowError('PISPTransactionModel.partyNotificationChannel: \'partyType, id, subId (when specified)\' parameters are required')
-          // input validation party-sub-id
-          expect(() => PISPTransactionModel.partyNotificationChannel(phase, 'party-type', 'party-id', ''))
-            .toThrowError('PISPTransactionModel.partyNotificationChannel: \'partyType, id, subId (when specified)\' parameters are required')
-        })
-      })
-    })
-
-    describe('getResponse', () => {
-      it('should give valid response', async () => {
-        const data = {
-          transactionRequestId: '1234-1234',
-          currentState: 'start'
-        }
+      it('should handle error', async () => {
+        mocked(
+          modelConfig.thirdpartyRequests.postThirdpartyRequestsTransactions
+        ).mockImplementationOnce(
+          () => {
+            throw new Error('mocked postThirdpartyRequestsTransactions exception')
+          }
+        )
         const model = await create(data, modelConfig)
 
-        // void responses
-        model.data.currentState = 'start'
-        expect(model.getResponse()).toBeUndefined()
+        try {
+          await model.run()
+          shouldNotBeExecuted()
+        } catch (err) {
+          expect(err.message).toEqual('mocked postThirdpartyRequestsTransactions exception')
+        }
 
-        model.data.currentState = 'errored'
-        expect(model.getResponse()).toBeUndefined()
+        // check that correct subscription has been done
+        expect(modelConfig.pubSub.subscribe).toBeCalledWith(channel, expect.anything())
 
-        model.data.currentState = 'partyLookupSuccess'
-        model.data.partyLookupResponse = { am: 'party-lookup-mocked-response' } as unknown as ThirdpartyTransactionPartyLookupResponse
-        expect(model.getResponse()).toEqual({ am: 'party-lookup-mocked-response' })
-
-        model.data.currentState = 'authorizationReceived'
-        model.data.initiateResponse = { am: 'authorization-received-mocked-response' } as unknown as ThirdpartyTransactionInitiateResponse
-        expect(model.getResponse()).toEqual({ am: 'authorization-received-mocked-response' })
-
-        model.data.currentState = 'transactionStatusReceived'
-        model.data.approveResponse = { am: 'transaction-status-mocked-response' } as unknown as ThirdpartyTransactionApproveResponse
-        expect(model.getResponse()).toEqual({ am: 'transaction-status-mocked-response' })
+        // check that correct unsubscription has been done
+        expect(modelConfig.pubSub.unsubscribe).toBeCalledWith(channel, 1)
       })
     })
 
@@ -485,7 +465,11 @@ describe('pipsTransactionModel', () => {
         expect(model.data.approveResponse).toBeFalsy()
 
         // do a request and await on published Message
-        await model.fsm.approve()
+        const result = await model.run()
+        expect(result).toEqual({
+          transactionStatus: { ...transactionStatus },
+          currentState: 'transactionStatusReceived'
+        })
 
         // check that correct subscription has been done
         expect(modelConfig.pubSub.subscribe).toBeCalledWith(channel, expect.anything())
@@ -509,6 +493,130 @@ describe('pipsTransactionModel', () => {
           data.initiateRequest?.payer.partyIdInfo.fspId
         )
       })
+
+      it('should handle error', async () => {
+        mocked(modelConfig.mojaloopRequests.putAuthorizations).mockImplementationOnce(
+          () => {
+            throw new Error('mocked putAuthorization exception')
+          }
+        )
+        const model = await create(data, modelConfig)
+
+        try {
+          await model.run()
+          shouldNotBeExecuted()
+        } catch (err) {
+          expect(err.message).toEqual('mocked putAuthorization exception')
+        }
+
+        // check that correct subscription has been done
+        expect(modelConfig.pubSub.subscribe).toBeCalledWith(channel, expect.anything())
+
+        // check that correct unsubscription has been done
+        expect(modelConfig.pubSub.unsubscribe).toBeCalledWith(channel, 1)
+      })
+    })
+
+    it('errored state', async () => {
+      const erroredData = {
+        transactionRequestId: '123',
+        currentState: 'errored'
+      }
+      const model = await create(erroredData, modelConfig)
+      expect(model.fsm.state).toEqual('errored')
+
+      const result = await model.run()
+      expect(result).toBeUndefined()
+    })
+
+    it('should do throw if requestLookup was not done before calling initialization', async () => {
+      const invalidData = {
+        transactionRequestId: '1234-1234',
+        currentState: 'partyLookupSuccess'
+        // lack of these properties
+        // payeeRequest
+        // payeeResolved
+        // initiateRequest
+        // should enforce throwing exception when model.run() will be called
+      }
+      const model = await create(invalidData, modelConfig)
+      expect(model.fsm.state).toEqual('partyLookupSuccess')
+      expect(model.run()).rejects.toThrowError('invalid payeeRequest data')
+    })
+  })
+
+  describe('channel names', () => {
+    test('notificationChannel', () => {
+      const phases = [
+        PISPTransactionPhase.lookup,
+        PISPTransactionPhase.initiation,
+        PISPTransactionPhase.approval
+      ]
+
+      phases.forEach((phase) => {
+        expect(PISPTransactionModel.notificationChannel(phase, 'trx-id')).toEqual(`pisp_transaction_${phase}_trx-id`)
+        expect(() => PISPTransactionModel.notificationChannel(phase, '')).toThrowError('PISPTransactionModel.notificationChannel: \'transactionRequestId\' parameter is required')
+        expect(() => PISPTransactionModel.notificationChannel(phase, null as unknown as string)).toThrowError('PISPTransactionModel.notificationChannel: \'transactionRequestId\' parameter is required')
+      })
+    })
+
+    test('partyNotificationChannel', () => {
+      const phases = [
+        PISPTransactionPhase.lookup,
+        PISPTransactionPhase.initiation,
+        PISPTransactionPhase.approval
+      ]
+
+      phases.forEach((phase) => {
+        // standard version
+        expect(PISPTransactionModel.partyNotificationChannel(phase, 'party-type', 'party-id', 'party-sub-id'))
+          .toEqual(`pisp_transaction_${phase}_party-type_party-id_party-sub-id`)
+        // no subId
+        expect(PISPTransactionModel.partyNotificationChannel(phase, 'party-type', 'party-id'))
+          .toEqual(`pisp_transaction_${phase}_party-type_party-id`)
+        // input validation party-type
+        expect(() => PISPTransactionModel.partyNotificationChannel(phase, '', 'party-id', 'party-sub-id'))
+          .toThrowError('PISPTransactionModel.partyNotificationChannel: \'partyType, id, subId (when specified)\' parameters are required')
+        expect(() => PISPTransactionModel.partyNotificationChannel(phase, null as unknown as string, 'party-id', 'party-sub-id'))
+          .toThrowError('PISPTransactionModel.partyNotificationChannel: \'partyType, id, subId (when specified)\' parameters are required')
+        // input validation party-id
+        expect(() => PISPTransactionModel.partyNotificationChannel(phase, 'party-type', '', 'party-sub-id'))
+          .toThrowError('PISPTransactionModel.partyNotificationChannel: \'partyType, id, subId (when specified)\' parameters are required')
+        expect(() => PISPTransactionModel.partyNotificationChannel(phase, 'party-type', null as unknown as string, 'party-sub-id'))
+          .toThrowError('PISPTransactionModel.partyNotificationChannel: \'partyType, id, subId (when specified)\' parameters are required')
+        // input validation party-sub-id
+        expect(() => PISPTransactionModel.partyNotificationChannel(phase, 'party-type', 'party-id', ''))
+          .toThrowError('PISPTransactionModel.partyNotificationChannel: \'partyType, id, subId (when specified)\' parameters are required')
+      })
+    })
+  })
+
+  describe('getResponse', () => {
+    it('should give valid response', async () => {
+      const data = {
+        transactionRequestId: '1234-1234',
+        currentState: 'start'
+      }
+      const model = await create(data, modelConfig)
+
+      // void responses
+      model.data.currentState = 'start'
+      expect(model.getResponse()).toBeUndefined()
+
+      model.data.currentState = 'errored'
+      expect(model.getResponse()).toBeUndefined()
+
+      model.data.currentState = 'partyLookupSuccess'
+      model.data.partyLookupResponse = { am: 'party-lookup-mocked-response' } as unknown as ThirdpartyTransactionPartyLookupResponse
+      expect(model.getResponse()).toEqual({ am: 'party-lookup-mocked-response' })
+
+      model.data.currentState = 'authorizationReceived'
+      model.data.initiateResponse = { am: 'authorization-received-mocked-response' } as unknown as ThirdpartyTransactionInitiateResponse
+      expect(model.getResponse()).toEqual({ am: 'authorization-received-mocked-response' })
+
+      model.data.currentState = 'transactionStatusReceived'
+      model.data.approveResponse = { am: 'transaction-status-mocked-response' } as unknown as ThirdpartyTransactionApproveResponse
+      expect(model.getResponse()).toEqual({ am: 'transaction-status-mocked-response' })
     })
   })
 
@@ -560,18 +668,18 @@ describe('pipsTransactionModel', () => {
       await model.saveToKVS()
       expect(mocked(modelConfig.kvs.set)).toBeCalledWith(model.key, model.data)
     })
-  })
-  it('should propagate error from KVS.set', async () => {
-    mocked(modelConfig.kvs.set).mockImplementationOnce(() => { throw new Error('error from KVS.set') })
-    const data: PISPTransactionData = {
-      transactionRequestId: '1234-1234',
-      currentState: 'transactionStatusReceived'
-    }
-    const model = await create(data, modelConfig)
-    checkPTMLayout(model, data)
+    it('should propagate error from KVS.set', async () => {
+      mocked(modelConfig.kvs.set).mockImplementationOnce(() => { throw new Error('error from KVS.set') })
+      const data: PISPTransactionData = {
+        transactionRequestId: '1234-1234',
+        currentState: 'transactionStatusReceived'
+      }
+      const model = await create(data, modelConfig)
+      checkPTMLayout(model, data)
 
-    // transition `init` should encounter exception when saving `context.data`
-    expect(() => model.saveToKVS()).rejects.toEqual(new Error('error from KVS.set'))
-    expect(mocked(modelConfig.kvs.set)).toBeCalledWith(model.key, model.data)
+      // transition `init` should encounter exception when saving `context.data`
+      expect(() => model.saveToKVS()).rejects.toEqual(new Error('error from KVS.set'))
+      expect(mocked(modelConfig.kvs.set)).toBeCalledWith(model.key, model.data)
+    })
   })
 })

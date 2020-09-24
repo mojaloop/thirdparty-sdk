@@ -28,7 +28,12 @@
 import { Message, PubSub } from '~/shared/pub-sub'
 import { PersistentModel } from '~/models/persistent.model'
 import { StateMachineConfig } from 'javascript-state-machine'
-import { MojaloopRequests, PutAuthorizationRequest, ThirdpartyRequests, TParty } from '@mojaloop/sdk-standard-components'
+import {
+  MojaloopRequests,
+  PutAuthorizationRequest,
+  ThirdpartyRequests,
+  TParty
+} from '@mojaloop/sdk-standard-components'
 import {
   PayeeLookupRequest,
   PISPTransactionData,
@@ -203,7 +208,6 @@ export class PISPTransactionModel
           resolve()
           // state machine should be in authorizationReceived state
         })
-        InvalidPISPTransactionDataError.throwIfInvalidProperty(this.data, 'initiateRequest')
 
         const res = await this.thirdpartyRequests.postThirdpartyRequestsTransactions(
           this.data.initiateRequest as ThirdpartyTransactionInitiateRequest,
@@ -227,7 +231,6 @@ export class PISPTransactionModel
       PISPTransactionPhase.approval,
       this.data?.approveRequest?.transactionRequestId as string
     )
-    const pubSub: PubSub = this.pubSub
 
     // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (resolve, reject) => {
@@ -236,7 +239,7 @@ export class PISPTransactionModel
         // this handler will be executed when PATCH /thirdpartyRequests/transactions/{ID} @ Inbound server
         subId = this.pubSub.subscribe(channel, async (channel: string, message: Message, sid: number) => {
           // first unsubscribe
-          pubSub.unsubscribe(channel, sid)
+          this.pubSub.unsubscribe(channel, sid)
 
           this.data.transactionStatus = { ...message as unknown as ThirdpartyTransactionStatus }
           this.data.approveResponse = {
@@ -248,9 +251,6 @@ export class PISPTransactionModel
           resolve()
           // state machine should be in transactionSuccess state
         })
-        InvalidPISPTransactionDataError.throwIfInvalidProperty(this.data, 'payeeRequest')
-        InvalidPISPTransactionDataError.throwIfInvalidProperty(this.data, 'initiateRequest')
-        InvalidPISPTransactionDataError.throwIfInvalidProperty(this.data, 'approveRequest')
 
         const res = await this.mojaloopRequests.putAuthorizations(
           this.data.transactionRequestId!,
@@ -261,7 +261,7 @@ export class PISPTransactionModel
         this.logger.push({ res }).info('ThirdpartyRequests.postThirdpartyRequestsTransactions request sent to peer')
       } catch (error) {
         this.logger.push(error).error('ThirdpartyRequests.postThirdpartyRequestsTransactions request error')
-        pubSub.unsubscribe(channel, subId)
+        this.pubSub.unsubscribe(channel, subId)
         reject(error)
       }
     })
@@ -348,7 +348,7 @@ export class PISPTransactionModel
 
         // avoid circular ref between pispTransactionState.lastError and err
         // TODO: what to return incase of error
-        err.pispTransactionState = { ...this.data.payeeRequest }
+        err.pispTransactionState = { ...this.data }
       }
       throw err
     }
