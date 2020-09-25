@@ -57,7 +57,12 @@ import { mocked } from 'ts-jest/utils'
 import mockLogger from 'test/unit/mockLogger'
 import shouldNotBeExecuted from 'test/unit/shouldNotBeExecuted'
 import sortedArray from 'test/unit/sortedArray'
-import { AuthenticationType, AuthorizationResponse, InboundAuthorizationsPostRequest, InboundAuthorizationsPutRequest } from '~/models/authorizations.interface'
+import {
+  AuthenticationType,
+  AuthorizationResponse,
+  InboundAuthorizationsPostRequest,
+  InboundAuthorizationsPutRequest
+} from '~/models/authorizations.interface'
 
 // mock KVS default exported class
 jest.mock('~/shared/kvs')
@@ -282,7 +287,6 @@ describe('pipsTransactionModel', () => {
           },
           payeeResolved: party,
           initiateRequest: {
-            transactionRequestId: '1234-1234',
             sourceAccountId: 'source-account-id',
             consentId: 'consent-id',
             payee: party,
@@ -353,7 +357,10 @@ describe('pipsTransactionModel', () => {
 
         // check we made a call to mojaloopRequest.getParties
         expect(modelConfig.thirdpartyRequests.postThirdpartyRequestsTransactions).toBeCalledWith(
-          data.initiateRequest,
+          {
+            transactionRequestId: data.transactionRequestId,
+            ...data.initiateRequest
+          },
           data.initiateRequest?.payer.partyIdInfo.fspId
         )
       })
@@ -413,7 +420,6 @@ describe('pipsTransactionModel', () => {
           },
           payeeResolved: party,
           initiateRequest: {
-            transactionRequestId: '1234-1234',
             sourceAccountId: 'source-account-id',
             consentId: 'consent-id',
             payee: party,
@@ -437,8 +443,7 @@ describe('pipsTransactionModel', () => {
             expiration: 'expiration'
           },
           approveRequest: {
-            authorizationResponse,
-            transactionRequestId: '1234-1234'
+            authorizationResponse
           }
         }
         channel = PISPTransactionModel.notificationChannel(
@@ -555,8 +560,12 @@ describe('pipsTransactionModel', () => {
 
       phases.forEach((phase) => {
         expect(PISPTransactionModel.notificationChannel(phase, 'trx-id')).toEqual(`pisp_transaction_${phase}_trx-id`)
-        expect(() => PISPTransactionModel.notificationChannel(phase, '')).toThrowError('PISPTransactionModel.notificationChannel: \'transactionRequestId\' parameter is required')
-        expect(() => PISPTransactionModel.notificationChannel(phase, null as unknown as string)).toThrowError('PISPTransactionModel.notificationChannel: \'transactionRequestId\' parameter is required')
+        expect(
+          () => PISPTransactionModel.notificationChannel(phase, '')
+        ).toThrowError('PISPTransactionModel.notificationChannel: \'transactionRequestId\' parameter is required')
+        expect(
+          () => PISPTransactionModel.notificationChannel(phase, null as unknown as string)
+        ).toThrowError('PISPTransactionModel.notificationChannel: \'transactionRequestId\' parameter is required')
       })
     })
 
