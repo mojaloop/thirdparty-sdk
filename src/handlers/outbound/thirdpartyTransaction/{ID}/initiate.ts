@@ -28,7 +28,7 @@
 import { StateResponseToolkit } from '~/server/plugins/state'
 import {
   PISPTransactionModelConfig,
-  ThirdpartyTransactionApproveRequest
+  ThirdpartyTransactionInitiateRequest
 } from '~/models/pispTransaction.interface'
 import {
   PISPTransactionModel,
@@ -38,13 +38,13 @@ import { Request, ResponseObject } from '@hapi/hapi'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function post (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
-  const payload = request.payload as ThirdpartyTransactionApproveRequest
+  const payload = request.payload as ThirdpartyTransactionInitiateRequest
 
   // prepare model config
   const modelConfig: PISPTransactionModelConfig = {
     kvs: h.getKVS(),
     pubSub: h.getPubSub(),
-    key: payload.transactionRequestId,
+    key: request.params.ID,
     logger: h.getLogger(),
     thirdpartyRequests: h.getThirdpartyRequests(),
     mojaloopRequests: h.getMojaloopRequests()
@@ -52,15 +52,14 @@ async function post (_context: any, request: Request, h: StateResponseToolkit): 
 
   // load model
   const model: PISPTransactionModel = await loadFromKVS(modelConfig)
-  model.data.approveRequest = payload
-  // probably this is not rquired, state machine should be already in authorizationReceived state
-  // model.data.currentState = 'authorizationReceived'
-  // run workflow and await on synchronous PATCH /thirdpartyRequests/transactions/{ID} response on Inbound Service
+  model.data.initiateRequest = payload
+
+  // run workflow and await on synchronous POST /authorizations response from Switch incoming on Inbound Service
   const result = await model.run()
 
   // there is a risk the workflow fail and in that case result is undefined
   if (!result) {
-    h.getLogger().error('outbound POST /thirdpartyTransactions/initiate unexpected result from workflow')
+    h.getLogger().error('outbound POST /thirdpartyTransaction/{ID}/initiate unexpected result from workflow')
     return h.response({}).code(500)
   }
 
