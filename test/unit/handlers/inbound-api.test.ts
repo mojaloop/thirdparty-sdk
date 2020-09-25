@@ -36,15 +36,19 @@ import {
 } from '~/models/authorizations.interface'
 import InboundAuthorizations from '~/handlers/inbound/authorizations'
 import {
+  InboundThirdpartyAuthorizationsPutRequest
+} from '~/models/thirdparty.authorizations.interface'
+import {
   OutboundAuthorizationsModel
 } from '~/models/outbound/authorizations.model'
 import {
-  InboundThirdpartyAuthorizationsPutRequest
-} from '~/models/thirdparty.authorizations.interface'
-import ThirdpartyAuthorizations from '~/handlers/inbound/thirdpartyRequests/transactions/{ID}/authorizations'
-import {
   OutboundThirdpartyAuthorizationsModel
 } from '~/models/outbound/thirdparty.authorizations.model'
+import {
+  PISPTransactionModel
+} from '~/models/pispTransaction.model'
+import { PISPTransactionPhase } from '~/models/pispTransaction.interface'
+import ThirdpartyAuthorizations from '~/handlers/inbound/thirdpartyRequests/transactions/{ID}/authorizations'
 import { Server, Request } from '@hapi/hapi'
 import { StateResponseToolkit } from '~/server/plugins/state'
 import { buildPayeeQuoteRequestFromTptRequest } from '~/domain/thirdpartyRequests/transactions'
@@ -179,8 +183,10 @@ describe('Inbound API routes', (): void => {
       expect(result.statusCode).toEqual(200)
       expect(toolkit.getPubSub).toBeCalledTimes(1)
 
-      const channel = OutboundAuthorizationsModel.notificationChannel(request.params.ID)
-      expect(pubSubMock.publish).toBeCalledWith(channel, putResponse)
+      const authChannel = OutboundAuthorizationsModel.notificationChannel(request.params.ID)
+      expect(pubSubMock.publish).toBeCalledWith(authChannel, putResponse)
+      const pispChannel = PISPTransactionModel.notificationChannel(PISPTransactionPhase.initiation, request.params.ID)
+      expect(pubSubMock.publish).toBeCalledWith(pispChannel, putResponse)
     })
 
     it('PUT success flow', async (): Promise<void> => {

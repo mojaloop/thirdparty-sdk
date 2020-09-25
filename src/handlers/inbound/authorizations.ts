@@ -34,19 +34,24 @@ import {
   InboundAuthorizationsModel,
   InboundAuthorizationsModelConfig
 } from '~/models/inbound/authorizations.model'
-
+import {
+  PISPTransactionModel
+} from '~/models/pispTransaction.model'
+import { PISPTransactionPhase } from '~/models/pispTransaction.interface'
 import { Request, ResponseObject } from '@hapi/hapi'
 import { StateResponseToolkit } from '~/server/plugins/state'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function put (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const payload = request.payload as unknown as InboundAuthorizationsPutRequest
-  const channel = OutboundAuthorizationsModel.notificationChannel(request.params.ID)
+  const authChannel = OutboundAuthorizationsModel.notificationChannel(request.params.ID)
+  const pispChannel = PISPTransactionModel.notificationChannel(PISPTransactionPhase.initiation, request.params.ID)
   const pubSub = h.getPubSub()
 
   // don't await on promise to resolve
   // let finish publish in background
-  pubSub.publish(channel, payload as unknown as Message)
+  pubSub.publish(authChannel, payload as unknown as Message)
+  pubSub.publish(pispChannel, payload as unknown as Message)
 
   // return asap
   return h.response().code(200)
