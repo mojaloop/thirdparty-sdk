@@ -277,9 +277,9 @@ export class PISPTransactionModel
    * depending on current state of model returns proper result
    */
   getResponse (): ThirdpartyTransactionPartyLookupResponse |
-    ThirdpartyTransactionInitiateResponse |
-    ThirdpartyTransactionApproveResponse |
-    void {
+  ThirdpartyTransactionInitiateResponse |
+  ThirdpartyTransactionApproveResponse |
+  void {
     switch (this.data.currentState) {
       case 'partyLookupSuccess':
         return this.data.partyLookupResponse
@@ -295,10 +295,10 @@ export class PISPTransactionModel
    * runs the workflow
    */
   async run (): Promise<
-    ThirdpartyTransactionPartyLookupResponse |
-    ThirdpartyTransactionInitiateResponse |
-    ThirdpartyTransactionApproveResponse |
-    void
+  ThirdpartyTransactionPartyLookupResponse |
+  ThirdpartyTransactionInitiateResponse |
+  ThirdpartyTransactionApproveResponse |
+  void
   > {
     const data = this.data
     try {
