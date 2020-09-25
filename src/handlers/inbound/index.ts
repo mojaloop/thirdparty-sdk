@@ -30,10 +30,23 @@ import Hello from './hello'
 import ThirdpartyRequestsTransactions from './thirdpartyRequests/transactions'
 import InboundAuthorizations from './authorizations'
 import ThirdpartyAuthorizations from './thirdpartyRequests/transactions/{ID}/authorizations'
+import PartiesByTypeAndId from './parties/{Type}/{ID}'
+import PartiesErrorByTypeAndID from './parties/{Type}/{ID}/error'
+import PartiesByTypeIdAndSubId from './parties/{Type}/{ID}/{SubId}'
+import PartiesErrorByTypeIdAndSubId from './parties/{Type}/{ID}/{SubId}/error'
+import NotifyThirdpartyTransactionRequests from './thirdpartyRequests/transactions/{ID}'
+import NotifyErrorThirdpartyTransactionRequests from './thirdpartyRequests/transactions/{ID}/error'
+
 export default {
   HelloGet: Hello.get,
   ThirdpartyRequestsTransactionsPost: ThirdpartyRequestsTransactions.post,
   InboundAuthorizationsPostRequest: InboundAuthorizations.post,
   InboundAuthorizationsIDPutResponse: InboundAuthorizations.put,
-  UpdateThirdpartyAuthorization: ThirdpartyAuthorizations.put
+  UpdateThirdpartyAuthorization: ThirdpartyAuthorizations.put,
+  PartiesByTypeAndId: PartiesByTypeAndId.put,
+  PartiesErrorByTypeAndID: PartiesErrorByTypeAndID.put,
+  PartiesByTypeIdAndSubId: PartiesByTypeIdAndSubId.put,  
+  PartiesErrorByTypeIdAndSubId: PartiesErrorByTypeIdAndSubId.put,
+  NotifyThirdpartyTransactionRequests: NotifyThirdpartyTransactionRequests.patch,
+  NotifyErrorThirdpartyTransactionRequests: NotifyErrorThirdpartyTransactionRequests.put
 }

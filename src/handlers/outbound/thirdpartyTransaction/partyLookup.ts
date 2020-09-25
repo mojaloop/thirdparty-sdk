@@ -66,7 +66,7 @@ async function post (_context: any, request: Request, h: StateResponseToolkit): 
 
   // there is a risk the workflow fail and in that case result is undefined
   if (!result) {
-    h.getLogger().error('outbound POST /thirdpartyTransactions/partyLookup unexpected result from workflow')
+    h.getLogger().error('outbound POST /thirdpartyTransaction/partyLookup unexpected result from workflow')
     return h.response({}).code(500)
   }
 

@@ -21,8 +21,9 @@
  * Gates Foundation
  - Name Surname <name.surname@gatesfoundation.com>
 
- - Sridhar Voruganti <sridhar.voruganti@modusbox.com>
  - Paweł Marzec <pawel.marzec@modusbox.com>
+ - Lewis Daly <lewisd@crosslaketech.com>
+ - Sridhar Voruganti <sridhar.voruganti@modusbox.com>
  --------------
  ******/
 import { Message, PubSub } from '~/shared/pub-sub'
@@ -31,6 +32,7 @@ import { StateMachineConfig } from 'javascript-state-machine'
 import {
   MojaloopRequests,
   PutAuthorizationRequest,
+  PostThirdPartyRequestTransactionsRequest,
   ThirdpartyRequests,
   TParty
 } from '@mojaloop/sdk-standard-components'
@@ -149,7 +151,7 @@ export class PISPTransactionModel
     return new Promise(async (resolve, reject) => {
       let subId = 0
       try {
-        // this handler will be executed when PUT parties/<type>/<id>/<subId> @ Inbound server
+        // this handler will be executed when PUT /parties/<type>/<id>/<subId> @ Inbound server
         subId = this.pubSub.subscribe(channel, async (channel: string, message: Message, sid: number) => {
           // first unsubscribe
           pubSub.unsubscribe(channel, sid)
@@ -209,8 +211,12 @@ export class PISPTransactionModel
           // state machine should be in authorizationReceived state
         })
 
+        const request: PostThirdPartyRequestTransactionsRequest = {
+          transactionRequestId: this.data?.transactionRequestId as string,
+          ...this.data?.initiateRequest as ThirdpartyTransactionInitiateRequest
+        }
         const res = await this.thirdpartyRequests.postThirdpartyRequestsTransactions(
-          this.data.initiateRequest as ThirdpartyTransactionInitiateRequest,
+          request,
           this.data.initiateRequest?.payer.partyIdInfo.fspId as string
         )
         this.logger.push({ res }).info('ThirdpartyRequests.postThirdpartyRequestsTransactions request sent to peer')
@@ -229,7 +235,7 @@ export class PISPTransactionModel
 
     const channel = PISPTransactionModel.notificationChannel(
       PISPTransactionPhase.approval,
-      this.data?.approveRequest?.transactionRequestId as string
+      this.data.transactionRequestId as string
     )
 
     // eslint-disable-next-line no-async-promise-executor
@@ -253,7 +259,7 @@ export class PISPTransactionModel
         })
 
         const res = await this.mojaloopRequests.putAuthorizations(
-          this.data.transactionRequestId!,
+          this.data?.transactionRequestId as string,
           // propagate signed challenge
           this.data?.approveRequest?.authorizationResponse as PutAuthorizationRequest,
           this.data?.initiateRequest?.payer.partyIdInfo.fspId as string
@@ -271,9 +277,9 @@ export class PISPTransactionModel
    * depending on current state of model returns proper result
    */
   getResponse (): ThirdpartyTransactionPartyLookupResponse |
-  ThirdpartyTransactionInitiateResponse |
-  ThirdpartyTransactionApproveResponse |
-  void {
+    ThirdpartyTransactionInitiateResponse |
+    ThirdpartyTransactionApproveResponse |
+    void {
     switch (this.data.currentState) {
       case 'partyLookupSuccess':
         return this.data.partyLookupResponse
@@ -289,10 +295,10 @@ export class PISPTransactionModel
    * runs the workflow
    */
   async run (): Promise<
-  ThirdpartyTransactionPartyLookupResponse |
-  ThirdpartyTransactionInitiateResponse |
-  ThirdpartyTransactionApproveResponse |
-  void
+    ThirdpartyTransactionPartyLookupResponse |
+    ThirdpartyTransactionInitiateResponse |
+    ThirdpartyTransactionApproveResponse |
+    void
   > {
     const data = this.data
     try {

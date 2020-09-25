@@ -29,15 +29,15 @@
 import Hello from './hello'
 import Authorizations from './authorizations'
 import ThirdpartyAuthorizations from './thirdpartyRequests/transactions/{ID}/authorizations'
-import ThirdpartyTransactionsLookup from './thirdpartyTransactions/partyLookup'
-import ThirdpartyTransactionsInitiate from './thirdpartyTransactions/initiate'
-import ThirdpartyTransactionsApprove from './thirdpartyTransactions/approve'
+import ThirdpartyTransactionPartyLookup from './thirdpartyTransaction/partyLookup'
+import ThirdpartyTransactionInitiate from './thirdpartyTransaction/{ID}/initiate'
+import ThirdpartyTransactionApprove from './thirdpartyTransaction/{ID}/approve'
 
 export default {
   OutboundAuthorizationsPost: Authorizations.post,
   VerifyThirdPartyAuthorization: ThirdpartyAuthorizations.post,
   HelloGet: Hello.get,
-  ThirdpartyTransactionsPartyLookup: ThirdpartyTransactionsLookup.post,
-  InitiateThirdpartyTransactions: ThirdpartyTransactionsInitiate.post,
-  ApproveThirdpartyTransactions: ThirdpartyTransactionsApprove.post
+  ThirdpartyTransactionPartyLookup: ThirdpartyTransactionPartyLookup.post,
+  InitiateThirdpartyTransaction: ThirdpartyTransactionInitiate.post,
+  ApproveThirdpartyTransaction: ThirdpartyTransactionApprove.post
 }
