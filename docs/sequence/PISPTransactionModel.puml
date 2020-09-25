@@ -1,0 +1,14 @@
+@startuml PISPTransactionModel
+
+title PISPTransactionModel
+
+[*] --> start: on creation of state machine
+start --> pendingPartyLookup: call ""GET /parties/{type}/{id}""
+pendingPartyLookup --> payeeResolved: inboundServer: ""PUT /parties/{type}/{ID}""
+payeeResolved --> pendingAuthorization: outboundServer: ""POST /thirdpartyTransaction/{id}/acceptParty""\ncall ""POST /thirdpartyRequests/transaction""
+pendingAuthorization --> authorizationReceived: inboundServer: ""POST /authorizations""
+authorizationReceived --> transactionSigned: outboundServer: ""POST /thirdpartyTransaction/{id}/signChallenge""\ncall ""PUT /authorizations/{id}""
+transactionSigned --> transactionSuccess: inboundServer: ""PATCH /thirdpartyRequests/transactions/{id}""
+transactionSuccess --> [*]
+
+@enduml
