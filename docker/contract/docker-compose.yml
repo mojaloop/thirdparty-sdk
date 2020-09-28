@@ -33,6 +33,7 @@ services:
 
   mongo:
     image: mongo
+    container_name: 3p_mongo
     # Disable logging as it is far too verbose for debugging locally
     logging:
       driver: none

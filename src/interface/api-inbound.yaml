@@ -887,15 +887,15 @@ paths:
           $ref: '#/paths/~1hello/get/responses/503'
   '/thirdpartyRequests/transactions/{ID}':
     patch:
-      tags:
-        - thirdpartyRequests
       operationId: NotifyThirdpartyTransactionRequests
       summary: NotifyThirdpartyTransactionRequests
       description: |
-        The HTTP request `PATCH /thirdpartyRequests/transactions/{ID}` is used to
+        The HTTP request `patch /thirdpartyRequests/transactions/{ID}` is used to
         notify a thirdparty of the outcome of a transaction request.
 
         Switch(Thirdparty API Adapter) -> PISP
+      tags:
+        - thirdpartyRequests
       parameters:
         - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/1'
         - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/2'

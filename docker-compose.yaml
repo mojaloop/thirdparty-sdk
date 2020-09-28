@@ -10,7 +10,7 @@ services:
     build:
       context: ./
       dockerfile: ./docker/Dockerfile
-    command: sh -c "/opt/thirdparty-scheme-adapter/wait4/wait4.js inbound-thirdparty-scheme-adapter && NODE_ENV=development npm run start:inbound"
+    command: sh -c "/opt/thirdparty-scheme-adapter/wait4/wait4.js inbound-thirdparty-scheme-adapter && NODE_ENV=test npm run start:inbound"
     volumes:
       - ./docker/wait4:/opt/thirdparty-scheme-adapter/wait4
     environment:
@@ -36,7 +36,7 @@ services:
     build:
       context: ./
       dockerfile: ./docker/Dockerfile
-    command: sh -c "/opt/thirdparty-scheme-adapter/wait4/wait4.js outbound-thirdparty-scheme-adapter && NODE_ENV=development npm run start:outbound"
+    command: sh -c "/opt/thirdparty-scheme-adapter/wait4/wait4.js outbound-thirdparty-scheme-adapter && NODE_ENV=test npm run start:outbound"
     volumes:
       - ./docker/wait4:/opt/thirdparty-scheme-adapter/wait4
     environment:

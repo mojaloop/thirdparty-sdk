@@ -17,7 +17,7 @@
   },
   "REDIS": {
     "PORT": 6379,
-    "HOST": "localhost",
+    "HOST": "redis",
     "TIMEOUT": 100
   },
   "INSPECT": {
@@ -26,10 +26,10 @@
     "COLOR": true
   },
   "SHARED": {
-    "PEER_ENDPOINT": "0.0.0.0:4003",
-    "ALS_ENDPOINT": "0.0.0.0:4002",
-    "QUOTES_ENDPOINT": "0.0.0.0:3002",
-    "TRANSFERS_ENDPOINT": "0.0.0.0:3000",
+    "PEER_ENDPOINT": "ml-testing-toolkit:15000",
+    "ALS_ENDPOINT": "ml-testing-toolkit:15000",
+    "QUOTES_ENDPOINT": "ml-testing-toolkit:15000",
+    "TRANSFERS_ENDPOINT": "ml-testing-toolkit:15000",
     "BULK_TRANSFERS_ENDPOINT": "",
     "DFSP_ID": "dfsp_a",
     "DFSP_BACKEND_URI": "0.0.0.0:9000",
@@ -39,7 +39,7 @@
     "TLS": {
       "inbound": {
         "mutualTLS": {
-            "enabled": false
+          "enabled": false
         },
         "creds": {
           "ca": "./secrets/dfsp_a_client.crt",
@@ -49,7 +49,7 @@
       },
       "outbound": {
         "mutualTLS": {
-            "enabled": false
+          "enabled": false
         },
         "creds": {
           "ca": "./secrets/dfsp_a_client.crt",
@@ -59,7 +59,7 @@
       },
       "test": {
         "mutualTLS": {
-            "enabled": false
+          "enabled": false
         },
         "creds": {
           "ca": "./secrets/dfsp_a_client.crt",
