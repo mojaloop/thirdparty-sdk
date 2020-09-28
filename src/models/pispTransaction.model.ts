@@ -27,6 +27,7 @@
  --------------
  ******/
 import { Message, PubSub } from '~/shared/pub-sub'
+import { InboundAuthorizationsPostRequest } from './authorizations.interface'
 import { PersistentModel } from '~/models/persistent.model'
 import { StateMachineConfig } from 'javascript-state-machine'
 import {
@@ -49,7 +50,6 @@ import {
   ThirdpartyTransactionPartyLookupResponse,
   ThirdpartyTransactionStatus
 } from './pispTransaction.interface'
-import { InboundAuthorizationsPostRequest } from './authorizations.interface'
 import inspect from '~/shared/inspect'
 
 export class InvalidPISPTransactionDataError extends Error {
@@ -138,6 +138,14 @@ export class PISPTransactionModel
     ].filter(x => !!x).join('_')
   }
 
+  static transactionModeKey (transactionRequestId: string): string {
+    if (!transactionRequestId) {
+      throw new Error('PISPTransactionModel.pispTransactionModeKey: \'transactionRequestId\' parameter is required')
+    }
+    // channel name
+    return `pisp_transaction_mode_for_${transactionRequestId}`
+  }
+
   async onRequestPartyLookup (): Promise<void> {
     InvalidPISPTransactionDataError.throwIfInvalidProperty(this.data, 'payeeRequest')
 
@@ -145,7 +153,6 @@ export class PISPTransactionModel
     const channel = PISPTransactionModel.partyNotificationChannel(
       PISPTransactionPhase.lookup, partyIdType, partyIdentifier, partySubIdOrType
     )
-    const pubSub: PubSub = this.pubSub
 
     // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (resolve, reject) => {
@@ -154,7 +161,7 @@ export class PISPTransactionModel
         // this handler will be executed when PUT /parties/<type>/<id>/<subId> @ Inbound server
         subId = this.pubSub.subscribe(channel, async (channel: string, message: Message, sid: number) => {
           // first unsubscribe
-          pubSub.unsubscribe(channel, sid)
+          this.pubSub.unsubscribe(channel, sid)
 
           this.data.payeeResolved = { ...message as unknown as TParty }
           this.data.partyLookupResponse = {
@@ -175,7 +182,7 @@ export class PISPTransactionModel
         this.logger.push({ res }).info('MojaloopRequests.getParties request sent to peer')
       } catch (error) {
         this.logger.push(error).error('MojaloopRequests.getParties request error')
-        pubSub.unsubscribe(channel, subId)
+        this.pubSub.unsubscribe(channel, subId)
         reject(error)
       }
     })
@@ -189,7 +196,6 @@ export class PISPTransactionModel
       PISPTransactionPhase.initiation,
       this.data.transactionRequestId as string
     )
-    const pubSub: PubSub = this.pubSub
 
     // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (resolve, reject) => {
@@ -198,7 +204,7 @@ export class PISPTransactionModel
         // this handler will be executed when POST /authorizations @ Inbound server
         subId = this.pubSub.subscribe(channel, async (channel: string, message: Message, sid: number) => {
           // first unsubscribe
-          pubSub.unsubscribe(channel, sid)
+          this.pubSub.unsubscribe(channel, sid)
 
           this.data.authorizationRequest = { ...message as unknown as InboundAuthorizationsPostRequest }
           this.data.initiateResponse = {
@@ -222,7 +228,7 @@ export class PISPTransactionModel
         this.logger.push({ res }).info('ThirdpartyRequests.postThirdpartyRequestsTransactions request sent to peer')
       } catch (error) {
         this.logger.push(error).error('ThirdpartyRequests.postThirdpartyRequestsTransactions request error')
-        pubSub.unsubscribe(channel, subId)
+        this.pubSub.unsubscribe(channel, subId)
         reject(error)
       }
     })
