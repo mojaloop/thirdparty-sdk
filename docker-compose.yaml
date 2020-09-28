@@ -23,6 +23,7 @@ services:
       - redis
     extra_hosts:
       - "redis:172.17.0.1"
+      - "ml-testing-toolkit:172.17.0.1"
     healthcheck:
       test: wget -q http://172.17.0.1:4005/health -O /dev/null || exit 1
       timeout: 3s
@@ -48,6 +49,7 @@ services:
       - redis
     extra_hosts:
       - "redis:172.17.0.1"
+      - "ml-testing-toolkit:172.17.0.1"
     healthcheck:
       test: wget -q http://172.17.0.1:4006/health -O /dev/null || exit 1
       timeout: 3s
