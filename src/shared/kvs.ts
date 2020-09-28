@@ -62,4 +62,10 @@ export class KVS extends RedisConnection {
 
     return asyncSet.call(this.client, key, stringified) as Promise<boolean>
   }
+
+  // removes the value for given key
+  async del (key: string): Promise<boolean> {
+    InvalidKeyError.throwIfInvalid(key)
+    return this.client.del(key)
+  }
 }

@@ -73,4 +73,25 @@ describe('KVS', () => {
     const value = await kvs.get('key-for-never-stored-value')
     expect(value).toBeUndefined()
   })
+
+  it('should DEL was was SET and next GET after should give unknown', async (): Promise<void> => {
+    const values = [
+      { a: 1, b: true, c: 'C', d: {} },
+      true,
+      123,
+      'the-string'
+    ]
+
+    for (const value in values) {
+      await kvs.set('key-del', value)
+      const retrieved = await kvs.get('key-del')
+      expect(retrieved).toEqual(value)
+      const result = await kvs.del('key-del')
+      expect(result).toBeTruthy()
+      const deleted = await kvs.get('key-del')
+      expect(deleted).toBeUndefined()
+      const resultDeleted = await kvs.del('key-del')
+      expect(resultDeleted).toBeTruthy()
+    }
+  })
 })

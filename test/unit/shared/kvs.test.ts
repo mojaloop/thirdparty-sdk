@@ -143,4 +143,33 @@ describe('KVS: Key Value Storage', () => {
       expect(error).toEqual(new InvalidKeyError())
     }
   })
+
+  it('should DEL key', async (): Promise<void> => {
+    const kvs = new KVS(config)
+    await kvs.connect()
+    const key = 'the-key'
+
+    const delSpy = jest.spyOn(kvs.client, 'del').mockImplementationOnce((
+      ...args: (string | Callback<number>)[]
+    ): boolean => {
+      const argKey: string = args[0] as unknown as string
+      expect(argKey).toEqual(key)
+      return true
+    })
+
+    const result = await kvs.del(key)
+    expect(result).toBeTruthy()
+    expect(delSpy).toBeCalledTimes(1)
+    expect(delSpy).toBeCalledWith(key)
+  })
+
+  it('should validate invalid key for DEL', async (): Promise<void> => {
+    const kvs = new KVS(config)
+    await kvs.connect()
+    try {
+      await kvs.del(null as unknown as string)
+    } catch (error) {
+      expect(error).toEqual(new InvalidKeyError())
+    }
+  })
 })
