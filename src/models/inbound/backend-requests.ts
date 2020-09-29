@@ -107,9 +107,9 @@ export class BackendRequests {
   }
 
   // makes a GET to Backend
-  async get<Response> (uri: string): Promise<Response | void> {
+  async get<Response> (path: string): Promise<Response | void> {
     return this.loggedRequest({
-      uri: this.fullUri(uri),
+      uri: this.fullUri(path),
       method: 'GET',
       headers: this.headers,
       agent: this.agent
@@ -117,9 +117,9 @@ export class BackendRequests {
   }
 
   // makes a PATCH to Backend
-  async patch<Body, Response> (uri: string, body: Body): Promise<Response | void> {
+  async patch<Body, Response> (path: string, body: Body): Promise<Response | void> {
     return this.loggedRequest({
-      uri: this.fullUri(uri),
+      uri: this.fullUri(path),
       method: 'PATCH',
       body: body as unknown as Record<string, unknown>,
       headers: this.headers,
@@ -128,9 +128,9 @@ export class BackendRequests {
   }
 
   // makes a POST to Backend
-  async post<Body, Response> (uri: string, body: Body): Promise<Response | void> {
+  async post<Body, Response> (path: string, body: Body): Promise<Response | void> {
     return this.loggedRequest({
-      uri: this.fullUri(uri),
+      uri: this.fullUri(path),
       method: 'POST',
       body: body as unknown as Record<string, unknown>,
       headers: this.headers,
@@ -139,9 +139,9 @@ export class BackendRequests {
   }
 
   // makes a PUT to Backend
-  async put<Body, Response> (uri: string, body: Body): Promise<Response | void> {
+  async put<Body, Response> (path: string, body: Body): Promise<Response | void> {
     return this.loggedRequest({
-      uri: this.fullUri(uri),
+      uri: this.fullUri(path),
       method: 'PUT',
       body: body as unknown as Record<string, unknown>,
       headers: this.headers,
@@ -156,7 +156,7 @@ export class BackendRequests {
     inRequest: InboundAuthorizationsPostRequest
   ): Promise<AuthenticationValue | void> {
     return this.post<InboundAuthorizationsPostRequest, AuthenticationValue>(
-      this.fullUri('signAuthorizationRequest'), inRequest
+      'signAuthorizationRequest', inRequest
     )
   }
 }
