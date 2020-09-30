@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+### [11.17.1](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.17.0...v11.17.1) (2020-09-30)
+
+
+### Bug Fixes
+
+* 1617 signchallenge uri ([#37](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/37)) ([47cff66](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/47cff66dbd7de087b8a0af1efaf991db3bd211e4))
+
 ## [11.17.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.16.0...v11.17.0) (2020-09-30)
 
 

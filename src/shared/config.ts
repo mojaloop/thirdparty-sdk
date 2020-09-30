@@ -83,6 +83,7 @@ export interface ServiceConfig {
     BULK_TRANSFERS_ENDPOINT: string
     DFSP_ID: string
     DFSP_BACKEND_URI: string
+    DFSP_BACKEND_SIGN_AUTHORIZATION_PATH: string
     DFSP_BACKEND_HTTP_SCHEME: string
     JWS_SIGN: boolean
     JWS_SIGNING_KEY: PathLike | Buffer
@@ -245,9 +246,14 @@ export const ConvictConfig = Convict<ServiceConfig>({
       default: 'dfsp_a'
     },
     DFSP_BACKEND_URI: {
-      doc: 'host/path address of DFSP\'s ',
+      doc: 'host address of DFSP\'s ',
       format: '*',
       default: 'localhost:9000'
+    },
+    DFSP_BACKEND_SIGN_AUTHORIZATION_PATH: {
+      doc: 'path use by BackendRequests.signAuthorizationRequest',
+      format: '*',
+      default: 'signchallenge'
     },
     DFSP_BACKEND_HTTP_SCHEME: {
       doc: 'Http scheme ',

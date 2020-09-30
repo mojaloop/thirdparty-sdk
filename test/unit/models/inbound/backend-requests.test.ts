@@ -40,7 +40,8 @@ describe('backendRequests', () => {
     dfspId: 'the-dfsp-id',
     logger: mockLogger(),
     scheme: Scheme.http,
-    uri: 'backend-uri'
+    uri: 'backend-uri',
+    singAuthorizationPath: 'singchallenge'
   }
 
   const headers = {
@@ -223,7 +224,7 @@ describe('backendRequests', () => {
       )
       const result = await backendRequests.signAuthorizationRequest(authorizationsPostRequest)
       expect(result).toEqual(authenticationValue)
-      expect(postSpy).toBeCalledWith('signAuthorizationRequest', authorizationsPostRequest)
+      expect(postSpy).toBeCalledWith(config.singAuthorizationPath, authorizationsPostRequest)
     })
   })
 })
