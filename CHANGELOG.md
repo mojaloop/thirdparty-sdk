@@ -1,4 +1,18 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+## [11.17.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.16.0...v11.17.0) (2020-09-30)
+
+
+### Features
+
+* **docs:** first pass at new outbound api docs ([21e0879](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/21e0879a2f2ef6cca746570a3e2ed8413bf31693))
+* **docs:** improved sequence diagram ([6dd35dd](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/6dd35dda13ee4853461f1d4aafa01c75ba9088c0))
+* **docs:** render sequence diagrams ([11b87b1](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/11b87b15c2c8a187fc1623b1fefb6fec7c674a1c))
+
+
+### Bug Fixes
+
+* 1617 backend requests & update deps ([#36](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/36)) ([b2588fb](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/b2588fb24ef64b4327035e1917de97d55c623b26))
+
 ## [11.16.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.15.0...v11.16.0) (2020-09-18)
 
 
