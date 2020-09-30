@@ -945,61 +945,11 @@ components:
             partyIdInfo:
               $ref: '#/paths/~1thirdpartyTransaction~1partyLookup/post/requestBody/content/application~1json/schema/properties/payee'
             merchantClassificationCode:
-              title: MerchantClassificationCode
-              type: string
-              pattern: '^[\d]{1,4}$'
-              description: |
-                A limited set of pre-defined numbers. This list would be a limited set of
-                numbers identifying a set of popular merchant types like School Fees,
-                Pubs and Restaurants, Groceries, etc.
-              example: 4321
+              $ref: '#/components/responses/ThirdpartyTransactionPartyLookupResponse/content/application~1json/schema/properties/party/properties/merchantClassificationCode'
             name:
-              title: PartyName
-              type: string
-              minLength: 1
-              maxLength: 128
-              description: Name of the Party. Could be a real name or a nickname.
-              example: Henrik Karlsson
+              $ref: '#/components/responses/ThirdpartyTransactionPartyLookupResponse/content/application~1json/schema/properties/party/properties/name'
             personalInfo:
-              title: PartyPersonalInfo
-              type: object
-              description: Data model for the complex type PartyPersonalInfo.
-              properties:
-                complexName:
-                  title: PartyComplexName
-                  type: object
-                  description: Data model for the complex type PartyComplexName.
-                  properties:
-                    firstName:
-                      title: FirstName
-                      type: string
-                      minLength: 1
-                      maxLength: 128
-                      pattern: '^(?!\s*$)[\w .,''-]{1,128}$'
-                      description: First name of the Party (Name Type).
-                      example: Henrik
-                    middleName:
-                      title: MiddleName
-                      type: string
-                      minLength: 1
-                      maxLength: 128
-                      pattern: '^(?!\s*$)[\w .,''-]{1,128}$'
-                      description: Middle name of the Party (Name Type).
-                      example: Johannes
-                    lastName:
-                      title: LastName
-                      type: string
-                      minLength: 1
-                      maxLength: 128
-                      pattern: '^(?!\s*$)[\w .,''-]{1,128}$'
-                      description: Last name of the Party (Name Type).
-                      example: Karlsson
-                dateOfBirth:
-                  title: DateofBirth (type Date)
-                  type: string
-                  pattern: '^(?:[1-9]\d{3}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1\d|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[1-9]\d(?:0[48]|[2468][048]|[13579][26])|(?:[2468][048]|[13579][26])00)-02-29)$'
-                  description: Date of Birth of the Party.
-                  example: '1966-06-16'
+              $ref: '#/components/responses/ThirdpartyTransactionPartyLookupResponse/content/application~1json/schema/properties/party/properties/personalInfo'
           required:
             - partyIdInfo
         payer:
@@ -1242,22 +1192,66 @@ components:
             type: object
             properties:
               party:
-                title: Party
                 type: object
-                description: |
-                  Data model for the complex type Party.
-
-                  This is a variant based on FSPIOP `Party` specification.
-                  Main difference being the newly added `accounts` property.
                 properties:
                   partyIdInfo:
                     $ref: '#/paths/~1thirdpartyTransaction~1partyLookup/post/requestBody/content/application~1json/schema/properties/payee'
                   merchantClassificationCode:
-                    $ref: '#/paths/~1thirdpartyTransaction~1%7BID%7D~1initiate/post/requestBody/content/application~1json/schema/properties/payee/properties/merchantClassificationCode'
+                    title: MerchantClassificationCode
+                    type: string
+                    pattern: '^[\d]{1,4}$'
+                    description: |
+                      A limited set of pre-defined numbers. This list would be a limited set of
+                      numbers identifying a set of popular merchant types like School Fees,
+                      Pubs and Restaurants, Groceries, etc.
+                    example: 4321
                   name:
-                    $ref: '#/paths/~1thirdpartyTransaction~1%7BID%7D~1initiate/post/requestBody/content/application~1json/schema/properties/payee/properties/name'
+                    title: PartyName
+                    type: string
+                    minLength: 1
+                    maxLength: 128
+                    description: Name of the Party. Could be a real name or a nickname.
+                    example: Henrik Karlsson
                   personalInfo:
-                    $ref: '#/paths/~1thirdpartyTransaction~1%7BID%7D~1initiate/post/requestBody/content/application~1json/schema/properties/payee/properties/personalInfo'
+                    title: PartyPersonalInfo
+                    type: object
+                    description: Data model for the complex type PartyPersonalInfo.
+                    properties:
+                      complexName:
+                        title: PartyComplexName
+                        type: object
+                        description: Data model for the complex type PartyComplexName.
+                        properties:
+                          firstName:
+                            title: FirstName
+                            type: string
+                            minLength: 1
+                            maxLength: 128
+                            pattern: '^(?!\s*$)[\w .,''-]{1,128}$'
+                            description: First name of the Party (Name Type).
+                            example: Henrik
+                          middleName:
+                            title: MiddleName
+                            type: string
+                            minLength: 1
+                            maxLength: 128
+                            pattern: '^(?!\s*$)[\w .,''-]{1,128}$'
+                            description: Middle name of the Party (Name Type).
+                            example: Johannes
+                          lastName:
+                            title: LastName
+                            type: string
+                            minLength: 1
+                            maxLength: 128
+                            pattern: '^(?!\s*$)[\w .,''-]{1,128}$'
+                            description: Last name of the Party (Name Type).
+                            example: Karlsson
+                      dateOfBirth:
+                        title: DateofBirth (type Date)
+                        type: string
+                        pattern: '^(?:[1-9]\d{3}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1\d|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[1-9]\d(?:0[48]|[2468][048]|[13579][26])|(?:[2468][048]|[13579][26])00)-02-29)$'
+                        description: Date of Birth of the Party.
+                        example: '1966-06-16'
                   accounts:
                     description: 'List of accounts associated with the party containing and DFSP routable address, currency identifier and description.'
                     title: AccountList
@@ -1296,8 +1290,6 @@ components:
                         description: Accounts associated with the Party.
                     required:
                       - account
-                required:
-                  - partyIdInfo
               currentState:
                 $ref: '#/components/schemas/ThirdpartyTransactionState'
     ThirdpartyTransactionInitiateResponse:

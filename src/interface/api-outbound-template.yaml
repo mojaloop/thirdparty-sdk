@@ -442,7 +442,19 @@ components:
             type: object
             properties:
               party:
-                $ref: '../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/schemas/Party.yaml'
+                type: object
+                properties:
+                    partyIdInfo:
+                      $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/PartyIdInfo.yaml'
+                    merchantClassificationCode:
+                      $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/MerchantClassificationCode.yaml'
+                    name:
+                      $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/PartyName.yaml'
+                    personalInfo:
+                      $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/PartyPersonalInfo.yaml'
+                    accounts:
+                      $ref: '../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/schemas/AccountList.yaml'
+                      description: List of accounts associated with the party containing and DFSP routable address, currency identifier and description.
               currentState: 
                 $ref: '#/components/schemas/ThirdpartyTransactionState'          
     ThirdpartyTransactionInitiateResponse:

@@ -70,10 +70,10 @@ async function post (_context: any, request: Request, h: StateResponseToolkit): 
   const logger = h.getLogger()
   try {
     if (config.INBOUND.PISP_TRANSACTION_MODE) {
-      console.log('pips transaction mode')
-      // pips transaction mode
+      console.log('PISP transaction mode')
+      // PISP transaction mode
       const channel = PISPTransactionModel.notificationChannel(
-        PISPTransactionPhase.approval,
+        PISPTransactionPhase.initiation,
         payload.transactionRequestId
       )
       const pubSub = h.getPubSub()

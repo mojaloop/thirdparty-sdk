@@ -125,7 +125,7 @@ export interface ServiceConfig {
 export const ConvictConfig = Convict<ServiceConfig>({
   ENV: {
     doc: 'The application environment.',
-    format: ['production', 'development', 'test', 'e2e'],
+    format: ['production', 'development', 'test', 'integration', 'e2e'],
     default: 'development',
     env: 'NODE_ENV'
   },
