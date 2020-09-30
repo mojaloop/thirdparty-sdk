@@ -25,7 +25,7 @@
  --------------
  ******/
 
-import { Logger as SDKLogger, RequestOptions, RequestResponse, request } from '@mojaloop/sdk-standard-components'
+import { Logger as SDKLogger, RequestOptions, RequestResponse, request, requests } from '@mojaloop/sdk-standard-components'
 import { AuthenticationValue, InboundAuthorizationsPostRequest } from '~/models/authorizations.interface'
 import { PrependFun, Scheme, prepend2Uri } from '~/shared/http-scheme'
 import { throwOrExtractData } from '~/shared/throw-or-extract-data'
@@ -96,7 +96,7 @@ export class BackendRequests {
   }
 
   // makes the requests with proper logging
-  protected async loggedRequest<Response> (opts: RequestOptions): Promise<Response | void> {
+  async loggedRequest<Response> (opts: RequestOptions): Promise<Response | void> {
     try {
       this.logger.push({ opts }).info(`Executing Backend ${this.config.scheme} ${opts.method} request`)
       return request<Response>(opts).then((res: RequestResponse<Response>) => throwOrExtractData<Response>(res))
@@ -121,7 +121,7 @@ export class BackendRequests {
     return this.loggedRequest({
       uri: this.fullUri(uri),
       method: 'PATCH',
-      body: body as unknown as Record<string, unknown>,
+      body: requests.common.bodyStringifier(body),
       headers: this.headers,
       agent: this.agent
     })
@@ -132,7 +132,7 @@ export class BackendRequests {
     return this.loggedRequest({
       uri: this.fullUri(uri),
       method: 'POST',
-      body: body as unknown as Record<string, unknown>,
+      body: requests.common.bodyStringifier(body),
       headers: this.headers,
       agent: this.agent
     })
@@ -143,7 +143,7 @@ export class BackendRequests {
     return this.loggedRequest({
       uri: this.fullUri(uri),
       method: 'PUT',
-      body: body as unknown as Record<string, unknown>,
+      body: requests.common.bodyStringifier(body),
       headers: this.headers,
       agent: this.agent
     })
