@@ -1,0 +1,19 @@
+version: "3.7"
+
+networks:
+  mojaloop-net:
+    name: mojaloop-net
+
+services:
+  mojaloop-peer:
+    image: mojaloop/simulator:v9.5.0
+   # build: 
+   #   context: ../../mojaloop-simulator
+    container_name: mojaloop-peer
+    env_file: ./dfsp_backend.env
+    volumes:
+       - ./dfsp_rules.json:/src/rules.json
+    ports:
+      - "9000:3000"
+      - "9002:3002"
+      - "9003:3003"

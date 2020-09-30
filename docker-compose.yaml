@@ -21,8 +21,10 @@ services:
       - "4005:4005"
     depends_on:
       - redis
+      - pisp-simulator
     extra_hosts:
       - "redis:172.17.0.1"
+      - "pisp-simulator:172.17.0.1"
     healthcheck:
       test: wget -q http://172.17.0.1:4005/health -O /dev/null || exit 1
       timeout: 3s
@@ -46,8 +48,10 @@ services:
       - "4006:4006"
     depends_on:
       - redis
+      - pisp-simulator
     extra_hosts:
       - "redis:172.17.0.1"
+      - "pisp-simulator:172.17.0.1"
     healthcheck:
       test: wget -q http://172.17.0.1:4006/health -O /dev/null || exit 1
       timeout: 3s
@@ -63,3 +67,18 @@ services:
     ports:
       - "6379:6379"
     restart: always
+  
+  pisp-simulator:
+    image: mojaloop/mojaloop-simulator:v9.4.1.7-pisp
+   # build: 
+   #   context: ../../mojaloop-simulator
+    networks:
+      - mojaloop-net
+    container_name: pisp-simulator
+    env_file: ./docker/dfsp_backend.env
+    volumes:
+       - ./docker/dfsp_rules.json:/src/rules.json
+    ports:
+      - "9000:3000"
+      - "9002:3002"
+      - "9003:3003"    

@@ -25,7 +25,7 @@
     "COLOR": true
   },
   "SHARED": {
-    "PEER_ENDPOINT": "0.0.0.0:4003",
+    "PEER_ENDPOINT": "localhost:9000",
     "ALS_ENDPOINT": "0.0.0.0:4002",
     "QUOTES_ENDPOINT": "0.0.0.0:3002",
     "TRANSFERS_ENDPOINT": "0.0.0.0:3000",
