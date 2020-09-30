@@ -223,7 +223,7 @@ describe('backendRequests', () => {
       )
       const result = await backendRequests.signAuthorizationRequest(authorizationsPostRequest)
       expect(result).toEqual(authenticationValue)
-      expect(postSpy).toBeCalledWith('http://backend-uri/signAuthorizationRequest', authorizationsPostRequest)
+      expect(postSpy).toBeCalledWith('signchallenge', authorizationsPostRequest)
     })
   })
 })

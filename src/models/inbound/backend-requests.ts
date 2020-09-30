@@ -156,7 +156,7 @@ export class BackendRequests {
     inRequest: InboundAuthorizationsPostRequest
   ): Promise<AuthenticationValue | void> {
     return this.post<InboundAuthorizationsPostRequest, AuthenticationValue>(
-      this.fullUri('signAuthorizationRequest'), inRequest
+      'signchallenge', inRequest
     )
   }
 }
