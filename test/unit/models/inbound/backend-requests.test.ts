@@ -28,7 +28,7 @@
 import { AuthenticationValue, InboundAuthorizationsPostRequest } from '~/models/authorizations.interface'
 import { BackendConfig, BackendRequests } from '~/models/inbound/backend-requests'
 import { Scheme } from '~/shared/http-scheme'
-import SDK, { RequestResponse } from '@mojaloop/sdk-standard-components'
+import SDK, { RequestResponse, requests } from '@mojaloop/sdk-standard-components'
 import mockLogger from '../../mockLogger'
 import http from 'http'
 import { HTTPResponseError } from '~/shared/http-response-error'
@@ -121,7 +121,7 @@ describe('backendRequests', () => {
         headers,
         method: 'PATCH',
         uri: 'http://backend-uri/zzz',
-        body: payload
+        body: requests.common.bodyStringifier(payload)
       })
     })
 
@@ -134,7 +134,7 @@ describe('backendRequests', () => {
         headers,
         method: 'POST',
         uri: 'http://backend-uri/zzz',
-        body: payload
+        body: requests.common.bodyStringifier(payload)
       })
     })
 
@@ -147,7 +147,7 @@ describe('backendRequests', () => {
         headers,
         method: 'PUT',
         uri: 'http://backend-uri/zzz',
-        body: payload
+        body: requests.common.bodyStringifier(payload)
       })
     })
 
@@ -159,7 +159,7 @@ describe('backendRequests', () => {
         headers,
         method: 'PUT',
         uri: 'http://backend-uri/zzz',
-        body: payload
+        body: requests.common.bodyStringifier(payload)
       })
     })
 
@@ -175,7 +175,7 @@ describe('backendRequests', () => {
         headers,
         method: 'PUT',
         uri: 'http://backend-uri/zzz',
-        body: payload
+        body: requests.common.bodyStringifier(payload)
       })
     })
 
@@ -196,7 +196,7 @@ describe('backendRequests', () => {
         headers,
         method: 'PUT',
         uri: 'http://backend-uri/zzz',
-        body: payload
+        body: requests.common.bodyStringifier(payload)
       })
     })
   })
