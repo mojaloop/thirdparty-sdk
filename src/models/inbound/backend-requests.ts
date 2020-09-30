@@ -25,7 +25,13 @@
  --------------
  ******/
 
-import { Logger as SDKLogger, RequestOptions, RequestResponse, request, requests } from '@mojaloop/sdk-standard-components'
+import {
+  Logger as SDKLogger,
+  RequestOptions,
+  RequestResponse,
+  request,
+  requests
+} from '@mojaloop/sdk-standard-components'
 import { AuthenticationValue, InboundAuthorizationsPostRequest } from '~/models/authorizations.interface'
 import { PrependFun, Scheme, prepend2Uri } from '~/shared/http-scheme'
 import { throwOrExtractData } from '~/shared/throw-or-extract-data'
@@ -43,6 +49,9 @@ export interface BackendConfig {
 
   // target uri for all requests
   uri: string
+
+  // the path for signAuthorizationRequest
+  singAuthorizationPath: string
 
   // should we keep alive connection with backend,
   // default 'true' if not specified
@@ -156,7 +165,7 @@ export class BackendRequests {
     inRequest: InboundAuthorizationsPostRequest
   ): Promise<AuthenticationValue | void> {
     return this.post<InboundAuthorizationsPostRequest, AuthenticationValue>(
-      'signchallenge', inRequest
+      this.config.singAuthorizationPath, inRequest
     )
   }
 }
