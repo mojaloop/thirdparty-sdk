@@ -110,7 +110,8 @@ export const StatePlugin = {
       logger,
       dfspId: config.SHARED.DFSP_ID,
       uri: config.SHARED.DFSP_BACKEND_URI,
-      scheme: config.SHARED.DFSP_BACKEND_HTTP_SCHEME as Scheme
+      scheme: config.SHARED.DFSP_BACKEND_HTTP_SCHEME as Scheme,
+      singAuthorizationPath: config.SHARED.DFSP_BACKEND_SIGN_AUTHORIZATION_PATH
     })
 
     try {
