@@ -406,8 +406,11 @@ describe('Outbound API routes', (): void => {
       payload: {
         authorizationResponse: {
           authenticationInfo: {
-            authentication: "OTP",
-            authenticationValue: "xxxxxxxxxxxxxxxxxx"
+            authentication: "U2F",
+            authenticationValue: {
+              pinValue: "xxxxxxxxxxx",
+              counter: "1"
+            }
           },
           responseType: "ENTERED"
         }
