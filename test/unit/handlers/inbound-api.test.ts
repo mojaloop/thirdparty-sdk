@@ -288,7 +288,6 @@ describe('Inbound API routes', (): void => {
         request as unknown as Request,
         toolkit as unknown as StateResponseToolkit
       )
-      // const response = await server.inject(request)
       expect(result.statusCode).toBe(202)
       expect(mockInboundPostAuthorization).toBeCalledWith(postRequest, request.headers['fspiop-source'])
     })
@@ -343,7 +342,6 @@ describe('Inbound API routes', (): void => {
         request as unknown as Request,
         toolkit as unknown as StateResponseToolkit
       )
-      // const response = await server.inject(request)
       expect(result.statusCode).toBe(202)
 
       // check pisp transaction mode
