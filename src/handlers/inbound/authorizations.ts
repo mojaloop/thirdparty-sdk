@@ -64,8 +64,8 @@ async function put (_context: any, request: Request, h: StateResponseToolkit): P
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function post (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
-  // TODO: this handler will be shared with ThirdpartyRequestTransactionModel so there is a need
-  // to properly handle two different models here - maybe via some configuration flag?
+  // this handler will be shared with ThirdpartyRequestTransactionModel so there is a need
+  // to properly handle two different models here - via configuration flag
   const payload = request.payload as InboundAuthorizationsPostRequest
   const logger = h.getLogger()
   try {
