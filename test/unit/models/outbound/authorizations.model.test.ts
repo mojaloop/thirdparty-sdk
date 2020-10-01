@@ -265,6 +265,18 @@ describe('OutboundAuthorizationsModel', () => {
 
         expect(async () => await model.run()).rejects.toEqual(error)
       })
+
+      it('exceptions - Error', async () => {
+        const error = new Error()
+        mocked(modelConfig.requests.postAuthorizations).mockImplementationOnce(
+          () => {
+            throw error
+          }
+        )
+        const model = await create({ ...data, currentState: 'errored' }, modelConfig)
+
+        expect(async () => await model.run()).rejects.toEqual(error)
+      })
     })
   })
 

@@ -233,7 +233,9 @@ describe('pipsTransactionModel', () => {
           modelConfig.mojaloopRequests.getParties
         ).mockImplementationOnce(
           () => {
-            throw new Error('mocked getParties exception')
+            const err = Error('mocked getParties exception') as unknown as Record<string, unknown>
+            err.pispTransactionState = {}
+            throw err
           }
         )
         const model = await create(lookupData, modelConfig)
@@ -250,6 +252,8 @@ describe('pipsTransactionModel', () => {
 
         // check that correct unsubscription has been done
         expect(modelConfig.pubSub.unsubscribe).toBeCalledWith(channel, 1)
+
+        expect(model.logger.info).toHaveBeenCalledWith('State machine is broken')
       })
     })
 
