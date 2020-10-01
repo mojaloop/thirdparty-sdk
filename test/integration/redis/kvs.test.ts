@@ -74,7 +74,7 @@ describe('KVS', () => {
     expect(value).toBeUndefined()
   })
 
-  it('should DEL was was SET and next GET after should give unknown', async (): Promise<void> => {
+  it('should DEL was SET and next GET after should give unknown', async (): Promise<void> => {
     const values = [
       { a: 1, b: true, c: 'C', d: {} },
       true,
