@@ -359,7 +359,6 @@ export class PISPTransactionModel
         await this.fsm.error(err)
 
         // avoid circular ref between pispTransactionState.lastError and err
-        // TODO: what to return incase of error
         err.pispTransactionState = { ...this.data }
       }
       throw err

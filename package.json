@@ -1,6 +1,6 @@
 {
   "name": "@mojaloop/thirdparty-scheme-adapter",
-  "version": "11.17.1",
+  "version": "11.16.0",
   "description": "Thirdparty Scheme Adapter ",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -14,6 +14,9 @@
     "build:api": "npm run build:api:inbound && npm run build:api:outbound",
     "build:api:inbound": "swagger-cli bundle -o ./src/interface/api-inbound.yaml -t yaml ./src/interface/api-inbound-template.yaml && swagger-cli validate ./src/interface/api-inbound.yaml",
     "build:api:outbound": "swagger-cli bundle -o ./src/interface/api-outbound.yaml -t yaml ./src/interface/api-outbound-template.yaml && swagger-cli validate ./src/interface/api-outbound.yaml",
+    "build:api:ttk": "npm run build:ttk-fspiop:api && npm run build:ttk-3p:api",
+    "build:ttk-fspiop:api": "swagger-cli bundle -o ./docker/contract/ml-testing-toolkit/spec_files/api_definitions/fspiop_1.0/api_spec.yaml -t yaml ./docker/contract/ml-testing-toolkit/spec_files/api_definitions/fspiop_1.0/api-template.yaml && swagger-cli validate ./docker/contract/ml-testing-toolkit/spec_files/api_definitions/fspiop_1.0/api_spec.yaml",
+    "build:ttk-3p:api": "swagger-cli bundle -o ./docker/contract/ml-testing-toolkit/spec_files/api_definitions/thirdparty_pisp/api_spec.yaml -t yaml ./docker/contract/ml-testing-toolkit/spec_files/api_definitions/thirdparty_pisp/thirdparty-pisp-api-template.yaml && swagger-cli validate ./docker/contract/ml-testing-toolkit/spec_files/api_definitions/thirdparty_pisp/api_spec.yaml",
     "docker:build": "docker build -t thirdparty-scheme-adapter:local -f ./docker/Dockerfile ./",
     "docker:run:inbound": "docker run -p 4005:4005 thirdparty-scheme-adapter:local npm run start:inbound",
     "docker:run:outbound": "docker run -p 4006:4006 thirdparty-scheme-adapter:local npm run start:outbound",
@@ -73,7 +76,7 @@
     "@mojaloop/central-services-health": "^10.6.0",
     "@mojaloop/central-services-metrics": "^9.5.0",
     "@mojaloop/central-services-shared": "^11.3.6",
-    "@mojaloop/sdk-standard-components": "^11.11.0",
+    "@mojaloop/sdk-standard-components": "^11.10.1",
     "@types/axios": "^0.14.0",
     "@types/convict": "^5.2.1",
     "@types/hapi": "^18.0.3",
@@ -103,8 +106,8 @@
     "@commitlint/cli": "^11.0.0",
     "@commitlint/config-conventional": "^11.0.0",
     "@types/redis-mock": "^0.17.0",
-    "@typescript-eslint/eslint-plugin": "4.3.0",
-    "@typescript-eslint/parser": "4.3.0",
+    "@typescript-eslint/eslint-plugin": "4.2.0",
+    "@typescript-eslint/parser": "4.2.0",
     "add": "^2.0.6",
     "eslint": "7.10.0",
     "eslint-config-standard": "14.1.1",
@@ -123,11 +126,11 @@
     "multi-file-swagger": "^2.3.0",
     "nodemon": "^2.0.4",
     "npm-audit-resolver": "^2.2.1",
-    "npm-check-updates": "^9.0.3",
+    "npm-check-updates": "^9.0.2",
     "redis-mock": "^0.52.0",
     "source-map-support": "0.5.19",
     "standard-version": "^9.0.0",
     "swagger-cli": "^4.0.4",
-    "ts-jest": "^26.4.1"
+    "ts-jest": "^26.4.0"
   }
 }
