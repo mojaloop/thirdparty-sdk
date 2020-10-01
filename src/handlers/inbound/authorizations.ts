@@ -68,35 +68,28 @@ async function post (_context: any, request: Request, h: StateResponseToolkit): 
   // to properly handle two different models here - via configuration flag
   const payload = request.payload as InboundAuthorizationsPostRequest
   const logger = h.getLogger()
-  try {
-    if (config.INBOUND.PISP_TRANSACTION_MODE) {
-      console.log('PISP transaction mode')
-      // PISP transaction mode
-      const channel = PISPTransactionModel.notificationChannel(
-        PISPTransactionPhase.initiation,
-        payload.transactionRequestId
-      )
-      const pubSub = h.getPubSub()
-      // don't await on promise to resolve
-      // let finish publish in background
-      pubSub.publish(channel, payload as unknown as Message)
-      logger.info('PISPTransactionModel handled POST /authorization request')
-    } else {
-      console.log('authorization mode')
-      // authorization mode
-      const sourceFspId = request.headers['fspiop-source']
-      const config: InboundAuthorizationsModelConfig = {
-        logger,
-        backendRequests: h.getBackendRequests(),
-        mojaloopRequests: h.getMojaloopRequests()
-      }
-      const model = new InboundAuthorizationsModel(config)
-      const response = await model.postAuthorizations(payload, sourceFspId)
-      logger.push({ response }).info('InboundAuthorizationsModel handled POST /authorizations request')
+  if (config.INBOUND.PISP_TRANSACTION_MODE) {
+    // PISP transaction mode
+    const channel = PISPTransactionModel.notificationChannel(
+      PISPTransactionPhase.initiation,
+      payload.transactionRequestId
+    )
+    const pubSub = h.getPubSub()
+    // don't await on promise to resolve
+    // let finish publish in background
+    pubSub.publish(channel, payload as unknown as Message)
+    logger.info('PISPTransactionModel handled POST /authorization request')
+  } else {
+    // authorization mode
+    const sourceFspId = request.headers['fspiop-source']
+    const config: InboundAuthorizationsModelConfig = {
+      logger,
+      backendRequests: h.getBackendRequests(),
+      mojaloopRequests: h.getMojaloopRequests()
     }
-  } catch (err) {
-    // nothing we can do if an error gets thrown back to us here apart from log it and continue
-    logger.push({ err }).error('Error handling POST /authorizations request')
+    const model = new InboundAuthorizationsModel(config)
+    const response = await model.postAuthorizations(payload, sourceFspId)
+    logger.push({ response }).info('InboundAuthorizationsModel handled POST /authorizations request')
   }
 
   // Note that we will have passed request validation, JWS etc... by this point
