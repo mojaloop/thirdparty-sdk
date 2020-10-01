@@ -63,8 +63,11 @@ describe('PISP Transaction', (): void => {
       const approveRequest = {
         authorizationResponse: {
           authenticationInfo: {
-            authentication: "OTP",
-            authenticationValue: "xxxxxxxxxxxxxxxxxxxxxx"
+            authentication: "U2F",
+            authenticationValue: {
+              pinValue: "xxxxxxxxxxx",
+              counter: "1"
+            }
           },
           responseType: "ENTERED"
         }
