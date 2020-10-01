@@ -138,14 +138,6 @@ export class PISPTransactionModel
     ].filter(x => !!x).join('_')
   }
 
-  static transactionModeKey (transactionRequestId: string): string {
-    if (!transactionRequestId) {
-      throw new Error('PISPTransactionModel.pispTransactionModeKey: \'transactionRequestId\' parameter is required')
-    }
-    // channel name
-    return `pisp_transaction_mode_for_${transactionRequestId}`
-  }
-
   async onRequestPartyLookup (): Promise<void> {
     InvalidPISPTransactionDataError.throwIfInvalidProperty(this.data, 'payeeRequest')
 

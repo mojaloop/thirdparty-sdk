@@ -308,7 +308,7 @@ ConvictConfig.validate({ allowed: 'strict' })
 // Load file contents for keys and secrets
 ConvictConfig.set('SHARED.JWS_SIGNING_KEY', getFileContent(ConvictConfig.get('SHARED').JWS_SIGNING_KEY))
 
-// Note: Have not seen these be comma seperated value strings. mimicing sdk-scheme-adapter for now
+// Note: Have not seen these be comma separated value strings. mimicking sdk-scheme-adapter for now
 ConvictConfig.set(
   'SHARED.TLS.inbound.creds.ca',
   getFileListContent(<string> ConvictConfig.get('SHARED').TLS.inbound.creds.ca)
