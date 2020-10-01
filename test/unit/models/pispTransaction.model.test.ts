@@ -34,17 +34,11 @@ import { MojaloopRequests, TAmountType, ThirdpartyRequests, TParty } from '@moja
 import {
   PISPTransactionData,
   PISPTransactionModelConfig,
-  // PISPTransactionModelState,
   PISPTransactionPhase,
   ThirdpartyTransactionApproveResponse,
   ThirdpartyTransactionInitiateResponse,
   ThirdpartyTransactionPartyLookupResponse,
   ThirdpartyTransactionStatus
-  // PISPTransactionStateMachine,
-  // ThirdpartyTransactionApproveResponse,
-  // ThirdpartyTransactionInitiateResponse,
-  // ThirdpartyTransactionPartyLookupResponse,
-  // ThirdpartyTransactionStatus
 } from '~/models/pispTransaction.interface'
 import {
   PISPTransactionModel,
