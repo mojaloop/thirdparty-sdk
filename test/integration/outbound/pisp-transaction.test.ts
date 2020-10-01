@@ -6,11 +6,10 @@ describe('PISP Transaction', (): void => {
   const lookupURI = `${env.outbound.baseUri}/thirdpartyTransaction/partyLookup`
   describe('/thirdpartyTransaction: partyLookup->initiate->approve', (): void => {
     it('transactionRequestState should be ACCEPTED', async (): Promise<void> => {
-
       const lookupRequest = {
         payee: {
-          partyIdType: "MSISDN",
-          partyIdentifier: "+4412345678"
+          partyIdType: 'MSISDN',
+          partyIdentifier: '+4412345678'
 
         },
         transactionRequestId: transactionRequestId
@@ -21,39 +20,39 @@ describe('PISP Transaction', (): void => {
 
       const initiateURI = `${env.outbound.baseUri}/thirdpartyTransaction/${transactionRequestId}/initiate`
       const initiateRequest = {
-        sourceAccountId: "dfspa.alice.1234",
-        consentId: "8e34f91d-d078-4077-8263-2c047876fcf6",
+        sourceAccountId: 'dfspa.alice.1234',
+        consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
         payee: {
           partyIdInfo: {
-            partyIdType: "MSISDN",
-            partyIdentifier: "+44 1234 5678",
-            fspId: "dfspb"
+            partyIdType: 'MSISDN',
+            partyIdentifier: '+44 1234 5678',
+            fspId: 'dfspb'
           }
         },
         payer: {
           personalInfo: {
             complexName: {
-              firstName: "Alice",
-              lastName: "K"
+              firstName: 'Alice',
+              lastName: 'K'
             }
           },
           partyIdInfo: {
-            partyIdType: "MSISDN",
-            partyIdentifier: "+44 8765 4321",
-            fspId: "dfspa"
+            partyIdType: 'MSISDN',
+            partyIdentifier: '+44 8765 4321',
+            fspId: 'dfspa'
           }
         },
-        amountType: "SEND",
+        amountType: 'SEND',
         amount: {
-          amount: "100",
-          currency: "USD"
+          amount: '100',
+          currency: 'USD'
         },
         transactionType: {
-          scenario: "TRANSFER",
-          initiator: "PAYER",
-          initiatorType: "CONSUMER"
+          scenario: 'TRANSFER',
+          initiator: 'PAYER',
+          initiatorType: 'CONSUMER'
         },
-        expiration: "2020-07-15T22:17:28.985-01:00"
+        expiration: '2020-07-15T22:17:28.985-01:00'
       }
       const initiateresponse = await axios.post(initiateURI, initiateRequest)
       expect(initiateresponse.status).toEqual(200)
@@ -63,13 +62,13 @@ describe('PISP Transaction', (): void => {
       const approveRequest = {
         authorizationResponse: {
           authenticationInfo: {
-            authentication: "U2F",
+            authentication: 'U2F',
             authenticationValue: {
-              pinValue: "xxxxxxxxxxx",
-              counter: "1"
+              pinValue: 'xxxxxxxxxxx',
+              counter: '1'
             }
           },
-          responseType: "ENTERED"
+          responseType: 'ENTERED'
         }
       }
       const approveResponse = await axios.post(approveURI, approveRequest)

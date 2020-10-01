@@ -583,8 +583,12 @@ describe('pipsTransactionModel', () => {
           .toEqual(`pisp_transaction_${phase}_party-type_party-id`)
         // input validation party-type
         expect(() => PISPTransactionModel.partyNotificationChannel(phase, '', 'party-id', 'party-sub-id'))
-          .toThrowError('PISPTransactionModel.partyNotificationChannel: \'partyType, id, subId (when specified)\' parameters are required')
-        expect(() => PISPTransactionModel.partyNotificationChannel(phase, null as unknown as string, 'party-id', 'party-sub-id'))
+          .toThrowError(
+            'PISPTransactionModel.partyNotificationChannel: \'partyType, id, subId (when specified)\' parameters are required'
+          )
+        expect(
+          () => PISPTransactionModel.partyNotificationChannel(phase, null as unknown as string, 'party-id', 'party-sub-id')
+        )
           .toThrowError('PISPTransactionModel.partyNotificationChannel: \'partyType, id, subId (when specified)\' parameters are required')
         // input validation party-id
         expect(() => PISPTransactionModel.partyNotificationChannel(phase, 'party-type', '', 'party-sub-id'))
