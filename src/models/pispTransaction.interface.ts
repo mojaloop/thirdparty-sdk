@@ -53,20 +53,10 @@ export enum PISPTransactionPhase {
 export interface PISPTransactionStateMachine extends ControlledStateMachine {
   requestPartyLookup: Method,
   onRequestPartyLookup: Method,
-  // probably not needed
-  // resolvedPartyLookup: Method,
-  // onResolvedPartyLookup: Method,
   initiate: Method,
   onInitiate: Method,
-  // probably not needed
-  // requestAuthorization: Method,
-  // onRequestAuthorization: Method,
   approve: Method,
   onApprove: Method,
-
-  // probably not needed
-  // notifySuccess: Method,
-  // onNotifySuccess: Method
 }
 
 export interface PISPTransactionModelConfig extends PersistentModelConfig {
