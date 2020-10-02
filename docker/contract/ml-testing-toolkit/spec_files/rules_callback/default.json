@@ -98,47 +98,9 @@
     },
     "type": "callback",
     "version": 1
-  },
+  },  
   {
     "ruleId": 3,
-    "priority": 1,
-    "description": "get /authorizations/{ID}",
-    "apiVersion": {
-      "minorVersion": 0,
-      "majorVersion": 1,
-      "type": "fspiop",
-      "asynchronous": true
-    },
-    "conditions": {
-      "all": [
-        {
-          "fact": "operationPath",
-          "operator": "equal",
-          "value": "/authorizations/{ID}"
-        },
-        {
-          "fact": "method",
-          "operator": "equal",
-          "value": "get"
-        }
-      ]
-    },
-    "event": {
-      "method": "put",
-      "path": "/authorizations/{ID}",
-      "params": {
-        "body": {
-          "responseType": "ENTERED"
-        }
-      },
-      "delay": 0,
-      "type": "MOCK_CALLBACK"
-    },
-    "type": "callback",
-    "version": 1
-  },
-  {
-    "ruleId": 4,
     "priority": 1,
     "description": "post /thirdpartyRequests/transactions.",
     "apiVersion": {
