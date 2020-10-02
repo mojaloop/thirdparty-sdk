@@ -304,6 +304,9 @@ export class PISPTransactionModel
       switch (data.currentState) {
         // lookup phase
         case 'start':
+          // save model to protect against data overwrite
+          await this.saveToKVS()
+
           this.logger.info(
             `requestPartyLookup requested for ${data.transactionRequestId},  currentState: ${data.currentState}`
           )
@@ -334,6 +337,7 @@ export class PISPTransactionModel
 
         case 'errored':
         default:
+          await this.saveToKVS()
           // stopped in errored state
           this.logger.info('State machine in errored state')
           return this.getResponse()
@@ -358,6 +362,10 @@ export class PISPTransactionModel
   }
 }
 
+export async function existsInKVS (config: PISPTransactionModelConfig): Promise<boolean> {
+  return config.kvs.exists(config.key)
+}
+
 export async function create (
   data: PISPTransactionData,
   config: PISPTransactionModelConfig
@@ -379,12 +387,18 @@ export async function loadFromKVS (
     if (!data) {
       throw new Error(`No data found in KVS for: ${config.key}`)
     }
-    config.logger.push({ data })
-    config.logger.info('data loaded from KVS')
+    config.logger.push({ data }).info('data loaded from KVS')
     return create(data, config)
   } catch (err) {
-    config.logger.push({ err })
-    config.logger.info(`Error loading data from KVS for key: ${config.key}`)
+    config.logger.push({ err }).info(`Error loading data from KVS for key: ${config.key}`)
     throw err
   }
+}
+
+export default {
+  InvalidPISPTransactionDataError,
+  PISPTransactionModel,
+  existsInKVS,
+  create,
+  loadFromKVS
 }

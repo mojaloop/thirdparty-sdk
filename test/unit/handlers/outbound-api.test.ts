@@ -27,9 +27,6 @@
  --------------
  ******/
 
-import { HealthResponse } from '~/interface/types'
-import { NotificationCallback, Message, PubSub } from '~/shared/pub-sub'
-import { ServerAPI, ServerConfig } from '~/server'
 import {
   AuthorizationResponse,
   AuthenticationType,
@@ -37,6 +34,8 @@ import {
   InboundAuthorizationsPutRequest,
   OutboundAuthorizationsModelState
 } from '~/models/authorizations.interface'
+import { HealthResponse } from '~/interface/types'
+import { NotificationCallback, Message, PubSub } from '~/shared/pub-sub'
 import {
   OutboundThirdpartyAuthorizationsModelState,
   InboundThirdpartyAuthorizationsPutRequest
@@ -45,13 +44,16 @@ import {
   PISPTransactionModelState,
   ThirdpartyTransactionStatus
 } from '~/models/pispTransaction.interface'
+import PTM from '~/models/pispTransaction.model'
+
 import { RedisConnectionConfig } from '~/shared/redis-connection'
 import { Server } from '@hapi/hapi'
+import { ServerAPI, ServerConfig } from '~/server'
+import { TParty } from '@mojaloop/sdk-standard-components'
 import Config from '~/shared/config'
 import Handlers from '~/handlers'
 import index from '~/index'
 import path from 'path'
-import { TParty } from '@mojaloop/sdk-standard-components'
 
 const putResponse: InboundAuthorizationsPutRequest = {
   authenticationInfo: {
@@ -72,43 +74,43 @@ const putThirdpartyAuthResponse: InboundThirdpartyAuthorizationsPutRequest = {
 }
 const partyLookupResponse: TParty = {
   partyIdInfo: {
-    partyIdType: "MSISDN",
-    partyIdentifier: "+4412345678",
-    fspId: "pispA"
+    partyIdType: 'MSISDN',
+    partyIdentifier: '+4412345678',
+    fspId: 'pispA'
   },
-  merchantClassificationCode: "4321",
-  name: "Justin Trudeau",
+  merchantClassificationCode: '4321',
+  name: 'Justin Trudeau',
   personalInfo: {
     complexName: {
-      firstName: "Justin",
-      middleName: "Pierre",
-      lastName: "Trudeau"
+      firstName: 'Justin',
+      middleName: 'Pierre',
+      lastName: 'Trudeau'
     },
-    dateOfBirth: "1980-01-01"
+    dateOfBirth: '1980-01-01'
   }
 }
 const initiateResponse: InboundAuthorizationsPostRequest = {
-  authenticationType: "U2F",
-  retriesLeft: "1",
+  authenticationType: 'U2F',
+  retriesLeft: '1',
   amount: {
-    currency: "USD",
-    amount: "124.45"
+    currency: 'USD',
+    amount: '124.45'
   },
-  transactionId: "2f169631-ef99-4cb1-96dc-91e8fc08f539",
-  transactionRequestId: "b51ec534-ee48-4575-b6a9-ead2955b8069",
+  transactionId: '2f169631-ef99-4cb1-96dc-91e8fc08f539',
+  transactionRequestId: 'b51ec534-ee48-4575-b6a9-ead2955b8069',
   quote: {
     transferAmount: {
-      currency: "USD",
-      amount: "124.45"
+      currency: 'USD',
+      amount: '124.45'
     },
-    expiration: "2020-08-24T08:38:08.699-04:00",
-    ilpPacket: "AYIBgQAAAAAAAASwNGxldmVsb25lLmRmc3AxLm1lci45T2RTOF81MDdqUUZ",
-    condition: "f5sqb7tBTWPd5Y8BDFdMm9BJR_MNI4isf8p8n4D5pHA"
+    expiration: '2020-08-24T08:38:08.699-04:00',
+    ilpPacket: 'AYIBgQAAAAAAAASwNGxldmVsb25lLmRmc3AxLm1lci45T2RTOF81MDdqUUZ',
+    condition: 'f5sqb7tBTWPd5Y8BDFdMm9BJR_MNI4isf8p8n4D5pHA'
   }
 }
 const approveResponse: ThirdpartyTransactionStatus = {
-  transactionId: "b51ec534-ee48-4575-b6a9-ead2955b8069",
-  transactionRequestState: "ACCEPTED"
+  transactionId: 'b51ec534-ee48-4575-b6a9-ead2955b8069',
+  transactionRequestState: 'ACCEPTED'
 }
 
 jest.mock('redis')
@@ -319,8 +321,8 @@ describe('Outbound API routes', (): void => {
       },
       payload: {
         payee: {
-          partyIdType: "MSISDN",
-          partyIdentifier: "+4412345678"
+          partyIdType: 'MSISDN',
+          partyIdentifier: '+4412345678'
         },
         transactionRequestId: 'b51ec534-ee48-4575-b6a9-ead2955b8069'
       }
@@ -339,6 +341,26 @@ describe('Outbound API routes', (): void => {
     })
   })
 
+  it('/thirdpartyTransaction/partyLookup guarded', async (): Promise<void> => {
+    jest.spyOn(PTM, 'existsInKVS').mockImplementationOnce(() => Promise.resolve(true))
+    const request = {
+      method: 'POST',
+      url: '/thirdpartyTransaction/partyLookup',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      payload: {
+        payee: {
+          partyIdType: 'MSISDN',
+          partyIdentifier: '+4412345678'
+        },
+        transactionRequestId: 'b51ec534-ee48-4575-b6a9-ead2955b8069'
+      }
+    }
+    const response = await server.inject(request)
+    expect(response.statusCode).toBe(422)
+  })
+
   it('/thirdpartyTransaction/{ID}/initiate', async (): Promise<void> => {
     const request = {
       method: 'POST',
@@ -347,39 +369,39 @@ describe('Outbound API routes', (): void => {
         'Content-Type': 'application/json'
       },
       payload: {
-        sourceAccountId: "dfspa.alice.1234",
-        consentId: "8e34f91d-d078-4077-8263-2c047876fcf6",
+        sourceAccountId: 'dfspa.alice.1234',
+        consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
         payee: {
           partyIdInfo: {
-            partyIdType: "MSISDN",
-            partyIdentifier: "+44 1234 5678",
-            fspId: "dfspb"
+            partyIdType: 'MSISDN',
+            partyIdentifier: '+44 1234 5678',
+            fspId: 'dfspb'
           }
         },
         payer: {
           personalInfo: {
             complexName: {
-              firstName: "Alice",
-              lastName: "K"
+              firstName: 'Alice',
+              lastName: 'K'
             }
           },
           partyIdInfo: {
-            partyIdType: "MSISDN",
-            partyIdentifier: "+44 8765 4321",
-            fspId: "dfspa"
+            partyIdType: 'MSISDN',
+            partyIdentifier: '+44 8765 4321',
+            fspId: 'dfspa'
           }
         },
-        amountType: "SEND",
+        amountType: 'SEND',
         amount: {
-          amount: "100",
-          currency: "USD"
+          amount: '100',
+          currency: 'USD'
         },
         transactionType: {
-          scenario: "TRANSFER",
-          initiator: "PAYER",
-          initiatorType: "CONSUMER"
+          scenario: 'TRANSFER',
+          initiator: 'PAYER',
+          initiatorType: 'CONSUMER'
         },
-        expiration: "2020-07-15T22:17:28.985-01:00"
+        expiration: '2020-07-15T22:17:28.985-01:00'
       }
     }
     const pubSub = new PubSub({} as RedisConnectionConfig)
@@ -406,13 +428,13 @@ describe('Outbound API routes', (): void => {
       payload: {
         authorizationResponse: {
           authenticationInfo: {
-            authentication: "U2F",
+            authentication: 'U2F',
             authenticationValue: {
-              pinValue: "xxxxxxxxxxx",
-              counter: "1"
+              pinValue: 'xxxxxxxxxxx',
+              counter: '1'
             }
           },
-          responseType: "ENTERED"
+          responseType: 'ENTERED'
         }
       }
     }

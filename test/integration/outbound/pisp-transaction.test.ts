@@ -1,9 +1,31 @@
 import axios from 'axios'
 import env from '../env'
 import { PISPTransactionModelState } from '~/models/pispTransaction.interface'
+import { KVS } from '~/shared/kvs'
+import { RedisConnectionConfig } from '~/shared/redis-connection'
+import Config from '~/shared/config'
+import mockLogger from '../../unit/mockLogger'
+
 describe('PISP Transaction', (): void => {
+  const config: RedisConnectionConfig = {
+    host: Config.REDIS.HOST,
+    port: Config.REDIS.PORT,
+    logger: mockLogger(),
+    timeout: Config.REDIS.TIMEOUT
+  }
+  let kvs: KVS
   const transactionRequestId = 'b51ec534-ee48-4575-b6a9-ead2955b8069'
   const lookupURI = `${env.outbound.baseUri}/thirdpartyTransaction/partyLookup`
+
+  beforeAll(async (): Promise<void> => {
+    kvs = new KVS(config)
+    await kvs.connect()
+  })
+
+  afterAll(async (): Promise<void> => {
+    await kvs.disconnect()
+  })
+
   describe('/thirdpartyTransaction: partyLookup->initiate->approve', (): void => {
     it('transactionRequestState should be ACCEPTED', async (): Promise<void> => {
       const lookupRequest = {
@@ -14,6 +36,9 @@ describe('PISP Transaction', (): void => {
         },
         transactionRequestId: transactionRequestId
       }
+      // be sure we disable guard
+      await kvs.del(transactionRequestId)
+
       const lookupResponse = await axios.post(lookupURI, lookupRequest)
       expect(lookupResponse.status).toEqual(200)
       expect(lookupResponse.data.currentState).toEqual(PISPTransactionModelState.partyLookupSuccess)
