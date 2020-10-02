@@ -31,8 +31,9 @@
           "exec": [
             "const userConfig = JSON.parse(pm.globals.get('userConfig'))",
             "const curDate = (new Date()).toUTCString()",
+            "const transactionRequestId = pm.request.url.path[1]",
             "const thirdpartyRequest = {",
-            "url: userConfig.CALLBACK_ENDPOINT + '/thirdpartyRequests/transactions/b51ec534-ee48-4575-b6a9-ead2955b8069',",
+            "url: userConfig.CALLBACK_ENDPOINT + '/thirdpartyRequests/transactions/' + transactionRequestId,",
             "method: 'patch',",
             "header: {",
             "  'FSPIOP-Source': 'switch',",
