@@ -743,12 +743,6 @@ paths:
       tags:
         - authorizations
       parameters:
-        - name: Type
-          in: path
-          required: true
-          schema:
-            type: string
-          description: 'The type of the party identifier. For example, `MSISDN`, `PERSONAL_ID`.'
         - $ref: '#/paths/~1authorizations~1%7BID%7D/parameters/0'
         - $ref: '#/paths/~1consents/post/parameters/1'
         - $ref: '#/paths/~1authorizations~1%7BID%7D/parameters/1'

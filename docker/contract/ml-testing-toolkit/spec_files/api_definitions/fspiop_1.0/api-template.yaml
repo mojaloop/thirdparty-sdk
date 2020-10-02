@@ -19,7 +19,6 @@ paths:
       - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Type.yaml'
       - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/ID.yaml'
       #Headers
-      - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Content-Length.yaml'
       - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Content-Type.yaml'
       - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Date.yaml'
       - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/X-Forwarded-For.yaml'
@@ -69,20 +68,8 @@ paths:
       tags:
         - parties
       parameters:
-        #Path
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Type.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/ID.yaml'
         #Headers
         - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Content-Length.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Content-Type.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Date.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/X-Forwarded-For.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Source.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Destination.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Encryption.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Signature.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-URI.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-HTTP-Method.yaml'
       requestBody:
         description: Party information returned.
         required: true
