@@ -33,7 +33,8 @@ import {
 } from '~/models/pispTransaction.interface'
 import {
   PISPTransactionModel,
-  create
+  create,
+  existsInKVS
 } from '~/models/pispTransaction.model'
 import { Request, ResponseObject } from '@hapi/hapi'
 
@@ -57,7 +58,10 @@ async function post (_context: any, request: Request, h: StateResponseToolkit): 
     thirdpartyRequests: h.getThirdpartyRequests(),
     mojaloopRequests: h.getMojaloopRequests()
   }
-
+  const exists = await existsInKVS(modelConfig)
+  if (exists) {
+    return h.response().code(422)
+  }
   // create model
   const model: PISPTransactionModel = await create(data, modelConfig)
 

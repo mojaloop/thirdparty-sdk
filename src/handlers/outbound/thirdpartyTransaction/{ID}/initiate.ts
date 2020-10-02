@@ -39,7 +39,6 @@ import { Request, ResponseObject } from '@hapi/hapi'
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function post (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const payload = request.payload as ThirdpartyTransactionInitiateRequest
-
   // prepare model config
   const modelConfig: PISPTransactionModelConfig = {
     kvs: h.getKVS(),
