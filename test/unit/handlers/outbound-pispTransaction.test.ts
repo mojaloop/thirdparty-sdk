@@ -26,6 +26,7 @@
  --------------
  ******/
 
+import PTM from '~/models/pispTransaction.model'
 import { Request } from '@hapi/hapi'
 import { StateResponseToolkit } from '~/server/plugins/state'
 import ThirdpartyTransactionPartyLookup from '~/handlers/outbound/thirdpartyTransaction/partyLookup'
@@ -36,7 +37,7 @@ import mockLogger from '../mockLogger'
 jest.mock('~/models/pispTransaction.model', () => ({
   PISPTransactionModel: {
     notificationChannel: jest.fn(() => 'the-mocked-channel'),
-    partyNotificationChannel: jest.fn(() => 'the-mocked-party-channel'),
+    partyNotificationChannel: jest.fn(() => 'the-mocked-party-channel')
   },
   create: jest.fn(async () => ({
     // this result will be tested
@@ -45,7 +46,8 @@ jest.mock('~/models/pispTransaction.model', () => ({
   loadFromKVS: jest.fn(() => ({
     data: jest.fn(),
     run: jest.fn(async () => undefined)
-  }))
+  })),
+  existsInKVS: jest.fn(() => Promise.resolve(false))
 }))
 
 describe('Outbound PISP transaction handlers', () => {
@@ -62,50 +64,50 @@ describe('Outbound PISP transaction handlers', () => {
     }))
   }
   const initiateRequest = {
-    sourceAccountId: "dfspa.alice.1234",
-    consentId: "8e34f91d-d078-4077-8263-2c047876fcf6",
+    sourceAccountId: 'dfspa.alice.1234',
+    consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
     payee: {
       partyIdInfo: {
-        partyIdType: "MSISDN",
-        partyIdentifier: "+44 1234 5678",
-        fspId: "dfspb"
+        partyIdType: 'MSISDN',
+        partyIdentifier: '+44 1234 5678',
+        fspId: 'dfspb'
       }
     },
     payer: {
       personalInfo: {
         complexName: {
-          firstName: "Alice",
-          lastName: "K"
+          firstName: 'Alice',
+          lastName: 'K'
         }
       },
       partyIdInfo: {
-        partyIdType: "MSISDN",
-        partyIdentifier: "+44 8765 4321",
-        fspId: "dfspa"
+        partyIdType: 'MSISDN',
+        partyIdentifier: '+44 8765 4321',
+        fspId: 'dfspa'
       }
     },
-    amountType: "SEND",
+    amountType: 'SEND',
     amount: {
-      amount: "100",
-      currency: "USD"
+      amount: '100',
+      currency: 'USD'
     },
     transactionType: {
-      scenario: "TRANSFER",
-      initiator: "PAYER",
-      initiatorType: "CONSUMER"
+      scenario: 'TRANSFER',
+      initiator: 'PAYER',
+      initiatorType: 'CONSUMER'
     },
-    expiration: "2020-07-15T22:17:28.985-01:00"
+    expiration: '2020-07-15T22:17:28.985-01:00'
   }
   const approveRequest = {
     authorizationResponse: {
       authenticationInfo: {
-        authentication: "U2F",
+        authentication: 'U2F',
         authenticationValue: {
-          pinValue: "xxxxxxxxxxx",
-          counter: "1"
+          pinValue: 'xxxxxxxxxxx',
+          counter: '1'
         }
       },
-      responseType: "ENTERED"
+      responseType: 'ENTERED'
     }
   }
   it('/thirdpartyTransaction/partyLookup should report error when result from \'run\' is undefined', async () => {
@@ -117,8 +119,8 @@ describe('Outbound PISP transaction handlers', () => {
       },
       payload: {
         payee: {
-          partyIdType: "MSISDN",
-          partyIdentifier: "564533335"
+          partyIdType: 'MSISDN',
+          partyIdentifier: '564533335'
         },
         transactionRequestId: 'n51ec534-se48-4575-b6a9-ead2955b8065'
       }
@@ -131,6 +133,32 @@ describe('Outbound PISP transaction handlers', () => {
     )
     expect(result.statusCode).toBe(500)
   })
+
+  it('/thirdpartyTransaction/partyLookup should be guarded', async () => {
+    jest.spyOn(PTM, 'existsInKVS').mockImplementationOnce(() => Promise.resolve(true))
+    const request = {
+      method: 'POST',
+      url: '/thirdpartyTransaction/partyLookup',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      payload: {
+        payee: {
+          partyIdType: 'MSISDN',
+          partyIdentifier: '564533335'
+        },
+        transactionRequestId: 'n51ec534-se48-4575-b6a9-ead2955b8065'
+      }
+    }
+
+    const result = await ThirdpartyTransactionPartyLookup.post(
+      {},
+      request as unknown as Request,
+      toolkit as unknown as StateResponseToolkit
+    )
+    expect(result.statusCode).toBe(422)
+  })
+
   it('/thirdpartyTransaction/{ID}/initiate should report error when result from \'run\' is undefined', async () => {
     const request = {
       method: 'POST',
@@ -139,7 +167,7 @@ describe('Outbound PISP transaction handlers', () => {
         'Content-Type': 'application/json'
       },
       params: {
-        'ID': 'q51ec534-se48-8575-b6a9-ead2955b8067'
+        ID: 'q51ec534-se48-8575-b6a9-ead2955b8067'
       },
       payload: initiateRequest
     }
@@ -159,7 +187,7 @@ describe('Outbound PISP transaction handlers', () => {
         'Content-Type': 'application/json'
       },
       params: {
-        'ID': 'r51ec534-se48-8575-b6a9-ead2955b8067'
+        ID: 'r51ec534-se48-8575-b6a9-ead2955b8067'
       },
       payload: approveRequest
     }
