@@ -211,6 +211,46 @@ paths:
         503:
           $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/503'
   /authorizations/{ID}:
+    parameters:
+      #Path
+      - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/ID.yaml'
+      #Headers
+      - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Content-Type.yaml'
+      - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Date.yaml'
+      - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/X-Forwarded-For.yaml'
+      - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Source.yaml'
+      - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Destination.yaml'
+      - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Encryption.yaml'
+      - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Signature.yaml'
+      - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-URI.yaml'
+      - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-HTTP-Method.yaml'
+    get:
+      tags:
+        - authorizations
+      operationId: GetAuthorizationsById
+      summary: GetAuthorizationsById
+      description: >-
+        The HTTP request GET /authorizations/ is used to request the Payer to
+        enter the applicable credentials in the Payee FSP system.
+      responses:
+        202:
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/202'
+        400:
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/400'
+        401:
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/401'
+        403:
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/403'
+        404:
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/404'
+        405:
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/405'
+        406:
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/406'
+        501:
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/501'
+        503:
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/503'
     put:
       tags:
         - authorizations
@@ -220,6 +260,53 @@ paths:
         The callback PUT /authorizations/ is used to inform the client of the
         result of a previously-requested authorization. The ID in the URI should
         contain the one that was used in the POST /authorizations/ requestBody.transactionRequestId @ OUTBOUND
+      parameters:
+        #Headers
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Content-Length.yaml'
+      requestBody:
+        description: Authorization request details
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InboundAuthorizationsIDPutResponse'
+            example:
+              authenticationInfo:
+                authentication: U2F
+                authenticationValue:
+                  pinValue: '233133331'
+                  counter: '1'
+              responseType: ENTERED
+      responses:
+        200:
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/200'
+        400:
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/400'
+        401:
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/401'
+        403:
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/403'
+        404:
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/404'
+        405:
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/405'
+        406:
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/406'
+        501:
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/501'
+        503:
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/503'
+  /authorizations/{ID}/error:
+    put:
+      summary: AuthorizationsByIDAndError
+      operationId: AuthorizationsByIDAndError
+      description: >-
+        If the server is unable to find the transaction request, or another
+        processing error occurs, the error callback PUT /authorizations//error
+        is used. The  in the URI should contain the  that was used in the GET
+        /authorizations/.
+      tags:
+        - authorizations
       parameters:
         #Path
         - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/ID.yaml'
@@ -235,19 +322,12 @@ paths:
         - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-URI.yaml'
         - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-HTTP-Method.yaml'
       requestBody:
-        description: Authorization request details
+        description: Error information returned.
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/InboundAuthorizationsIDPutResponse'
-            example:
-              authenticationInfo:
-                authentication: U2F
-                authenticationValue:
-                  pinValue: '233133331'
-                  counter: '1'
-              responseType: ENTERED
+              $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/ErrorInformationObject.yaml'
       responses:
         200:
           $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/200'
@@ -545,7 +625,7 @@ paths:
   /consents/{ID}/generateChallenge:
     post:
       tags:
-        - consents
+        - consent
       operationId: GenerateChallengeRequest
       summary: GenerateChallengeRequest
       description: |
@@ -603,6 +683,8 @@ paths:
         - Called by a DFSP when a dfsp wants to unlink user's account(s).
 
         PISP -> Switch
+      tags:
+        - consent
       parameters:
       #Path
         - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/ID.yaml'
