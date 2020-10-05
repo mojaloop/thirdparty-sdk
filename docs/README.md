@@ -13,6 +13,16 @@ The PISP Transaction Sequence breaks down the async Mojaloop calls into a series
 
 ### DFSP Transaction Sequence
 
+![DFSP Transaction Sequence](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/mojaloop/thirdparty-scheme-adapter/feat/1728-dfsp-3p-state-machine-design/docs/sequence/PISPTransactionApi.puml)
+
+**Notes:**
+1. In this example, the scheme adapter is responsible for contacting the auth-service, and not the dfsp backend itself. This will need to be configurable
+
+[ todo:
+  - should we make this 2 sync calls instead of 1? That way the dfsp gets a chance to abort for any other reason (e.g. source account has no funds)
+
+]
+
 ### PISP Linking Sequence
 **TODO**
 
