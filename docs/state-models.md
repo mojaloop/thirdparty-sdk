@@ -1,4 +1,7 @@
 # Scheme Adapter Changes
+> Note: this is an outdated document and will be removed shortly. 
+> Refer to the sequence diagrams in [`./README.md`](./README.md) for a more updated list of the sequences
+
 
 <!-- TODO: Lewis update this doc -->
 

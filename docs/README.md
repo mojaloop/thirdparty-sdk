@@ -3,28 +3,29 @@
 
 ## Contents
 
-- [state-models](./state-models.md) - The internal states for the scenarios modelled by the scheme adapter
-- [outbound-api](./outbound-api.md) - The API design for the external interface 
+### [PISP Transaction Sequence]
 
-**Can we rename outbound and inbound api to _external_ and _internal_ api respectively?**
+The PISP Transaction Sequence breaks down the async Mojaloop calls into a series of synchronous calls:
 
-- Where external is for communication between the DFSP and the adapter
-- And internal is for communication between the adapter and the adapter
+![PISP Transaction Sequence](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/mojaloop/thirdparty-scheme-adapter/feat/1728-dfsp-3p-state-machine-design/docs/sequence/PISPTransactionApi.puml)
 
 
 
-## TODO:
 
-- timeout design - how do we handle timeouts gracefully?
+### [DFSP Transaction Sequence]
+
+### [PISP Linking Sequence]
+**TODO**
+### [DFSP Linking Sequence]
+**TODO**
+
+
+
+
+## Design Questions:
+
+- **timeout design** - how do we handle timeouts gracefully?
   - between redis handlers and http handlers
   - any given redis handler must listen to 2 events:
     - http event (happy path)
     - timeout event 
-
-
-Story breakdown
-
-- outbound-pisp design
-- build out model for all states
-- breakdown into 3 phases
-  - implement one by one
