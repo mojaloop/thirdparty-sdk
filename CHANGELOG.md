@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+## [11.18.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.17.1...v11.18.0) (2020-10-05)
+
+
+### Features
+
+* **pips-transaction-request-model:** PISP-side state machine and handlers ([#38](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/38)) ([67093e6](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/67093e6f295aeead789ad522b73d151587ddf0af))
+
 ### [11.17.1](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.17.0...v11.17.1) (2020-09-30)
 
 
