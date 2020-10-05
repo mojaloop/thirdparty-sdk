@@ -44,15 +44,20 @@ function getFileListContent (pathList: string): Array<Buffer> {
   return pathList.split(',').map((path) => getFileContent(path))
 }
 
-export interface InOutConfig {
+export interface OutConfig {
   HOST: string
   PORT: number
 }
+
+export interface InConfig extends OutConfig{
+  PISP_TRANSACTION_MODE: boolean
+}
+
 // interface to represent service configuration
 export interface ServiceConfig {
   ENV: string
-  INBOUND: InOutConfig
-  OUTBOUND: InOutConfig
+  INBOUND: InConfig
+  OUTBOUND: OutConfig
   WSO2_AUTH: {
     staticToken: string
     tokenEndpoint: string
@@ -121,7 +126,7 @@ export interface ServiceConfig {
 export const ConvictConfig = Convict<ServiceConfig>({
   ENV: {
     doc: 'The application environment.',
-    format: ['production', 'development', 'test'],
+    format: ['production', 'development', 'test', 'integration', 'e2e'],
     default: 'development',
     env: 'NODE_ENV'
   },
@@ -137,6 +142,12 @@ export const ConvictConfig = Convict<ServiceConfig>({
       format: 'port',
       default: 3001,
       env: 'INBOUND_PORT'
+    },
+    PISP_TRANSACTION_MODE: {
+      doc: 'PISPTransactionModel to be used',
+      format: 'Boolean',
+      default: false,
+      env: 'PISP_TRANSACTION_MODE'
     }
   },
   OUTBOUND: {
@@ -297,7 +308,7 @@ ConvictConfig.validate({ allowed: 'strict' })
 // Load file contents for keys and secrets
 ConvictConfig.set('SHARED.JWS_SIGNING_KEY', getFileContent(ConvictConfig.get('SHARED').JWS_SIGNING_KEY))
 
-// Note: Have not seen these be comma seperated value strings. mimicing sdk-scheme-adapter for now
+// Note: Have not seen these be comma separated value strings. mimicking sdk-scheme-adapter for now
 ConvictConfig.set(
   'SHARED.TLS.inbound.creds.ca',
   getFileListContent(<string> ConvictConfig.get('SHARED').TLS.inbound.creds.ca)

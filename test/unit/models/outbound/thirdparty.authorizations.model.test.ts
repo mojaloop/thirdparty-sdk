@@ -84,7 +84,7 @@ describe('OutboundThirdpartyAuthorizationsModel', () => {
     await modelConfig.pubSub.disconnect()
   })
 
-  function checkThirdpartyAuthorizationsModelLayout(am: OutboundThirdpartyAuthorizationsModel, optData?: OutboundThirdpartyAuthorizationsData) {
+  function checkThirdpartyAuthorizationsModelLayout (am: OutboundThirdpartyAuthorizationsModel, optData?: OutboundThirdpartyAuthorizationsData) {
     expect(am).toBeTruthy()
     expect(am.data).toBeDefined()
     expect(am.fsm.state).toEqual(optData?.currentState || 'start')
@@ -244,7 +244,6 @@ describe('OutboundThirdpartyAuthorizationsModel', () => {
       })
 
       it('errored', async () => {
-
         const model = await create({ ...data, currentState: 'errored' }, modelConfig)
 
         const result = await model.run()

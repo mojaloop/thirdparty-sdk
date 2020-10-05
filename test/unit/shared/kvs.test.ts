@@ -29,6 +29,8 @@ import { Callback } from 'redis'
 import { InvalidKeyError, KVS } from '~/shared/kvs'
 import { RedisConnectionConfig } from '~/shared/redis-connection'
 import mockLogger from '../mockLogger'
+import shouldNotBeExecuted from '../shouldNotBeExecuted'
+
 jest.mock('redis')
 
 describe('KVS: Key Value Storage', () => {
@@ -142,5 +144,65 @@ describe('KVS: Key Value Storage', () => {
     } catch (error) {
       expect(error).toEqual(new InvalidKeyError())
     }
+  })
+
+  it('should DEL key', async (): Promise<void> => {
+    const kvs = new KVS(config)
+    await kvs.connect()
+    const key = 'the-key'
+
+    const delSpy = jest.spyOn(kvs.client, 'del').mockImplementationOnce((
+      ...args: (string | Callback<number>)[]
+    ): boolean => {
+      const argKey: string = args[0] as unknown as string
+      expect(argKey).toEqual(key)
+      return true
+    })
+
+    const result = await kvs.del(key)
+    expect(result).toBeTruthy()
+    expect(delSpy).toBeCalledTimes(1)
+    expect(delSpy).toBeCalledWith(key)
+  })
+
+  it('should validate invalid key for DEL', async (): Promise<void> => {
+    const kvs = new KVS(config)
+    await kvs.connect()
+    try {
+      await kvs.del(null as unknown as string)
+    } catch (error) {
+      expect(error).toEqual(new InvalidKeyError())
+    }
+  })
+
+  it('should check does key EXISTS', async () => {
+    const key = 'non-existing-key'
+    const kvs = new KVS(config)
+    await kvs.connect()
+
+    const spyExists = jest.spyOn(kvs.client, 'exists')
+    const result = await kvs.exists(key)
+    expect(result).toBeFalsy()
+    expect(spyExists).toBeCalledWith(key, expect.anything())
+  })
+
+  it('should reject and propagate error from EXISTS', async () => {
+    const key = 'non-existing-key'
+    const kvs = new KVS(config)
+    await kvs.connect()
+
+    const spyExists = jest.spyOn(kvs.client, 'exists').mockImplementationOnce((...args: (string | Callback<number>)[]
+    ): boolean => {
+      const cb = args[1] as Callback<number>
+      cb(new Error('mocked-error'), 0)
+      return false
+    })
+    try {
+      await kvs.exists(key)
+      shouldNotBeExecuted()
+    } catch (err) {
+      expect(err).toEqual(new Error('mocked-error'))
+    }
+    expect(spyExists).toBeCalledWith(key, expect.anything())
   })
 })

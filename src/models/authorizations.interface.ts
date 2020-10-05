@@ -24,10 +24,10 @@
  - Paweł Marzec <pawel.marzec@modusbox.com>
  --------------
  ******/
-import { ControlledStateMachine, PersistentModelConfig, StateData } from '~/models/persistent.model'
-import { Method } from 'javascript-state-machine'
 import { PostAuthorizationsRequest, ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
+import { Method } from 'javascript-state-machine'
 import { PubSub } from '~/shared/pub-sub'
+import { ControlledStateMachine, PersistentModelConfig, StateData } from './persistent.model'
 
 export enum AuthenticationType {
   OTP = 'OTP',

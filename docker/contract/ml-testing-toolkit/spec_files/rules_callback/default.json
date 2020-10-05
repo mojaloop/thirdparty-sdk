@@ -1,0 +1,186 @@
+[
+  {
+    "ruleId": 1,
+    "priority": 1,
+    "description": "get /parties/{Type}/{ID}",
+    "apiVersion": {
+      "minorVersion": 0,
+      "majorVersion": 1,
+      "type": "fspiop",
+      "asynchronous": true
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/parties/{Type}/{ID}"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "get"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/parties/{Type}/{ID}",
+      "params": {
+        "headers": {
+          "Content-Type": "application/vnd.interoperability.parties+json;version=1.0",
+          "Date": "Wed, 27 May 2020 11:13:34 GMT",
+          "X-Forwarded-For": "sed eiusmod sunt",
+          "FSPIOP-Source": "pisp",
+          "FSPIOP-Destination": "dfspa",
+          "FSPIOP-Encryption": "magna Excepteur dolore nisi fugiat",
+          "FSPIOP-Signature": "nisi",
+          "FSPIOP-URI": "veniam reprehenderit anim ut",
+          "FSPIOP-HTTP-Method": "PUT",
+          "Content-Length": ""
+        },
+        "body": {
+          "party": {
+            "partyIdInfo": {
+              "partyIdType": "{$request.params.Type}",
+              "partyIdentifier": "{$request.params.ID}",
+              "fspId": "{$config.FSPID}"
+            },
+            "merchantClassificationCode": "4321",
+            "name": "Justin Trudeau",
+            "personalInfo": {
+              "complexName": {
+                "firstName": "Justin",
+                "middleName": "Pierre",
+                "lastName": "Trudeau"
+              },
+              "dateOfBirth": "1980-01-01"
+            }
+          }
+        }
+      },
+      "delay": 0,
+      "type": "FIXED_CALLBACK"
+    },
+    "type": "callback",
+    "version": 1
+  },
+  {
+    "ruleId": 2,
+    "priority": 1,
+    "description": "get /parties/{Type}/{ID}/{SubId}",
+    "apiVersion": {
+      "minorVersion": 0,
+      "majorVersion": 1,
+      "type": "fspiop",
+      "asynchronous": true
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/parties/{Type}/{ID}/{SubId}"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "get"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/parties/{Type}/{ID}/{SubId}",
+      "params": {},
+      "delay": 0,
+      "type": "MOCK_CALLBACK"
+    },
+    "type": "callback",
+    "version": 1
+  },  
+  {
+    "ruleId": 3,
+    "priority": 1,
+    "description": "post /thirdpartyRequests/transactions.",
+    "apiVersion": {
+      "minorVersion": 1,
+      "majorVersion": 0,
+      "type": "thirdparty_pisp",
+      "asynchronous": true
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/thirdpartyRequests/transactions"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "post"
+        }
+      ]
+    },
+    "event": {
+      "method": "post",
+      "path": "/authorizations",
+      "params": {
+        "headers": {
+          "Accept": "application/vnd.interoperability.authorizations+json;version=1.0",
+          "Content-Type": "application/vnd.interoperability.authorizations+json;version=1.0",
+          "Date": "Wed, 27 May 2020 11:13:34 GMT",
+          "FSPIOP-Source": "DFSPA"
+        },
+        "body": {
+          "authenticationType": "U2F",
+          "retriesLeft": "1",
+          "amount": {
+            "currency": "USD",
+            "amount": "124.45"
+          },
+          "transactionId": "2f169631-ef99-4cb1-96dc-91e8fc08f539",
+          "transactionRequestId": "{$request.body.transactionRequestId}",
+          "quote": {
+            "transferAmount": {
+              "currency": "USD",
+              "amount": "124.45"
+            },
+            "payeeReceiveAmount": {
+              "currency": "USD",
+              "amount": "123.45"
+            },
+            "payeeFspFee": {
+              "currency": "USD",
+              "amount": "1"
+            },
+            "payeeFspCommission": {
+              "currency": "USD",
+              "amount": "0"
+            },
+            "expiration": "2020-08-24T08:38:08.699-04:00",
+            "geoCode": {
+              "latitude": "+45.4215",
+              "longitude": "+75.6972"
+            },
+            "ilpPacket": "AYIBgQAAAAAAAASwNGxldmVsb25lLmRmc3AxLm1lci45T2RTOF81MDdqUUZ",
+            "condition": "f5sqb7tBTWPd5Y8BDFdMm9BJR_MNI4isf8p8n4D5pHA",
+            "extensionList": {
+              "extension": [
+                {
+                  "key": "errorDescription",
+                  "value": "This is a more detailed error description"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "delay": 0,
+      "type": "FIXED_CALLBACK"
+    },
+    "type": "callback",
+    "version": 1
+  }
+]

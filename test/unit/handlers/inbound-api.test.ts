@@ -36,15 +36,19 @@ import {
 } from '~/models/authorizations.interface'
 import InboundAuthorizations from '~/handlers/inbound/authorizations'
 import {
+  InboundThirdpartyAuthorizationsPutRequest
+} from '~/models/thirdparty.authorizations.interface'
+import {
   OutboundAuthorizationsModel
 } from '~/models/outbound/authorizations.model'
 import {
-  InboundThirdpartyAuthorizationsPutRequest
-} from '~/models/thirdparty.authorizations.interface'
-import ThirdpartyAuthorizations from '~/handlers/inbound/thirdpartyRequests/transactions/{ID}/authorizations'
-import {
   OutboundThirdpartyAuthorizationsModel
 } from '~/models/outbound/thirdparty.authorizations.model'
+import {
+  PISPTransactionModel
+} from '~/models/pispTransaction.model'
+import { PISPTransactionPhase } from '~/models/pispTransaction.interface'
+import ThirdpartyAuthorizations from '~/handlers/inbound/thirdpartyRequests/transactions/{ID}/authorizations'
 import { Server, Request } from '@hapi/hapi'
 import { StateResponseToolkit } from '~/server/plugins/state'
 import { buildPayeeQuoteRequestFromTptRequest } from '~/domain/thirdpartyRequests/transactions'
@@ -53,6 +57,8 @@ import Config from '~/shared/config'
 import TestData from 'test/unit/data/mockData.json'
 import index from '~/index'
 import path from 'path'
+import config from '~/shared/config'
+import { logger } from '~/shared/logger'
 
 const mockData = JSON.parse(JSON.stringify(TestData))
 const postThirdpartyRequestsTransactionRequest = mockData.postThirdpartyRequestsTransactionRequest
@@ -151,7 +157,7 @@ describe('Inbound API routes', (): void => {
   })
 
   describe('/authorization', () => {
-    it('PUT handler && pubSub invocation', async (): Promise<void> => {
+    it('PUT handler && pubSub invocation - authorization mode', async (): Promise<void> => {
       const request = {
         params: {
           ID: '123'
@@ -179,8 +185,45 @@ describe('Inbound API routes', (): void => {
       expect(result.statusCode).toEqual(200)
       expect(toolkit.getPubSub).toBeCalledTimes(1)
 
-      const channel = OutboundAuthorizationsModel.notificationChannel(request.params.ID)
-      expect(pubSubMock.publish).toBeCalledWith(channel, putResponse)
+      // check default authorization mode
+      const authChannel = OutboundAuthorizationsModel.notificationChannel(request.params.ID)
+      expect(pubSubMock.publish).toBeCalledWith(authChannel, putResponse)
+    })
+
+    it('PUT handler && pubSub invocation - pisp transfer mode', async (): Promise<void> => {
+      config.INBOUND.PISP_TRANSACTION_MODE = true
+      const request = {
+        params: {
+          ID: '123'
+        },
+        payload: putResponse
+      }
+      const pubSubMock = {
+        publish: jest.fn()
+      }
+      const toolkit = {
+        getPubSub: jest.fn(() => pubSubMock),
+        response: jest.fn(() => ({
+          code: jest.fn((code: number) => ({
+            statusCode: code
+          }))
+        }))
+      }
+
+      const result = await InboundAuthorizations.put(
+        {},
+        request as unknown as Request,
+        toolkit as unknown as StateResponseToolkit
+      )
+
+      expect(result.statusCode).toEqual(200)
+      expect(toolkit.getPubSub).toBeCalledTimes(1)
+
+      // check pisp transaction mode
+      const pispChannel = PISPTransactionModel.notificationChannel(PISPTransactionPhase.initiation, request.params.ID)
+      expect(pubSubMock.publish).toBeCalledWith(pispChannel, putResponse)
+
+      config.INBOUND.PISP_TRANSACTION_MODE = false
     })
 
     it('PUT success flow', async (): Promise<void> => {
@@ -196,7 +239,7 @@ describe('Inbound API routes', (): void => {
       expect(response.statusCode).toBe(200)
     })
 
-    it('POST success flow', async (): Promise<void> => {
+    it('POST success flow - authorization mode', async (): Promise<void> => {
       const postRequest = {
         toParticipantId: 'pisp',
         authenticationType: 'U2F',
@@ -226,9 +269,88 @@ describe('Inbound API routes', (): void => {
         },
         payload: postRequest
       }
-      const response = await server.inject(request)
-      expect(response.statusCode).toBe(202)
+      const pubSubMock = {
+        publish: jest.fn()
+      }
+      const toolkit = {
+        getLogger: jest.fn(() => logger),
+        getPubSub: jest.fn(() => pubSubMock),
+        getBackendRequests: jest.fn(),
+        getMojaloopRequests: jest.fn(),
+        response: jest.fn(() => ({
+          code: jest.fn((code: number) => ({
+            statusCode: code
+          }))
+        }))
+      }
+      const result = await InboundAuthorizations.post(
+        {},
+        request as unknown as Request,
+        toolkit as unknown as StateResponseToolkit
+      )
+      expect(result.statusCode).toBe(202)
       expect(mockInboundPostAuthorization).toBeCalledWith(postRequest, request.headers['fspiop-source'])
+    })
+
+    it('POST success flow - pisp transaction mode', async (): Promise<void> => {
+      config.INBOUND.PISP_TRANSACTION_MODE = true
+      const postRequest = {
+        toParticipantId: 'pisp',
+        authenticationType: 'U2F',
+        retriesLeft: '1',
+        amount: {
+          currency: 'USD',
+          amount: '100'
+        },
+        transactionId: 'c87e9f61-e0d1-4a1c-a992-002718daf402',
+        transactionRequestId: 'aca279be-60c6-42ff-aab5-901d61b5e35c',
+        quote: {
+          transferAmount: {
+            currency: 'USD',
+            amount: '105'
+          },
+          expiration: '2020-07-15T09:48:54.961Z',
+          ilpPacket: 'ilp-packet-value',
+          condition: 'condition-000000000-111111111-222222222-abc'
+        }
+      }
+      const request = {
+        method: 'POST',
+        url: '/authorizations',
+        headers: {
+          'Content-Type': 'application/json',
+          'fspiop-source': 'sourceDfspId'
+        },
+        payload: postRequest
+      }
+      const pubSubMock = {
+        publish: jest.fn()
+      }
+      const toolkit = {
+        getLogger: jest.fn(() => logger),
+        getPubSub: jest.fn(() => pubSubMock),
+        getBackendRequests: jest.fn(),
+        getMojaloopRequests: jest.fn(),
+        response: jest.fn(() => ({
+          code: jest.fn((code: number) => ({
+            statusCode: code
+          }))
+        }))
+      }
+      const result = await InboundAuthorizations.post(
+        {},
+        request as unknown as Request,
+        toolkit as unknown as StateResponseToolkit
+      )
+      expect(result.statusCode).toBe(202)
+
+      // check pisp transaction mode
+      const pispChannel = PISPTransactionModel.notificationChannel(
+        PISPTransactionPhase.initiation,
+        postRequest.transactionRequestId
+      )
+      expect(pubSubMock.publish).toBeCalledWith(pispChannel, postRequest)
+      config.INBOUND.PISP_TRANSACTION_MODE = false
     })
   })
 

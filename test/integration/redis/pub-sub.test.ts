@@ -27,14 +27,14 @@
 
 import { Message, PubSub } from '~/shared/pub-sub'
 import { RedisConnectionConfig } from '~/shared/redis-connection'
-import mockLogger from '../../unit/mockLogger'
+import { logger } from '~/shared/logger'
 import Config from '~/shared/config'
 
 describe('PubSub', () => {
   const config: RedisConnectionConfig = {
     host: Config.REDIS.HOST,
     port: Config.REDIS.PORT,
-    logger: mockLogger(),
+    logger: logger,
     timeout: Config.REDIS.TIMEOUT
   }
   let listener: PubSub

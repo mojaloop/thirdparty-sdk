@@ -97,6 +97,7 @@ export class PubSub extends RedisConnection {
 
     // do nothing if channel doesn't exist
     if (!callbacksForChannel) {
+      this.logger.info(`broadcastMessage: no callbacks for '${channel}' channel`)
       return
     }
 
