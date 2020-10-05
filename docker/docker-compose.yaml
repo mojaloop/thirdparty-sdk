@@ -5,15 +5,138 @@ networks:
     name: mojaloop-net
 
 services:
-  mojaloop-peer:
-    image: mojaloop/simulator:v9.5.0
+  inbound-thirdparty-scheme-adapter-a:
+    container_name: inbound-thirdparty-scheme-adapter-a
+    build:
+      context: ../
+      dockerfile: ./docker/Dockerfile
+    command: sh -c "/opt/thirdparty-scheme-adapter/wait4/wait4.js inbound-thirdparty-scheme-adapter && NODE_ENV=test npm run start:inbound"
+    volumes:
+      - ./wait4:/opt/thirdparty-scheme-adapter/wait4
+      - ./scheme_a/config:/opt/thirdparty-scheme-adapter/config
+    environment:
+      - NODE_ENV=test
+    networks:
+      - mojaloop-net
+    ports:
+      - "4005:4005"
+    depends_on:
+      - redis
+      - pisp-simulator
+    extra_hosts:
+      - "redis:172.17.0.1"
+      - "pisp-simulator:172.17.0.1"
+    healthcheck:
+      test: wget -q http://172.17.0.1:4005/health -O /dev/null || exit 1
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+      interval: 30s
+
+  outbound-thirdparty-scheme-adapter-a:
+    container_name: outbound-thirdparty-scheme-adapter-a
+    build:
+      context: ../
+      dockerfile: ./docker/Dockerfile
+    command: sh -c "/opt/thirdparty-scheme-adapter/wait4/wait4.js outbound-thirdparty-scheme-adapter && NODE_ENV=test npm run start:outbound"
+    volumes:
+      - ./wait4:/opt/thirdparty-scheme-adapter/wait4
+      - ./scheme_a/config:/opt/thirdparty-scheme-adapter/config
+    environment:
+      - NODE_ENV=test
+    networks:
+      - mojaloop-net
+    ports:
+      - "4006:4006"
+    depends_on:
+      - redis
+      - pisp-simulator
+    extra_hosts:
+      - "redis:172.17.0.1"
+      - "pisp-simulator:172.17.0.1"
+    healthcheck:
+      test: wget -q http://172.17.0.1:4006/health -O /dev/null || exit 1
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+      interval: 30s
+  
+  inbound-thirdparty-scheme-adapter-b:
+    container_name: inbound-thirdparty-scheme-adapter-b
+    build:
+      context: ../
+      dockerfile: ./docker/Dockerfile
+    command: sh -c "/opt/thirdparty-scheme-adapter/wait4/wait4.js inbound-thirdparty-scheme-adapter && NODE_ENV=test npm run start:inbound"
+    volumes:
+      - ./wait4:/opt/thirdparty-scheme-adapter/wait4
+      - ./scheme_b/config:/opt/thirdparty-scheme-adapter/config
+    environment:
+      - NODE_ENV=test
+    networks:
+      - mojaloop-net
+    ports:
+      - "4007:4007"
+    depends_on:
+      - redis
+      - pisp-simulator
+    extra_hosts:
+      - "redis:172.17.0.1"
+      - "pisp-simulator:172.17.0.1"
+    healthcheck:
+      test: wget -q http://172.17.0.1:4007/health -O /dev/null || exit 1
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+      interval: 30s
+
+  outbound-thirdparty-scheme-adapter-b:
+    container_name: outbound-thirdparty-scheme-adapter-b
+    build:
+      context: ../
+      dockerfile: ./docker/Dockerfile
+    command: sh -c "/opt/thirdparty-scheme-adapter/wait4/wait4.js outbound-thirdparty-scheme-adapter && NODE_ENV=test npm run start:outbound"
+    volumes:
+      - ./wait4:/opt/thirdparty-scheme-adapter/wait4
+      - ./scheme_b/config:/opt/thirdparty-scheme-adapter/config
+    environment:
+      - NODE_ENV=test
+    networks:
+      - mojaloop-net
+    ports:
+      - "4008:4008"
+    depends_on:
+      - redis
+      - pisp-simulator
+    extra_hosts:
+      - "redis:172.17.0.1"
+      - "pisp-simulator:172.17.0.1"
+    healthcheck:
+      test: wget -q http://172.17.0.1:4008/health -O /dev/null || exit 1
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+      interval: 30s
+  
+  redis:
+    container_name: redis
+    image: "redis:5.0.4-alpine"
+    networks:
+      - mojaloop-net
+    ports:
+      - "6379:6379"
+    restart: always
+  
+  pisp-simulator:
+    image: mojaloop/mojaloop-simulator:v9.4.1.7-pisp
    # build: 
-   #   context: ../../mojaloop-simulator
-    container_name: mojaloop-peer
+   #   context: .././mojaloop-simulator
+    networks:
+      - mojaloop-net
+    container_name: pisp-simulator
     env_file: ./dfsp_backend.env
     volumes:
        - ./dfsp_rules.json:/src/rules.json
     ports:
       - "9000:3000"
       - "9002:3002"
-      - "9003:3003"
+      - "9003:3003"    

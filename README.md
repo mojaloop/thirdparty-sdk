@@ -61,5 +61,16 @@ This package exemplifies the use of the Mojaloop SDK Standard Components for TLS
   `Outbound API` service is used by `Thirdparty backend` to make a call to `Mojaloop Switch`  
   Its responsibility is to transform asynchronous Mojaloop API native interface's set of calls to a synchronous call.
 
+## Integration Test
+   To run integration tests, first start `docker-compose` inside `docker` folder.
+   ```bash
+   cd docker
+   docker-compose build && docker-compose up
+   ```
+   Then run the following command
+   ```bash
+   npm run test:integration
+   ```
+
 # Contribution
 Read the [contributing.md](./contributing.md) doc

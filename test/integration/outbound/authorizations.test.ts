@@ -30,7 +30,6 @@ import axios from 'axios'
 import env from '../env'
 
 describe('POST /authorizations', (): void => {
-  // setup for POST OUTbound
   const scenariosURI = `${env.outbound.baseUri}/authorizations`
   const options = {
     toParticipantId: 'pisp',
@@ -53,30 +52,8 @@ describe('POST /authorizations', (): void => {
     }
   }
 
-  // setup for PUT INbound
-  const scenariosURIIn = `${env.inbound.baseUri}/authorizations/${options.transactionRequestId}`
-  const optionsIn = {
-    authenticationInfo: {
-      authentication: 'U2F',
-      authenticationValue: {
-        pinValue: 'the-mocked-pin-value',
-        counter: '1'
-      }
-    },
-    responseType: 'ENTERED'
-  }
-
   it('DFSPB asks via scheme adapter the PISP to deliver Authorization from User', async (): Promise<void> => {
     // Act
-    setTimeout(async () => {
-      try {
-        const res = await axios.put(scenariosURIIn, optionsIn)
-        expect(res.status).toBe(200)
-      } catch (e) {
-        console.log(e.message)
-      }
-    }, 50)
-
     const response = await axios.post(scenariosURI, options)
 
     // Assert

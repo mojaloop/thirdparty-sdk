@@ -1,10 +1,10 @@
 {
   "INBOUND": {
-    "PORT": 4005,
+    "PORT": 4007,
     "HOST": "0.0.0.0"
   },
   "OUTBOUND": {
-    "PORT": 4006,
+    "PORT": 4008,
     "HOST": "0.0.0.0"
   },
   "WSO2_AUTH": {
@@ -16,7 +16,7 @@
   },
   "REDIS": {
     "PORT": 6379,
-    "HOST": "localhost",
+    "HOST": "redis",
     "TIMEOUT": 100
   },
   "INSPECT": {
@@ -25,20 +25,20 @@
     "COLOR": true
   },
   "SHARED": {
-    "PEER_ENDPOINT": "0.0.0.0:4003",
+    "PEER_ENDPOINT": "inbound-thirdparty-scheme-adapter-a:4005",
     "ALS_ENDPOINT": "0.0.0.0:4002",
     "QUOTES_ENDPOINT": "0.0.0.0:3002",
     "TRANSFERS_ENDPOINT": "0.0.0.0:3000",
     "BULK_TRANSFERS_ENDPOINT": "",
     "DFSP_ID": "dfsp_a",
-    "DFSP_BACKEND_URI": "0.0.0.0:9000",
+    "DFSP_BACKEND_URI": "pisp-simulator:9000",
     "DFSP_BACKEND_HTTP_SCHEME": "http",
     "JWS_SIGN": false,
     "JWS_SIGNING_KEY": "./secrets/jwsSigningKey.key",
     "TLS": {
       "inbound": {
         "mutualTLS": {
-            "enabled": false
+          "enabled": false
         },
         "creds": {
           "ca": "./secrets/dfsp_a_client.crt",
@@ -48,7 +48,7 @@
       },
       "outbound": {
         "mutualTLS": {
-            "enabled": false
+          "enabled": false
         },
         "creds": {
           "ca": "./secrets/dfsp_a_client.crt",
@@ -58,7 +58,7 @@
       },
       "test": {
         "mutualTLS": {
-            "enabled": false
+          "enabled": false
         },
         "creds": {
           "ca": "./secrets/dfsp_a_client.crt",
