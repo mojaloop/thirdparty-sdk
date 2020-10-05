@@ -13,6 +13,8 @@ paths:
       operationId: OutboundAuthorizationsPost
       summary: Outbound Authorizations endpoint
       description: DFSP Requests Authorization of Transaction from the End User
+      tags:
+        - authorizations
       # parameters:
       #   #Headers
       #   - $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Accept.yaml'
@@ -124,12 +126,138 @@ paths:
       operationId: HelloGet
       summary: example get
       description: The HTTP request GET /hello is used to return some example json.
+  /thirdpartyTransaction/partyLookup:
+    post:
+      operationId: ThirdpartyTransactionPartyLookup
+      summary: Thirdparty transaction party lookup.
+      description: >
+        The HTTP request `POST /thirdpartyTransaction/partyLookup` is used to lookup information regarding the requested Party, defined by `Type`, `ID` and optionally `SubId`.
+      tags:
+        - thirdpartyRequests
+      requestBody:
+        description: Thirdparty transaction party lookup body.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                payee:
+                  $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/PartyIdInfo.yaml'
+                transactionRequestId:
+                  $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/CorrelationId.yaml'
+      responses:
+        '200':
+          $ref: '#/components/responses/ThirdpartyTransactionPartyLookupResponse'
+        '400':
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/400'
+        '401':
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/401'
+        '403':
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/403'
+        '404':
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/404'
+        '405':
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/405'
+        '406':
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/406'
+        '501':
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/501'
+        '503':
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/503'      
+  /thirdpartyTransaction/{ID}/initiate:
+    post:
+      operationId: InitiateThirdpartyTransaction
+      summary: Initiates a third party transaction.
+      description: >
+        The HTTP request `POST /thirdpartyTransaction/{ID}/initiate` is sent to the Switch to initiate a third party request transaction.
+      tags:
+        - thirdpartyRequests
+      parameters:
+        #Path
+        - $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/ID.yaml'
+      requestBody:
+        description: Thirdparty transaction initiate request body.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OutboundThirdpartyRequestsTransactionsPostRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/ThirdpartyTransactionInitiateResponse'
+        '400':
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/400'
+        '401':
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/401'
+        '403':
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/403'
+        '404':
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/404'
+        '405':
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/405'
+        '406':
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/406'
+        '501':
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/501'
+        '503':
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/503'
+  /thirdpartyTransaction/{ID}/approve:
+    post:
+      operationId: ApproveThirdpartyTransaction
+      summary: Approve a third party transaction.
+      description: >
+        The HTTP request `POST /thirdpartyTransaction/{ID}/approve` is used to approve a third party transaction .
+      tags:
+        - thirdpartyRequests
+      parameters:
+        #Path
+        - $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/ID.yaml'
+      requestBody:
+        description: Thirdparty transaction approve request body contains Authorization details
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                authorizationResponse:
+                  $ref: '#/components/schemas/AuthorizationsIDPutResponse'
+            example:
+              authorizationResponse:   
+                authenticationInfo:
+                  authentication: U2F
+                  authenticationValue:
+                    pinValue: '233133331'
+                    counter: '1'
+                responseType: ENTERED
+      responses:
+        '200':
+          $ref: '#/components/responses/ThirdpartyTransactionApproveResponse'
+        '400':
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/400'
+        '401':
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/401'
+        '403':
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/403'
+        '404':
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/404'
+        '405':
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/405'
+        '406':
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/406'
+        '501':
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/501'
+        '503':
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/503'
   /thirdpartyRequests/transactions/{ID}/authorizations:
     post:
       operationId: VerifyThirdPartyAuthorization
       summary: VerifyThirdPartyAuthorization
       description: |
-        The HTTP request `POST /thirdpartyRequests/transactions/{id}/authorizations` is used by the DFSP to verify a third party authorization.
+        The HTTP request `POST /thirdpartyRequests/transactions/{ID}/authorizations` is used by the DFSP to verify a third party authorization.
+      tags:
+        - thirdpartyRequests
       parameters:
         #Path
         - $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/ID.yaml'
@@ -139,7 +267,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/VerifyThirdPartyAuthorizationRequest'
+              $ref: '../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/schemas/ThirdpartyRequestsTransactionsIDAuthorizationsPostRequest.yaml'
             example:
               challenge: '<QuoteResponse object>'
               value: '<base64 encoded binary - the signed quote response object>'
@@ -148,7 +276,7 @@ paths:
               status: 'PENDING'
       responses:
         '200':
-          $ref: '#/components/responses/ThirdPartyAuthorizationResponse'
+          $ref: '#/components/responses/ThirdpartyAuthorizationResponse'
         '400':
           $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/400'
         '401':
@@ -175,30 +303,74 @@ components:
         - WAITING_FOR_AUTHORIZATION_REQUEST
         - COMPLETED
         - ERROR_OCCURRED
-    AuthorizationResponse:
-      title: AuthorizationResponse
-      description: |
-          Enum containing response information; if the customer entered the
-          authentication value, rejected the transaction, or requested a
-          resend of the authentication value.
+    ThirdpartyTransactionState:
+      title: ThirdpartyTransactionState
+      description: state of thirdparty transaction
       type: string
       enum:
-        - ENTERED
-        - REJECTED
-        - RESEND
-    AuthenticationType:
-      title: AuthenticationType
+        - start
+        - partyLookupSuccess
+        - authorizationReceived
+        - transactionSuccess  
+    Counter:
+      allOf:
+        - $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/Integer.yaml'
+      description: Sequential counter used for cloning detection. Present only for U2F authentication.
+    U2FPIN:
+      title: U2FPIN
       type: string
-      enum:
-        - OTP
-        - QRCODE
-        - U2F
-      description: |
-        Below are the allowed values for the enumeration AuthenticationType.
-        - OTP - One-time password generated by the Payer FSP.
-        - QRCODE - QR code used as One Time Password.
-        - U2F
-      example: UTF
+      pattern: ^\S{1,64}$
+      minLength: 1
+      maxLength: 64
+      description: >
+        U2F challenge-response, where payer FSP verifies if the response provided by end-user device matches the previously registered key.
+    U2FPinValue:
+      title: U2FPinValue
+      type: object
+      description: >
+        U2F challenge-response, where payer FSP verifies if the response provided by end-user device matches the previously registered key.
+      properties:
+        pinValue:
+          allOf:
+            - $ref: '#/components/schemas/U2FPIN'
+          description: U2F challenge-response.
+        counter:
+          allOf:
+            - $ref: '#/components/schemas/Counter'
+          description: Sequential counter used for cloning detection. Present only for U2F authentication.
+      required:
+        - pinValue
+        - counter
+    AuthenticationValue:
+      title: AuthenticationValue
+      oneOf:
+        - $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/OtpValue.yaml'
+        - $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/QRCODE.yaml'
+        - $ref: '#/components/schemas/U2FPinValue'
+      description: Contains the authentication value. The format depends on the authentication type used in the AuthenticationInfo complex type.
+    AuthenticationInfo:
+      title: AuthenticationInfo
+      type: object
+      description: Data model for the complex type AuthenticationInfo.
+      properties:
+        authentication:
+          $ref: '../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/schemas/AuthorizationChannelType.yaml'
+        authenticationValue:
+          $ref: '#/components/schemas/AuthenticationValue'
+      required:
+        - authentication
+        - authenticationValue
+    AuthorizationsIDPutResponse:
+      title: AuthorizationsIDPutResponse
+      type: object
+      description: 'PUT /authorizations/{ID} object'
+      properties:
+        authenticationInfo:
+          $ref: '#/components/schemas/AuthenticationInfo'
+        responseType:
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/AuthorizationResponse.yaml'
+      required:
+        - responseType
     OutboundAuthorizationsPostRequest:
       title: authorizationsRequest
       description: POST /authorizations Request object
@@ -207,7 +379,7 @@ components:
         toParticipantId: 
           type: string
         authenticationType:
-          $ref: '#/components/schemas/AuthenticationType'
+          $ref: '../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/schemas/AuthorizationChannelType.yaml'
         retriesLeft:
           $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/Integer.yaml'
         amount:
@@ -226,92 +398,37 @@ components:
         - transactionRequestId
         - quote
       additionalProperties: false
-    AccountId:
-      type: string
-      description: >
-        A long-lived account identifier provided by the DFSP
-        this MUST NOT be Bank Account Number or anything that
-        may expose a User's private bank account information
-    ThirdPartyAuthorizationsState:
-      title: ThirdPartyAuthorizationsState
-      description: Transition state of thirdparty authorizations
-      type: string
-      enum:
-        - WAITING_FOR_AUTHORIZATION_REQUEST
-        - COMPLETED
-        - ERROR_OCCURRED
-    VerifyThirdPartyAuthorizationRequest:
-      title: VerifyThirdPartyAuthorizationRequest
+    OutboundThirdpartyRequestsTransactionsPostRequest:
+      title: ThirdpartyRequestsTransactionsPostRequest
       type: object
-      description: The object sent in the POST /thirdpartyRequests/transactions/{id}/authorizations request.
+      description: The object sent in the POST `/thirdpartyTransaction/{ID}/initiate` request.
       properties:
-        toParticipantId:
-          type: string
-          description: The id of the destination participant, in this case, a DFSP
-        challenge:
-          type: string
-          description: The original Challenge Object as a JSON string
-        value:
-          allOf:
-            - $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/BinaryString.yaml'
-          description: 'Base64 encoded binary string - the signed challenge'
-        consentId:
-          allOf:
-            - $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/CorrelationId.yaml'
-          description: >
-            Common ID between the PISP and FSP for the Consent object
-            This tells DFSP and auth-service which constent allows the PISP to initiate transaction.
         sourceAccountId:
-          allOf:
-            - $ref: '#/components/schemas/AccountId'
-          description: DFSP specific account identifiers, e.g. `dfspa.alice.1234`
-        status:
-          type: string
-          enum:
-            - PENDING
-          description: The status of the authorization. This MUST be PENDING for a POST request
-      required:
-        - challenge
-        - value
-        - consentId
-        - sourceAccountId
-        - status
-    ThirdPartyAuthorizationResponse:
-      title: ThirdPartyAuthorizationResponse
-      type: object
-      description: The response for POST /thirdpartyRequests/transactions/{id}/authorizations request.
-      properties:
-        challenge:
-          type: string
-          description: The original Challenge Object as a JSON string
-        value:
-          allOf:
-            - $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/BinaryString.yaml'
-          description: 'Base64 encoded binary string - the signed challenge'
+          $ref: '../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/schemas/AccountAddress.yaml'
         consentId:
-          allOf:
-            - $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/CorrelationId.yaml'
-          description: >
-            Common ID between the PISP and FSP for the Consent object
-            This tells DFSP and auth-service which constent allows the PISP to initiate transaction.
-        sourceAccountId:
-          allOf:
-            - $ref: '#/components/schemas/AccountId'
-          description: DFSP specific account identifiers, e.g. `dfspa.alice.1234`
-        status:
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/CorrelationId.yaml'
+        payee:
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/Party.yaml'
+        payer:
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/Party.yaml'
+        amountType:
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/AmountType.yaml'
+        amount:
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/Money.yaml'
+        transactionType:
+          $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/TransactionType.yaml'
+        expiration:
           type: string
-          enum:
-            - VERIFIED
-          description: The status of the authorization.
-        currentState:
-          $ref: '#/components/schemas/ThirdPartyAuthorizationsState'
+          example: '2016-05-24T08:38:08.699-04:00'
       required:
-        - challenge
-        - value
-        - consentId
         - sourceAccountId
-        - status
-
+        - consentId
+        - payee
+        - payer
+        - amountType
+        - amount
+        - transactionType
+        - expiration
   responses:
     OutboundAuthorizationsPostResponse:
         description: |
@@ -327,14 +444,64 @@ components:
               additionalProperties: false
               properties:
                 authenticationInfo:
-                  $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/AuthenticationInfo.yaml'
+                  $ref: '#/components/schemas/AuthenticationInfo'
                 responseType:
                   $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/AuthorizationResponse.yaml'
                 currentState:
                   $ref: '#/components/schemas/AuthorizationsState'
-    ThirdPartyAuthorizationResponse:
-      description: 'ThirdPartyAuthorizationResponse'
+    ThirdpartyAuthorizationResponse:
+      description: 'ThirdpartyAuthorizationResponse'
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ThirdPartyAuthorizationResponse'
+            $ref: '../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/schemas/ThirdpartyRequestsTransactionsIDAuthorizationsPutResponse.yaml'
+    ThirdpartyTransactionPartyLookupResponse:
+      description: Thirdparty transaction party lookup response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              party:
+                type: object
+                properties:
+                    partyIdInfo:
+                      $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/PartyIdInfo.yaml'
+                    merchantClassificationCode:
+                      $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/MerchantClassificationCode.yaml'
+                    name:
+                      $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/PartyName.yaml'
+                    personalInfo:
+                      $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/PartyPersonalInfo.yaml'
+                    accounts:
+                      $ref: '../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/schemas/AccountList.yaml'
+                      description: List of accounts associated with the party containing and DFSP routable address, currency identifier and description.
+              currentState: 
+                $ref: '#/components/schemas/ThirdpartyTransactionState'          
+    ThirdpartyTransactionInitiateResponse:
+      description: Thirdparty transaction initiate response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              authorization:
+                $ref: '../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/schemas/AuthorizationsPostRequest.yaml'
+              currentState:
+                $ref: '#/components/schemas/ThirdpartyTransactionState'      
+    ThirdpartyTransactionApproveResponse:
+      description: Thirdparty transaction approve response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              transactionStatus:
+                type: object
+                properties:
+                  transactionId:
+                    $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/CorrelationId.yaml'
+                  transactionRequestState:
+                    $ref: '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/TransactionRequestState.yaml'
+              currentState:
+                $ref: '#/components/schemas/ThirdpartyTransactionState'

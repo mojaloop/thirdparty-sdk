@@ -1,6 +1,6 @@
 {
   "name": "@mojaloop/thirdparty-scheme-adapter",
-  "version": "11.17.1",
+  "version": "11.18.0",
   "description": "Thirdparty Scheme Adapter ",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -14,6 +14,9 @@
     "build:api": "npm run build:api:inbound && npm run build:api:outbound",
     "build:api:inbound": "swagger-cli bundle -o ./src/interface/api-inbound.yaml -t yaml ./src/interface/api-inbound-template.yaml && swagger-cli validate ./src/interface/api-inbound.yaml",
     "build:api:outbound": "swagger-cli bundle -o ./src/interface/api-outbound.yaml -t yaml ./src/interface/api-outbound-template.yaml && swagger-cli validate ./src/interface/api-outbound.yaml",
+    "build:api:ttk": "npm run build:ttk-fspiop:api && npm run build:ttk-3p:api",
+    "build:ttk-fspiop:api": "swagger-cli bundle -o ./docker/contract/ml-testing-toolkit/spec_files/api_definitions/fspiop_1.0/api_spec.yaml -t yaml ./docker/contract/ml-testing-toolkit/spec_files/api_definitions/fspiop_1.0/api-template.yaml && swagger-cli validate ./docker/contract/ml-testing-toolkit/spec_files/api_definitions/fspiop_1.0/api_spec.yaml",
+    "build:ttk-3p:api": "swagger-cli bundle -o ./docker/contract/ml-testing-toolkit/spec_files/api_definitions/thirdparty_pisp/api_spec.yaml -t yaml ./docker/contract/ml-testing-toolkit/spec_files/api_definitions/thirdparty_pisp/thirdparty-pisp-api-template.yaml && swagger-cli validate ./docker/contract/ml-testing-toolkit/spec_files/api_definitions/thirdparty_pisp/api_spec.yaml",
     "docker:build": "docker build -t thirdparty-scheme-adapter:local -f ./docker/Dockerfile ./",
     "docker:run:inbound": "docker run -p 4005:4005 thirdparty-scheme-adapter:local npm run start:inbound",
     "docker:run:outbound": "docker run -p 4006:4006 thirdparty-scheme-adapter:local npm run start:outbound",

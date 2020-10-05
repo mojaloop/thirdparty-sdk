@@ -25,6 +25,7 @@
 
  --------------
  ******/
+
 import { InboundAuthorizationsPostRequest, InboundAuthorizationsPutRequest } from '~/models/authorizations.interface'
 import { Message } from '~/shared/pub-sub'
 import {
@@ -34,15 +35,24 @@ import {
   InboundAuthorizationsModel,
   InboundAuthorizationsModelConfig
 } from '~/models/inbound/authorizations.model'
-
+import {
+  PISPTransactionModel
+} from '~/models/pispTransaction.model'
+import { PISPTransactionPhase } from '~/models/pispTransaction.interface'
 import { Request, ResponseObject } from '@hapi/hapi'
 import { StateResponseToolkit } from '~/server/plugins/state'
+
+import config from '~/shared/config'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function put (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const payload = request.payload as unknown as InboundAuthorizationsPutRequest
-  const channel = OutboundAuthorizationsModel.notificationChannel(request.params.ID)
   const pubSub = h.getPubSub()
+
+  // select proper channel name where message will be published
+  const channel = config.INBOUND.PISP_TRANSACTION_MODE
+    ? PISPTransactionModel.notificationChannel(PISPTransactionPhase.initiation, request.params.ID)
+    : OutboundAuthorizationsModel.notificationChannel(request.params.ID)
 
   // don't await on promise to resolve
   // let finish publish in background
@@ -54,12 +64,24 @@ async function put (_context: any, request: Request, h: StateResponseToolkit): P
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function post (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
-  // TODO: this handler will be shared with ThirdpartyRequestTransactionModel so there is a need
-  // to properly handle two different models here - maybe via some configuration flag?
+  // this handler will be shared with ThirdpartyRequestTransactionModel so there is a need
+  // to properly handle two different models here - via configuration flag
+  const payload = request.payload as InboundAuthorizationsPostRequest
   const logger = h.getLogger()
-  try {
+  if (config.INBOUND.PISP_TRANSACTION_MODE) {
+    // PISP transaction mode
+    const channel = PISPTransactionModel.notificationChannel(
+      PISPTransactionPhase.initiation,
+      payload.transactionRequestId
+    )
+    const pubSub = h.getPubSub()
+    // don't await on promise to resolve
+    // let finish publish in background
+    pubSub.publish(channel, payload as unknown as Message)
+    logger.info('PISPTransactionModel handled POST /authorization request')
+  } else {
+    // authorization mode
     const sourceFspId = request.headers['fspiop-source']
-    const payload = request.payload as InboundAuthorizationsPostRequest
     const config: InboundAuthorizationsModelConfig = {
       logger,
       backendRequests: h.getBackendRequests(),
@@ -68,9 +90,6 @@ async function post (_context: any, request: Request, h: StateResponseToolkit): 
     const model = new InboundAuthorizationsModel(config)
     const response = await model.postAuthorizations(payload, sourceFspId)
     logger.push({ response }).info('InboundAuthorizationsModel handled POST /authorizations request')
-  } catch (err) {
-    // nothing we can do if an error gets thrown back to us here apart from log it and continue
-    logger.push({ err }).error('Error handling POST /authorizations request')
   }
 
   // Note that we will have passed request validation, JWS etc... by this point

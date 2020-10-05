@@ -141,7 +141,7 @@ docker-compose specification: [docker-compose.yaml](./docker-compose.yaml)
 # Configuration and run environments of services
 > Configuration is managed by [Convict](https://github.com/mozilla/node-convict)
 
-Services can be run in three environments: `development`, `test`, `production`.  
+Services can be run in five environments: `development`, `test`, `integration`, `e2e`, `production`.  
 Selection of run environment can be done by setting `NODE_ENV` environment variable.  
 Dedicated to environments configuration files are located in [config/](./config) folder. 
 
@@ -152,7 +152,7 @@ Actual schema is defined in [src/shared/config.ts](./src/shared/config.ts)
 {
   ENV: {
     doc: 'The application environment.',
-    format: ['production', 'development', 'test'],
+    format: ['production', 'development', 'test', 'integration', 'e2e'],
     default: 'development',
     env: 'NODE_ENV'
   },

@@ -10,11 +10,11 @@ services:
     build:
       context: ./
       dockerfile: ./docker/Dockerfile
-    command: sh -c "/opt/thirdparty-scheme-adapter/wait4/wait4.js inbound-thirdparty-scheme-adapter && NODE_ENV=development npm run start:inbound"
+    command: sh -c "/opt/thirdparty-scheme-adapter/wait4/wait4.js inbound-thirdparty-scheme-adapter && NODE_ENV=integration npm run start:inbound"
     volumes:
       - ./docker/wait4:/opt/thirdparty-scheme-adapter/wait4
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=integration
     networks:
       - mojaloop-net
     ports:
@@ -24,7 +24,7 @@ services:
       - pisp-simulator
     extra_hosts:
       - "redis:172.17.0.1"
-      - "pisp-simulator:172.17.0.1"
+      - "ml-testing-toolkit:172.17.0.1"
     healthcheck:
       test: wget -q http://172.17.0.1:4005/health -O /dev/null || exit 1
       timeout: 3s
@@ -37,11 +37,11 @@ services:
     build:
       context: ./
       dockerfile: ./docker/Dockerfile
-    command: sh -c "/opt/thirdparty-scheme-adapter/wait4/wait4.js outbound-thirdparty-scheme-adapter && NODE_ENV=development npm run start:outbound"
+    command: sh -c "/opt/thirdparty-scheme-adapter/wait4/wait4.js outbound-thirdparty-scheme-adapter && NODE_ENV=integration npm run start:outbound"
     volumes:
       - ./docker/wait4:/opt/thirdparty-scheme-adapter/wait4
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=integration
     networks:
       - mojaloop-net
     ports:
@@ -51,7 +51,7 @@ services:
       - pisp-simulator
     extra_hosts:
       - "redis:172.17.0.1"
-      - "pisp-simulator:172.17.0.1"
+      - "ml-testing-toolkit:172.17.0.1"
     healthcheck:
       test: wget -q http://172.17.0.1:4006/health -O /dev/null || exit 1
       timeout: 3s

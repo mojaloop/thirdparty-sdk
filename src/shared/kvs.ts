@@ -62,4 +62,24 @@ export class KVS extends RedisConnection {
 
     return asyncSet.call(this.client, key, stringified) as Promise<boolean>
   }
+
+  // removes the value for given key
+  async del (key: string): Promise<boolean> {
+    InvalidKeyError.throwIfInvalid(key)
+    return this.client.del(key)
+  }
+
+  // check is any data for given key
+  async exists (key: string): Promise<boolean> {
+    // there is problem with TS typings
+    // so using `promisify` isn't working
+    return new Promise((resolve, reject) => {
+      this.client.exists(key, (err: unknown, result: number) => {
+        if (err) {
+          return reject(err)
+        }
+        resolve(result === 1)
+      })
+    })
+  }
 }

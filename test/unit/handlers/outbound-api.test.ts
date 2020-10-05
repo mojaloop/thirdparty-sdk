@@ -27,21 +27,29 @@
  --------------
  ******/
 
-import { HealthResponse } from '~/interface/types'
-import { NotificationCallback, Message, PubSub } from '~/shared/pub-sub'
-import { ServerAPI, ServerConfig } from '~/server'
 import {
   AuthorizationResponse,
   AuthenticationType,
+  InboundAuthorizationsPostRequest,
   InboundAuthorizationsPutRequest,
   OutboundAuthorizationsModelState
 } from '~/models/authorizations.interface'
+import { HealthResponse } from '~/interface/types'
+import { NotificationCallback, Message, PubSub } from '~/shared/pub-sub'
 import {
   OutboundThirdpartyAuthorizationsModelState,
   InboundThirdpartyAuthorizationsPutRequest
 } from '~/models/thirdparty.authorizations.interface'
+import {
+  PISPTransactionModelState,
+  ThirdpartyTransactionStatus
+} from '~/models/pispTransaction.interface'
+import PTM from '~/models/pispTransaction.model'
+
 import { RedisConnectionConfig } from '~/shared/redis-connection'
 import { Server } from '@hapi/hapi'
+import { ServerAPI, ServerConfig } from '~/server'
+import { TParty } from '@mojaloop/sdk-standard-components'
 import Config from '~/shared/config'
 import Handlers from '~/handlers'
 import index from '~/index'
@@ -64,14 +72,58 @@ const putThirdpartyAuthResponse: InboundThirdpartyAuthorizationsPutRequest = {
   status: 'VERIFIED',
   value: 'value'
 }
+const partyLookupResponse: TParty = {
+  partyIdInfo: {
+    partyIdType: 'MSISDN',
+    partyIdentifier: '+4412345678',
+    fspId: 'pispA'
+  },
+  merchantClassificationCode: '4321',
+  name: 'Justin Trudeau',
+  personalInfo: {
+    complexName: {
+      firstName: 'Justin',
+      middleName: 'Pierre',
+      lastName: 'Trudeau'
+    },
+    dateOfBirth: '1980-01-01'
+  }
+}
+const initiateResponse: InboundAuthorizationsPostRequest = {
+  authenticationType: 'U2F',
+  retriesLeft: '1',
+  amount: {
+    currency: 'USD',
+    amount: '124.45'
+  },
+  transactionId: '2f169631-ef99-4cb1-96dc-91e8fc08f539',
+  transactionRequestId: 'b51ec534-ee48-4575-b6a9-ead2955b8069',
+  quote: {
+    transferAmount: {
+      currency: 'USD',
+      amount: '124.45'
+    },
+    expiration: '2020-08-24T08:38:08.699-04:00',
+    ilpPacket: 'AYIBgQAAAAAAAASwNGxldmVsb25lLmRmc3AxLm1lci45T2RTOF81MDdqUUZ',
+    condition: 'f5sqb7tBTWPd5Y8BDFdMm9BJR_MNI4isf8p8n4D5pHA'
+  }
+}
+const approveResponse: ThirdpartyTransactionStatus = {
+  transactionId: 'b51ec534-ee48-4575-b6a9-ead2955b8069',
+  transactionRequestState: 'ACCEPTED'
+}
 
 jest.mock('redis')
 jest.mock('@mojaloop/sdk-standard-components', () => {
   return {
-    MojaloopRequests: jest.fn(),
+    MojaloopRequests: jest.fn(() => ({
+      getParties: jest.fn(() => Promise.resolve(partyLookupResponse)),
+      putAuthorizations: jest.fn(() => Promise.resolve(approveResponse))
+    })),
     ThirdpartyRequests: jest.fn(() => ({
       postAuthorizations: jest.fn(() => Promise.resolve(putResponse)),
-      postThirdpartyRequestsTransactionsAuthorizations: jest.fn(() => Promise.resolve(putThirdpartyAuthResponse))
+      postThirdpartyRequestsTransactionsAuthorizations: jest.fn(() => Promise.resolve(putThirdpartyAuthResponse)),
+      postThirdpartyRequestsTransactions: jest.fn(() => Promise.resolve(initiateResponse))
     })),
     WSO2Auth: jest.fn(),
     Logger: {
@@ -259,5 +311,145 @@ describe('Outbound API routes', (): void => {
       ...putThirdpartyAuthResponse,
       currentState: OutboundThirdpartyAuthorizationsModelState.succeeded
     })
-  }, 30000)
+  })
+
+  it('/thirdpartyTransaction/partyLookup', async (): Promise<void> => {
+    const request = {
+      method: 'POST',
+      url: '/thirdpartyTransaction/partyLookup',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      payload: {
+        payee: {
+          partyIdType: 'MSISDN',
+          partyIdentifier: '+4412345678'
+        },
+        transactionRequestId: 'b51ec534-ee48-4575-b6a9-ead2955b8069'
+      }
+    }
+    const pubSub = new PubSub({} as RedisConnectionConfig)
+    // defer publication to notification channel
+    setTimeout(() => pubSub.publish(
+      'some-channel',
+      partyLookupResponse as unknown as Message
+    ), 10)
+    const response = await server.inject(request)
+    expect(response.statusCode).toBe(200)
+    expect(response.result).toEqual({
+      party: { ...partyLookupResponse },
+      currentState: PISPTransactionModelState.partyLookupSuccess
+    })
+  })
+
+  it('/thirdpartyTransaction/partyLookup guarded', async (): Promise<void> => {
+    jest.spyOn(PTM, 'existsInKVS').mockImplementationOnce(() => Promise.resolve(true))
+    const request = {
+      method: 'POST',
+      url: '/thirdpartyTransaction/partyLookup',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      payload: {
+        payee: {
+          partyIdType: 'MSISDN',
+          partyIdentifier: '+4412345678'
+        },
+        transactionRequestId: 'b51ec534-ee48-4575-b6a9-ead2955b8069'
+      }
+    }
+    const response = await server.inject(request)
+    expect(response.statusCode).toBe(422)
+  })
+
+  it('/thirdpartyTransaction/{ID}/initiate', async (): Promise<void> => {
+    const request = {
+      method: 'POST',
+      url: '/thirdpartyTransaction/b51ec534-ee48-4575-b6a9-ead2955b8069/initiate',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      payload: {
+        sourceAccountId: 'dfspa.alice.1234',
+        consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
+        payee: {
+          partyIdInfo: {
+            partyIdType: 'MSISDN',
+            partyIdentifier: '+44 1234 5678',
+            fspId: 'dfspb'
+          }
+        },
+        payer: {
+          personalInfo: {
+            complexName: {
+              firstName: 'Alice',
+              lastName: 'K'
+            }
+          },
+          partyIdInfo: {
+            partyIdType: 'MSISDN',
+            partyIdentifier: '+44 8765 4321',
+            fspId: 'dfspa'
+          }
+        },
+        amountType: 'SEND',
+        amount: {
+          amount: '100',
+          currency: 'USD'
+        },
+        transactionType: {
+          scenario: 'TRANSFER',
+          initiator: 'PAYER',
+          initiatorType: 'CONSUMER'
+        },
+        expiration: '2020-07-15T22:17:28.985-01:00'
+      }
+    }
+    const pubSub = new PubSub({} as RedisConnectionConfig)
+    // defer publication to notification channel
+    setTimeout(() => pubSub.publish(
+      'some-channel',
+      initiateResponse as unknown as Message
+    ), 10)
+    const response = await server.inject(request)
+    expect(response.statusCode).toBe(200)
+    expect(response.result).toEqual({
+      authorization: { ...initiateResponse },
+      currentState: PISPTransactionModelState.authorizationReceived
+    })
+  })
+
+  it('/thirdpartyTransaction/{ID}/approve', async (): Promise<void> => {
+    const request = {
+      method: 'POST',
+      url: '/thirdpartyTransaction/b51ec534-ee48-4575-b6a9-ead2955b8069/approve',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      payload: {
+        authorizationResponse: {
+          authenticationInfo: {
+            authentication: 'U2F',
+            authenticationValue: {
+              pinValue: 'xxxxxxxxxxx',
+              counter: '1'
+            }
+          },
+          responseType: 'ENTERED'
+        }
+      }
+    }
+    const pubSub = new PubSub({} as RedisConnectionConfig)
+    // defer publication to notification channel
+    setTimeout(() => pubSub.publish(
+      'some-channel',
+      approveResponse as unknown as Message
+    ), 10)
+    const response = await server.inject(request)
+    expect(response.statusCode).toBe(200)
+    expect(response.result).toEqual({
+      transactionStatus: { ...approveResponse },
+      currentState: PISPTransactionModelState.transactionStatusReceived
+    })
+  })
 })

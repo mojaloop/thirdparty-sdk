@@ -57,7 +57,7 @@ jest.mock('~/shared/kvs')
 jest.mock('~/shared/pub-sub')
 
 describe('OutboundAuthorizationsModel', () => {
-  const ConnectionConfig: RedisConnectionConfig = {
+  const connectionConfig: RedisConnectionConfig = {
     port: 6789,
     host: 'localhost',
     logger: mockLogger()
@@ -66,10 +66,10 @@ describe('OutboundAuthorizationsModel', () => {
 
   beforeEach(async () => {
     modelConfig = {
-      kvs: new KVS(ConnectionConfig),
+      kvs: new KVS(connectionConfig),
       key: 'cache-key',
-      logger: ConnectionConfig.logger,
-      pubSub: new PubSub(ConnectionConfig),
+      logger: connectionConfig.logger,
+      pubSub: new PubSub(connectionConfig),
       requests: {
         postAuthorizations: jest.fn()
       } as unknown as ThirdpartyRequests
@@ -167,7 +167,7 @@ describe('OutboundAuthorizationsModel', () => {
       // defer publication to notification channel
       setImmediate(() => model.pubSub.publish(
         channel,
-        putResponse as unknown as Message // TODO: think about generic Message so casting will not be necessary
+        putResponse as unknown as Message
       ))
       // do a request and await on published Message
       await model.fsm.requestAuthorization()
@@ -262,6 +262,18 @@ describe('OutboundAuthorizationsModel', () => {
           }
         )
         const model = await create(data, modelConfig)
+
+        expect(async () => await model.run()).rejects.toEqual(error)
+      })
+
+      it('exceptions - Error', async () => {
+        const error = new Error()
+        mocked(modelConfig.requests.postAuthorizations).mockImplementationOnce(
+          () => {
+            throw error
+          }
+        )
+        const model = await create({ ...data, currentState: 'errored' }, modelConfig)
 
         expect(async () => await model.run()).rejects.toEqual(error)
       })

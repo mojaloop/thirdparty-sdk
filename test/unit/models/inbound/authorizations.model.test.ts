@@ -39,7 +39,7 @@ import mockLogger from '../../mockLogger'
 import { mocked } from 'ts-jest/utils'
 import { HTTPResponseError } from '../../../../src/shared/http-response-error'
 
-describe('inboundThirdpartyTransactionModel', () => {
+describe('InboundAuthorizationModel', () => {
   const logger = mockLogger()
 
   describe('authorizations', () => {

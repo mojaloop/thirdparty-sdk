@@ -100,9 +100,6 @@ export class OutboundAuthorizationsModel
         // in handlers/inbound is implemented putAuthorizationsById handler
         // which publish PutAuthorizationsResponse to channel
         subId = this.pubSub.subscribe(channel, async (channel: string, message: Message, sid: number) => {
-          if (!message) {
-            return reject(new Error('invalid Message'))
-          }
           // first unsubscribe
           pubSub.unsubscribe(channel, sid)
 

@@ -56,8 +56,8 @@ describe('PUT /authorizations', (): void => {
         const pubSub = new PubSub(config)
         await pubSub.connect()
         expect(pubSub.isConnected).toBeTruthy()
-        pubSub.subscribe('authorizations_123', async (channel: string, message: Message, _id: number) => {
-          expect(channel).toEqual('authorizations_123')
+        pubSub.subscribe('pisp_transaction_initiation_123', async (channel: string, message: Message, _id: number) => {
+          expect(channel).toEqual('pisp_transaction_initiation_123')
           expect(message).toEqual(payload)
           await pubSub.disconnect()
           expect(pubSub.isConnected).toBeFalsy()

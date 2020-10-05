@@ -110,8 +110,11 @@ describe('PubSub', () => {
     const ps = new PubSub(config)
     await ps.connect()
 
-    const id = ps.subscribe('first-channel', jest.fn())
+    let id = ps.subscribe('first-channel', jest.fn())
     expect(id).toBe(1)
+    // check more than one subscription to the same channel
+    id = ps.subscribe('first-channel', jest.fn())
+    expect(id).toBe(2)
 
     const result = ps.unsubscribe('first-channel', id + 1)
     expect(result).toBeFalsy()
@@ -145,5 +148,16 @@ describe('PubSub', () => {
     expect(ps.publish('the-channel', null as unknown as Message)).rejects.toEqual(
       new InvalidMessageError('the-channel')
     )
+  })
+
+  it('broadcast should do nothing if no listener registered', async (): Promise<void> => {
+    const ps = new PubSub(config)
+    await ps.connect()
+
+    ps.client.emit('message', 'not-existing')
+    await new Promise((resolve) => {
+      expect(ps.logger.info).toBeCalledWith('broadcastMessage: no callbacks for \'not-existing\' channel')
+      setTimeout(resolve, 10)
+    })
   })
 })
