@@ -1,0 +1,208 @@
+@startuml
+
+title DFSP Thirdparty Transaction
+
+
+box "Mojaloop"
+    participant Switch
+end box
+
+box "thirdparty-scheme-adapter"
+  participant "inbound-server" as IBS
+  participant "3p-state" as ST8
+  participant "outbound-server" as OBS
+end box
+
+participant "DFSP Backend" as DFSP
+
+== Initate Transaction ==
+
+' TODO: does this go directly to the DFSPBackend? Or is it proxied through the inbound-server?
+
+Switch -> IBS: ""POST /thirdpartyRequests/transactions""
+activate IBS
+IBS --> Switch: 202 Accepted
+IBS -> DFSP: ""POST /thirdpartyRequests/transactions""
+deactivate IBS
+DFSP -> DFSP: Lookup ""consentId"", ""sourceAccountId""
+DFSP -> DFSP: Construct the Transaction Object, \nwith the PISP as a participant
+DFSP -> DFSP: Perform Quote Cycle \n(process not shown here)
+
+... DFSP recieves quote response back from sdk-scheme-adapter ...
+
+' todo: payload
+' todo: better name? Different resource?
+DFSP -> OBS: ""POST /authorizationRequest""
+activate OBS
+OBS -> ST8: ""requestAuth()""
+activate ST8
+' todo: better state names
+rnote right of ST8: ""state: requestAuth""
+ST8 -> Switch: ""POST /authorizations""
+Switch --> ST8: ""202 Accepted""
+deactivate ST8
+
+... PISP recieves Authorization request, confirms transfer with user and signs the challenge ...
+
+Switch -> IBS: ""PUT /authorizations/{id}""
+activate IBS
+IBS -> ST8: ""onAuthResponse()""
+activate ST8
+rnote right of ST8: ""state: authResponse""
+
+' At this point, we can either leave the verification up to the DFSP, or the scheme-adapter can take care of it
+
+IBS --> Switch: ""200 OK""
+deactivate IBS
+
+ST8 -> Switch: ""POST /thirdpartyRequests/{id}/authorizations""
+Switch --> ST8: ""202 Accepted""
+' rnote right of ST8: ""state: requestVerification""
+deactivate ST8
+
+
+... Auth Service looks up consent, ensures challenge was signed correctly ...
+
+Switch -> IBS: ""PUT /thirdpartyRequests/{id}/authorizations""
+activate IBS
+IBS -> ST8: ""onAuthVerified()""
+activate ST8
+IBS --> Switch: ""200 OK""
+deactivate IBS
+rnote right of ST8: ""state: authVerified""
+ST8 -> OBS: ""proceed()""
+' TODO: payload
+OBS --> DFSP: ""200 Accepted""
+
+DFSP -> DFSP: Initiate the transfer \n(process not shown here)
+
+
+
+
+
+
+
+
+
+
+' activate OBS
+' ' TODO: line up with state-models.md doc
+' OBS -> ST8: ""partyLookup()""
+' rnote right of ST8: ""state: requestPartyLookup""
+' activate ST8
+
+' ST8 -> Switch: ""GET /parties/{type}/{id}""
+' Switch --> ST8: ""202 Accepted""
+' rnote right of ST8: ""state: pendingPartyLookup""
+
+' note over Switch
+'   Switch performs party lookup... just like normal
+' end note
+
+' Switch -> IBS: ""PUT /parties/{type}/{id}""
+' IBS -> ST8: ""onPartyLookup()""
+' IBS --> Switch: ""200 OK""
+' rnote right of ST8: ""state: payeeResolved""
+
+' ST8 -> OBS: ""something...""
+' deactivate ST8
+
+' ' TODO: party lookup details
+' OBS --> PISP: ""200 OK""
+' deactivate OBS
+' deactivate PISP
+
+' ...User checks the party name, and confirms...
+
+
+
+' rnote right of PISP #Light
+' ""POST /thirdpartyTransactions/{id}/initiate""
+' {
+'   sourceAccountId: "dfspa.alice.1234",
+'   consentId: "555",
+'   amount: {
+'     amount: "20.00",
+'     currency: "USD"
+'   },
+'   "amountType": "SEND"
+' }
+' end note
+' PISP -> OBS: ""POST /thirdpartyTransactions/{id}/initiate""
+' activate PISP
+' activate OBS
+' ' TODO: line up with state-models.md doc
+
+' OBS -> ST8: ""initiate()""
+' activate ST8
+' rnote right of ST8: ""state: requestTransaction""
+
+' ST8 -> Switch: ""POST /thirdpartyRequests/transactions""
+' Switch --> ST8: ""202 Accepted""
+' rnote right of ST8: ""state: pendingTransactionAuthorization""
+
+
+' note over Switch
+'   Switch kicks off the transaction - DFSP issues ""POST /authorizations""
+' end note
+
+' Switch -> IBS: ""POST /authorizations""
+' IBS -> ST8: ""onPostAuthorizations()""
+' IBS --> Switch: ""200 OK""
+' rnote right of ST8: ""state: authorizationReceived""
+
+
+' ST8 -> OBS: ""something...""
+' deactivate ST8
+
+' 'TODO: add authorization details
+' OBS --> PISP: ""200 OK""
+' deactivate OBS
+' deactivate PISP
+
+' ...Present quote to be approved\nUser signs the challenge...
+
+
+' == Approve Transaction ==
+' rnote right of PISP #Light
+' ""POST /thirdpartyTransactions/{id}/approve""
+' {
+'   signedChallenge: "base64(xxx)"
+' }
+' end note
+' PISP -> OBS: ""POST /thirdpartyTransactions/{id}/approve""
+' activate PISP
+' activate OBS
+
+' OBS -> ST8: ""approve()""
+' activate ST8
+' rnote right of ST8: ""state: approvalReceived""
+
+
+' ST8 -> Switch: ""PUT /authorizations/{id}""
+' Switch --> ST8: ""202 Accepted""
+' rnote right of ST8: ""state: pendingTransaction""
+
+' note over Switch
+'   1. DFSP checks the authorization with the auth-service, or their own auth-service.
+'   2. DFSP is happy, so initiates the ""POST /transfer""
+' end note
+
+
+' Switch -> IBS: ""PATCH /thirdpartyRequests/transactions/{id}""
+' IBS -> ST8: ""onTransactionSuccess()""
+' IBS --> Switch: ""200 OK""
+' rnote right of ST8: ""state: transactionSuccess""
+
+
+' ST8 -> OBS: ""something...""
+' deactivate ST8
+
+' OBS --> PISP: ""200 OK""
+' deactivate OBS
+' deactivate PISP
+
+
+
+
+@enduml

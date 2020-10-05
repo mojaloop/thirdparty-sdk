@@ -3,7 +3,6 @@
 > Refer to the sequence diagrams in [`./README.md`](./README.md) for a more updated list of the sequences
 
 
-<!-- TODO: Lewis update this doc -->
 
 A design document to explain/discuss the changes required in the `sdk-scheme-adapter` to implement PISP functionality.
 
