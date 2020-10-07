@@ -115,5 +115,6 @@ describe('StatePlugin', () => {
       logger,
       tlsCreds: config.SHARED.TLS.creds
     })
+    config.SHARED.TLS.mutualTLS.enabled = false
   })
 })

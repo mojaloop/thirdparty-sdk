@@ -207,13 +207,48 @@ export const ConvictConfig = Convict<ServiceConfig>({
     }
   },
   SHARED: {
-    PEER_ENDPOINT: '0.0.0.0:4003',
-    ALS_ENDPOINT: '0.0.0.0:4002',
-    QUOTES_ENDPOINT: '0.0.0.0:3002',
-    TRANSFERS_ENDPOINT: '0.0.0.0:3000',
-    BULK_TRANSFERS_ENDPOINT: '',
-    THIRDPARTY_REQUESTS_ENDPOINT: '',
-    TRANSACTION_REQUEST_ENDPOINT: '',
+    PEER_ENDPOINT: {
+      doc: 'Peer/Switch endpoint',
+      format: '*',
+      default: '0.0.0.0:4003',
+      env: 'PEER_ENDPOINT'
+    },
+    ALS_ENDPOINT: {
+      doc: 'ALS endpoint',
+      format: '*',
+      default: undefined, // '0.0.0.0:4002',
+      env: 'ALS_ENDPOINT'
+    },
+    QUOTES_ENDPOINT: {
+      doc: 'Quotes endpoint',
+      format: '*',
+      default: undefined, // '0.0.0.0:3002',
+      env: 'QUOTES_ENDPOINT'
+    },
+    TRANSFERS_ENDPOINT: {
+      doc: 'Peer/Switch endpoint',
+      format: '*',
+      default: undefined, // '0.0.0.0:3000',
+      env: 'TRANSFERS_ENDPOINT'
+    },
+    BULK_TRANSFERS_ENDPOINT: {
+      doc: 'Bulk Transfers endpoint',
+      format: '*',
+      env: 'BULK_TRANSFERS_ENDPOINT',
+      default: undefined
+    },
+    THIRDPARTY_REQUESTS_ENDPOINT: {
+      doc: 'Thirdparty Requests endpoint',
+      format: '*',
+      env: 'THIRDPARTY_REQUESTS_ENDPOINT',
+      default: undefined
+    },
+    TRANSACTION_REQUEST_ENDPOINT: {
+      doc: 'Transaction Request endpoint',
+      format: '*',
+      env: 'TRANSACTION_REQUEST_ENDPOINT',
+      default: undefined
+    },
     DFSP_ID: {
       doc: 'Id of DFSP',
       format: '*',

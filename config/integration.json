@@ -30,7 +30,6 @@
     "ALS_ENDPOINT": "ml-testing-toolkit:15000",
     "QUOTES_ENDPOINT": "ml-testing-toolkit:15000",
     "TRANSFERS_ENDPOINT": "ml-testing-toolkit:15000",
-    "BULK_TRANSFERS_ENDPOINT": "",
     "DFSP_ID": "dfsp_a",
     "DFSP_BACKEND_URI": "0.0.0.0:9000",
     "DFSP_BACKEND_HTTP_SCHEME": "http",
