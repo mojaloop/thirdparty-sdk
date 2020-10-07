@@ -25,7 +25,7 @@ This package exemplifies the use of the Mojaloop SDK Standard Components for TLS
    ```bash
    127.0.0.1 redis
    ```
-4. Start Redis container through docker-compose
+4. Start Redis container through docker-compose in a separate terminal window
    ```bash
    docker-compose up redis
    ```
