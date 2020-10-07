@@ -201,8 +201,8 @@ jobs:
             cd ./docker/
             docker-compose build
             docker-compose up -d 
-            chmod +x ./docker/wait4/wait4.js
-            sh -c "./docker/wait4/wait4.js cicd-integration-tests"
+            chmod +x ./wait4/wait4.js
+            sh -c "./wait4/wait4.js cicd-integration-tests"
       - run:
           name: Build docker images
           command: |
