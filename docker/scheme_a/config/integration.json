@@ -2,7 +2,7 @@
   "INBOUND": {
     "PORT": 4055,
     "HOST": "0.0.0.0",
-    "PISP_TRANSACTION_MODE": true
+    "PISP_TRANSACTION_MODE": false
   },
   "OUTBOUND": {
     "PORT": 4056,
