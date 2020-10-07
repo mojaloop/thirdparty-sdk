@@ -27,10 +27,9 @@
  ******/
 
 import axios from 'axios'
-import env from '../env'
 
 describe('POST /authorizations', (): void => {
-  const scenariosURI = `${env.outbound.baseUri}/authorizations`
+  const scenariosURI = 'http://127.0.0.1:4056/authorizations'
   const options = {
     toParticipantId: 'pisp',
     authenticationType: 'U2F',

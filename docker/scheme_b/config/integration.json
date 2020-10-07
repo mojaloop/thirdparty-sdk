@@ -1,10 +1,10 @@
 {
   "INBOUND": {
-    "PORT": 4005,
+    "PORT": 4057,
     "HOST": "0.0.0.0"
   },
   "OUTBOUND": {
-    "PORT": 4006,
+    "PORT": 4058,
     "HOST": "0.0.0.0"
   },
   "WSO2_AUTH": {
@@ -25,13 +25,13 @@
     "COLOR": true
   },
   "SHARED": {
-    "PEER_ENDPOINT": "inbound-thirdparty-scheme-adapter-b:4007",
+    "PEER_ENDPOINT": "inbound-thirdparty-scheme-adapter-a:4055",
     "ALS_ENDPOINT": "0.0.0.0:4002",
     "QUOTES_ENDPOINT": "0.0.0.0:3002",
     "TRANSFERS_ENDPOINT": "0.0.0.0:3000",
     "BULK_TRANSFERS_ENDPOINT": "",
     "DFSP_ID": "dfsp_a",
-    "DFSP_BACKEND_URI": "0.0.0.0:9000",
+    "DFSP_BACKEND_URI": "pisp-simulator:9000",
     "DFSP_BACKEND_HTTP_SCHEME": "http",
     "JWS_SIGN": false,
     "JWS_SIGNING_KEY": "./secrets/jwsSigningKey.key",

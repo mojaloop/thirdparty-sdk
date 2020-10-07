@@ -21,7 +21,6 @@ services:
       - "4005:4005"
     depends_on:
       - redis
-      - pisp-simulator
     extra_hosts:
       - "redis:172.17.0.1"
       - "ml-testing-toolkit:172.17.0.1"
@@ -48,7 +47,6 @@ services:
       - "4006:4006"
     depends_on:
       - redis
-      - pisp-simulator
     extra_hosts:
       - "redis:172.17.0.1"
       - "ml-testing-toolkit:172.17.0.1"

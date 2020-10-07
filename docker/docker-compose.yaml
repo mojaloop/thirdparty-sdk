@@ -10,24 +10,23 @@ services:
     build:
       context: ../
       dockerfile: ./docker/Dockerfile
-    command: sh -c "/opt/thirdparty-scheme-adapter/wait4/wait4.js inbound-thirdparty-scheme-adapter && NODE_ENV=test npm run start:inbound"
+    command: sh -c "/opt/thirdparty-scheme-adapter/wait4/wait4.js inbound-thirdparty-scheme-adapter && NODE_ENV=integration npm run start:inbound"
     volumes:
       - ./wait4:/opt/thirdparty-scheme-adapter/wait4
       - ./scheme_a/config:/opt/thirdparty-scheme-adapter/config
     environment:
-      - NODE_ENV=test
+      - NODE_ENV=integration
     networks:
       - mojaloop-net
     ports:
-      - "4005:4005"
+      - "4055:4055"
     depends_on:
-      - redis
       - pisp-simulator
     extra_hosts:
       - "redis:172.17.0.1"
       - "pisp-simulator:172.17.0.1"
     healthcheck:
-      test: wget -q http://172.17.0.1:4005/health -O /dev/null || exit 1
+      test: wget -q http://172.17.0.1:4055/health -O /dev/null || exit 1
       timeout: 3s
       retries: 10
       start_period: 10s
@@ -38,24 +37,23 @@ services:
     build:
       context: ../
       dockerfile: ./docker/Dockerfile
-    command: sh -c "/opt/thirdparty-scheme-adapter/wait4/wait4.js outbound-thirdparty-scheme-adapter && NODE_ENV=test npm run start:outbound"
+    command: sh -c "/opt/thirdparty-scheme-adapter/wait4/wait4.js outbound-thirdparty-scheme-adapter && NODE_ENV=integration npm run start:outbound"
     volumes:
       - ./wait4:/opt/thirdparty-scheme-adapter/wait4
       - ./scheme_a/config:/opt/thirdparty-scheme-adapter/config
     environment:
-      - NODE_ENV=test
+      - NODE_ENV=integration
     networks:
       - mojaloop-net
     ports:
-      - "4006:4006"
+      - "4056:4056"
     depends_on:
-      - redis
       - pisp-simulator
     extra_hosts:
       - "redis:172.17.0.1"
       - "pisp-simulator:172.17.0.1"
     healthcheck:
-      test: wget -q http://172.17.0.1:4006/health -O /dev/null || exit 1
+      test: wget -q http://172.17.0.1:4056/health -O /dev/null || exit 1
       timeout: 3s
       retries: 10
       start_period: 10s
@@ -66,24 +64,23 @@ services:
     build:
       context: ../
       dockerfile: ./docker/Dockerfile
-    command: sh -c "/opt/thirdparty-scheme-adapter/wait4/wait4.js inbound-thirdparty-scheme-adapter && NODE_ENV=test npm run start:inbound"
+    command: sh -c "/opt/thirdparty-scheme-adapter/wait4/wait4.js inbound-thirdparty-scheme-adapter && NODE_ENV=integration npm run start:inbound"
     volumes:
       - ./wait4:/opt/thirdparty-scheme-adapter/wait4
       - ./scheme_b/config:/opt/thirdparty-scheme-adapter/config
     environment:
-      - NODE_ENV=test
+      - NODE_ENV=integration
     networks:
       - mojaloop-net
     ports:
-      - "4007:4007"
+      - "4057:4057"
     depends_on:
-      - redis
       - pisp-simulator
     extra_hosts:
       - "redis:172.17.0.1"
       - "pisp-simulator:172.17.0.1"
     healthcheck:
-      test: wget -q http://172.17.0.1:4007/health -O /dev/null || exit 1
+      test: wget -q http://172.17.0.1:4057/health -O /dev/null || exit 1
       timeout: 3s
       retries: 10
       start_period: 10s
@@ -94,38 +91,28 @@ services:
     build:
       context: ../
       dockerfile: ./docker/Dockerfile
-    command: sh -c "/opt/thirdparty-scheme-adapter/wait4/wait4.js outbound-thirdparty-scheme-adapter && NODE_ENV=test npm run start:outbound"
+    command: sh -c "/opt/thirdparty-scheme-adapter/wait4/wait4.js outbound-thirdparty-scheme-adapter && NODE_ENV=integration npm run start:outbound"
     volumes:
       - ./wait4:/opt/thirdparty-scheme-adapter/wait4
       - ./scheme_b/config:/opt/thirdparty-scheme-adapter/config
     environment:
-      - NODE_ENV=test
+      - NODE_ENV=integration
     networks:
       - mojaloop-net
     ports:
-      - "4008:4008"
+      - "4058:4058"
     depends_on:
-      - redis
       - pisp-simulator
     extra_hosts:
       - "redis:172.17.0.1"
       - "pisp-simulator:172.17.0.1"
     healthcheck:
-      test: wget -q http://172.17.0.1:4008/health -O /dev/null || exit 1
+      test: wget -q http://172.17.0.1:4058/health -O /dev/null || exit 1
       timeout: 3s
       retries: 10
       start_period: 10s
       interval: 30s
-  
-  redis:
-    container_name: redis
-    image: "redis:5.0.4-alpine"
-    networks:
-      - mojaloop-net
-    ports:
-      - "6379:6379"
-    restart: always
-  
+
   pisp-simulator:
     image: mojaloop/mojaloop-simulator:v9.4.1.7-pisp
    # build: 
