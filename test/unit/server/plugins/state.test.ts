@@ -103,8 +103,8 @@ describe('StatePlugin', () => {
     const spyWSO2Auth = jest.spyOn(SDK, 'WSO2Auth').mockImplementationOnce(
       () => ({ Iam: 'mockedWSO2Auth' } as unknown as SDK.WSO2Auth)
     )
-    config.SHARED.TLS.outbound.mutualTLS.enabled = true
-    config.SHARED.TLS.outbound.creds = {
+    config.SHARED.TLS.mutualTLS.enabled = true
+    config.SHARED.TLS.creds = {
       ca: 'mocked ca',
       cert: 'mocked cert',
       key: 'mocked key'
@@ -113,7 +113,8 @@ describe('StatePlugin', () => {
     expect(spyWSO2Auth).toBeCalledWith({
       ...config.WSO2_AUTH,
       logger,
-      tlsCreds: config.SHARED.TLS.outbound.creds
+      tlsCreds: config.SHARED.TLS.creds
     })
+    config.SHARED.TLS.mutualTLS.enabled = false
   })
 })
