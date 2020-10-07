@@ -282,7 +282,6 @@ describe('Outbound API routes', (): void => {
     })
   })
 
-  // jest.setTimeout(30000)
   it('/thirdpartyRequests/transactions/{ID}/authorizations', async (): Promise<void> => {
     const request = {
       method: 'POST',
