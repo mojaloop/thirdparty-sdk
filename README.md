@@ -25,7 +25,7 @@ This package exemplifies the use of the Mojaloop SDK Standard Components for TLS
    ```bash
    127.0.0.1 redis
    ```
-4. Start Redis container through docker-compose
+4. Start Redis container through docker-compose in a separate terminal window
    ```bash
    docker-compose up redis
    ```
@@ -62,7 +62,7 @@ This package exemplifies the use of the Mojaloop SDK Standard Components for TLS
   Its responsibility is to transform asynchronous Mojaloop API native interface's set of calls to a synchronous call.
 
 ## Integration Test
-   To run integration tests, first start `docker-compose` inside `docker` folder.
+   To run integration tests, first start `docker-compose` inside `docker` folder in a separate window.
    ```bash
    cd docker
    docker-compose build && docker-compose up
