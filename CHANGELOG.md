@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+## [11.19.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.18.0...v11.19.0) (2020-10-07)
+
+
+### Features
+
+* 1671 extend config to have all sdk standard components endpoints ([#40](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/40)) ([86d4ae3](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/86d4ae3d8ae0de8636a3bbb5ea5e2e4d9c91a4dc))
+
 ## [11.18.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.17.1...v11.18.0) (2020-10-05)
 
 

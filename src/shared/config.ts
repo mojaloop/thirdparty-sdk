@@ -30,6 +30,7 @@
 import Convict from 'convict'
 import PACKAGE from '../../package.json'
 import fs, { PathLike } from 'fs'
+import { BaseRequestTLSConfig } from '@mojaloop/sdk-standard-components'
 
 export { PACKAGE }
 
@@ -77,48 +78,19 @@ export interface ServiceConfig {
   }
   SHARED: {
     PEER_ENDPOINT: string
-    ALS_ENDPOINT: string
-    QUOTES_ENDPOINT: string
-    TRANSFERS_ENDPOINT: string
-    BULK_TRANSFERS_ENDPOINT: string
+    ALS_ENDPOINT?: string
+    QUOTES_ENDPOINT?: string
+    TRANSFERS_ENDPOINT?: string
+    BULK_TRANSFERS_ENDPOINT?: string
+    THIRDPARTY_REQUESTS_ENDPOINT?: string
+    TRANSACTION_REQUEST_ENDPOINT?: string
     DFSP_ID: string
     DFSP_BACKEND_URI: string
     DFSP_BACKEND_SIGN_AUTHORIZATION_PATH: string
     DFSP_BACKEND_HTTP_SCHEME: string
     JWS_SIGN: boolean
     JWS_SIGNING_KEY: PathLike | Buffer
-    TLS: {
-      inbound: {
-        mutualTLS: {
-          enabled: boolean
-        },
-        creds: {
-          ca: string | Array<Buffer>
-          cert: string | Array<Buffer>
-          key: string | Array<Buffer>
-        }
-      },
-      outbound: {
-        mutualTLS: {
-          enabled: boolean
-        },
-        creds: {
-          ca: string | Array<Buffer>
-          cert: string | Array<Buffer>
-          key: string | Array<Buffer>
-        }
-      },
-      test: {
-        mutualTLS: {
-          enabled: boolean
-        },
-        creds: {
-          ca: string | Array<Buffer>
-          cert: string | Array<Buffer>
-          key: string | Array<Buffer>
-        }
-      }
-    }
+    TLS: BaseRequestTLSConfig
   }
 }
 
@@ -235,11 +207,48 @@ export const ConvictConfig = Convict<ServiceConfig>({
     }
   },
   SHARED: {
-    PEER_ENDPOINT: '0.0.0.0:4003',
-    ALS_ENDPOINT: '0.0.0.0:4002',
-    QUOTES_ENDPOINT: '0.0.0.0:3002',
-    TRANSFERS_ENDPOINT: '0.0.0.0:3000',
-    BULK_TRANSFERS_ENDPOINT: '',
+    PEER_ENDPOINT: {
+      doc: 'Peer/Switch endpoint',
+      format: '*',
+      default: '0.0.0.0:4003',
+      env: 'PEER_ENDPOINT'
+    },
+    ALS_ENDPOINT: {
+      doc: 'ALS endpoint',
+      format: '*',
+      default: undefined, // '0.0.0.0:4002',
+      env: 'ALS_ENDPOINT'
+    },
+    QUOTES_ENDPOINT: {
+      doc: 'Quotes endpoint',
+      format: '*',
+      default: undefined, // '0.0.0.0:3002',
+      env: 'QUOTES_ENDPOINT'
+    },
+    TRANSFERS_ENDPOINT: {
+      doc: 'Peer/Switch endpoint',
+      format: '*',
+      default: undefined, // '0.0.0.0:3000',
+      env: 'TRANSFERS_ENDPOINT'
+    },
+    BULK_TRANSFERS_ENDPOINT: {
+      doc: 'Bulk Transfers endpoint',
+      format: '*',
+      env: 'BULK_TRANSFERS_ENDPOINT',
+      default: undefined
+    },
+    THIRDPARTY_REQUESTS_ENDPOINT: {
+      doc: 'Thirdparty Requests endpoint',
+      format: '*',
+      env: 'THIRDPARTY_REQUESTS_ENDPOINT',
+      default: undefined
+    },
+    TRANSACTION_REQUEST_ENDPOINT: {
+      doc: 'Transaction Request endpoint',
+      format: '*',
+      env: 'TRANSACTION_REQUEST_ENDPOINT',
+      default: undefined
+    },
     DFSP_ID: {
       doc: 'Id of DFSP',
       format: '*',
@@ -264,35 +273,13 @@ export const ConvictConfig = Convict<ServiceConfig>({
     JWS_SIGNING_KEY: '',
     // Todo: Investigate proper key setup
     TLS: {
-      inbound: {
-        mutualTLS: {
-          enabled: false
-        },
-        creds: {
-          ca: '',
-          cert: '',
-          key: ''
-        }
+      mutualTLS: {
+        enabled: false
       },
-      outbound: {
-        mutualTLS: {
-          enabled: false
-        },
-        creds: {
-          ca: '',
-          cert: '',
-          key: ''
-        }
-      },
-      test: {
-        mutualTLS: {
-          enabled: false
-        },
-        creds: {
-          ca: '',
-          cert: '',
-          key: ''
-        }
+      creds: {
+        ca: '',
+        cert: '',
+        key: ''
       }
     }
   }
@@ -310,42 +297,16 @@ ConvictConfig.set('SHARED.JWS_SIGNING_KEY', getFileContent(ConvictConfig.get('SH
 
 // Note: Have not seen these be comma separated value strings. mimicking sdk-scheme-adapter for now
 ConvictConfig.set(
-  'SHARED.TLS.inbound.creds.ca',
-  getFileListContent(<string> ConvictConfig.get('SHARED').TLS.inbound.creds.ca)
+  'SHARED.TLS.creds.ca',
+  getFileListContent(<string> ConvictConfig.get('SHARED').TLS.creds.ca)
 )
 ConvictConfig.set(
-  'SHARED.TLS.inbound.creds.cert',
-  getFileListContent(<string> ConvictConfig.get('SHARED').TLS.inbound.creds.cert)
+  'SHARED.TLS.creds.cert',
+  getFileListContent(<string> ConvictConfig.get('SHARED').TLS.creds.cert)
 )
 ConvictConfig.set(
-  'SHARED.TLS.inbound.creds.key',
-  getFileListContent(<string> ConvictConfig.get('SHARED').TLS.inbound.creds.key)
-)
-
-ConvictConfig.set(
-  'SHARED.TLS.outbound.creds.ca',
-  getFileListContent(<string> ConvictConfig.get('SHARED').TLS.outbound.creds.ca)
-)
-ConvictConfig.set(
-  'SHARED.TLS.outbound.creds.cert',
-  getFileListContent(<string> ConvictConfig.get('SHARED').TLS.outbound.creds.cert)
-)
-ConvictConfig.set(
-  'SHARED.TLS.outbound.creds.key',
-  getFileListContent(<string> ConvictConfig.get('SHARED').TLS.outbound.creds.key)
-)
-
-ConvictConfig.set(
-  'SHARED.TLS.test.creds.ca',
-  getFileListContent(<string> ConvictConfig.get('SHARED').TLS.test.creds.ca)
-)
-ConvictConfig.set(
-  'SHARED.TLS.test.creds.cert',
-  getFileListContent(<string> ConvictConfig.get('SHARED').TLS.test.creds.cert)
-)
-ConvictConfig.set(
-  'SHARED.TLS.test.creds.key',
-  getFileListContent(<string> ConvictConfig.get('SHARED').TLS.test.creds.key)
+  'SHARED.TLS.creds.key',
+  getFileListContent(<string> ConvictConfig.get('SHARED').TLS.creds.key)
 )
 
 // extract simplified config from Convict object
