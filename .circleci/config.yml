@@ -195,16 +195,14 @@ jobs:
             docker-compose pull
             docker-compose up -d 
       - run:
-          name: Spin up the pisp-simulator and extra 3party-scheme-adapter
+          name: Spin up the pisp-simulator and extra thirdparty-scheme-adapters A & B
           command: |
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             cd ./docker/
             docker-compose build
             docker-compose up -d 
-            chmod +x ./wait4/wait4.js
-            sh -c "./wait4/wait4.js cicd-integration-tests"
       - run:
-          name: Build docker images
+          name: Spin up core thirdparty-scheme-adapter with redis
           command: |
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             docker-compose build
