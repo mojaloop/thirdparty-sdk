@@ -51,7 +51,7 @@ describe('POST /authorizations', (): void => {
     }
   }
 
-  it('DFSPB asks via scheme adapter the PISP to deliver Authorization from User', async (): Promise<void> => {
+  it('DFSP asks via scheme adapter the PISP to deliver Authorization from User', async (): Promise<void> => {
     // Act
     const response = await axios.post(scenariosURI, options)
 
