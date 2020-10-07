@@ -78,10 +78,12 @@ export interface ServiceConfig {
   }
   SHARED: {
     PEER_ENDPOINT: string
-    ALS_ENDPOINT: string
-    QUOTES_ENDPOINT: string
-    TRANSFERS_ENDPOINT: string
-    BULK_TRANSFERS_ENDPOINT: string
+    ALS_ENDPOINT?: string
+    QUOTES_ENDPOINT?: string
+    TRANSFERS_ENDPOINT?: string
+    BULK_TRANSFERS_ENDPOINT?: string
+    THIRDPARTY_REQUESTS_ENDPOINT?: string
+    TRANSACTION_REQUEST_ENDPOINT?: string
     DFSP_ID: string
     DFSP_BACKEND_URI: string
     DFSP_BACKEND_SIGN_AUTHORIZATION_PATH: string
@@ -210,6 +212,8 @@ export const ConvictConfig = Convict<ServiceConfig>({
     QUOTES_ENDPOINT: '0.0.0.0:3002',
     TRANSFERS_ENDPOINT: '0.0.0.0:3000',
     BULK_TRANSFERS_ENDPOINT: '',
+    THIRDPARTY_REQUESTS_ENDPOINT: '',
+    TRANSACTION_REQUEST_ENDPOINT: '',
     DFSP_ID: {
       doc: 'Id of DFSP',
       format: '*',

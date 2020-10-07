@@ -74,8 +74,8 @@ export const StatePlugin = {
     const wso2Auth = new SDK.WSO2Auth({
       ...config.WSO2_AUTH,
       logger,
-      tlsCreds: config.SHARED.TLS.outbound.mutualTLS.enabled
-        ? config.SHARED.TLS.outbound.creds as TLSCreds
+      tlsCreds: config.SHARED.TLS.mutualTLS.enabled
+        ? config.SHARED.TLS.creds as TLSCreds
         : undefined
     })
 
@@ -87,6 +87,8 @@ export const StatePlugin = {
       quotesEndpoint: config.SHARED.QUOTES_ENDPOINT,
       transfersEndpoint: config.SHARED.TRANSFERS_ENDPOINT,
       bulkTransfersEndpoint: config.SHARED.BULK_TRANSFERS_ENDPOINT,
+      thirdpartyRequestsEndpoint: config.SHARED.THIRDPARTY_REQUESTS_ENDPOINT,
+      transactionRequestsEndpoint: config.SHARED.TRANSACTION_REQUEST_ENDPOINT,
       dfspId: config.SHARED.DFSP_ID,
       tls: config.SHARED.TLS,
       jwsSign: config.SHARED.JWS_SIGN,
@@ -100,6 +102,8 @@ export const StatePlugin = {
       quotesEndpoint: config.SHARED.QUOTES_ENDPOINT,
       transfersEndpoint: config.SHARED.TRANSFERS_ENDPOINT,
       bulkTransfersEndpoint: config.SHARED.BULK_TRANSFERS_ENDPOINT,
+      thirdpartyRequestsEndpoint: config.SHARED.THIRDPARTY_REQUESTS_ENDPOINT,
+      transactionRequestsEndpoint: config.SHARED.TRANSACTION_REQUEST_ENDPOINT,
       dfspId: config.SHARED.DFSP_ID,
       tls: config.SHARED.TLS,
       jwsSign: config.SHARED.JWS_SIGN,
