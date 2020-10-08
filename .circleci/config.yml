@@ -195,14 +195,7 @@ jobs:
             docker-compose pull
             docker-compose up -d 
       - run:
-          name: Spin up the pisp-simulator and extra thirdparty-scheme-adapters A & B
-          command: |
-            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-            cd ./docker/
-            docker-compose build
-            docker-compose up -d 
-      - run:
-          name: Spin up core thirdparty-scheme-adapter with redis
+          name: Build docker images
           command: |
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             docker-compose build
