@@ -216,6 +216,7 @@ describe('Outbound API routes', (): void => {
     expect(result.MojaloopRequestsPresent).toBeTruthy()
     expect(result.ThirdpartyRequestsPresent).toBeTruthy()
   })
+
   it('/metrics', async (): Promise<void> => {
     const request = {
       method: 'GET',
