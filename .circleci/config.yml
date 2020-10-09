@@ -211,7 +211,6 @@ jobs:
           name: Execute Wait4 script
           command: |
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-            sleep 30
             chmod +x ./docker/wait4/wait4.js
             sh -c "./docker/wait4/wait4.js cicd-integration-tests"
       - run:
