@@ -29,7 +29,7 @@
 import axios from 'axios'
 
 describe('POST /authorizations', (): void => {
-  const scenariosURI = 'http://127.0.0.1:4056/authorizations'
+  const scenariosURI = `http://127.0.0.1:4056/authorizations`
   const options = {
     toParticipantId: 'pisp',
     authenticationType: 'U2F',
