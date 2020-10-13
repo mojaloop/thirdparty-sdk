@@ -21,16 +21,34 @@ This package exemplifies the use of the Mojaloop SDK Standard Components for TLS
    ```bash
    npm install
    ```
-3. Start Inbound API server 
+3. Modify the hosts to setup local DNS for Redis
+   ```bash
+   127.0.0.1 redis
+   ```
+4. Start Redis container through docker-compose in a separate terminal window
+   ```bash
+   docker-compose up redis
+   ```
+5. Start Inbound API server 
    ```bash
    npm run start:inbound
    ```
-    then visit in your web browser http://localhost:4005/health
-4. Start Outbound API server
+   then visit in your web browser http://localhost:4005/health
+   
+   In case to start the test environment
+   ```bash
+   NODE_ENV=test npm run start:inbound
+   ```
+6. Start Outbound API server
    ```bash
    npm run start:outbound
    ```
-    then visit in your web browser http://localhost:4006/health
+   then visit in your web browser http://localhost:4006/health
+
+   In case to start the test environment
+   ```bash
+   NODE_ENV=test npm run start:outbound
+   ```
 
 ## Inbound & Outbound API
 > This package delivers implementation Inbound and Outbound API services which will be used by Thirdparty to integrate with `Mojaloop Switch`
@@ -42,6 +60,17 @@ This package exemplifies the use of the Mojaloop SDK Standard Components for TLS
 ### Outbound API
   `Outbound API` service is used by `Thirdparty backend` to make a call to `Mojaloop Switch`  
   Its responsibility is to transform asynchronous Mojaloop API native interface's set of calls to a synchronous call.
+
+## Integration Test
+   To run integration tests, first start `docker-compose` inside `docker` folder in a separate window.
+   ```bash
+   cd docker
+   docker-compose build && docker-compose up
+   ```
+   Then run the following command
+   ```bash
+   npm run test:integration
+   ```
 
 # Contribution
 Read the [contributing.md](./contributing.md) doc

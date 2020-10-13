@@ -5,7 +5,8 @@
     "ambient.d.ts",
     "jest.bdd.config.js",
     "jest.config.js",
-    "jest.integration.config.js"
+    "jest.integration.config.js",
+    "docker"
   ],
   "exclude": [
     "node_modules",

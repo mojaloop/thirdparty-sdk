@@ -193,13 +193,25 @@ jobs:
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             cd ./docker/contract/ml-testing-toolkit/
             docker-compose pull
-            docker-compose up -d 
+            docker-compose up -d
       - run:
-          name: Build docker images
+          name: Spin up core thirdparty-scheme-adapter with redis
           command: |
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             docker-compose build
-            docker-compose up -d 
+            docker-compose up -d
+      - run:
+          name: Spin up the pisp-simulator and extra thirdparty-scheme-adapters A & B
+          command: |
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            cd ./docker/
+            docker-compose build
+            docker-compose up -d
+      - run:
+          name: Execute Wait4 script
+          command: |
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            sleep 30
             chmod +x ./docker/wait4/wait4.js
             sh -c "./docker/wait4/wait4.js cicd-integration-tests"
       - run:
