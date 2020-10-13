@@ -1,4 +1,48 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+## [11.20.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.19.0...v11.20.0) (2020-10-13)
+
+
+### Features
+
+* **api-outbound:** add POST /authorizations integration test ([d5251a5](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/d5251a5c1fa4c34db8d4e7bb7a73e96a8586a089))
+* **api-outbound:** add test outbound POST authorizations ([b3348bd](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/b3348bd8b2b4f523280a07891b4815aff3389a9b))
+* **api-outbound:** change docker-compose for proper CICD running ([c985c41](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/c985c41c3302cbea6eb377fea7c80886f8627ba7))
+* **docker:** setup docker config to run ([e6dead5](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/e6dead57f8b1e3f3a24c342c17436b37479ff17b))
+
+
+### Bug Fixes
+
+* **api-inbound:** add example for POST authorizations ([d10e332](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/d10e332fc7c80fdb21f1de2e6b72891ed9dd462f))
+* **api-outbound:** add example for POST authorizations ([504da8b](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/504da8bbc766e57a726c91629e0fdef8867995e4))
+* **circleci-config:** fix wait4 path ([b510803](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/b510803c461263975d321262c295b822599870ab))
+* **circleci-config:** remove wait4 and apply review suggestions ([92f4de4](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/92f4de42e7074e7a59be00aca8976d6e2a2bc587))
+* **integration-test:** change integration.json value for outboudn api integration test ([b7da0cd](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/b7da0cdfc5d61ddc4718583879e418d06f6b8e69))
+* **outbound-api.test:** changes as per reviewer request ([cfdd4b6](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/cfdd4b65e7a584c1b82c3e4b9bc066fa1b92f9de))
+* **package-update:** fix conflict on package ([73e3311](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/73e3311ad9d1affe488f39ead35303b7373dc5db))
+
+
+### Documentation
+
+* **readme:** update Quick Start steps ([a31eb1a](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/a31eb1a7af12c4293ae9a0b30419f88fb4417932))
+
+
+### Tests
+
+* **circleci-build:** test circleci build ([701c876](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/701c876a5afd62f5d0c2f1024dab7a2ca296c504))
+* **circleci-build:** test circleci build with additional containers after core containers ([2effe23](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/2effe239d13b85ef3ecd1647e0b8f5fd678720ca))
+* **circleci-build:** test circleci build with master version ([151358e](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/151358e26b0788969b5e58ac747ba6144d4f19e2))
+* **circleci-build:** test circleci build with master version of wait4 config ([d9c6ae6](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/d9c6ae67d9bcf56f6c15b084224bd4002180d47d))
+* **circleci-build:** test circleci config ([e234273](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/e234273f868fce5d041381f5ff1515d0098fba9b))
+* **circleci-build:** test circleci config ([403d343](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/403d343f0e141d96ee1dfeb79c7f6331903c78f3))
+* **circleci-build:** test circleci config ([aa2d9a6](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/aa2d9a6eef4036eeaa8c515d7a24fe6cb3245a8a))
+
+
+### Maintenance
+
+* **package:** update deps ([e93d9a2](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/e93d9a25b79415f5467f8761d50dadb113506a6f))
+* **package-update:** update package.json ([6ac1ba5](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/6ac1ba544e4fec3dca6dfa6088aec2e5fc981552))
+* **update-package:** update package ([bae4761](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/bae4761ea04c189a0622478cf82f8f12c2ae4e94))
+
 ## [11.19.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.18.0...v11.19.0) (2020-10-07)
 
 
