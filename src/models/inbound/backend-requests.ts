@@ -37,6 +37,8 @@ import { PrependFun, Scheme, prepend2Uri } from '~/shared/http-scheme'
 import { throwOrExtractData } from '~/shared/throw-or-extract-data'
 
 import http from 'http'
+import { OutboundRequestToPayTransferPostRequest, OutboundRequestToPayTransferPostResponse } from '../thirdparty.transactions.interface'
+import config from '~/shared/config'
 
 export interface BackendConfig {
   // FSP id of this DFSP
@@ -167,5 +169,30 @@ export class BackendRequests {
     return this.post<InboundAuthorizationsPostRequest, AuthenticationValue>(
       this.config.singAuthorizationPath, inRequest
     )
+  }
+
+  async requestToPayTransfer (
+    request: OutboundRequestToPayTransferPostRequest
+  ): Promise<OutboundRequestToPayTransferPostResponse | void> {
+    return this.loggedRequest<OutboundRequestToPayTransferPostResponse>({
+      uri: config.SHARED.SDK_REQUEST_TO_PAY_TRANSFER_URI,
+      method: 'POST',
+      body: requests.common.bodyStringifier(request),
+      headers: this.headers,
+      agent: this.agent
+    })
+  }
+
+  async notifyAboutTransfer (
+    request: OutboundRequestToPayTransferPostResponse,
+    id: string
+  ): Promise<void> {
+    return this.loggedRequest<void>({
+      uri: config.SHARED.NOTIFY_ABOUT_TRANSFER_URI.replace('{ID}', id),
+      method: 'PATCH',
+      body: requests.common.bodyStringifier(request),
+      headers: this.headers,
+      agent: this.agent
+    })
   }
 }
