@@ -37,8 +37,12 @@ import { PrependFun, Scheme, prepend2Uri } from '~/shared/http-scheme'
 import { throwOrExtractData } from '~/shared/throw-or-extract-data'
 
 import http from 'http'
-import { OutboundRequestToPayTransferPostRequest, OutboundRequestToPayTransferPostResponse } from '../thirdparty.transactions.interface'
+import {
+  OutboundRequestToPayTransferPostRequest,
+  OutboundRequestToPayTransferPostResponse
+} from '../thirdparty.transactions.interface'
 import config from '~/shared/config'
+import { ThirdpartyTransactionStatus } from '../pispTransaction.interface'
 
 export interface BackendConfig {
   // FSP id of this DFSP
@@ -184,7 +188,7 @@ export class BackendRequests {
   }
 
   async notifyAboutTransfer (
-    request: OutboundRequestToPayTransferPostResponse,
+    request: ThirdpartyTransactionStatus,
     id: string
   ): Promise<void> {
     return this.loggedRequest<void>({

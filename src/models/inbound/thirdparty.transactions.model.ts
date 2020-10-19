@@ -37,6 +37,7 @@ import {
   OutboundRequestToPayTransferPostResponse
 } from '../thirdparty.transactions.interface'
 import config from '~/shared/config'
+import { ThirdpartyTransactionStatus } from '../pispTransaction.interface'
 
 export interface InboundThridpartyTransactionsModelConfig {
   logger: SDKLogger.Logger
@@ -93,7 +94,11 @@ export class InboundThridpartyTransactionsModel {
 
     // optionally notify via PATCH
     if (config.SHARED.NOTIFY_ABOUT_TRANSFER_URI) {
-      await this.backendRequests.notifyAboutTransfer(response, inRequest.transactionRequestId)
+      const transactionStatus: ThirdpartyTransactionStatus = {
+        transactionId: inRequest.transactionRequestId,
+        transactionRequestState: 'ACCEPTED'
+      }
+      await this.backendRequests.notifyAboutTransfer(transactionStatus, inRequest.transactionRequestId)
     }
 
     return response
