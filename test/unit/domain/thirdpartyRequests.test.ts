@@ -49,7 +49,7 @@ jest.mock('@mojaloop/sdk-standard-components', () => {
   }
 })
 
-describe('thirdpartyRequests/transactions', (): void => {
+describe.only('thirdpartyRequests/transactions', (): void => {
   beforeEach((): void => {
     jest.clearAllMocks()
     resetUuid()
@@ -63,7 +63,6 @@ describe('thirdpartyRequests/transactions', (): void => {
     expectMockQuoteRequest.toEqual(expect.objectContaining({
       quoteId: '00000000-0000-1000-8000-000000000001',
       transactionId: '00000000-0000-1000-8000-000000000002',
-      note: ''
     }))
     expectMockQuoteRequest.toEqual(expect.objectContaining({
       payee: postQuoteRequest.payload.payee,
@@ -80,7 +79,7 @@ describe('thirdpartyRequests/transactions', (): void => {
       postThirdpartyRequestsTransactionRequest.payload
     )
 
-    resetUuid()
+    // resetUuid()
 
     forwardPostQuoteRequestToPayee(
       postThirdpartyRequestsTransactionRequest.payload,
