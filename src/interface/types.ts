@@ -113,7 +113,7 @@ export interface QuoteRequest {
   amountType: AmountType;
   amount: Money;
   transactionType: TransactionType;
-  note: string;
+  note?: string;
 }
 
 export interface HealthResponse {

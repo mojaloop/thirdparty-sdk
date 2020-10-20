@@ -63,7 +63,6 @@ describe('thirdpartyRequests/transactions', (): void => {
     expectMockQuoteRequest.toEqual(expect.objectContaining({
       quoteId: '00000000-0000-1000-8000-000000000001',
       transactionId: '00000000-0000-1000-8000-000000000002',
-      note: ''
     }))
     expectMockQuoteRequest.toEqual(expect.objectContaining({
       payee: postQuoteRequest.payload.payee,
