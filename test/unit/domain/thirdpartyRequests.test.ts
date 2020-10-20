@@ -49,7 +49,7 @@ jest.mock('@mojaloop/sdk-standard-components', () => {
   }
 })
 
-describe.only('thirdpartyRequests/transactions', (): void => {
+describe('thirdpartyRequests/transactions', (): void => {
   beforeEach((): void => {
     jest.clearAllMocks()
     resetUuid()
