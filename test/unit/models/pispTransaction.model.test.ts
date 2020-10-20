@@ -190,7 +190,7 @@ describe('pipsTransactionModel', () => {
         // defer publication to notification channel
         setImmediate(() => model.pubSub.publish(
           channel,
-          party as unknown as Message
+          { party } as unknown as Message
         ))
         // let be sure we don't have expected data yet
         expect(model.data.payeeResolved).toBeFalsy()
@@ -210,7 +210,7 @@ describe('pipsTransactionModel', () => {
         expect(modelConfig.pubSub.unsubscribe).toBeCalledWith(channel, 1)
 
         // check we got needed part of response stored
-        expect(model.data.payeeResolved).toEqual(party)
+        expect(model.data.payeeResolved).toEqual({ party })
 
         // check we got lookup response phase response stored
         expect(model.data.partyLookupResponse).toEqual({
@@ -283,7 +283,7 @@ describe('pipsTransactionModel', () => {
             partyIdType: 'party-id-type',
             partyIdentifier: 'party-identifier'
           },
-          payeeResolved: party,
+          payeeResolved: { party },
           initiateRequest: {
             sourceAccountId: 'source-account-id',
             consentId: 'consent-id',
@@ -416,7 +416,7 @@ describe('pipsTransactionModel', () => {
             partyIdType: 'party-id-type',
             partyIdentifier: 'party-identifier'
           },
-          payeeResolved: party,
+          payeeResolved: { party },
           initiateRequest: {
             sourceAccountId: 'source-account-id',
             consentId: 'consent-id',

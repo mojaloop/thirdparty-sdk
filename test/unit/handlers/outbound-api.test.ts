@@ -41,6 +41,7 @@ import {
   InboundThirdpartyAuthorizationsPutRequest
 } from '~/models/thirdparty.authorizations.interface'
 import {
+  PartiesPutResponse,
   PISPTransactionModelState,
   ThirdpartyTransactionStatus
 } from '~/models/pispTransaction.interface'
@@ -49,7 +50,6 @@ import PTM from '~/models/pispTransaction.model'
 import { RedisConnectionConfig } from '~/shared/redis-connection'
 import { Server } from '@hapi/hapi'
 import { ServerAPI, ServerConfig } from '~/server'
-import { TParty } from '@mojaloop/sdk-standard-components'
 import Config from '~/shared/config'
 import Handlers from '~/handlers'
 import index from '~/index'
@@ -72,21 +72,23 @@ const putThirdpartyAuthResponse: InboundThirdpartyAuthorizationsPutRequest = {
   status: 'VERIFIED',
   value: 'value'
 }
-const partyLookupResponse: TParty = {
-  partyIdInfo: {
-    partyIdType: 'MSISDN',
-    partyIdentifier: '+4412345678',
-    fspId: 'pispA'
-  },
-  merchantClassificationCode: '4321',
-  name: 'Justin Trudeau',
-  personalInfo: {
-    complexName: {
-      firstName: 'Justin',
-      middleName: 'Pierre',
-      lastName: 'Trudeau'
+const partyLookupResponse: PartiesPutResponse = {
+  party: {
+    partyIdInfo: {
+      partyIdType: 'MSISDN',
+      partyIdentifier: '+4412345678',
+      fspId: 'pispA'
     },
-    dateOfBirth: '1980-01-01'
+    merchantClassificationCode: '4321',
+    name: 'Justin Trudeau',
+    personalInfo: {
+      complexName: {
+        firstName: 'Justin',
+        middleName: 'Pierre',
+        lastName: 'Trudeau'
+      },
+      dateOfBirth: '1980-01-01'
+    }
   }
 }
 const initiateResponse: InboundAuthorizationsPostRequest = {
@@ -337,7 +339,7 @@ describe('Outbound API routes', (): void => {
     const response = await server.inject(request)
     expect(response.statusCode).toBe(200)
     expect(response.result).toEqual({
-      party: { ...partyLookupResponse },
+      party: { ...partyLookupResponse.party },
       currentState: PISPTransactionModelState.partyLookupSuccess
     })
   })

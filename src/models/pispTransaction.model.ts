@@ -34,10 +34,10 @@ import {
   MojaloopRequests,
   PutAuthorizationRequest,
   PostThirdPartyRequestTransactionsRequest,
-  ThirdpartyRequests,
-  TParty
+  ThirdpartyRequests
 } from '@mojaloop/sdk-standard-components'
 import {
+  PartiesPutResponse,
   PayeeLookupRequest,
   PISPTransactionData,
   PISPTransactionModelConfig,
@@ -155,9 +155,9 @@ export class PISPTransactionModel
           // first unsubscribe
           this.pubSub.unsubscribe(channel, sid)
 
-          this.data.payeeResolved = { ...message as unknown as TParty }
+          this.data.payeeResolved = { ...message as unknown as PartiesPutResponse }
           this.data.partyLookupResponse = {
-            party: { ...this.data.payeeResolved },
+            party: { ...this.data.payeeResolved.party },
             currentState: PISPTransactionModelState[
               this.data.currentState as keyof typeof PISPTransactionModelState
             ]

@@ -36,6 +36,10 @@ import { ControlledStateMachine, PersistentModelConfig, StateData } from '~/mode
 import { PubSub } from '~/shared/pub-sub'
 import { InboundAuthorizationsPostRequest, InboundAuthorizationsPutRequest } from './authorizations.interface'
 
+export interface PartiesPutResponse {
+  party: TParty
+}
+
 export enum PISPTransactionModelState {
   start = 'start',
   partyLookupSuccess = 'partyLookupSuccess',
@@ -119,7 +123,7 @@ export interface PISPTransactionData extends StateData {
 
   // party lookup
   payeeRequest?: PayeeLookupRequest
-  payeeResolved?: TParty
+  payeeResolved?: PartiesPutResponse
   partyLookupResponse?: ThirdpartyTransactionPartyLookupResponse
 
   // initiate

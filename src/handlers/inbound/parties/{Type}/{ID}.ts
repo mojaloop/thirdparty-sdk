@@ -24,25 +24,24 @@
 import { Request, ResponseObject } from '@hapi/hapi'
 import { Message } from '~/shared/pub-sub'
 import { StateResponseToolkit } from '~/server/plugins/state'
-import { PISPTransactionPhase, } from '~/models/pispTransaction.interface'
+import { PartiesPutResponse, PISPTransactionPhase } from '~/models/pispTransaction.interface'
 import { PISPTransactionModel } from '~/models/pispTransaction.model'
-import { TParty } from '@mojaloop/sdk-standard-components'
 
 /**
  * Handles a inbound PUT /parties/{Type}/{ID} request
  */
-async function put (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
-    const partyRequest = request.payload as TParty
-    const channel = PISPTransactionModel.partyNotificationChannel(
-        PISPTransactionPhase.lookup, 
-        request.params.Type, 
-        request.params.ID)
-    const pubSub = h.getPubSub()
-    // don't await on promise to resolve, let finish publish in background
-    pubSub.publish(channel, partyRequest as unknown as Message)
-    return h.response({}).code(200)
+async function put (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+  const partiesResponse = request.payload as PartiesPutResponse
+  const channel = PISPTransactionModel.partyNotificationChannel(
+    PISPTransactionPhase.lookup,
+    request.params.Type,
+    request.params.ID)
+  const pubSub = h.getPubSub()
+  // don't await on promise to resolve, let finish publish in background
+  pubSub.publish(channel, partiesResponse as unknown as Message)
+  return h.response({}).code(200)
 }
 
 export default {
-    put
+  put
 }
