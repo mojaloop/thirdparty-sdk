@@ -1,4 +1,19 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+### [11.20.2](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.20.0...v11.20.2) (2020-10-20)
+
+
+### Bug Fixes
+
+* bump bugfix version to see if that fixes the circleci cache ([4197b53](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/4197b53ef3c83246fb8022c1daef54724441c633))
+* **quote:** remove empty quote `note` field, and make optional ([5583eef](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/5583eeffd2aeace741c6838f9ccbc153470e4f3f))
+* **tests:** broken quote ids ([99004c3](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/99004c3d683db6db533c2a037260279d2554dcae))
+* **tests:** broken quote ids ([4774ca1](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/4774ca161fa053ef43ffe55a11712439604dbd81))
+
+
+### Maintenance
+
+* remove .only ([63bf3be](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/63bf3be299b2f74e937f0f85dc8c922924193db8))
+
 ## [11.20.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.19.0...v11.20.0) (2020-10-13)
 
 
