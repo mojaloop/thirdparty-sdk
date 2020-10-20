@@ -33,7 +33,6 @@ export function buildPayeeQuoteRequestFromTptRequest (request: ThirdpartyTransac
   const quoteRequest = {
     quoteId: uuid(),
     transactionId: uuid(),
-    note: '',
     transactionRequestId: request.transactionRequestId,
     payee: request.payee,
     payer: request.payer,
