@@ -79,7 +79,7 @@ describe.only('thirdpartyRequests/transactions', (): void => {
       postThirdpartyRequestsTransactionRequest.payload
     )
 
-    // resetUuid()
+    resetUuid()
 
     forwardPostQuoteRequestToPayee(
       postThirdpartyRequestsTransactionRequest.payload,
