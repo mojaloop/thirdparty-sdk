@@ -50,6 +50,7 @@ services:
     extra_hosts:
       - "redis:172.17.0.1"
       - "ml-testing-toolkit:172.17.0.1"
+      - "sdk-scheme-adapter:172.17.0.1"
     healthcheck:
       test: wget -q http://172.17.0.1:4006/health -O /dev/null || exit 1
       timeout: 3s
@@ -57,6 +58,46 @@ services:
       start_period: 10s
       interval: 30s
   
+  sdk-scheme-adapter:
+    image: "mojaloop/sdk-scheme-adapter:v10.6.2.7-pisp"
+    # build: 
+    #   context: ../sdk-scheme-adapter
+    #   dockerfile: ./Dockerfile
+    container_name: sdk-scheme-adapter
+    env_file: ./docker/sdk_scheme_adapter.env
+    volumes:
+      - "./docker/secrets:/secrets"
+      - "./docker/jwsVerificationKeys:/jwsVerificationKeys"
+    ports:
+      - "7000:4000"
+      - "7002:4001"
+    networks:
+      - mojaloop-net
+    depends_on:
+      - redis
+    restart: always
+    extra_hosts:
+      - "central-ledger.local:172.17.0.1"
+      - "central-settlement.local:172.17.0.1"
+      - "ml-api-adapter.local:172.17.0.1"
+      - "account-lookup-service.local:172.17.0.1"
+      - "account-lookup-service-admin.local:172.17.0.1"
+      - "quoting-service.local:172.17.0.1"
+      - "moja-simulator.local:172.17.0.1"
+      - "central-ledger:172.17.0.1"
+      - "central-settlement:172.17.0.1"
+      - "ml-api-adapter:172.17.0.1"
+      - "account-lookup-service:172.17.0.1"
+      - "account-lookup-service-admin:172.17.0.1"
+      - "quoting-service:172.17.0.1"
+      - "simulator:172.17.0.1"
+      - "host.docker.internal:172.17.0.1"
+      - "simulator.local:172.17.0.1"
+      - "transaction-request-service:172.17.0.1"
+      - "pisp-backend:172.17.0.1"
+      - "ml-testing-toolkit:172.17.0.1"
+
+
   redis:
     container_name: redis
     image: "redis:5.0.4-alpine"

@@ -2,12 +2,12 @@
   "VERSION": 1,
   "CALLBACK_ENDPOINT": "http://inbound-thirdparty-scheme-adapter:4005",
   "CALLBACK_RESOURCE_ENDPOINTS": {
-    "enabled": false,
+    "enabled": true,
     "endpoints": [
       {
         "method": "put",
         "path": "/parties/{Type}/{ID}",
-        "endpoint": "http://localhost:4002"
+        "endpoint": "http://172.17.0.1:7000"
       },
       {
         "method": "put",
