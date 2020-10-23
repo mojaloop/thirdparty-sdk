@@ -137,7 +137,7 @@ export class PISPTransactionModel
     const { partyIdType, partyIdentifier, partySubIdOrType } = this.data?.payeeRequest as PayeeLookupRequest
 
     try {
-      // cal GET /parties on sdk-scheme-adapter Outbound service
+      // call GET /parties on sdk-scheme-adapter Outbound service
       const response = this.data.payeeResolved = await this.backendRequests.requestPartiesInformation(
         partyIdType, partyIdentifier, partySubIdOrType
       ) as RequestPartiesInformationResponse

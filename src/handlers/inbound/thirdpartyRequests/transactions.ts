@@ -38,7 +38,6 @@ import { Enums } from '@mojaloop/central-services-error-handling'
 import { Enum } from '@mojaloop/central-services-shared'
 import { Request, ResponseObject } from '@hapi/hapi'
 import { StateResponseToolkit } from '~/server/plugins/state'
-// import { ThirdpartyTransactionRequest } from '~/interface/types'
 import {
   InboundThridpartyTransactionsModelConfig,
   InboundThridpartyTransactionsModel
@@ -59,8 +58,6 @@ async function post (_context: Context, request: Request, h: StateResponseToolki
     return h.response(Enums.FSPIOPErrorCodes.CLIENT_ERROR).code(Enum.Http.ReturnCodes.BADREQUEST.CODE)
   }
 
-  // old code
-  // forwardPostQuoteRequestToPayee(transactionRequest, h.getMojaloopRequests())
   const modelConfig: InboundThridpartyTransactionsModelConfig = {
     logger: h.getLogger(),
     backendRequests: h.getBackendRequests(),
