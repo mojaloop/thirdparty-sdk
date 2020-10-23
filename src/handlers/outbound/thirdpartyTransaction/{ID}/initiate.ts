@@ -46,7 +46,8 @@ async function post (_context: any, request: Request, h: StateResponseToolkit): 
     key: request.params.ID,
     logger: h.getLogger(),
     thirdpartyRequests: h.getThirdpartyRequests(),
-    mojaloopRequests: h.getMojaloopRequests()
+    mojaloopRequests: h.getMojaloopRequests(),
+    backendRequests: h.getBackendRequests()
   }
 
   // load model

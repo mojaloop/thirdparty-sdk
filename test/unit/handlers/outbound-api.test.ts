@@ -41,9 +41,10 @@ import {
   InboundThirdpartyAuthorizationsPutRequest
 } from '~/models/thirdparty.authorizations.interface'
 import {
-  PartiesPutResponse,
+  RequestPartiesInformationResponse,
   PISPTransactionModelState,
-  ThirdpartyTransactionStatus
+  ThirdpartyTransactionStatus,
+  RequestPartiesInformationState
 } from '~/models/pispTransaction.interface'
 import PTM from '~/models/pispTransaction.model'
 
@@ -54,6 +55,7 @@ import Config from '~/shared/config'
 import Handlers from '~/handlers'
 import index from '~/index'
 import path from 'path'
+import SDK from '@mojaloop/sdk-standard-components'
 
 const putResponse: InboundAuthorizationsPutRequest = {
   authenticationInfo: {
@@ -72,7 +74,7 @@ const putThirdpartyAuthResponse: InboundThirdpartyAuthorizationsPutRequest = {
   status: 'VERIFIED',
   value: 'value'
 }
-const partyLookupResponse: PartiesPutResponse = {
+const partyLookupResponse: RequestPartiesInformationResponse = {
   party: {
     partyIdInfo: {
       partyIdType: 'MSISDN',
@@ -89,7 +91,8 @@ const partyLookupResponse: PartiesPutResponse = {
       },
       dateOfBirth: '1980-01-01'
     }
-  }
+  },
+  currentState: RequestPartiesInformationState.COMPLETED
 }
 const initiateResponse: InboundAuthorizationsPostRequest = {
   authenticationType: 'U2F',
@@ -148,7 +151,8 @@ jest.mock('@mojaloop/sdk-standard-components', () => {
           push: jest.fn(() => methods)
         }
       })
-    }
+    },
+    request: jest.fn()
   }
 })
 
@@ -330,12 +334,13 @@ describe('Outbound API routes', (): void => {
         transactionRequestId: 'b51ec534-ee48-4575-b6a9-ead2955b8069'
       }
     }
-    const pubSub = new PubSub({} as RedisConnectionConfig)
-    // defer publication to notification channel
-    setTimeout(() => pubSub.publish(
-      'some-channel',
-      partyLookupResponse as unknown as Message
-    ), 10)
+    jest.spyOn(SDK, 'request').mockImplementationOnce(() => Promise.resolve({
+      statusCode: 200,
+      data: {
+        party: { ...partyLookupResponse.party },
+        currentState: 'COMPLETED'
+      }
+    }))
     const response = await server.inject(request)
     expect(response.statusCode).toBe(200)
     expect(response.result).toEqual({

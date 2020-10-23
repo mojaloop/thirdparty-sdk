@@ -68,15 +68,23 @@ export class InboundThridpartyTransactionsModel {
   async requestToPayTransfer (
     inRequest: InboundThirdpartyTransactionPostRequest
   ): Promise<OutboundRequestToPayTransferPostResponse> {
-    // TODO: lookup consentId, sourceAccountId and pispId
-    // Verify that they exist and consent is granted with a valid credential
-
+    this.logger.push({ inRequest }).info('requestToPayTransfer: inRequest')
     // propagate make the requestToPayTransfer on outbound sdk-scheme-adapter
     const requestToPayTransfer: OutboundRequestToPayTransferPostRequest = {
       // TODO: should we generate a new id or use the one from inRequest?
       requestToPayTransactionId: inRequest.transactionRequestId,
-      from: { ...inRequest.payer },
-      to: { ...inRequest.payee },
+      from: {
+        idType: inRequest.payer.partyIdInfo.partyIdType,
+        idValue: inRequest.payer.partyIdInfo.partyIdentifier,
+        idSubValue: inRequest.payer.partyIdInfo.partySubIdentifier,
+        fspId: inRequest.payer.partyIdInfo.fspId
+      },
+      to: {
+        idType: inRequest.payee.partyIdInfo.partyIdType,
+        idValue: inRequest.payee.partyIdInfo.partyIdentifier,
+        idSubValue: inRequest.payee.partyIdInfo.partySubIdentifier,
+        fspId: inRequest.payee.partyIdInfo.fspId
+      },
       amountType: inRequest.amountType,
 
       // TMoney
@@ -88,9 +96,13 @@ export class InboundThridpartyTransactionsModel {
       initiator: inRequest.transactionType.initiator,
       initiatorType: inRequest.transactionType.initiatorType
     }
+    this.logger.push({ requestToPayTransfer }).info('requestToPayTransfer: requestToPayTransfer')
+
     const response = await this.backendRequests.requestToPayTransfer(
       requestToPayTransfer
     ) as OutboundRequestToPayTransferPostResponse
+
+    this.logger.push({ response }).info('requestToPayTransfer: response')
 
     // optionally notify via PATCH
     if (config.SHARED.NOTIFY_ABOUT_TRANSFER_URI) {

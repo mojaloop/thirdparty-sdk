@@ -25,7 +25,7 @@
  --------------
 ******/
 
-import { TMoney, TAmountType, TransactionType, TParty, TCurrency } from '@mojaloop/sdk-standard-components'
+import { TMoney, TAmountType, TransactionType, TParty, TCurrency, TExtensionList } from '@mojaloop/sdk-standard-components'
 
 export interface InboundThirdpartyTransactionPostRequest {
   transactionRequestId: string
@@ -39,10 +39,37 @@ export interface InboundThirdpartyTransactionPostRequest {
   expiration: string
 }
 
+export enum PayerType {
+  CONSUMER = 'CONSUMER',
+  AGENT = 'AGENT',
+  BUSINESS = 'BUSINESS',
+  DEVICE = 'DEVICE'
+}
+
+export interface TransferParty {
+  idType: string
+  idValue: string
+  type?: PayerType
+  idSubValue?: string
+  displayName?: string
+  firstName?: string
+  middleName?: string
+  lastName?: string
+  dateOfBirth?: string
+  merchantClassificationCode?: string
+  fspId?: string
+  accounts?: Array<{
+    address: string
+    currency: TCurrency
+    description: string
+  }>
+  extensionList?: TExtensionList
+}
+
 export interface OutboundRequestToPayTransferPostRequest {
   requestToPayTransactionId: string
-  from: TParty
-  to: TParty
+  from: TransferParty
+  to: TransferParty
   amountType: TAmountType
   note?: string
   // TMoney properties

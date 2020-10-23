@@ -37,13 +37,13 @@ import {
   ThirdpartyRequests
 } from '@mojaloop/sdk-standard-components'
 import {
-  PartiesPutResponse,
   PayeeLookupRequest,
   PISPTransactionData,
   PISPTransactionModelConfig,
   PISPTransactionModelState,
   PISPTransactionPhase,
   PISPTransactionStateMachine,
+  RequestPartiesInformationResponse,
   ThirdpartyTransactionApproveResponse,
   ThirdpartyTransactionInitiateRequest,
   ThirdpartyTransactionInitiateResponse,
@@ -51,6 +51,8 @@ import {
   ThirdpartyTransactionStatus
 } from './pispTransaction.interface'
 import inspect from '~/shared/inspect'
+import { BackendRequests } from './inbound/backend-requests'
+import { HTTPResponseError } from '~/shared/http-response-error'
 
 export class InvalidPISPTransactionDataError extends Error {
   public data: PISPTransactionData
@@ -82,6 +84,7 @@ export class PISPTransactionModel
       transitions: [
         // Party Lookup Phase
         { name: 'requestPartyLookup', from: 'start', to: 'partyLookupSuccess' },
+        { name: 'failPartyLookup', from: 'partyLookupSuccess', to: 'partyLookupFailure' },
 
         // Initiate Transaction Phase
         { name: 'initiate', from: 'partyLookupSuccess', to: 'authorizationReceived' },
@@ -93,6 +96,7 @@ export class PISPTransactionModel
       methods: {
         // specific transitions handlers methods
         onRequestPartyLookup: () => this.onRequestPartyLookup(),
+        onFailPartyLookup: () => this.onFailPartyLookup(),
         onInitiate: () => this.onInitiate(),
         onApprove: () => this.onApprove()
       }
@@ -114,7 +118,10 @@ export class PISPTransactionModel
     return this.config.mojaloopRequests
   }
 
-  // TODO: why can't we overload these?
+  get backendRequests (): BackendRequests {
+    return this.config.backendRequests
+  }
+
   static notificationChannel (phase: PISPTransactionPhase, transactionRequestId: string): string {
     if (!transactionRequestId) {
       throw new Error('PISPTransactionModel.notificationChannel: \'transactionRequestId\' parameter is required')
@@ -123,61 +130,50 @@ export class PISPTransactionModel
     return `pisp_transaction_${phase}_${transactionRequestId}`
   }
 
-  static partyNotificationChannel (phase: PISPTransactionPhase, partyType: string, id: string, subId?: string): string {
-    if (!(partyType && id) || subId?.length === 0) {
-      throw new Error(
-        'PISPTransactionModel.partyNotificationChannel: \'partyType, id, subId (when specified)\' parameters are required'
-      )
-    }
-    // channel name
-    // format is: `pisp_transaction_<phase>_<partyTypeOrTransactionId>[_<subId>]`
-    return [
-      PISPTransactionModel.notificationChannel(phase, partyType),
-      id,
-      subId
-    ].filter(x => !!x).join('_')
-  }
-
   async onRequestPartyLookup (): Promise<void> {
     InvalidPISPTransactionDataError.throwIfInvalidProperty(this.data, 'payeeRequest')
 
+    // extract params for GET /parties
     const { partyIdType, partyIdentifier, partySubIdOrType } = this.data?.payeeRequest as PayeeLookupRequest
-    const channel = PISPTransactionModel.partyNotificationChannel(
-      PISPTransactionPhase.lookup, partyIdType, partyIdentifier, partySubIdOrType
-    )
 
-    // eslint-disable-next-line no-async-promise-executor
-    return new Promise(async (resolve, reject) => {
-      let subId = 0
-      try {
-        // this handler will be executed when PUT /parties/<type>/<id>/<subId> @ Inbound server
-        subId = this.pubSub.subscribe(channel, async (channel: string, message: Message, sid: number) => {
-          // first unsubscribe
-          this.pubSub.unsubscribe(channel, sid)
+    try {
+      // cal GET /parties on sdk-scheme-adapter Outbound service
+      const response = this.data.payeeResolved = await this.backendRequests.requestPartiesInformation(
+        partyIdType, partyIdentifier, partySubIdOrType
+      ) as RequestPartiesInformationResponse
 
-          this.data.payeeResolved = { ...message as unknown as PartiesPutResponse }
+      this.data.partyLookupResponse = {
+        party: response.party,
+        currentState: PISPTransactionModelState[
+          this.data.currentState as keyof typeof PISPTransactionModelState
+        ]
+      }
+    } catch (error) {
+      this.logger.push({ error }).error('onRequestPartyLookup -> requestPartiesInformation')
+      // try to handle specific HTTP related error
+      if (error instanceof HTTPResponseError) {
+        const errorData = error.getData()
+        // do we have errorInformation -> if yes handle it elsewhere rethrow error
+        if (errorData?.res?.data?.errorInformation) {
+          await this.fsm.error()
           this.data.partyLookupResponse = {
-            party: { ...this.data.payeeResolved.party },
+            errorInformation: errorData.res.data.errorInformation,
             currentState: PISPTransactionModelState[
               this.data.currentState as keyof typeof PISPTransactionModelState
             ]
           }
-          resolve()
-          // state machine should be in partyLookupSuccess state
-        })
-
-        const res = await this.mojaloopRequests.getParties(
-          partyIdType,
-          partyIdentifier,
-          partySubIdOrType
-        )
-        this.logger.push({ res }).info('MojaloopRequests.getParties request sent to peer')
-      } catch (error) {
-        this.logger.push(error).error('MojaloopRequests.getParties request error')
-        this.pubSub.unsubscribe(channel, subId)
-        reject(error)
+          // error handled, no need to rethrow
+          return
+        }
       }
-    })
+      // rethrow unhandled error
+      throw error
+    }
+  }
+
+  onFailPartyLookup (): void {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    this.data!.partyLookupResponse!.currentState = PISPTransactionModelState.partyLookupFailure
   }
 
   async onInitiate (): Promise<void> {
@@ -188,6 +184,8 @@ export class PISPTransactionModel
       PISPTransactionPhase.initiation,
       this.data.transactionRequestId as string
     )
+
+    this.logger.push({ channel }).info('onInitiate - subscribe to channel')
 
     // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (resolve, reject) => {
@@ -236,6 +234,8 @@ export class PISPTransactionModel
       this.data.transactionRequestId as string
     )
 
+    this.logger.push({ channel }).info('onApprove - subscribe to channel')
+
     // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (resolve, reject) => {
       let subId = 0
@@ -280,6 +280,7 @@ export class PISPTransactionModel
   void {
     switch (this.data.currentState) {
       case 'partyLookupSuccess':
+      case 'partyLookupFailure':
         return this.data.partyLookupResponse
       case 'authorizationReceived':
         return this.data.initiateResponse
@@ -311,7 +312,12 @@ export class PISPTransactionModel
             `requestPartyLookup requested for ${data.transactionRequestId},  currentState: ${data.currentState}`
           )
           await this.fsm.requestPartyLookup()
-          this.logger.info('requestPartyLookup completed successfully')
+          if (this.data.partyLookupResponse?.errorInformation) {
+            await this.fsm.failPartyLookup()
+            this.logger.info('requestPartyLookup failed')
+          } else {
+            this.logger.info('requestPartyLookup completed successfully')
+          }
           await this.saveToKVS()
           return this.getResponse()
 

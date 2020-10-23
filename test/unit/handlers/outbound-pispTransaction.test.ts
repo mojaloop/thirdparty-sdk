@@ -36,8 +36,7 @@ import mockLogger from '../mockLogger'
 
 jest.mock('~/models/pispTransaction.model', () => ({
   PISPTransactionModel: {
-    notificationChannel: jest.fn(() => 'the-mocked-channel'),
-    partyNotificationChannel: jest.fn(() => 'the-mocked-party-channel')
+    notificationChannel: jest.fn(() => 'the-mocked-channel')
   },
   create: jest.fn(async () => ({
     // this result will be tested
@@ -57,6 +56,7 @@ describe('Outbound PISP transaction handlers', () => {
     getLogger: jest.fn(() => mockLogger()),
     getThirdpartyRequests: jest.fn(),
     getMojaloopRequests: jest.fn(),
+    getBackendRequests: jest.fn(),
     response: jest.fn(() => ({
       code: jest.fn((code: number) => ({
         statusCode: code
