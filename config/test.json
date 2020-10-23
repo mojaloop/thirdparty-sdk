@@ -33,7 +33,7 @@
     "DFSP_ID": "dfsp_a",
     "DFSP_BACKEND_URI": "0.0.0.0:9000",
     "DFSP_BACKEND_HTTP_SCHEME": "http",
-    "SDK_REQUEST_TO_PAY_TRANSFER_URI": "0.0.0.0:9000/requestToPay",
+    "SDK_REQUEST_TO_PAY_TRANSFER_URI": "0.0.0.0:9000/requestToPayTransfer",
     "SDK_PARTIES_INFORMATION_URI": "0.0.0.0:7002/parties/{Type}/{ID}/{SubId}",
     "JWS_SIGN": false,
     "JWS_SIGNING_KEY": "./secrets/jwsSigningKey.key",
