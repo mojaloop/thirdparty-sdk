@@ -88,6 +88,9 @@ export interface ServiceConfig {
     DFSP_BACKEND_URI: string
     DFSP_BACKEND_SIGN_AUTHORIZATION_PATH: string
     DFSP_BACKEND_HTTP_SCHEME: string
+    SDK_REQUEST_TO_PAY_TRANSFER_URI: string
+    SDK_PARTIES_INFORMATION_URI: string
+    NOTIFY_ABOUT_TRANSFER_URI: string
     JWS_SIGN: boolean
     JWS_SIGNING_KEY: PathLike | Buffer
     TLS: BaseRequestTLSConfig
@@ -268,6 +271,21 @@ export const ConvictConfig = Convict<ServiceConfig>({
       doc: 'Http scheme ',
       format: ['http', 'https'],
       default: 'http'
+    },
+    SDK_REQUEST_TO_PAY_TRANSFER_URI: {
+      doc: 'uri to sdk-scheme-adapter requestToPayTransfer endpoint',
+      format: '*',
+      default: 'localhost:9000/requestToPayTransfer'
+    },
+    SDK_PARTIES_INFORMATION_URI: {
+      doc: 'uri to sdk-scheme-adapter requestToPayTransfer endpoint',
+      format: '*',
+      default: 'localhost:7002/parties/{Type}/{ID}/{SubId}'
+    },
+    NOTIFY_ABOUT_TRANSFER_URI: {
+      doc: 'uri to sdk-scheme-adapter requestToPayTransfer endpoint',
+      format: '*',
+      default: 'localhost:9000/thridpartyRequests/transactions/{ID}'
     },
     JWS_SIGN: false,
     JWS_SIGNING_KEY: '',

@@ -36,4 +36,3 @@ services:
     container_name: 3p_mongo
     ports:
       - "27017:27017"
-  

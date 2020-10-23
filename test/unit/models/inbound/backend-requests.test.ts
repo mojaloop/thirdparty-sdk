@@ -32,6 +32,7 @@ import SDK, { RequestResponse, requests } from '@mojaloop/sdk-standard-component
 import mockLogger from '../../mockLogger'
 import http from 'http'
 import { HTTPResponseError } from '~/shared/http-response-error'
+import { ThirdpartyTransactionStatus } from '~/models/pispTransaction.interface'
 
 describe('backendRequests', () => {
   let backendRequests: BackendRequests
@@ -83,6 +84,11 @@ describe('backendRequests', () => {
     }
   }
 
+  const transactionStatus: ThirdpartyTransactionStatus = {
+    transactionId: 'mocked-transaction-id',
+    transactionRequestState: 'ACCEPTED'
+  }
+
   beforeEach(() => {
     backendRequests = new BackendRequests(config)
   })
@@ -98,6 +104,9 @@ describe('backendRequests', () => {
     expect(typeof backendRequests.patch).toEqual('function')
     expect(typeof backendRequests.post).toEqual('function')
     expect(typeof backendRequests.put).toEqual('function')
+    expect(typeof backendRequests.signAuthorizationRequest).toEqual('function')
+    expect(typeof backendRequests.notifyAboutTransfer).toEqual('function')
+    expect(typeof backendRequests.requestPartiesInformation).toEqual('function')
   })
 
   describe('http methods', () => {
@@ -225,6 +234,45 @@ describe('backendRequests', () => {
       const result = await backendRequests.signAuthorizationRequest(authorizationsPostRequest)
       expect(result).toEqual(authenticationValue)
       expect(postSpy).toBeCalledWith(config.singAuthorizationPath, authorizationsPostRequest)
+    })
+  })
+
+  describe('notifyAboutTransfer', () => {
+    it('should propagate call loggedRequest', async () => {
+      const loggedRequestSpy = jest.spyOn(backendRequests, 'loggedRequest').mockImplementationOnce(
+        () => Promise.resolve()
+      )
+      const result = await backendRequests.notifyAboutTransfer(transactionStatus, 'mocked-transaction-request-id')
+      expect(result).toBeUndefined()
+      expect(loggedRequestSpy).toHaveBeenCalledWith({
+        method: 'PATCH',
+        uri: 'http://localhost:9000/thridpartyRequests/transactions/mocked-transaction-request-id',
+        body: JSON.stringify(transactionStatus),
+        agent: expect.anything(),
+        headers: expect.anything()
+      })
+    })
+  })
+
+  describe('requestPartiesInformation', () => {
+    it('should propagate call loggedRequest', async () => {
+      const loggedRequestSpy = jest.spyOn(backendRequests, 'loggedRequest').mockImplementationOnce(
+        () => Promise.resolve({
+          party: { Iam: 'mocked-party' },
+          currentState: 'COMPLETED'
+        })
+      )
+      const result = await backendRequests.requestPartiesInformation('type', 'id', 'subId')
+      expect(result).toEqual({
+        party: { Iam: 'mocked-party' },
+        currentState: 'COMPLETED'
+      })
+      expect(loggedRequestSpy).toHaveBeenCalledWith({
+        method: 'GET',
+        uri: 'http://0.0.0.0:7002/parties/type/id/subId',
+        agent: expect.anything(),
+        headers: expect.anything()
+      })
     })
   })
 })

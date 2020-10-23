@@ -41,19 +41,21 @@ import {
   InboundThirdpartyAuthorizationsPutRequest
 } from '~/models/thirdparty.authorizations.interface'
 import {
+  RequestPartiesInformationResponse,
   PISPTransactionModelState,
-  ThirdpartyTransactionStatus
+  ThirdpartyTransactionStatus,
+  RequestPartiesInformationState
 } from '~/models/pispTransaction.interface'
 import PTM from '~/models/pispTransaction.model'
 
 import { RedisConnectionConfig } from '~/shared/redis-connection'
 import { Server } from '@hapi/hapi'
 import { ServerAPI, ServerConfig } from '~/server'
-import { TParty } from '@mojaloop/sdk-standard-components'
 import Config from '~/shared/config'
 import Handlers from '~/handlers'
 import index from '~/index'
 import path from 'path'
+import SDK from '@mojaloop/sdk-standard-components'
 
 const putResponse: InboundAuthorizationsPutRequest = {
   authenticationInfo: {
@@ -72,22 +74,25 @@ const putThirdpartyAuthResponse: InboundThirdpartyAuthorizationsPutRequest = {
   status: 'VERIFIED',
   value: 'value'
 }
-const partyLookupResponse: TParty = {
-  partyIdInfo: {
-    partyIdType: 'MSISDN',
-    partyIdentifier: '+4412345678',
-    fspId: 'pispA'
-  },
-  merchantClassificationCode: '4321',
-  name: 'Justin Trudeau',
-  personalInfo: {
-    complexName: {
-      firstName: 'Justin',
-      middleName: 'Pierre',
-      lastName: 'Trudeau'
+const partyLookupResponse: RequestPartiesInformationResponse = {
+  party: {
+    partyIdInfo: {
+      partyIdType: 'MSISDN',
+      partyIdentifier: '+4412345678',
+      fspId: 'pispA'
     },
-    dateOfBirth: '1980-01-01'
-  }
+    merchantClassificationCode: '4321',
+    name: 'Justin Trudeau',
+    personalInfo: {
+      complexName: {
+        firstName: 'Justin',
+        middleName: 'Pierre',
+        lastName: 'Trudeau'
+      },
+      dateOfBirth: '1980-01-01'
+    }
+  },
+  currentState: RequestPartiesInformationState.COMPLETED
 }
 const initiateResponse: InboundAuthorizationsPostRequest = {
   authenticationType: 'U2F',
@@ -146,7 +151,8 @@ jest.mock('@mojaloop/sdk-standard-components', () => {
           push: jest.fn(() => methods)
         }
       })
-    }
+    },
+    request: jest.fn()
   }
 })
 
@@ -328,16 +334,17 @@ describe('Outbound API routes', (): void => {
         transactionRequestId: 'b51ec534-ee48-4575-b6a9-ead2955b8069'
       }
     }
-    const pubSub = new PubSub({} as RedisConnectionConfig)
-    // defer publication to notification channel
-    setTimeout(() => pubSub.publish(
-      'some-channel',
-      partyLookupResponse as unknown as Message
-    ), 10)
+    jest.spyOn(SDK, 'request').mockImplementationOnce(() => Promise.resolve({
+      statusCode: 200,
+      data: {
+        party: { ...partyLookupResponse.party },
+        currentState: 'COMPLETED'
+      }
+    }))
     const response = await server.inject(request)
     expect(response.statusCode).toBe(200)
     expect(response.result).toEqual({
-      party: { ...partyLookupResponse },
+      party: { ...partyLookupResponse.party },
       currentState: PISPTransactionModelState.partyLookupSuccess
     })
   })

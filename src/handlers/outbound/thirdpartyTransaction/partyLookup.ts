@@ -56,10 +56,12 @@ async function post (_context: any, request: Request, h: StateResponseToolkit): 
     key: payload.transactionRequestId,
     logger: h.getLogger(),
     thirdpartyRequests: h.getThirdpartyRequests(),
-    mojaloopRequests: h.getMojaloopRequests()
+    mojaloopRequests: h.getMojaloopRequests(),
+    backendRequests: h.getBackendRequests()
   }
   const exists = await existsInKVS(modelConfig)
   if (exists) {
+    modelConfig.logger.push({ key: modelConfig.key }).info('PISPTransactionModel already exists. Giving back 422')
     return h.response().code(422)
   }
   // create model

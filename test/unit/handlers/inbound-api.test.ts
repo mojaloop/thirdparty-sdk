@@ -53,7 +53,6 @@ import { Server, Request } from '@hapi/hapi'
 import { StateResponseToolkit } from '~/server/plugins/state'
 import { buildPayeeQuoteRequestFromTptRequest } from '~/domain/thirdpartyRequests/transactions'
 import { resetUuid } from '../__mocks__/uuidv4'
-import Config from '~/shared/config'
 import TestData from 'test/unit/data/mockData.json'
 import index from '~/index'
 import path from 'path'
@@ -138,8 +137,8 @@ describe('Inbound API routes', (): void => {
   beforeAll(async (): Promise<void> => {
     const apiPath = path.resolve(__dirname, '../../../src/interface/api-inbound.yaml')
     const serverConfig: ServerConfig = {
-      port: Config.INBOUND.PORT,
-      host: Config.INBOUND.HOST,
+      port: config.INBOUND.PORT,
+      host: config.INBOUND.HOST,
       api: ServerAPI.inbound
     }
     const serverHandlers = {
@@ -397,7 +396,7 @@ describe('Inbound API routes', (): void => {
     expect(response.statusCode).toBe(200)
   })
 
-  it('/thirdpartyRequests/transactions should forward quote request to payee', async (): Promise<void> => {
+  xit('/thirdpartyRequests/transactions should forward requestToPayTransfer', async (): Promise<void> => {
     const request = {
       method: 'POST',
       url: '/thirdpartyRequests/transactions',

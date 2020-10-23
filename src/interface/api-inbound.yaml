@@ -118,7 +118,7 @@ paths:
                 description: Data model for the complex type object that contains an optional element ErrorInformation used along with 4xx and 5xx responses.
                 properties:
                   errorInformation:
-                    $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D~1error/put/requestBody/content/application~1json/schema/properties/errorInformation'
+                    $ref: '#/paths/~1thirdpartyRequests~1transactions~1%7BID%7D~1error/put/requestBody/content/application~1json/schema/properties/errorInformation'
           headers:
             Content-Length:
               required: false
@@ -310,17 +310,17 @@ paths:
       tags:
         - thirdpartyRequests
       parameters:
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/1'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/2'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/3'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/4'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/5'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/6'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/7'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/8'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/9'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/10'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/11'
+        - $ref: '#/paths/~1thirdpartyRequests~1transactions~1%7BID%7D/patch/parameters/0'
+        - $ref: '#/paths/~1thirdpartyRequests~1transactions~1%7BID%7D/patch/parameters/1'
+        - $ref: '#/paths/~1thirdpartyRequests~1transactions~1%7BID%7D/patch/parameters/2'
+        - $ref: '#/paths/~1thirdpartyRequests~1transactions~1%7BID%7D/patch/parameters/3'
+        - $ref: '#/paths/~1thirdpartyRequests~1transactions~1%7BID%7D/patch/parameters/4'
+        - $ref: '#/paths/~1thirdpartyRequests~1transactions~1%7BID%7D/patch/parameters/5'
+        - $ref: '#/paths/~1thirdpartyRequests~1transactions~1%7BID%7D/patch/parameters/6'
+        - $ref: '#/paths/~1thirdpartyRequests~1transactions~1%7BID%7D/patch/parameters/7'
+        - $ref: '#/paths/~1thirdpartyRequests~1transactions~1%7BID%7D/patch/parameters/8'
+        - $ref: '#/paths/~1thirdpartyRequests~1transactions~1%7BID%7D/patch/parameters/9'
+        - $ref: '#/paths/~1thirdpartyRequests~1transactions~1%7BID%7D/patch/parameters/10'
       requestBody:
         description: The thirdparty authorization details to update
         required: true
@@ -353,24 +353,18 @@ paths:
           $ref: '#/paths/~1hello/get/responses/501'
         '503':
           $ref: '#/paths/~1hello/get/responses/503'
-  '/parties/{Type}/{ID}':
-    put:
-      operationId: PartiesByTypeAndId
-      summary: Return party information
+  '/thirdpartyRequests/transactions/{ID}':
+    patch:
+      operationId: NotifyThirdpartyTransactionRequests
+      summary: NotifyThirdpartyTransactionRequests
       description: |
-        The callback `PUT /parties/{Type}/{ID}` is used to inform the
-        PISP of a successful result of the Party information lookup.
+        The HTTP request `PATCH /thirdpartyRequests/transactions/{ID}` is used to
+        notify a thirdparty of the outcome of a transaction request.
 
-        Switch(Account Lookup Service) -> PISP.
+        Switch(Thirdparty API Adapter) -> PISP
       tags:
-        - parties
+        - thirdpartyRequests
       parameters:
-        - name: Type
-          in: path
-          required: true
-          schema:
-            type: string
-          description: 'The type of the party identifier. For example, `MSISDN`, `PERSONAL_ID`.'
         - name: ID
           in: path
           required: true
@@ -473,450 +467,6 @@ paths:
             Required if signature verification is used, for more information, see
             [the API Signature document](https://github.com/mojaloop/docs/tree/master/Specification%20Document%20Set).
       requestBody:
-        description: Party information returned.
-        required: true
-        content:
-          application/json:
-            schema:
-              title: PartiesTypeIDPutResponse
-              type: object
-              description: |
-                The object sent in the PUT /parties/{Type}/{ID} callback.
-
-                This is a variant based on FSPIOP `PartiesTypeIDPutResponse` specification.
-                Main difference being that it returns a `Party` with the newly added
-                `accounts` property.
-              properties:
-                party:
-                  title: Party
-                  type: object
-                  description: |
-                    Data model for the complex type Party.
-
-                    This is a variant based on FSPIOP `Party` specification.
-                    Main difference being the newly added `accounts` property.
-                  properties:
-                    partyIdInfo:
-                      title: PartyIdInfo
-                      type: object
-                      description: Data model for the complex type PartyIdInfo.
-                      properties:
-                        partyIdType:
-                          title: PartyIdType
-                          type: string
-                          enum:
-                            - MSISDN
-                            - EMAIL
-                            - PERSONAL_ID
-                            - BUSINESS
-                            - DEVICE
-                            - ACCOUNT_ID
-                            - IBAN
-                            - ALIAS
-                          description: |
-                            Below are the allowed values for the enumeration.
-                            - MSISDN - An MSISDN (Mobile Station International Subscriber Directory
-                            Number, that is, the phone number) is used as reference to a participant.
-                            The MSISDN identifier should be in international format according to the
-                            [ITU-T E.164 standard](https://www.itu.int/rec/T-REC-E.164/en).
-                            Optionally, the MSISDN may be prefixed by a single plus sign, indicating the
-                            international prefix.
-                            - EMAIL - An email is used as reference to a
-                            participant. The format of the email should be according to the informational
-                            [RFC 3696](https://tools.ietf.org/html/rfc3696).
-                            - PERSONAL_ID - A personal identifier is used as reference to a participant.
-                            Examples of personal identification are passport number, birth certificate
-                            number, and national registration number. The identifier number is added in
-                            the PartyIdentifier element. The personal identifier type is added in the
-                            PartySubIdOrType element.
-                            - BUSINESS - A specific Business (for example, an organization or a company)
-                            is used as reference to a participant. The BUSINESS identifier can be in any
-                            format. To make a transaction connected to a specific username or bill number
-                            in a Business, the PartySubIdOrType element should be used.
-                            - DEVICE - A specific device (for example, a POS or ATM) ID connected to a
-                            specific business or organization is used as reference to a Party.
-                            For referencing a specific device under a specific business or organization,
-                            use the PartySubIdOrType element.
-                            - ACCOUNT_ID - A bank account number or FSP account ID should be used as
-                            reference to a participant. The ACCOUNT_ID identifier can be in any format,
-                            as formats can greatly differ depending on country and FSP.
-                            - IBAN - A bank account number or FSP account ID is used as reference to a
-                            participant. The IBAN identifier can consist of up to 34 alphanumeric
-                            characters and should be entered without whitespace.
-                            - ALIAS An alias is used as reference to a participant. The alias should be
-                            created in the FSP as an alternative reference to an account owner.
-                            Another example of an alias is a username in the FSP system.
-                            The ALIAS identifier can be in any format. It is also possible to use the
-                            PartySubIdOrType element for identifying an account under an Alias defined
-                            by the PartyIdentifier.
-                          example: PERSONAL_ID
-                        partyIdentifier:
-                          title: PartyIdentifier
-                          type: string
-                          minLength: 1
-                          maxLength: 128
-                          description: Identifier of the Party.
-                          example: 16135551212
-                        partySubIdOrType:
-                          title: PartySubIdOrType
-                          type: string
-                          minLength: 1
-                          maxLength: 128
-                          description: |
-                            Either a sub-identifier of a PartyIdentifier, or a sub-type of the
-                            PartyIdType, normally a PersonalIdentifierType.
-                          example: DRIVING_LICENSE
-                        fspId:
-                          title: FspId
-                          type: string
-                          minLength: 1
-                          maxLength: 32
-                          description: FSP identifier.
-                          example: 1234
-                      required:
-                        - partyIdType
-                        - partyIdentifier
-                    merchantClassificationCode:
-                      title: MerchantClassificationCode
-                      type: string
-                      pattern: '^[\d]{1,4}$'
-                      description: |
-                        A limited set of pre-defined numbers. This list would be a limited set of
-                        numbers identifying a set of popular merchant types like School Fees,
-                        Pubs and Restaurants, Groceries, etc.
-                      example: 4321
-                    name:
-                      title: PartyName
-                      type: string
-                      minLength: 1
-                      maxLength: 128
-                      description: Name of the Party. Could be a real name or a nickname.
-                      example: Henrik Karlsson
-                    personalInfo:
-                      title: PartyPersonalInfo
-                      type: object
-                      description: Data model for the complex type PartyPersonalInfo.
-                      properties:
-                        complexName:
-                          title: PartyComplexName
-                          type: object
-                          description: Data model for the complex type PartyComplexName.
-                          properties:
-                            firstName:
-                              title: FirstName
-                              type: string
-                              minLength: 1
-                              maxLength: 128
-                              pattern: '^(?!\s*$)[\w .,''-]{1,128}$'
-                              description: First name of the Party (Name Type).
-                              example: Henrik
-                            middleName:
-                              title: MiddleName
-                              type: string
-                              minLength: 1
-                              maxLength: 128
-                              pattern: '^(?!\s*$)[\w .,''-]{1,128}$'
-                              description: Middle name of the Party (Name Type).
-                              example: Johannes
-                            lastName:
-                              title: LastName
-                              type: string
-                              minLength: 1
-                              maxLength: 128
-                              pattern: '^(?!\s*$)[\w .,''-]{1,128}$'
-                              description: Last name of the Party (Name Type).
-                              example: Karlsson
-                        dateOfBirth:
-                          title: DateofBirth (type Date)
-                          type: string
-                          pattern: '^(?:[1-9]\d{3}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1\d|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[1-9]\d(?:0[48]|[2468][048]|[13579][26])|(?:[2468][048]|[13579][26])00)-02-29)$'
-                          description: Date of Birth of the Party.
-                          example: '1966-06-16'
-                    accounts:
-                      description: 'List of accounts associated with the party containing and DFSP routable address, currency identifier and description.'
-                      title: AccountList
-                      type: object
-                      properties:
-                        account:
-                          type: array
-                          items:
-                            title: Account
-                            type: object
-                            description: Data model for the complex type Account.
-                            properties:
-                              address:
-                                title: AccountAddress
-                                type: string
-                                description: |
-                                  A long-lived unique account identifier provided by the DFSP. This MUST NOT
-                                  be Bank Account Number or anything that may expose a User's private bank
-                                  account information.
-                                pattern: '^([0-9A-Za-z_~\-\.]+[0-9A-Za-z_~\-])$'
-                                minLength: 1
-                                maxLength: 1023
-                              currency:
-                                $ref: '#/paths/~1authorizations/post/requestBody/content/application~1json/schema/properties/amount/properties/currency'
-                              description:
-                                title: Name
-                                type: string
-                                pattern: '^(?!\s*$)[\w .,''-]{1,128}$'
-                                description: |
-                                  The API data type Name is a JSON String, restricted by a regular expression
-                                  to avoid characters which are generally not used in a name.
-                                  Regular Expression - The regular expression for restricting the
-                                  Name type is \"^(?!\\s*$)[\\w .,'-]{1,128}$\". The restriction does not
-                                  allow a string consisting of whitespace only, all Unicode characters are
-                                  allowed, as well as the period (.) (apostrophe (‘), dash (-), comma (,)
-                                  and space characters ( ).
-                                  **Note:** In some programming languages,
-                                  Unicode support must be specifically enabled. For example, if Java is used,
-                                  the flag UNICODE_CHARACTER_CLASS must be enabled to allow Unicode characters.
-                            required:
-                              - currency
-                          minItems: 1
-                          maxItems: 32
-                          description: Accounts associated with the Party.
-                      required:
-                        - account
-                  required:
-                    - partyIdInfo
-              required:
-                - party
-      responses:
-        '200':
-          $ref: '#/paths/~1hello/get/responses/200'
-        '400':
-          $ref: '#/paths/~1hello/get/responses/400'
-        '401':
-          $ref: '#/paths/~1hello/get/responses/401'
-        '403':
-          $ref: '#/paths/~1hello/get/responses/403'
-        '404':
-          $ref: '#/paths/~1hello/get/responses/404'
-        '405':
-          $ref: '#/paths/~1hello/get/responses/405'
-        '406':
-          $ref: '#/paths/~1hello/get/responses/406'
-        '501':
-          $ref: '#/paths/~1hello/get/responses/501'
-        '503':
-          $ref: '#/paths/~1hello/get/responses/503'
-  '/parties/{Type}/{ID}/error':
-    put:
-      operationId: PartiesErrorByTypeAndID
-      summary: Return error information
-      description: |
-        If the server is unable to find Party information of the provided
-        identity, or another processing error occurred, the error callback PUT
-        /parties///error (or PUT /parties////error) is used.
-      tags:
-        - parties
-      parameters:
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/0'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/1'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/2'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/3'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/4'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/5'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/6'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/7'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/8'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/9'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/10'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/11'
-      requestBody:
-        description: Error information returned.
-        required: true
-        content:
-          application/json:
-            schema:
-              title: ErrorInformationObject
-              type: object
-              description: Data model for the complex type object that contains ErrorInformation.
-              properties:
-                errorInformation:
-                  title: ErrorInformation
-                  type: object
-                  description: Data model for the complex type ErrorInformation.
-                  properties:
-                    errorCode:
-                      title: ErrorCode
-                      type: string
-                      pattern: '^[1-9]\d{3}$'
-                      description: |
-                        The API data type ErrorCode is a JSON String of four characters,
-                        consisting of digits only. Negative numbers are not allowed.
-                        A leading zero is not allowed. Each error code in the API is a
-                        four-digit number, for example, 1234, where the first number
-                        (1 in the example) represents the high-level error category,
-                        the second number (2 in the example) represents the low-level error category,
-                        and the last two numbers (34 in the example) represent the specific error.
-                      example: 5100
-                    errorDescription:
-                      title: ErrorDescription
-                      type: string
-                      minLength: 1
-                      maxLength: 128
-                      description: Error description string.
-                      example: This is an error description.
-                    extensionList:
-                      $ref: '#/paths/~1authorizations/post/requestBody/content/application~1json/schema/properties/quote/properties/extensionList'
-                  required:
-                    - errorCode
-                    - errorDescription
-              required:
-                - errorInformation
-      responses:
-        '200':
-          $ref: '#/paths/~1hello/get/responses/200'
-        '400':
-          $ref: '#/paths/~1hello/get/responses/400'
-        '401':
-          $ref: '#/paths/~1hello/get/responses/401'
-        '403':
-          $ref: '#/paths/~1hello/get/responses/403'
-        '404':
-          $ref: '#/paths/~1hello/get/responses/404'
-        '405':
-          $ref: '#/paths/~1hello/get/responses/405'
-        '406':
-          $ref: '#/paths/~1hello/get/responses/406'
-        '501':
-          $ref: '#/paths/~1hello/get/responses/501'
-        '503':
-          $ref: '#/paths/~1hello/get/responses/503'
-  '/parties/{Type}/{ID}/{SubId}':
-    put:
-      operationId: PartiesByTypeIdAndSubId
-      summary: Return party information
-      description: |
-        The callback `PUT /parties/{Type}/{ID}/{SubId}` is used to inform the
-        PISP of a successful result of the Party information lookup.
-
-        Switch(Account Lookup Service) -> PISP.
-      tags:
-        - parties
-      parameters:
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/0'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/1'
-        - name: SubId
-          in: path
-          required: true
-          schema:
-            type: string
-          description: |
-            A sub-identifier of the party identifier, or a sub-type of the party
-            identifier's type. For example, `PASSPORT`, `DRIVING_LICENSE`.
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/2'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/3'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/4'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/5'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/6'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/7'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/8'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/9'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/10'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/11'
-      requestBody:
-        description: Party information returned.
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/requestBody/content/application~1json/schema'
-      responses:
-        '200':
-          $ref: '#/paths/~1hello/get/responses/200'
-        '400':
-          $ref: '#/paths/~1hello/get/responses/400'
-        '401':
-          $ref: '#/paths/~1hello/get/responses/401'
-        '403':
-          $ref: '#/paths/~1hello/get/responses/403'
-        '404':
-          $ref: '#/paths/~1hello/get/responses/404'
-        '405':
-          $ref: '#/paths/~1hello/get/responses/405'
-        '406':
-          $ref: '#/paths/~1hello/get/responses/406'
-        '501':
-          $ref: '#/paths/~1hello/get/responses/501'
-        '503':
-          $ref: '#/paths/~1hello/get/responses/503'
-  '/parties/{Type}/{ID}/{SubId}/error':
-    put:
-      operationId: PartiesErrorByTypeIdAndSubId
-      summary: Return error information
-      description: |
-        If the server is unable to find Party information of the provided
-        identity, or another processing error occurred, the error callback PUT
-        /parties///error (or PUT /parties////error) is used.
-      tags:
-        - parties
-      parameters:
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/0'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/1'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D~1%7BSubId%7D/put/parameters/2'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/2'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/3'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/4'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/5'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/6'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/7'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/8'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/9'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/10'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/11'
-      requestBody:
-        description: Error information returned.
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D~1error/put/requestBody/content/application~1json/schema'
-      responses:
-        '200':
-          $ref: '#/paths/~1hello/get/responses/200'
-        '400':
-          $ref: '#/paths/~1hello/get/responses/400'
-        '401':
-          $ref: '#/paths/~1hello/get/responses/401'
-        '403':
-          $ref: '#/paths/~1hello/get/responses/403'
-        '404':
-          $ref: '#/paths/~1hello/get/responses/404'
-        '405':
-          $ref: '#/paths/~1hello/get/responses/405'
-        '406':
-          $ref: '#/paths/~1hello/get/responses/406'
-        '501':
-          $ref: '#/paths/~1hello/get/responses/501'
-        '503':
-          $ref: '#/paths/~1hello/get/responses/503'
-  '/thirdpartyRequests/transactions/{ID}':
-    patch:
-      operationId: NotifyThirdpartyTransactionRequests
-      summary: NotifyThirdpartyTransactionRequests
-      description: |
-        The HTTP request `PATCH /thirdpartyRequests/transactions/{ID}` is used to
-        notify a thirdparty of the outcome of a transaction request.
-
-        Switch(Thirdparty API Adapter) -> PISP
-      tags:
-        - thirdpartyRequests
-      parameters:
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/1'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/2'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/3'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/4'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/5'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/6'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/7'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/8'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/9'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/10'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/11'
-      requestBody:
         required: true
         content:
           application/json:
@@ -970,24 +520,59 @@ paths:
         the error callback `PUT /thirdpartyRequests/transactions/{ID}/error` is used.
         The `{ID}` in the URI should contain the `transactionRequestId` that was used for the creation of the transaction request.     
       parameters:
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/1'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/2'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/3'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/4'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/5'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/6'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/7'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/8'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/9'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/10'
-        - $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/parameters/11'
+        - $ref: '#/paths/~1thirdpartyRequests~1transactions~1%7BID%7D/patch/parameters/0'
+        - $ref: '#/paths/~1thirdpartyRequests~1transactions~1%7BID%7D/patch/parameters/1'
+        - $ref: '#/paths/~1thirdpartyRequests~1transactions~1%7BID%7D/patch/parameters/2'
+        - $ref: '#/paths/~1thirdpartyRequests~1transactions~1%7BID%7D/patch/parameters/3'
+        - $ref: '#/paths/~1thirdpartyRequests~1transactions~1%7BID%7D/patch/parameters/4'
+        - $ref: '#/paths/~1thirdpartyRequests~1transactions~1%7BID%7D/patch/parameters/5'
+        - $ref: '#/paths/~1thirdpartyRequests~1transactions~1%7BID%7D/patch/parameters/6'
+        - $ref: '#/paths/~1thirdpartyRequests~1transactions~1%7BID%7D/patch/parameters/7'
+        - $ref: '#/paths/~1thirdpartyRequests~1transactions~1%7BID%7D/patch/parameters/8'
+        - $ref: '#/paths/~1thirdpartyRequests~1transactions~1%7BID%7D/patch/parameters/9'
+        - $ref: '#/paths/~1thirdpartyRequests~1transactions~1%7BID%7D/patch/parameters/10'
       requestBody:
         description: Error information returned.
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D~1error/put/requestBody/content/application~1json/schema'
+              title: ErrorInformationObject
+              type: object
+              description: Data model for the complex type object that contains ErrorInformation.
+              properties:
+                errorInformation:
+                  title: ErrorInformation
+                  type: object
+                  description: Data model for the complex type ErrorInformation.
+                  properties:
+                    errorCode:
+                      title: ErrorCode
+                      type: string
+                      pattern: '^[1-9]\d{3}$'
+                      description: |
+                        The API data type ErrorCode is a JSON String of four characters,
+                        consisting of digits only. Negative numbers are not allowed.
+                        A leading zero is not allowed. Each error code in the API is a
+                        four-digit number, for example, 1234, where the first number
+                        (1 in the example) represents the high-level error category,
+                        the second number (2 in the example) represents the low-level error category,
+                        and the last two numbers (34 in the example) represent the specific error.
+                      example: 5100
+                    errorDescription:
+                      title: ErrorDescription
+                      type: string
+                      minLength: 1
+                      maxLength: 128
+                      description: Error description string.
+                      example: This is an error description.
+                    extensionList:
+                      $ref: '#/paths/~1authorizations/post/requestBody/content/application~1json/schema/properties/quote/properties/extensionList'
+                  required:
+                    - errorCode
+                    - errorDescription
+              required:
+                - errorInformation
       responses:
         '200':
           $ref: '#/paths/~1hello/get/responses/200'
@@ -1503,13 +1088,141 @@ components:
               description: Data model for the complex type Party.
               properties:
                 partyIdInfo:
-                  $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/requestBody/content/application~1json/schema/properties/party/properties/partyIdInfo'
+                  title: PartyIdInfo
+                  type: object
+                  description: Data model for the complex type PartyIdInfo.
+                  properties:
+                    partyIdType:
+                      title: PartyIdType
+                      type: string
+                      enum:
+                        - MSISDN
+                        - EMAIL
+                        - PERSONAL_ID
+                        - BUSINESS
+                        - DEVICE
+                        - ACCOUNT_ID
+                        - IBAN
+                        - ALIAS
+                      description: |
+                        Below are the allowed values for the enumeration.
+                        - MSISDN - An MSISDN (Mobile Station International Subscriber Directory
+                        Number, that is, the phone number) is used as reference to a participant.
+                        The MSISDN identifier should be in international format according to the
+                        [ITU-T E.164 standard](https://www.itu.int/rec/T-REC-E.164/en).
+                        Optionally, the MSISDN may be prefixed by a single plus sign, indicating the
+                        international prefix.
+                        - EMAIL - An email is used as reference to a
+                        participant. The format of the email should be according to the informational
+                        [RFC 3696](https://tools.ietf.org/html/rfc3696).
+                        - PERSONAL_ID - A personal identifier is used as reference to a participant.
+                        Examples of personal identification are passport number, birth certificate
+                        number, and national registration number. The identifier number is added in
+                        the PartyIdentifier element. The personal identifier type is added in the
+                        PartySubIdOrType element.
+                        - BUSINESS - A specific Business (for example, an organization or a company)
+                        is used as reference to a participant. The BUSINESS identifier can be in any
+                        format. To make a transaction connected to a specific username or bill number
+                        in a Business, the PartySubIdOrType element should be used.
+                        - DEVICE - A specific device (for example, a POS or ATM) ID connected to a
+                        specific business or organization is used as reference to a Party.
+                        For referencing a specific device under a specific business or organization,
+                        use the PartySubIdOrType element.
+                        - ACCOUNT_ID - A bank account number or FSP account ID should be used as
+                        reference to a participant. The ACCOUNT_ID identifier can be in any format,
+                        as formats can greatly differ depending on country and FSP.
+                        - IBAN - A bank account number or FSP account ID is used as reference to a
+                        participant. The IBAN identifier can consist of up to 34 alphanumeric
+                        characters and should be entered without whitespace.
+                        - ALIAS An alias is used as reference to a participant. The alias should be
+                        created in the FSP as an alternative reference to an account owner.
+                        Another example of an alias is a username in the FSP system.
+                        The ALIAS identifier can be in any format. It is also possible to use the
+                        PartySubIdOrType element for identifying an account under an Alias defined
+                        by the PartyIdentifier.
+                      example: PERSONAL_ID
+                    partyIdentifier:
+                      title: PartyIdentifier
+                      type: string
+                      minLength: 1
+                      maxLength: 128
+                      description: Identifier of the Party.
+                      example: 16135551212
+                    partySubIdOrType:
+                      title: PartySubIdOrType
+                      type: string
+                      minLength: 1
+                      maxLength: 128
+                      description: |
+                        Either a sub-identifier of a PartyIdentifier, or a sub-type of the
+                        PartyIdType, normally a PersonalIdentifierType.
+                      example: DRIVING_LICENSE
+                    fspId:
+                      title: FspId
+                      type: string
+                      minLength: 1
+                      maxLength: 32
+                      description: FSP identifier.
+                      example: 1234
+                  required:
+                    - partyIdType
+                    - partyIdentifier
                 merchantClassificationCode:
-                  $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/requestBody/content/application~1json/schema/properties/party/properties/merchantClassificationCode'
+                  title: MerchantClassificationCode
+                  type: string
+                  pattern: '^[\d]{1,4}$'
+                  description: |
+                    A limited set of pre-defined numbers. This list would be a limited set of
+                    numbers identifying a set of popular merchant types like School Fees,
+                    Pubs and Restaurants, Groceries, etc.
+                  example: 4321
                 name:
-                  $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/requestBody/content/application~1json/schema/properties/party/properties/name'
+                  title: PartyName
+                  type: string
+                  minLength: 1
+                  maxLength: 128
+                  description: Name of the Party. Could be a real name or a nickname.
+                  example: Henrik Karlsson
                 personalInfo:
-                  $ref: '#/paths/~1parties~1%7BType%7D~1%7BID%7D/put/requestBody/content/application~1json/schema/properties/party/properties/personalInfo'
+                  title: PartyPersonalInfo
+                  type: object
+                  description: Data model for the complex type PartyPersonalInfo.
+                  properties:
+                    complexName:
+                      title: PartyComplexName
+                      type: object
+                      description: Data model for the complex type PartyComplexName.
+                      properties:
+                        firstName:
+                          title: FirstName
+                          type: string
+                          minLength: 1
+                          maxLength: 128
+                          pattern: '^(?!\s*$)[\w .,''-]{1,128}$'
+                          description: First name of the Party (Name Type).
+                          example: Henrik
+                        middleName:
+                          title: MiddleName
+                          type: string
+                          minLength: 1
+                          maxLength: 128
+                          pattern: '^(?!\s*$)[\w .,''-]{1,128}$'
+                          description: Middle name of the Party (Name Type).
+                          example: Johannes
+                        lastName:
+                          title: LastName
+                          type: string
+                          minLength: 1
+                          maxLength: 128
+                          pattern: '^(?!\s*$)[\w .,''-]{1,128}$'
+                          description: Last name of the Party (Name Type).
+                          example: Karlsson
+                    dateOfBirth:
+                      title: DateofBirth (type Date)
+                      type: string
+                      pattern: '^(?:[1-9]\d{3}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1\d|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[1-9]\d(?:0[48]|[2468][048]|[13579][26])|(?:[2468][048]|[13579][26])00)-02-29)$'
+                      description: Date of Birth of the Party.
+                      example: '1966-06-16'
               required:
                 - partyIdInfo
           description: Information about the Payee in the proposed financial transaction.

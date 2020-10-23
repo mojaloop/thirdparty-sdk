@@ -37,6 +37,15 @@ import { PrependFun, Scheme, prepend2Uri } from '~/shared/http-scheme'
 import { throwOrExtractData } from '~/shared/throw-or-extract-data'
 
 import http from 'http'
+import {
+  OutboundRequestToPayTransferPostRequest,
+  OutboundRequestToPayTransferPostResponse
+} from '../thirdparty.transactions.interface'
+import config from '~/shared/config'
+import {
+  RequestPartiesInformationResponse,
+  ThirdpartyTransactionStatus
+} from '../pispTransaction.interface'
 
 export interface BackendConfig {
   // FSP id of this DFSP
@@ -110,7 +119,9 @@ export class BackendRequests {
       this.logger.push({ opts }).info(`Executing Backend ${this.config.scheme} ${opts.method} request`)
       return request<Response>(opts).then((res: RequestResponse<Response>) => throwOrExtractData<Response>(res))
     } catch (err) {
-      this.logger.push({ err }).error(`Error attempting Backend ${this.config.scheme} ${opts.method} request`)
+      this.logger.push({ err }).error(
+        `Error attempting Backend ${this.config.scheme} ${opts.method} ${opts.uri}`
+      )
       throw err
     }
   }
@@ -167,5 +178,59 @@ export class BackendRequests {
     return this.post<InboundAuthorizationsPostRequest, AuthenticationValue>(
       this.config.singAuthorizationPath, inRequest
     )
+  }
+
+  async requestToPayTransfer (
+    request: OutboundRequestToPayTransferPostRequest
+  ): Promise<OutboundRequestToPayTransferPostResponse | void> {
+    return this.loggedRequest<OutboundRequestToPayTransferPostResponse>({
+      uri: this.prependScheme(config.SHARED.SDK_REQUEST_TO_PAY_TRANSFER_URI),
+      method: 'POST',
+      body: requests.common.bodyStringifier(request),
+      headers: this.headers,
+      agent: this.agent
+    })
+  }
+
+  async notifyAboutTransfer (
+    request: ThirdpartyTransactionStatus,
+    id: string
+  ): Promise<void> {
+    return this.loggedRequest<void>({
+      uri: this.prependScheme(config.SHARED.NOTIFY_ABOUT_TRANSFER_URI.replace('{ID}', id)),
+      method: 'PATCH',
+      body: requests.common.bodyStringifier(request),
+      headers: {
+        ...this.headers,
+        'fspiop-source': config.SHARED.DFSP_ID
+      },
+
+      agent: this.agent
+    })
+  }
+
+  async requestPartiesInformation (
+    type: string, id: string, subId?: string
+  ): Promise<RequestPartiesInformationResponse | void> {
+    // generate uri from template
+    const uri = this.prependScheme(
+      config.SHARED.SDK_PARTIES_INFORMATION_URI
+        .replace('{Type}', type)
+        .replace('{ID}', id)
+        // SubId is optional so replace placeholder or cleanup the path
+        .replace(
+          subId ? '{SubId}' : '/{SubId}',
+          subId || ''
+        )
+    )
+    this.logger.push({ uri, template: config.SHARED.SDK_PARTIES_INFORMATION_URI }).info('requestPartiesInformation')
+
+    // make the GET /parties/{Type}/{ID}[/{SubId}] call
+    return this.loggedRequest<RequestPartiesInformationResponse>({
+      uri,
+      method: 'GET',
+      headers: this.headers,
+      agent: this.agent
+    })
   }
 }

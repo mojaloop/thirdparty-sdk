@@ -32,13 +32,28 @@ import {
   TMoney, TParty, TAmountType, TransactionType
 } from '@mojaloop/sdk-standard-components'
 import { Method } from 'javascript-state-machine'
+import { ErrorInformation } from '~/interface/types'
 import { ControlledStateMachine, PersistentModelConfig, StateData } from '~/models/persistent.model'
 import { PubSub } from '~/shared/pub-sub'
 import { InboundAuthorizationsPostRequest, InboundAuthorizationsPutRequest } from './authorizations.interface'
+import { BackendRequests } from './inbound/backend-requests'
+
+export enum RequestPartiesInformationState {
+  COMPLETED = 'COMPLETED',
+  WAITING_FOR_REQUEST_PARTY_INFORMATION = 'WAITING_FOR_REQUEST_PARTY_INFORMATION',
+  ERROR_OCCURRED = 'ERROR_OCCURRED'
+}
+
+export interface RequestPartiesInformationResponse {
+  party?: TParty
+  currentState: RequestPartiesInformationState
+  errorInformation?: ErrorInformation
+}
 
 export enum PISPTransactionModelState {
   start = 'start',
   partyLookupSuccess = 'partyLookupSuccess',
+  partyLookupFailure = 'partyLookupFailure',
   authorizationReceived = 'authorizationReceived',
   transactionStatusReceived = 'transactionStatusReceived',
   errored = 'errored'
@@ -51,18 +66,21 @@ export enum PISPTransactionPhase {
 }
 
 export interface PISPTransactionStateMachine extends ControlledStateMachine {
-  requestPartyLookup: Method,
-  onRequestPartyLookup: Method,
-  initiate: Method,
-  onInitiate: Method,
-  approve: Method,
-  onApprove: Method,
+  requestPartyLookup: Method
+  onRequestPartyLookup: Method
+  failPartyLookup: Method
+  onFailPartyLookup: Method
+  initiate: Method
+  onInitiate: Method
+  approve: Method
+  onApprove: Method
 }
 
 export interface PISPTransactionModelConfig extends PersistentModelConfig {
   pubSub: PubSub
   thirdpartyRequests: ThirdpartyRequests
   mojaloopRequests: MojaloopRequests
+  backendRequests: BackendRequests
 }
 
 // derived from request body specification
@@ -80,7 +98,8 @@ export interface ThirdpartyTransactionPartyLookupRequest {
 }
 
 export interface ThirdpartyTransactionPartyLookupResponse {
-  party: TParty
+  party?: TParty
+  errorInformation?: ErrorInformation
   currentState: PISPTransactionModelState
 }
 
@@ -119,7 +138,7 @@ export interface PISPTransactionData extends StateData {
 
   // party lookup
   payeeRequest?: PayeeLookupRequest
-  payeeResolved?: TParty
+  payeeResolved?: RequestPartiesInformationResponse
   partyLookupResponse?: ThirdpartyTransactionPartyLookupResponse
 
   // initiate
