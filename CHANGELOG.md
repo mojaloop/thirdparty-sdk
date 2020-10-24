@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+## [11.21.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.20.2...v11.21.0) (2020-10-24)
+
+
+### Features
+
+* work in tandem with sdk-scheme-adapter  ([#43](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/43)) ([4f711cd](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/4f711cd7c0041ad8ad2619fb0db4af6797dcb115))
+
 ### [11.20.2](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.20.0...v11.20.2) (2020-10-20)
 
 
