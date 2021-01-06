@@ -89,7 +89,7 @@
     "@types/redis": "^2.8.27",
     "ajv": "^6.12.6",
     "ajv-keywords": "^3.5.2",
-    "axios": "^0.20.0",
+    "axios": "^0.21.1",
     "blipp": "^4.0.1",
     "commander": "^6.1.0",
     "convict": "^6.0.0",
