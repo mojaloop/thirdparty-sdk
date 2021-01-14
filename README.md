@@ -62,12 +62,25 @@ This package exemplifies the use of the Mojaloop SDK Standard Components for TLS
   Its responsibility is to transform asynchronous Mojaloop API native interface's set of calls to a synchronous call.
 
 ## Integration Test
-   To run integration tests, first start `docker-compose` inside `docker` folder in a separate window.
+   To run integration tests, first start `docker-compose` in root folder
+
+   ```bash
+   docker-compose build && docker-compose up
+   ```
+   
+   then start `docker-compose` inside `docker` folder in a separate window.
    ```bash
    cd docker
    docker-compose build && docker-compose up
    ```
-   Then run the following command
+
+   then start `docker-compose` inside `docker/contract` folder in a separate window.
+   ```bash
+   cd docker/contract
+   docker-compose build && docker-compose up
+   ```
+
+   Finally run the following command to execute tests
    ```bash
    npm run test:integration
    ```
