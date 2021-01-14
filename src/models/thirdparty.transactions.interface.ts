@@ -25,7 +25,14 @@
  --------------
 ******/
 
-import { TMoney, TAmountType, TransactionType, TParty, TCurrency, TExtensionList } from '@mojaloop/sdk-standard-components'
+import {
+  TMoney,
+  TAmountType,
+  TransactionType,
+  TParty,
+  TCurrency,
+  TExtensionList
+} from '@mojaloop/sdk-standard-components'
 
 export interface InboundThirdpartyTransactionPostRequest {
   transactionRequestId: string
