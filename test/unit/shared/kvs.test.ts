@@ -108,13 +108,13 @@ describe('KVS: Key Value Storage', () => {
     const setSpy = jest.spyOn(kvs.client, 'set').mockImplementationOnce((
       _key: string,
       _value: string,
-      mode: string,
+      flag: string,
+      _mode: string,
       _duration: number,
-      _flag: string,
       _cb?: Callback<'OK' | undefined>
     ): boolean => {
-      if (mode) {
-        const ccb = mode as unknown as Callback<'OK' | undefined>
+      if (flag) {
+        const ccb = flag as unknown as Callback<'OK' | undefined>
         ccb(null, 'OK')
       }
       return true
