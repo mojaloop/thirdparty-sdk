@@ -30,6 +30,7 @@
 import Convict from 'convict'
 import PACKAGE from '../../package.json'
 import fs, { PathLike } from 'fs'
+import path from 'path'
 import { BaseRequestTLSConfig } from '@mojaloop/sdk-standard-components'
 
 export { PACKAGE }
@@ -305,7 +306,7 @@ export const ConvictConfig = Convict<ServiceConfig>({
 
 // Load environment dependent configuration
 const env = ConvictConfig.get('ENV')
-ConvictConfig.loadFile(`${__dirname}/../../config/${env}.json`)
+ConvictConfig.loadFile(path.join(__dirname, `/../../config/${env}.json`))
 
 // Perform configuration validation
 ConvictConfig.validate({ allowed: 'strict' })
