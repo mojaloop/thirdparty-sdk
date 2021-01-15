@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+### [11.21.1](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.21.0...v11.21.1) (2021-01-15)
+
+
+### Maintenance
+
+* 1942 update deps ([#46](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/46)) ([5d8aeac](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/5d8aeaceaf8b977223d690e5fe1e7b41ffa6e36c))
+
 ## [11.21.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.20.2...v11.21.0) (2020-10-24)
 
 
