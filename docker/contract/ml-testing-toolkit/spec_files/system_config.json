@@ -22,11 +22,23 @@
     "JWT_COOKIE_NAME": "TTK-API_ACCESS_TOKEN",
     "EMBEDDED_CERTIFICATE": "password"
   },
+  "CONNECTION_MANAGER": {
+    "API_URL": "http://connection-manager-api:5061",
+    "AUTH_ENABLED": false,
+    "HUB_USERNAME": "hub",
+    "HUB_PASSWORD": "hub"
+  },
   "API_DEFINITIONS": [
     {
       "type": "fspiop",
       "version": "1.0",
       "folderPath": "fspiop_1.0",
+      "asynchronous": true
+    },
+    {
+      "type": "fspiop",
+      "version": "1.1",
+      "folderPath": "fspiop_1.1",
       "asynchronous": true
     },
     {

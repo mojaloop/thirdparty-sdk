@@ -31,7 +31,7 @@ describe('PISP Transaction', (): void => {
       const lookupRequest = {
         payee: {
           partyIdType: 'MSISDN',
-          partyIdentifier: '+4412345678'
+          partyIdentifier: '4412345678'
 
         },
         transactionRequestId: transactionRequestId
