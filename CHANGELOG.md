@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+### [11.21.3](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.21.2...v11.21.3) (2021-02-19)
+
+
+### Maintenance
+
+* update license file ([#44](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/44)) ([68f8541](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/68f8541524686cec37a91c1413528aa5879f56c1))
+
 ### [11.21.2](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.21.1...v11.21.2) (2021-02-19)
 
 
