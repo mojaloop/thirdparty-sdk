@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+### [11.21.4](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.21.3...v11.21.4) (2021-02-19)
+
+
+### Maintenance
+
+* 2060 latest docker images ([#48](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/48)) ([1bf15be](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/1bf15be5f85d1e30bdd930f158261e77af798f8b))
+
 ### [11.21.3](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.21.2...v11.21.3) (2021-02-19)
 
 
