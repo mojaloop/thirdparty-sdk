@@ -59,7 +59,7 @@ services:
       interval: 30s
   
   sdk-scheme-adapter:
-    image: "mojaloop/sdk-scheme-adapter:v10.6.2.7-pisp"
+    image: "mojaloop/sdk-scheme-adapter:v11.10.1.3-pisp"
     # build: 
     #   context: ../sdk-scheme-adapter
     #   dockerfile: ./Dockerfile
@@ -100,7 +100,7 @@ services:
 
   redis:
     container_name: redis
-    image: "redis:5.0.4-alpine"
+    image: "redis:6.0.10-alpine"
     networks:
       - mojaloop-net
     ports:
