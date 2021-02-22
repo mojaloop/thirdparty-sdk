@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+## [11.22.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.21.4...v11.22.0) (2021-02-22)
+
+
+### Features
+
+* introduce shared/http-request base class ([#49](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/49)) ([201591c](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/201591cfd1ebdd022d70e93c4d876ff6e6e59fcf))
+
 ### [11.21.4](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.21.3...v11.21.4) (2021-02-19)
 
 
