@@ -25,18 +25,9 @@
  --------------
  ******/
 
-import {
-  Logger as SDKLogger,
-  RequestOptions,
-  RequestResponse,
-  request,
-  requests
-} from '@mojaloop/sdk-standard-components'
+import { requests } from '@mojaloop/sdk-standard-components'
 import { AuthenticationValue, InboundAuthorizationsPostRequest } from '~/models/authorizations.interface'
-import { PrependFun, Scheme, prepend2Uri } from '~/shared/http-scheme'
-import { throwOrExtractData } from '~/shared/throw-or-extract-data'
-
-import http from 'http'
+import { HttpRequestConfig, HttpRequest } from '~/shared/http-request'
 import {
   OutboundRequestToPayTransferPostRequest,
   OutboundRequestToPayTransferPostResponse
@@ -47,126 +38,25 @@ import {
   ThirdpartyTransactionStatus
 } from '../pispTransaction.interface'
 
-export interface BackendConfig {
-  // FSP id of this DFSP
-  dfspId: string
-
-  logger: SDKLogger.Logger
-
-  // type of http scheme
-  scheme: Scheme
-
-  // target uri for all requests
-  uri: string
-
+export interface BackendConfig extends HttpRequestConfig{
   // the path for signAuthorizationRequest
   singAuthorizationPath: string
-
-  // should we keep alive connection with backend,
-  // default 'true' if not specified
-  keepAlive?: boolean
 }
 
 /**
  * @class BackendRequests
  * @description tiny wrapper dedicated to make requests to DFSP backend endpoint
  */
-export class BackendRequests {
-  // requests config
-  protected config: BackendConfig
-
-  // the http agent to make requests
-  protected agent: http.Agent
-
+export class BackendRequests extends HttpRequest {
+  // we want this constructor for better code support
+  // eslint-disable-next-line no-useless-constructor
   constructor (config: BackendConfig) {
-    this.config = config
-    this.agent = new http.Agent({
-      keepAlive: typeof config.keepAlive === 'undefined' ? true : config.keepAlive
-    })
+    super(config)
   }
 
-  protected get logger (): SDKLogger.Logger {
-    return this.config.logger
-  }
-
-  // generates minimal set of headers for request
-  protected get headers (): Record<string, string> {
-    return {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-      Date: new Date().toUTCString()
-    }
-  }
-
-  // getter used to implement dynamic protected method
-  // which is used to generate fullUri
-  protected get prependScheme (): PrependFun {
-    return prepend2Uri(this.config.scheme)
-  }
-
-  // build full URI pointing to backend endpoint using config.uri and config.scheme
-  get endpoint (): string {
-    return this.prependScheme(this.config.uri)
-  }
-
-  fullUri (path: string): string {
-    return `${this.endpoint}/${path}`
-  }
-
-  // makes the requests with proper logging
-  async loggedRequest<Response> (opts: RequestOptions): Promise<Response | void> {
-    try {
-      this.logger.push({ opts }).info(`Executing Backend ${this.config.scheme} ${opts.method} request`)
-      return request<Response>(opts).then((res: RequestResponse<Response>) => throwOrExtractData<Response>(res))
-    } catch (err) {
-      this.logger.push({ err }).error(
-        `Error attempting Backend ${this.config.scheme} ${opts.method} ${opts.uri}`
-      )
-      throw err
-    }
-  }
-
-  // makes a GET to Backend
-  async get<Response> (path: string): Promise<Response | void> {
-    return this.loggedRequest({
-      uri: this.fullUri(path),
-      method: 'GET',
-      headers: this.headers,
-      agent: this.agent
-    })
-  }
-
-  // makes a PATCH to Backend
-  async patch<Body, Response> (path: string, body: Body): Promise<Response | void> {
-    return this.loggedRequest({
-      uri: this.fullUri(path),
-      method: 'PATCH',
-      body: requests.common.bodyStringifier(body),
-      headers: this.headers,
-      agent: this.agent
-    })
-  }
-
-  // makes a POST to Backend
-  async post<Body, Response> (path: string, body: Body): Promise<Response | void> {
-    return this.loggedRequest({
-      uri: this.fullUri(path),
-      method: 'POST',
-      body: requests.common.bodyStringifier(body),
-      headers: this.headers,
-      agent: this.agent
-    })
-  }
-
-  // makes a PUT to Backend
-  async put<Body, Response> (path: string, body: Body): Promise<Response | void> {
-    return this.loggedRequest({
-      uri: this.fullUri(path),
-      method: 'PUT',
-      body: requests.common.bodyStringifier(body),
-      headers: this.headers,
-      agent: this.agent
-    })
+  // GETTERS
+  get singAuthorizationPath (): string {
+    return (this.config as unknown as BackendConfig).singAuthorizationPath
   }
 
   // requests signing of Authorization Request
@@ -176,7 +66,7 @@ export class BackendRequests {
     inRequest: InboundAuthorizationsPostRequest
   ): Promise<AuthenticationValue | void> {
     return this.post<InboundAuthorizationsPostRequest, AuthenticationValue>(
-      this.config.singAuthorizationPath, inRequest
+      this.singAuthorizationPath, inRequest
     )
   }
 

@@ -28,10 +28,7 @@
 import { AuthenticationValue, InboundAuthorizationsPostRequest } from '~/models/authorizations.interface'
 import { BackendConfig, BackendRequests } from '~/models/inbound/backend-requests'
 import { Scheme } from '~/shared/http-scheme'
-import SDK, { RequestResponse, requests } from '@mojaloop/sdk-standard-components'
 import mockLogger from '../../mockLogger'
-import http from 'http'
-import { HTTPResponseError } from '~/shared/http-response-error'
 import { ThirdpartyTransactionStatus } from '~/models/pispTransaction.interface'
 
 describe('backendRequests', () => {
@@ -43,20 +40,6 @@ describe('backendRequests', () => {
     scheme: Scheme.http,
     uri: 'backend-uri',
     singAuthorizationPath: 'singchallenge'
-  }
-
-  const headers = {
-    Accept: 'application/json',
-    Date: expect.anything(),
-    'Content-Type': 'application/json'
-  }
-
-  const payload = { Iam: 'the-mocked-payload' }
-
-  const response: RequestResponse = {
-    statusCode: 200,
-    data: { Iam: 'mocked-response' },
-    headers
   }
 
   const authenticationValue: AuthenticationValue = {
@@ -107,123 +90,6 @@ describe('backendRequests', () => {
     expect(typeof backendRequests.signAuthorizationRequest).toEqual('function')
     expect(typeof backendRequests.notifyAboutTransfer).toEqual('function')
     expect(typeof backendRequests.requestPartiesInformation).toEqual('function')
-  })
-
-  describe('http methods', () => {
-    it('should properly GET', async () => {
-      const requestSpy = jest.spyOn(SDK, 'request').mockImplementationOnce(() => Promise.resolve(response))
-      const result = await backendRequests.get('zzz')
-      expect(result).toEqual(response.data)
-      expect(requestSpy).toBeCalledWith({
-        agent: expect.anything(),
-        headers,
-        method: 'GET',
-        uri: 'http://backend-uri/zzz'
-      })
-    })
-
-    it('should properly PATCH', async () => {
-      const requestSpy = jest.spyOn(SDK, 'request').mockImplementationOnce(() => Promise.resolve(response))
-      const result = await backendRequests.patch('zzz', payload)
-      expect(result).toEqual(response.data)
-      expect(requestSpy).toBeCalledWith({
-        agent: expect.anything(),
-        headers,
-        method: 'PATCH',
-        uri: 'http://backend-uri/zzz',
-        body: requests.common.bodyStringifier(payload)
-      })
-    })
-
-    it('should properly POST', async () => {
-      const requestSpy = jest.spyOn(SDK, 'request').mockImplementationOnce(() => Promise.resolve(response))
-      const result = await backendRequests.post('zzz', payload)
-      expect(result).toEqual(response.data)
-      expect(requestSpy).toBeCalledWith({
-        agent: expect.anything(),
-        headers,
-        method: 'POST',
-        uri: 'http://backend-uri/zzz',
-        body: requests.common.bodyStringifier(payload)
-      })
-    })
-
-    it('should properly PUT', async () => {
-      const requestSpy = jest.spyOn(SDK, 'request').mockImplementationOnce(() => Promise.resolve(response))
-      const result = await backendRequests.put('zzz', payload)
-      expect(result).toEqual(response.data)
-      expect(requestSpy).toBeCalledWith({
-        agent: expect.anything(),
-        headers,
-        method: 'PUT',
-        uri: 'http://backend-uri/zzz',
-        body: requests.common.bodyStringifier(payload)
-      })
-    })
-
-    it('should propagate thrown exception', async () => {
-      const requestSpy = jest.spyOn(SDK, 'request').mockImplementationOnce(() => { throw new Error('exception') })
-      expect(backendRequests.put('zzz', payload)).rejects.toThrowError('exception')
-      expect(requestSpy).toBeCalledWith({
-        agent: expect.anything(),
-        headers,
-        method: 'PUT',
-        uri: 'http://backend-uri/zzz',
-        body: requests.common.bodyStringifier(payload)
-      })
-    })
-
-    it('should return void for 204', async () => {
-      const requestSpy = jest.spyOn(SDK, 'request').mockImplementationOnce(() => Promise.resolve({
-        statusCode: 204,
-        data: { It: 'does not matter' }
-      }))
-      const result = await backendRequests.put('zzz', payload)
-      expect(result).toBeUndefined()
-      expect(requestSpy).toBeCalledWith({
-        agent: expect.anything(),
-        headers,
-        method: 'PUT',
-        uri: 'http://backend-uri/zzz',
-        body: requests.common.bodyStringifier(payload)
-      })
-    })
-
-    it('should throw exception non success full status code', async () => {
-      const requestSpy = jest.spyOn(SDK, 'request').mockImplementationOnce(() => Promise.resolve({
-        statusCode: 304,
-        data: { It: 'does not matter' }
-      }))
-      expect(backendRequests.put('zzz', payload)).rejects.toThrow(new HTTPResponseError({
-        msg: `Request returned non-success status code ${304}`,
-        res: {
-          statusCode: 304,
-          data: { It: 'does not matter' }
-        }
-      }))
-      expect(requestSpy).toBeCalledWith({
-        agent: expect.anything(),
-        headers,
-        method: 'PUT',
-        uri: 'http://backend-uri/zzz',
-        body: requests.common.bodyStringifier(payload)
-      })
-    })
-  })
-
-  describe('keepAlive flag', () => {
-    const agentSpy = jest.spyOn(http, 'Agent').mockImplementationOnce(
-      () => ({ Iam: 'mocked-agent' } as unknown as http.Agent)
-    )
-
-    const kaConfig: BackendConfig = {
-      ...config,
-      keepAlive: false
-    }
-
-    const request = new BackendRequests(kaConfig)
-    expect(request).toBeTruthy()
-    expect(agentSpy).toBeCalledWith({ keepAlive: false })
   })
 
   describe('signAuthorizationRequest', () => {

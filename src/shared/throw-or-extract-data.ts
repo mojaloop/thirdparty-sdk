@@ -37,7 +37,7 @@ export function throwOrExtractData<Data> (res: RequestResponse<Data>): Data | vo
     return
   }
 
-  // transform non successful statusCodes into exception
+  // transform non-successful statusCodes into exception
   if (res.statusCode < 200 || res.statusCode >= 300) {
     // not a successful request
     throw new HTTPResponseError({
