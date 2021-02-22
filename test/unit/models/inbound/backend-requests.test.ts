@@ -39,7 +39,7 @@ describe('backendRequests', () => {
     logger: mockLogger(),
     scheme: Scheme.http,
     uri: 'backend-uri',
-    singAuthorizationPath: 'singchallenge'
+    signAuthorizationPath: 'singchallenge'
   }
 
   const authenticationValue: AuthenticationValue = {
@@ -99,7 +99,7 @@ describe('backendRequests', () => {
       )
       const result = await backendRequests.signAuthorizationRequest(authorizationsPostRequest)
       expect(result).toEqual(authenticationValue)
-      expect(postSpy).toBeCalledWith(config.singAuthorizationPath, authorizationsPostRequest)
+      expect(postSpy).toBeCalledWith(config.signAuthorizationPath, authorizationsPostRequest)
     })
   })
 

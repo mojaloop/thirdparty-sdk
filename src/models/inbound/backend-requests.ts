@@ -38,9 +38,9 @@ import {
   ThirdpartyTransactionStatus
 } from '../pispTransaction.interface'
 
-export interface BackendConfig extends HttpRequestConfig{
+export interface BackendConfig extends HttpRequestConfig {
   // the path for signAuthorizationRequest
-  singAuthorizationPath: string
+  signAuthorizationPath: string
 }
 
 /**
@@ -55,8 +55,8 @@ export class BackendRequests extends HttpRequest {
   }
 
   // GETTERS
-  get singAuthorizationPath (): string {
-    return (this.config as unknown as BackendConfig).singAuthorizationPath
+  get signAuthorizationPath (): string {
+    return (this.config as unknown as BackendConfig).signAuthorizationPath
   }
 
   // requests signing of Authorization Request
@@ -66,7 +66,7 @@ export class BackendRequests extends HttpRequest {
     inRequest: InboundAuthorizationsPostRequest
   ): Promise<AuthenticationValue | void> {
     return this.post<InboundAuthorizationsPostRequest, AuthenticationValue>(
-      this.singAuthorizationPath, inRequest
+      this.signAuthorizationPath, inRequest
     )
   }
 
