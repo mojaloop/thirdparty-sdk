@@ -4,19 +4,30 @@ title PISP Transaction
 
 
 participant "PISP Backend" as PISP
-box "thirdparty-scheme-adapter"
-  participant "outbound-server" as OBS
+box "PISP 3p-scheme-adapter"
+  participant "outbound-server" as 3p_PISP_OBS
   participant "3p-state" as ST8
-  participant "inbound-server" as IBS
+  participant "inbound-server" as 3p_PISP_IBS
 end box
-
+box "PISP sdk-scheme-adapter"
+  participant "outbound-server" as SDK_PISP_OBS
+  participant "inbound-server" as SDK_PISP_IBS
+end box
 box "Mojaloop"
     participant Switch
 end box
-
+box "DFSP sdk-scheme-adapter"
+  participant "inbound-server" as SDK_DFSP_IBS
+  participant "outbound-server" as SDK_DFSP_OBS
+end box
+box "DFSP 3p-scheme-adapter"
+  participant "inbound-server" as 3p_DFSP_IBS
+  participant "outbound-server" as 3p_DFSP_OBS
+end box
+participant "AUTH-SERVICE" as AUTHS
 == Party Lookup ==
 rnote right of PISP #Light
-""POST /thirdpartyTransactions""
+POST /thirdpartyTransactions
 {
   transactionRequestId: "12345",
   payee: {
@@ -27,40 +38,34 @@ rnote right of PISP #Light
   }
 }
 end note
-PISP -> OBS: ""POST /thirdpartyTransactions""
+PISP -> 3p_PISP_OBS: POST /thirdpartyTransactions
 activate PISP
-activate OBS
+activate 3p_PISP_OBS
 ' TODO: line up with state-models.md doc
-OBS -> ST8: ""partyLookup()""
-rnote right of ST8: ""state: requestPartyLookup""
+3p_PISP_OBS -> ST8: partyLookup()
+rnote right of ST8: state: requestPartyLookup
 activate ST8
 
-ST8 -> Switch: ""GET /parties/{type}/{id}""
-Switch --> ST8: ""202 Accepted""
-rnote right of ST8: ""state: pendingPartyLookup""
+ST8 -> SDK_PISP_OBS: SYNC GET /parties/{type}/{id}
+activate SDK_PISP_OBS
+SDK_PISP_OBS -> SDK_PISP_OBS: retrieve PartiesInformation from Switch
+SDK_PISP_OBS -> ST8: 200 PartyInformation
+deactivate SDK_PISP_OBS
+rnote right of ST8: state: payeeResolved
 
-note over Switch
-  Switch performs party lookup... just like normal
-end note
-
-Switch -> IBS: ""PUT /parties/{type}/{id}""
-IBS -> ST8: ""onPartyLookup()""
-IBS --> Switch: ""200 OK""
-rnote right of ST8: ""state: payeeResolved""
-
-ST8 -> OBS: ""something...""
+ST8 -> 3p_PISP_OBS: partyInformation
 deactivate ST8
 
 ' TODO: party lookup details
-OBS --> PISP: ""200 OK""
-deactivate OBS
+3p_PISP_OBS --> PISP: 200 OK PartyInformation
+deactivate 3p_PISP_OBS
 deactivate PISP
 
-...User checks the party name, and confirms...
+...User checks the party name, and confirms transaction to continue...
 
 == Initate Transaction ==
 rnote right of PISP #Light
-""POST /thirdpartyTransactions/{id}/initiate""
+POST /thirdpartyTransactions/{id}/initiate
 {
   sourceAccountId: "dfspa.alice.1234",
   consentId: "555",
@@ -71,36 +76,113 @@ rnote right of PISP #Light
   "amountType": "SEND"
 }
 end note
-PISP -> OBS: ""POST /thirdpartyTransactions/{id}/initiate""
+PISP -> 3p_PISP_OBS: POST /thirdpartyTransactions/{id}/initiate
 activate PISP
-activate OBS
-' TODO: line up with state-models.md doc
+activate 3p_PISP_OBS
 
-OBS -> ST8: ""initiate()""
+3p_PISP_OBS -> ST8: initiate()
 activate ST8
-rnote right of ST8: ""state: requestTransaction""
+rnote right of ST8: state: requestTransaction
 
-ST8 -> Switch: ""POST /thirdpartyRequests/transactions""
-Switch --> ST8: ""202 Accepted""
-rnote right of ST8: ""state: pendingTransactionAuthorization""
-
-
-note over Switch
-  Switch kicks off the transaction - DFSP issues ""POST /authorizations""
-end note
-
-Switch -> IBS: ""POST /authorizations""
-IBS -> ST8: ""onPostAuthorizations()""
-IBS --> Switch: ""200 OK""
-rnote right of ST8: ""state: authorizationReceived""
-
-
-ST8 -> OBS: ""something...""
+ST8 -> Switch: POST /thirdpartyRequests/transactions
+activate Switch
+Switch --> ST8: 202 Accepted
 deactivate ST8
+rnote right of ST8: state: pendingTransactionInitiation
+
+note over 3p_DFSP_IBS
+  DFSP handles PISP transaction request
+end note
+Switch -> 3p_DFSP_IBS: POST /thirdpartyRequests/transactions
+activate 3p_DFSP_IBS
+3p_DFSP_IBS --> Switch: 202 Accepted
+rnote right of 3p_DFSP_IBS: state: transactionRequestReceived
+note over 3p_DFSP_IBS
+  **transactionRequestState** is **RECEIVED**
+end note
+deactivate Switch
+3p_DFSP_IBS -> Switch: GET /consents/{consentId}
+activate Switch
+Switch --> 3p_DFSP_IBS: 202 Accepted
+deactivate 3p_DFSP_IBS
+Switch -> AUTHS: GET /consents/{consentId}
+activate AUTHS
+AUTHS --> Switch: 202 Accepted
+deactivate Switch
+AUTHS -> AUTHS: lookup for Consent
+AUTHS -> Switch: PUT /consents/{consentId}
+activate Switch
+Switch --> AUTHS: 202 Accepted
+deactivate AUTHS
+Switch -> 3p_DFSP_IBS: PUT /consents/{consentId}
+activate 3p_DFSP_IBS
+3p_DFSP_IBS --> Switch: 202 Accepted
+deactivate Switch
+3p_DFSP_IBS -> 3p_DFSP_IBS: Lookup **consentId, sourceAccountid and pispId**.\nVerify that they exists, and consent is granted with a valid credential
+3p_DFSP_IBS -> 3p_DFSP_IBS: Generate **transactionId**: '1234-1234-1234-1234'
+note over 3p_DFSP_IBS
+  DFSP informs PISP that **transactionId** has been allocated\n
+end note
+rnote right of 3p_DFSP_IBS #Light
+PUT /thirdpartyRequests/transaction/{id}
+{
+  transactionId: '1234-1234-1234-1234',
+  transactionRequestState: 'RECEIVED'
+}
+end note
+3p_DFSP_IBS -> Switch: PUT /thirdpartyRequests/transaction/{id}
+activate Switch
+Switch --> 3p_DFSP_IBS: 202 Accepted
+Switch -> 3p_PISP_IBS: PUT /thirdpartyRequests/transaction/{id}
+activate 3p_PISP_IBS
+3p_PISP_IBS --> Switch: 202 accepted
+deactivate Switch
+3p_PISP_IBS -> ST8: transactionRequestReceived()
+activate ST8
+rnote right of ST8: state: transactionInitiated
+ST8 -> ST8: store received **transactionId**
+rnote right of ST8: state: pendingTransactionAuthorization
+deactivate ST8
+deactivate 3p_PISP_IBS
+
+note over 3p_DFSP_IBS
+  DFSP requires QuotesInformation\n
+end note
+rnote right of 3p_DFSP_IBS: state: pendingQuotesRequest
+3p_DFSP_IBS -> SDK_DFSP_OBS: SYNC POST /quotes
+activate SDK_DFSP_OBS
+SDK_DFSP_OBS -> SDK_DFSP_OBS: retrieve QuotesInformation from Switch
+SDK_DFSP_OBS -> 3p_DFSP_IBS: 200 QuotesInformation
+deactivate SDK_DFSP_OBS
+note over 3p_DFSP_IBS
+  DFSP has the QuotesInformation, they can now ask the PISP for authorization
+  **transactionRequestState** is **PENDING**
+end note
+rnote right of 3p_DFSP_IBS: state: pendingAuthorizationRequest
+3p_DFSP_IBS -> SDK_DFSP_OBS: SYNC POST /authorization
+activate SDK_DFSP_OBS
+SDK_DFSP_OBS -> Switch: POST /authorization
+activate Switch
+Switch --> SDK_DFSP_OBS: 202 Accepted
+SDK_DFSP_OBS -> SDK_DFSP_OBS: waiting on PUT /authorization/{id}
+deactivate SDK_DFSP_OBS
+Switch -> 3p_PISP_IBS: POST /authorizations
+activate 3p_PISP_IBS
+3p_PISP_IBS --> Switch: 200 OK
+deactivate Switch
+3p_PISP_IBS -> ST8: authorizationRequestReceived()
+activate ST8
+deactivate 3p_PISP_IBS
+rnote right of ST8: state: authorizationReceived
+
+
+ST8 -> 3p_PISP_OBS: QuotesInformation, transactionId
+deactivate ST8
+deactivate 3p_PISP_IBS
 
 'TODO: add authorization details
-OBS --> PISP: ""200 OK""
-deactivate OBS
+3p_PISP_OBS --> PISP: 200 OK
+deactivate 3p_PISP_OBS
 deactivate PISP
 
 ...Present quote to be approved\nUser signs the challenge...
@@ -108,41 +190,100 @@ deactivate PISP
 
 == Approve Transaction ==
 rnote right of PISP #Light
-""POST /thirdpartyTransactions/{id}/approve""
+POST /thirdpartyTransactions/{id}/approve
 {
   signedChallenge: "base64(xxx)"
 }
 end note
-PISP -> OBS: ""POST /thirdpartyTransactions/{id}/approve""
+PISP -> 3p_PISP_OBS: POST /thirdpartyTransactions/{id}/approve
 activate PISP
-activate OBS
+activate 3p_PISP_OBS
 
-OBS -> ST8: ""approve()""
+3p_PISP_OBS -> ST8: approve()
 activate ST8
-rnote right of ST8: ""state: approvalReceived""
+rnote right of ST8: state: approvalReceived
 
 
-ST8 -> Switch: ""PUT /authorizations/{id}""
-Switch --> ST8: ""202 Accepted""
-rnote right of ST8: ""state: pendingTransaction""
-
-note over Switch
-  1. DFSP checks the authorization with the auth-service, or their own auth-service.
-  2. DFSP is happy, so initiates the ""POST /transfer""
+ST8 -> Switch: PUT /authorizations/{id}
+activate Switch
+Switch --> ST8: 202 Accepted
+rnote right of ST8: state: pendingTransaction
+deactivate ST8
+Switch -> SDK_DFSP_IBS: PUT /authorization/{id}
+activate SDK_DFSP_IBS
+SDK_DFSP_IBS --> Switch: 202 Accept
+deactivate Switch
+SDK_DFSP_IBS -> SDK_DFSP_OBS: notify about PUT /authorization/{id}
+activate SDK_DFSP_OBS
+SDK_DFSP_OBS -> 3p_DFSP_IBS: 200: AuthorizationInformation
+deactivate SDK_DFSP_IBS
+deactivate SDK_DFSP_OBS
+note over 3p_DFSP_IBS
+  DFSP checks the authorization with the **AUTH-SERVICE**.
 end note
 
+3p_DFSP_IBS -> Switch: POST /thridpartyRequest/transactions/{transactionRequestId}/authorizations
+activate Switch
+Switch --> 3p_DFSP_IBS: 202 Accepted
+deactivate 3p_DFSP_IBS
+rnote right of 3p_DFSP_IBS: state: pendingAuthorizationVerification
+Switch -> AUTHS: POST /thridpartyRequest/transactions/{transactionRequestId}/authorizations
+activate AUTHS
+AUTHS --> Switch: 202 Accepted
+deactivate Switch
 
-Switch -> IBS: ""PATCH /thirdpartyRequests/transactions/{id}""
-IBS -> ST8: ""onTransactionSuccess()""
-IBS --> Switch: ""200 OK""
-rnote right of ST8: ""state: transactionSuccess""
+note over AUTHS
+  lookup Consent
+  ensure sourceAccountId matches with Consent
+  verify signed challenge with publicKey for Consent
+  AuthorizationInformation is verified and **ACCEPTED**
+end note
+AUTHS -> Switch: PUT /thridpartyRequest/transactions/{transactionRequestId}/authorizations
+activate Switch
+Switch --> AUTHS: 202 Accepted
+deactivate AUTHS
+Switch -> 3p_DFSP_IBS: PUT /thridpartyRequest/transactions/{transactionRequestId}/authorizations
+3p_DFSP_IBS --> Switch: 202 Accepted
+deactivate Switch
+
+note over 3p_DFSP_IBS
+  **transactionRequestState** is **ACCEPTED**
+  DFSP is happy, so initiates the POST /transfer
+end note
+activate 3p_DFSP_IBS
+rnote right of 3p_DFSP_IBS: state: pendingTransfer
+3p_DFSP_IBS -> SDK_DFSP_OBS: SYNC POST /simpleTransfer
+activate SDK_DFSP_OBS
+SDK_DFSP_OBS -> SDK_DFSP_OBS: request Switch to realize simple transfer
+SDK_DFSP_OBS -> 3p_DFSP_IBS: 202: Transfer done
+deactivate SDK_DFSP_OBS
+note over 3p_DFSP_IBS
+  DFSP notifies PISP that Transfer is done
+end note
+rnote right of 3p_DFSP_IBS: state: pendingTransferNotification
+3p_DFSP_IBS -> Switch: PATCH /thirdpartyRequests/transactions/{id}
+activate Switch
+Switch --> 3p_DFSP_IBS: 202 Accepted
+rnote right of 3p_DFSP_IBS: state: transactionRequestSuccess
+deactivate 3p_DFSP_IBS
 
 
-ST8 -> OBS: ""something...""
+Switch -> 3p_PISP_IBS: PATCH /thirdpartyRequests/transactions/{id}
+activate 3p_PISP_IBS
+3p_PISP_IBS---> Switch: 200 OK
+deactivate Switch
+
+3p_PISP_IBS -> ST8: onTransactionSuccess()
+deactivate 3p_PISP_IBS
+activate ST8
+rnote right of ST8: state: transactionSuccess
+
+
+ST8 -> 3p_PISP_OBS: Transaction & Transfer are done
 deactivate ST8
 
-OBS --> PISP: ""200 OK""
-deactivate OBS
+3p_PISP_OBS --> PISP: 200 OK
+deactivate 3p_PISP_OBS
 deactivate PISP
 
 
