@@ -15,7 +15,7 @@ box "Mojaloop"
 end box
 
 == Party Lookup ==
-rnote right of PISP #Light
+rnote right of PISP #LightBlue
 ""POST /thirdpartyTransactions""
 {
   transactionRequestId: "12345",
@@ -59,7 +59,7 @@ deactivate PISP
 ...User checks the party name, and confirms...
 
 == Initate Transaction ==
-rnote right of PISP #Light
+rnote right of PISP #LightBlue
 ""POST /thirdpartyTransactions/{id}/initiate""
 {
   sourceAccountId: "dfspa.alice.1234",
@@ -107,7 +107,7 @@ deactivate PISP
 
 
 == Approve Transaction ==
-rnote right of PISP #Light
+rnote right of PISP #LightBlue
 ""POST /thirdpartyTransactions/{id}/approve""
 {
   signedChallenge: "base64(xxx)"
