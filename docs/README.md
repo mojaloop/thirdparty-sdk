@@ -11,7 +11,15 @@
 - Where external is for communication between the DFSP and the adapter
 - And internal is for communication between the adapter and the adapter
 
+## Sequence Diagrams
+[DFSP Transaction Model](./DFSPTransactionModelSeq.md)  
+How a DFSP experiences a PISP transaction
 
+[PISP Transaction Model](./PISPTransactionModelSeq.md)  
+How a PISP experiences a transaction
+
+[PISP Transaction API](./PISPTransactionAPISeq.md)  
+Example PISP Transaction
 
 ## TODO:
 

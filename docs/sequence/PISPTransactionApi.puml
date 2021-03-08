@@ -30,7 +30,7 @@ participant "AUTH-SERVICE" as AUTHS
 
 == Party Lookup ==
 autonumber 1 "<b>LOOK-#</b>"
-rnote right of PISP #Light
+rnote right of PISP #LightBlue
 POST /thirdpartyTransactions
 {
   transactionRequestId: "12345",
@@ -71,7 +71,7 @@ deactivate PISP
 
 == Initate Transaction ==
 autonumber 1 "<b>INIT-#</b>"
-rnote right of PISP #Light
+rnote right of PISP #LightBlue
 POST /thirdpartyTransactions/{transactionRequestId}/initiate
 {
   sourceAccountId: "dfspa.alice.1234",
@@ -244,6 +244,7 @@ deactivate PISP
 
 == Approve Transaction ==
 autonumber 1 "<b>APPR-#</b>"
+rnote right of PISP #LightBlue
 rnote right of PISP #Light
 POST /thirdpartyTransactions/{id}/approve
 {
