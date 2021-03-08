@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+## [11.23.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.22.0...v11.23.0) (2021-03-08)
+
+
+### Features
+
+* defferedJob ([#53](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/53)) ([eb9daf8](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/eb9daf8e4140810a90e46e665ef7ab110e0f6629))
+
 ## [11.22.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.21.4...v11.22.0) (2021-02-22)
 
 
