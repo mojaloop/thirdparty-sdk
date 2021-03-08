@@ -26,7 +26,7 @@
  ******/
 
 /**
- * defferedJob is a workflow to
+ * deferredJob is a workflow to
  * - setup pub/sub one time subscription to channel
  * - initiate the workflow start by jobInitiator callback
  * - consume published message by jobListener callback

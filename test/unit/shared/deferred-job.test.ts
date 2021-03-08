@@ -34,7 +34,7 @@ import {
 import { uuid } from 'uuidv4'
 jest.mock('redis')
 
-describe('defferedJob', () => {
+describe('deferredJob', () => {
   test('module layout', () => {
     expect(typeof deferredJob).toEqual('function')
   })
