@@ -150,7 +150,7 @@ note over DFSP_TM
 end note
 DFSP_TM -> DFSP_TM: notifyThirdpartyAboutTransactionRequestState(transactionId, transactionRequestState)
 rnote right of DFSP_TM: state: pendingNotifyThirdpartyAboutTransactionRequestState
-rnote right of DFSP_TM #Light
+rnote right of DFSP_TM #LightBlue
 PUT /thirdpartyRequests/transaction/{transactionRequestId}
 {
   transactionId: '1234-1234-1234-1234',
