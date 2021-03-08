@@ -1,0 +1,22 @@
+description: Thirdparty transaction party lookup response
+content:
+  application/json:
+    schema:
+      type: object
+      properties:
+        party:
+          type: object
+          properties:
+            partyIdInfo:
+              $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/schemas/PartyIdInfo.yaml'
+            merchantClassificationCode:
+              $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/schemas/MerchantClassificationCode.yaml'
+            name:
+              $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/schemas/PartyName.yaml'
+            personalInfo:
+              $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/schemas/PartyPersonalInfo.yaml'
+            accounts:
+              $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/AccountList.yaml'
+              description: List of accounts associated with the party containing and DFSP routable address, currency identifier and description.
+        currentState: 
+          $ref: '../../components/schemas/ThirdpartyTransactionState.yaml'

@@ -1,0 +1,36 @@
+post:
+  operationId: InitiateThirdpartyTransaction
+  summary: Initiates a third party transaction.
+  description: >
+    The HTTP request `POST /thirdpartyTransaction/{ID}/initiate` is sent to the Switch to initiate a third party request transaction.
+  tags:
+    - thirdpartyRequests
+  parameters:
+    #Path
+    - $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/ID.yaml'
+  requestBody:
+    description: Thirdparty transaction initiate request body.
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../components/schemas/ThirdpartyRequestsTransactionsPostRequest.yaml'
+  responses:
+    '200':
+      $ref: '../components/responses/ThirdpartyRequestsTransactionsPostResponse.yaml'
+    '400':
+      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/400.yaml'
+    '401':
+      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/401.yaml'
+    '403':
+      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/403.yaml'
+    '404':
+      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/404.yaml'
+    '405':
+      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/405.yaml'
+    '406':
+      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/406.yaml'
+    '501':
+      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/501.yaml'
+    '503':
+      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/503.yaml'
