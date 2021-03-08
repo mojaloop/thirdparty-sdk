@@ -82,7 +82,7 @@ export class ListenerRequired extends Error {
   }
 }
 
-// minimal mvp for Wait
+// minimal mvp validation for timeout
 export class PositiveTimeoutRequired extends Error {
   public channel: string
 
