@@ -25,7 +25,9 @@
  --------------
  ******/
 
-import { AuthenticationValue, InboundAuthorizationsPostRequest } from '~/models/authorizations.interface'
+import {
+  thirdparty as tpAPI
+} from '@mojaloop/api-snippets'
 import { BackendConfig, BackendRequests } from '~/models/inbound/backend-requests'
 import { Scheme } from '~/shared/http-scheme'
 import mockLogger from '../../mockLogger'
@@ -42,12 +44,12 @@ describe('backendRequests', () => {
     signAuthorizationPath: 'singchallenge'
   }
 
-  const authenticationValue: AuthenticationValue = {
+  const authenticationValue = {
     pinValue: 'the-mocked-pin-value',
     counter: '1'
   }
 
-  const authorizationsPostRequest: InboundAuthorizationsPostRequest = {
+  const authorizationsPostRequest:  tpAPI.Schemas.AuthorizationsPostRequest = {
     authenticationType: 'U2F',
     retriesLeft: '1',
     amount: {

@@ -29,15 +29,11 @@
 
 import { Handlers, ServerAPI, ServerConfig } from '~/server'
 import { HealthResponse } from '~/interface/types'
-import {
-  AuthorizationResponse,
-  AuthenticationType,
-  InboundAuthorizationsPutRequest
-} from '~/models/authorizations.interface'
 import InboundAuthorizations from '~/handlers/inbound/authorizations'
 import {
-  InboundThirdpartyAuthorizationsPutRequest
-} from '~/models/thirdparty.authorizations.interface'
+  v1_1 as fspiopAPI,
+  thirdparty as tpAPI
+} from '@mojaloop/api-snippets'
 import {
   OutboundAuthorizationsModel
 } from '~/models/outbound/authorizations.model'
@@ -113,17 +109,17 @@ jest.mock('~/models/inbound/authorizations.model', () => ({
   }))
 }))
 
-const putResponse: InboundAuthorizationsPutRequest = {
+const putResponse: fspiopAPI.Schemas.AuthorizationsIDPutResponse = {
   authenticationInfo: {
-    authentication: AuthenticationType.U2F,
+    authentication: 'U2F',
     authenticationValue: {
       pinValue: 'the-mocked-pin-value',
       counter: '1'
-    }
+    } as any
   },
-  responseType: AuthorizationResponse.ENTERED
+  responseType: 'ENTERED'
 }
-const putThirdpartyAuthResponse: InboundThirdpartyAuthorizationsPutRequest = {
+const putThirdpartyAuthResponse: tpAPI.Schemas.ThirdpartyRequestsTransactionsIDAuthorizationsPutResponse = {
   challenge: 'challenge',
   consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
   sourceAccountId: 'dfspa.alice.1234',

@@ -27,10 +27,9 @@ optionally within square brackets <email>.
 ******/
 
 import {
-  AuthenticationType,
-  AuthorizationResponse,
-  InboundAuthorizationsPutRequest
-} from '~/models/authorizations.interface'
+  v1_1 as fspiopAPI,
+  thirdparty as tpAPI
+} from '@mojaloop/api-snippets'
 import { InboundAuthorizationsModel, InboundAuthorizationsModelConfig } from '~/models/inbound/authorizations.model'
 import { BackendRequests } from '~/models/inbound/backend-requests'
 import { MojaloopRequests } from '@mojaloop/sdk-standard-components'
@@ -53,7 +52,7 @@ describe('InboundAuthorizationModel', () => {
       counter: '1'
     }
 
-    const authorizationRequest = {
+    const authorizationRequest: tpAPI.Schemas.AuthorizationsPostRequest = {
       authenticationType: 'U2F',
       retriesLeft: '1',
       amount: {
@@ -121,12 +120,12 @@ describe('InboundAuthorizationModel', () => {
         dfspId
       )
 
-      const authorizationPutPayload: InboundAuthorizationsPutRequest = {
+      const authorizationPutPayload: fspiopAPI.Schemas.AuthorizationsIDPutResponse = {
         authenticationInfo: {
-          authentication: AuthenticationType.U2F,
-          authenticationValue
+          authentication: 'U2F',
+          authenticationValue: authenticationValue as any
         },
-        responseType: AuthorizationResponse.ENTERED
+        responseType: 'ENTERED'
       }
       expect(config.backendRequests.signAuthorizationRequest).toHaveBeenCalledWith(authorizationRequest)
 

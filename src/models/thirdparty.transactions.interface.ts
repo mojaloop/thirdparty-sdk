@@ -26,23 +26,18 @@
 ******/
 
 import {
-  TMoney,
-  TAmountType,
-  TransactionType,
-  TParty,
-  TCurrency,
-  TExtensionList
-} from '@mojaloop/sdk-standard-components'
+  v1_1 as fspiopAPI
+} from '@mojaloop/api-snippets'
 
 export interface InboundThirdpartyTransactionPostRequest {
   transactionRequestId: string
   sourceAccountId: string
   consentId: string
-  payee: TParty
-  payer: TParty
-  amountType: TAmountType
-  amount: TMoney
-  transactionType: TransactionType
+  payee: fspiopAPI.Schemas.Party
+  payer: fspiopAPI.Schemas.Party
+  amountType: fspiopAPI.Schemas.AmountType
+  amount: fspiopAPI.Schemas.Money
+  transactionType: fspiopAPI.Schemas.TransactionType
   expiration: string
 }
 
@@ -67,20 +62,20 @@ export interface TransferParty {
   fspId?: string
   accounts?: Array<{
     address: string
-    currency: TCurrency
+    currency: fspiopAPI.Schemas.Currency
     description: string
   }>
-  extensionList?: TExtensionList
+  extensionList?: fspiopAPI.Schemas.ExtensionList
 }
 
 export interface OutboundRequestToPayTransferPostRequest {
   requestToPayTransactionId: string
   from: TransferParty
   to: TransferParty
-  amountType: TAmountType
+  amountType: fspiopAPI.Schemas.AmountType
   note?: string
   // TMoney properties
-  currency: TCurrency
+  currency: fspiopAPI.Schemas.Currency
   amount: string
   // TransactionType properties
   scenario: string

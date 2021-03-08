@@ -30,9 +30,12 @@ import {
 } from '~/models/persistent.model'
 import { Method } from 'javascript-state-machine'
 import {
-  PostThirdpartyRequestsTransactionsAuthorizationsRequest,
   ThirdpartyRequests
 } from '@mojaloop/sdk-standard-components'
+import {
+  thirdparty as tpAPI
+} from '@mojaloop/api-snippets'
+
 import { PubSub } from '~/shared/pub-sub'
 
 export enum OutboundThirdpartyAuthorizationsModelState {
@@ -41,19 +44,19 @@ export enum OutboundThirdpartyAuthorizationsModelState {
   errored = 'ERROR_OCCURRED'
 }
 
-export interface InboundThirdpartyAuthorizationsPutRequest {
-  challenge: string;
-  consentId: string;
-  sourceAccountId: string;
-  status: 'PENDING' | 'VERIFIED';
-  value: string;
-}
+// export interface InboundThirdpartyAuthorizationsPutRequest {
+//   challenge: string;
+//   consentId: string;
+//   sourceAccountId: string;
+//   status: 'PENDING' | 'VERIFIED';
+//   value: string;
+// }
 
-export interface OutboundThirdpartyAuthorizationsPostRequest extends InboundThirdpartyAuthorizationsPutRequest {
+export interface OutboundThirdpartyAuthorizationsPostRequest extends tpAPI.Schemas.ThirdpartyRequestsTransactionsIDAuthorizationsPostRequest {
   toParticipantId: string;
 }
 
-export interface OutboundThirdpartyAuthorizationsPostResponse extends InboundThirdpartyAuthorizationsPutRequest {
+export interface OutboundThirdpartyAuthorizationsPostResponse extends tpAPI.Schemas.ThirdpartyRequestsTransactionsIDAuthorizationsPutResponse {
   currentState: OutboundThirdpartyAuthorizationsModelState;
 }
 
@@ -69,6 +72,6 @@ export interface OutboundThirdpartyAuthorizationsModelConfig extends PersistentM
 
 export interface OutboundThirdpartyAuthorizationsData extends StateData {
   toParticipantId: string
-  request: PostThirdpartyRequestsTransactionsAuthorizationsRequest
+  request: tpAPI.Schemas.ThirdpartyRequestsTransactionsIDAuthorizationsPostRequest
   response?: OutboundThirdpartyAuthorizationsPostResponse
 }

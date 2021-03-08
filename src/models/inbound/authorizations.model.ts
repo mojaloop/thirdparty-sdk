@@ -28,17 +28,14 @@
 
 import { BackendRequests } from './backend-requests'
 import {
-  AuthenticationType,
-  AuthorizationResponse,
-  InboundAuthorizationsPostRequest,
-  InboundAuthorizationsPutRequest
-} from '~/models/authorizations.interface'
-import {
   Logger as SDKLogger,
   MojaloopRequests,
-  Errors,
-  TErrorInformationObject
+  Errors
 } from '@mojaloop/sdk-standard-components'
+import {
+  v1_1 as fspiopAPI,
+  thirdparty as tpAPI
+} from '@mojaloop/api-snippets'
 import { HTTPResponseError } from '~/shared/http-response-error'
 
 export interface InboundAuthorizationsModelConfig {
@@ -67,7 +64,7 @@ export class InboundAuthorizationsModel {
   }
 
   async postAuthorizations (
-    inRequest: InboundAuthorizationsPostRequest,
+    inRequest: tpAPI.Schemas.AuthorizationsPostRequest,
     srcDfspId: string
   ): Promise<void> {
     try {
@@ -75,12 +72,12 @@ export class InboundAuthorizationsModel {
       if (!authenticationValue) {
         throw new Error('no-authentication-value')
       }
-      const authorizationPutPayload: InboundAuthorizationsPutRequest = {
+      const authorizationPutPayload: fspiopAPI.Schemas.AuthorizationsIDPutResponse = {
         authenticationInfo: {
-          authentication: AuthenticationType.U2F,
+          authentication: 'U2F',
           authenticationValue
         },
-        responseType: AuthorizationResponse.ENTERED
+        responseType: 'ENTERED'
       }
       await this.mojaloopRequests.putAuthorizations(
         inRequest.transactionRequestId,
@@ -93,7 +90,7 @@ export class InboundAuthorizationsModel {
       this.logger.push({ mojaloopError }).info(`Sending error response to ${srcDfspId}`)
       await this.mojaloopRequests.putAuthorizationsError(
         inRequest.transactionRequestId,
-        mojaloopError as unknown as TErrorInformationObject,
+        mojaloopError as unknown as fspiopAPI.Schemas.ErrorInformationObject,
         srcDfspId
       )
     }

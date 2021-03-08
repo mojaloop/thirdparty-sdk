@@ -37,9 +37,8 @@ import {
   create
 } from '~/models/outbound/authorizations.model'
 import {
-  TMoney,
-  TQuotesIDPutResponse
-} from '@mojaloop/sdk-standard-components'
+  v1_1 as fspiopAPI
+} from '@mojaloop/api-snippets'
 import { Request, ResponseObject } from '@hapi/hapi'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -54,8 +53,8 @@ async function post (_context: any, request: Request, h: StateResponseToolkit): 
       retriesLeft: payload.retriesLeft,
       transactionId: payload.transactionId,
       transactionRequestId: payload.transactionRequestId,
-      amount: payload.amount as TMoney,
-      quote: payload.quote as unknown as TQuotesIDPutResponse
+      amount: payload.amount as fspiopAPI.Schemas.Money,
+      quote: payload.quote as unknown as fspiopAPI.Schemas.QuotesIDPutResponse
     },
     currentState: 'start'
   }

@@ -28,14 +28,16 @@
  ******/
 import {
   ThirdpartyRequests,
-  MojaloopRequests,
-  TMoney, TParty, TAmountType, TransactionType
+  MojaloopRequests
 } from '@mojaloop/sdk-standard-components'
+import {
+  v1_1 as fspiopAPI,
+  thirdparty as tpAPI
+} from '@mojaloop/api-snippets'
 import { Method } from 'javascript-state-machine'
 import { ErrorInformation } from '~/interface/types'
 import { ControlledStateMachine, PersistentModelConfig, StateData } from '~/models/persistent.model'
 import { PubSub } from '~/shared/pub-sub'
-import { InboundAuthorizationsPostRequest, InboundAuthorizationsPutRequest } from './authorizations.interface'
 import { BackendRequests } from './inbound/backend-requests'
 
 export enum RequestPartiesInformationState {
@@ -45,7 +47,7 @@ export enum RequestPartiesInformationState {
 }
 
 export interface RequestPartiesInformationResponse {
-  party?: TParty
+  party?: fspiopAPI.Schemas.Party
   currentState: RequestPartiesInformationState
   errorInformation?: ErrorInformation
 }
@@ -98,7 +100,7 @@ export interface ThirdpartyTransactionPartyLookupRequest {
 }
 
 export interface ThirdpartyTransactionPartyLookupResponse {
-  party?: TParty
+  party?: fspiopAPI.Schemas.Party
   errorInformation?: ErrorInformation
   currentState: PISPTransactionModelState
 }
@@ -106,16 +108,16 @@ export interface ThirdpartyTransactionPartyLookupResponse {
 export interface ThirdpartyTransactionInitiateRequest {
   sourceAccountId: string
   consentId: string
-  payee: TParty
-  payer: TParty
-  amountType: TAmountType
-  amount: TMoney
-  transactionType: TransactionType
+  payee: fspiopAPI.Schemas.Party
+  payer: fspiopAPI.Schemas.Party
+  amountType: fspiopAPI.Schemas.AmountType
+  amount: fspiopAPI.Schemas.Money
+  transactionType: fspiopAPI.Schemas.TransactionType
   expiration: string
 }
 
 export interface ThirdpartyTransactionInitiateResponse {
-  authorization: InboundAuthorizationsPostRequest
+  authorization: tpAPI.Schemas.AuthorizationsPostRequest
   currentState: PISPTransactionModelState
 }
 
@@ -130,7 +132,7 @@ export interface ThirdpartyTransactionApproveResponse {
 }
 
 export interface ThirdpartyTransactionApproveRequest {
-  authorizationResponse: InboundAuthorizationsPutRequest
+  authorizationResponse: fspiopAPI.Schemas.AuthorizationsIDPutResponse
 }
 
 export interface PISPTransactionData extends StateData {
@@ -143,7 +145,7 @@ export interface PISPTransactionData extends StateData {
 
   // initiate
   initiateRequest?: ThirdpartyTransactionInitiateRequest
-  authorizationRequest?: InboundAuthorizationsPostRequest
+  authorizationRequest?: tpAPI.Schemas.AuthorizationsPostRequest
   initiateResponse?: ThirdpartyTransactionInitiateResponse
 
   // approve

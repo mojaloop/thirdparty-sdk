@@ -24,26 +24,14 @@
  - Paweł Marzec <pawel.marzec@modusbox.com>
  --------------
  ******/
-import { PostAuthorizationsRequest, ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
+import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
+import {
+  v1_1 as fspiopAPI,
+  thirdparty as tpAPI
+} from '@mojaloop/api-snippets'
 import { Method } from 'javascript-state-machine'
 import { PubSub } from '~/shared/pub-sub'
 import { ControlledStateMachine, PersistentModelConfig, StateData } from './persistent.model'
-
-export enum AuthenticationType {
-  OTP = 'OTP',
-  QRCODE = 'QRCODE',
-  U2F = 'U2F'
-}
-
-export interface AuthenticationValue {
-  pinValue: string
-  counter: string
-}
-
-export interface AuthenticationInfo {
-  authentication: AuthenticationType
-  authenticationValue: AuthenticationValue | string
-}
 
 export enum AuthorizationResponse {
   ENTERED = 'ENTERED',
@@ -57,31 +45,7 @@ export enum OutboundAuthorizationsModelState {
   errored = 'ERROR_OCCURRED'
 }
 
-export interface InboundAuthorizationsPutRequest {
-  authenticationInfo: AuthenticationInfo;
-  responseType: AuthorizationResponse;
-}
-export interface InboundAuthorizationsPostRequest {
-  authenticationType: string
-  retriesLeft: string
-  amount: {
-    currency: string
-    amount: string
-  },
-  transactionId: string
-  transactionRequestId: string
-  quote: {
-    transferAmount: {
-      currency: string
-      amount: string
-    },
-    expiration: string
-    ilpPacket: string
-    condition: string
-  }
-}
-
-export interface OutboundAuthorizationsPostResponse extends InboundAuthorizationsPutRequest {
+export interface OutboundAuthorizationsPostResponse extends fspiopAPI.Schemas.AuthorizationsIDPutResponse {
   currentState: OutboundAuthorizationsModelState;
 }
 
@@ -97,10 +61,10 @@ export interface OutboundAuthorizationsModelConfig extends PersistentModelConfig
 
 export interface OutboundAuthorizationData extends StateData {
   toParticipantId: string
-  request: PostAuthorizationsRequest
+  request: tpAPI.Schemas.AuthorizationsPostRequest
   response?: OutboundAuthorizationsPostResponse
 }
 
-export interface OutboundAuthorizationsPostRequest extends InboundAuthorizationsPostRequest {
+export interface OutboundAuthorizationsPostRequest extends tpAPI.Schemas.AuthorizationsPostRequest {
   toParticipantId: string
 }
