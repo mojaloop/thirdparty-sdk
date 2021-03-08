@@ -83,6 +83,7 @@
     "@mojaloop/central-services-metrics": "^9.5.0",
     "@mojaloop/central-services-shared": "^11.5.5",
     "@mojaloop/sdk-standard-components": "^15.0.2",
+    "@mojaloop/api-snippets": "^12.0.8",
     "@types/axios": "^0.14.0",
     "@types/convict": "^5.2.2",
     "@types/hapi": "^18.0.5",
