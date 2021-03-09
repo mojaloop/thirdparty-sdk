@@ -1,4 +1,16 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+## [11.24.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.23.0...v11.24.0) (2021-03-09)
+
+
+### Features
+
+* Update Inbound & Outbound API defs and typescript definitions ([#52](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/52)) ([8235c3d](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/8235c3dcce02538d2f7104c37fefa19bfd771f0d))
+
+
+### Maintenance
+
+* disable circleci audit-licenses and license-scan ([#54](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/54)) ([57bd740](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/57bd7400674b77ec26ef6714c93329902438b952))
+
 ## [11.23.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.22.0...v11.23.0) (2021-03-08)
 
 
