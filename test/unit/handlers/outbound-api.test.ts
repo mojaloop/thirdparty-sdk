@@ -28,17 +28,16 @@
  ******/
 
 import {
-  AuthorizationResponse,
-  AuthenticationType,
-  InboundAuthorizationsPostRequest,
-  InboundAuthorizationsPutRequest,
   OutboundAuthorizationsModelState
 } from '~/models/authorizations.interface'
+import {
+  v1_1 as fspiopAPI,
+  thirdparty as tpAPI
+} from '@mojaloop/api-snippets'
 import { HealthResponse } from '~/interface/types'
 import { NotificationCallback, Message, PubSub } from '~/shared/pub-sub'
 import {
-  OutboundThirdpartyAuthorizationsModelState,
-  InboundThirdpartyAuthorizationsPutRequest
+  OutboundThirdpartyAuthorizationsModelState
 } from '~/models/thirdparty.authorizations.interface'
 import {
   RequestPartiesInformationResponse,
@@ -57,17 +56,17 @@ import index from '~/index'
 import path from 'path'
 import SDK from '@mojaloop/sdk-standard-components'
 
-const putResponse: InboundAuthorizationsPutRequest = {
+const putResponse: fspiopAPI.Schemas.AuthorizationsIDPutResponse = {
   authenticationInfo: {
-    authentication: AuthenticationType.U2F,
+    authentication: 'U2F',
     authenticationValue: {
       pinValue: 'the-mocked-pin-value',
       counter: '1'
-    }
+    } as fspiopAPI.Schemas.AuthenticationValue
   },
-  responseType: AuthorizationResponse.ENTERED
+  responseType: 'ENTERED'
 }
-const putThirdpartyAuthResponse: InboundThirdpartyAuthorizationsPutRequest = {
+const putThirdpartyAuthResponse: tpAPI.Schemas.ThirdpartyRequestsTransactionsIDAuthorizationsPutResponse = {
   challenge: 'challenge',
   consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
   sourceAccountId: 'dfspa.alice.1234',
@@ -94,7 +93,7 @@ const partyLookupResponse: RequestPartiesInformationResponse = {
   },
   currentState: RequestPartiesInformationState.COMPLETED
 }
-const initiateResponse: InboundAuthorizationsPostRequest = {
+const initiateResponse: tpAPI.Schemas.AuthorizationsPostRequest = {
   authenticationType: 'U2F',
   retriesLeft: '1',
   amount: {

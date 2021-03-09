@@ -1,0 +1,32 @@
+post:
+  operationId: OutboundAuthorizationsPost
+  summary: Outbound Authorizations endpoint
+  description: DFSP Requests Authorization of Transaction from the End User
+  tags:
+    - authorizations
+  requestBody:
+    description: Authorization request details
+    required: true
+    content:
+      application/json:
+        schema: 
+          $ref: '../components/schemas/AuthorizationsRequest.yaml'
+  responses:
+    '200':
+      $ref: '../components/responses/AuthorizationsResponse.yaml'
+    '400':
+      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/400.yaml'
+    '401':
+      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/401.yaml'
+    '403':
+      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/403.yaml'
+    '404':
+      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/404.yaml'
+    '405':
+      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/405.yaml'
+    '406':
+      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/406.yaml'
+    '501':
+      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/501.yaml'
+    '503':
+      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/503.yaml'

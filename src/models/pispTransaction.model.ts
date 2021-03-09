@@ -27,15 +27,16 @@
  --------------
  ******/
 import { Message, PubSub } from '~/shared/pub-sub'
-import { InboundAuthorizationsPostRequest } from './authorizations.interface'
 import { PersistentModel } from '~/models/persistent.model'
 import { StateMachineConfig } from 'javascript-state-machine'
 import {
   MojaloopRequests,
-  PutAuthorizationRequest,
-  PostThirdPartyRequestTransactionsRequest,
   ThirdpartyRequests
 } from '@mojaloop/sdk-standard-components'
+import {
+  v1_1 as fspiopAPI,
+  thirdparty as tpAPI
+} from '@mojaloop/api-snippets'
 import {
   PayeeLookupRequest,
   PISPTransactionData,
@@ -196,7 +197,7 @@ export class PISPTransactionModel
           // first unsubscribe
           this.pubSub.unsubscribe(channel, sid)
 
-          this.data.authorizationRequest = { ...message as unknown as InboundAuthorizationsPostRequest }
+          this.data.authorizationRequest = { ...message as unknown as tpAPI.Schemas.AuthorizationsPostRequest }
           this.data.initiateResponse = {
             authorization: { ...this.data.authorizationRequest },
             currentState: PISPTransactionModelState[
@@ -207,7 +208,7 @@ export class PISPTransactionModel
           // state machine should be in authorizationReceived state
         })
 
-        const request: PostThirdPartyRequestTransactionsRequest = {
+        const request: tpAPI.Schemas.ThirdpartyRequestsTransactionsPostRequest = {
           transactionRequestId: this.data?.transactionRequestId as string,
           ...this.data?.initiateRequest as ThirdpartyTransactionInitiateRequest
         }
@@ -259,7 +260,7 @@ export class PISPTransactionModel
         const res = await this.mojaloopRequests.putAuthorizations(
           this.data?.transactionRequestId as string,
           // propagate signed challenge
-          this.data?.approveRequest?.authorizationResponse as PutAuthorizationRequest,
+          this.data?.approveRequest?.authorizationResponse as fspiopAPI.Schemas.AuthorizationsIDPutResponse,
           this.data?.initiateRequest?.payer.partyIdInfo.fspId as string
         )
         this.logger.push({ res }).info('ThirdpartyRequests.postThirdpartyRequestsTransactions request sent to peer')

@@ -26,13 +26,15 @@
  ******/
 
 import {
-  InboundAuthorizationsPutRequest,
   OutboundAuthorizationsPostResponse,
   OutboundAuthorizationsModelConfig,
   OutboundAuthorizationsModelState,
   OutboundAuthorizationData,
   OutboundAuthorizationStateMachine
 } from '~/models/authorizations.interface'
+import {
+  v1_1 as fspiopAPI
+} from '@mojaloop/api-snippets'
 
 import { PersistentModel } from '~/models/persistent.model'
 import { StateMachineConfig } from 'javascript-state-machine'
@@ -105,7 +107,7 @@ export class OutboundAuthorizationsModel
 
           // TODO: investigate PubSub subscribe method and callback
           // should be a generic so casting here would be not necessary...
-          const putResponse = { ...message as unknown as InboundAuthorizationsPutRequest }
+          const putResponse = { ...message as unknown as fspiopAPI.Schemas.AuthorizationsIDPutResponse }
 
           // store response which will be returned by 'getResponse' method in workflow 'run'
           this.data.response = {

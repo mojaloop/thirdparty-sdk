@@ -28,6 +28,9 @@
 import { ThirdpartyTransactionRequest, QuoteRequest } from '../../interface/types'
 import { uuid } from 'uuidv4'
 import SDK from '@mojaloop/sdk-standard-components'
+import {
+  v1_1 as fspiopAPI
+} from '@mojaloop/api-snippets'
 
 export function buildPayeeQuoteRequestFromTptRequest (request: ThirdpartyTransactionRequest): QuoteRequest {
   const quoteRequest = {
@@ -51,7 +54,7 @@ export async function forwardPostQuoteRequestToPayee (
   const quote = buildPayeeQuoteRequestFromTptRequest(request)
 
   // payee fspid should be defined due to a prior GET /parties call.
-  mojaloopRequests.postQuotes(quote as unknown as SDK.PostQuoteRequest, <string> quote.payee.partyIdInfo.fspId)
+  mojaloopRequests.postQuotes(quote as unknown as fspiopAPI.Schemas.QuotesPostRequest, <string> quote.payee.partyIdInfo.fspId)
 }
 
 // todo: create dfsp outbound calls for these checks.
