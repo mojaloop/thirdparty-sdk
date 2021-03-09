@@ -6,7 +6,6 @@ post:
   tags:
     - thirdpartyRequests
   parameters:
-    #Path
     - $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/ID.yaml'
   requestBody:
     description: The thirdparty authorization details to verify

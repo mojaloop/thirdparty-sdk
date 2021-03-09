@@ -260,6 +260,7 @@ jobs:
       - store_artifacts:
           path: ./audit/results
 
+  # temporarily disbaled as api-snippets is not compatible with existing license policy 
   # audit-licenses:
   #   executor: default-docker
   #   steps:

@@ -115,7 +115,7 @@ const putResponse: fspiopAPI.Schemas.AuthorizationsIDPutResponse = {
     authenticationValue: {
       pinValue: 'the-mocked-pin-value',
       counter: '1'
-    } as any
+    } as fspiopAPI.Schemas.AuthenticationValue
   },
   responseType: 'ENTERED'
 }

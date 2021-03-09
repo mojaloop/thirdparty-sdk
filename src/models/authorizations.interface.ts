@@ -33,12 +33,6 @@ import { Method } from 'javascript-state-machine'
 import { PubSub } from '~/shared/pub-sub'
 import { ControlledStateMachine, PersistentModelConfig, StateData } from './persistent.model'
 
-export enum AuthorizationResponse {
-  ENTERED = 'ENTERED',
-  REJECTED = 'REJECTED',
-  RESEND = 'RESEND'
-}
-
 export enum OutboundAuthorizationsModelState {
   start = 'WAITING_FOR_AUTHORIZATION_REQUEST',
   succeeded = 'COMPLETED',

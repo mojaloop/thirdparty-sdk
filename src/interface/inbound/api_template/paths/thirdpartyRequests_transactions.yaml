@@ -1,4 +1,4 @@
-# todo: uncomment parameters after header middleware simalar to `sdk-scheme-adapter` is checked in
+# todo: uncomment parameters after header middleware similar to `sdk-scheme-adapter` is checked in
 #parameters:
 # - $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/ID.yaml'
 # - $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/Content-Type.yaml'

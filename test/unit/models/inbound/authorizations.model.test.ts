@@ -123,7 +123,7 @@ describe('InboundAuthorizationModel', () => {
       const authorizationPutPayload: fspiopAPI.Schemas.AuthorizationsIDPutResponse = {
         authenticationInfo: {
           authentication: 'U2F',
-          authenticationValue: authenticationValue as any
+          authenticationValue: authenticationValue as fspiopAPI.Schemas.AuthenticationValue
         },
         responseType: 'ENTERED'
       }

@@ -44,14 +44,6 @@ export enum OutboundThirdpartyAuthorizationsModelState {
   errored = 'ERROR_OCCURRED'
 }
 
-// export interface InboundThirdpartyAuthorizationsPutRequest {
-//   challenge: string;
-//   consentId: string;
-//   sourceAccountId: string;
-//   status: 'PENDING' | 'VERIFIED';
-//   value: string;
-// }
-
 export interface OutboundThirdpartyAuthorizationsPostRequest extends tpAPI.Schemas.ThirdpartyRequestsTransactionsIDAuthorizationsPostRequest {
   toParticipantId: string;
 }

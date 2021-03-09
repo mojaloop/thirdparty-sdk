@@ -499,9 +499,7 @@ export interface components {
     Longitude: string;
     /** Data model for the complex type GeoCode. Indicates the geographic location from where the transaction was initiated. */
     GeoCode: {
-      /** Latitude of the Party. */
       latitude: components["schemas"]["Latitude"];
-      /** Longitude of the Party. */
       longitude: components["schemas"]["Longitude"];
     };
     /** Information for recipient (transport layer information). */
@@ -524,23 +522,14 @@ export interface components {
     };
     /** The object sent in the PUT /quotes/{ID} callback. */
     QuotesIDPutResponse: {
-      /** The amount of money that the Payee FSP should receive. */
       transferAmount: components["schemas"]["Money"];
-      /** The amount of Money that the Payee should receive in the end-to-end transaction. Optional as the Payee FSP might not want to disclose any optional Payee fees. */
       payeeReceiveAmount?: components["schemas"]["Money"];
-      /** Payee FSP’s part of the transaction fee. */
       payeeFspFee?: components["schemas"]["Money"];
-      /** Transaction commission from the Payee FSP. */
       payeeFspCommission?: components["schemas"]["Money"];
-      /** Date and time until when the quotation is valid and can be honored when used in the subsequent transaction. */
       expiration: components["schemas"]["DateTime"];
-      /** Longitude and Latitude of the Payee. Can be used to detect fraud. */
       geoCode?: components["schemas"]["GeoCode"];
-      /** The ILP Packet that must be attached to the transfer by the Payer. */
       ilpPacket: components["schemas"]["IlpPacket"];
-      /** The condition that must be attached to the transfer by the Payer. */
       condition: components["schemas"]["IlpCondition"];
-      /** Optional extension, specific to deployment. */
       extensionList?: components["schemas"]["ExtensionList-2"];
     };
     /** POST /authorizations Request object */
@@ -579,9 +568,7 @@ export interface components {
       Partial<components["schemas"]["U2FPinValue"]>;
     /** Data model for the complex type AuthenticationInfo. */
     AuthenticationInfo: {
-      /** Type of authentication. */
       authentication: components["schemas"]["AuthenticationType"];
-      /** Authentication value. */
       authenticationValue: components["schemas"]["AuthenticationValue"];
     };
     /**
@@ -593,9 +580,7 @@ export interface components {
     AuthorizationResponse: "ENTERED" | "REJECTED" | "RESEND";
     /** The object sent in the PUT /authorizations/{ID} callback. */
     AuthorizationsIDPutResponse: {
-      /** OTP or QR Code if entered, otherwise empty. */
       authenticationInfo?: components["schemas"]["AuthenticationInfo"];
-      /** Enum containing response information; if the customer entered the authentication value, rejected the transaction, or requested a resend of the authentication value. */
       responseType: components["schemas"]["AuthorizationResponse"];
     };
     /**
@@ -811,6 +796,8 @@ export interface components {
       /** The status of the authorization. This value must be `VERIFIED` for a PUT request. */
       status: "VERIFIED";
     };
+    /** Identifier that correlates all messages of the same sequence. The API data type UUID (Universally Unique Identifier) is a JSON String in canonical format, conforming to [RFC 4122](https://tools.ietf.org/html/rfc4122), that is restricted by a regular expression for interoperability reasons. A UUID is always 36 characters long, 32 hexadecimal symbols and 4 dashes (‘-‘). */
+    "CorrelationId-2": string;
     /**
      * Below are the allowed values for the enumeration.
      * - RECEIVED - Payer FSP has received the transaction from the Payee FSP.
@@ -821,7 +808,7 @@ export interface components {
     TransactionRequestState: "RECEIVED" | "PENDING" | "ACCEPTED" | "REJECTED";
     /** The object sent in the PATCH /thirdpartyRequests/transactions/{ID} callback. */
     ThirdpartyRequestsTransactionsIDPatchResponse: {
-      transactionId: components["schemas"]["CorrelationId"];
+      transactionId: components["schemas"]["CorrelationId-2"];
       transactionRequestState: components["schemas"]["TransactionRequestState"];
     };
     /** Data model for the complex type object that contains ErrorInformation. */

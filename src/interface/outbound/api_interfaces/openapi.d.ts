@@ -397,9 +397,7 @@ export interface components {
     Longitude: string;
     /** Data model for the complex type GeoCode. Indicates the geographic location from where the transaction was initiated. */
     GeoCode: {
-      /** Latitude of the Party. */
       latitude: components["schemas"]["Latitude"];
-      /** Longitude of the Party. */
       longitude: components["schemas"]["Longitude"];
     };
     /** Information for recipient (transport layer information). */
@@ -422,23 +420,14 @@ export interface components {
     };
     /** The object sent in the PUT /quotes/{ID} callback. */
     QuotesIDPutResponse: {
-      /** The amount of money that the Payee FSP should receive. */
       transferAmount: components["schemas"]["Money"];
-      /** The amount of Money that the Payee should receive in the end-to-end transaction. Optional as the Payee FSP might not want to disclose any optional Payee fees. */
       payeeReceiveAmount?: components["schemas"]["Money"];
-      /** Payee FSP’s part of the transaction fee. */
       payeeFspFee?: components["schemas"]["Money"];
-      /** Transaction commission from the Payee FSP. */
       payeeFspCommission?: components["schemas"]["Money"];
-      /** Date and time until when the quotation is valid and can be honored when used in the subsequent transaction. */
       expiration: components["schemas"]["DateTime"];
-      /** Longitude and Latitude of the Payee. Can be used to detect fraud. */
       geoCode?: components["schemas"]["GeoCode"];
-      /** The ILP Packet that must be attached to the transfer by the Payer. */
       ilpPacket: components["schemas"]["IlpPacket"];
-      /** The condition that must be attached to the transfer by the Payer. */
       condition: components["schemas"]["IlpCondition"];
-      /** Optional extension, specific to deployment. */
       extensionList?: components["schemas"]["ExtensionList-2"];
     };
     /** POST /authorizations Request object */
@@ -498,15 +487,10 @@ export interface components {
     FspId: string;
     /** Data model for the complex type PartyIdInfo. An ExtensionList element has been added to this reqeust in version v1.1 */
     PartyIdInfo: {
-      /** Type of the identifier. */
       partyIdType: components["schemas"]["PartyIdType"];
-      /** An identifier for the Party. */
       partyIdentifier: components["schemas"]["PartyIdentifier"];
-      /** A sub-identifier or sub-type for the Party. */
       partySubIdOrType?: components["schemas"]["PartySubIdOrType"];
-      /** FSP ID (if known). */
       fspId?: components["schemas"]["FspId"];
-      /** Optional extension, specific to deployment. */
       extensionList?: components["schemas"]["ExtensionList-2"];
     };
     /** Thirdparty transaction party lookup request */
@@ -570,13 +554,9 @@ export interface components {
       | "transactionSuccess";
     /** Data model for the complex type Party. */
     Party: {
-      /** Party Id type, id, sub ID or type, and FSP Id. */
       partyIdInfo: components["schemas"]["PartyIdInfo"];
-      /** Used in the context of Payee Information, where the Payee happens to be a merchant accepting merchant payments. */
       merchantClassificationCode?: components["schemas"]["MerchantClassificationCode"];
-      /** Display name of the Party, could be a real name or a nick name. */
       name?: components["schemas"]["PartyName"];
-      /** Personal information used to verify identity of Party such as first, middle, last name and date of birth. */
       personalInfo?: components["schemas"]["PartyPersonalInfo"];
     };
     /**
@@ -679,21 +659,26 @@ export interface components {
       Partial<components["schemas"]["U2FPinValue"]>;
     /** Data model for the complex type AuthenticationInfo. */
     "AuthenticationInfo-2": {
-      /** Type of authentication. */
       authentication: components["schemas"]["AuthenticationType"];
-      /** Authentication value. */
       authenticationValue: components["schemas"]["AuthenticationValue"];
     };
+    /**
+     * Below are the allowed values for the enumeration.
+     * - ENTERED - Consumer entered the authentication value.
+     * - REJECTED - Consumer rejected the transaction.
+     * - RESEND - Consumer requested to resend the authentication value.
+     */
+    "AuthorizationResponse-2": "ENTERED" | "REJECTED" | "RESEND";
     /** The object sent in the PUT /authorizations/{ID} callback. */
     AuthorizationsIDPutResponse: {
-      /** OTP or QR Code if entered, otherwise empty. */
       authenticationInfo?: components["schemas"]["AuthenticationInfo-2"];
-      /** Enum containing response information; if the customer entered the authentication value, rejected the transaction, or requested a resend of the authentication value. */
-      responseType: components["schemas"]["AuthorizationResponse"];
+      responseType: components["schemas"]["AuthorizationResponse-2"];
     };
     ThirdpartyTransactionApproveRequest: {
       authorizationResponse?: components["schemas"]["AuthorizationsIDPutResponse"];
     };
+    /** Identifier that correlates all messages of the same sequence. The API data type UUID (Universally Unique Identifier) is a JSON String in canonical format, conforming to [RFC 4122](https://tools.ietf.org/html/rfc4122), that is restricted by a regular expression for interoperability reasons. A UUID is always 36 characters long, 32 hexadecimal symbols and 4 dashes (‘-‘). */
+    "CorrelationId-2": string;
     /**
      * Below are the allowed values for the enumeration.
      * - RECEIVED - Payer FSP has received the transaction from the Payee FSP.
@@ -836,7 +821,6 @@ export interface components {
             merchantClassificationCode?: components["schemas"]["MerchantClassificationCode"];
             name?: components["schemas"]["PartyName"];
             personalInfo?: components["schemas"]["PartyPersonalInfo"];
-            /** List of accounts associated with the party containing and DFSP routable address, currency identifier and description. */
             accounts?: components["schemas"]["AccountList"];
           };
           currentState?: components["schemas"]["ThirdpartyTransactionState"];
@@ -857,7 +841,7 @@ export interface components {
       content: {
         "application/json": {
           transactionStatus?: {
-            transactionId?: components["schemas"]["CorrelationId"];
+            transactionId?: components["schemas"]["CorrelationId-2"];
             transactionRequestState?: components["schemas"]["TransactionRequestState"];
           };
           currentState?: components["schemas"]["ThirdpartyTransactionState"];
