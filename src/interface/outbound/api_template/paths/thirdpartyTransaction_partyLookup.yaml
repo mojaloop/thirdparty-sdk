@@ -16,18 +16,18 @@ post:
     '200':
       $ref: '../components/responses/ThirdpartyTransactionPartyLookupResponse.yaml'
     '400':
-      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/400.yaml'
+      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/400.yaml'
     '401':
-      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/401.yaml'
+      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/401.yaml'
     '403':
-      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/403.yaml'
+      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/403.yaml'
     '404':
-      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/404.yaml'
+      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/404.yaml'
     '405':
-      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/405.yaml'
+      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/405.yaml'
     '406':
-      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/406.yaml'
+      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/406.yaml'
     '501':
-      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/501.yaml'
+      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/501.yaml'
     '503':
-      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/503.yaml'
+      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/503.yaml'

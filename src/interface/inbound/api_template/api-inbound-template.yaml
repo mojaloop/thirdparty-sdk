@@ -19,8 +19,6 @@ paths:
     $ref: paths/health.yaml
   '/metrics':
     $ref: paths/metrics.yaml
-  '/hello':
-    $ref: paths/hello.yaml
   '/authorizations':
     $ref: paths/authorizations.yaml
   '/authorizations/{ID}':

@@ -69,32 +69,6 @@ paths:
       operationId: MetricsGet
       summary: Prometheus metrics endpoint
       description: The HTTP request GET /metrics is used to return metrics for the API.
-  /hello:
-    get:
-      tags:
-        - health
-      responses:
-        '200':
-          $ref: '#/components/responses/200'
-        '400':
-          $ref: '#/components/responses/400'
-        '401':
-          $ref: '#/components/responses/401'
-        '403':
-          $ref: '#/components/responses/403'
-        '404':
-          $ref: '#/components/responses/404'
-        '405':
-          $ref: '#/components/responses/405'
-        '406':
-          $ref: '#/components/responses/406'
-        '501':
-          $ref: '#/components/responses/501'
-        '503':
-          $ref: '#/components/responses/503'
-      operationId: HelloGet
-      summary: example get
-      description: The HTTP request GET /hello is used to return some example json.
   /authorizations:
     post:
       operationId: OutboundAuthorizationsPost
@@ -436,7 +410,7 @@ components:
                 type: object
                 properties:
                   transactionId:
-                    $ref: '#/components/schemas/CorrelationId-2'
+                    $ref: '#/components/schemas/CorrelationId'
                   transactionRequestState:
                     $ref: '#/components/schemas/TransactionRequestState'
               currentState:
@@ -468,17 +442,46 @@ components:
         The `Content-Type` header indicates the specific version of the API used
         to send the payload body.
   schemas:
+    ErrorCode:
+      title: ErrorCode
+      type: string
+      pattern: '^[1-9]\d{3}$'
+      description: >-
+        The API data type ErrorCode is a JSON String of four characters,
+        consisting of digits only. Negative numbers are not allowed. A leading
+        zero is not allowed. Each error code in the API is a four-digit number,
+        for example, 1234, where the first number (1 in the example) represents
+        the high-level error category, the second number (2 in the example)
+        represents the low-level error category, and the last two numbers (34 in
+        the example) represent the specific error.
+      example: '5100'
+    ErrorDescription:
+      title: ErrorDescription
+      type: string
+      minLength: 1
+      maxLength: 128
+      description: Error description string.
+    ExtensionKey:
+      title: ExtensionKey
+      type: string
+      minLength: 1
+      maxLength: 32
+      description: Extension key.
+    ExtensionValue:
+      title: ExtensionValue
+      type: string
+      minLength: 1
+      maxLength: 128
+      description: Extension value.
     Extension:
       title: Extension
       type: object
       description: Data model for the complex type Extension.
       properties:
         key:
-          type: string
-          description: Extension key.
+          $ref: '#/components/schemas/ExtensionKey'
         value:
-          type: string
-          description: Extension value.
+          $ref: '#/components/schemas/ExtensionValue'
       required:
         - key
         - value
@@ -504,13 +507,9 @@ components:
       description: Data model for the complex type ErrorInformation.
       properties:
         errorCode:
-          type: string
-          description: Specific error number.
-          example: 5100
+          $ref: '#/components/schemas/ErrorCode'
         errorDescription:
-          type: string
-          description: Error description string.
-          example: This is an error description.
+          $ref: '#/components/schemas/ErrorDescription'
         extensionList:
           $ref: '#/components/schemas/ExtensionList'
       required:
@@ -825,46 +824,6 @@ components:
       pattern: '^[A-Za-z0-9-_]{43}$'
       maxLength: 48
       description: Condition that must be attached to the transfer by the Payer.
-    ExtensionKey:
-      title: ExtensionKey
-      type: string
-      minLength: 1
-      maxLength: 32
-      description: Extension key.
-    ExtensionValue:
-      title: ExtensionValue
-      type: string
-      minLength: 1
-      maxLength: 128
-      description: Extension value.
-    Extension-2:
-      title: Extension
-      type: object
-      description: Data model for the complex type Extension.
-      properties:
-        key:
-          $ref: '#/components/schemas/ExtensionKey'
-        value:
-          $ref: '#/components/schemas/ExtensionValue'
-      required:
-        - key
-        - value
-    ExtensionList-2:
-      title: ExtensionList
-      type: object
-      description: >-
-        Data model for the complex type ExtensionList. An optional list of
-        extensions, specific to deployment.
-      properties:
-        extension:
-          type: array
-          items:
-            $ref: '#/components/schemas/Extension-2'
-          minItems: 1
-          maxItems: 16
-          description: Number of Extension elements.
-      required:
-        - extension
     QuotesIDPutResponse:
       title: QuotesIDPutResponse
       type: object
@@ -887,7 +846,7 @@ components:
         condition:
           $ref: '#/components/schemas/IlpCondition'
         extensionList:
-          $ref: '#/components/schemas/ExtensionList-2'
+          $ref: '#/components/schemas/ExtensionList'
       required:
         - transferAmount
         - expiration
@@ -920,19 +879,81 @@ components:
         - transactionRequestId
         - quote
       additionalProperties: false
+    AuthenticationType:
+      title: AuthenticationType
+      type: string
+      enum:
+        - OTP
+        - QRCODE
+        - U2F
+      description: |-
+        Below are the allowed values for the enumeration AuthenticationType.
+        - OTP - One-time password generated by the Payer FSP.
+        - QRCODE - QR code used as One Time Password.
+        - U2F - U2F is a new addition isolated to Thirdparty stream.
+      example: OTP
+    OtpValue:
+      title: OtpValue
+      type: string
+      pattern: '^\d{3,10}$'
+      description: >-
+        The API data type OtpValue is a JSON String of 3 to 10 characters,
+        consisting of digits only. Negative numbers are not allowed. One or more
+        leading zeros are allowed.
+    QRCODE:
+      title: QRCODE
+      type: string
+      minLength: 1
+      maxLength: 64
+      description: QR code used as a One Time Password.
+    U2FPIN:
+      title: U2FPIN
+      type: string
+      pattern: '^\S{1,64}$'
+      minLength: 1
+      maxLength: 64
+      description: >
+        U2F challenge-response, where payer FSP verifies if the response
+        provided by end-user device matches the previously registered key.
+    U2FPinValue:
+      title: U2FPinValue
+      type: object
+      description: >
+        U2F challenge-response, where payer FSP verifies if the response
+        provided by end-user device matches the previously registered key.
+      properties:
+        pinValue:
+          allOf:
+            - $ref: '#/components/schemas/U2FPIN'
+          description: U2F challenge-response.
+        counter:
+          allOf:
+            - $ref: '#/components/schemas/Integer'
+          description: >-
+            Sequential counter used for cloning detection. Present only for U2F
+            authentication.
+      required:
+        - pinValue
+        - counter
+    AuthenticationValue:
+      title: AuthenticationValue
+      anyOf:
+        - $ref: '#/components/schemas/OtpValue'
+        - $ref: '#/components/schemas/QRCODE'
+        - $ref: '#/components/schemas/U2FPinValue'
+      pattern: '^\d{3,10}$|^\S{1,64}$'
+      description: >-
+        Contains the authentication value. The format depends on the
+        authentication type used in the AuthenticationInfo complex type.
     AuthenticationInfo:
       title: AuthenticationInfo
       type: object
       description: Data model for the complex type AuthenticationInfo.
       properties:
         authentication:
-          type: string
-          description: Type of authentication.
-          example: OTP
+          $ref: '#/components/schemas/AuthenticationType'
         authenticationValue:
-          type: string
-          description: Authentication value.
-          example: 1234
+          $ref: '#/components/schemas/AuthenticationValue'
       required:
         - authentication
         - authenticationValue
@@ -948,6 +969,7 @@ components:
         - ENTERED - Consumer entered the authentication value.
         - REJECTED - Consumer rejected the transaction.
         - RESEND - Consumer requested to resend the authentication value.
+      example: ENTERED
     AuthorizationsState:
       title: AuthorizationsState
       description: state of POST authorizations
@@ -1051,7 +1073,7 @@ components:
         fspId:
           $ref: '#/components/schemas/FspId'
         extensionList:
-          $ref: '#/components/schemas/ExtensionList-2'
+          $ref: '#/components/schemas/ExtensionList'
       required:
         - partyIdType
         - partyIdentifier
@@ -1407,106 +1429,15 @@ components:
         - transactionRequestId
         - quote
       additionalProperties: false
-    AuthenticationType:
-      title: AuthenticationType
-      type: string
-      enum:
-        - OTP
-        - QRCODE
-        - U2F
-      description: |-
-        Below are the allowed values for the enumeration AuthenticationType.
-        - OTP - One-time password generated by the Payer FSP.
-        - QRCODE - QR code used as One Time Password.
-        - U2F - U2F is a new addition isolated to Thirdparty stream.
-      example: OTP
-    OtpValue:
-      title: OtpValue
-      type: string
-      pattern: '^\d{3,10}$'
-      description: >-
-        The API data type OtpValue is a JSON String of 3 to 10 characters,
-        consisting of digits only. Negative numbers are not allowed. One or more
-        leading zeros are allowed.
-    QRCODE:
-      title: QRCODE
-      type: string
-      minLength: 1
-      maxLength: 64
-      description: QR code used as a One Time Password.
-    U2FPIN:
-      title: U2FPIN
-      type: string
-      pattern: '^\S{1,64}$'
-      minLength: 1
-      maxLength: 64
-      description: >
-        U2F challenge-response, where payer FSP verifies if the response
-        provided by end-user device matches the previously registered key.
-    U2FPinValue:
-      title: U2FPinValue
-      type: object
-      description: >
-        U2F challenge-response, where payer FSP verifies if the response
-        provided by end-user device matches the previously registered key.
-      properties:
-        pinValue:
-          allOf:
-            - $ref: '#/components/schemas/U2FPIN'
-          description: U2F challenge-response.
-        counter:
-          allOf:
-            - $ref: '#/components/schemas/Integer'
-          description: >-
-            Sequential counter used for cloning detection. Present only for U2F
-            authentication.
-      required:
-        - pinValue
-        - counter
-    AuthenticationValue:
-      title: AuthenticationValue
-      anyOf:
-        - $ref: '#/components/schemas/OtpValue'
-        - $ref: '#/components/schemas/QRCODE'
-        - $ref: '#/components/schemas/U2FPinValue'
-      pattern: '^\d{3,10}$|^\S{1,64}$'
-      description: >-
-        Contains the authentication value. The format depends on the
-        authentication type used in the AuthenticationInfo complex type.
-    AuthenticationInfo-2:
-      title: AuthenticationInfo
-      type: object
-      description: Data model for the complex type AuthenticationInfo.
-      properties:
-        authentication:
-          $ref: '#/components/schemas/AuthenticationType'
-        authenticationValue:
-          $ref: '#/components/schemas/AuthenticationValue'
-      required:
-        - authentication
-        - authenticationValue
-    AuthorizationResponse-2:
-      title: AuthorizationResponse
-      type: string
-      enum:
-        - ENTERED
-        - REJECTED
-        - RESEND
-      description: |-
-        Below are the allowed values for the enumeration.
-        - ENTERED - Consumer entered the authentication value.
-        - REJECTED - Consumer rejected the transaction.
-        - RESEND - Consumer requested to resend the authentication value.
-      example: ENTERED
     AuthorizationsIDPutResponse:
       title: AuthorizationsIDPutResponse
       type: object
       description: 'The object sent in the PUT /authorizations/{ID} callback.'
       properties:
         authenticationInfo:
-          $ref: '#/components/schemas/AuthenticationInfo-2'
+          $ref: '#/components/schemas/AuthenticationInfo'
         responseType:
-          $ref: '#/components/schemas/AuthorizationResponse-2'
+          $ref: '#/components/schemas/AuthorizationResponse'
       required:
         - responseType
     ThirdpartyTransactionApproveRequest:
@@ -1514,18 +1445,6 @@ components:
       properties:
         authorizationResponse:
           $ref: '#/components/schemas/AuthorizationsIDPutResponse'
-    CorrelationId-2:
-      title: CorrelationId
-      type: string
-      pattern: >-
-        ^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$
-      description: >-
-        Identifier that correlates all messages of the same sequence. The API
-        data type UUID (Universally Unique Identifier) is a JSON String in
-        canonical format, conforming to [RFC
-        4122](https://tools.ietf.org/html/rfc4122), that is restricted by a
-        regular expression for interoperability reasons. A UUID is always 36
-        characters long, 32 hexadecimal symbols and 4 dashes (‘-‘).
     TransactionRequestState:
       title: TransactionRequestState
       type: string
