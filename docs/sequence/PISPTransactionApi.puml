@@ -25,7 +25,6 @@ box "DFSP tp-scheme-adapter"
   participant "DFSPTransactionModel" as DFSP_TM
   participant "outbound-server" as DFSP_TP_OUT
 end box
-participant "AUTH-SERVICE" as AUTHS
 
 
 == Party Lookup ==
@@ -74,13 +73,23 @@ autonumber 1 "<b>INIT-#</b>"
 rnote right of PISP #LightBlue
 POST /thirdpartyTransactions/{transactionRequestId}/initiate
 {
-  sourceAccountId: "dfspa.alice.1234",
-  consentId: "555",
   amount: {
     amount: "20.00",
     currency: "USD"
   },
-  "amountType": "SEND"
+  "amountType": "SEND",
+  "payee": {....},
+  "payer": {
+    "partyIdType": "THIRD_PARTY_LINK",
+    "partyIdentifier": "qwerty-56789",
+    "fspId": "dfspa"
+  },
+  "transactionType": {
+    "scenario": "TRANSFER",
+    "initiator": 'PAYER",
+    "initiatorType": "CONSUMER"
+  },
+  expiration: "2021-03-08T08:08:08.699-04:00"
 }
 end note
 PISP -> PISP_TP_OUT: POST /thirdpartyTransactions/{transactionRequestId}/initiate
@@ -113,33 +122,9 @@ activate DFSP_TM
 rnote right of DFSP_TM: state: transactionRequestReceived\n**transactionRequestState** is **RECEIVED**
 DFSP_TM -> DFSP_TM: persist transactionRequestState for transactionRequestId
 note over DFSP_TM
-  DFSP asks AUTH-SERVICE for Consent details
+  DFSP asks its backend to verify consent for payer via THIRD_PARTY_LINK
 end note
-DFSP_TM -> DFSP_TM: retrieveConsent(consentId)
-rnote right of DFSP_TM: state: pendingRetrieveConsent
-DFSP_TM -> Switch: GET /consents/{consentId}
-activate Switch
-Switch --> DFSP_TM: 202 Accepted
-deactivate DFSP_TM
-Switch -> AUTHS: GET /consents/{consentId}
-activate AUTHS
-AUTHS --> Switch: 202 Accepted
-deactivate Switch
-AUTHS -> AUTHS: lookup for Consent
-AUTHS -> Switch: PUT /consents/{consentId}
-activate Switch
-Switch --> AUTHS: 202 Accepted
-deactivate AUTHS
-Switch -> DFSP_TM: PUT /consents/{consentId}
-activate DFSP_TM
-DFSP_TM --> Switch: 202 Accepted
-deactivate Switch
-note over DFSP_TM
-  DFSP validates Consent
-  Verify that consent is granted with a valid credential
-end note
-DFSP_TM -> DFSP_TM: validateConsent(consent, sourcAccountId, pispId)
-rnote right of DFSP_TM: state: pendingValidateConsent
+DFSP_TM -> DFSP_TM: backend.verifyConsent(pispId, payer)
 note over DFSP_TM
   DFSP is happy with Consent
 end note
@@ -246,12 +231,12 @@ deactivate PISP
 autonumber 1 "<b>APPR-#</b>"
 rnote right of PISP #LightBlue
 rnote right of PISP #Light
-POST /thirdpartyTransactions/{id}/approve
+POST /thirdpartyTransactions/{transactionRequestId}/approve
 {
   signedChallenge: "base64(xxx)"
 }
 end note
-PISP -> PISP_TP_OUT: POST /thirdpartyTransactions/{id}/approve
+PISP -> PISP_TP_OUT: POST /thirdpartyTransactions/{transactionRequestId}/approve
 activate PISP
 activate PISP_TP_OUT
 
@@ -278,41 +263,18 @@ end note
 deactivate DFSP_SDK_IN
 deactivate DFSP_SDK_OUT
 note over DFSP_TM
-  DFSP checks the received AuthorizationInformation with the **AUTH-SERVICE**.
+  DFSP checks the received AuthorizationInformation with backend.
 end note
-DFSP_TM -> DFSP_TM: verifyAuthorization(AuthorizationInformation)
-DFSP_TM -> Switch: POST /thirdpartyRequest/transactions/{transactionRequestId}/authorizations
-activate Switch
-Switch --> DFSP_TM: 202 Accepted
-deactivate DFSP_TM
 rnote right of DFSP_TM: state: pendingVerifyAuthorization
-Switch -> AUTHS: POST /thirdpartyRequest/transactions/{transactionRequestId}/authorizations
-activate AUTHS
-AUTHS --> Switch: 202 Accepted
-deactivate Switch
+DFSP_TM -> DFSP_TM: backend.verifyAuthorization(AuthorizationInformation)
 
-note over AUTHS
-  lookup Consent
-  ensure sourceAccountId matches with Consent
-  verify signed challenge with publicKey for Consent
-  AuthorizationInformation is verified and **ACCEPTED**
-end note
-AUTHS -> Switch: PUT /thirdpartyRequest/transactions/{transactionRequestId}/authorizations
-activate Switch
-Switch --> AUTHS: 202 Accepted
-deactivate AUTHS
-Switch -> DFSP_TM: PUT /thirdpartyRequest/transactions/{transactionRequestId}/authorizations
-activate DFSP_TM
-DFSP_TM --> Switch: 202 Accepted
-deactivate Switch
-
-rnote right of DFSP_TM: **transactionRequestState** is **ACCEPTED**
+rnote right of DFSP_TM: DFSP is happy with Authorization\n**transactionRequestState** is **ACCEPTED**
 DFSP_TM -> DFSP_TM: persist transactionRequestState for transactionRequestId
 
 note over DFSP_TM
   DFSP is happy, so initiates the Transfer for transferId
-  **Question:** maybe here we should notifiy PISP
-  that Authorization recevied is OK
+  **Question:** maybe we should notify PISP
+  that Authorization received is OK
   and DFSp will initiate Transfer
   
   PUT or PATCH /thirdpartyRequest/transactions/{transactionRequestId}
