@@ -232,19 +232,6 @@ describe('Outbound API routes', (): void => {
     expect(response.statusCode).toBe(200)
   })
 
-  it('/hello', async (): Promise<void> => {
-    const request = {
-      method: 'GET',
-      url: '/hello'
-    }
-
-    const response = await server.inject(request)
-    expect(response.statusCode).toBe(200)
-    expect(JSON.parse(response.payload)).toEqual({
-      hello: 'outbound'
-    })
-  })
-
   it('/authorizations', async (): Promise<void> => {
     const request = {
       method: 'POST',

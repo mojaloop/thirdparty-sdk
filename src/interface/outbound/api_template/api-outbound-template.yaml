@@ -19,8 +19,6 @@ paths:
     $ref: '../../inbound/api_template/paths/health.yaml'
   '/metrics':
     $ref: '../../inbound/api_template/paths/metrics.yaml'
-  '/hello':
-    $ref: '../../inbound/api_template/paths/hello.yaml'
   '/authorizations':
     $ref: paths/authorizations.yaml
   '/thirdpartyTransaction/partyLookup':

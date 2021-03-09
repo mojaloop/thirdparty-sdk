@@ -10,9 +10,6 @@ export interface paths {
   "/metrics": {
     get: operations["MetricsGet"];
   };
-  "/hello": {
-    get: operations["HelloGet"];
-  };
   "/authorizations": {
     post: operations["InboundAuthorizationsPostRequest"];
   };
@@ -50,20 +47,6 @@ export interface operations {
   };
   /** The HTTP request GET /metrics is used to return metrics for the API. */
   MetricsGet: {
-    responses: {
-      200: components["responses"]["200"];
-      400: components["responses"]["400"];
-      401: components["responses"]["401"];
-      403: components["responses"]["403"];
-      404: components["responses"]["404"];
-      405: components["responses"]["405"];
-      406: components["responses"]["406"];
-      501: components["responses"]["501"];
-      503: components["responses"]["503"];
-    };
-  };
-  /** The HTTP request GET /hello is used to return some example json. */
-  HelloGet: {
     responses: {
       200: components["responses"]["200"];
       400: components["responses"]["400"];
@@ -271,7 +254,7 @@ export interface components {
     "X-Forwarded-For": string;
     /** The `FSPIOP-Source` header field is a non-HTTP standard field used by the API for identifying the sender of the HTTP request. The field should be set by the original sender of the request. Required for routing and signature verification (see header field `FSPIOP-Signature`). */
     "FSPIOP-Source": string;
-    /** The `FSPIOP-Destination` header field is a non-HTTP standard field used by the API for HTTP header based routing of requests and responses to the destination. The field should be set by the original sender of the request (if known), so that any entities between the client and the server do not need to parse the payload for routing purposes. */
+    /** The `FSPIOP-Destination` header field is a non-HTTP standard field used by the API for HTTP header based routing of requests and responses to the destination. The field must be set by the original sender of the request if the destination is known (valid for all services except GET /parties) so that any entities between the client and the server do not need to parse the payload for routing purposes. If the destination is not known (valid for service GET /parties), the field should be left empty. */
     "FSPIOP-Destination": string;
     /** The `FSPIOP-Encryption` header field is a non-HTTP standard field used by the API for applying end-to-end encryption of the request. */
     "FSPIOP-Encryption": string;
@@ -283,12 +266,18 @@ export interface components {
     "FSPIOP-HTTP-Method": string;
   };
   schemas: {
+    /** The API data type ErrorCode is a JSON String of four characters, consisting of digits only. Negative numbers are not allowed. A leading zero is not allowed. Each error code in the API is a four-digit number, for example, 1234, where the first number (1 in the example) represents the high-level error category, the second number (2 in the example) represents the low-level error category, and the last two numbers (34 in the example) represent the specific error. */
+    ErrorCode: string;
+    /** Error description string. */
+    ErrorDescription: string;
+    /** Extension key. */
+    ExtensionKey: string;
+    /** Extension value. */
+    ExtensionValue: string;
     /** Data model for the complex type Extension. */
     Extension: {
-      /** Extension key. */
-      key: string;
-      /** Extension value. */
-      value: string;
+      key: components["schemas"]["ExtensionKey"];
+      value: components["schemas"]["ExtensionValue"];
     };
     /** Data model for the complex type ExtensionList. An optional list of extensions, specific to deployment. */
     ExtensionList: {
@@ -297,10 +286,8 @@ export interface components {
     };
     /** Data model for the complex type ErrorInformation. */
     ErrorInformation: {
-      /** Specific error number. */
-      errorCode: string;
-      /** Error description string. */
-      errorDescription: string;
+      errorCode: components["schemas"]["ErrorCode"];
+      errorDescription: components["schemas"]["ErrorDescription"];
       extensionList?: components["schemas"]["ExtensionList"];
     };
     /** Data model for the complex type object that contains an optional element ErrorInformation used along with 4xx and 5xx responses. */
@@ -506,20 +493,6 @@ export interface components {
     IlpPacket: string;
     /** Condition that must be attached to the transfer by the Payer. */
     IlpCondition: string;
-    /** Extension key. */
-    ExtensionKey: string;
-    /** Extension value. */
-    ExtensionValue: string;
-    /** Data model for the complex type Extension. */
-    "Extension-2": {
-      key: components["schemas"]["ExtensionKey"];
-      value: components["schemas"]["ExtensionValue"];
-    };
-    /** Data model for the complex type ExtensionList. An optional list of extensions, specific to deployment. */
-    "ExtensionList-2": {
-      /** Number of Extension elements. */
-      extension: components["schemas"]["Extension-2"][];
-    };
     /** The object sent in the PUT /quotes/{ID} callback. */
     QuotesIDPutResponse: {
       transferAmount: components["schemas"]["Money"];
@@ -530,7 +503,7 @@ export interface components {
       geoCode?: components["schemas"]["GeoCode"];
       ilpPacket: components["schemas"]["IlpPacket"];
       condition: components["schemas"]["IlpCondition"];
-      extensionList?: components["schemas"]["ExtensionList-2"];
+      extensionList?: components["schemas"]["ExtensionList"];
     };
     /** POST /authorizations Request object */
     InboundAuthorizationsPostRequest: {
@@ -673,7 +646,7 @@ export interface components {
       partyIdentifier: components["schemas"]["PartyIdentifier"];
       partySubIdOrType?: components["schemas"]["PartySubIdOrType"];
       fspId?: components["schemas"]["FspId"];
-      extensionList?: components["schemas"]["ExtensionList-2"];
+      extensionList?: components["schemas"]["ExtensionList"];
     };
     /** A limited set of pre-defined numbers. This list would be a limited set of numbers identifying a set of popular merchant types like School Fees, Pubs and Restaurants, Groceries, etc. */
     MerchantClassificationCode: string;
@@ -796,8 +769,6 @@ export interface components {
       /** The status of the authorization. This value must be `VERIFIED` for a PUT request. */
       status: "VERIFIED";
     };
-    /** Identifier that correlates all messages of the same sequence. The API data type UUID (Universally Unique Identifier) is a JSON String in canonical format, conforming to [RFC 4122](https://tools.ietf.org/html/rfc4122), that is restricted by a regular expression for interoperability reasons. A UUID is always 36 characters long, 32 hexadecimal symbols and 4 dashes (‘-‘). */
-    "CorrelationId-2": string;
     /**
      * Below are the allowed values for the enumeration.
      * - RECEIVED - Payer FSP has received the transaction from the Payee FSP.
@@ -808,7 +779,7 @@ export interface components {
     TransactionRequestState: "RECEIVED" | "PENDING" | "ACCEPTED" | "REJECTED";
     /** The object sent in the PATCH /thirdpartyRequests/transactions/{ID} callback. */
     ThirdpartyRequestsTransactionsIDPatchResponse: {
-      transactionId: components["schemas"]["CorrelationId-2"];
+      transactionId: components["schemas"]["CorrelationId"];
       transactionRequestState: components["schemas"]["TransactionRequestState"];
     };
     /** Data model for the complex type object that contains ErrorInformation. */
