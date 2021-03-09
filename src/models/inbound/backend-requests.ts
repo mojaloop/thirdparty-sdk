@@ -26,7 +26,10 @@
  ******/
 
 import { requests } from '@mojaloop/sdk-standard-components'
-import { AuthenticationValue, InboundAuthorizationsPostRequest } from '~/models/authorizations.interface'
+import {
+  v1_1 as fspiopAPI,
+  thirdparty as tpAPI
+} from '@mojaloop/api-snippets'
 import { HttpRequestConfig, HttpRequest } from '~/shared/http-request'
 import {
   OutboundRequestToPayTransferPostRequest,
@@ -63,9 +66,9 @@ export class BackendRequests extends HttpRequest {
   // PISP Backend will ask the User to sign AuthorizationRequest
   // and in response delivers the cryptographic proof of signing in AuthenticationValue.pinValue
   async signAuthorizationRequest (
-    inRequest: InboundAuthorizationsPostRequest
-  ): Promise<AuthenticationValue | void> {
-    return this.post<InboundAuthorizationsPostRequest, AuthenticationValue>(
+    inRequest: tpAPI.Schemas.AuthorizationsPostRequest
+  ): Promise<fspiopAPI.Schemas.AuthenticationValue | void> {
+    return this.post<tpAPI.Schemas.AuthorizationsPostRequest, fspiopAPI.Schemas.AuthenticationValue>(
       this.signAuthorizationPath, inRequest
     )
   }

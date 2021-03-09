@@ -1,0 +1,7 @@
+title: AuthorizationsState
+description: state of POST authorizations
+type: string
+enum:
+  - WAITING_FOR_AUTHORIZATION_REQUEST
+  - COMPLETED
+  - ERROR_OCCURRED

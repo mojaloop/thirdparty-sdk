@@ -26,7 +26,10 @@
  --------------
  ******/
 
-import { InboundAuthorizationsPostRequest, InboundAuthorizationsPutRequest } from '~/models/authorizations.interface'
+import {
+  v1_1 as fspiopAPI,
+  thirdparty as tpAPI
+} from '@mojaloop/api-snippets'
 import { Message } from '~/shared/pub-sub'
 import {
   OutboundAuthorizationsModel
@@ -46,7 +49,7 @@ import config from '~/shared/config'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function put (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
-  const payload = request.payload as unknown as InboundAuthorizationsPutRequest
+  const payload = request.payload as unknown as fspiopAPI.Schemas.AuthorizationsIDPutResponse
   const pubSub = h.getPubSub()
 
   // select proper channel name where message will be published
@@ -66,7 +69,7 @@ async function put (_context: any, request: Request, h: StateResponseToolkit): P
 async function post (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   // this handler will be shared with ThirdpartyRequestTransactionModel so there is a need
   // to properly handle two different models here - via configuration flag
-  const payload = request.payload as InboundAuthorizationsPostRequest
+  const payload = request.payload as tpAPI.Schemas.AuthorizationsPostRequest
   const logger = h.getLogger()
   if (config.INBOUND.PISP_TRANSACTION_MODE) {
     // PISP transaction mode

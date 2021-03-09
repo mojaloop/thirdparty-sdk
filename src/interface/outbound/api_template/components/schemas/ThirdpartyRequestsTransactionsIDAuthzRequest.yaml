@@ -1,0 +1,7 @@
+$ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/ThirdpartyRequestsTransactionsIDAuthorizationsPostRequest.yaml'
+example:
+challenge: '<QuoteResponse object>'
+value: '<base64 encoded binary - the signed quote response object>'
+consentId: '8d34f91d-d078-4077-8263-2c0498dhbjr'
+sourceAccountId: 'dfspa.alice.1234'
+status: 'PENDING'

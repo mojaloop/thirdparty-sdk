@@ -1,0 +1,18 @@
+description: |
+  response body of POST/authorizations 
+  derived from AuthorizationsIDPutResponse by Inbound Service via Pub/Sub channel
+content:
+  application/json:
+    schema:
+      title: OutboundAuthorizationsPostResponse
+      type: object
+      required:
+        - responseType
+      additionalProperties: false
+      properties:
+        authenticationInfo:
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/schemas/AuthenticationInfo.yaml'
+        responseType:
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/schemas/AuthorizationResponse.yaml'
+        currentState:
+          $ref: '../../components/schemas/AuthorizationsState.yaml'

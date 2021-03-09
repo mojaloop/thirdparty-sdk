@@ -1,0 +1,26 @@
+title: authorizationsRequest
+description: POST /authorizations Request object
+type: object
+properties:
+  toParticipantId: 
+    type: string
+  authenticationType:
+    $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/AuthorizationChannelType.yaml'
+  retriesLeft:
+    $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/schemas/Integer.yaml'
+  amount:
+    $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/schemas/Money.yaml'
+  transactionId:
+    $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/schemas/CorrelationId.yaml'
+  transactionRequestId:
+    $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/schemas/CorrelationId.yaml'
+  quote:
+    $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/schemas/QuotesIDPutResponse.yaml'
+required:
+  - authenticationType
+  - retriesLeft
+  - amount
+  - transactionId
+  - transactionRequestId
+  - quote
+additionalProperties: false

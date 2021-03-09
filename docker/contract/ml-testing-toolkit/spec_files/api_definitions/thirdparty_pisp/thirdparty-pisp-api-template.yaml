@@ -23,38 +23,38 @@ paths:
         Switch(Thirdparty API Adapter) -> PISP
       parameters:
         #Path
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/ID.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/ID.yaml'
         #Headers
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Content-Length.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Content-Type.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Date.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Source.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Destination.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/Content-Length.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/Content-Type.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/Date.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-Source.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-Destination.yaml'
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/schemas/ThirdpartyRequestsTransactionsIDPatchResponse.yaml'
+              $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/ThirdpartyRequestsTransactionsIDPatchResponse.yaml'
       responses:
         200:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/200'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/200.yaml'
         400:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/400'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/400.yaml'
         401:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/401'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/401.yaml'
         403:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/403'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/403.yaml'
         404:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/404'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/404.yaml'
         405:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/405'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/405.yaml'
         406:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/406'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/406.yaml'
         501:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/501'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/501.yaml'
         503:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/503'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/503.yaml'
   /thirdpartyRequests/transactions:
     post:
       tags:
@@ -68,24 +68,24 @@ paths:
         PISP -> Switch(Thirdparty API Adapter)
       parameters:
         #Headers
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Accept.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Content-Length.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Content-Type.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Date.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/X-Forwarded-For.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Source.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Destination.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Encryption.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Signature.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-URI.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-HTTP-Method.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/Accept.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/Content-Length.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/Content-Type.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/Date.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/X-Forwarded-For.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-Source.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-Destination.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-Encryption.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-Signature.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-URI.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-HTTP-Method.yaml'
       requestBody:
         description: Transaction request to be created.
         required: true
         content:
           application/json:
             schema:
-              $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/schemas/ThirdpartyRequestsTransactionsPostRequest.yaml'
+              $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/ThirdpartyRequestsTransactionsPostRequest.yaml'
             example:
               transactionRequestId: '8d34f91d-d078-4077-8263-2c047876fcf6'
               sourceAccountId: 'dfspa.alice.1234'
@@ -115,23 +115,23 @@ paths:
               expiration: '2020-07-15T22:17:28.985-01:00'
       responses:
         202:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/202'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/202.yaml'
         400:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/400'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/400.yaml'
         401:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/401'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/401.yaml'
         403:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/403'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/403.yaml'
         404:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/404'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/404.yaml'
         405:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/405'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/405.yaml'
         406:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/406'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/406.yaml'
         501:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/501'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/501.yaml'
         503:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/503'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/503.yaml'
   /authorizations:
     post:
       tags:
@@ -141,17 +141,17 @@ paths:
       description: DFSP Requests Authorization of Transaction from the End User
       parameters:
         #Headers
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Accept.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Content-Length.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Content-Type.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Date.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/X-Forwarded-For.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Source.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Destination.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Encryption.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Signature.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-URI.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-HTTP-Method.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/Accept.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/Content-Length.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/Content-Type.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/Date.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/X-Forwarded-For.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-Source.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-Destination.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-Encryption.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-Signature.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-URI.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-HTTP-Method.yaml'
       requestBody:
         description: Authorization request details
         required: true
@@ -193,37 +193,37 @@ paths:
                       value: This is a more detailed error description
       responses:
         202:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/202'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/202.yaml'
         400:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/400'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/400.yaml'
         401:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/401'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/401.yaml'
         403:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/403'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/403.yaml'
         404:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/404'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/404.yaml'
         405:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/405'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/405.yaml'
         406:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/406'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/406.yaml'
         501:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/501'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/501.yaml'
         503:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/503'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/503.yaml'
   /authorizations/{ID}:
     parameters:
       #Path
-      - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/ID.yaml'
+      - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/ID.yaml'
       #Headers
-      - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Content-Type.yaml'
-      - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Date.yaml'
-      - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/X-Forwarded-For.yaml'
-      - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Source.yaml'
-      - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Destination.yaml'
-      - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Encryption.yaml'
-      - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Signature.yaml'
-      - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-URI.yaml'
-      - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-HTTP-Method.yaml'
+      - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/Content-Type.yaml'
+      - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/Date.yaml'
+      - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/X-Forwarded-For.yaml'
+      - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-Source.yaml'
+      - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-Destination.yaml'
+      - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-Encryption.yaml'
+      - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-Signature.yaml'
+      - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-URI.yaml'
+      - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-HTTP-Method.yaml'
     get:
       tags:
         - authorizations
@@ -234,23 +234,23 @@ paths:
         enter the applicable credentials in the Payee FSP system.
       responses:
         202:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/202'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/202.yaml'
         400:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/400'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/400.yaml'
         401:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/401'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/401.yaml'
         403:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/403'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/403.yaml'
         404:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/404'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/404.yaml'
         405:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/405'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/405.yaml'
         406:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/406'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/406.yaml'
         501:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/501'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/501.yaml'
         503:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/503'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/503.yaml'
     put:
       tags:
         - authorizations
@@ -262,7 +262,7 @@ paths:
         contain the one that was used in the POST /authorizations/ requestBody.transactionRequestId @ OUTBOUND
       parameters:
         #Headers
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Content-Length.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/Content-Length.yaml'
       requestBody:
         description: Authorization request details
         required: true
@@ -279,23 +279,23 @@ paths:
               responseType: ENTERED
       responses:
         200:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/200'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/200.yaml'
         400:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/400'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/400.yaml'
         401:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/401'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/401.yaml'
         403:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/403'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/403.yaml'
         404:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/404'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/404.yaml'
         405:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/405'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/405.yaml'
         406:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/406'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/406.yaml'
         501:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/501'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/501.yaml'
         503:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/503'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/503.yaml'
   /authorizations/{ID}/error:
     put:
       summary: AuthorizationsByIDAndError
@@ -309,44 +309,44 @@ paths:
         - authorizations
       parameters:
         #Path
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/ID.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/ID.yaml'
         #Headers
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Content-Length.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Content-Type.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Date.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/X-Forwarded-For.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Source.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Destination.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Encryption.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Signature.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-URI.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-HTTP-Method.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/Content-Length.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/Content-Type.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/Date.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/X-Forwarded-For.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-Source.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-Destination.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-Encryption.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-Signature.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-URI.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-HTTP-Method.yaml'
       requestBody:
         description: Error information returned.
         required: true
         content:
           application/json:
             schema:
-              $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/ErrorInformationObject.yaml'
+              $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/schemas/ErrorInformationObject.yaml'
       responses:
         200:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/200'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/200.yaml'
         400:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/400'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/400.yaml'
         401:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/401'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/401.yaml'
         403:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/403'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/403.yaml'
         404:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/404'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/404.yaml'
         405:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/405'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/405.yaml'
         406:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/406'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/406.yaml'
         501:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/501'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/501.yaml'
         503:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/503'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/503.yaml'
   /consentRequests:
     post:
       tags:
@@ -359,24 +359,24 @@ paths:
         PISP -> Switch
       parameters:
         #Headers
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Accept.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Content-Length.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Content-Type.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Date.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/X-Forwarded-For.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Source.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Destination.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Encryption.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Signature.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-URI.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-HTTP-Method.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/Accept.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/Content-Length.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/Content-Type.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/Date.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/X-Forwarded-For.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-Source.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-Destination.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-Encryption.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-Signature.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-URI.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-HTTP-Method.yaml'
       requestBody:
         description: The consentRequest to create
         required: true
         content:
           application/json:
             schema:
-              $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/schemas/ConsentRequestsPostRequest.yaml'
+              $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/ConsentRequestsPostRequest.yaml'
             example:
               id: '456'
               initiatorId: 'pispA'
@@ -393,23 +393,23 @@ paths:
               callbackUri: 'pisp-app://callback.com'
       responses:
         202:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/202'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/202.yaml'
         400:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/400'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/400.yaml'
         401:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/401'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/401.yaml'
         403:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/403'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/403.yaml'
         404:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/404'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/404.yaml'
         405:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/405'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/405.yaml'
         406:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/406'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/406.yaml'
         501:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/501'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/501.yaml'
         503:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/503'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/503.yaml'
   /consentRequests/{ID}:
     put:
       tags:
@@ -426,19 +426,19 @@ paths:
         PISP -> Switch
       parameters:
         #Path
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/ID.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/ID.yaml'
         #Headers
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Accept.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Content-Length.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Content-Type.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Date.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/X-Forwarded-For.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Source.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Destination.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Encryption.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Signature.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-URI.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-HTTP-Method.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/Accept.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/Content-Length.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/Content-Type.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/Date.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/X-Forwarded-For.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-Source.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-Destination.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-Encryption.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-Signature.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-URI.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-HTTP-Method.yaml'
       requestBody:
         description: The updated consentRequest body
         required: true
@@ -446,29 +446,29 @@ paths:
           application/json:
             schema:
               oneOf:
-                - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/schemas/ConsentRequestsIDPutResponseWeb.yaml'
-                - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/schemas/ConsentRequestsIDPutResponseWebAuth.yaml'
-                - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/schemas/ConsentRequestsIDPutResponseOTP.yaml'
-                - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/schemas/ConsentRequestsIDPutResponseOTPAuth.yaml'
+                - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/ConsentRequestsIDPutResponseWeb.yaml'
+                - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/ConsentRequestsIDPutResponseWebAuth.yaml'
+                - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/ConsentRequestsIDPutResponseOTP.yaml'
+                - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/ConsentRequestsIDPutResponseOTPAuth.yaml'
       responses:
         200:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/200'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/200.yaml'
         400:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/400'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/400.yaml'
         401:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/401'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/401.yaml'
         403:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/403'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/403.yaml'
         404:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/404'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/404.yaml'
         405:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/405'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/405.yaml'
         406:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/406'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/406.yaml'
         501:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/501'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/501.yaml'
         503:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/503'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/503.yaml'
   /consents:
     post:
       description: >
@@ -486,38 +486,38 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/schemas/ConsentsPostRequest.yaml'
+              $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/ConsentsPostRequest.yaml'
       parameters:
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Accept.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Content-Length.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Content-Type.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Date.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/X-Forwarded-For.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Source.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Destination.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Encryption.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Signature.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-URI.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-HTTP-Method.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/Accept.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/Content-Length.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/Content-Type.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/Date.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/X-Forwarded-For.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-Source.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-Destination.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-Encryption.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-Signature.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-URI.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-HTTP-Method.yaml'
       responses:
         202:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/202'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/202.yaml'
         400:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/400'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/400.yaml'
         401:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/401'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/401.yaml'
         403:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/403'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/403.yaml'
         404:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/404'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/404.yaml'
         405:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/405'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/405.yaml'
         406:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/406'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/406.yaml'
         501:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/501'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/501.yaml'
         503:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/503'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/503.yaml'
   /consents/{ID}:
     put:
       description: |
@@ -538,41 +538,42 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/schemas/ConsentsIDPutResponse.yaml'
+              oneOf:
+                - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/ConsentsIDPutResponseSigned.yaml'
+                - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/ConsentsIDPutResponseUnsigned.yaml'
+                - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/ConsentsIDPutResponseVerified.yaml'
       parameters:
         #Path
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/ID.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/ID.yaml'
         #Headers
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Content-Type.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Date.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/X-Forwarded-For.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Source.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Destination.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Encryption.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Signature.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-URI.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-HTTP-Method.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/Content-Type.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/Date.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/X-Forwarded-For.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-Source.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-Destination.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-Encryption.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-Signature.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-URI.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-HTTP-Method.yaml'
       responses:
         200:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/200'
-        202:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/202'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/200.yaml'
         400:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/400'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/400.yaml'
         401:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/401'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/401.yaml'
         403:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/403'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/403.yaml'
         404:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/404'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/404.yaml'
         405:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/405'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/405.yaml'
         406:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/406'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/406.yaml'
         501:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/501'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/501.yaml'
         503:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/503'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/503.yaml'
     patch:
       description: |
         The HTTP request `PATCH /consents/{ID}` is used to notify the PISP and DFSP of revoked consent.
@@ -587,41 +588,39 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/schemas/ConsentsIDPatchResponse.yaml'
+              $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/ConsentsIDPatchResponse.yaml'
       parameters:
         #Path
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/ID.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/ID.yaml'
         #Headers
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Content-Type.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Date.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/X-Forwarded-For.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Source.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Destination.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Encryption.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Signature.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-URI.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-HTTP-Method.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/Content-Type.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/Date.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/X-Forwarded-For.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-Source.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-Destination.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-Encryption.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-Signature.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-URI.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-HTTP-Method.yaml'
       responses:
         200:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/200'
-        202:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/202'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/200.yaml'
         400:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/400'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/400.yaml'
         401:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/401'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/401.yaml'
         403:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/403'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/403.yaml'
         404:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/404'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/404.yaml'
         405:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/405'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/405.yaml'
         406:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/406'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/406.yaml'
         501:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/501'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/501.yaml'
         503:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/503'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/503.yaml'
   /consents/{ID}/generateChallenge:
     post:
       tags:
@@ -634,47 +633,47 @@ paths:
         PISP -> Switch
       parameters:
         #Path
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/ID.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/ID.yaml'
         #Headers
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Accept.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Content-Length.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Content-Type.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Date.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/X-Forwarded-For.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Source.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Destination.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Encryption.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Signature.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-URI.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-HTTP-Method.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/Accept.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/Content-Length.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/Content-Type.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/Date.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/X-Forwarded-For.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-Source.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-Destination.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-Encryption.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-Signature.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-URI.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-HTTP-Method.yaml'
       requestBody:
         description: GenerateChallengeRequest Body
         required: true
         content:
           application/json:
             schema:
-              $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/schemas/ConsentsIDGenerateChallengePostRequest.yaml'
+              $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/ConsentsIDGenerateChallengePostRequest.yaml'
             example:
               type: 'FIDO'
       responses:
         202:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/202'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/202.yaml'
         400:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/400'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/400.yaml'
         401:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/401'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/401.yaml'
         403:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/403'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/403.yaml'
         404:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/404'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/404.yaml'
         405:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/405'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/405.yaml'
         406:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/406'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/406.yaml'
         501:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/501'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/501.yaml'
         503:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/503'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/503.yaml'
   /consents/{ID}/revoke:
     post:
       description: |
@@ -687,44 +686,44 @@ paths:
         - consent
       parameters:
       #Path
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/ID.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/ID.yaml'
       #Headers
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Content-Length.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Content-Type.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/Date.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/X-Forwarded-For.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Source.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Destination.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Encryption.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-Signature.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-URI.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/parameters/FSPIOP-HTTP-Method.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/Content-Length.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/Content-Type.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/Date.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/X-Forwarded-For.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-Source.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-Destination.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-Encryption.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-Signature.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-URI.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/FSPIOP-HTTP-Method.yaml'
       operationId: RevokeConsent
       responses:
         202:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/202'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/202.yaml'
         400:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/400'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/400.yaml'
         401:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/401'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/401.yaml'
         403:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/403'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/403.yaml'
         404:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/404'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/404.yaml'
         405:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/405'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/405.yaml'
         406:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/406'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/406.yaml'
         501:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/501'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/501.yaml'
         503:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/responses/index.yaml#/503'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/503.yaml'
 components:
   # TODO: Move to `mojaloop/api-snippets.
   schemas:
     Counter:
       allOf:
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/Integer.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/schemas/Integer.yaml'
       description: Sequential counter used for cloning detection. Present only for U2F authentication.
     U2FPIN:
       title: U2FPIN
@@ -751,8 +750,8 @@ components:
     AuthenticationValue:
       title: AuthenticationValue
       oneOf:
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/OtpValue.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/QRCODE.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/schemas/OtpValue.yaml'
+        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/schemas/QRCODE.yaml'
         - $ref: '#/components/schemas/U2FPinValue'
       description: Contains the authentication value. The format depends on the authentication type used in the AuthenticationInfo complex type.
     AuthenticationInfo:
@@ -761,7 +760,7 @@ components:
       description: Data model for the complex type AuthenticationInfo.
       properties:
         authentication:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/schemas/AuthorizationChannelType.yaml'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/AuthorizationChannelType.yaml'
         authenticationValue:
           $ref: '#/components/schemas/AuthenticationValue'
       required:
@@ -775,7 +774,7 @@ components:
         authenticationInfo:
           $ref: '#/components/schemas/AuthenticationInfo'
         responseType:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/AuthorizationResponse.yaml'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/schemas/AuthorizationResponse.yaml'
       required:
         - responseType          
     OutboundAuthorizationsPostRequest:
@@ -784,17 +783,17 @@ components:
       type: object
       properties:
         authenticationType:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/schemas/AuthorizationChannelType.yaml'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/AuthorizationChannelType.yaml'
         retriesLeft:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/Integer.yaml'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/schemas/Integer.yaml'
         amount:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/Money.yaml'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/schemas/Money.yaml'
         transactionId:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/CorrelationId.yaml'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/schemas/CorrelationId.yaml'
         transactionRequestId:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/CorrelationId.yaml'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/schemas/CorrelationId.yaml'
         quote:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/QuotesIDPutResponse.yaml'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/schemas/QuotesIDPutResponse.yaml'
       required:
         - authenticationType
         - retriesLeft

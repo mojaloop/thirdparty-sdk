@@ -1,0 +1,35 @@
+openapi: 3.0.1
+info:
+  title: Mojaloop Thirdparty Inbound Scheme Adapter
+  description: >
+    Specification for the Thirdparty Inbound Scheme Adapter API
+
+    Please see other documentation on
+    https://github.com/mojaloop/thirdparty-scheme-adapter for more information.
+
+
+    **Note on terminology:** The term "Switch" is equal to the term "Hub", and
+    the term "FSP" is equal to the term "DFSP".
+  license:
+    name: 'TBD'
+    url: 'TBD'
+  version: 0.1.0
+paths:
+  '/health':
+    $ref: paths/health.yaml
+  '/metrics':
+    $ref: paths/metrics.yaml
+  '/hello':
+    $ref: paths/hello.yaml
+  '/authorizations':
+    $ref: paths/authorizations.yaml
+  '/authorizations/{ID}':
+    $ref: paths/authorizations_ID.yaml
+  '/thirdpartyRequests/transactions':
+    $ref: paths/thirdpartyRequests_transactions.yaml
+  '/thirdpartyRequests/transactions/{ID}/authorizations':
+    $ref: paths/thirdpartyRequests_transactions_ID_authz.yaml
+  '/thirdpartyRequests/transactions/{ID}':
+    $ref: paths/thirdpartyRequests_transactions_ID.yaml
+  '/thirdpartyRequests/transactions/{ID}/error':
+    $ref: paths/thirdpartyRequests_transactions_ID_error.yaml

@@ -76,13 +76,13 @@ export class InboundThridpartyTransactionsModel {
       from: {
         idType: inRequest.payer.partyIdInfo.partyIdType,
         idValue: inRequest.payer.partyIdInfo.partyIdentifier,
-        idSubValue: inRequest.payer.partyIdInfo.partySubIdentifier,
+        idSubValue: inRequest.payer.partyIdInfo.partySubIdOrType,
         fspId: inRequest.payer.partyIdInfo.fspId
       },
       to: {
         idType: inRequest.payee.partyIdInfo.partyIdType,
         idValue: inRequest.payee.partyIdInfo.partyIdentifier,
-        idSubValue: inRequest.payee.partyIdInfo.partySubIdentifier,
+        idSubValue: inRequest.payee.partyIdInfo.partySubIdOrType,
         fspId: inRequest.payee.partyIdInfo.fspId
       },
       amountType: inRequest.amountType,

@@ -1,0 +1,7 @@
+type: object
+description: Thirdparty transaction party lookup request
+properties:
+  payee:
+    $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/schemas/PartyIdInfo.yaml'
+  transactionRequestId: 
+    $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/schemas/CorrelationId.yaml'

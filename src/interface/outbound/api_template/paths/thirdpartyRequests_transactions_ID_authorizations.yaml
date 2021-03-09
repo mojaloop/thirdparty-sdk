@@ -1,0 +1,35 @@
+post:
+  operationId: VerifyThirdPartyAuthorization
+  summary: VerifyThirdPartyAuthorization
+  description: |
+    The HTTP request `POST /thirdpartyRequests/transactions/{ID}/authorizations` is used by the DFSP to verify a third party authorization.
+  tags:
+    - thirdpartyRequests
+  parameters:
+    - $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/parameters/ID.yaml'
+  requestBody:
+    description: The thirdparty authorization details to verify
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../components/schemas/ThirdpartyRequestsTransactionsIDAuthzRequest.yaml'
+  responses:
+    '200':
+      $ref: '../components/responses/ThirdpartyRequestsTransactionsIDAuthzResponse.yaml'
+    '400':
+      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/400.yaml'
+    '401':
+      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/401.yaml'
+    '403':
+      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/403.yaml'
+    '404':
+      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/404.yaml'
+    '405':
+      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/405.yaml'
+    '406':
+      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/406.yaml'
+    '501':
+      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/501.yaml'
+    '503':
+      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/responses/503.yaml'

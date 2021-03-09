@@ -31,8 +31,10 @@ import { NotificationCallback, Message, PubSub } from '~/shared/pub-sub'
 import { RedisConnectionConfig } from '~/shared/redis-connection'
 import {
   OutboundThirdpartyAuthorizationsModelState,
-  InboundThirdpartyAuthorizationsPutRequest
 } from '~/models/thirdparty.authorizations.interface'
+import {
+  thirdparty as tpAPI
+} from '@mojaloop/api-snippets'
 import Config from '~/shared/config'
 import index from '~/index'
 import path from 'path'
@@ -88,7 +90,7 @@ defineFeature(feature, (test): void => {
   })
 
   test('VerifyThirdPartyAuthorization', ({ given, when, then }): void => {
-    const putThirdpartyAuthResponse: InboundThirdpartyAuthorizationsPutRequest = {
+    const putThirdpartyAuthResponse: tpAPI.Schemas.ThirdpartyRequestsTransactionsIDAuthorizationsPutResponse = {
       challenge: 'challenge',
       consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
       sourceAccountId: 'dfspa.alice.1234',

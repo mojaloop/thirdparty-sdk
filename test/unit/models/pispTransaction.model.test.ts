@@ -30,7 +30,7 @@ import {
   NotificationCallback,
   PubSub
 } from '~/shared/pub-sub'
-import { MojaloopRequests, TAmountType, ThirdpartyRequests, TParty } from '@mojaloop/sdk-standard-components'
+import { MojaloopRequests, ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
 import {
   PISPTransactionData,
   PISPTransactionModelConfig,
@@ -53,11 +53,9 @@ import mockLogger from 'test/unit/mockLogger'
 import shouldNotBeExecuted from 'test/unit/shouldNotBeExecuted'
 import sortedArray from 'test/unit/sortedArray'
 import {
-  AuthenticationType,
-  AuthorizationResponse,
-  InboundAuthorizationsPostRequest,
-  InboundAuthorizationsPutRequest
-} from '~/models/authorizations.interface'
+  v1_1 as fspiopAPI,
+  thirdparty as tpAPI
+} from '@mojaloop/api-snippets'
 import { BackendRequests } from '~/models/inbound/backend-requests'
 import { HTTPResponseError } from '~/shared/http-response-error'
 
@@ -164,10 +162,10 @@ describe('pipsTransactionModel', () => {
   })
 
   describe('transaction flow', () => {
-    const party: TParty = {
+    const party: fspiopAPI.Schemas.Party = {
       partyIdInfo: {
         fspId: 'fsp-id',
-        partyIdType: 'party-id-type',
+        partyIdType: 'PERSONAL_ID',
         partyIdentifier: 'party-identifier'
       }
     }
@@ -264,10 +262,10 @@ describe('pipsTransactionModel', () => {
       let data: PISPTransactionData
       let channel: string
 
-      const authorizationRequest: InboundAuthorizationsPostRequest = {
+      const authorizationRequest:  tpAPI.Schemas.AuthorizationsPostRequest  = {
         transactionRequestId: '1234-1234',
         transactionId: '5678-5678',
-        authenticationType: 'authentication-type',
+        authenticationType: 'U2F',
         retriesLeft: '1',
         amount: {
           amount: '123.00',
@@ -303,19 +301,19 @@ describe('pipsTransactionModel', () => {
             payer: {
               partyIdInfo: {
                 fspId: 'payer-fsp-id',
-                partyIdType: 'payer-party-id-type',
+                partyIdType: 'PERSONAL_ID',
                 partyIdentifier: 'payer-party-identifier'
               }
             },
-            amountType: 'SEND' as TAmountType,
+            amountType: 'SEND' as fspiopAPI.Schemas.AmountType,
             amount: {
               amount: '123.00',
               currency: 'USD'
             },
             transactionType: {
-              scenario: 'transaction-type-scenario',
-              initiator: 'transaction-type-initiator',
-              initiatorType: 'transaction-type-initiator-type'
+              scenario: 'PAYMENT',
+              initiator: 'PAYER',
+              initiatorType: 'BUSINESS'
             },
             expiration: 'expiration'
           }
@@ -404,15 +402,15 @@ describe('pipsTransactionModel', () => {
       let data: PISPTransactionData
       let channel: string
 
-      const authorizationResponse: InboundAuthorizationsPutRequest = {
+      const authorizationResponse: fspiopAPI.Schemas.AuthorizationsIDPutResponse = {
         authenticationInfo: {
-          authentication: AuthenticationType.U2F,
+          authentication: 'U2F',
           authenticationValue: {
             pinValue: 'pin-value',
             counter: '1'
-          }
+          } as any
         },
-        responseType: AuthorizationResponse.ENTERED
+        responseType: 'ENTERED'
       }
 
       const transactionStatus: ThirdpartyTransactionStatus = {
@@ -439,19 +437,19 @@ describe('pipsTransactionModel', () => {
             payer: {
               partyIdInfo: {
                 fspId: 'payer-fsp-id',
-                partyIdType: 'payer-party-id-type',
+                partyIdType: 'PERSONAL_ID',
                 partyIdentifier: 'payer-party-identifier'
               }
             },
-            amountType: 'SEND' as TAmountType,
+            amountType: 'SEND' as fspiopAPI.Schemas.AmountType,
             amount: {
               amount: '123.00',
               currency: 'USD'
             },
             transactionType: {
-              scenario: 'transaction-type-scenario',
-              initiator: 'transaction-type-initiator',
-              initiatorType: 'transaction-type-initiator-type'
+              scenario: 'PAYMENT',
+              initiator: 'PAYER',
+              initiatorType: 'BUSINESS'
             },
             expiration: 'expiration'
           },

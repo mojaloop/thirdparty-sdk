@@ -1,0 +1,8 @@
+title: ThirdpartyTransactionState
+description: state of thirdparty transaction
+type: string
+enum:
+  - start
+  - partyLookupSuccess
+  - authorizationReceived
+  - transactionSuccess  

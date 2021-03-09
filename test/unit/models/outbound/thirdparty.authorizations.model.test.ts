@@ -30,8 +30,7 @@ import { Message, NotificationCallback, PubSub } from '~/shared/pub-sub'
 import {
   OutboundThirdpartyAuthorizationsModelConfig,
   OutboundThirdpartyAuthorizationsModelState,
-  OutboundThirdpartyAuthorizationsData,
-  InboundThirdpartyAuthorizationsPutRequest
+  OutboundThirdpartyAuthorizationsData
 } from '~/models/thirdparty.authorizations.interface'
 
 import {
@@ -39,9 +38,11 @@ import {
   create,
   loadFromKVS
 } from '~/models/outbound/thirdparty.authorizations.model'
+import {
+  thirdparty as tpAPI
+} from '@mojaloop/api-snippets'
 
 import {
-  PostThirdpartyRequestsTransactionsAuthorizationsRequest,
   ThirdpartyRequests
 } from '@mojaloop/sdk-standard-components'
 import { RedisConnectionConfig } from '~/shared/redis-connection'
@@ -127,7 +128,7 @@ describe('OutboundThirdpartyAuthorizationsModel', () => {
     let channel: string
     let handler: NotificationCallback
     let data: OutboundThirdpartyAuthorizationsData
-    let putResponse: InboundThirdpartyAuthorizationsPutRequest
+    let putResponse:  tpAPI.Schemas.ThirdpartyRequestsTransactionsIDAuthorizationsPutResponse
     beforeEach(() => {
       mocked(modelConfig.pubSub.subscribe).mockImplementationOnce(
         (_channel: string, cb: NotificationCallback) => {
@@ -148,7 +149,7 @@ describe('OutboundThirdpartyAuthorizationsModel', () => {
           sourceAccountId: 'sourceAccountId',
           status: 'PENDING',
           value: 'value'
-        } as unknown as PostThirdpartyRequestsTransactionsAuthorizationsRequest, // minimal request body
+        } as unknown as tpAPI.Schemas.ThirdpartyRequestsTransactionsIDAuthorizationsPostRequest, // minimal request body
         currentState: 'start'
       }
 
@@ -271,7 +272,7 @@ describe('OutboundThirdpartyAuthorizationsModel', () => {
     it('should properly call `KVS.get`, get expected data in `context.data` and setup state of machine', async () => {
       const dataFromCache: OutboundThirdpartyAuthorizationsData = {
         toParticipantId: 'dfspA',
-        request: { mocked: true } as unknown as PostThirdpartyRequestsTransactionsAuthorizationsRequest,
+        request: { mocked: true } as unknown as tpAPI.Schemas.ThirdpartyRequestsTransactionsIDAuthorizationsPostRequest,
         currentState: 'succeeded'
       }
       mocked(modelConfig.kvs.get).mockImplementationOnce(async () => dataFromCache)
@@ -307,7 +308,7 @@ describe('OutboundThirdpartyAuthorizationsModel', () => {
       mocked(modelConfig.kvs.set).mockImplementationOnce(() => Promise.resolve(true))
       const data: OutboundThirdpartyAuthorizationsData = {
         toParticipantId: 'dfspA',
-        request: { mocked: true } as unknown as PostThirdpartyRequestsTransactionsAuthorizationsRequest,
+        request: { mocked: true } as unknown as tpAPI.Schemas.ThirdpartyRequestsTransactionsIDAuthorizationsPostRequest,
         currentState: 'succeeded'
       }
 
@@ -322,7 +323,7 @@ describe('OutboundThirdpartyAuthorizationsModel', () => {
       mocked(modelConfig.kvs.set).mockImplementationOnce(() => { throw new Error('error from KVS.set') })
       const data: OutboundThirdpartyAuthorizationsData = {
         toParticipantId: 'dfspA',
-        request: { mocked: true } as unknown as PostThirdpartyRequestsTransactionsAuthorizationsRequest,
+        request: { mocked: true } as unknown as tpAPI.Schemas.ThirdpartyRequestsTransactionsIDAuthorizationsPostRequest,
         currentState: 'succeeded'
       }
       const am = await create(data, modelConfig)

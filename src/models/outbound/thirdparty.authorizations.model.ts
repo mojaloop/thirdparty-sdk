@@ -25,13 +25,15 @@
  --------------
  ******/
 import {
-  InboundThirdpartyAuthorizationsPutRequest,
   OutboundThirdpartyAuthorizationsPostResponse,
   OutboundThirdpartyAuthorizationsModelConfig,
   OutboundThirdpartyAuthorizationsModelState,
   OutboundThirdpartyAuthorizationsData,
   OutboundThirdpartyAuthorizationStateMachine
 } from '~/models/thirdparty.authorizations.interface'
+import {
+  thirdparty as tpAPI
+} from '@mojaloop/api-snippets'
 import { Message, PubSub } from '~/shared/pub-sub'
 import { PersistentModel } from '~/models/persistent.model'
 import { StateMachineConfig } from 'javascript-state-machine'
@@ -99,7 +101,7 @@ export class OutboundThirdpartyAuthorizationsModel
           // first unsubscribe
           pubSub.unsubscribe(channel, sid)
 
-          const putResponse = { ...message as unknown as InboundThirdpartyAuthorizationsPutRequest }
+          const putResponse = { ...message as unknown as tpAPI.Schemas.ThirdpartyRequestsTransactionsIDAuthorizationsPutResponse }
           // store response which will be returned by 'getResponse' method in workflow 'run'
           this.data.response = {
             ...putResponse,

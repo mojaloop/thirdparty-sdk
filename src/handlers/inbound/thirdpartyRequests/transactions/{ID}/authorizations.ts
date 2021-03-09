@@ -25,14 +25,16 @@
 import { Request, ResponseObject } from '@hapi/hapi'
 import { Message } from '~/shared/pub-sub'
 import { StateResponseToolkit } from '~/server/plugins/state'
-import { InboundThirdpartyAuthorizationsPutRequest } from '~/models/thirdparty.authorizations.interface'
+import {
+  thirdparty as tpAPI
+} from '@mojaloop/api-snippets'
 import { OutboundThirdpartyAuthorizationsModel } from '~/models/outbound/thirdparty.authorizations.model'
 
 /**
  * Handles a inbound PUT /thirdpartyRequests/transactions/{ID} request
  */
 async function put (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
-  const transactionRequest = request.payload as InboundThirdpartyAuthorizationsPutRequest
+  const transactionRequest = request.payload as tpAPI.Schemas.ThirdpartyRequestsTransactionsIDAuthorizationsPutResponse
   const transactionRequestId: string = request.params.ID
   const channel = OutboundThirdpartyAuthorizationsModel.notificationChannel(transactionRequestId)
   const pubSub = h.getPubSub()

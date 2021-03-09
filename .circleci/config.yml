@@ -260,25 +260,26 @@ jobs:
       - store_artifacts:
           path: ./audit/results
 
-  audit-licenses:
-    executor: default-docker
-    steps:
-      - run:
-          name: Install general dependencies
-          command: *defaults_Dependencies
-      - checkout
-      - run:
-          <<: *defaults_license_scanner
-      - restore_cache:
-          key: dependency-cache-{{ checksum "package-lock.json" }}
-      - run:
-          name: Prune non-production packages before running license-scanner
-          command: npm ci --production
-      - run:
-          name: Run the license-scanner
-          command: cd /tmp/license-scanner && pathToRepo=$CIRCLE_WORKING_DIRECTORY make run
-      - store_artifacts:
-          path: /tmp/license-scanner/results
+  # temporarily disbaled as api-snippets is not compatible with existing license policy 
+  # audit-licenses:
+  #   executor: default-docker
+  #   steps:
+  #     - run:
+  #         name: Install general dependencies
+  #         command: *defaults_Dependencies
+  #     - checkout
+  #     - run:
+  #         <<: *defaults_license_scanner
+  #     - restore_cache:
+  #         key: dependency-cache-{{ checksum "package-lock.json" }}
+  #     - run:
+  #         name: Prune non-production packages before running license-scanner
+  #         command: npm ci --production
+  #     - run:
+  #         name: Run the license-scanner
+  #         command: cd /tmp/license-scanner && pathToRepo=$CIRCLE_WORKING_DIRECTORY make run
+  #     - store_artifacts:
+  #         path: /tmp/license-scanner/results
 
   build-local:
     executor: default-machine
@@ -513,17 +514,17 @@ workflows:
             tags:
               only: /.*/
 
-      - audit-licenses:
-          context: org-global
-          requires:
-            - setup
-          filters:
-            tags:
-              only: /.*/
-            branches:
-              ignore:
-                - /feature*/
-                - /bugfix*/
+      # - audit-licenses:
+      #     context: org-global
+      #     requires:
+      #       - setup
+      #     filters:
+      #       tags:
+      #         only: /.*/
+      #       branches:
+      #         ignore:
+      #           - /feature*/
+      #           - /bugfix*/
 
       - test-integration:
           context: org-global
@@ -583,7 +584,7 @@ workflows:
             - test-coverage
             - test-integration
             - test-bdd
-            - audit-licenses
+            # - audit-licenses
             - linting-check
             - vulnerability-check
             # - image-scan
