@@ -614,6 +614,7 @@ workflows:
             # - image-scan
             - test-unit
             - test-coverage
+            - build-local
           filters:
             tags:
               only: /.*/
