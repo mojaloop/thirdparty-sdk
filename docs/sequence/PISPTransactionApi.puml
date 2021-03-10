@@ -174,34 +174,34 @@ note over PISP_TM
 end note
 
 note over DFSP_TM
-  DFSP requires QuotesInformation\n
+  DFSP requires QuoteInformation
 end note
-DFSP_TM -> DFSP_TM: SDKRequest.requestQuotes()
-rnote right of DFSP_TM: state: pendingRequestQuotes
+DFSP_TM -> DFSP_TM: SDKRequest.requestQuote()
+rnote right of DFSP_TM: state: pendingRequestQuote
 DFSP_TM -> DFSP_SDK_OUT: SYNC POST /quotes
 activate DFSP_SDK_OUT
-DFSP_SDK_OUT -> DFSP_SDK_OUT: retrieve QuotesInformation from Switch
-DFSP_SDK_OUT -> DFSP_TM: 200 QuotesInformation
+DFSP_SDK_OUT -> DFSP_SDK_OUT: retrieve QuoteInformation from Switch
+DFSP_SDK_OUT -> DFSP_TM: 200 QuoteInformation
 deactivate DFSP_SDK_OUT
 note over DFSP_TM
-  DFSP has the QuotesInformation, they can now ask the PISP for authorization
+  DFSP has the QuoteInformation, they can now ask the PISP for authorization
 end note
 DFSP_TM -> DFSP_TM: requestAuthorization()
 rnote right of DFSP_TM: state: pendingRequestAuthorization\n**transactionRequestState** is **PENDING**
 DFSP_TM -> DFSP_TM: persist transactionRequestState for transactionRequestId
-DFSP_TM -> DFSP_TM: SDKRequest.requestAuthorization(QuotesInformation)
+DFSP_TM -> DFSP_TM: SDKRequest.requestAuthorization(QuoteInformation)
 DFSP_TM -> DFSP_SDK_OUT: SYNC POST /authorization
 note over DFSP_TM
   From now DFSPTransactionModel is blocked
-  on synchronous call to POST /authorization
+  on synchronous call to POST /authorizations
   until PISP initiate **Approve Transaction** phase.
   Here timeout scenario should be handled properly
 end note
 activate DFSP_SDK_OUT
-DFSP_SDK_OUT -> Switch: POST /authorization
+DFSP_SDK_OUT -> Switch: POST /authorizations
 activate Switch
 Switch --> DFSP_SDK_OUT: 202 Accepted
-DFSP_SDK_OUT -> DFSP_SDK_OUT: waiting on PUT /authorization/{transactionRequestId}
+DFSP_SDK_OUT -> DFSP_SDK_OUT: waiting on PUT /authorizations/{transactionRequestId}
 deactivate DFSP_SDK_OUT
 Switch -> PISP_TP_IN: POST /authorizations
 activate PISP_TP_IN
@@ -216,7 +216,7 @@ rnote right of PISP_TM: state: transactionInitiationSuccess
 deactivate PISP_TP_IN
 
 
-PISP_TM -> PISP_TP_OUT: QuotesInformation, transactionId
+PISP_TM -> PISP_TP_OUT: QuoteInformation, transactionId
 deactivate PISP_TM
 deactivate PISP_TP_IN
 
