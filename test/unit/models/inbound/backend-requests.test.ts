@@ -32,6 +32,7 @@ import { BackendConfig, BackendRequests } from '~/models/inbound/backend-request
 import { Scheme } from '~/shared/http-scheme'
 import mockLogger from '../../mockLogger'
 import { ThirdpartyTransactionStatus } from '~/models/pispTransaction.interface'
+import TestData from 'test/unit/data/mockData.json'
 
 describe('backendRequests', () => {
   let backendRequests: BackendRequests
@@ -141,6 +142,20 @@ describe('backendRequests', () => {
         agent: expect.anything(),
         headers: expect.anything()
       })
+    })
+  })
+
+  describe('getUserAccounts', () => {
+    it('should propagate call to get', async () => {
+      const mockData = JSON.parse(JSON.stringify(TestData))
+      const userId = mockData.accountsRequest.params.ID
+      const response = mockData.accountsRequest.payload
+      const getSpy = jest.spyOn(backendRequests, 'get').mockImplementationOnce(
+        () => Promise.resolve(response)
+      )
+      const result = await backendRequests.getUserAccounts(userId)
+      expect(result).toEqual(response)
+      expect(getSpy).toBeCalledWith(`accounts/${userId}`)
     })
   })
 })

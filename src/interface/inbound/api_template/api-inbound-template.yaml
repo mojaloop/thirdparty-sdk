@@ -31,3 +31,8 @@ paths:
     $ref: paths/thirdpartyRequests_transactions_ID.yaml
   '/thirdpartyRequests/transactions/{ID}/error':
     $ref: paths/thirdpartyRequests_transactions_ID_error.yaml
+  '/accounts/{ID}':
+    $ref: paths/accounts_ID.yaml
+  '/accounts/{ID}/error':
+    $ref: paths/accounts_ID_error.yaml
+

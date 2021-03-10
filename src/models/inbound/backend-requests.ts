@@ -73,6 +73,12 @@ export class BackendRequests extends HttpRequest {
     )
   }
 
+  // get user account details from DFSP Backend 
+  async getUserAccounts (userId: string): Promise<tpAPI.Schemas.AccountsIDPutResponse | void> {
+    const accountsPath = `accounts/${userId}`;
+    return this.get<tpAPI.Schemas.AccountsIDPutResponse>(accountsPath)
+  }
+
   async requestToPayTransfer (
     request: OutboundRequestToPayTransferPostRequest
   ): Promise<OutboundRequestToPayTransferPostResponse | void> {

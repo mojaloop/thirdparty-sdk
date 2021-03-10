@@ -25,6 +25,9 @@ export interface paths {
   "/thirdpartyRequests/transactions/{ID}/authorizations": {
     post: operations["VerifyThirdPartyAuthorization"];
   };
+  "/accounts/{ID}": {
+    get: operations["GetAccountsByUserId"];
+  };
 }
 
 export interface operations {
@@ -146,6 +149,25 @@ export interface operations {
     };
     responses: {
       200: components["responses"]["ThirdpartyRequestsTransactionsIDAuthzResponse"];
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      405: components["responses"]["405"];
+      406: components["responses"]["406"];
+      501: components["responses"]["501"];
+      503: components["responses"]["503"];
+    };
+  };
+  /** The HTTP request `GET /accounts/{ID}` is used to retrieve the list of potential accounts available for linking. */
+  GetAccountsByUserId: {
+    parameters: {
+      path: {
+        ID: components["parameters"]["ID"];
+      };
+    };
+    responses: {
+      200: components["responses"]["AccountsByUserIdResponse"];
       400: components["responses"]["400"];
       401: components["responses"]["401"];
       403: components["responses"]["403"];
@@ -672,6 +694,11 @@ export interface components {
       /** The status of the authorization. This value must be `VERIFIED` for a PUT request. */
       status: "VERIFIED";
     };
+    AccountsIDPutResponse: {
+      accountNickname: components["schemas"]["AccountAddress"];
+      id: components["schemas"]["AccountAddress"];
+      currency: components["schemas"]["Currency"];
+    }[];
   };
   responses: {
     /** OK */
@@ -809,6 +836,15 @@ export interface components {
     ThirdpartyRequestsTransactionsIDAuthzResponse: {
       content: {
         "application/json": components["schemas"]["ThirdpartyRequestsTransactionsIDAuthorizationsPutResponse"];
+      };
+    };
+    /**
+     * response body of GET /accounts/{ID}
+     * derived from UpdateAccountsByUserId by Inbound Service via Pub/Sub channel
+     */
+    AccountsByUserIdResponse: {
+      content: {
+        "application/json": components["schemas"]["AccountsIDPutResponse"];
       };
     };
   };

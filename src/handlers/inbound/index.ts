@@ -26,19 +26,22 @@
  - Sridhar Voruganti <sridhar.voruganti@modusbox.com>
  --------------
  ******/
-import Hello from './hello'
 import ThirdpartyRequestsTransactions from './thirdpartyRequests/transactions'
 import InboundAuthorizations from './authorizations'
 import ThirdpartyAuthorizations from './thirdpartyRequests/transactions/{ID}/authorizations'
 import NotifyThirdpartyTransactionRequests from './thirdpartyRequests/transactions/{ID}'
 import NotifyErrorThirdpartyTransactionRequests from './thirdpartyRequests/transactions/{ID}/error'
+import InboundAccounts from './accounts/{ID}'
+import InboundAccountsError from './accounts/{ID}/error'
 
 export default {
-  HelloGet: Hello.get,
   ThirdpartyRequestsTransactionsPost: ThirdpartyRequestsTransactions.post,
   InboundAuthorizationsPostRequest: InboundAuthorizations.post,
   InboundAuthorizationsIDPutResponse: InboundAuthorizations.put,
   UpdateThirdpartyAuthorization: ThirdpartyAuthorizations.put,
   NotifyThirdpartyTransactionRequests: NotifyThirdpartyTransactionRequests.patch,
-  NotifyErrorThirdpartyTransactionRequests: NotifyErrorThirdpartyTransactionRequests.put
+  NotifyErrorThirdpartyTransactionRequests: NotifyErrorThirdpartyTransactionRequests.put,
+  GetAccountsByUserId: InboundAccounts.get,
+  UpdateAccountsByUserId: InboundAccounts.put,
+  UpdateAccountsByUserIdError: InboundAccountsError.put
 }

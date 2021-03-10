@@ -21,18 +21,45 @@
  * Gates Foundation
  - Name Surname <name.surname@gatesfoundation.com>
 
- - Paweł Marzec <pawel.marzec@modusbox.com>
-
+ - Sridhar Voruganti - sridhar.voruganti@modusbox.com
  --------------
  ******/
+import {
+  ControlledStateMachine,
+  PersistentModelConfig, StateData
+} from '~/models/persistent.model'
+import { Method } from 'javascript-state-machine'
+import {
+  ThirdpartyRequests
+} from '@mojaloop/sdk-standard-components'
+import {
+  thirdparty as tpAPI
+} from '@mojaloop/api-snippets'
+import { PubSub } from '~/shared/pub-sub'
 
-import { Request, ResponseObject, ResponseToolkit } from '@hapi/hapi'
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function get (_context: any, _request: Request, h: ResponseToolkit): ResponseObject {
-  return h.response({ hello: 'outbound' }).code(200)
+export enum OutboundAccountsModelState {
+  start = 'WAITING_FOR_ACCOUNTS_REQUEST',
+  succeeded = 'COMPLETED',
+  errored = 'ERROR_OCCURRED'
 }
 
-export default {
-  get
+export interface OutboundAccountsGetResponse {
+  accounts: tpAPI.Schemas.AccountsIDPutResponse,
+  currentState: OutboundAccountsModelState;
+}
+
+export interface OutboundAccountsStateMachine extends ControlledStateMachine {
+  requestAccounts: Method
+  onRequestAccounts: Method
+}
+
+export interface OutboundAccountsModelConfig extends PersistentModelConfig {
+  pubSub: PubSub
+  requests: ThirdpartyRequests
+}
+
+export interface OutboundAccountsData extends StateData {
+  toParticipantId: string
+  userId: string
+  response?: OutboundAccountsGetResponse
 }

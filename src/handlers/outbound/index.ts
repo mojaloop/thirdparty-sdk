@@ -26,18 +26,18 @@
 
  --------------
  ******/
-import Hello from './hello'
 import Authorizations from './authorizations'
 import ThirdpartyAuthorizations from './thirdpartyRequests/transactions/{ID}/authorizations'
 import ThirdpartyTransactionPartyLookup from './thirdpartyTransaction/partyLookup'
 import ThirdpartyTransactionInitiate from './thirdpartyTransaction/{ID}/initiate'
 import ThirdpartyTransactionApprove from './thirdpartyTransaction/{ID}/approve'
+import Accounts from './accounts/{ID}'
 
 export default {
   OutboundAuthorizationsPost: Authorizations.post,
   VerifyThirdPartyAuthorization: ThirdpartyAuthorizations.post,
-  HelloGet: Hello.get,
   ThirdpartyTransactionPartyLookup: ThirdpartyTransactionPartyLookup.post,
   InitiateThirdpartyTransaction: ThirdpartyTransactionInitiate.post,
-  ApproveThirdpartyTransaction: ThirdpartyTransactionApprove.post
+  ApproveThirdpartyTransaction: ThirdpartyTransactionApprove.post,
+  GetAccountsByUserId: Accounts.get
 }
