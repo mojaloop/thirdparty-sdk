@@ -84,29 +84,4 @@ defineFeature(feature, (test): void => {
       expect(healthResponse.uptime).toBeGreaterThan(1.0)
     })
   })
-
-  test('Hello Check', ({ given, when, then }): void => {
-    given('Outbound API server', async (): Promise<void> => {
-      server = await prepareOutboundAPIServer()
-    })
-
-    when('I get \'Hello\' response', async (): Promise<ServerInjectResponse> => {
-      const request = {
-        method: 'GET',
-        url: '/hello'
-      }
-      response = await server.inject(request)
-      return response
-    })
-
-    interface HelloResponse {
-      hello: string;
-    }
-
-    then('The \'hello\' property should be \'outbound\'', (): void => {
-      const healthResponse = response.result as HelloResponse
-      expect(response.statusCode).toBe(200)
-      expect(healthResponse.hello).toEqual('outbound')
-    })
-  })
 })

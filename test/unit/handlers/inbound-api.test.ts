@@ -369,19 +369,6 @@ describe('Inbound API routes', (): void => {
     expect(result.ThirdpartyRequestsPresent).toBeTruthy()
   })
 
-  it('/hello', async (): Promise<void> => {
-    const request = {
-      method: 'GET',
-      url: '/hello'
-    }
-
-    const response = await server.inject(request)
-    expect(response.statusCode).toBe(200)
-    expect(JSON.parse(response.payload)).toEqual({
-      hello: 'inbound'
-    })
-  })
-
   it('/metrics', async (): Promise<void> => {
     const request = {
       method: 'GET',

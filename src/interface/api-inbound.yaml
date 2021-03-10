@@ -69,32 +69,6 @@ paths:
       operationId: MetricsGet
       summary: Prometheus metrics endpoint
       description: The HTTP request GET /metrics is used to return metrics for the API.
-  /hello:
-    get:
-      tags:
-        - health
-      responses:
-        '200':
-          $ref: '#/components/responses/200'
-        '400':
-          $ref: '#/components/responses/400'
-        '401':
-          $ref: '#/components/responses/401'
-        '403':
-          $ref: '#/components/responses/403'
-        '404':
-          $ref: '#/components/responses/404'
-        '405':
-          $ref: '#/components/responses/405'
-        '406':
-          $ref: '#/components/responses/406'
-        '501':
-          $ref: '#/components/responses/501'
-        '503':
-          $ref: '#/components/responses/503'
-      operationId: HelloGet
-      summary: example get
-      description: The HTTP request GET /hello is used to return some example json.
   /authorizations:
     post:
       description: >
@@ -521,17 +495,46 @@ components:
         The `Content-Type` header indicates the specific version of the API used
         to send the payload body.
   schemas:
+    ErrorCode:
+      title: ErrorCode
+      type: string
+      pattern: '^[1-9]\d{3}$'
+      description: >-
+        The API data type ErrorCode is a JSON String of four characters,
+        consisting of digits only. Negative numbers are not allowed. A leading
+        zero is not allowed. Each error code in the API is a four-digit number,
+        for example, 1234, where the first number (1 in the example) represents
+        the high-level error category, the second number (2 in the example)
+        represents the low-level error category, and the last two numbers (34 in
+        the example) represent the specific error.
+      example: '5100'
+    ErrorDescription:
+      title: ErrorDescription
+      type: string
+      minLength: 1
+      maxLength: 128
+      description: Error description string.
+    ExtensionKey:
+      title: ExtensionKey
+      type: string
+      minLength: 1
+      maxLength: 32
+      description: Extension key.
+    ExtensionValue:
+      title: ExtensionValue
+      type: string
+      minLength: 1
+      maxLength: 128
+      description: Extension value.
     Extension:
       title: Extension
       type: object
       description: Data model for the complex type Extension.
       properties:
         key:
-          type: string
-          description: Extension key.
+          $ref: '#/components/schemas/ExtensionKey'
         value:
-          type: string
-          description: Extension value.
+          $ref: '#/components/schemas/ExtensionValue'
       required:
         - key
         - value
@@ -557,13 +560,9 @@ components:
       description: Data model for the complex type ErrorInformation.
       properties:
         errorCode:
-          type: string
-          description: Specific error number.
-          example: 5100
+          $ref: '#/components/schemas/ErrorCode'
         errorDescription:
-          type: string
-          description: Error description string.
-          example: This is an error description.
+          $ref: '#/components/schemas/ErrorDescription'
         extensionList:
           $ref: '#/components/schemas/ExtensionList'
       required:
@@ -878,46 +877,6 @@ components:
       pattern: '^[A-Za-z0-9-_]{43}$'
       maxLength: 48
       description: Condition that must be attached to the transfer by the Payer.
-    ExtensionKey:
-      title: ExtensionKey
-      type: string
-      minLength: 1
-      maxLength: 32
-      description: Extension key.
-    ExtensionValue:
-      title: ExtensionValue
-      type: string
-      minLength: 1
-      maxLength: 128
-      description: Extension value.
-    Extension-2:
-      title: Extension
-      type: object
-      description: Data model for the complex type Extension.
-      properties:
-        key:
-          $ref: '#/components/schemas/ExtensionKey'
-        value:
-          $ref: '#/components/schemas/ExtensionValue'
-      required:
-        - key
-        - value
-    ExtensionList-2:
-      title: ExtensionList
-      type: object
-      description: >-
-        Data model for the complex type ExtensionList. An optional list of
-        extensions, specific to deployment.
-      properties:
-        extension:
-          type: array
-          items:
-            $ref: '#/components/schemas/Extension-2'
-          minItems: 1
-          maxItems: 16
-          description: Number of Extension elements.
-      required:
-        - extension
     QuotesIDPutResponse:
       title: QuotesIDPutResponse
       type: object
@@ -940,7 +899,7 @@ components:
         condition:
           $ref: '#/components/schemas/IlpCondition'
         extensionList:
-          $ref: '#/components/schemas/ExtensionList-2'
+          $ref: '#/components/schemas/ExtensionList'
       required:
         - transferAmount
         - expiration
@@ -1304,7 +1263,7 @@ components:
         fspId:
           $ref: '#/components/schemas/FspId'
         extensionList:
-          $ref: '#/components/schemas/ExtensionList-2'
+          $ref: '#/components/schemas/ExtensionList'
       required:
         - partyIdType
         - partyIdentifier
@@ -1635,18 +1594,6 @@ components:
         - consentId
         - sourceAccountId
         - status
-    CorrelationId-2:
-      title: CorrelationId
-      type: string
-      pattern: >-
-        ^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$
-      description: >-
-        Identifier that correlates all messages of the same sequence. The API
-        data type UUID (Universally Unique Identifier) is a JSON String in
-        canonical format, conforming to [RFC
-        4122](https://tools.ietf.org/html/rfc4122), that is restricted by a
-        regular expression for interoperability reasons. A UUID is always 36
-        characters long, 32 hexadecimal symbols and 4 dashes (‘-‘).
     TransactionRequestState:
       title: TransactionRequestState
       type: string
@@ -1669,7 +1616,7 @@ components:
         callback.
       properties:
         transactionId:
-          $ref: '#/components/schemas/CorrelationId-2'
+          $ref: '#/components/schemas/CorrelationId'
         transactionRequestState:
           $ref: '#/components/schemas/TransactionRequestState'
       required:
@@ -1758,9 +1705,12 @@ components:
       description: >-
         The `FSPIOP-Destination` header field is a non-HTTP standard field used
         by the API for HTTP header based routing of requests and responses to
-        the destination. The field should be set by the original sender of the
-        request (if known), so that any entities between the client and the
-        server do not need to parse the payload for routing purposes.
+        the destination. The field must be set by the original sender of the
+        request if the destination is known (valid for all services except GET
+        /parties) so that any entities between the client and the server do not
+        need to parse the payload for routing purposes. If the destination is
+        not known (valid for service GET /parties), the field should be left
+        empty.
     FSPIOP-Encryption:
       name: FSPIOP-Encryption
       in: header
