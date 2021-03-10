@@ -1,14 +1,11 @@
-put:
-  operationId: UpdateThirdpartyAuthorization
-  summary: UpdateThirdpartyAuthorization
-  description: |
-    The HTTP request `PUT /thirdpartyRequests/transactions/{id}/authorizations` is used by the auth-service to update a thirdparty authorization after successful validation.
-    For an unsuccessful authorization result, the `PUT /thirdpartyRequests/transactions/{id}/authorizations/error` will be called by the auth-service, instead of this endpoint.
+post:
   tags:
-    - thirdpartyRequests
+    - consents
+  operationId: PostConsents
+  summary: PostConsents
+  description: >
+    DFSP sends this request to the PISP after granting consent.
   parameters:
-    #Path
-    - $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/parameters/ID.yaml'
     #Headers
     - $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/parameters/Content-Length.yaml'
     - $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/parameters/Content-Type.yaml'
@@ -21,21 +18,14 @@ put:
     - $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/parameters/FSPIOP-URI.yaml'
     - $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/parameters/FSPIOP-HTTP-Method.yaml'
   requestBody:
-    description: The thirdparty authorization details to update
     required: true
     content:
       application/json:
         schema:
-          $ref: '../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/ThirdpartyRequestsTransactionsIDAuthorizationsPutResponse.yaml'
-        example:
-          challenge: '<QuoteResponse object>'
-          value: '<base64 encoded binary - the signed quote response object>'
-          consentId: '8d34f91d-d078-4077-8263-2c0498dhbjr'
-          sourceAccountId: 'dfspa.alice.1234'
-          status: 'VERIFIED'
+          $ref: '../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/ConsentsPostRequest.yaml'
   responses:
-    '200':
-      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/200.yaml'
+    '202':
+      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/202.yaml'
     '400':
       $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/400.yaml'
     '401':

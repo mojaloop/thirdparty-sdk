@@ -33,3 +33,9 @@ paths:
     $ref: paths/thirdpartyRequests_transactions_ID.yaml
   '/thirdpartyRequests/transactions/{ID}/error':
     $ref: paths/thirdpartyRequests_transactions_ID_error.yaml
+  '/consents':
+    $ref: paths/consents.yaml
+  '/consentRequests/{ID}':
+    $ref: paths/consentRequests_ID.yaml
+  '/consentRequests/{ID}/error':
+    $ref: paths/consentRequests_ID_error.yaml

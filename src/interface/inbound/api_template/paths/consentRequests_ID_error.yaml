@@ -1,11 +1,10 @@
 put:
-  operationId: UpdateThirdpartyAuthorization
-  summary: UpdateThirdpartyAuthorization
-  description: |
-    The HTTP request `PUT /thirdpartyRequests/transactions/{id}/authorizations` is used by the auth-service to update a thirdparty authorization after successful validation.
-    For an unsuccessful authorization result, the `PUT /thirdpartyRequests/transactions/{id}/authorizations/error` will be called by the auth-service, instead of this endpoint.
   tags:
-    - thirdpartyRequests
+    - consentRequests
+  operationId: NotifyErrorConsentRequests
+  summary: NotifyErrorConsentRequests
+  description: |
+    DFSP responds to the PISP if something went wrong with validating an OTP or secret.
   parameters:
     #Path
     - $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/parameters/ID.yaml'
@@ -21,18 +20,12 @@ put:
     - $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/parameters/FSPIOP-URI.yaml'
     - $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/parameters/FSPIOP-HTTP-Method.yaml'
   requestBody:
-    description: The thirdparty authorization details to update
+    description: Error information returned.
     required: true
     content:
       application/json:
         schema:
-          $ref: '../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/ThirdpartyRequestsTransactionsIDAuthorizationsPutResponse.yaml'
-        example:
-          challenge: '<QuoteResponse object>'
-          value: '<base64 encoded binary - the signed quote response object>'
-          consentId: '8d34f91d-d078-4077-8263-2c0498dhbjr'
-          sourceAccountId: 'dfspa.alice.1234'
-          status: 'VERIFIED'
+          $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/schemas/ErrorInformationObject.yaml'
   responses:
     '200':
       $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/200.yaml'
