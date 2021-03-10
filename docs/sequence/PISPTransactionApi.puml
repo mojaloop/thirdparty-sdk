@@ -48,7 +48,7 @@ activate PISP_TP_OUT
 PISP_TP_OUT -> PISP_TM: partyLookup()
 rnote right of PISP_TM: state: requestPartyLookup
 activate PISP_TM
-
+PISP_TM -> PISP_TM: SDKRequest.requestPartiesInformation
 PISP_TM -> PISP_SDK_OUT: SYNC GET /parties/{type}/{id}
 activate PISP_SDK_OUT
 PISP_SDK_OUT -> PISP_SDK_OUT: retrieve PartiesInformation from Switch
@@ -98,8 +98,8 @@ activate PISP_TP_OUT
 
 PISP_TP_OUT -> PISP_TM: initiate()
 activate PISP_TM
-rnote right of PISP_TM: state: requestTransaction
-
+rnote right of PISP_TM: state: requestThirdpartyTransaction
+PISP_TM -> PISP_TM: SDKRequest.requestThirdpartyTransaction()
 PISP_TM -> Switch: POST /thirdpartyRequests/transactions
 activate Switch
 Switch --> PISP_TM: 202 Accepted
@@ -124,7 +124,7 @@ DFSP_TM -> DFSP_TM: persist transactionRequestState for transactionRequestId
 note over DFSP_TM
   DFSP asks its backend to verify consent for payer via THIRD_PARTY_LINK
 end note
-DFSP_TM -> DFSP_TM: backend.verifyConsent(pispId, payer)
+DFSP_TM -> DFSP_TM: PISPBackendRequest.verifyConsent(pispId, payer)
 note over DFSP_TM
   DFSP is happy with Consent
 end note
@@ -133,7 +133,7 @@ DFSP_TM -> DFSP_TM: so generate **transactionId**: '1234-1234-1234-1234'
 note over DFSP_TM
   DFSP informs PISP that **transactionId** has been allocated
 end note
-DFSP_TM -> DFSP_TM: notifyThirdpartyAboutTransactionRequestState(transactionId, transactionRequestState)
+DFSP_TM -> DFSP_TM: SDKRequest.notifyThirdpartyAboutTransactionRequestState(transactionId, transactionRequestState)
 rnote right of DFSP_TM: state: pendingNotifyThirdpartyAboutTransactionRequestState
 rnote right of DFSP_TM #LightBlue
 PUT /thirdpartyRequests/transaction/{transactionRequestId}
@@ -176,7 +176,7 @@ end note
 note over DFSP_TM
   DFSP requires QuotesInformation\n
 end note
-DFSP_TM -> DFSP_TM: requestQuotes()
+DFSP_TM -> DFSP_TM: SDKRequest.requestQuotes()
 rnote right of DFSP_TM: state: pendingRequestQuotes
 DFSP_TM -> DFSP_SDK_OUT: SYNC POST /quotes
 activate DFSP_SDK_OUT
@@ -188,7 +188,8 @@ note over DFSP_TM
 end note
 DFSP_TM -> DFSP_TM: requestAuthorization()
 rnote right of DFSP_TM: state: pendingRequestAuthorization\n**transactionRequestState** is **PENDING**
-DFSP_TM -> DFSP_TM: persist transactionRequestState for transactionRequestId 
+DFSP_TM -> DFSP_TM: persist transactionRequestState for transactionRequestId
+DFSP_TM -> DFSP_TM: SDKRequest.requestAuthorization(QuotesInformation)
 DFSP_TM -> DFSP_SDK_OUT: SYNC POST /authorization
 note over DFSP_TM
   From now DFSPTransactionModel is blocked
@@ -243,7 +244,7 @@ activate PISP_TP_OUT
 PISP_TP_OUT -> PISP_TM: approve()
 activate PISP_TM
 rnote right of PISP_TM: state: approvalReceived
-
+PISP_TM -> PISP_TM: SDKRequest.verifyAuthorization(transactionRequestId, signedChallenge)
 
 PISP_TM -> Switch: PUT /authorizations/{transactionRequestId}
 activate Switch
@@ -266,25 +267,53 @@ note over DFSP_TM
   DFSP checks the received AuthorizationInformation with backend.
 end note
 rnote right of DFSP_TM: state: pendingVerifyAuthorization
-DFSP_TM -> DFSP_TM: backend.verifyAuthorization(AuthorizationInformation)
+DFSP_TM -> DFSP_TM: PISPBackendRequest.verifyAuthorization(AuthorizationInformation)
+
+note over PISP, DFSP_TM
+  ERROR_SCENARIO: DFSP notifies PISP about Authorization error and then ends its workflow here
+end note
+rnote right of DFSP_TM: DFSP is unhappy with Authorization\n**transactionRequestState** is **REJECTED**
+rnote right of DFSP_TM: state: failureVerifyAuthorization
+DFSP_TM -> DFSP_TM: persist transactionRequestState for transactionRequestId
+DFSP_TM -> DFSP_TM: SDKRequest.notifyThirdpartyAboutRejectedAuthorization(transactionRequestId)
+DFSP_TM -> Switch: PUT /thirdpartyRequests/transaction/{transactionRequestId}/error
+activate Switch
+Switch -> DFSP_TM: 202 Accept
+note over DFSP_TM
+  ERROR_SCENARIO: **DFSPTransactionModel ends its workflow here**
+end note
+Swich -> PISP_TP_IN: PUT /thirdpartyRequests/transaction/{transactionRequestId}/error
+activate PISP_TP_IN
+PISP_TP_IN -> Switch: 202 Accept
+deactivate Switch
+
+note over PISP_TM
+  ERROR_SCENARIO: **PISPTransactionModel will end its workflow here**
+end note
+PISP_TP_IN -> PISP_TM: authorizationRejected()
+deactivate PISP_TP_IN
+activate PISP_TM
+rnote right of PISP_TM: state: rejectedAuthorization
+PISP_TM -> PISP_TP_OUT: not approved: authorization is rejected
+deactivate PISP_TM
+PISP_TP_OUT -> PISP: 500: authorization is rejected
+
+
+
+note over PISP, DFSP_TM
+  HAPPY_SCENARIO: **DFSPTransactionModel continues workflow**
+end note
 
 rnote right of DFSP_TM: DFSP is happy with Authorization\n**transactionRequestState** is **ACCEPTED**
 DFSP_TM -> DFSP_TM: persist transactionRequestState for transactionRequestId
 
 note over DFSP_TM
   DFSP is happy, so initiates the Transfer for transferId
-  **Question:** maybe we should notify PISP
-  that Authorization received is OK
-  and DFSp will initiate Transfer
-  
-  PUT or PATCH /thirdpartyRequest/transactions/{transactionRequestId}
-  {
-    transactionRequestState: **ACCEPTED**
-  }
-  then PISP can visualise progress of requested transaction to the User
 end note
+DFSP_TM -> DFSP_TM: generate **transferId**
 DFSP_TM -> DFSP_TM: transfer(transferId)
 rnote right of DFSP_TM: state: pendingTransfer
+DFSP_TM -> DFSP_TM: SDKRequest.transfer(transferId, transferPayload)
 DFSP_TM -> DFSP_SDK_OUT: SYNC POST /simpleTransfer
 activate DFSP_SDK_OUT
 DFSP_SDK_OUT -> DFSP_SDK_OUT: request Switch to realize simple transfer
@@ -293,7 +322,7 @@ deactivate DFSP_SDK_OUT
 note over DFSP_TM
   DFSP notifies PISP that Transfer is done
 end note
-DFSP_TM -> DFSP_TM: notifyThirdpartyAboutTransfer(transferId)
+DFSP_TM -> DFSP_TM: SDKRequest.notifyThirdpartyAboutTransfer(transferId)
 rnote right of DFSP_TM: state: pendingNotifyThirdpartyAboutTransfer
 
 DFSP_TM -> Switch: PATCH /thirdpartyRequests/transactions/{transactionRequestId}
@@ -302,6 +331,10 @@ Switch --> DFSP_TM: 202 Accepted
 rnote right of DFSP_TM: state: transactionRequestSuccess
 deactivate DFSP_TM
 
+
+note over PISP_TM
+  HAPPY_SCENARIO: **PISPTransactionModel continues workflow**
+end note
 
 Switch -> PISP_TP_IN: PATCH /thirdpartyRequests/transactions/{transactionRequestId}
 activate PISP_TP_IN
