@@ -87,11 +87,17 @@ export interface ServiceConfig {
     TRANSACTION_REQUEST_ENDPOINT?: string
     DFSP_ID: string
     DFSP_BACKEND_URI: string
-    DFSP_BACKEND_SIGN_AUTHORIZATION_PATH: string
     DFSP_BACKEND_HTTP_SCHEME: string
+    DFSP_BACKEND_VERIFY_AUTHORIZATION_PATH: string
+    DFSP_BACKEND_VERIFY_CONSENT_PATH: string
+    PISP_BACKEND_URI: string
+    PISP_BACKEND_HTTP_SCHEME: string
+    PISP_BACKEND_SIGN_AUTHORIZATION_PATH: string
+    SDK_OUTGOING_URI: string
+    SDK_OUTGOING_HTTP_SCHEME: string
     SDK_REQUEST_TO_PAY_TRANSFER_URI: string
     SDK_PARTIES_INFORMATION_URI: string
-    NOTIFY_ABOUT_TRANSFER_URI: string
+    SDK_NOTIFY_ABOUT_TRANSFER_URI: string
     JWS_SIGN: boolean
     JWS_SIGNING_KEY: PathLike | Buffer
     TLS: BaseRequestTLSConfig
@@ -263,12 +269,42 @@ export const ConvictConfig = Convict<ServiceConfig>({
       format: '*',
       default: 'localhost:9000'
     },
-    DFSP_BACKEND_SIGN_AUTHORIZATION_PATH: {
-      doc: 'path use by BackendRequests.signAuthorizationRequest',
+    DFSP_BACKEND_HTTP_SCHEME: {
+      doc: 'Http scheme ',
+      format: ['http', 'https'],
+      default: 'http'
+    },
+    DFSP_BACKEND_VERIFY_AUTHORIZATION_PATH: {
+      doc: 'path use by DFSPBackendRequests.verifyAuthorization',
+      format: '*',
+      default: 'verify-authorization'
+    },
+    DFSP_BACKEND_VERIFY_CONSENT_PATH: {
+      doc: 'path use by DFSPBackendRequests.verifyConsent',
+      format: '*',
+      default: 'verify-consent'
+    },
+    PISP_BACKEND_URI: {
+      doc: 'host address of DFSP\'s ',
+      format: '*',
+      default: 'localhost:9000'
+    },
+    PISP_BACKEND_SIGN_AUTHORIZATION_PATH: {
+      doc: 'path use by PISPBackendRequests.signAuthorization',
       format: '*',
       default: 'signchallenge'
     },
-    DFSP_BACKEND_HTTP_SCHEME: {
+    PISP_BACKEND_HTTP_SCHEME: {
+      doc: 'Http scheme ',
+      format: ['http', 'https'],
+      default: 'http'
+    },
+    SDK_OUTGOING_URI: {
+      doc: 'host address of SDK scheme-adapter Outgoing service\'s ',
+      format: '*',
+      default: 'localhost:7002'
+    },
+    SDK_OUTGOING_HTTP_SCHEME: {
       doc: 'Http scheme ',
       format: ['http', 'https'],
       default: 'http'
@@ -283,7 +319,7 @@ export const ConvictConfig = Convict<ServiceConfig>({
       format: '*',
       default: 'localhost:7002/parties/{Type}/{ID}/{SubId}'
     },
-    NOTIFY_ABOUT_TRANSFER_URI: {
+    SDK_NOTIFY_ABOUT_TRANSFER_URI: {
       doc: 'uri to sdk-scheme-adapter requestToPayTransfer endpoint',
       format: '*',
       default: 'localhost:9000/thridpartyRequests/transactions/{ID}'
