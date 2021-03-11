@@ -1,4 +1,6 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+### [11.24.3](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.24.2...v11.24.3) (2021-03-11)
+
 ### [11.24.2](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.24.1...v11.24.2) (2021-03-10)
 
 
