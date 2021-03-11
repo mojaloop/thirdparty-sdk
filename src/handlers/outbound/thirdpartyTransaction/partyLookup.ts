@@ -57,7 +57,7 @@ async function post (_context: any, request: Request, h: StateResponseToolkit): 
     logger: h.getLogger(),
     thirdpartyRequests: h.getThirdpartyRequests(),
     mojaloopRequests: h.getMojaloopRequests(),
-    backendRequests: h.getBackendRequests()
+    sdkRequests: h.getSDKRequests()
   }
   const exists = await existsInKVS(modelConfig)
   if (exists) {

@@ -25,7 +25,7 @@
  --------------
  ******/
 
-import { BackendRequests } from './backend-requests'
+import { SDKRequests } from '~/shared/sdk-requests'
 import {
   Logger as SDKLogger,
   MojaloopRequests,
@@ -41,7 +41,7 @@ import { ThirdpartyTransactionStatus } from '../pispTransaction.interface'
 
 export interface InboundThridpartyTransactionsModelConfig {
   logger: SDKLogger.Logger
-  backendRequests: BackendRequests
+  sdkRequests: SDKRequests
   mojaloopRequests: MojaloopRequests
   thirdpartyRequests: ThirdpartyRequests
 }
@@ -57,8 +57,8 @@ export class InboundThridpartyTransactionsModel {
     return this.config.logger
   }
 
-  protected get backendRequests (): BackendRequests {
-    return this.config.backendRequests
+  protected get sdkRequests (): SDKRequests {
+    return this.config.sdkRequests
   }
 
   protected get mojaloopRequests (): MojaloopRequests {
@@ -98,19 +98,19 @@ export class InboundThridpartyTransactionsModel {
     }
     this.logger.push({ requestToPayTransfer }).info('requestToPayTransfer: requestToPayTransfer')
 
-    const response = await this.backendRequests.requestToPayTransfer(
+    const response = await this.sdkRequests.requestToPayTransfer(
       requestToPayTransfer
     ) as OutboundRequestToPayTransferPostResponse
 
     this.logger.push({ response }).info('requestToPayTransfer: response')
 
     // optionally notify via PATCH
-    if (config.SHARED.NOTIFY_ABOUT_TRANSFER_URI) {
+    if (config.SHARED.SDK_NOTIFY_ABOUT_TRANSFER_URI) {
       const transactionStatus: ThirdpartyTransactionStatus = {
         transactionId: inRequest.transactionRequestId,
         transactionRequestState: 'ACCEPTED'
       }
-      await this.backendRequests.notifyAboutTransfer(transactionStatus, inRequest.transactionRequestId)
+      await this.sdkRequests.notifyAboutTransfer(transactionStatus, inRequest.transactionRequestId)
     }
 
     return response
