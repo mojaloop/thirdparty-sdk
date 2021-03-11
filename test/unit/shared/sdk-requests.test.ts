@@ -25,14 +25,14 @@
  --------------
  ******/
 
-import { SDKRequestConfig, SDKRequest } from '~/shared/sdk-requests'
+import { SDKRequestConfig, SDKRequests } from '~/shared/sdk-requests'
 import { Scheme } from '~/shared/http-scheme'
 import mockLogger from '../mockLogger'
 import { ThirdpartyTransactionStatus } from '~/models/pispTransaction.interface'
 import { uuid } from 'uuidv4'
 import { OutboundRequestToPayTransferPostRequest } from '~/models/thirdparty.transactions.interface'
 describe('SDKRequests', () => {
-  let sdkRequest: SDKRequest
+  let sdkRequest: SDKRequests
 
   const config: SDKRequestConfig = {
     dfspId: 'the-dfsp-id',
@@ -69,7 +69,7 @@ describe('SDKRequests', () => {
   }
 
   beforeEach(() => {
-    sdkRequest = new SDKRequest(config)
+    sdkRequest = new SDKRequests(config)
   })
 
   it('should create instance successfully', () => {

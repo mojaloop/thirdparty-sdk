@@ -48,7 +48,7 @@ export interface SDKRequestConfig extends HttpRequestsConfig {
  * @description tiny wrapper dedicated to make requests to SDK scheme adapter Outgoing
  *              and SDK MojaloopRequest/ThirdpartyRequest interfaces
  */
-export class SDKRequest extends HttpRequests {
+export class SDKRequests extends HttpRequests {
   // we want this constructor for better code support
   // eslint-disable-next-line no-useless-constructor
   constructor (config: SDKRequestConfig) {
