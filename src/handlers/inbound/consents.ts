@@ -21,30 +21,41 @@
  * Gates Foundation
  - Name Surname <name.surname@gatesfoundation.com>
 
- - Paweł Marzec <pawel.marzec@modusbox.com>
  - Kevin Leyow <kevin.leyow@modusbox.com>
- - Sridhar Voruganti <sridhar.voruganti@modusbox.com>
+
  --------------
  ******/
-import Hello from './hello'
-import ThirdpartyRequestsTransactions from './thirdpartyRequests/transactions'
-import InboundAuthorizations from './authorizations'
-import InboundConsents from './consents'
-import InboundConsentRequestsId from './consentRequests/{ID}'
-import InboundConsentRequestsIdError from './consentRequests/{ID}/error'
-import ThirdpartyAuthorizations from './thirdpartyRequests/transactions/{ID}/authorizations'
-import NotifyThirdpartyTransactionRequests from './thirdpartyRequests/transactions/{ID}'
-import NotifyErrorThirdpartyTransactionRequests from './thirdpartyRequests/transactions/{ID}/error'
+
+import {
+  thirdparty as tpAPI
+} from '@mojaloop/api-snippets'
+import { Message } from '~/shared/pub-sub'
+import { Request, ResponseObject } from '@hapi/hapi'
+import { StateResponseToolkit } from '~/server/plugins/state'
+import { notificationChannel } from '../../models/pispConsentRequest.model';
+import { Enum } from '@mojaloop/central-services-shared';
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function post (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+  const payload = request.payload as tpAPI.Schemas.ConsentsPostRequest
+  const logger = h.getLogger()
+
+  // POST /consents is a follow-up request to PATCH /consentRequests
+  // so we publish the request on the PISPConsentRequestModel
+  const channel = notificationChannel(
+    payload.consentRequestId
+  )
+  const pubSub = h.getPubSub()
+  // don't await on promise to resolve
+  // let finish publish in background
+  pubSub.publish(channel, payload as unknown as Message)
+  logger.info('PISPConsentRequestModel handled POST /consents request')
+
+  // Note that we will have passed request validation, JWS etc... by this point
+  // so it is safe to return 202
+  return h.response().code(Enum.Http.ReturnCodes.ACCEPTED.CODE)
+}
 
 export default {
-  HelloGet: Hello.get,
-  ThirdpartyRequestsTransactionsPost: ThirdpartyRequestsTransactions.post,
-  InboundAuthorizationsPostRequest: InboundAuthorizations.post,
-  InboundAuthorizationsIDPutResponse: InboundAuthorizations.put,
-  UpdateThirdpartyAuthorization: ThirdpartyAuthorizations.put,
-  NotifyThirdpartyTransactionRequests: NotifyThirdpartyTransactionRequests.patch,
-  NotifyErrorThirdpartyTransactionRequests: NotifyErrorThirdpartyTransactionRequests.put,
-  PatchConsentRequest: InboundConsentRequestsId.patch,
-  NotifyErrorConsentRequests: InboundConsentRequestsIdError.put,
-  PostConsents: InboundConsents.post
+  post
 }

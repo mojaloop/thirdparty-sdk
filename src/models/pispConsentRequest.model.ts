@@ -21,30 +21,24 @@
  * Gates Foundation
  - Name Surname <name.surname@gatesfoundation.com>
 
- - Paweł Marzec <pawel.marzec@modusbox.com>
  - Kevin Leyow <kevin.leyow@modusbox.com>
- - Sridhar Voruganti <sridhar.voruganti@modusbox.com>
  --------------
  ******/
-import Hello from './hello'
-import ThirdpartyRequestsTransactions from './thirdpartyRequests/transactions'
-import InboundAuthorizations from './authorizations'
-import InboundConsents from './consents'
-import InboundConsentRequestsId from './consentRequests/{ID}'
-import InboundConsentRequestsIdError from './consentRequests/{ID}/error'
-import ThirdpartyAuthorizations from './thirdpartyRequests/transactions/{ID}/authorizations'
-import NotifyThirdpartyTransactionRequests from './thirdpartyRequests/transactions/{ID}'
-import NotifyErrorThirdpartyTransactionRequests from './thirdpartyRequests/transactions/{ID}/error'
 
-export default {
-  HelloGet: Hello.get,
-  ThirdpartyRequestsTransactionsPost: ThirdpartyRequestsTransactions.post,
-  InboundAuthorizationsPostRequest: InboundAuthorizations.post,
-  InboundAuthorizationsIDPutResponse: InboundAuthorizations.put,
-  UpdateThirdpartyAuthorization: ThirdpartyAuthorizations.put,
-  NotifyThirdpartyTransactionRequests: NotifyThirdpartyTransactionRequests.patch,
-  NotifyErrorThirdpartyTransactionRequests: NotifyErrorThirdpartyTransactionRequests.put,
-  PatchConsentRequest: InboundConsentRequestsId.patch,
-  NotifyErrorConsentRequests: InboundConsentRequestsIdError.put,
-  PostConsents: InboundConsents.post
+ // TODO: use Async2sync model for this.
+/**
+ * @name channelName
+ * @description generates the pub/sub channel name
+ * @param {object} - args
+ * @param {string} args.consentRequestId - the consent request  id
+ * @returns {string} - the pub/sub channel name
+ */
+export function notificationChannel(consentRequestId: string) {
+  if (!consentRequestId) {
+    throw new Error('PISPConsentRequest.notificationChannel: \'consentRequestId\' parameter is required')
+  }
+  // channel name
+  return `consent_request_${consentRequestId}`
 }
+
+

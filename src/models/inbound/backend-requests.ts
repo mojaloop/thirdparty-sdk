@@ -36,6 +36,7 @@ import {
   OutboundRequestToPayTransferPostResponse
 } from '../thirdparty.transactions.interface'
 import config from '~/shared/config'
+import { uuid } from 'uuidv4';
 import {
   RequestPartiesInformationResponse,
   ThirdpartyTransactionStatus
@@ -125,5 +126,24 @@ export class BackendRequests extends HttpRequest {
       headers: this.headers,
       agent: this.agent
     })
+  }
+
+  // todo: create dfsp outbound calls for checking if OTP is valid.
+  //       this is mocked for now
+  async validateOTPSecret (_consentRequestId: string, _consentId: string): Promise<boolean> {
+    return true
+  }
+
+  // todo: the dfsp needs to return the accounts and scopes for the consent request.
+  //       this are mocked for now.
+  async getScopesAndAccounts (_consentRequestId: string): Promise<tpAPI.Schemas.Scope[]> {
+    return [
+      {
+        accountId: uuid(),
+        actions: [
+          'accounts.getBalance',
+          'accounts.transfer'
+        ]
+      }]
   }
 }

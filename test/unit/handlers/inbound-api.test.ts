@@ -44,7 +44,10 @@ import {
   PISPTransactionModel
 } from '~/models/pispTransaction.model'
 import { PISPTransactionPhase } from '~/models/pispTransaction.interface'
+import { notificationChannel } from '~/models/pispConsentRequest.model'
 import ThirdpartyAuthorizations from '~/handlers/inbound/thirdpartyRequests/transactions/{ID}/authorizations'
+import ConsentsHandler from '~/handlers/inbound/consents'
+import ConsentRequestsIdHandler from '~/handlers/inbound/consentRequests/{ID}'
 import { Server, Request } from '@hapi/hapi'
 import { StateResponseToolkit } from '~/server/plugins/state'
 import { buildPayeeQuoteRequestFromTptRequest } from '~/domain/thirdpartyRequests/transactions'
@@ -58,6 +61,7 @@ import { logger } from '~/shared/logger'
 const mockData = JSON.parse(JSON.stringify(TestData))
 const postThirdpartyRequestsTransactionRequest = mockData.postThirdpartyRequestsTransactionRequest
 const __postQuotes = jest.fn(() => Promise.resolve())
+const __postConsents = jest.fn(() => Promise.resolve())
 
 jest.mock('@mojaloop/sdk-standard-components', () => {
   const loggerMethods = {
@@ -78,7 +82,11 @@ jest.mock('@mojaloop/sdk-standard-components', () => {
         postQuotes: __postQuotes
       }
     }),
-    ThirdpartyRequests: jest.fn(),
+    ThirdpartyRequests: jest.fn(() => {
+      return {
+        postConsents: __postConsents
+      }
+    }),
     WSO2Auth: jest.fn(),
     Logger: {
       Logger: jest.fn(() => ({
@@ -125,6 +133,23 @@ const putThirdpartyAuthResponse: tpAPI.Schemas.ThirdpartyRequestsTransactionsIDA
   sourceAccountId: 'dfspa.alice.1234',
   status: 'VERIFIED',
   value: 'value'
+}
+
+const postConsentRequest: tpAPI.Schemas.ConsentsPostRequest = {
+  consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
+  consentRequestId: '997c89f4-053c-4283-bfec-45a1a0a28fba',
+  scopes: [{
+      accountId: 'some-id',
+      actions: [
+        'accounts.getBalance',
+        'accounts.transfer'
+      ]
+    }
+  ]
+}
+
+const patchConsentRequestsRequest: tpAPI.Schemas.ConsentRequestsIDPatchRequest = {
+  authToken: '123455'
 }
 
 describe('Inbound API routes', (): void => {
@@ -464,6 +489,109 @@ describe('Inbound API routes', (): void => {
 
     const response = await server.inject(request)
     expect(response.statusCode).toBe(400)
+  })
+
+  describe('POST /consents', () => {
+    it('handler && pubSub invocation', async (): Promise<void> => {
+      const request = {
+        payload: postConsentRequest
+      }
+      const pubSubMock = {
+        publish: jest.fn()
+      }
+      const toolkit = {
+        getPubSub: jest.fn(() => pubSubMock),
+        response: jest.fn(() => ({
+          code: jest.fn((code: number) => ({
+            statusCode: code
+          }))
+        })),
+        getLogger: jest.fn(() => logger)
+      }
+
+      const result = await ConsentsHandler.post(
+        {},
+        request as unknown as Request,
+        toolkit as unknown as StateResponseToolkit
+      )
+
+      expect(result.statusCode).toEqual(202)
+      expect(toolkit.getPubSub).toBeCalledTimes(1)
+
+      const channel = notificationChannel(postConsentRequest.consentRequestId)
+      expect(pubSubMock.publish).toBeCalledWith(channel, postConsentRequest)
+    })
+
+    it('input validation', async (): Promise<void> => {
+      const request = {
+        method: 'POST',
+        url: '/consents',
+        headers: {
+          'Content-Type': 'application/json',
+          'FSPIOP-Source': 'switch',
+          Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
+          'FSPIOP-Destination': 'dfspA'
+        },
+        payload: postConsentRequest
+      }
+      const response = await server.inject(request)
+      expect(response.statusCode).toBe(202)
+    })
+  })
+
+  describe('PATCH /consentRequests/{ID}', () => {
+    it('handler && pubSub invocation', async (): Promise<void> => {
+      const request = {
+        payload: patchConsentRequestsRequest,
+        params: {
+          ID: "520f9165-7be6-4a40-9fc8-b30fcf4f62ab"
+        },
+        headers: {
+          'Content-Type': 'application/json',
+          'FSPIOP-Source': 'switch',
+          Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
+          'FSPIOP-Destination': 'dfspA'
+        },
+      }
+      const pubSubMock = {
+        publish: jest.fn()
+      }
+      const toolkit = {
+        getPubSub: jest.fn(() => pubSubMock),
+        response: jest.fn(() => ({
+          code: jest.fn((code: number) => ({
+            statusCode: code
+          }))
+        })),
+        getLogger: jest.fn(() => logger),
+        getBackendRequests: jest.fn(),
+        getThirdpartyRequests: jest.fn(),
+      }
+
+      const result = await ConsentRequestsIdHandler.patch(
+        {},
+        request as unknown as Request,
+        toolkit as unknown as StateResponseToolkit
+      )
+
+      expect(result.statusCode).toEqual(202)
+    })
+
+    it.only('input validation', async (): Promise<void> => {
+      const request = {
+        method: 'PATCH',
+        url: '/consentRequests/520f9165-7be6-4a40-9fc8-b30fcf4f62ab',
+        headers: {
+          'Content-Type': 'application/json',
+          'FSPIOP-Source': 'switch',
+          Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
+          'FSPIOP-Destination': 'dfspA'
+        },
+        payload: patchConsentRequestsRequest
+      }
+      const response = await server.inject(request)
+      expect(response.statusCode).toBe(202)
+    })
   })
 
   describe('/thirdpartyRequests/transactions/{ID}/authorizations', () => {

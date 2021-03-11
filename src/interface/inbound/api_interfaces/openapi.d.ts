@@ -929,16 +929,12 @@ export interface components {
        * decided by the DFSP who creates the Consent
        * This field is REQUIRED for POST /consent.
        */
-      id: components["schemas"]["CorrelationId"];
+      consentId: components["schemas"]["CorrelationId"];
       /**
        * The id of the ConsentRequest that was used to initiate the
        * creation of this Consent.
        */
-      requestId?: components["schemas"]["CorrelationId"];
-      participantId: components["schemas"]["FspId"];
-      /** PISP identifier who uses this Consent. */
-      initiatorId: components["schemas"]["FspId"];
-      revokedAt?: components["schemas"]["DateTime"];
+      consentRequestId: components["schemas"]["CorrelationId"];
       scopes: components["schemas"]["Scope"][];
     };
     /** The object sent in a `PATCH /consentRequests/{ID}` request. */
