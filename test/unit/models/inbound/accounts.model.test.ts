@@ -179,8 +179,16 @@ describe('InboundAccountsModel', () => {
     })
 
     test('reformating of thrown exception when no user accounts returned', async () => {
-      mocked(config.backendRequests.getUserAccounts).mockImplementationOnce(() => Promise.resolve())
-
+      mocked(config.backendRequests.getUserAccounts).mockImplementationOnce(
+        () => {
+          throw new HTTPResponseError({
+            msg: 'mocked-error',
+            res: {
+              body: JSON.stringify({ statusCode: '3200' })
+            }
+          })
+        }
+      )
       await model.getUserAccounts(userId, dfspId)
 
       expect(config.backendRequests.getUserAccounts).toHaveBeenCalledWith(userId)
@@ -188,8 +196,8 @@ describe('InboundAccountsModel', () => {
         userId,
         {
           errorInformation: {
-            errorCode: '2001',
-            errorDescription: 'Internal server error'
+            errorCode: '3200',
+            errorDescription: 'Generic ID not found'
           }
         },
         dfspId
