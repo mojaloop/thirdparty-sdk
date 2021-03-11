@@ -10,9 +10,6 @@ export interface paths {
   "/metrics": {
     get: operations["MetricsGet"];
   };
-  "/hello": {
-    get: operations["HelloGet"];
-  };
   "/authorizations": {
     post: operations["InboundAuthorizationsPostRequest"];
   };
@@ -59,20 +56,6 @@ export interface operations {
   };
   /** The HTTP request GET /metrics is used to return metrics for the API. */
   MetricsGet: {
-    responses: {
-      200: components["responses"]["200"];
-      400: components["responses"]["400"];
-      401: components["responses"]["401"];
-      403: components["responses"]["403"];
-      404: components["responses"]["404"];
-      405: components["responses"]["405"];
-      406: components["responses"]["406"];
-      501: components["responses"]["501"];
-      503: components["responses"]["503"];
-    };
-  };
-  /** The HTTP request GET /hello is used to return some example json. */
-  HelloGet: {
     responses: {
       200: components["responses"]["200"];
       400: components["responses"]["400"];

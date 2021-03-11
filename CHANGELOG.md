@@ -1,4 +1,20 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+### [11.24.3](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.24.2...v11.24.3) (2021-03-11)
+
+### [11.24.2](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.24.1...v11.24.2) (2021-03-10)
+
+
+### CI/CD
+
+* add build-local dep to publish step ([#57](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/57)) ([a1e3aee](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/a1e3aee880f9e227a1f436db101fc883e9daeafa))
+
+### [11.24.1](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.24.0...v11.24.1) (2021-03-09)
+
+
+### Bug Fixes
+
+* 2060 api templates generation warning and drop hello example endpoint ([#55](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/55)) ([eb1ed0f](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/eb1ed0fcc71c36f71d7a470149d109632483360d))
+
 ## [11.24.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.23.0...v11.24.0) (2021-03-09)
 
 
