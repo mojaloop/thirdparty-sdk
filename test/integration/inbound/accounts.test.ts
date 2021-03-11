@@ -45,10 +45,10 @@ describe('PUT /accounts/{ID}', (): void => {
     const payload = mockData.accountsRequest.payload
     const headers = {
       headers: {
-        'Content-Type': 'application/vnd.interoperability.authorizations+json;version=1.0',
-        Accept: 'application/vnd.interoperability.authorizations+json;version=1',
-        'FSPIOP-Source': 'psip',
-        'FSPIOP-Destination': 'dfspA',
+        'Content-Type': 'application/vnd.interoperability.thirdparty+json;version=1.0',
+        Accept: 'application/vnd.interoperability.thirdparty+json;version=1',
+        'FSPIOP-Source': 'dfspA',
+        'FSPIOP-Destination': 'pisp',
         Date: 'Wed, 03 Jun 2020 08:22:12 GMT'
       }
     }
@@ -59,8 +59,8 @@ describe('PUT /accounts/{ID}', (): void => {
         const pubSub = new PubSub(config)
         await pubSub.connect()
         expect(pubSub.isConnected).toBeTruthy()
-        pubSub.subscribe('accounts_123', async (channel: string, message: Message, _id: number) => {
-          expect(channel).toEqual('accounts_123')
+        pubSub.subscribe('accounts_username1234', async (channel: string, message: Message, _id: number) => {
+          expect(channel).toEqual('accounts_username1234')
           expect(message).toEqual(payload)
           await pubSub.disconnect()
           expect(pubSub.isConnected).toBeFalsy()
