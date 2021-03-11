@@ -1,0 +1,16 @@
+description: |
+  response body of GET /accounts/{ID} 
+  derived from UpdateAccountsByUserId by Inbound Service via Pub/Sub channel
+content:
+  application/json:
+    schema: 
+      $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/AccountsIDPutResponse.yaml'
+    example:
+    -
+      accountNickname: 'dfspa.user.nickname1'
+      id: 'dfspa.username.1234'
+      currency: 'ZAR'
+    -
+      accountNickname: 'dfspa.user.nickname2'
+      id: 'dfspa.username.5678'
+      currency: 'USD'

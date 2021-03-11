@@ -21,18 +21,39 @@
  * Gates Foundation
  - Name Surname <name.surname@gatesfoundation.com>
 
- - Paweł Marzec <pawel.marzec@modusbox.com>
-
+ * Sridhar Voruganti <sridhar.voruganti@modusbox.com>
  --------------
  ******/
 
-import { Request, ResponseObject, ResponseToolkit } from '@hapi/hapi'
+import axios from 'axios'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function get (_context: any, _request: Request, h: ResponseToolkit): ResponseObject {
-  return h.response({ hello: 'inbound' }).code(200)
-}
+describe('GET /accounts/{ID}', (): void => {
+  const scenariosURI = `http://127.0.0.1:4056/accounts/username1234`
+  const expectedResp = {
+    accounts: [
+      {
+        "accountNickname": "dfspa.user.nickname1",
+        "id": "dfspa.username.1234",
+        "currency": "ZAR"
+      },
+      {
+        "accountNickname": "dfspa.user.nickname2",
+        "id": "dfspa.username.5678",
+        "currency": "USD"
+      }
+    ],
+    currentState: "COMPLETED"
+  }
 
-export default {
-  get
-}
+  it('PISP requests DFSP to return user accounts for linking', async (): Promise<void> => {
+    // Act
+    const response = await axios.get(scenariosURI)
+
+    // Assert
+    expect(response.status).toBe(200)
+    expect(response.data).toEqual(expectedResp)
+
+    // Assert state machine state
+    expect(response.data.currentState).toEqual('COMPLETED')
+  })
+})

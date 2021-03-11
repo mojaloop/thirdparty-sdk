@@ -84,5 +84,49 @@
         "initiatorType": "CONSUMER"
       }
     }
+  },
+  "accountsRequest": {
+    "headers": {
+      "fspiop-source": "pispA",
+      "fspiop-destination": "dfspA"
+    },
+    "params": {
+      "ID": "username1234"
+    },
+    "payload": [
+      {
+        "accountNickname": "dfspa.user.nickname1",
+        "id": "dfspa.username.1234",
+        "currency": "ZAR"
+      },
+      {
+        "accountNickname": "dfspa.user.nickname2",
+        "id": "dfspa.username.5678",
+        "currency": "USD"
+      }
+    ]
+  },
+  "accountsRequestError": {
+    "headers": {
+      "fspiop-source": "pispA",
+      "fspiop-destination": "dfspA"
+    },
+    "params": {
+      "ID": "username1234"
+    },
+    "payload": {
+      "errorInformation": {
+        "errorCode": "6000",
+        "errorDescription": "Generic accounts error",
+        "extensionList": {
+          "extension": [
+            {
+              "key": "test.k",
+              "value": "test.v"
+            }
+          ]
+        }
+      }
+    }
   }
 }

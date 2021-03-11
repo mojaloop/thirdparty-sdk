@@ -43,11 +43,16 @@ import {
 import {
   PISPTransactionModel
 } from '~/models/pispTransaction.model'
+import {
+  OutboundAccountsModel
+} from '~/models/outbound/accounts.model'
 import { PISPTransactionPhase } from '~/models/pispTransaction.interface'
 import ThirdpartyAuthorizations from '~/handlers/inbound/thirdpartyRequests/transactions/{ID}/authorizations'
 import { Server, Request } from '@hapi/hapi'
 import { StateResponseToolkit } from '~/server/plugins/state'
 import { buildPayeeQuoteRequestFromTptRequest } from '~/domain/thirdpartyRequests/transactions'
+import InboundAccounts from '~/handlers/inbound/accounts/{ID}'
+import InboundAccountError from '~/handlers/inbound/accounts/{ID}/error'
 import { resetUuid } from '../__mocks__/uuidv4'
 import TestData from 'test/unit/data/mockData.json'
 import index from '~/index'
@@ -79,6 +84,7 @@ jest.mock('@mojaloop/sdk-standard-components', () => {
       }
     }),
     ThirdpartyRequests: jest.fn(),
+    BackendRequests: jest.fn(),
     WSO2Auth: jest.fn(),
     Logger: {
       Logger: jest.fn(() => ({
@@ -101,6 +107,13 @@ jest.mock('~/shared/pub-sub', () => {
     }))
   }
 })
+
+const mockInboundGetAccounts = jest.fn(() => Promise.resolve())
+jest.mock('~/models/inbound/accounts.model', () => ({
+  InboundAccountsModel: jest.fn(() => ({
+    getUserAccounts: mockInboundGetAccounts
+  }))
+}))
 
 const mockInboundPostAuthorization = jest.fn(() => Promise.resolve())
 jest.mock('~/models/inbound/authorizations.model', () => ({
@@ -500,6 +513,110 @@ describe('Inbound API routes', (): void => {
       }
       const response = await server.inject(request)
       expect(response.statusCode).toBe(200)
+    })
+  })
+
+  describe('/accounts/{ID}', () => {
+    const request: Request = mockData.accountsRequest
+    const errorRequest: Request = mockData.accountsRequestError
+    it('PUT handler && pubSub invocation', async (): Promise<void> => {
+      const pubSubMock = {
+        publish: jest.fn()
+      }
+      const toolkit = {
+        getPubSub: jest.fn(() => pubSubMock),
+        getLogger: jest.fn(() => logger),
+        getBackendRequests: jest.fn(),
+        getThirdpartyRequests: jest.fn(),
+        response: jest.fn(() => ({
+          code: jest.fn((code: number) => ({
+            statusCode: code
+          }))
+        }))
+      }
+
+      const result = await InboundAccounts.put(
+        {},
+        request,
+        toolkit as unknown as StateResponseToolkit
+      )
+
+      expect(result.statusCode).toEqual(200)
+      expect(toolkit.getPubSub).toBeCalledTimes(1)
+
+      const channel = OutboundAccountsModel.notificationChannel(request.params.ID)
+      expect(pubSubMock.publish).toBeCalledWith(channel, request.payload)
+    })
+
+    it('input validation', async (): Promise<void> => {
+      const invalRequest = {
+        method: 'PUT',
+        url: '/accounts/username1234',
+        headers: {
+          'Content-Type': 'application/json',
+          'FSPIOP-Source': 'switch',
+          Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
+          'FSPIOP-Destination': 'dfspA'
+        },
+        payload: request.payload
+      }
+      const response = await server.inject(invalRequest)
+      expect(response.statusCode).toBe(200)
+    })
+
+    it('GET handler', async (): Promise<void> => {
+      const pubSubMock = {
+        publish: jest.fn()
+      }
+      const toolkit = {
+        getPubSub: jest.fn(() => pubSubMock),
+        getLogger: jest.fn(() => logger),
+        getBackendRequests: jest.fn(),
+        getThirdpartyRequests: jest.fn(),
+        response: jest.fn(() => ({
+          code: jest.fn((code: number) => ({
+            statusCode: code
+          }))
+        }))
+      }
+
+      const result = await InboundAccounts.get(
+        {},
+        request,
+        toolkit as unknown as StateResponseToolkit
+      )
+
+      expect(result.statusCode).toBe(202)
+      expect(mockInboundGetAccounts).not.toHaveBeenCalled()
+    })
+    
+    it('PUT error handler && pubSub invocation', async (): Promise<void> => {
+      const pubSubMock = {
+        publish: jest.fn()
+      }
+      const toolkit = {
+        getPubSub: jest.fn(() => pubSubMock),
+        getLogger: jest.fn(() => logger),
+        getBackendRequests: jest.fn(),
+        getThirdpartyRequests: jest.fn(),
+        response: jest.fn(() => ({
+          code: jest.fn((code: number) => ({
+            statusCode: code
+          }))
+        }))
+      }
+
+      const result = await InboundAccountError.put(
+        {},
+        errorRequest,
+        toolkit as unknown as StateResponseToolkit
+      )
+
+      expect(result.statusCode).toEqual(200)
+      expect(toolkit.getPubSub).toBeCalledTimes(1)
+
+      const channel = OutboundAccountsModel.notificationChannel(request.params.ID)
+      expect(pubSubMock.publish).toBeCalledWith(channel, errorRequest.payload)
     })
   })
 })
