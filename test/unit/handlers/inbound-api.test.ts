@@ -270,7 +270,7 @@ describe('Inbound API routes', (): void => {
       const toolkit = {
         getLogger: jest.fn(() => logger),
         getPubSub: jest.fn(() => pubSubMock),
-        getBackendRequests: jest.fn(),
+        getPISPBackendRequests: jest.fn(),
         getMojaloopRequests: jest.fn(),
         response: jest.fn(() => ({
           code: jest.fn((code: number) => ({
