@@ -105,7 +105,7 @@ export class OutboundAccountsModel
           // first unsubscribe
           pubSub.unsubscribe(channel, sid)
 
-          const putResponse = { ...message as unknown as tpAPI.Schemas.AccountsIDPutResponse }
+          const putResponse = [ ...message as unknown as tpAPI.Schemas.AccountsIDPutResponse ]
           // store response which will be returned by 'getResponse' method in workflow 'run'
           this.data.response = {
             accounts: putResponse,

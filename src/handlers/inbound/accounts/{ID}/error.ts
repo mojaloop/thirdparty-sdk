@@ -31,7 +31,7 @@ import {
 /**
  * Handles an inbound PUT /accounts/{ID}/error request
  */
-async function put (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+async function put (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const userId: string = request.params.ID
   const channel = OutboundAccountsModel.notificationChannel(userId)
   const pubSub = h.getPubSub()

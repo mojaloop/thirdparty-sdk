@@ -587,7 +587,7 @@ describe('Inbound API routes', (): void => {
       )
 
       expect(result.statusCode).toBe(202)
-      expect(mockInboundGetAccounts).toBeCalledWith(request.params.ID, request.headers['fspiop-source'])
+      expect(mockInboundGetAccounts).not.toHaveBeenCalled()
     })
     
     it('PUT error handler && pubSub invocation', async (): Promise<void> => {

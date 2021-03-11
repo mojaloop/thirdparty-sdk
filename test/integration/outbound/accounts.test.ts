@@ -30,18 +30,18 @@ import axios from 'axios'
 describe('GET /accounts/{ID}', (): void => {
   const scenariosURI = `http://127.0.0.1:4056/accounts/username1234`
   const expectedResp = {
-    accounts: {
-      0: {
+    accounts: [
+      {
         "accountNickname": "dfspa.user.nickname1",
         "id": "dfspa.username.1234",
         "currency": "ZAR"
       },
-      1: {
+      {
         "accountNickname": "dfspa.user.nickname2",
         "id": "dfspa.username.5678",
         "currency": "USD"
       }
-    },
+    ],
     currentState: "COMPLETED"
   }
 

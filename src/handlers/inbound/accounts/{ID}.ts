@@ -41,10 +41,10 @@ import { Request, ResponseObject } from '@hapi/hapi'
 import { StateResponseToolkit } from '~/server/plugins/state'
 
 /**
- * Handles a inbound PUT /accounts/{ID} request
+ * Handles an inbound PUT /accounts/{ID} request
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function put (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+async function put (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const payload = request.payload as unknown as tpAPI.Schemas.AccountsIDPutResponse
   const userId: string = request.params.ID
   const channel = OutboundAccountsModel.notificationChannel(userId)
@@ -55,11 +55,11 @@ async function put (_context: any, request: Request, h: StateResponseToolkit): P
 }
 
 /**
- * Handles a inbound GET /accounts/{ID} request
+ * Handles an inbound GET /accounts/{ID} request
  */
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function get (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+async function get (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const userId: string = request.params.ID
   const logger = h.getLogger()
   const sourceFspId = request.headers['fspiop-source']
@@ -69,11 +69,12 @@ async function get (_context: any, request: Request, h: StateResponseToolkit): P
     thirdpartyRequests: h.getThirdpartyRequests()
   }
   const model = new InboundAccountsModel(config)
-  const response = await model.getUserAccounts(userId, sourceFspId)
-  logger.push({ response }).info('InboundAccountsModel handled GET /accounts/{ID} request')
+  // don't await on promise to be resolved
+  setImmediate(async () => {
+    const response = await model.getUserAccounts(userId, sourceFspId)
+    logger.push({ response }).info('InboundAccountsModel handled GET /accounts/{ID} request')
+  })
 
-  // Note that we will have passed request validation, JWS etc... by this point
-  // so it is safe to return 202
   return h.response().code(202)
 }
 

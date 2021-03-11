@@ -64,18 +64,18 @@ describe('OutboundAccountsModel', () => {
   }
   let modelConfig: OutboundAccountsModelConfig
   const expectedResp = {
-    "accounts": {
-      "0": {
+    "accounts": [
+      {
         "accountNickname": "dfspa.user.nickname1",
         "id": "dfspa.username.1234",
         "currency": "ZAR"
       },
-      "1": {
+      {
         "accountNickname": "dfspa.user.nickname2",
         "id": "dfspa.username.5678",
         "currency": "USD"
       }
-    },
+    ],
     "currentState": OutboundAccountsModelState.succeeded
   }
 
