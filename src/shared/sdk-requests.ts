@@ -95,18 +95,6 @@ export class SDKRequest extends HttpRequests {
    *  requestVerifyAuthorization
    *
    * */
-  async requestToPayTransfer (
-    request: OutboundRequestToPayTransferPostRequest
-  ): Promise<OutboundRequestToPayTransferPostResponse | void> {
-    return this.loggedRequest<OutboundRequestToPayTransferPostResponse>({
-      uri: this.prependScheme(this.requestToPayTransferPath),
-      method: 'POST',
-      body: requests.common.bodyStringifier(request),
-      headers: this.headers,
-      agent: this.agent
-    })
-  }
-
   async notifyAboutTransfer (
     request: ThirdpartyTransactionStatus,
     id: string
@@ -114,13 +102,13 @@ export class SDKRequest extends HttpRequests {
     // TODO: replace by thirdpartyRequests.patchThridpartyRequestTransaction
     return this.loggedRequest<void>({
       //  uri: this.prependScheme(config.SHARED.NOTIFY_ABOUT_TRANSFER_URI.replace('{ID}', id)),
-      uri: this.fullUri(this.notifyAboutTransferPath.replace('{ID}', id)),
+      uri: this.prependScheme(this.notifyAboutTransferPath.replace('{ID}', id)),
       method: 'PATCH',
       body: requests.common.bodyStringifier(request),
       headers: {
         ...this.headers,
         // 'fspiop-source': this.config.SHARED.DFSP_ID
-        'fspiop-source': this.config.dfspId
+        'fspiop-source': this.dfspId
       },
 
       agent: this.agent
@@ -148,6 +136,19 @@ export class SDKRequest extends HttpRequests {
     return this.loggedRequest<RequestPartiesInformationResponse>({
       uri,
       method: 'GET',
+      headers: this.headers,
+      agent: this.agent
+    })
+  }
+
+  // TODO drop it and replace by requestTransfer
+  async requestToPayTransfer (
+    request: OutboundRequestToPayTransferPostRequest
+  ): Promise<OutboundRequestToPayTransferPostResponse | void> {
+    return this.loggedRequest<OutboundRequestToPayTransferPostResponse>({
+      uri: this.fullUri(this.requestToPayTransferPath),
+      method: 'POST',
+      body: requests.common.bodyStringifier(request),
       headers: this.headers,
       agent: this.agent
     })
