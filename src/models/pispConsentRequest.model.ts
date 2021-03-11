@@ -25,7 +25,7 @@
  --------------
  ******/
 
- // TODO: use Async2sync model for this.
+// TODO: use Async2sync model for this.
 /**
  * @name channelName
  * @description generates the pub/sub channel name
@@ -33,12 +33,10 @@
  * @param {string} args.consentRequestId - the consent request  id
  * @returns {string} - the pub/sub channel name
  */
-export function notificationChannel(consentRequestId: string) {
+export function notificationChannel (consentRequestId: string) {
   if (!consentRequestId) {
     throw new Error('PISPConsentRequest.notificationChannel: \'consentRequestId\' parameter is required')
   }
   // channel name
   return `consent_request_${consentRequestId}`
 }
-
-
