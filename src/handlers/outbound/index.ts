@@ -26,7 +26,6 @@
 
  --------------
  ******/
-import Hello from './hello'
 import Authorizations from './authorizations'
 import ThirdpartyAuthorizations from './thirdpartyRequests/transactions/{ID}/authorizations'
 import ThirdpartyTransactionPartyLookup from './thirdpartyTransaction/partyLookup'
@@ -36,7 +35,6 @@ import ThirdpartyTransactionApprove from './thirdpartyTransaction/{ID}/approve'
 export default {
   OutboundAuthorizationsPost: Authorizations.post,
   VerifyThirdPartyAuthorization: ThirdpartyAuthorizations.post,
-  HelloGet: Hello.get,
   ThirdpartyTransactionPartyLookup: ThirdpartyTransactionPartyLookup.post,
   InitiateThirdpartyTransaction: ThirdpartyTransactionInitiate.post,
   ApproveThirdpartyTransaction: ThirdpartyTransactionApprove.post

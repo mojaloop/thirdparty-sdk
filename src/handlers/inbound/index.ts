@@ -26,7 +26,6 @@
  - Sridhar Voruganti <sridhar.voruganti@modusbox.com>
  --------------
  ******/
-import Hello from './hello'
 import ThirdpartyRequestsTransactions from './thirdpartyRequests/transactions'
 import InboundAuthorizations from './authorizations'
 import ThirdpartyAuthorizations from './thirdpartyRequests/transactions/{ID}/authorizations'
@@ -34,7 +33,6 @@ import NotifyThirdpartyTransactionRequests from './thirdpartyRequests/transactio
 import NotifyErrorThirdpartyTransactionRequests from './thirdpartyRequests/transactions/{ID}/error'
 
 export default {
-  HelloGet: Hello.get,
   ThirdpartyRequestsTransactionsPost: ThirdpartyRequestsTransactions.post,
   InboundAuthorizationsPostRequest: InboundAuthorizations.post,
   InboundAuthorizationsIDPutResponse: InboundAuthorizations.put,
