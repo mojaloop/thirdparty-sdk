@@ -36,9 +36,9 @@ import {
 } from '@mojaloop/api-snippets'
 import { Method } from 'javascript-state-machine'
 import { ErrorInformation } from '~/interface/types'
-import { ControlledStateMachine, PersistentModelConfig, StateData } from '~/models/persistent.model'
+import { ControlledStateMachine, StateData, PersistentModelConfig } from '~/models/persistent.model'
 import { PubSub } from '~/shared/pub-sub'
-import { BackendRequests } from './inbound/backend-requests'
+import { SDKRequests } from '~/shared/sdk-requests'
 
 export enum RequestPartiesInformationState {
   COMPLETED = 'COMPLETED',
@@ -82,7 +82,7 @@ export interface PISPTransactionModelConfig extends PersistentModelConfig {
   pubSub: PubSub
   thirdpartyRequests: ThirdpartyRequests
   mojaloopRequests: MojaloopRequests
-  backendRequests: BackendRequests
+  sdkRequests: SDKRequests
 }
 
 // derived from request body specification

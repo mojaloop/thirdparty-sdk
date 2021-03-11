@@ -56,8 +56,8 @@ import {
   v1_1 as fspiopAPI,
   thirdparty as tpAPI
 } from '@mojaloop/api-snippets'
-import { BackendRequests } from '~/models/inbound/backend-requests'
 import { HTTPResponseError } from '~/shared/http-response-error'
+import { SDKRequests } from '~/shared/sdk-requests'
 
 // mock KVS default exported class
 jest.mock('~/shared/kvs')
@@ -89,12 +89,12 @@ describe('pipsTransactionModel', () => {
         getParties: jest.fn(() => Promise.resolve({ statusCode: 202 })),
         putAuthorizations: jest.fn(() => Promise.resolve({ statusCode: 202 }))
       } as unknown as MojaloopRequests,
-      backendRequests: {
+      sdkRequests: {
         requestPartiesInformation: jest.fn(() => Promise.resolve({
           party: { Iam: 'mocked-party' },
           currentStatus: 'COMPLETED'
         }))
-      } as unknown as BackendRequests
+      } as unknown as SDKRequests
     }
     mocked(modelConfig.pubSub.subscribe).mockImplementationOnce(
       (_channel: string, cb: NotificationCallback) => {
@@ -191,7 +191,7 @@ describe('pipsTransactionModel', () => {
 
       it('should give response properly populated from backendRequests.requestPartiesInformation', async () => {
         const model = await create(lookupData, modelConfig)
-        mocked(modelConfig.backendRequests.requestPartiesInformation).mockImplementationOnce(() => Promise.resolve({
+        mocked(modelConfig.sdkRequests.requestPartiesInformation).mockImplementationOnce(() => Promise.resolve({
           party,
           currentState: RequestPartiesInformationState.COMPLETED
         }))
@@ -219,14 +219,14 @@ describe('pipsTransactionModel', () => {
         })
 
         // check we made a call to mojaloopRequest.getParties
-        expect(modelConfig.backendRequests.requestPartiesInformation).toBeCalledWith(
+        expect(modelConfig.sdkRequests.requestPartiesInformation).toBeCalledWith(
           'party-id-type', 'party-identifier', undefined
         )
       })
 
       it('should handle error', async () => {
         mocked(
-          modelConfig.backendRequests.requestPartiesInformation
+          modelConfig.sdkRequests.requestPartiesInformation
         ).mockImplementationOnce(
           () => {
             const err = new HTTPResponseError({
@@ -262,7 +262,7 @@ describe('pipsTransactionModel', () => {
       let data: PISPTransactionData
       let channel: string
 
-      const authorizationRequest:  tpAPI.Schemas.AuthorizationsPostRequest  = {
+      const authorizationRequest: tpAPI.Schemas.AuthorizationsPostRequest = {
         transactionRequestId: '1234-1234',
         transactionId: '5678-5678',
         authenticationType: 'U2F',
@@ -408,7 +408,7 @@ describe('pipsTransactionModel', () => {
           authenticationValue: {
             pinValue: 'pin-value',
             counter: '1'
-          } as any
+          } as fspiopAPI.Schemas.AuthenticationValue
         },
         responseType: 'ENTERED'
       }
