@@ -454,7 +454,10 @@ describe('Outbound API routes', (): void => {
     const request = {
       method: 'GET',
       url: '/accounts/username1234',
-      headers: {}
+      headers: {
+        'FSPIOP-Source': 'pisp',
+        'FSPIOP-Destination': 'dfspA',
+      }
     }
     const pubSub = new PubSub({} as RedisConnectionConfig)
     // defer publication to notification channel

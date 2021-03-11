@@ -6,7 +6,11 @@ get:
   tags:
     - accounts
   parameters:
+  #Path
   - $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/parameters/ID.yaml'
+  #Headers
+  - $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/parameters/FSPIOP-Source.yaml'
+  - $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/parameters/FSPIOP-Destination.yaml'
   responses:
     '200':
       $ref: '../components/responses/AccountsByUserIdResponse.yaml'

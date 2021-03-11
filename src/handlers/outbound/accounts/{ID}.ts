@@ -43,7 +43,7 @@ async function get (_context: any, request: Request, h: StateResponseToolkit): P
   const userId: string = request.params.ID
   // prepare config
   const data: OutboundAccountsData = {
-    toParticipantId: '',
+    toParticipantId: request.headers['fspiop-destination'],
     userId: userId,
     currentState: 'start'
   }

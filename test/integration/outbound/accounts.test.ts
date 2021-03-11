@@ -29,6 +29,13 @@ import axios from 'axios'
 
 describe('GET /accounts/{ID}', (): void => {
   const scenariosURI = `http://127.0.0.1:4056/accounts/username1234`
+  const requestConfig = {
+    headers: {
+      'FSPIOP-Source': 'pisp',
+      'FSPIOP-Destination': 'dfspA',
+      Date: new Date().toUTCString()
+    }
+  }
   const expectedResp = {
     accounts: [
       {
@@ -47,7 +54,7 @@ describe('GET /accounts/{ID}', (): void => {
 
   it('PISP requests DFSP to return user accounts for linking', async (): Promise<void> => {
     // Act
-    const response = await axios.get(scenariosURI)
+    const response = await axios.get(scenariosURI, requestConfig)
 
     // Assert
     expect(response.status).toBe(200)
