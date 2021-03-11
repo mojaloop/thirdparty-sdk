@@ -1,4 +1,13 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+### [11.24.3](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.24.2...v11.24.3) (2021-03-11)
+
+### [11.24.2](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.24.1...v11.24.2) (2021-03-10)
+
+
+### CI/CD
+
+* add build-local dep to publish step ([#57](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/57)) ([a1e3aee](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/a1e3aee880f9e227a1f436db101fc883e9daeafa))
+
 ### [11.24.1](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.24.0...v11.24.1) (2021-03-09)
 
 
