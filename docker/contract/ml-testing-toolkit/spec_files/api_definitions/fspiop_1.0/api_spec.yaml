@@ -980,6 +980,7 @@ components:
       minLength: 1
       maxLength: 128
       description: Identifier of the Party.
+      example: '16135551212'
     PartySubIdOrType:
       title: PartySubIdOrType
       type: string
@@ -1073,6 +1074,7 @@ components:
       maxLength: 128
       pattern: '^(?!\s*$)[\w .,''-]{1,128}$'
       description: First name of the Party (Name Type).
+      example: Henrik
     MiddleName:
       title: MiddleName
       type: string
@@ -1080,6 +1082,7 @@ components:
       maxLength: 128
       pattern: '^(?!\s*$)[\w .,''-]{1,128}$'
       description: Middle name of the Party (Name Type).
+      example: Johannes
     LastName:
       title: LastName
       type: string
@@ -1087,6 +1090,7 @@ components:
       maxLength: 128
       pattern: '^(?!\s*$)[\w .,''-]{1,128}$'
       description: Last name of the Party (Name Type).
+      example: Karlsson
     PartyComplexName:
       title: PartyComplexName
       type: object
@@ -1104,6 +1108,7 @@ components:
       pattern: >-
         ^(?:[1-9]\d{3}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1\d|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[1-9]\d(?:0[48]|[2468][048]|[13579][26])|(?:[2468][048]|[13579][26])00)-02-29)$
       description: Date of Birth of the Party.
+      example: '1966-06-16'
     PartyPersonalInfo:
       title: PartyPersonalInfo
       type: object

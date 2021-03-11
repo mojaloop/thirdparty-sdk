@@ -28,14 +28,44 @@ export interface paths {
   "/thirdpartyRequests/transactions/{ID}/error": {
     put: operations["NotifyErrorThirdpartyTransactionRequests"];
   };
-  "/consents": {
-    post: operations["PostConsents"];
+  "/accounts/{ID}": {
+    get: operations["GetAccountsByUserId"];
+    put: operations["UpdateAccountsByUserId"];
+    parameters: {
+      path: {
+        ID: components["parameters"]["ID"];
+      };
+      header: {
+        Date: components["parameters"]["Date"];
+        "X-Forwarded-For"?: components["parameters"]["X-Forwarded-For"];
+        "FSPIOP-Source": components["parameters"]["FSPIOP-Source"];
+        "FSPIOP-Destination"?: components["parameters"]["FSPIOP-Destination"];
+        "FSPIOP-Encryption"?: components["parameters"]["FSPIOP-Encryption"];
+        "FSPIOP-Signature"?: components["parameters"]["FSPIOP-Signature"];
+        "FSPIOP-URI"?: components["parameters"]["FSPIOP-URI"];
+        "FSPIOP-HTTP-Method"?: components["parameters"]["FSPIOP-HTTP-Method"];
+      };
+    };
   };
-  "/consentRequests/{ID}": {
-    patch: operations["PatchConsentRequest"];
-  };
-  "/consentRequests/{ID}/error": {
-    put: operations["NotifyErrorConsentRequests"];
+  "/accounts/{ID}/error": {
+    put: operations["UpdateAccountsByUserIdError"];
+    parameters: {
+      path: {
+        ID: components["parameters"]["ID"];
+      };
+      header: {
+        "Content-Length"?: components["parameters"]["Content-Length"];
+        "Content-Type": components["parameters"]["Content-Type"];
+        Date: components["parameters"]["Date"];
+        "X-Forwarded-For"?: components["parameters"]["X-Forwarded-For"];
+        "FSPIOP-Source": components["parameters"]["FSPIOP-Source"];
+        "FSPIOP-Destination"?: components["parameters"]["FSPIOP-Destination"];
+        "FSPIOP-Encryption"?: components["parameters"]["FSPIOP-Encryption"];
+        "FSPIOP-Signature"?: components["parameters"]["FSPIOP-Signature"];
+        "FSPIOP-URI"?: components["parameters"]["FSPIOP-URI"];
+        "FSPIOP-HTTP-Method"?: components["parameters"]["FSPIOP-HTTP-Method"];
+      };
+    };
   };
 }
 
@@ -239,25 +269,8 @@ export interface operations {
       503: components["responses"]["503"];
     };
   };
-  /** DFSP sends this request to the PISP after granting consent. */
-  PostConsents: {
-    parameters: {
-      header: {
-        "Content-Length"?: components["parameters"]["Content-Length"];
-        "Content-Type": components["parameters"]["Content-Type"];
-        Date: components["parameters"]["Date"];
-        "X-Forwarded-For"?: components["parameters"]["X-Forwarded-For"];
-        "FSPIOP-Source": components["parameters"]["FSPIOP-Source"];
-        "FSPIOP-Destination"?: components["parameters"]["FSPIOP-Destination"];
-        "FSPIOP-Encryption"?: components["parameters"]["FSPIOP-Encryption"];
-        "FSPIOP-Signature"?: components["parameters"]["FSPIOP-Signature"];
-        "FSPIOP-URI"?: components["parameters"]["FSPIOP-URI"];
-        "FSPIOP-HTTP-Method"?: components["parameters"]["FSPIOP-HTTP-Method"];
-      };
-    };
-    requestBody: {
-      "application/json": components["schemas"]["ConsentsPostRequest"];
-    };
+  /** The HTTP request `GET /accounts/{ID}` is used to retrieve the list of potential accounts available for linking. */
+  GetAccountsByUserId: {
     responses: {
       202: components["responses"]["202"];
       400: components["responses"]["400"];
@@ -270,30 +283,19 @@ export interface operations {
       503: components["responses"]["503"];
     };
   };
-  /** PISP sends user's OTP token to a DFSP to verify user trusts aforementioned PISP */
-  PatchConsentRequest: {
+  /** The HTTP request `PUT /accounts/{ID}` is used to return the list of potential accounts available for linking */
+  UpdateAccountsByUserId: {
     parameters: {
-      path: {
-        ID: components["parameters"]["ID"];
-      };
       header: {
         "Content-Length"?: components["parameters"]["Content-Length"];
         "Content-Type": components["parameters"]["Content-Type"];
-        Date: components["parameters"]["Date"];
-        "X-Forwarded-For"?: components["parameters"]["X-Forwarded-For"];
-        "FSPIOP-Source": components["parameters"]["FSPIOP-Source"];
-        "FSPIOP-Destination"?: components["parameters"]["FSPIOP-Destination"];
-        "FSPIOP-Encryption"?: components["parameters"]["FSPIOP-Encryption"];
-        "FSPIOP-Signature"?: components["parameters"]["FSPIOP-Signature"];
-        "FSPIOP-URI"?: components["parameters"]["FSPIOP-URI"];
-        "FSPIOP-HTTP-Method"?: components["parameters"]["FSPIOP-HTTP-Method"];
       };
     };
     requestBody: {
-      "application/json": components["schemas"]["ConsentRequestsIDPatchRequest"];
+      "application/json": components["schemas"]["AccountsIDPutResponse"];
     };
     responses: {
-      202: components["responses"]["202"];
+      200: components["responses"]["200"];
       400: components["responses"]["400"];
       401: components["responses"]["401"];
       403: components["responses"]["403"];
@@ -304,23 +306,12 @@ export interface operations {
       503: components["responses"]["503"];
     };
   };
-  /** DFSP responds to the PISP if something went wrong with validating an OTP or secret. */
-  NotifyErrorConsentRequests: {
+  /** The HTTP request `PUT /accounts/{ID}/error` is used to return error information */
+  UpdateAccountsByUserIdError: {
     parameters: {
-      path: {
-        ID: components["parameters"]["ID"];
-      };
       header: {
         "Content-Length"?: components["parameters"]["Content-Length"];
         "Content-Type": components["parameters"]["Content-Type"];
-        Date: components["parameters"]["Date"];
-        "X-Forwarded-For"?: components["parameters"]["X-Forwarded-For"];
-        "FSPIOP-Source": components["parameters"]["FSPIOP-Source"];
-        "FSPIOP-Destination"?: components["parameters"]["FSPIOP-Destination"];
-        "FSPIOP-Encryption"?: components["parameters"]["FSPIOP-Encryption"];
-        "FSPIOP-Signature"?: components["parameters"]["FSPIOP-Signature"];
-        "FSPIOP-URI"?: components["parameters"]["FSPIOP-URI"];
-        "FSPIOP-HTTP-Method"?: components["parameters"]["FSPIOP-HTTP-Method"];
       };
     };
     requestBody: {
@@ -894,36 +885,11 @@ export interface components {
     ErrorInformationObject: {
       errorInformation: components["schemas"]["ErrorInformation"];
     };
-    /**
-     * The scopes requested for a ConsentRequest.
-     * - "accounts.getBalance" - Get the balance of a given account.
-     * - "accounts.transfer" - Initiate a transfer from an account.
-     */
-    ConsentScopeType: "accounts.getBalance" | "accounts.transfer";
-    /** Scope + Account Identifier mapping for a Consent. */
-    Scope: {
-      accountId: components["schemas"]["AccountAddress"];
-      actions: components["schemas"]["ConsentScopeType"][];
-    };
-    /** The object sent in a `POST /consents` request. */
-    ConsentsPostRequest: {
-      /**
-       * Common ID between the PISP and FSP for the Consent object
-       * decided by the DFSP who creates the Consent
-       * This field is REQUIRED for POST /consent.
-       */
-      consentId: components["schemas"]["CorrelationId"];
-      /**
-       * The id of the ConsentRequest that was used to initiate the
-       * creation of this Consent.
-       */
-      consentRequestId: components["schemas"]["CorrelationId"];
-      scopes: components["schemas"]["Scope"][];
-    };
-    /** The object sent in a `PATCH /consentRequests/{ID}` request. */
-    ConsentRequestsIDPatchRequest: {
-      authToken: components["schemas"]["OtpValue"];
-    };
+    AccountsIDPutResponse: {
+      accountNickname: components["schemas"]["AccountAddress"];
+      id: components["schemas"]["AccountAddress"];
+      currency: components["schemas"]["Currency"];
+    }[];
   };
   responses: {
     /** OK */

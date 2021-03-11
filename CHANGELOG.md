@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+## [11.25.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.24.3...v11.25.0) (2021-03-11)
+
+
+### Features
+
+* Add Inbound and Outbound accounts endpoints ([#56](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/56)) ([2aa08f7](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/2aa08f7891dadc1081152a26dca8c915558369e9))
+
 ### [11.24.3](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.24.2...v11.24.3) (2021-03-11)
 
 ### [11.24.2](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.24.1...v11.24.2) (2021-03-10)
