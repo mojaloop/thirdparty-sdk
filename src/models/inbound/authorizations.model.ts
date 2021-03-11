@@ -26,7 +26,7 @@
  --------------
  ******/
 
-import { BackendRequests } from './backend-requests'
+import { PISPBackendRequests } from '~/shared/pisp-backend-requests'
 import {
   Logger as SDKLogger,
   MojaloopRequests,
@@ -40,7 +40,7 @@ import { HTTPResponseError } from '~/shared/http-response-error'
 
 export interface InboundAuthorizationsModelConfig {
   logger: SDKLogger.Logger
-  backendRequests: BackendRequests
+  pispBackendRequests: PISPBackendRequests
   mojaloopRequests: MojaloopRequests
 }
 
@@ -55,8 +55,8 @@ export class InboundAuthorizationsModel {
     return this.config.logger
   }
 
-  protected get backendRequests (): BackendRequests {
-    return this.config.backendRequests
+  protected get backendRequests (): PISPBackendRequests {
+    return this.config.pispBackendRequests
   }
 
   protected get mojaloopRequests (): MojaloopRequests {
@@ -68,7 +68,7 @@ export class InboundAuthorizationsModel {
     srcDfspId: string
   ): Promise<void> {
     try {
-      const authenticationValue = await this.backendRequests.signAuthorizationRequest(inRequest)
+      const authenticationValue = await this.backendRequests.signAuthorization(inRequest)
       if (!authenticationValue) {
         throw new Error('no-authentication-value')
       }

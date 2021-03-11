@@ -31,7 +31,7 @@ import {
   thirdparty as tpAPI
 } from '@mojaloop/api-snippets'
 import { InboundAuthorizationsModel, InboundAuthorizationsModelConfig } from '~/models/inbound/authorizations.model'
-import { BackendRequests } from '~/models/inbound/backend-requests'
+import { PISPBackendRequests } from '~/shared/pisp-backend-requests'
 import { MojaloopRequests } from '@mojaloop/sdk-standard-components'
 
 import mockLogger from '../../mockLogger'
@@ -44,7 +44,7 @@ describe('InboundAuthorizationModel', () => {
   describe('authorizations', () => {
     let model: InboundAuthorizationsModel
     let config: InboundAuthorizationsModelConfig
-    let backendRequests: BackendRequests
+    let pispBackendRequests: PISPBackendRequests
     let mojaloopRequests: MojaloopRequests
     const dfspId = 'dfsp-id'
     const authenticationValue = {
@@ -101,13 +101,13 @@ describe('InboundAuthorizationModel', () => {
         putAuthorizationsError: jest.fn(() => Promise.resolve())
       } as unknown as MojaloopRequests
 
-      backendRequests = {
-        signAuthorizationRequest: jest.fn(() => Promise.resolve(authenticationValue))
-      } as unknown as BackendRequests
+      pispBackendRequests = {
+        signAuthorization: jest.fn(() => Promise.resolve(authenticationValue))
+      } as unknown as PISPBackendRequests
 
       config = {
         logger,
-        backendRequests,
+        pispBackendRequests,
         mojaloopRequests
       }
 
@@ -127,7 +127,7 @@ describe('InboundAuthorizationModel', () => {
         },
         responseType: 'ENTERED'
       }
-      expect(config.backendRequests.signAuthorizationRequest).toHaveBeenCalledWith(authorizationRequest)
+      expect(config.pispBackendRequests.signAuthorization).toHaveBeenCalledWith(authorizationRequest)
 
       expect(config.mojaloopRequests.putAuthorizations).toHaveBeenCalledWith(
         authorizationRequest.transactionRequestId,
@@ -153,7 +153,7 @@ describe('InboundAuthorizationModel', () => {
         dfspId
       )
 
-      expect(config.backendRequests.signAuthorizationRequest).toHaveBeenCalledWith(authorizationRequest)
+      expect(config.pispBackendRequests.signAuthorization).toHaveBeenCalledWith(authorizationRequest)
       expect(config.mojaloopRequests.putAuthorizationsError).toHaveBeenCalledWith(
         authorizationRequest.transactionRequestId,
         {
@@ -183,7 +183,7 @@ describe('InboundAuthorizationModel', () => {
         dfspId
       )
 
-      expect(config.backendRequests.signAuthorizationRequest).toHaveBeenCalledWith(authorizationRequest)
+      expect(config.pispBackendRequests.signAuthorization).toHaveBeenCalledWith(authorizationRequest)
       expect(config.mojaloopRequests.putAuthorizationsError).toHaveBeenCalledWith(
         authorizationRequest.transactionRequestId,
         {
@@ -208,7 +208,7 @@ describe('InboundAuthorizationModel', () => {
         dfspId
       )
 
-      expect(config.backendRequests.signAuthorizationRequest).toHaveBeenCalledWith(authorizationRequest)
+      expect(config.pispBackendRequests.signAuthorization).toHaveBeenCalledWith(authorizationRequest)
       expect(config.mojaloopRequests.putAuthorizationsError).toHaveBeenCalledWith(
         authorizationRequest.transactionRequestId,
         {
@@ -238,7 +238,7 @@ describe('InboundAuthorizationModel', () => {
         dfspId
       )
 
-      expect(config.backendRequests.signAuthorizationRequest).toHaveBeenCalledWith(authorizationRequest)
+      expect(config.pispBackendRequests.signAuthorization).toHaveBeenCalledWith(authorizationRequest)
       expect(config.mojaloopRequests.putAuthorizationsError).toHaveBeenCalledWith(
         authorizationRequest.transactionRequestId,
         {
@@ -251,14 +251,14 @@ describe('InboundAuthorizationModel', () => {
       )
     })
     test('reformating of thrown exception when no-authentication-value returned', async () => {
-      mocked(config.backendRequests.signAuthorizationRequest).mockImplementationOnce(() => Promise.resolve())
+      mocked(config.pispBackendRequests.signAuthorization).mockImplementationOnce(() => Promise.resolve())
 
       await model.postAuthorizations(
         authorizationRequest,
         dfspId
       )
 
-      expect(config.backendRequests.signAuthorizationRequest).toHaveBeenCalledWith(authorizationRequest)
+      expect(config.pispBackendRequests.signAuthorization).toHaveBeenCalledWith(authorizationRequest)
       expect(config.mojaloopRequests.putAuthorizationsError).toHaveBeenCalledWith(
         authorizationRequest.transactionRequestId,
         {
