@@ -31,11 +31,13 @@ import ThirdpartyAuthorizations from './thirdpartyRequests/transactions/{ID}/aut
 import ThirdpartyTransactionPartyLookup from './thirdpartyTransaction/partyLookup'
 import ThirdpartyTransactionInitiate from './thirdpartyTransaction/{ID}/initiate'
 import ThirdpartyTransactionApprove from './thirdpartyTransaction/{ID}/approve'
+import Accounts from './accounts/{ID}'
 
 export default {
   OutboundAuthorizationsPost: Authorizations.post,
   VerifyThirdPartyAuthorization: ThirdpartyAuthorizations.post,
   ThirdpartyTransactionPartyLookup: ThirdpartyTransactionPartyLookup.post,
   InitiateThirdpartyTransaction: ThirdpartyTransactionInitiate.post,
-  ApproveThirdpartyTransaction: ThirdpartyTransactionApprove.post
+  ApproveThirdpartyTransaction: ThirdpartyTransactionApprove.post,
+  GetAccountsByUserId: Accounts.get
 }

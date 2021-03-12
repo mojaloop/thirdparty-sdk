@@ -126,7 +126,8 @@ export const StatePlugin = {
       uri: config.SHARED.DFSP_BACKEND_URI,
       scheme: config.SHARED.DFSP_BACKEND_HTTP_SCHEME as Scheme,
       verifyAuthorizationPath: config.SHARED.DFSP_BACKEND_VERIFY_AUTHORIZATION_PATH,
-      verifyConsentPath: config.SHARED.DFSP_BACKEND_VERIFY_CONSENT_PATH
+      verifyConsentPath: config.SHARED.DFSP_BACKEND_VERIFY_CONSENT_PATH,
+      getUserAccountsPath: config.SHARED.DFSP_BACKEND_GET_USER_ACCOUNTS_PATH
     })
 
     const sdkRequests = new SDKRequests({

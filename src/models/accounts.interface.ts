@@ -21,27 +21,47 @@
  * Gates Foundation
  - Name Surname <name.surname@gatesfoundation.com>
 
- - Paweł Marzec <pawel.marzec@modusbox.com>
- - Kevin Leyow <kevin.leyow@modusbox.com>
- - Sridhar Voruganti <sridhar.voruganti@modusbox.com>
+ - Sridhar Voruganti - sridhar.voruganti@modusbox.com
  --------------
  ******/
-import ThirdpartyRequestsTransactions from './thirdpartyRequests/transactions'
-import InboundAuthorizations from './authorizations'
-import ThirdpartyAuthorizations from './thirdpartyRequests/transactions/{ID}/authorizations'
-import NotifyThirdpartyTransactionRequests from './thirdpartyRequests/transactions/{ID}'
-import NotifyErrorThirdpartyTransactionRequests from './thirdpartyRequests/transactions/{ID}/error'
-import InboundAccounts from './accounts/{ID}'
-import InboundAccountsError from './accounts/{ID}/error'
+import {
+  ControlledStateMachine,
+  PersistentModelConfig, StateData
+} from '~/models/persistent.model'
+import { Method } from 'javascript-state-machine'
+import {
+  ThirdpartyRequests
+} from '@mojaloop/sdk-standard-components'
+import {
+  v1_1 as fspiopAPI,
+  thirdparty as tpAPI
+} from '@mojaloop/api-snippets'
+import { PubSub } from '~/shared/pub-sub'
 
-export default {
-  ThirdpartyRequestsTransactionsPost: ThirdpartyRequestsTransactions.post,
-  InboundAuthorizationsPostRequest: InboundAuthorizations.post,
-  InboundAuthorizationsIDPutResponse: InboundAuthorizations.put,
-  UpdateThirdpartyAuthorization: ThirdpartyAuthorizations.put,
-  NotifyThirdpartyTransactionRequests: NotifyThirdpartyTransactionRequests.patch,
-  NotifyErrorThirdpartyTransactionRequests: NotifyErrorThirdpartyTransactionRequests.put,
-  GetAccountsByUserId: InboundAccounts.get,
-  UpdateAccountsByUserId: InboundAccounts.put,
-  UpdateAccountsByUserIdError: InboundAccountsError.put
+export enum OutboundAccountsModelState {
+  start = 'WAITING_FOR_ACCOUNTS_REQUEST',
+  succeeded = 'COMPLETED',
+  errored = 'ERROR_OCCURRED'
+}
+
+export interface OutboundAccountsGetResponse {
+  accounts: tpAPI.Schemas.AccountsIDPutResponse
+  errorInformation?: fspiopAPI.Schemas.ErrorInformation
+  currentState: OutboundAccountsModelState
+}
+
+export interface OutboundAccountsStateMachine extends ControlledStateMachine {
+  requestAccounts: Method
+  onRequestAccounts: Method
+}
+
+export interface OutboundAccountsModelConfig extends PersistentModelConfig {
+  pubSub: PubSub
+  requests: ThirdpartyRequests
+}
+
+export interface OutboundAccountsData extends StateData {
+  toParticipantId: string
+  userId: string
+  response?: OutboundAccountsGetResponse
 }

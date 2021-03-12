@@ -26,10 +26,12 @@
  ******/
 
 import { HttpRequestsConfig, HttpRequests } from '~/shared/http-requests'
+import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
 
 export interface DFSPBackendConfig extends HttpRequestsConfig {
   verifyAuthorizationPath: string
   verifyConsentPath: string
+  getUserAccountsPath: string
 }
 
 /**
@@ -61,10 +63,21 @@ export class DFSPBackendRequests extends HttpRequests {
     return this.config.verifyConsentPath
   }
 
+  // get accounts path getter
+  get getUserAccountsPath (): string {
+    return this.config.getUserAccountsPath
+  }
+
   // REQUESTS
   /**
    * TODO:
    *  verifyConsent
    *  verifyAuthorization
-  */
+   */
+
+  // request user's accounts details from DFSP Backend
+  async getUserAccounts (userId: string): Promise<tpAPI.Schemas.AccountsIDPutResponse | void> {
+    const accountsPath = this.fullUri(this.getUserAccountsPath.replace('{ID}', userId))
+    return this.get<tpAPI.Schemas.AccountsIDPutResponse>(accountsPath)
+  }
 }

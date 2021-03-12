@@ -90,6 +90,7 @@ export interface ServiceConfig {
     DFSP_BACKEND_HTTP_SCHEME: string
     DFSP_BACKEND_VERIFY_AUTHORIZATION_PATH: string
     DFSP_BACKEND_VERIFY_CONSENT_PATH: string
+    DFSP_BACKEND_GET_USER_ACCOUNTS_PATH: string
     PISP_BACKEND_URI: string
     PISP_BACKEND_HTTP_SCHEME: string
     PISP_BACKEND_SIGN_AUTHORIZATION_PATH: string
@@ -283,6 +284,11 @@ export const ConvictConfig = Convict<ServiceConfig>({
       doc: 'path use by DFSPBackendRequests.verifyConsent',
       format: '*',
       default: 'verify-consent'
+    },
+    DFSP_BACKEND_GET_USER_ACCOUNTS_PATH: {
+      doc: 'path use by DFSPBackendRequests.getUserAccounts',
+      format: '*',
+      default: 'accounts/{ID}'
     },
     PISP_BACKEND_URI: {
       doc: 'host address of DFSP\'s ',

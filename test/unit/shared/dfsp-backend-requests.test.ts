@@ -28,6 +28,7 @@
 import { DFSPBackendConfig, DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
 import { Scheme } from '~/shared/http-scheme'
 import mockLogger from '../mockLogger'
+import TestData from 'test/unit/data/mockData.json'
 
 describe('backendRequests', () => {
   let dfspBackendRequests: DFSPBackendRequests
@@ -37,7 +38,8 @@ describe('backendRequests', () => {
     scheme: Scheme.http,
     uri: 'backend-uri',
     verifyAuthorizationPath: 'verify-authorization',
-    verifyConsentPath: 'verify-consent'
+    verifyConsentPath: 'verify-consent',
+    getUserAccountsPath: 'accounts/{ID}'
   }
 
   beforeEach(() => {
@@ -61,5 +63,19 @@ describe('backendRequests', () => {
      *  - verifyAuthorization
      *  - verifyConsent
      */
+  })
+
+  describe('getUserAccounts', () => {
+    it('should propagate call to get', async () => {
+      const mockData = JSON.parse(JSON.stringify(TestData))
+      const userId = mockData.accountsRequest.params.ID
+      const response = mockData.accountsRequest.payload
+      const getSpy = jest.spyOn(dfspBackendRequests, 'get').mockImplementationOnce(
+        () => Promise.resolve(response)
+      )
+      const result = await dfspBackendRequests.getUserAccounts(userId)
+      expect(result).toEqual(response)
+      expect(getSpy).toBeCalledWith(`http://backend-uri/accounts/${userId}`)
+    })
   })
 })

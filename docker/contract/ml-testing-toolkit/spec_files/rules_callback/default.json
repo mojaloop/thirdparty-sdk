@@ -98,7 +98,7 @@
     },
     "type": "callback",
     "version": 1
-  },  
+  },
   {
     "ruleId": 3,
     "priority": 1,
@@ -176,6 +176,65 @@
             }
           }
         }
+      },
+      "delay": 0,
+      "type": "FIXED_CALLBACK"
+    },
+    "type": "callback",
+    "version": 1
+  },
+  {
+    "ruleId": 4,
+    "priority": 1,
+    "description": "get /accounts/{ID}",
+    "apiVersion": {
+      "minorVersion": 0,
+      "majorVersion": 1,
+      "type": "thirdparty_pisp",
+      "asynchronous": true
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/accounts/{ID}"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "get"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/accounts/{ID}",
+      "params": {
+        "headers": {
+          "Content-Type": "application/vnd.interoperability.parties+json;version=1.0",
+          "Date": "Wed, 27 May 2020 11:13:34 GMT",
+          "X-Forwarded-For": "sed eiusmod sunt",
+          "FSPIOP-Source": "dfspa",
+          "FSPIOP-Destination": "pisp",
+          "FSPIOP-Encryption": "magna Excepteur dolore nisi fugiat",
+          "FSPIOP-Signature": "nisi",
+          "FSPIOP-URI": "veniam reprehenderit anim ut",
+          "FSPIOP-HTTP-Method": "PUT",
+          "Content-Length": ""
+        },
+        "body": [
+          {
+            "accountNickname": "dfspa.user.nickname1",
+            "id": "dfspa.username.1234",
+            "currency": "ZAR"
+          },
+          {
+            "accountNickname": "dfspa.user.nickname2",
+            "id": "dfspa.username.5678",
+            "currency": "USD"
+          }
+        ]
       },
       "delay": 0,
       "type": "FIXED_CALLBACK"

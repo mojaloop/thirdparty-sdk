@@ -46,16 +46,19 @@ import {
   RequestPartiesInformationState
 } from '~/models/pispTransaction.interface'
 import PTM from '~/models/pispTransaction.model'
+import { OutboundAccountsModelState } from '~/models/accounts.interface'
 
 import { RedisConnectionConfig } from '~/shared/redis-connection'
 import { Server } from '@hapi/hapi'
 import { ServerAPI, ServerConfig } from '~/server'
 import Config from '~/shared/config'
 import Handlers from '~/handlers'
+import TestData from 'test/unit/data/mockData.json'
 import index from '~/index'
 import path from 'path'
 import SDK from '@mojaloop/sdk-standard-components'
 
+const mockData = JSON.parse(JSON.stringify(TestData))
 const putResponse: fspiopAPI.Schemas.AuthorizationsIDPutResponse = {
   authenticationInfo: {
     authentication: 'U2F',
@@ -127,7 +130,8 @@ jest.mock('@mojaloop/sdk-standard-components', () => {
     ThirdpartyRequests: jest.fn(() => ({
       postAuthorizations: jest.fn(() => Promise.resolve(putResponse)),
       postThirdpartyRequestsTransactionsAuthorizations: jest.fn(() => Promise.resolve(putThirdpartyAuthResponse)),
-      postThirdpartyRequestsTransactions: jest.fn(() => Promise.resolve(initiateResponse))
+      postThirdpartyRequestsTransactions: jest.fn(() => Promise.resolve(initiateResponse)),
+      getAccounts: jest.fn(() => Promise.resolve(mockData.accountsRequest.payload))
     })),
     WSO2Auth: jest.fn(),
     Logger: {
@@ -445,4 +449,69 @@ describe('Outbound API routes', (): void => {
       currentState: PISPTransactionModelState.transactionStatusReceived
     })
   })
+
+  it('/accounts/{ID} -success', async (): Promise<void> => {
+    const request = {
+      method: 'GET',
+      url: '/accounts/username1234',
+      headers: {
+        'FSPIOP-Source': 'pisp',
+        'FSPIOP-Destination': 'dfspA',
+      }
+    }
+    const pubSub = new PubSub({} as RedisConnectionConfig)
+    // defer publication to notification channel
+    setTimeout(() => pubSub.publish(
+      'some-channel',
+      mockData.accountsRequest.payload as unknown as Message
+    ), 10)
+    const response = await server.inject(request)
+    expect(response.statusCode).toBe(200)
+    const expectedResp = {
+      "accounts": [
+        {
+          "accountNickname": "dfspa.user.nickname1",
+          "id": "dfspa.username.1234",
+          "currency": "ZAR"
+        },
+        {
+          "accountNickname": "dfspa.user.nickname2",
+          "id": "dfspa.username.5678",
+          "currency": "USD"
+        }
+      ],
+      "currentState": OutboundAccountsModelState.succeeded
+    }
+    expect((response.result)).toEqual(expectedResp)
+  }),
+    it('/accounts/{ID} -fail', async (): Promise<void> => {
+      const request = {
+        method: 'GET',
+        url: '/accounts/username1234',
+        headers: {
+          'FSPIOP-Source': 'pisp',
+          'FSPIOP-Destination': 'dfspA',
+        }
+      }
+      const errorResp = {
+        "errorInformation": {
+          "errorCode": "3200",
+          "errorDescription": "Generic ID not found"
+        }
+      }
+      const pubSub = new PubSub({} as RedisConnectionConfig)
+      // defer publication to notification channel
+      setTimeout(() => pubSub.publish(
+        'some-channel',
+        errorResp as unknown as Message
+      ), 10)
+      const response = await server.inject(request)
+      expect(response.statusCode).toBe(500)
+      const expectedResp = {
+        "accounts": [],
+        "currentState": OutboundAccountsModelState.succeeded,
+        "errorInformation": errorResp.errorInformation
+      }
+      expect((response.result)).toEqual(expectedResp)
+    })
 })

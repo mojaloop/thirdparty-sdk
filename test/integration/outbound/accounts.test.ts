@@ -21,27 +21,46 @@
  * Gates Foundation
  - Name Surname <name.surname@gatesfoundation.com>
 
- - Paweł Marzec <pawel.marzec@modusbox.com>
- - Kevin Leyow <kevin.leyow@modusbox.com>
- - Sridhar Voruganti <sridhar.voruganti@modusbox.com>
+ * Sridhar Voruganti <sridhar.voruganti@modusbox.com>
  --------------
  ******/
-import ThirdpartyRequestsTransactions from './thirdpartyRequests/transactions'
-import InboundAuthorizations from './authorizations'
-import ThirdpartyAuthorizations from './thirdpartyRequests/transactions/{ID}/authorizations'
-import NotifyThirdpartyTransactionRequests from './thirdpartyRequests/transactions/{ID}'
-import NotifyErrorThirdpartyTransactionRequests from './thirdpartyRequests/transactions/{ID}/error'
-import InboundAccounts from './accounts/{ID}'
-import InboundAccountsError from './accounts/{ID}/error'
 
-export default {
-  ThirdpartyRequestsTransactionsPost: ThirdpartyRequestsTransactions.post,
-  InboundAuthorizationsPostRequest: InboundAuthorizations.post,
-  InboundAuthorizationsIDPutResponse: InboundAuthorizations.put,
-  UpdateThirdpartyAuthorization: ThirdpartyAuthorizations.put,
-  NotifyThirdpartyTransactionRequests: NotifyThirdpartyTransactionRequests.patch,
-  NotifyErrorThirdpartyTransactionRequests: NotifyErrorThirdpartyTransactionRequests.put,
-  GetAccountsByUserId: InboundAccounts.get,
-  UpdateAccountsByUserId: InboundAccounts.put,
-  UpdateAccountsByUserIdError: InboundAccountsError.put
-}
+import axios from 'axios'
+
+describe('GET /accounts/{ID}', (): void => {
+  const scenariosURI = 'http://127.0.0.1:4056/accounts/username1234'
+  const requestConfig = {
+    headers: {
+      'FSPIOP-Source': 'pisp',
+      'FSPIOP-Destination': 'dfspA',
+      Date: new Date().toUTCString()
+    }
+  }
+  const expectedResp = {
+    accounts: [
+      {
+        accountNickname: 'dfspa.user.nickname1',
+        id: 'dfspa.username.1234',
+        currency: 'ZAR'
+      },
+      {
+        accountNickname: 'dfspa.user.nickname2',
+        id: 'dfspa.username.5678',
+        currency: 'USD'
+      }
+    ],
+    currentState: 'COMPLETED'
+  }
+
+  it('PISP requests DFSP to return user accounts for linking', async (): Promise<void> => {
+    // Act
+    const response = await axios.get(scenariosURI, requestConfig)
+
+    // Assert
+    expect(response.status).toBe(200)
+    expect(response.data).toEqual(expectedResp)
+
+    // Assert state machine state
+    expect(response.data.currentState).toEqual('COMPLETED')
+  })
+})
