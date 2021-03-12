@@ -28,7 +28,7 @@
 import axios from 'axios'
 
 describe('GET /accounts/{ID}', (): void => {
-  const scenariosURI = 'http://127.0.0.1:4056/accounts/username1234'
+  const scenariosURI = 'http://127.0.0.1:4006/accounts/username1234'
   const requestConfig = {
     headers: {
       'FSPIOP-Source': 'pisp',
