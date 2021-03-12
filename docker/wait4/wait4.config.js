@@ -60,6 +60,16 @@ module.exports = {
           description: 'TTK Simulator',
           uri: 'localhost:15000',
           method: 'ncat'
+        },
+        {
+          description: 'SDK scheme-adapter Ingoing',
+          uri: 'localhost:7000',
+          method: 'ncat'
+        },
+        {
+          description: 'SDK scheme-adapter Outgoing',
+          uri: 'localhost:7002',
+          method: 'ncat'
         }
       ]
     },
