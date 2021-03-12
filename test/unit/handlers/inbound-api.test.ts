@@ -613,7 +613,7 @@ describe('Inbound API routes', (): void => {
       expect(result.statusCode).toBe(202)
       expect(mockInboundGetAccounts).not.toHaveBeenCalled()
     })
-    
+
     it('PUT error handler && pubSub invocation', async (): Promise<void> => {
       const pubSubMock = {
         publish: jest.fn()
@@ -729,7 +729,7 @@ describe('Inbound API routes', (): void => {
       expect(result.statusCode).toEqual(202)
     })
 
-    it.only('input validation', async (): Promise<void> => {
+    it('input validation', async (): Promise<void> => {
       const request = {
         method: 'PATCH',
         url: '/consentRequests/520f9165-7be6-4a40-9fc8-b30fcf4f62ab',
