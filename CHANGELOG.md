@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+### [11.25.1](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.25.0...v11.25.1) (2021-03-12)
+
+
+### Maintenance
+
+* add request headers to accounts endpoint ([#60](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/60)) ([b8b35b6](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/b8b35b693bd2b13ef0a45e884cdc1a4eaf673c6d))
+
 ## [11.25.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.24.3...v11.25.0) (2021-03-11)
 
 
