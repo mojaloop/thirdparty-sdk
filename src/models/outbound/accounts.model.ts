@@ -104,17 +104,19 @@ export class OutboundAccountsModel
           // first unsubscribe
           pubSub.unsubscribe(channel, sid)
 
-          let putResponse: tpAPI.Schemas.AccountsIDPutResponse | fspiopAPI.Schemas.ErrorInformationObject
-          if (JSON.stringify(message).indexOf('errorCode') === -1)
-            putResponse = [...message as unknown as tpAPI.Schemas.AccountsIDPutResponse]
-          else
-            putResponse = { ...message as unknown as fspiopAPI.Schemas.ErrorInformationObject }
+          type PutResponseOrError = tpAPI.Schemas.AccountsIDPutResponse & fspiopAPI.Schemas.ErrorInformationObject
+          const putResponse = message as unknown as PutResponseOrError
+
           // store response which will be returned by 'getResponse' method in workflow 'run'
           this.data.response = {
-            accounts: putResponse,
+            accounts: putResponse.errorInformation ? [] : [...putResponse],
             currentState: OutboundAccountsModelState[
               this.data.currentState as keyof typeof OutboundAccountsModelState
             ]
+          }
+
+          if (putResponse.errorInformation) {
+            this.data.response.errorInformation = { ...putResponse.errorInformation }
           }
           resolve()
         })

@@ -33,6 +33,7 @@ import {
   OutboundAccountsModelState,
 } from '~/models/accounts.interface'
 import {
+  v1_1 as fspiopAPI,
   thirdparty as tpAPI
 } from '@mojaloop/api-snippets'
 import {
@@ -77,6 +78,14 @@ describe('OutboundAccountsModel', () => {
       }
     ],
     "currentState": OutboundAccountsModelState.succeeded
+  }
+  const idNotFoundResp = {
+    accounts: [],
+    errorInformation: {
+      "errorCode": "3200",
+      "errorDescription": "Generic ID not found"
+    },
+    currentState: "COMPLETED"
   }
 
   beforeEach(async () => {
@@ -142,7 +151,9 @@ describe('OutboundAccountsModel', () => {
     let channel: string
     let handler: NotificationCallback
     let data: OutboundAccountsData
-    let putResponse: tpAPI.Schemas.AccountsIDPutResponse
+    type PutResponseOrError = tpAPI.Schemas.AccountsIDPutResponse & fspiopAPI.Schemas.ErrorInformationObject
+    let putResponse: PutResponseOrError
+
     const mockData = JSON.parse(JSON.stringify(TestData))
     beforeEach(() => {
       mocked(modelConfig.pubSub.subscribe).mockImplementationOnce(
@@ -167,7 +178,7 @@ describe('OutboundAccountsModel', () => {
       putResponse = mockData.accountsRequest.payload
     })
 
-    it('should give response properly populated from notification channel', async () => {
+    it('should give response properly populated from notification channel - success', async () => {
       const model = await create(data, modelConfig)
       // defer publication to notification channel
       setImmediate(() => model.pubSub.publish(
@@ -181,6 +192,28 @@ describe('OutboundAccountsModel', () => {
       const result = model.getResponse()
       // Assertions
       expect(result).toEqual(expectedResp)
+      expect(mocked(modelConfig.requests.getAccounts)).toHaveBeenCalledWith(
+        model.data.userId, model.data.toParticipantId
+      )
+      expect(mocked(modelConfig.pubSub.subscribe)).toBeCalledTimes(1)
+      expect(mocked(modelConfig.pubSub.unsubscribe)).toBeCalledWith(channel, subId)
+      expect(mocked(modelConfig.pubSub.publish)).toBeCalledWith(channel, putResponse)
+    })
+    it('should give response properly populated from notification channel - ID not found', async () => {
+      putResponse = mockData.accountsRequestError.payload
+      const model = await create(data, modelConfig)
+      // defer publication to notification channel
+      setImmediate(() => model.pubSub.publish(
+        channel,
+        putResponse as unknown as Message
+      ))
+      // do a request and await on published Message
+      await model.fsm.requestAccounts()
+
+      // retrieve the request
+      const result = model.getResponse()
+      // Assertions
+      expect(result).toEqual(idNotFoundResp)
       expect(mocked(modelConfig.requests.getAccounts)).toHaveBeenCalledWith(
         model.data.userId, model.data.toParticipantId
       )

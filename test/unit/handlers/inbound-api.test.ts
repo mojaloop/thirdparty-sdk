@@ -615,7 +615,7 @@ describe('Inbound API routes', (): void => {
       expect(result.statusCode).toEqual(200)
       expect(toolkit.getPubSub).toBeCalledTimes(1)
 
-      const channel = OutboundAccountsModel.notificationChannel(request.params.ID)
+      const channel = OutboundAccountsModel.notificationChannel(errorRequest.params.ID)
       expect(pubSubMock.publish).toBeCalledWith(channel, errorRequest.payload)
     })
   })

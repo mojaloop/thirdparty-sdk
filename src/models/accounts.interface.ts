@@ -45,8 +45,9 @@ export enum OutboundAccountsModelState {
 }
 
 export interface OutboundAccountsGetResponse {
-  accounts: tpAPI.Schemas.AccountsIDPutResponse | fspiopAPI.Schemas.ErrorInformationObject,
-  currentState: OutboundAccountsModelState;
+  accounts: tpAPI.Schemas.AccountsIDPutResponse
+  errorInformation?: fspiopAPI.Schemas.ErrorInformation
+  currentState: OutboundAccountsModelState
 }
 
 export interface OutboundAccountsStateMachine extends ControlledStateMachine {
