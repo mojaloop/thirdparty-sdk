@@ -55,6 +55,11 @@ module.exports = {
           description: 'PISP Simulator',
           uri: 'localhost:9000',
           method: 'ncat'
+        },
+        {
+          description: 'TTK Simulator',
+          uri: 'localhost:15000',
+          method: 'ncat'
         }
       ]
     },
