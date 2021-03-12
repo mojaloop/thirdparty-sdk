@@ -178,6 +178,23 @@ describe('InboundAccountsModel', () => {
       )
     })
 
+    test('reformating of thrown exception incase of empty response', async () => {
+      mocked(config.backendRequests.getUserAccounts).mockImplementationOnce(() => Promise.resolve())
+      await model.getUserAccounts(userId, dfspId)
+
+      expect(config.backendRequests.getUserAccounts).toHaveBeenCalledWith(userId)
+      expect(config.thirdpartyRequests.putAccountsError).toHaveBeenCalledWith(
+        userId,
+        {
+          errorInformation: {
+            errorCode: '2001',
+            errorDescription: 'Internal server error'
+          }
+        },
+        dfspId
+      )
+    })
+
     test('reformating of thrown exception when no user accounts returned', async () => {
       mocked(config.backendRequests.getUserAccounts).mockImplementationOnce(
         () => {

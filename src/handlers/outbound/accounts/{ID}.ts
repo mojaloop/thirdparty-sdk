@@ -43,7 +43,7 @@ async function get (_context: any, request: Request, h: StateResponseToolkit): P
   const userId: string = request.params.ID
   // prepare config
   const data: OutboundAccountsData = {
-    toParticipantId: '',
+    toParticipantId: request.headers['fspiop-destination'],
     userId: userId,
     currentState: 'start'
   }
@@ -56,8 +56,10 @@ async function get (_context: any, request: Request, h: StateResponseToolkit): P
   }
 
   const model: OutboundAccountsModel = await create(data, config)
-  const result = await model.run();
-  return h.response(result as OutboundAccountsGetResponse).code(200)
+  const result = (await model.run()) as OutboundAccountsGetResponse
+  const statusCode = (result.errorInformation) ? 500 : 200
+
+  return h.response(result).code(statusCode)
 }
 
 export default {

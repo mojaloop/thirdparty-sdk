@@ -450,11 +450,14 @@ describe('Outbound API routes', (): void => {
     })
   })
 
-  it('/accounts/{ID}', async (): Promise<void> => {
+  it('/accounts/{ID} -success', async (): Promise<void> => {
     const request = {
       method: 'GET',
       url: '/accounts/username1234',
-      headers: {}
+      headers: {
+        'FSPIOP-Source': 'pisp',
+        'FSPIOP-Destination': 'dfspA',
+      }
     }
     const pubSub = new PubSub({} as RedisConnectionConfig)
     // defer publication to notification channel
@@ -480,5 +483,35 @@ describe('Outbound API routes', (): void => {
       "currentState": OutboundAccountsModelState.succeeded
     }
     expect((response.result)).toEqual(expectedResp)
-  })
+  }),
+    it('/accounts/{ID} -fail', async (): Promise<void> => {
+      const request = {
+        method: 'GET',
+        url: '/accounts/username1234',
+        headers: {
+          'FSPIOP-Source': 'pisp',
+          'FSPIOP-Destination': 'dfspA',
+        }
+      }
+      const errorResp = {
+        "errorInformation": {
+          "errorCode": "3200",
+          "errorDescription": "Generic ID not found"
+        }
+      }
+      const pubSub = new PubSub({} as RedisConnectionConfig)
+      // defer publication to notification channel
+      setTimeout(() => pubSub.publish(
+        'some-channel',
+        errorResp as unknown as Message
+      ), 10)
+      const response = await server.inject(request)
+      expect(response.statusCode).toBe(500)
+      const expectedResp = {
+        "accounts": [],
+        "currentState": OutboundAccountsModelState.succeeded,
+        "errorInformation": errorResp.errorInformation
+      }
+      expect((response.result)).toEqual(expectedResp)
+    })
 })

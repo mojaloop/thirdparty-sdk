@@ -32,6 +32,7 @@ import {
   OutboundAccountsStateMachine
 } from '~/models/accounts.interface'
 import {
+  v1_1 as fspiopAPI,
   thirdparty as tpAPI
 } from '@mojaloop/api-snippets'
 import { Message, PubSub } from '~/shared/pub-sub'
@@ -99,19 +100,23 @@ export class OutboundAccountsModel
         // in handlers/inbound is implemented UpdateAccountsByUserId handler
         // which publish getAccounts response to channel
         subId = this.pubSub.subscribe(channel, async (channel: string, message: Message, sid: number) => {
-          // if (!message) {
-          //   return reject(new Error('invalid Message'))
-          // }
+
           // first unsubscribe
           pubSub.unsubscribe(channel, sid)
 
-          const putResponse = [ ...message as unknown as tpAPI.Schemas.AccountsIDPutResponse ]
+          type PutResponseOrError = tpAPI.Schemas.AccountsIDPutResponse & fspiopAPI.Schemas.ErrorInformationObject
+          const putResponse = message as unknown as PutResponseOrError
+
           // store response which will be returned by 'getResponse' method in workflow 'run'
           this.data.response = {
-            accounts: putResponse,
+            accounts: putResponse.errorInformation ? [] : [...putResponse],
             currentState: OutboundAccountsModelState[
               this.data.currentState as keyof typeof OutboundAccountsModelState
             ]
+          }
+
+          if (putResponse.errorInformation) {
+            this.data.response.errorInformation = { ...putResponse.errorInformation }
           }
           resolve()
         })
