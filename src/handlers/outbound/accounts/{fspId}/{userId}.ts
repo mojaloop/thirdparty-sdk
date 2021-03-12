@@ -35,15 +35,15 @@ import {
 } from '~/models/outbound/accounts.model'
 
 /**
- * Handles outbound GET /accounts/{ID} request
+ * Handles outbound GET /accounts/{fspId}/{userId} request
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function get (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
 
-  const userId: string = request.params.ID
+  const userId: string = request.params.userId
   // prepare config
   const data: OutboundAccountsData = {
-    toParticipantId: request.headers['fspiop-destination'],
+    toParticipantId: request.params.fspId,
     userId: userId,
     currentState: 'start'
   }

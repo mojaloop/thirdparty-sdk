@@ -25,7 +25,7 @@ export interface paths {
   "/thirdpartyRequests/transactions/{ID}/authorizations": {
     post: operations["VerifyThirdPartyAuthorization"];
   };
-  "/accounts/{ID}": {
+  "/accounts/{fspId}/{userId}": {
     get: operations["GetAccountsByUserId"];
   };
 }
@@ -159,15 +159,12 @@ export interface operations {
       503: components["responses"]["503"];
     };
   };
-  /** The HTTP request `GET /accounts/{ID}` is used to retrieve the list of potential accounts available for linking. */
+  /** The HTTP request `GET /accounts/{fspId}/{userId}` is used to retrieve the list of potential accounts available for linking. */
   GetAccountsByUserId: {
     parameters: {
       path: {
-        ID: components["parameters"]["ID"];
-      };
-      header: {
-        "FSPIOP-Source": components["parameters"]["FSPIOP-Source"];
-        "FSPIOP-Destination"?: components["parameters"]["FSPIOP-Destination"];
+        fspId: components["schemas"]["FspId"];
+        userId: components["schemas"]["AccountAddress"];
       };
     };
     responses: {
@@ -188,10 +185,6 @@ export interface components {
   parameters: {
     /** The identifier value. */
     ID: string;
-    /** The `FSPIOP-Source` header field is a non-HTTP standard field used by the API for identifying the sender of the HTTP request. The field should be set by the original sender of the request. Required for routing and signature verification (see header field `FSPIOP-Signature`). */
-    "FSPIOP-Source": string;
-    /** The `FSPIOP-Destination` header field is a non-HTTP standard field used by the API for HTTP header based routing of requests and responses to the destination. The field must be set by the original sender of the request if the destination is known (valid for all services except GET /parties) so that any entities between the client and the server do not need to parse the payload for routing purposes. If the destination is not known (valid for service GET /parties), the field should be left empty. */
-    "FSPIOP-Destination": string;
   };
   schemas: {
     /** The API data type ErrorCode is a JSON String of four characters, consisting of digits only. Negative numbers are not allowed. A leading zero is not allowed. Each error code in the API is a four-digit number, for example, 1234, where the first number (1 in the example) represents the high-level error category, the second number (2 in the example) represents the low-level error category, and the last two numbers (34 in the example) represent the specific error. */

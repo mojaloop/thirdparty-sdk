@@ -27,15 +27,7 @@
 
 import axios from 'axios'
 
-describe('GET /accounts/{ID}', (): void => {
-  const scenariosURI = `http://127.0.0.1:4056/accounts/username1234`
-  const requestConfig = {
-    headers: {
-      'FSPIOP-Source': 'pisp',
-      'FSPIOP-Destination': 'dfspA',
-      Date: new Date().toUTCString()
-    }
-  }
+describe('GET /accounts/{fspId}/{userId}', (): void => {
   const expectedResp = {
     accounts: [
       {
@@ -53,8 +45,9 @@ describe('GET /accounts/{ID}', (): void => {
   }
 
   it('PISP requests DFSP to return user accounts for linking', async (): Promise<void> => {
+    const scenariosURI = `http://127.0.0.1:4006/accounts/dfspa/username1234`
     // Act
-    const response = await axios.get(scenariosURI, requestConfig)
+    const response = await axios.get(scenariosURI)
 
     // Assert
     expect(response.status).toBe(200)
@@ -62,5 +55,24 @@ describe('GET /accounts/{ID}', (): void => {
 
     // Assert state machine state
     expect(response.data.currentState).toEqual('COMPLETED')
+  })
+
+  it('PISP requests DFSP: Expect ID not found', async (): Promise<void> => {
+    const scenariosURI = `http://127.0.0.1:4006/accounts/dfspa/test`
+    const idNotFoundResp = {
+      accounts: [],
+      errorInformation: {
+        errorCode: '3200',
+        errorDescription: 'Generic ID not found'
+      },
+      currentState: 'COMPLETED'
+    }
+
+    await axios.get(scenariosURI)
+      .catch(error => {
+        // Assert
+        expect(error.response.status).toBe(500)
+        expect(error.response.data).toEqual(expect.objectContaining(idNotFoundResp))
+      })
   })
 })

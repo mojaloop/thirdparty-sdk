@@ -31,7 +31,7 @@ import ThirdpartyAuthorizations from './thirdpartyRequests/transactions/{ID}/aut
 import ThirdpartyTransactionPartyLookup from './thirdpartyTransaction/partyLookup'
 import ThirdpartyTransactionInitiate from './thirdpartyTransaction/{ID}/initiate'
 import ThirdpartyTransactionApprove from './thirdpartyTransaction/{ID}/approve'
-import Accounts from './accounts/{ID}'
+import Accounts from './accounts/{fspId}/{userId}'
 
 export default {
   OutboundAuthorizationsPost: Authorizations.post,
