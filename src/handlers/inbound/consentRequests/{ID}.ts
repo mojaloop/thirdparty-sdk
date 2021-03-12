@@ -35,7 +35,7 @@ import { Enum } from '@mojaloop/central-services-shared'
 import {
   InboundConsentRequestsRequestModel,
   InboundConsentRequestsRequestModelConfig
-} from '~/models/inbound/consentsRequests.model'
+} from '~/models/inbound/consentRequests.model'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function patch (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {

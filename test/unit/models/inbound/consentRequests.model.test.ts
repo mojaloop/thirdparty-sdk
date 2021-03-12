@@ -28,7 +28,7 @@ optionally within square brackets <email>.
 import {
   thirdparty as tpAPI
 } from '@mojaloop/api-snippets'
-import { InboundConsentRequestsRequestModel, InboundConsentRequestsRequestModelConfig } from '~/models/inbound/consentsRequests.model'
+import { InboundConsentRequestsRequestModel, InboundConsentRequestsRequestModelConfig } from '~/models/inbound/consentRequests.model'
 import { BackendRequests } from '~/models/inbound/backend-requests'
 import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components';
 

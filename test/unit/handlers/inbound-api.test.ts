@@ -129,6 +129,13 @@ jest.mock('~/models/inbound/authorizations.model', () => ({
   }))
 }))
 
+const mockInboundPostConsents = jest.fn(() => Promise.resolve())
+jest.mock('~/models/inbound/consentRequests.model', () => ({
+  InboundConsentRequestsRequestModel: jest.fn(() => ({
+    postConsentsRequest: mockInboundPostConsents
+  }))
+}))
+
 const putResponse: fspiopAPI.Schemas.AuthorizationsIDPutResponse = {
   authenticationInfo: {
     authentication: 'U2F',
