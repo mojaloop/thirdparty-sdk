@@ -517,7 +517,7 @@ describe('Inbound API routes', (): void => {
     })
   })
 
-  describe('/accounts/{ID}', () => {
+  describe('/accounts/{dfspId}/{userId}', () => {
     const request: Request = mockData.accountsRequest
     const errorRequest: Request = mockData.accountsRequestError
     it('PUT handler && pubSub invocation', async (): Promise<void> => {
@@ -550,7 +550,7 @@ describe('Inbound API routes', (): void => {
     })
 
     it('input validation', async (): Promise<void> => {
-      const invalRequest = {
+      const inRequest = {
         method: 'PUT',
         url: '/accounts/username1234',
         headers: {
@@ -561,7 +561,7 @@ describe('Inbound API routes', (): void => {
         },
         payload: request.payload
       }
-      const response = await server.inject(invalRequest)
+      const response = await server.inject(inRequest)
       expect(response.statusCode).toBe(200)
     })
 

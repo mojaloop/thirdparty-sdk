@@ -94,7 +94,7 @@ describe('OutboundAccountsModel', () => {
       key: 'cache-key',
       logger: connectionConfig.logger,
       pubSub: new PubSub(connectionConfig),
-      requests: {
+      thirdpartyRequests: {
         getAccounts: jest.fn()
       } as unknown as ThirdpartyRequests
     }
@@ -114,7 +114,7 @@ describe('OutboundAccountsModel', () => {
 
     // check new getters
     expect(am.pubSub).toEqual(modelConfig.pubSub)
-    expect(am.requests).toEqual(modelConfig.requests)
+    expect(am.thirdpartyRequests).toEqual(modelConfig.thirdpartyRequests)
 
     // check is fsm correctly constructed
     expect(typeof am.fsm.init).toEqual('function')
@@ -192,7 +192,7 @@ describe('OutboundAccountsModel', () => {
       const result = model.getResponse()
       // Assertions
       expect(result).toEqual(expectedResp)
-      expect(mocked(modelConfig.requests.getAccounts)).toHaveBeenCalledWith(
+      expect(mocked(modelConfig.thirdpartyRequests.getAccounts)).toHaveBeenCalledWith(
         model.data.userId, model.data.toParticipantId
       )
       expect(mocked(modelConfig.pubSub.subscribe)).toBeCalledTimes(1)
@@ -214,7 +214,7 @@ describe('OutboundAccountsModel', () => {
       const result = model.getResponse()
       // Assertions
       expect(result).toEqual(idNotFoundResp)
-      expect(mocked(modelConfig.requests.getAccounts)).toHaveBeenCalledWith(
+      expect(mocked(modelConfig.thirdpartyRequests.getAccounts)).toHaveBeenCalledWith(
         model.data.userId, model.data.toParticipantId
       )
       expect(mocked(modelConfig.pubSub.subscribe)).toBeCalledTimes(1)
@@ -223,7 +223,7 @@ describe('OutboundAccountsModel', () => {
     })
 
     it('should properly handle error from requests.getAccounts', async () => {
-      mocked(modelConfig.requests.getAccounts).mockImplementationOnce(
+      mocked(modelConfig.thirdpartyRequests.getAccounts).mockImplementationOnce(
         () => { throw new Error('error from requests.getAccounts') }
       )
       const model = await create(data, modelConfig)
@@ -254,7 +254,7 @@ describe('OutboundAccountsModel', () => {
         const result = await model.run()
 
         expect(result).toEqual(expectedResp)
-        expect(mocked(modelConfig.requests.getAccounts)).toHaveBeenCalledWith(
+        expect(mocked(modelConfig.thirdpartyRequests.getAccounts)).toHaveBeenCalledWith(
           model.data.userId, model.data.toParticipantId
         )
         expect(mocked(modelConfig.pubSub.subscribe)).toBeCalledTimes(1)
@@ -287,7 +287,7 @@ describe('OutboundAccountsModel', () => {
 
       it('exceptions', async () => {
         const error = { message: 'error from requests.getAccounts', accountsState: 'broken' }
-        mocked(modelConfig.requests.getAccounts).mockImplementationOnce(
+        mocked(modelConfig.thirdpartyRequests.getAccounts).mockImplementationOnce(
           () => {
             throw error
           }
@@ -299,7 +299,7 @@ describe('OutboundAccountsModel', () => {
 
       it('exceptions - Error', async () => {
         const error = new Error()
-        mocked(modelConfig.requests.getAccounts).mockImplementationOnce(
+        mocked(modelConfig.thirdpartyRequests.getAccounts).mockImplementationOnce(
           () => {
             throw error
           }

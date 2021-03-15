@@ -29,5 +29,5 @@ paths:
     $ref: paths/thirdpartyTransaction_approve.yaml
   '/thirdpartyRequests/transactions/{ID}/authorizations':
     $ref: paths/thirdpartyRequests_transactions_ID_authorizations.yaml
-  '/accounts/{ID}':
+  '/accounts/{fspId}/{userId}':
     $ref: paths/accounts_ID.yaml

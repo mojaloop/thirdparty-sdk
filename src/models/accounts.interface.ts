@@ -57,7 +57,7 @@ export interface OutboundAccountsStateMachine extends ControlledStateMachine {
 
 export interface OutboundAccountsModelConfig extends PersistentModelConfig {
   pubSub: PubSub
-  requests: ThirdpartyRequests
+  thirdpartyRequests: ThirdpartyRequests
 }
 
 export interface OutboundAccountsData extends StateData {
