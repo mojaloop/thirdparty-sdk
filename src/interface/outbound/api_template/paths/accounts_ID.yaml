@@ -2,11 +2,20 @@ get:
   operationId: GetAccountsByUserId
   summary: GetAccountsByUserId
   description: |
-    The HTTP request `GET /accounts/{ID}` is used to retrieve the list of potential accounts available for linking.
+    The HTTP request `GET /accounts/{fspId}/{userId}` is used to retrieve the list of potential accounts available for linking.
   tags:
     - accounts
   parameters:
-  - $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/parameters/ID.yaml'
+    - name: fspId
+      in: path
+      required: true
+      schema:
+        $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/schemas/FspId.yaml'
+    - name: userId
+      in: path
+      required: true
+      schema:
+        $ref: '../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/AccountAddress.yaml'
   responses:
     '200':
       $ref: '../components/responses/AccountsByUserIdResponse.yaml'

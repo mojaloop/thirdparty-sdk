@@ -33,6 +33,7 @@ import {
   ThirdpartyRequests
 } from '@mojaloop/sdk-standard-components'
 import {
+  v1_1 as fspiopAPI,
   thirdparty as tpAPI
 } from '@mojaloop/api-snippets'
 import { PubSub } from '~/shared/pub-sub'
@@ -44,8 +45,9 @@ export enum OutboundAccountsModelState {
 }
 
 export interface OutboundAccountsGetResponse {
-  accounts: tpAPI.Schemas.AccountsIDPutResponse,
-  currentState: OutboundAccountsModelState;
+  accounts: tpAPI.Schemas.AccountsIDPutResponse
+  errorInformation?: fspiopAPI.Schemas.ErrorInformation
+  currentState: OutboundAccountsModelState
 }
 
 export interface OutboundAccountsStateMachine extends ControlledStateMachine {
@@ -55,7 +57,7 @@ export interface OutboundAccountsStateMachine extends ControlledStateMachine {
 
 export interface OutboundAccountsModelConfig extends PersistentModelConfig {
   pubSub: PubSub
-  requests: ThirdpartyRequests
+  thirdpartyRequests: ThirdpartyRequests
 }
 
 export interface OutboundAccountsData extends StateData {

@@ -30,9 +30,10 @@ import { Message, NotificationCallback, PubSub } from '~/shared/pub-sub'
 import {
   OutboundAccountsData,
   OutboundAccountsModelConfig,
-  OutboundAccountsModelState,
+  OutboundAccountsModelState
 } from '~/models/accounts.interface'
 import {
+  v1_1 as fspiopAPI,
   thirdparty as tpAPI
 } from '@mojaloop/api-snippets'
 import {
@@ -64,19 +65,27 @@ describe('OutboundAccountsModel', () => {
   }
   let modelConfig: OutboundAccountsModelConfig
   const expectedResp = {
-    "accounts": [
+    accounts: [
       {
-        "accountNickname": "dfspa.user.nickname1",
-        "id": "dfspa.username.1234",
-        "currency": "ZAR"
+        accountNickname: 'dfspa.user.nickname1',
+        id: 'dfspa.username.1234',
+        currency: 'ZAR'
       },
       {
-        "accountNickname": "dfspa.user.nickname2",
-        "id": "dfspa.username.5678",
-        "currency": "USD"
+        accountNickname: 'dfspa.user.nickname2',
+        id: 'dfspa.username.5678',
+        currency: 'USD'
       }
     ],
-    "currentState": OutboundAccountsModelState.succeeded
+    currentState: OutboundAccountsModelState.succeeded
+  }
+  const idNotFoundResp = {
+    accounts: [],
+    errorInformation: {
+      errorCode: '3200',
+      errorDescription: 'Generic ID not found'
+    },
+    currentState: 'COMPLETED'
   }
 
   beforeEach(async () => {
@@ -85,7 +94,7 @@ describe('OutboundAccountsModel', () => {
       key: 'cache-key',
       logger: connectionConfig.logger,
       pubSub: new PubSub(connectionConfig),
-      requests: {
+      thirdpartyRequests: {
         getAccounts: jest.fn()
       } as unknown as ThirdpartyRequests
     }
@@ -105,7 +114,7 @@ describe('OutboundAccountsModel', () => {
 
     // check new getters
     expect(am.pubSub).toEqual(modelConfig.pubSub)
-    expect(am.requests).toEqual(modelConfig.requests)
+    expect(am.thirdpartyRequests).toEqual(modelConfig.thirdpartyRequests)
 
     // check is fsm correctly constructed
     expect(typeof am.fsm.init).toEqual('function')
@@ -142,7 +151,9 @@ describe('OutboundAccountsModel', () => {
     let channel: string
     let handler: NotificationCallback
     let data: OutboundAccountsData
-    let putResponse: tpAPI.Schemas.AccountsIDPutResponse
+    type PutResponseOrError = tpAPI.Schemas.AccountsIDPutResponse & fspiopAPI.Schemas.ErrorInformationObject
+    let putResponse: PutResponseOrError
+
     const mockData = JSON.parse(JSON.stringify(TestData))
     beforeEach(() => {
       mocked(modelConfig.pubSub.subscribe).mockImplementationOnce(
@@ -167,7 +178,7 @@ describe('OutboundAccountsModel', () => {
       putResponse = mockData.accountsRequest.payload
     })
 
-    it('should give response properly populated from notification channel', async () => {
+    it('should give response properly populated from notification channel - success', async () => {
       const model = await create(data, modelConfig)
       // defer publication to notification channel
       setImmediate(() => model.pubSub.publish(
@@ -181,7 +192,29 @@ describe('OutboundAccountsModel', () => {
       const result = model.getResponse()
       // Assertions
       expect(result).toEqual(expectedResp)
-      expect(mocked(modelConfig.requests.getAccounts)).toHaveBeenCalledWith(
+      expect(mocked(modelConfig.thirdpartyRequests.getAccounts)).toHaveBeenCalledWith(
+        model.data.userId, model.data.toParticipantId
+      )
+      expect(mocked(modelConfig.pubSub.subscribe)).toBeCalledTimes(1)
+      expect(mocked(modelConfig.pubSub.unsubscribe)).toBeCalledWith(channel, subId)
+      expect(mocked(modelConfig.pubSub.publish)).toBeCalledWith(channel, putResponse)
+    })
+    it('should give response properly populated from notification channel - ID not found', async () => {
+      putResponse = mockData.accountsRequestError.payload
+      const model = await create(data, modelConfig)
+      // defer publication to notification channel
+      setImmediate(() => model.pubSub.publish(
+        channel,
+        putResponse as unknown as Message
+      ))
+      // do a request and await on published Message
+      await model.fsm.requestAccounts()
+
+      // retrieve the request
+      const result = model.getResponse()
+      // Assertions
+      expect(result).toEqual(idNotFoundResp)
+      expect(mocked(modelConfig.thirdpartyRequests.getAccounts)).toHaveBeenCalledWith(
         model.data.userId, model.data.toParticipantId
       )
       expect(mocked(modelConfig.pubSub.subscribe)).toBeCalledTimes(1)
@@ -190,7 +223,7 @@ describe('OutboundAccountsModel', () => {
     })
 
     it('should properly handle error from requests.getAccounts', async () => {
-      mocked(modelConfig.requests.getAccounts).mockImplementationOnce(
+      mocked(modelConfig.thirdpartyRequests.getAccounts).mockImplementationOnce(
         () => { throw new Error('error from requests.getAccounts') }
       )
       const model = await create(data, modelConfig)
@@ -221,7 +254,7 @@ describe('OutboundAccountsModel', () => {
         const result = await model.run()
 
         expect(result).toEqual(expectedResp)
-        expect(mocked(modelConfig.requests.getAccounts)).toHaveBeenCalledWith(
+        expect(mocked(modelConfig.thirdpartyRequests.getAccounts)).toHaveBeenCalledWith(
           model.data.userId, model.data.toParticipantId
         )
         expect(mocked(modelConfig.pubSub.subscribe)).toBeCalledTimes(1)
@@ -254,7 +287,7 @@ describe('OutboundAccountsModel', () => {
 
       it('exceptions', async () => {
         const error = { message: 'error from requests.getAccounts', accountsState: 'broken' }
-        mocked(modelConfig.requests.getAccounts).mockImplementationOnce(
+        mocked(modelConfig.thirdpartyRequests.getAccounts).mockImplementationOnce(
           () => {
             throw error
           }
@@ -266,7 +299,7 @@ describe('OutboundAccountsModel', () => {
 
       it('exceptions - Error', async () => {
         const error = new Error()
-        mocked(modelConfig.requests.getAccounts).mockImplementationOnce(
+        mocked(modelConfig.thirdpartyRequests.getAccounts).mockImplementationOnce(
           () => {
             throw error
           }

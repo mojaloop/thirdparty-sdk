@@ -65,7 +65,7 @@ async function get (_context: unknown, request: Request, h: StateResponseToolkit
   const sourceFspId = request.headers['fspiop-source']
   const config: InboundAccountsModelConfig = {
     logger,
-    backendRequests: h.getBackendRequests(),
+    dfspBackendRequests: h.getDFSPBackendRequests(),
     thirdpartyRequests: h.getThirdpartyRequests()
   }
   const model = new InboundAccountsModel(config)

@@ -25,7 +25,7 @@ export interface paths {
   "/thirdpartyRequests/transactions/{ID}/authorizations": {
     post: operations["VerifyThirdPartyAuthorization"];
   };
-  "/accounts/{ID}": {
+  "/accounts/{fspId}/{userId}": {
     get: operations["GetAccountsByUserId"];
   };
 }
@@ -159,11 +159,12 @@ export interface operations {
       503: components["responses"]["503"];
     };
   };
-  /** The HTTP request `GET /accounts/{ID}` is used to retrieve the list of potential accounts available for linking. */
+  /** The HTTP request `GET /accounts/{fspId}/{userId}` is used to retrieve the list of potential accounts available for linking. */
   GetAccountsByUserId: {
     parameters: {
       path: {
-        ID: components["parameters"]["ID"];
+        fspId: components["schemas"]["FspId"];
+        userId: components["schemas"]["AccountAddress"];
       };
     };
     responses: {

@@ -49,9 +49,9 @@
     },
     "params": {},
     "payload": {
-      "quoteId":"1e8beca7-2f72-4d3b-b775-fc1a6470e1de",
-      "transactionId":"c1e7bfc3-f5f5-45d3-a255-6bb3c9e22869",
-      "note":"",
+      "quoteId": "1e8beca7-2f72-4d3b-b775-fc1a6470e1de",
+      "transactionId": "c1e7bfc3-f5f5-45d3-a255-6bb3c9e22869",
+      "note": "",
       "transactionRequestId": "7d34f91d-d078-4077-8263-2c047876fcf6",
       "payee": {
         "partyIdInfo": {
@@ -112,20 +112,12 @@
       "fspiop-destination": "dfspA"
     },
     "params": {
-      "ID": "username1234"
+      "ID": "test"
     },
     "payload": {
       "errorInformation": {
-        "errorCode": "6000",
-        "errorDescription": "Generic accounts error",
-        "extensionList": {
-          "extension": [
-            {
-              "key": "test.k",
-              "value": "test.v"
-            }
-          ]
-        }
+        "errorCode": "3200",
+        "errorDescription": "Generic ID not found"
       }
     }
   },

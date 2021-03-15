@@ -25,7 +25,7 @@
  --------------
  ******/
 
-import { BackendRequests } from './backend-requests'
+import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
 import {
   Logger as SDKLogger,
   ThirdpartyRequests,
@@ -38,7 +38,7 @@ import { HTTPResponseError } from '~/shared/http-response-error'
 
 export interface InboundAccountsModelConfig {
   logger: SDKLogger.Logger
-  backendRequests: BackendRequests
+  dfspBackendRequests: DFSPBackendRequests
   thirdpartyRequests: ThirdpartyRequests
 }
 
@@ -53,8 +53,8 @@ export class InboundAccountsModel {
     return this.config.logger
   }
 
-  protected get backendRequests (): BackendRequests {
-    return this.config.backendRequests
+  protected get dfspBackendRequests (): DFSPBackendRequests {
+    return this.config.dfspBackendRequests
   }
 
   protected get thirdpartyRequests (): ThirdpartyRequests {
@@ -63,8 +63,7 @@ export class InboundAccountsModel {
 
   async getUserAccounts (userId: string, srcDfspId: string): Promise<void> {
     try {
-
-      const userAccounts = await this.backendRequests.getUserAccounts(userId)
+      const userAccounts = await this.dfspBackendRequests.getUserAccounts(userId)
       if (!userAccounts) {
         throw new Error('No user accounts found for the specified userId')
       }

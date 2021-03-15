@@ -314,7 +314,7 @@ describe('Inbound API routes', (): void => {
       const toolkit = {
         getLogger: jest.fn(() => logger),
         getPubSub: jest.fn(() => pubSubMock),
-        getBackendRequests: jest.fn(),
+        getPISPBackendRequests: jest.fn(),
         getMojaloopRequests: jest.fn(),
         response: jest.fn(() => ({
           code: jest.fn((code: number) => ({
@@ -332,6 +332,7 @@ describe('Inbound API routes', (): void => {
     })
 
     it('POST success flow - pisp transaction mode', async (): Promise<void> => {
+      // TODO: investigate how to drop this flag used in handlers/authorizations/put
       config.INBOUND.PISP_TRANSACTION_MODE = true
       const postRequest = {
         toParticipantId: 'pisp',
@@ -368,7 +369,7 @@ describe('Inbound API routes', (): void => {
       const toolkit = {
         getLogger: jest.fn(() => logger),
         getPubSub: jest.fn(() => pubSubMock),
-        getBackendRequests: jest.fn(),
+        getPISPBackendRequests: jest.fn(),
         getMojaloopRequests: jest.fn(),
         response: jest.fn(() => ({
           code: jest.fn((code: number) => ({
@@ -547,7 +548,7 @@ describe('Inbound API routes', (): void => {
     })
   })
 
-  describe('/accounts/{ID}', () => {
+  describe('/accounts/{dfspId}/{userId}', () => {
     const request: Request = mockData.accountsRequest
     const errorRequest: Request = mockData.accountsRequestError
     it('PUT handler && pubSub invocation', async (): Promise<void> => {
@@ -557,7 +558,7 @@ describe('Inbound API routes', (): void => {
       const toolkit = {
         getPubSub: jest.fn(() => pubSubMock),
         getLogger: jest.fn(() => logger),
-        getBackendRequests: jest.fn(),
+        getDFSPBackendRequests: jest.fn(),
         getThirdpartyRequests: jest.fn(),
         response: jest.fn(() => ({
           code: jest.fn((code: number) => ({
@@ -580,7 +581,7 @@ describe('Inbound API routes', (): void => {
     })
 
     it('input validation', async (): Promise<void> => {
-      const invalRequest = {
+      const inRequest = {
         method: 'PUT',
         url: '/accounts/username1234',
         headers: {
@@ -591,7 +592,7 @@ describe('Inbound API routes', (): void => {
         },
         payload: request.payload
       }
-      const response = await server.inject(invalRequest)
+      const response = await server.inject(inRequest)
       expect(response.statusCode).toBe(200)
     })
 
@@ -602,7 +603,7 @@ describe('Inbound API routes', (): void => {
       const toolkit = {
         getPubSub: jest.fn(() => pubSubMock),
         getLogger: jest.fn(() => logger),
-        getBackendRequests: jest.fn(),
+        getDFSPBackendRequests: jest.fn(),
         getThirdpartyRequests: jest.fn(),
         response: jest.fn(() => ({
           code: jest.fn((code: number) => ({
@@ -628,7 +629,7 @@ describe('Inbound API routes', (): void => {
       const toolkit = {
         getPubSub: jest.fn(() => pubSubMock),
         getLogger: jest.fn(() => logger),
-        getBackendRequests: jest.fn(),
+        getDFSPBackendRequests: jest.fn(),
         getThirdpartyRequests: jest.fn(),
         response: jest.fn(() => ({
           code: jest.fn((code: number) => ({
@@ -646,7 +647,7 @@ describe('Inbound API routes', (): void => {
       expect(result.statusCode).toEqual(200)
       expect(toolkit.getPubSub).toBeCalledTimes(1)
 
-      const channel = OutboundAccountsModel.notificationChannel(request.params.ID)
+      const channel = OutboundAccountsModel.notificationChannel(errorRequest.params.ID)
       expect(pubSubMock.publish).toBeCalledWith(channel, errorRequest.payload)
     })
   })

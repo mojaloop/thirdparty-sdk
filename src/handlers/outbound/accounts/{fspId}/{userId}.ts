@@ -35,15 +35,14 @@ import {
 } from '~/models/outbound/accounts.model'
 
 /**
- * Handles outbound GET /accounts/{ID} request
+ * Handles outbound GET /accounts/{fspId}/{userId} request
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function get (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
-
-  const userId: string = request.params.ID
+  const userId: string = request.params.userId
   // prepare config
   const data: OutboundAccountsData = {
-    toParticipantId: '',
+    toParticipantId: request.params.fspId,
     userId: userId,
     currentState: 'start'
   }
@@ -52,12 +51,14 @@ async function get (_context: any, request: Request, h: StateResponseToolkit): P
     kvs: h.getKVS(),
     logger: h.getLogger(),
     pubSub: h.getPubSub(),
-    requests: h.getThirdpartyRequests()
+    thirdpartyRequests: h.getThirdpartyRequests()
   }
 
   const model: OutboundAccountsModel = await create(data, config)
-  const result = await model.run();
-  return h.response(result as OutboundAccountsGetResponse).code(200)
+  const result = (await model.run()) as OutboundAccountsGetResponse
+  const statusCode = (result.errorInformation) ? 500 : 200
+
+  return h.response(result).code(statusCode)
 }
 
 export default {

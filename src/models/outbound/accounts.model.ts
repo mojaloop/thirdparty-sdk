@@ -32,6 +32,7 @@ import {
   OutboundAccountsStateMachine
 } from '~/models/accounts.interface'
 import {
+  v1_1 as fspiopAPI,
   thirdparty as tpAPI
 } from '@mojaloop/api-snippets'
 import { Message, PubSub } from '~/shared/pub-sub'
@@ -68,8 +69,8 @@ export class OutboundAccountsModel
     return this.config.pubSub
   }
 
-  get requests (): ThirdpartyRequests {
-    return this.config.requests
+  get thirdpartyRequests (): ThirdpartyRequests {
+    return this.config.thirdpartyRequests
   }
 
   // generate the name of notification channel dedicated for accounts requests
@@ -99,25 +100,28 @@ export class OutboundAccountsModel
         // in handlers/inbound is implemented UpdateAccountsByUserId handler
         // which publish getAccounts response to channel
         subId = this.pubSub.subscribe(channel, async (channel: string, message: Message, sid: number) => {
-          // if (!message) {
-          //   return reject(new Error('invalid Message'))
-          // }
           // first unsubscribe
           pubSub.unsubscribe(channel, sid)
 
-          const putResponse = [ ...message as unknown as tpAPI.Schemas.AccountsIDPutResponse ]
+          type PutResponseOrError = tpAPI.Schemas.AccountsIDPutResponse & fspiopAPI.Schemas.ErrorInformationObject
+          const putResponse = message as unknown as PutResponseOrError
+
           // store response which will be returned by 'getResponse' method in workflow 'run'
           this.data.response = {
-            accounts: putResponse,
+            accounts: putResponse.errorInformation ? [] : [...putResponse],
             currentState: OutboundAccountsModelState[
               this.data.currentState as keyof typeof OutboundAccountsModelState
             ]
+          }
+
+          if (putResponse.errorInformation) {
+            this.data.response.errorInformation = { ...putResponse.errorInformation }
           }
           resolve()
         })
 
         // send GET /accounts/${userId} request to the switch
-        const res = await this.requests.getAccounts(this.data.userId, this.data.toParticipantId)
+        const res = await this.thirdpartyRequests.getAccounts(this.data.userId, this.data.toParticipantId)
         this.logger.push({ res }).info('getAccounts request sent to peer')
       } catch (error) {
         this.logger.push(error).error('getAccounts request error')
@@ -148,7 +152,7 @@ export class OutboundAccountsModel
           // the first transition is requestAccounts
           await this.fsm.requestAccounts()
           this.logger.info(`getAccounts requested for ${data.userId},  currentState: ${data.currentState}`)
-        /* falls through */
+          /* falls through */
 
         case 'succeeded':
           // all steps complete so return

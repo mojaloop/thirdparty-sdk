@@ -253,17 +253,26 @@ paths:
           $ref: '#/components/responses/501'
         '503':
           $ref: '#/components/responses/503'
-  '/accounts/{ID}':
+  '/accounts/{fspId}/{userId}':
     get:
       operationId: GetAccountsByUserId
       summary: GetAccountsByUserId
       description: >
-        The HTTP request `GET /accounts/{ID}` is used to retrieve the list of
-        potential accounts available for linking.
+        The HTTP request `GET /accounts/{fspId}/{userId}` is used to retrieve
+        the list of potential accounts available for linking.
       tags:
         - accounts
       parameters:
-        - $ref: '#/components/parameters/ID'
+        - name: fspId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/FspId'
+        - name: userId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/AccountAddress'
       responses:
         '200':
           $ref: '#/components/responses/AccountsByUserIdResponse'

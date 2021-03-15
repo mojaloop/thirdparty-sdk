@@ -56,7 +56,7 @@ describe('Outbound PISP transaction handlers', () => {
     getLogger: jest.fn(() => mockLogger()),
     getThirdpartyRequests: jest.fn(),
     getMojaloopRequests: jest.fn(),
-    getBackendRequests: jest.fn(),
+    getSDKRequests: jest.fn(),
     response: jest.fn(() => ({
       code: jest.fn((code: number) => ({
         statusCode: code

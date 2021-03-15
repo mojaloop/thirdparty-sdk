@@ -81,7 +81,11 @@ describe('StatePlugin', () => {
     expect(ServerMock.decorate.mock.calls[5][0]).toEqual('toolkit')
     expect(ServerMock.decorate.mock.calls[5][1]).toEqual('getWSO2Auth')
     expect(ServerMock.decorate.mock.calls[6][0]).toEqual('toolkit')
-    expect(ServerMock.decorate.mock.calls[6][1]).toEqual('getBackendRequests')
+    expect(ServerMock.decorate.mock.calls[6][1]).toEqual('getPISPBackendRequests')
+    expect(ServerMock.decorate.mock.calls[7][0]).toEqual('toolkit')
+    expect(ServerMock.decorate.mock.calls[7][1]).toEqual('getDFSPBackendRequests')
+    expect(ServerMock.decorate.mock.calls[8][0]).toEqual('toolkit')
+    expect(ServerMock.decorate.mock.calls[8][1]).toEqual('getSDKRequests')
 
     // check listener registration on 'stop' event
     expect(ServerMock.events.on).toBeCalledTimes(1)

@@ -1,4 +1,25 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+## [11.26.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.25.2...v11.26.0) (2021-03-15)
+
+
+### Features
+
+* 2060 separate backend requests and sdk requests ([#59](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/59)) ([57c5540](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/57c5540ab7b49c8ebb1ea6c0f53dd2237c8b1743)), closes [#51](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/51)
+
+### [11.25.2](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.25.1...v11.25.2) (2021-03-15)
+
+
+### Maintenance
+
+* modify outbound accounts endpoint path ([#61](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/61)) ([7dbabd0](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/7dbabd0ef7e5a3000e103d472c2b238cfca4e07c))
+
+### [11.25.1](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.25.0...v11.25.1) (2021-03-12)
+
+
+### Maintenance
+
+* add request headers to accounts endpoint ([#60](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/60)) ([b8b35b6](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/b8b35b693bd2b13ef0a45e884cdc1a4eaf673c6d))
+
 ## [11.25.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.24.3...v11.25.0) (2021-03-11)
 
 

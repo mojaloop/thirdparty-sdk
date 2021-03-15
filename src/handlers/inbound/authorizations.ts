@@ -87,7 +87,7 @@ async function post (_context: any, request: Request, h: StateResponseToolkit): 
     const sourceFspId = request.headers['fspiop-source']
     const config: InboundAuthorizationsModelConfig = {
       logger,
-      backendRequests: h.getBackendRequests(),
+      pispBackendRequests: h.getPISPBackendRequests(),
       mojaloopRequests: h.getMojaloopRequests()
     }
     const model = new InboundAuthorizationsModel(config)

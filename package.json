@@ -1,6 +1,6 @@
 {
   "name": "@mojaloop/thirdparty-scheme-adapter",
-  "version": "11.25.0",
+  "version": "11.26.0",
   "description": "Thirdparty Scheme Adapter ",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
