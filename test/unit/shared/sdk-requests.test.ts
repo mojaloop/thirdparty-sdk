@@ -83,7 +83,7 @@ describe('SDKRequests', () => {
     expect(typeof sdkRequest.patch).toEqual('function')
     expect(typeof sdkRequest.post).toEqual('function')
     expect(typeof sdkRequest.put).toEqual('function')
-    expect(typeof sdkRequest.notifyAboutTransfer).toEqual('function')
+    expect(typeof sdkRequest.notifyThirdpartyAboutTransfer).toEqual('function')
     expect(typeof sdkRequest.requestPartiesInformation).toEqual('function')
   })
 
@@ -94,7 +94,7 @@ describe('SDKRequests', () => {
         () => Promise.resolve()
       )
       const transactionRequestId = uuid()
-      const result = await sdkRequest.notifyAboutTransfer(transactionStatus, transactionRequestId)
+      const result = await sdkRequest.notifyThirdpartyAboutTransfer(transactionStatus, transactionRequestId)
       expect(result).toBeUndefined()
       expect(loggedRequestSpy).toHaveBeenCalledWith({
         method: 'PATCH',
