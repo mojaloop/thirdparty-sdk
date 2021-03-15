@@ -85,7 +85,7 @@ export class SDKRequests extends HttpRequests {
 
   // REQUESTS
   /**
-   * TODO:
+   * TODO: these requests will be used by DFSPTransactionModel
    *  notifyThirdpartyAboutRejectedAuthorization
    *  notifyThirdpartyAboutTransfer
    *  requestAuthorization
@@ -95,7 +95,7 @@ export class SDKRequests extends HttpRequests {
    *  requestVerifyAuthorization
    *
    * */
-  async notifyAboutTransfer (
+  async notifyThirdpartyAboutTransfer (
     request: ThirdpartyTransactionStatus,
     id: string
   ): Promise<void> {

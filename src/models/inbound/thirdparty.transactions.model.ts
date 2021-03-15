@@ -46,6 +46,7 @@ export interface InboundThridpartyTransactionsModelConfig {
   thirdpartyRequests: ThirdpartyRequests
 }
 
+// TODO: replace this model by DFSPTransactionModel as described in docs/sequence/PISPTransactionApi.puml
 export class InboundThridpartyTransactionsModel {
   protected config: InboundThridpartyTransactionsModelConfig
 
@@ -65,6 +66,8 @@ export class InboundThridpartyTransactionsModel {
     return this.config.mojaloopRequests
   }
 
+  // RequestToPay endpoint was used by POC PISPTransaction code
+  // TODO: use it when PISPMerchantTransaction flow will be implemented in future
   async requestToPayTransfer (
     inRequest: InboundThirdpartyTransactionPostRequest
   ): Promise<OutboundRequestToPayTransferPostResponse> {
@@ -110,7 +113,7 @@ export class InboundThridpartyTransactionsModel {
         transactionId: inRequest.transactionRequestId,
         transactionRequestState: 'ACCEPTED'
       }
-      await this.sdkRequests.notifyAboutTransfer(transactionStatus, inRequest.transactionRequestId)
+      await this.sdkRequests.notifyThirdpartyAboutTransfer(transactionStatus, inRequest.transactionRequestId)
     }
 
     return response
