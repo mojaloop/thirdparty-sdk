@@ -25,18 +25,17 @@
  --------------
  ******/
 
-import { HttpRequestConfig, HttpRequest } from '~/shared/http-request'
+import { HttpRequestsConfig, HttpRequests } from '~/shared/http-requests'
 import { Scheme } from '~/shared/http-scheme'
 import SDK, { RequestResponse, requests } from '@mojaloop/sdk-standard-components'
 import mockLogger from '../mockLogger'
 import http from 'http'
 import { HTTPResponseError } from '~/shared/http-response-error'
 
-describe('HttpRequest', () => {
-  let httpRequest: HttpRequest
+describe('HttpRequests', () => {
+  let httpRequest: HttpRequests
 
-  const config: HttpRequestConfig = {
-    dfspId: 'the-dfsp-id',
+  const config: HttpRequestsConfig = {
     logger: mockLogger(),
     scheme: Scheme.http,
     uri: 'backend-uri'
@@ -57,7 +56,7 @@ describe('HttpRequest', () => {
   }
 
   beforeEach(() => {
-    httpRequest = new HttpRequest(config)
+    httpRequest = new HttpRequests(config)
   })
 
   it('should create instance successfully', () => {
@@ -180,12 +179,12 @@ describe('HttpRequest', () => {
       () => ({ Iam: 'mocked-agent' } as unknown as http.Agent)
     )
 
-    const kaConfig: HttpRequestConfig = {
+    const kaConfig: HttpRequestsConfig = {
       ...config,
       keepAlive: false
     }
 
-    const request = new HttpRequest(kaConfig)
+    const request = new HttpRequests(kaConfig)
     expect(request).toBeTruthy()
     expect(agentSpy).toBeCalledWith({ keepAlive: false })
   })

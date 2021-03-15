@@ -33,7 +33,9 @@ import { RedisConnectionConfig } from '~/shared/redis-connection'
 import { logger } from '~/shared/logger'
 
 import config from '~/shared/config'
-import { BackendRequests } from '~/models/inbound/backend-requests'
+import { PISPBackendRequests } from '~/shared/pisp-backend-requests'
+import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
+import { SDKRequests } from '~/shared/sdk-requests'
 import { Scheme } from '~/shared/http-scheme'
 
 export interface StateResponseToolkit extends ResponseToolkit {
@@ -43,7 +45,9 @@ export interface StateResponseToolkit extends ResponseToolkit {
   getMojaloopRequests: () => SDK.MojaloopRequests
   getThirdpartyRequests: () => SDK.ThirdpartyRequests
   getWSO2Auth: () => SDK.WSO2Auth
-  getBackendRequests: () => BackendRequests
+  getPISPBackendRequests: () => PISPBackendRequests
+  getDFSPBackendRequests: () => DFSPBackendRequests
+  getSDKRequests: () => SDKRequests
 }
 
 export const StatePlugin = {
@@ -110,12 +114,30 @@ export const StatePlugin = {
       jwsSigningKey: <Buffer> config.SHARED.JWS_SIGNING_KEY
     })
 
-    const backendRequests = new BackendRequests({
+    const pispBackendRequests = new PISPBackendRequests({
       logger,
-      dfspId: config.SHARED.DFSP_ID,
+      uri: config.SHARED.PISP_BACKEND_URI,
+      scheme: config.SHARED.PISP_BACKEND_HTTP_SCHEME as Scheme,
+      signAuthorizationPath: config.SHARED.PISP_BACKEND_SIGN_AUTHORIZATION_PATH
+    })
+
+    const dfspBackendRequests = new DFSPBackendRequests({
+      logger,
       uri: config.SHARED.DFSP_BACKEND_URI,
       scheme: config.SHARED.DFSP_BACKEND_HTTP_SCHEME as Scheme,
-      signAuthorizationPath: config.SHARED.DFSP_BACKEND_SIGN_AUTHORIZATION_PATH
+      verifyAuthorizationPath: config.SHARED.DFSP_BACKEND_VERIFY_AUTHORIZATION_PATH,
+      verifyConsentPath: config.SHARED.DFSP_BACKEND_VERIFY_CONSENT_PATH,
+      getUserAccountsPath: config.SHARED.DFSP_BACKEND_GET_USER_ACCOUNTS_PATH
+    })
+
+    const sdkRequests = new SDKRequests({
+      logger,
+      dfspId: config.SHARED.DFSP_ID,
+      uri: config.SHARED.SDK_OUTGOING_URI,
+      scheme: config.SHARED.SDK_OUTGOING_HTTP_SCHEME as Scheme,
+      requestPartiesInformationPath: config.SHARED.SDK_PARTIES_INFORMATION_URI,
+      requestToPayTransferPath: config.SHARED.SDK_REQUEST_TO_PAY_TRANSFER_URI,
+      notifyAboutTransferPath: config.SHARED.SDK_NOTIFY_ABOUT_TRANSFER_URI
     })
 
     try {
@@ -130,7 +152,9 @@ export const StatePlugin = {
       server.decorate('toolkit', 'getMojaloopRequests', (): SDK.MojaloopRequests => mojaloopRequests)
       server.decorate('toolkit', 'getThirdpartyRequests', (): SDK.ThirdpartyRequests => thirdpartyRequest)
       server.decorate('toolkit', 'getWSO2Auth', (): SDK.WSO2Auth => wso2Auth)
-      server.decorate('toolkit', 'getBackendRequests', (): BackendRequests => backendRequests)
+      server.decorate('toolkit', 'getPISPBackendRequests', (): PISPBackendRequests => pispBackendRequests)
+      server.decorate('toolkit', 'getDFSPBackendRequests', (): DFSPBackendRequests => dfspBackendRequests)
+      server.decorate('toolkit', 'getSDKRequests', (): SDKRequests => sdkRequests)
 
       // disconnect from redis when server is stopped
       server.events.on('stop', async () => {

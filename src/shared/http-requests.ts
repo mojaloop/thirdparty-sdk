@@ -35,10 +35,7 @@ import { PrependFun, Scheme, prepend2Uri } from '~/shared/http-scheme'
 import { throwOrExtractData } from '~/shared/throw-or-extract-data'
 import http from 'http'
 
-export interface HttpRequestConfig {
-  // FSP id of this DFSP
-  dfspId: string
-
+export interface HttpRequestsConfig {
   logger: SDKLogger.Logger
 
   // type of http scheme
@@ -56,21 +53,27 @@ export interface HttpRequestConfig {
  * @class HttpRequest
  * @description tiny wrapper dedicated to make requests with proper logging
  */
-export class HttpRequest {
+export class HttpRequests {
   // request config
-  protected config: HttpRequestConfig
+  protected _config: HttpRequestsConfig
 
   // the http agent to make requests
   protected agent: http.Agent
 
-  constructor (config: HttpRequestConfig) {
-    this.config = config
+  constructor (config: HttpRequestsConfig) {
+    this._config = config
     this.agent = new http.Agent({
       keepAlive: typeof config.keepAlive === 'undefined' ? true : config.keepAlive
     })
   }
 
   // GETTERS
+
+  // config getter
+  // to allow polymorphic properties in derived classes later
+  protected get config (): HttpRequestsConfig {
+    return this._config
+  }
 
   // get sdk logger
   protected get logger (): SDKLogger.Logger {

@@ -29,7 +29,7 @@ import {
   InboundAccountsModel,
   InboundAccountsModelConfig
 } from '~/models/inbound/accounts.model'
-import { BackendRequests } from '~/models/inbound/backend-requests'
+import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
 import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
 import TestData from 'test/unit/data/mockData.json'
 
@@ -43,7 +43,7 @@ describe('InboundAccountsModel', () => {
   describe('accounts', () => {
     let model: InboundAccountsModel
     let config: InboundAccountsModelConfig
-    let backendRequests: BackendRequests
+    let dfspBackendRequests: DFSPBackendRequests
     let thirdpartyRequests: ThirdpartyRequests
     const dfspId = 'dfsp-id'
     const userId = mockData.accountsRequest.params.ID
@@ -55,13 +55,13 @@ describe('InboundAccountsModel', () => {
         putAccountsError: jest.fn(() => Promise.resolve())
       } as unknown as ThirdpartyRequests
 
-      backendRequests = {
+      dfspBackendRequests = {
         getUserAccounts: jest.fn(() => Promise.resolve(putRequest))
-      } as unknown as BackendRequests
+      } as unknown as DFSPBackendRequests
 
       config = {
         logger,
-        backendRequests,
+        dfspBackendRequests,
         thirdpartyRequests
       }
 
@@ -71,7 +71,7 @@ describe('InboundAccountsModel', () => {
     test('happy flow', async () => {
       await model.getUserAccounts(userId, dfspId)
 
-      expect(config.backendRequests.getUserAccounts).toHaveBeenCalledWith(userId)
+      expect(config.dfspBackendRequests.getUserAccounts).toHaveBeenCalledWith(userId)
       expect(config.thirdpartyRequests.putAccounts).toHaveBeenCalledWith(userId, putRequest, dfspId)
     })
 
@@ -89,7 +89,7 @@ describe('InboundAccountsModel', () => {
 
       await model.getUserAccounts(userId, dfspId)
 
-      expect(config.backendRequests.getUserAccounts).toHaveBeenCalledWith(userId)
+      expect(config.dfspBackendRequests.getUserAccounts).toHaveBeenCalledWith(userId)
       expect(config.thirdpartyRequests.putAccountsError).toHaveBeenCalledWith(
         userId,
         {
@@ -116,7 +116,7 @@ describe('InboundAccountsModel', () => {
 
       await model.getUserAccounts(userId, dfspId)
 
-      expect(config.backendRequests.getUserAccounts).toHaveBeenCalledWith(userId)
+      expect(config.dfspBackendRequests.getUserAccounts).toHaveBeenCalledWith(userId)
       expect(config.thirdpartyRequests.putAccountsError).toHaveBeenCalledWith(
         userId,
         {
@@ -138,7 +138,7 @@ describe('InboundAccountsModel', () => {
 
       await model.getUserAccounts(userId, dfspId)
 
-      expect(config.backendRequests.getUserAccounts).toHaveBeenCalledWith(userId)
+      expect(config.dfspBackendRequests.getUserAccounts).toHaveBeenCalledWith(userId)
       expect(config.thirdpartyRequests.putAccountsError).toHaveBeenCalledWith(
         userId,
         {
@@ -165,7 +165,7 @@ describe('InboundAccountsModel', () => {
 
       await model.getUserAccounts(userId, dfspId)
 
-      expect(config.backendRequests.getUserAccounts).toHaveBeenCalledWith(userId)
+      expect(config.dfspBackendRequests.getUserAccounts).toHaveBeenCalledWith(userId)
       expect(config.thirdpartyRequests.putAccountsError).toHaveBeenCalledWith(
         userId,
         {
@@ -179,10 +179,10 @@ describe('InboundAccountsModel', () => {
     })
 
     test('reformating of thrown exception incase of empty response', async () => {
-      mocked(config.backendRequests.getUserAccounts).mockImplementationOnce(() => Promise.resolve())
+      mocked(config.dfspBackendRequests.getUserAccounts).mockImplementationOnce(() => Promise.resolve())
       await model.getUserAccounts(userId, dfspId)
 
-      expect(config.backendRequests.getUserAccounts).toHaveBeenCalledWith(userId)
+      expect(config.dfspBackendRequests.getUserAccounts).toHaveBeenCalledWith(userId)
       expect(config.thirdpartyRequests.putAccountsError).toHaveBeenCalledWith(
         userId,
         {
@@ -196,7 +196,7 @@ describe('InboundAccountsModel', () => {
     })
 
     test('reformating of thrown exception when no user accounts returned', async () => {
-      mocked(config.backendRequests.getUserAccounts).mockImplementationOnce(
+      mocked(config.dfspBackendRequests.getUserAccounts).mockImplementationOnce(
         () => {
           throw new HTTPResponseError({
             msg: 'mocked-error',
@@ -208,7 +208,7 @@ describe('InboundAccountsModel', () => {
       )
       await model.getUserAccounts(userId, dfspId)
 
-      expect(config.backendRequests.getUserAccounts).toHaveBeenCalledWith(userId)
+      expect(config.dfspBackendRequests.getUserAccounts).toHaveBeenCalledWith(userId)
       expect(config.thirdpartyRequests.putAccountsError).toHaveBeenCalledWith(
         userId,
         {

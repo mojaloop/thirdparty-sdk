@@ -39,7 +39,6 @@ import {
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function get (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
-
   const userId: string = request.params.userId
   // prepare config
   const data: OutboundAccountsData = {
@@ -52,7 +51,7 @@ async function get (_context: any, request: Request, h: StateResponseToolkit): P
     kvs: h.getKVS(),
     logger: h.getLogger(),
     pubSub: h.getPubSub(),
-    requests: h.getThirdpartyRequests()
+    thirdpartyRequests: h.getThirdpartyRequests()
   }
 
   const model: OutboundAccountsModel = await create(data, config)

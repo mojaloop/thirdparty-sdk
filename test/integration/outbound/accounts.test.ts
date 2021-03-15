@@ -31,21 +31,21 @@ describe('GET /accounts/{fspId}/{userId}', (): void => {
   const expectedResp = {
     accounts: [
       {
-        "accountNickname": "dfspa.user.nickname1",
-        "id": "dfspa.username.1234",
-        "currency": "ZAR"
+        accountNickname: 'dfspa.user.nickname1',
+        id: 'dfspa.username.1234',
+        currency: 'ZAR'
       },
       {
-        "accountNickname": "dfspa.user.nickname2",
-        "id": "dfspa.username.5678",
-        "currency": "USD"
+        accountNickname: 'dfspa.user.nickname2',
+        id: 'dfspa.username.5678',
+        currency: 'USD'
       }
     ],
-    currentState: "COMPLETED"
+    currentState: 'COMPLETED'
   }
 
   it('PISP requests DFSP to return user accounts for linking', async (): Promise<void> => {
-    const scenariosURI = `http://127.0.0.1:4006/accounts/dfspa/username1234`
+    const scenariosURI = 'http://127.0.0.1:4006/accounts/dfspa/username1234'
     // Act
     const response = await axios.get(scenariosURI)
 
@@ -58,7 +58,7 @@ describe('GET /accounts/{fspId}/{userId}', (): void => {
   })
 
   it('PISP requests DFSP: Expect ID not found', async (): Promise<void> => {
-    const scenariosURI = `http://127.0.0.1:4006/accounts/dfspa/test`
+    const scenariosURI = 'http://127.0.0.1:4006/accounts/dfspa/test'
     const idNotFoundResp = {
       accounts: [],
       errorInformation: {

@@ -69,8 +69,8 @@ export class OutboundAccountsModel
     return this.config.pubSub
   }
 
-  get requests (): ThirdpartyRequests {
-    return this.config.requests
+  get thirdpartyRequests (): ThirdpartyRequests {
+    return this.config.thirdpartyRequests
   }
 
   // generate the name of notification channel dedicated for accounts requests
@@ -100,7 +100,6 @@ export class OutboundAccountsModel
         // in handlers/inbound is implemented UpdateAccountsByUserId handler
         // which publish getAccounts response to channel
         subId = this.pubSub.subscribe(channel, async (channel: string, message: Message, sid: number) => {
-
           // first unsubscribe
           pubSub.unsubscribe(channel, sid)
 
@@ -122,7 +121,7 @@ export class OutboundAccountsModel
         })
 
         // send GET /accounts/${userId} request to the switch
-        const res = await this.requests.getAccounts(this.data.userId, this.data.toParticipantId)
+        const res = await this.thirdpartyRequests.getAccounts(this.data.userId, this.data.toParticipantId)
         this.logger.push({ res }).info('getAccounts request sent to peer')
       } catch (error) {
         this.logger.push(error).error('getAccounts request error')
@@ -153,7 +152,7 @@ export class OutboundAccountsModel
           // the first transition is requestAccounts
           await this.fsm.requestAccounts()
           this.logger.info(`getAccounts requested for ${data.userId},  currentState: ${data.currentState}`)
-        /* falls through */
+          /* falls through */
 
         case 'succeeded':
           // all steps complete so return
