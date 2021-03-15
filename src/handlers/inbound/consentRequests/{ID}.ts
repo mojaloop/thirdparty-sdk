@@ -38,7 +38,7 @@ import {
 } from '~/models/inbound/consentRequests.model'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function patch (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+async function patch (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const payload = request.payload as tpAPI.Schemas.ConsentRequestsIDPatchRequest
   const consentRequestsRequestId = request.params.ID
   const authToken = payload.authToken

@@ -71,9 +71,7 @@ export class BackendRequests extends HttpRequest {
   get getScopesPath (): string {
     return (this.config as unknown as BackendConfig).getScopesPath
   }
-  get backendURI (): string {
-    return (this.config as unknown as BackendConfig).uri
-  }
+
   // requests signing of Authorization Request
   // PISP Backend will ask the User to sign AuthorizationRequest
   // and in response delivers the cryptographic proof of signing in AuthenticationValue.pinValue
@@ -149,10 +147,7 @@ export class BackendRequests extends HttpRequest {
   // This check is needed to continue the flow of responding to a /consentRequest
   // with either a POST /consents or PUT /consentRequests/{ID}/error
   async validateOTPSecret (consentRequestId: string, authToken: string): Promise<ValidateOTPResponse | void> {
-    const uri = this.prependScheme(
-      this.backendURI + '/' +
-      this.validateOTPPath
-    )
+    const uri = this.fullUri(this.validateOTPPath)
     this.logger.push({ uri, template: config.SHARED.DFSP_BACKEND_VALIDATE_OTP_PATH }).info('validateOTPSecret')
 
     const validateRequest = requests.common.bodyStringifier({
@@ -171,10 +166,8 @@ export class BackendRequests extends HttpRequest {
 
   // retrieve the scopes that PISP is granted on a user's behalf
   async getScopes (consentRequestId: string): Promise<tpAPI.Schemas.Scope[] | void> {
-    const uri = this.prependScheme(
-      this.backendURI + '/' +
-      this.getScopesPath
-        .replace('{ID}', consentRequestId)
+    const uri = this.fullUri(
+      this.getScopesPath.replace('{ID}', consentRequestId)
     )
     this.logger.push({ uri, template: config.SHARED.DFSP_BACKEND_GET_SCOPES_PATH }).info('getScopes')
 

@@ -81,11 +81,8 @@ export class InboundConsentRequestsRequestModel {
         throw new Error('Invalid OTP')
       }
       const scopesGranted = await this.backendRequests.getScopes(consentRequestsRequestId)
-      if (!scopesGranted) {
-        throw new Error('No scopes returned')
-      }
-      if (scopesGranted.length < 1) {
-        throw new Error('No scopes granted')
+      if (!scopesGranted || scopesGranted.length < 1) {
+        throw new Error('InvalidAuthToken')
       }
 
       const postConsentRequestsPayload: tpAPI.Schemas.ConsentsPostRequest = {
@@ -101,8 +98,9 @@ export class InboundConsentRequestsRequestModel {
       this.logger.push({ err }).error('Error in patchConsentRequest @ Inbound')
       const mojaloopError = this.reformatError(err)
       this.logger.push({ mojaloopError }).info(`Sending error response to ${srcDfspId}`)
-      // todo: handle error. putConsentRequestsError needs to be added to
+      // TODO: handle error. putConsentRequestsError needs to be added to
       //       sdk-standard-components
+      // TODO: identify the errorCodes to match the error scenarios
       // await this.thirdpartyRequests.putConsentRequestsError(
       //  consentRequestsRequestId,
       //  mojaloopError as unknown as fspiopAPI.Schemas.ErrorInformationObject,
