@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+### [11.25.2](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.25.1...v11.25.2) (2021-03-15)
+
+
+### Maintenance
+
+* modify outbound accounts endpoint path ([#61](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/61)) ([7dbabd0](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/7dbabd0ef7e5a3000e103d472c2b238cfca4e07c))
+
 ### [11.25.1](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.25.0...v11.25.1) (2021-03-12)
 
 
