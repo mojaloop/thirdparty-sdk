@@ -28,7 +28,7 @@
 import { HttpRequestsConfig, HttpRequests } from '~/shared/http-requests'
 import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
 import { requests } from '@mojaloop/sdk-standard-components'
-import { ValidateOTPResponse } from '../models/inbound/consentRequests.model';
+import { ValidateOTPResponse } from '../models/inbound/consentRequests.model'
 
 export interface DFSPBackendConfig extends HttpRequestsConfig {
   verifyAuthorizationPath: string
@@ -103,8 +103,8 @@ export class DFSPBackendRequests extends HttpRequests {
     this.logger.push({ uri, template: this.validateOTPPath }).info('validateOTPSecret')
 
     const validateRequest = requests.common.bodyStringifier({
-      "consentRequestId": consentRequestId,
-      "authToken": authToken
+      consentRequestId: consentRequestId,
+      authToken: authToken
     })
 
     return this.loggedRequest<ValidateOTPResponse>({
