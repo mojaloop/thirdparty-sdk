@@ -54,8 +54,10 @@ describe('InboundConsentRequestsRequestModel', () => {
       } as unknown as ThirdpartyRequests
 
       backendRequests = {
-        validateOTPSecret: jest.fn(() => Promise.resolve(true)),
-        getScopesAndAccounts: jest.fn(() => Promise.resolve(
+        validateOTPSecret: jest.fn(() => Promise.resolve({
+          isValid: true
+        })),
+        getScopes: jest.fn(() => Promise.resolve(
           [
             {
               accountId: "35ad7f40-1646-4237-b24c-d6b2d507fe59",
@@ -85,7 +87,7 @@ describe('InboundConsentRequestsRequestModel', () => {
       )
 
       expect(config.backendRequests.validateOTPSecret).toHaveBeenCalledWith(id, patchConsentRequests.authToken)
-      expect(config.backendRequests.getScopesAndAccounts).toHaveBeenCalledWith(id)
+      expect(config.backendRequests.getScopes).toHaveBeenCalledWith(id)
 
       expect(config.thirdpartyRequests.postConsents).toHaveBeenCalledWith(
         expect.objectContaining({

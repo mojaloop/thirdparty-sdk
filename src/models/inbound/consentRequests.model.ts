@@ -38,6 +38,10 @@ import { HTTPResponseError } from '~/shared/http-response-error'
 import { uuid } from '../../../test/unit/__mocks__/uuidv4';
 
 
+export interface ValidateOTPResponse {
+  isValid: boolean
+}
+
 export interface InboundConsentRequestsRequestModelConfig {
   logger: SDKLogger.Logger
   backendRequests: BackendRequests
@@ -69,14 +73,17 @@ export class InboundConsentRequestsRequestModel {
     authToken: string
   ): Promise<void> {
     try {
-      // mocked OTP validation the dfsp needs to do
       const isValidOTP = await this.backendRequests.validateOTPSecret(consentRequestsRequestId, authToken)
       if (!isValidOTP) {
+        throw new Error('No response returned')
+      }
+      if (!isValidOTP.isValid) {
         throw new Error('Invalid OTP')
       }
-      // mocked scopes which the dfsp would need to fetch from their backend
-      // todo: double check how the dfsp knows what accountId's and actions to return
-      const scopesGranted = await this.backendRequests.getScopesAndAccounts(consentRequestsRequestId)
+      const scopesGranted = await this.backendRequests.getScopes(consentRequestsRequestId)
+      if (!scopesGranted) {
+        throw new Error('No scopes returned')
+      }
       if (scopesGranted.length < 1) {
         throw new Error('No scopes granted')
       }

@@ -115,7 +115,9 @@ export const StatePlugin = {
       dfspId: config.SHARED.DFSP_ID,
       uri: config.SHARED.DFSP_BACKEND_URI,
       scheme: config.SHARED.DFSP_BACKEND_HTTP_SCHEME as Scheme,
-      signAuthorizationPath: config.SHARED.DFSP_BACKEND_SIGN_AUTHORIZATION_PATH
+      signAuthorizationPath: config.SHARED.DFSP_BACKEND_SIGN_AUTHORIZATION_PATH,
+      validateOTPPath: config.SHARED.DFSP_BACKEND_VALIDATE_OTP_PATH,
+      getScopesPath: config.SHARED.DFSP_BACKEND_GET_SCOPES_PATH
     })
 
     try {

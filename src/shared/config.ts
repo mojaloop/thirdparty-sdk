@@ -91,6 +91,8 @@ export interface ServiceConfig {
     DFSP_BACKEND_HTTP_SCHEME: string
     SDK_REQUEST_TO_PAY_TRANSFER_URI: string
     SDK_PARTIES_INFORMATION_URI: string
+    DFSP_BACKEND_VALIDATE_OTP_PATH: string
+    DFSP_BACKEND_GET_SCOPES_PATH: string
     NOTIFY_ABOUT_TRANSFER_URI: string
     JWS_SIGN: boolean
     JWS_SIGNING_KEY: PathLike | Buffer
@@ -287,6 +289,16 @@ export const ConvictConfig = Convict<ServiceConfig>({
       doc: 'uri to sdk-scheme-adapter requestToPayTransfer endpoint',
       format: '*',
       default: 'localhost:9000/thridpartyRequests/transactions/{ID}'
+    },
+    DFSP_BACKEND_VALIDATE_OTP_PATH: {
+      doc: 'uri to sdk-scheme-adapter validateOTP endpoint',
+      format: '*',
+      default: 'validateOTP'
+    },
+    DFSP_BACKEND_GET_SCOPES_PATH: {
+      doc: 'uri to sdk-scheme-adapter getScopes endpoint',
+      format: '*',
+      default: '{ID}/scopes'
     },
     JWS_SIGN: false,
     JWS_SIGNING_KEY: '',

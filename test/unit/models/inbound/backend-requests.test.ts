@@ -42,7 +42,9 @@ describe('backendRequests', () => {
     logger: mockLogger(),
     scheme: Scheme.http,
     uri: 'backend-uri',
-    signAuthorizationPath: 'singchallenge'
+    signAuthorizationPath: 'signchallenge',
+    validateOTPPath: 'validateOTP',
+    getScopesPath: 'scopes/{ID}'
   }
 
   const authenticationValue = {
@@ -93,6 +95,8 @@ describe('backendRequests', () => {
     expect(typeof backendRequests.signAuthorizationRequest).toEqual('function')
     expect(typeof backendRequests.notifyAboutTransfer).toEqual('function')
     expect(typeof backendRequests.requestPartiesInformation).toEqual('function')
+    expect(typeof backendRequests.getScopes).toEqual('function')
+    expect(typeof backendRequests.validateOTPSecret).toEqual('function')
   })
 
   describe('signAuthorizationRequest', () => {
@@ -156,6 +160,49 @@ describe('backendRequests', () => {
       const result = await backendRequests.getUserAccounts(userId)
       expect(result).toEqual(response)
       expect(getSpy).toBeCalledWith(`accounts/${userId}`)
+    })
+  })
+
+  describe('validateOTPSecret', () => {
+    it('should propagate call to post', async () => {
+      const loggedRequestSpy = jest.spyOn(backendRequests, 'loggedRequest').mockImplementationOnce(
+        () => Promise.resolve(mockData.backendValidateOTPResponseValid.payload)
+      )
+      const mockData = JSON.parse(JSON.stringify(TestData))
+      const response = mockData.backendValidateOTPResponseValid.payload
+
+      const result = await backendRequests.validateOTPSecret('some-uuid', '123456')
+      expect(result).toEqual(response)
+      expect(loggedRequestSpy).toHaveBeenCalledWith({
+        method: 'POST',
+        uri: 'http://backend-uri/validateOTP',
+        agent: expect.anything(),
+        headers: expect.anything(),
+        body: JSON.stringify({
+          consentRequestId: 'some-uuid',
+          authToken: '123456'
+        }),
+      })
+    })
+  })
+
+  describe('getScopes', () => {
+    it('should propagate call to get', async () => {
+      const loggedRequestSpy = jest.spyOn(backendRequests, 'loggedRequest').mockImplementationOnce(
+        () => Promise.resolve(mockData.backendGetScopesResponse.payload)
+      )
+      const mockData = JSON.parse(JSON.stringify(TestData))
+      const consentRequestId = mockData.backendGetScopesRequest.params.ID
+      const response = mockData.backendGetScopesResponse.payload
+
+      const result = await backendRequests.getScopes(consentRequestId)
+      expect(result).toEqual(response)
+      expect(loggedRequestSpy).toHaveBeenCalledWith({
+        method: 'GET',
+        uri: 'http://backend-uri/scopes/' + consentRequestId,
+        agent: expect.anything(),
+        headers: expect.anything()
+      })
     })
   })
 })

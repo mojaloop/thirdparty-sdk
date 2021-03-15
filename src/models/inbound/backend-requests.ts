@@ -36,7 +36,7 @@ import {
   OutboundRequestToPayTransferPostResponse
 } from '../thirdparty.transactions.interface'
 import config from '~/shared/config'
-import { uuid } from 'uuidv4';
+import { ValidateOTPResponse } from './consentRequests.model';
 import {
   RequestPartiesInformationResponse,
   ThirdpartyTransactionStatus
@@ -45,6 +45,9 @@ import {
 export interface BackendConfig extends HttpRequestConfig {
   // the path for signAuthorizationRequest
   signAuthorizationPath: string
+  validateOTPPath: string
+  getScopesPath: string
+  uri: string
 }
 
 /**
@@ -62,7 +65,15 @@ export class BackendRequests extends HttpRequest {
   get signAuthorizationPath (): string {
     return (this.config as unknown as BackendConfig).signAuthorizationPath
   }
-
+  get validateOTPPath (): string {
+    return (this.config as unknown as BackendConfig).validateOTPPath
+  }
+  get getScopesPath (): string {
+    return (this.config as unknown as BackendConfig).getScopesPath
+  }
+  get backendURI (): string {
+    return (this.config as unknown as BackendConfig).uri
+  }
   // requests signing of Authorization Request
   // PISP Backend will ask the User to sign AuthorizationRequest
   // and in response delivers the cryptographic proof of signing in AuthenticationValue.pinValue
@@ -74,7 +85,7 @@ export class BackendRequests extends HttpRequest {
     )
   }
 
-  // get user account details from DFSP Backend 
+  // get user account details from DFSP Backend
   async getUserAccounts (userId: string): Promise<tpAPI.Schemas.AccountsIDPutResponse | void> {
     const accountsPath = `accounts/${userId}`;
     return this.get<tpAPI.Schemas.AccountsIDPutResponse>(accountsPath)
@@ -134,22 +145,44 @@ export class BackendRequests extends HttpRequest {
     })
   }
 
-  // todo: create dfsp outbound calls for checking if OTP is valid.
-  //       this is mocked for now
-  async validateOTPSecret (_consentRequestId: string, _consentId: string): Promise<boolean> {
-    return true
+  // POST the consent request ID and authToken for a DFSP to validate.
+  // This check is needed to continue the flow of responding to a /consentRequest
+  // with either a POST /consents or PUT /consentRequests/{ID}/error
+  async validateOTPSecret (consentRequestId: string, authToken: string): Promise<ValidateOTPResponse | void> {
+    const uri = this.prependScheme(
+      this.backendURI + '/' +
+      this.validateOTPPath
+    )
+    this.logger.push({ uri, template: config.SHARED.DFSP_BACKEND_VALIDATE_OTP_PATH }).info('validateOTPSecret')
+
+    const validateRequest = requests.common.bodyStringifier({
+      "consentRequestId": consentRequestId,
+      "authToken": authToken
+    })
+
+    return this.loggedRequest<ValidateOTPResponse>({
+      uri,
+      method: 'POST',
+      headers: this.headers,
+      agent: this.agent,
+      body: validateRequest
+    })
   }
 
-  // todo: the dfsp needs to return the accounts and scopes for the consent request.
-  //       this are mocked for now.
-  async getScopesAndAccounts (_consentRequestId: string): Promise<tpAPI.Schemas.Scope[]> {
-    return [
-      {
-        accountId: uuid(),
-        actions: [
-          'accounts.getBalance',
-          'accounts.transfer'
-        ]
-      }]
+  // retrieve the scopes that PISP is granted on a user's behalf
+  async getScopes (consentRequestId: string): Promise<tpAPI.Schemas.Scope[] | void> {
+    const uri = this.prependScheme(
+      this.backendURI + '/' +
+      this.getScopesPath
+        .replace('{ID}', consentRequestId)
+    )
+    this.logger.push({ uri, template: config.SHARED.DFSP_BACKEND_GET_SCOPES_PATH }).info('getScopes')
+
+    return this.loggedRequest<tpAPI.Schemas.Scope[]>({
+      uri,
+      method: 'GET',
+      headers: this.headers,
+      agent: this.agent
+    })
   }
 }
