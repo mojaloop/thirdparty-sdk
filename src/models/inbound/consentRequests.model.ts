@@ -25,7 +25,7 @@
  --------------
  ******/
 
-import { BackendRequests } from './backend-requests'
+
 import {
   Logger as SDKLogger,
   ThirdpartyRequests,
@@ -36,6 +36,7 @@ import {
 } from '@mojaloop/api-snippets'
 import { HTTPResponseError } from '~/shared/http-response-error'
 import { uuid } from '../../../test/unit/__mocks__/uuidv4';
+import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests';
 
 
 export interface ValidateOTPResponse {
@@ -44,7 +45,7 @@ export interface ValidateOTPResponse {
 
 export interface InboundConsentRequestsRequestModelConfig {
   logger: SDKLogger.Logger
-  backendRequests: BackendRequests
+  dfspBackendRequests: DFSPBackendRequests
   thirdpartyRequests: ThirdpartyRequests
 }
 
@@ -59,8 +60,8 @@ export class InboundConsentRequestsRequestModel {
     return this.config.logger
   }
 
-  protected get backendRequests (): BackendRequests {
-    return this.config.backendRequests
+  protected get dfspBackendRequests (): DFSPBackendRequests {
+    return this.config.dfspBackendRequests
   }
 
   protected get thirdpartyRequests (): ThirdpartyRequests {
@@ -73,14 +74,14 @@ export class InboundConsentRequestsRequestModel {
     authToken: string
   ): Promise<void> {
     try {
-      const isValidOTP = await this.backendRequests.validateOTPSecret(consentRequestsRequestId, authToken)
+      const isValidOTP = await this.dfspBackendRequests.validateOTPSecret(consentRequestsRequestId, authToken)
       if (!isValidOTP) {
         throw new Error('No response returned')
       }
       if (!isValidOTP.isValid) {
         throw new Error('Invalid OTP')
       }
-      const scopesGranted = await this.backendRequests.getScopes(consentRequestsRequestId)
+      const scopesGranted = await this.dfspBackendRequests.getScopes(consentRequestsRequestId)
       if (!scopesGranted || scopesGranted.length < 1) {
         throw new Error('InvalidAuthToken')
       }

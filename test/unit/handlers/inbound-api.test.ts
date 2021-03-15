@@ -724,7 +724,7 @@ describe('Inbound API routes', (): void => {
           }))
         })),
         getLogger: jest.fn(() => logger),
-        getBackendRequests: jest.fn(),
+        getDFSPBackendRequests: jest.fn(),
         getThirdpartyRequests: jest.fn(),
       }
 

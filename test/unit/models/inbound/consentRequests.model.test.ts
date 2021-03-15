@@ -29,7 +29,7 @@ import {
   thirdparty as tpAPI
 } from '@mojaloop/api-snippets'
 import { InboundConsentRequestsRequestModel, InboundConsentRequestsRequestModelConfig } from '~/models/inbound/consentRequests.model'
-import { BackendRequests } from '~/models/inbound/backend-requests'
+import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
 import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components';
 
 import mockLogger from '../../mockLogger'
@@ -41,7 +41,7 @@ describe('InboundConsentRequestsRequestModel', () => {
   describe('consentRequests', () => {
     let model: InboundConsentRequestsRequestModel
     let config: InboundConsentRequestsRequestModelConfig
-    let backendRequests: BackendRequests
+    let dfspBackendRequests: DFSPBackendRequests
     let thirdpartyRequests: ThirdpartyRequests
     const dfspId = 'dfsp-id'
 
@@ -53,7 +53,7 @@ describe('InboundConsentRequestsRequestModel', () => {
         postConsents: jest.fn(() => Promise.resolve()),
       } as unknown as ThirdpartyRequests
 
-      backendRequests = {
+      dfspBackendRequests = {
         validateOTPSecret: jest.fn(() => Promise.resolve({
           isValid: true
         })),
@@ -67,11 +67,11 @@ describe('InboundConsentRequestsRequestModel', () => {
               ]
             }]
         ))
-      } as unknown as BackendRequests
+      } as unknown as DFSPBackendRequests
 
       config = {
         logger,
-        backendRequests,
+        dfspBackendRequests,
         thirdpartyRequests
       }
 
@@ -86,8 +86,8 @@ describe('InboundConsentRequestsRequestModel', () => {
         patchConsentRequests.authToken
       )
 
-      expect(config.backendRequests.validateOTPSecret).toHaveBeenCalledWith(id, patchConsentRequests.authToken)
-      expect(config.backendRequests.getScopes).toHaveBeenCalledWith(id)
+      expect(config.dfspBackendRequests.validateOTPSecret).toHaveBeenCalledWith(id, patchConsentRequests.authToken)
+      expect(config.dfspBackendRequests.getScopes).toHaveBeenCalledWith(id)
 
       expect(config.thirdpartyRequests.postConsents).toHaveBeenCalledWith(
         expect.objectContaining({

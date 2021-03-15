@@ -49,7 +49,7 @@ async function patch (_context: unknown, request: Request, h: StateResponseToolk
   // if the OTP is valid the DFSP issues out a POST /consents request.
   const modelConfig: InboundConsentRequestsRequestModelConfig = {
     logger: h.getLogger(),
-    backendRequests: h.getBackendRequests(),
+    dfspBackendRequests: h.getDFSPBackendRequests(),
     thirdpartyRequests: h.getThirdpartyRequests()
   }
   const model = new InboundConsentRequestsRequestModel(modelConfig)
