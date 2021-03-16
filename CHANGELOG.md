@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+## [11.27.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.26.0...v11.27.0) (2021-03-16)
+
+
+### Features
+
+* add initial inbound handlers for consent request flow ([#58](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/58)) ([0b2dd14](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/0b2dd1493e82fee023df1d88b11cefe4f70ff34a))
+
 ## [11.26.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.25.2...v11.26.0) (2021-03-15)
 
 
