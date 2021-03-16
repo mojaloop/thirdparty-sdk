@@ -27,11 +27,15 @@
 
 import { HttpRequestsConfig, HttpRequests } from '~/shared/http-requests'
 import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
+import { requests } from '@mojaloop/sdk-standard-components'
+import { ValidateOTPResponse } from '../models/inbound/consentRequests.model'
 
 export interface DFSPBackendConfig extends HttpRequestsConfig {
   verifyAuthorizationPath: string
   verifyConsentPath: string
   getUserAccountsPath: string
+  validateOTPPath: string
+  getScopesPath: string
 }
 
 /**
@@ -68,6 +72,16 @@ export class DFSPBackendRequests extends HttpRequests {
     return this.config.getUserAccountsPath
   }
 
+  // validate OTP path getter
+  get validateOTPPath (): string {
+    return this.config.validateOTPPath
+  }
+
+  // get scopes path getter
+  get getScopesPath (): string {
+    return this.config.getScopesPath
+  }
+
   // REQUESTS
   /**
    * TODO:
@@ -79,5 +93,41 @@ export class DFSPBackendRequests extends HttpRequests {
   async getUserAccounts (userId: string): Promise<tpAPI.Schemas.AccountsIDPutResponse | void> {
     const accountsPath = this.fullUri(this.getUserAccountsPath.replace('{ID}', userId))
     return this.get<tpAPI.Schemas.AccountsIDPutResponse>(accountsPath)
+  }
+
+  // POST the consent request ID and authToken for a DFSP to validate.
+  // This check is needed to continue the flow of responding to a /consentRequest
+  // with either a POST /consents or PUT /consentRequests/{ID}/error
+  async validateOTPSecret (consentRequestId: string, authToken: string): Promise<ValidateOTPResponse | void> {
+    const uri = this.fullUri(this.validateOTPPath)
+    this.logger.push({ uri, template: this.validateOTPPath }).info('validateOTPSecret')
+
+    const validateRequest = requests.common.bodyStringifier({
+      consentRequestId: consentRequestId,
+      authToken: authToken
+    })
+
+    return this.loggedRequest<ValidateOTPResponse>({
+      uri,
+      method: 'POST',
+      headers: this.headers,
+      agent: this.agent,
+      body: validateRequest
+    })
+  }
+
+  // retrieve the scopes that PISP is granted on a user's behalf
+  async getScopes (consentRequestId: string): Promise<tpAPI.Schemas.Scope[] | void> {
+    const uri = this.fullUri(
+      this.getScopesPath.replace('{ID}', consentRequestId)
+    )
+    this.logger.push({ uri, template: this.getScopesPath }).info('getScopes')
+
+    return this.loggedRequest<tpAPI.Schemas.Scope[]>({
+      uri,
+      method: 'GET',
+      headers: this.headers,
+      agent: this.agent
+    })
   }
 }

@@ -35,4 +35,9 @@ paths:
     $ref: paths/accounts_ID.yaml
   '/accounts/{ID}/error':
     $ref: paths/accounts_ID_error.yaml
-
+  '/consents':
+    $ref: paths/consents.yaml
+  '/consentRequests/{ID}':
+    $ref: paths/consentRequests_ID.yaml
+  '/consentRequests/{ID}/error':
+    $ref: paths/consentRequests_ID_error.yaml

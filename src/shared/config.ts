@@ -99,6 +99,8 @@ export interface ServiceConfig {
     SDK_REQUEST_TO_PAY_TRANSFER_URI: string
     SDK_PARTIES_INFORMATION_URI: string
     SDK_NOTIFY_ABOUT_TRANSFER_URI: string
+    DFSP_BACKEND_VALIDATE_OTP_PATH: string
+    DFSP_BACKEND_GET_SCOPES_PATH: string
     JWS_SIGN: boolean
     JWS_SIGNING_KEY: PathLike | Buffer
     TLS: BaseRequestTLSConfig
@@ -289,6 +291,16 @@ export const ConvictConfig = Convict<ServiceConfig>({
       doc: 'path use by DFSPBackendRequests.getUserAccounts',
       format: '*',
       default: 'accounts/{ID}'
+    },
+    DFSP_BACKEND_VALIDATE_OTP_PATH: {
+      doc: 'uri to sdk-scheme-adapter validateOTP endpoint',
+      format: '*',
+      default: 'validateOTP'
+    },
+    DFSP_BACKEND_GET_SCOPES_PATH: {
+      doc: 'uri to sdk-scheme-adapter getScopes endpoint',
+      format: '*',
+      default: '{ID}/scopes'
     },
     PISP_BACKEND_URI: {
       doc: 'host address of DFSP\'s ',

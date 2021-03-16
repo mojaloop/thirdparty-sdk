@@ -28,6 +28,9 @@
  ******/
 import ThirdpartyRequestsTransactions from './thirdpartyRequests/transactions'
 import InboundAuthorizations from './authorizations'
+import InboundConsents from './consents'
+import InboundConsentRequestsId from './consentRequests/{ID}'
+import InboundConsentRequestsIdError from './consentRequests/{ID}/error'
 import ThirdpartyAuthorizations from './thirdpartyRequests/transactions/{ID}/authorizations'
 import NotifyThirdpartyTransactionRequests from './thirdpartyRequests/transactions/{ID}'
 import NotifyErrorThirdpartyTransactionRequests from './thirdpartyRequests/transactions/{ID}/error'
@@ -43,5 +46,8 @@ export default {
   NotifyErrorThirdpartyTransactionRequests: NotifyErrorThirdpartyTransactionRequests.put,
   GetAccountsByUserId: InboundAccounts.get,
   UpdateAccountsByUserId: InboundAccounts.put,
-  UpdateAccountsByUserIdError: InboundAccountsError.put
+  UpdateAccountsByUserIdError: InboundAccountsError.put,
+  PatchConsentRequest: InboundConsentRequestsId.patch,
+  NotifyErrorConsentRequests: InboundConsentRequestsIdError.put,
+  PostConsents: InboundConsents.post
 }

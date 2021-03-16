@@ -39,7 +39,9 @@ describe('backendRequests', () => {
     uri: 'backend-uri',
     verifyAuthorizationPath: 'verify-authorization',
     verifyConsentPath: 'verify-consent',
-    getUserAccountsPath: 'accounts/{ID}'
+    getUserAccountsPath: 'accounts/{ID}',
+    validateOTPPath: 'validateOTP',
+    getScopesPath: 'scopes/{ID}'
   }
 
   beforeEach(() => {

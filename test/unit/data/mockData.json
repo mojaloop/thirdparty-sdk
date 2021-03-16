@@ -120,5 +120,57 @@
         "errorDescription": "Generic ID not found"
       }
     }
+  },
+  "backendValidateOTPRequest": {
+    "headers": {
+    },
+    "params": {
+    },
+    "payload": {
+      "consentRequestId": "3356cdc5-ee8f-4fcf-b7b6-aee68ac56a42",
+      "authToken": "12345"
+    }
+  },
+  "backendValidateOTPResponseValid": {
+    "headers": {
+    },
+    "params": {
+    },
+    "payload": {
+      "isValid": true
+    }
+  },
+  "backendValidateOTPResponseInvalid": {
+    "headers": {
+    },
+    "params": {
+    },
+    "payload": {
+      "isValid": false
+    }
+  },
+  "backendGetScopesRequest": {
+    "headers": {
+    },
+    "params": {
+      "ID": "079ede98-e587-4af8-98a5-6eb0b9b45cad"
+    },
+    "payload": {
+    }
+  },
+  "backendGetScopesResponse": {
+    "headers": {
+    },
+    "params": {
+    },
+    "payload": {
+      "scopes": [{
+        "accountId": "some-id",
+        "actions": [
+          "accounts.getBalance",
+          "accounts.transfer"
+        ]
+      }]
+    }
   }
 }
