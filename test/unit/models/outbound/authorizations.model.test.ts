@@ -30,7 +30,7 @@ import { Message, NotificationCallback, PubSub } from '~/shared/pub-sub'
 import {
   OutboundAuthorizationData,
   OutboundAuthorizationsModelConfig,
-  OutboundAuthorizationsModelState,
+  OutboundAuthorizationsModelState
 } from '~/models/authorizations.interface'
 import {
   v1_1 as fspiopAPI,
@@ -145,7 +145,7 @@ describe('OutboundAuthorizationsModel', () => {
         toParticipantId: '123',
         request: {
           transactionRequestId: '1'
-        } as unknown as  tpAPI.Schemas.AuthorizationsPostRequest, // minimal request body
+        } as unknown as tpAPI.Schemas.AuthorizationsPostRequest, // minimal request body
         currentState: 'start'
       }
 
@@ -157,7 +157,7 @@ describe('OutboundAuthorizationsModel', () => {
           authenticationValue: {
             pinValue: 'the-mocked-pin-value',
             counter: '1'
-          } as any
+          } as fspiopAPI.Schemas.AuthenticationValue
         },
         responseType: 'ENTERED'
       }
@@ -268,15 +268,15 @@ describe('OutboundAuthorizationsModel', () => {
       })
 
       it('exceptions - Error', async () => {
-        const error = new Error()
+        const error = new Error('the-exception')
         mocked(modelConfig.requests.postAuthorizations).mockImplementationOnce(
           () => {
             throw error
           }
         )
-        const model = await create({ ...data, currentState: 'errored' }, modelConfig)
+        const model = await create({ ...data, currentState: 'start' }, modelConfig)
 
-        expect(async () => await model.run()).rejects.toEqual(error)
+        expect(model.run()).rejects.toEqual(error)
       })
     })
   })
@@ -285,7 +285,7 @@ describe('OutboundAuthorizationsModel', () => {
     it('should properly call `KVS.get`, get expected data in `context.data` and setup state of machine', async () => {
       const dataFromCache: OutboundAuthorizationData = {
         toParticipantId: '123',
-        request: { mocked: true } as unknown as  tpAPI.Schemas.AuthorizationsPostRequest,
+        request: { mocked: true } as unknown as tpAPI.Schemas.AuthorizationsPostRequest,
         currentState: 'succeeded'
       }
       mocked(modelConfig.kvs.get).mockImplementationOnce(async () => dataFromCache)
@@ -321,7 +321,7 @@ describe('OutboundAuthorizationsModel', () => {
       mocked(modelConfig.kvs.set).mockImplementationOnce(() => Promise.resolve(true))
       const data: OutboundAuthorizationData = {
         toParticipantId: '123',
-        request: { mocked: true } as unknown as  tpAPI.Schemas.AuthorizationsPostRequest,
+        request: { mocked: true } as unknown as tpAPI.Schemas.AuthorizationsPostRequest,
         currentState: 'succeeded'
       }
       const model = await create(data, modelConfig)
@@ -336,7 +336,7 @@ describe('OutboundAuthorizationsModel', () => {
       mocked(modelConfig.kvs.set).mockImplementationOnce(() => { throw new Error('error from KVS.set') })
       const data: OutboundAuthorizationData = {
         toParticipantId: '123',
-        request: { mocked: true } as unknown as  tpAPI.Schemas.AuthorizationsPostRequest,
+        request: { mocked: true } as unknown as tpAPI.Schemas.AuthorizationsPostRequest,
         currentState: 'succeeded'
       }
       const am = await create(data, modelConfig)
