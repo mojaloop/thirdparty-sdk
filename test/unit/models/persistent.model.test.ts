@@ -44,7 +44,7 @@ import sortedArray from 'test/unit/sortedArray'
 // mock KVS default exported class
 jest.mock('~/shared/kvs')
 
-describe('Persistent State Machine', () => {
+describe('PersistentModel', () => {
   interface TestStateMachine extends ControlledStateMachine {
     start2End: Method;
     start2Middle: Method;
