@@ -81,7 +81,7 @@ export class SDKOutgoingRequests extends HttpRequests {
    *  // these two will be done by calling ThirdpartyRequests interface, so not implemented here
    *  notifyThirdpartyAboutRejectedAuthorization
    *  notifyThirdpartyAboutTransfer
-   *  // syncronous calls to SDKOutgoing§
+   *  // synchronous calls to SDKOutgoing
    *  requestAuthorization
    *  requestQuote,
    *  requestThirdpartyTransaction
