@@ -32,14 +32,12 @@ import {
   OutboundRequestToPayTransferPostResponse
 } from '../models/thirdparty.transactions.interface'
 import {
-  ThirdpartyTransactionStatus,
   RequestPartiesInformationResponse
 } from '~/models/pispTransaction.interface'
-export interface SDKRequestConfig extends HttpRequestsConfig {
+export interface SDKOutgoingRequestsConfig extends HttpRequestsConfig {
   dfspId: string
   requestPartiesInformationPath: string
   requestToPayTransferPath: string
-  notifyAboutTransferPath: string
 }
 
 /**
@@ -50,7 +48,7 @@ export interface SDKRequestConfig extends HttpRequestsConfig {
 export class SDKOutgoingRequests extends HttpRequests {
   // we want this constructor for better code support
   // eslint-disable-next-line no-useless-constructor
-  constructor (config: SDKRequestConfig) {
+  constructor (config: SDKOutgoingRequestsConfig) {
     super(config)
   }
 
@@ -58,8 +56,8 @@ export class SDKOutgoingRequests extends HttpRequests {
 
   // config getter
   // polymorphism for getters can be handy and saves a lot of type casting
-  protected get config (): SDKRequestConfig {
-    return super.config as unknown as SDKRequestConfig
+  protected get config (): SDKOutgoingRequestsConfig {
+    return super.config as unknown as SDKOutgoingRequestsConfig
   }
 
   // requestToPayTransfer path getter
@@ -70,11 +68,6 @@ export class SDKOutgoingRequests extends HttpRequests {
   // requestToPayTransfer path getter
   get requestToPayTransferPath (): string {
     return this.config.requestToPayTransferPath
-  }
-
-  // notifyAboutTransfer path getter
-  get notifyAboutTransferPath (): string {
-    return this.config.notifyAboutTransferPath
   }
 
   // dfspId getter
