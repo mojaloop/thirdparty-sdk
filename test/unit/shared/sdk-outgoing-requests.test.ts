@@ -47,7 +47,8 @@ describe('SDKOutgoingRequests', () => {
 
   const transactionStatus: ThirdpartyTransactionStatus = {
     transactionId: 'mocked-transaction-id',
-    transactionRequestState: 'ACCEPTED'
+    transactionRequestState: 'ACCEPTED',
+    transactionState: 'COMPLETED'
   }
 
   const requestToPayTransfer: OutboundRequestToPayTransferPostRequest = {

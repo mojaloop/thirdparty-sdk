@@ -415,7 +415,8 @@ describe('pipsTransactionModel', () => {
 
       const transactionStatus: ThirdpartyTransactionStatus = {
         transactionId: '5678-5678',
-        transactionRequestState: 'ACCEPTED'
+        transactionRequestState: 'ACCEPTED',
+        transactionState: 'COMPLETED'
       }
 
       beforeEach(async () => {

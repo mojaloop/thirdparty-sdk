@@ -123,7 +123,8 @@ export interface ThirdpartyTransactionInitiateResponse {
 
 export interface ThirdpartyTransactionStatus {
   transactionId: string
-  transactionRequestState: 'RECEIVED' | 'PENDING' | 'ACCEPTED' | 'REJECTED'
+  transactionRequestState: 'RECEIVED' | 'PENDING' | 'ACCEPTED' | 'REJECTED',
+  transactionState: 'RECEIVED' | 'PENDING' | 'COMPLETED' | 'REJECTED'
 }
 
 export interface ThirdpartyTransactionApproveResponse {

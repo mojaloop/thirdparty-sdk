@@ -85,8 +85,10 @@ export class SDKOutgoingRequests extends HttpRequests {
   // REQUESTS
   /**
    * TODO: these requests will be used by DFSPTransactionModel
+   *  // these two will be done by calling ThirdpartyRequests interface, so not implemented here
    *  notifyThirdpartyAboutRejectedAuthorization
    *  notifyThirdpartyAboutTransfer
+   *  // syncronous calls to SDKOutgoing§
    *  requestAuthorization
    *  requestQuote,
    *  requestThirdpartyTransaction
@@ -94,25 +96,6 @@ export class SDKOutgoingRequests extends HttpRequests {
    *  requestVerifyAuthorization
    *
    * */
-  async notifyThirdpartyAboutTransfer (
-    request: ThirdpartyTransactionStatus,
-    id: string
-  ): Promise<void> {
-    // TODO: replace by thirdpartyRequests.patchThridpartyRequestTransaction
-    return this.loggedRequest<void>({
-      //  uri: this.prependScheme(config.SHARED.NOTIFY_ABOUT_TRANSFER_URI.replace('{ID}', id)),
-      uri: this.prependScheme(this.notifyAboutTransferPath.replace('{ID}', id)),
-      method: 'PATCH',
-      body: requests.common.bodyStringifier(request),
-      headers: {
-        ...this.headers,
-        // 'fspiop-source': this.config.SHARED.DFSP_ID
-        'fspiop-source': this.dfspId
-      },
-
-      agent: this.agent
-    })
-  }
 
   async requestPartiesInformation (
     type: string, id: string, subId?: string
