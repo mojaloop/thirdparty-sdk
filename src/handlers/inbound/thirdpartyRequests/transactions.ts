@@ -60,7 +60,7 @@ async function post (_context: Context, request: Request, h: StateResponseToolki
 
   const modelConfig: InboundThridpartyTransactionsModelConfig = {
     logger: h.getLogger(),
-    sdkRequests: h.getSDKRequests(),
+    sdkOutgoingRequests: h.getSDKOutgoingRequests(),
     mojaloopRequests: h.getMojaloopRequests(),
     thirdpartyRequests: h.getThirdpartyRequests()
   }

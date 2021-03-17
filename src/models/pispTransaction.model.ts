@@ -52,7 +52,7 @@ import {
   ThirdpartyTransactionStatus
 } from './pispTransaction.interface'
 import inspect from '~/shared/inspect'
-import { SDKRequests } from '~/shared/sdk-requests'
+import { SDKOutgoingRequests } from '~/shared/sdk-outgoing-requests'
 import { HTTPResponseError } from '~/shared/http-response-error'
 
 export class InvalidPISPTransactionDataError extends Error {
@@ -119,8 +119,8 @@ export class PISPTransactionModel
     return this.config.mojaloopRequests
   }
 
-  get sdkRequests (): SDKRequests {
-    return this.config.sdkRequests
+  get sdkOutgoingRequests (): SDKOutgoingRequests {
+    return this.config.sdkOutgoingRequests
   }
 
   static notificationChannel (phase: PISPTransactionPhase, transactionRequestId: string): string {
@@ -139,7 +139,7 @@ export class PISPTransactionModel
 
     try {
       // call GET /parties on sdk-scheme-adapter Outbound service
-      const response = this.data.payeeResolved = await this.sdkRequests.requestPartiesInformation(
+      const response = this.data.payeeResolved = await this.sdkOutgoingRequests.requestPartiesInformation(
         partyIdType, partyIdentifier, partySubIdOrType
       ) as RequestPartiesInformationResponse
 

@@ -36,7 +36,6 @@ import {
   RequestPartiesInformationResponse
 } from '~/models/pispTransaction.interface'
 export interface SDKRequestConfig extends HttpRequestsConfig {
-  // TODO: SDK Requests Interfaces: MojaloopRequests & ThridpartyRequests
   dfspId: string
   requestPartiesInformationPath: string
   requestToPayTransferPath: string
@@ -44,11 +43,11 @@ export interface SDKRequestConfig extends HttpRequestsConfig {
 }
 
 /**
- * @class SDKRequest
+ * @class SDKOutgoingRequest
  * @description tiny wrapper dedicated to make requests to SDK scheme adapter Outgoing
- *              and SDK MojaloopRequest/ThirdpartyRequest interfaces
+ *
  */
-export class SDKRequests extends HttpRequests {
+export class SDKOutgoingRequests extends HttpRequests {
   // we want this constructor for better code support
   // eslint-disable-next-line no-useless-constructor
   constructor (config: SDKRequestConfig) {
@@ -141,7 +140,7 @@ export class SDKRequests extends HttpRequests {
     })
   }
 
-  // TODO drop it and replace by requestTransfer
+  // TODO: drop it and replace by requestTransfer
   async requestToPayTransfer (
     request: OutboundRequestToPayTransferPostRequest
   ): Promise<OutboundRequestToPayTransferPostResponse | void> {
