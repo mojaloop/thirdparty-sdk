@@ -1,4 +1,18 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+## [11.28.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.27.1...v11.28.0) (2021-03-16)
+
+
+### Features
+
+* 2060 async2sync model ([#63](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/63)) ([101538b](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/101538b5eca6e2e36cd1c97524fe167d586f19f3))
+
+### [11.27.1](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.27.0...v11.27.1) (2021-03-16)
+
+
+### Bug Fixes
+
+* unresolved promise warning in authorization model ([#62](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/62)) ([65209e8](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/65209e8016f17fbba14439b9dd2dddfdccf14f35))
+
 ## [11.27.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.26.0...v11.27.0) (2021-03-16)
 
 
