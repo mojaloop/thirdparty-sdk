@@ -292,6 +292,39 @@ paths:
           $ref: '#/components/responses/501'
         '503':
           $ref: '#/components/responses/503'
+  '/consentRequests/{ID}/validate':
+    post:
+      operationId: OutboundConsentRequestsValidatePost
+      summary: Outbound consent requests validate endpoint
+      description: PISP requests account linking using an OTP
+      tags:
+        - consentRequests
+      requestBody:
+        description: Consent requests validate request details
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsentRequestsValidateRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/ConsentRequestsValidateResponse'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '405':
+          $ref: '#/components/responses/405'
+        '406':
+          $ref: '#/components/responses/406'
+        '501':
+          $ref: '#/components/responses/501'
+        '503':
+          $ref: '#/components/responses/503'
 components:
   responses:
     '200':
@@ -478,6 +511,17 @@ components:
             - accountNickname: dfspa.user.nickname2
               id: dfspa.username.5678
               currency: USD
+    ConsentRequestsValidateResponse:
+      description: Consent requests validate response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              consent:
+                $ref: '#/components/schemas/ConsentsPostRequest'
+              currentState:
+                $ref: '#/components/schemas/ConsentRequestsValidateState'
   headers:
     Content-Length:
       required: false
@@ -1618,6 +1662,77 @@ components:
           - accountNickname
           - id
           - currency
+    ConsentRequestsValidateRequest:
+      title: ConsentRequestsValidateRequest
+      description: 'POST /consentRequests/{ID}/validate Request object'
+      type: object
+      properties:
+        toParticipantId:
+          type: string
+        authToken:
+          type: string
+      required:
+        - toParticipantId
+        - authToken
+    ConsentScopeType:
+      title: ConsentScopeType
+      type: string
+      enum:
+        - accounts.getBalance
+        - accounts.transfer
+      description: |
+        The scopes requested for a ConsentRequest.
+        - "accounts.getBalance" - Get the balance of a given account.
+        - "accounts.transfer" - Initiate a transfer from an account.
+    Scope:
+      title: Scope
+      type: object
+      description: Scope + Account Identifier mapping for a Consent.
+      example: |
+        {
+          accountId: "dfsp.username.5678",
+          actions: [ "accounts.transfer", "accounts.getBalance" ]
+        }
+      properties:
+        accountId:
+          $ref: '#/components/schemas/AccountAddress'
+        actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConsentScopeType'
+      required:
+        - accountId
+        - actions
+    ConsentsPostRequest:
+      title: ConsentPostRequest
+      type: object
+      description: The object sent in a `POST /consents` request.
+      properties:
+        consentId:
+          allOf:
+            - $ref: '#/components/schemas/CorrelationId'
+          description: |
+            Common ID between the PISP and FSP for the Consent object
+            decided by the DFSP who creates the Consent
+            This field is REQUIRED for POST /consent.
+        consentRequestId:
+          allOf:
+            - $ref: '#/components/schemas/CorrelationId'
+          description: |
+            The id of the ConsentRequest that was used to initiate the
+            creation of this Consent.
+        scopes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Scope'
+      required:
+        - consentId
+        - consentRequestId
+        - scopes
+    ConsentRequestsValidateState:
+      title: ConsentRequestsValidateState
+      description: state of POST consent requests validate
+      type: string
   parameters:
     ID:
       name: ID

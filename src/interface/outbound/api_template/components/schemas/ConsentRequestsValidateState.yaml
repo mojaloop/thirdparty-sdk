@@ -1,0 +1,3 @@
+title: ConsentRequestsValidateState
+description: state of POST consent requests validate
+type: string
