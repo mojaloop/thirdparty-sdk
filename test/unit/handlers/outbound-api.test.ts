@@ -117,7 +117,8 @@ const initiateResponse: tpAPI.Schemas.AuthorizationsPostRequest = {
 }
 const approveResponse: ThirdpartyTransactionStatus = {
   transactionId: 'b51ec534-ee48-4575-b6a9-ead2955b8069',
-  transactionRequestState: 'ACCEPTED'
+  transactionRequestState: 'ACCEPTED',
+  transactionState: 'COMPLETED'
 }
 
 jest.mock('redis')

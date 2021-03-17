@@ -85,7 +85,7 @@ describe('StatePlugin', () => {
     expect(ServerMock.decorate.mock.calls[7][0]).toEqual('toolkit')
     expect(ServerMock.decorate.mock.calls[7][1]).toEqual('getDFSPBackendRequests')
     expect(ServerMock.decorate.mock.calls[8][0]).toEqual('toolkit')
-    expect(ServerMock.decorate.mock.calls[8][1]).toEqual('getSDKRequests')
+    expect(ServerMock.decorate.mock.calls[8][1]).toEqual('getSDKOutgoingRequests')
 
     // check listener registration on 'stop' event
     expect(ServerMock.events.on).toBeCalledTimes(1)

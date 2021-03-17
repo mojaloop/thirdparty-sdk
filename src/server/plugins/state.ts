@@ -35,7 +35,7 @@ import { logger } from '~/shared/logger'
 import config from '~/shared/config'
 import { PISPBackendRequests } from '~/shared/pisp-backend-requests'
 import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
-import { SDKRequests } from '~/shared/sdk-requests'
+import { SDKOutgoingRequests } from '~/shared/sdk-outgoing-requests'
 import { Scheme } from '~/shared/http-scheme'
 
 export interface StateResponseToolkit extends ResponseToolkit {
@@ -47,7 +47,7 @@ export interface StateResponseToolkit extends ResponseToolkit {
   getWSO2Auth: () => SDK.WSO2Auth
   getPISPBackendRequests: () => PISPBackendRequests
   getDFSPBackendRequests: () => DFSPBackendRequests
-  getSDKRequests: () => SDKRequests
+  getSDKOutgoingRequests: () => SDKOutgoingRequests
 }
 
 export const StatePlugin = {
@@ -132,14 +132,13 @@ export const StatePlugin = {
       getScopesPath: config.SHARED.DFSP_BACKEND_GET_SCOPES_PATH
     })
 
-    const sdkRequests = new SDKRequests({
+    const sdkOutgoingRequests = new SDKOutgoingRequests({
       logger,
       dfspId: config.SHARED.DFSP_ID,
       uri: config.SHARED.SDK_OUTGOING_URI,
       scheme: config.SHARED.SDK_OUTGOING_HTTP_SCHEME as Scheme,
       requestPartiesInformationPath: config.SHARED.SDK_PARTIES_INFORMATION_URI,
-      requestToPayTransferPath: config.SHARED.SDK_REQUEST_TO_PAY_TRANSFER_URI,
-      notifyAboutTransferPath: config.SHARED.SDK_NOTIFY_ABOUT_TRANSFER_URI
+      requestToPayTransferPath: config.SHARED.SDK_REQUEST_TO_PAY_TRANSFER_URI
     })
 
     try {
@@ -156,7 +155,7 @@ export const StatePlugin = {
       server.decorate('toolkit', 'getWSO2Auth', (): SDK.WSO2Auth => wso2Auth)
       server.decorate('toolkit', 'getPISPBackendRequests', (): PISPBackendRequests => pispBackendRequests)
       server.decorate('toolkit', 'getDFSPBackendRequests', (): DFSPBackendRequests => dfspBackendRequests)
-      server.decorate('toolkit', 'getSDKRequests', (): SDKRequests => sdkRequests)
+      server.decorate('toolkit', 'getSDKOutgoingRequests', (): SDKOutgoingRequests => sdkOutgoingRequests)
 
       // disconnect from redis when server is stopped
       server.events.on('stop', async () => {

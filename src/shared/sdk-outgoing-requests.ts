@@ -32,26 +32,23 @@ import {
   OutboundRequestToPayTransferPostResponse
 } from '../models/thirdparty.transactions.interface'
 import {
-  ThirdpartyTransactionStatus,
   RequestPartiesInformationResponse
 } from '~/models/pispTransaction.interface'
-export interface SDKRequestConfig extends HttpRequestsConfig {
-  // TODO: SDK Requests Interfaces: MojaloopRequests & ThridpartyRequests
+export interface SDKOutgoingRequestsConfig extends HttpRequestsConfig {
   dfspId: string
   requestPartiesInformationPath: string
   requestToPayTransferPath: string
-  notifyAboutTransferPath: string
 }
 
 /**
- * @class SDKRequest
+ * @class SDKOutgoingRequest
  * @description tiny wrapper dedicated to make requests to SDK scheme adapter Outgoing
- *              and SDK MojaloopRequest/ThirdpartyRequest interfaces
+ *
  */
-export class SDKRequests extends HttpRequests {
+export class SDKOutgoingRequests extends HttpRequests {
   // we want this constructor for better code support
   // eslint-disable-next-line no-useless-constructor
-  constructor (config: SDKRequestConfig) {
+  constructor (config: SDKOutgoingRequestsConfig) {
     super(config)
   }
 
@@ -59,8 +56,8 @@ export class SDKRequests extends HttpRequests {
 
   // config getter
   // polymorphism for getters can be handy and saves a lot of type casting
-  protected get config (): SDKRequestConfig {
-    return super.config as unknown as SDKRequestConfig
+  protected get config (): SDKOutgoingRequestsConfig {
+    return super.config as unknown as SDKOutgoingRequestsConfig
   }
 
   // requestToPayTransfer path getter
@@ -73,11 +70,6 @@ export class SDKRequests extends HttpRequests {
     return this.config.requestToPayTransferPath
   }
 
-  // notifyAboutTransfer path getter
-  get notifyAboutTransferPath (): string {
-    return this.config.notifyAboutTransferPath
-  }
-
   // dfspId getter
   get dfspId (): string {
     return this.config.dfspId
@@ -86,8 +78,10 @@ export class SDKRequests extends HttpRequests {
   // REQUESTS
   /**
    * TODO: these requests will be used by DFSPTransactionModel
+   *  // these two will be done by calling ThirdpartyRequests interface, so not implemented here
    *  notifyThirdpartyAboutRejectedAuthorization
    *  notifyThirdpartyAboutTransfer
+   *  // synchronous calls to SDKOutgoing
    *  requestAuthorization
    *  requestQuote,
    *  requestThirdpartyTransaction
@@ -95,25 +89,6 @@ export class SDKRequests extends HttpRequests {
    *  requestVerifyAuthorization
    *
    * */
-  async notifyThirdpartyAboutTransfer (
-    request: ThirdpartyTransactionStatus,
-    id: string
-  ): Promise<void> {
-    // TODO: replace by thirdpartyRequests.patchThridpartyRequestTransaction
-    return this.loggedRequest<void>({
-      //  uri: this.prependScheme(config.SHARED.NOTIFY_ABOUT_TRANSFER_URI.replace('{ID}', id)),
-      uri: this.prependScheme(this.notifyAboutTransferPath.replace('{ID}', id)),
-      method: 'PATCH',
-      body: requests.common.bodyStringifier(request),
-      headers: {
-        ...this.headers,
-        // 'fspiop-source': this.config.SHARED.DFSP_ID
-        'fspiop-source': this.dfspId
-      },
-
-      agent: this.agent
-    })
-  }
 
   async requestPartiesInformation (
     type: string, id: string, subId?: string
@@ -141,7 +116,7 @@ export class SDKRequests extends HttpRequests {
     })
   }
 
-  // TODO drop it and replace by requestTransfer
+  // TODO: drop it and replace by requestTransfer
   async requestToPayTransfer (
     request: OutboundRequestToPayTransferPostRequest
   ): Promise<OutboundRequestToPayTransferPostResponse | void> {

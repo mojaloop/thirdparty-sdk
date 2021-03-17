@@ -38,7 +38,7 @@ import { Method } from 'javascript-state-machine'
 import { ErrorInformation } from '~/interface/types'
 import { ControlledStateMachine, StateData, PersistentModelConfig } from '~/models/persistent.model'
 import { PubSub } from '~/shared/pub-sub'
-import { SDKRequests } from '~/shared/sdk-requests'
+import { SDKOutgoingRequests } from '~/shared/sdk-outgoing-requests'
 
 export enum RequestPartiesInformationState {
   COMPLETED = 'COMPLETED',
@@ -82,7 +82,7 @@ export interface PISPTransactionModelConfig extends PersistentModelConfig {
   pubSub: PubSub
   thirdpartyRequests: ThirdpartyRequests
   mojaloopRequests: MojaloopRequests
-  sdkRequests: SDKRequests
+  sdkOutgoingRequests: SDKOutgoingRequests
 }
 
 // derived from request body specification
@@ -123,7 +123,8 @@ export interface ThirdpartyTransactionInitiateResponse {
 
 export interface ThirdpartyTransactionStatus {
   transactionId: string
-  transactionRequestState: 'RECEIVED' | 'PENDING' | 'ACCEPTED' | 'REJECTED'
+  transactionRequestState: 'RECEIVED' | 'PENDING' | 'ACCEPTED' | 'REJECTED',
+  transactionState: 'RECEIVED' | 'PENDING' | 'COMPLETED' | 'REJECTED'
 }
 
 export interface ThirdpartyTransactionApproveResponse {

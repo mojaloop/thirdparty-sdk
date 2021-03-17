@@ -87,7 +87,7 @@
     "@mojaloop/central-services-health": "^11.0.0",
     "@mojaloop/central-services-metrics": "^9.5.0",
     "@mojaloop/central-services-shared": "^11.5.9",
-    "@mojaloop/sdk-standard-components": "^15.2.1",
+    "@mojaloop/sdk-standard-components": "^15.4.0",
     "@types/axios": "^0.14.0",
     "@types/convict": "^5.2.2",
     "@types/hapi": "^18.0.5",
@@ -142,11 +142,11 @@
     "nodemon": "^2.0.7",
     "npm-audit-resolver": "^2.2.1",
     "npm-check-updates": "^11.1.4",
+    "openapi-response-validator": "^7.2.3",
+    "openapi-typescript": "^2.4.2",
     "redis-mock": "0.52.0",
     "source-map-support": "0.5.19",
     "standard-version": "^9.1.1",
-    "openapi-response-validator": "^7.2.3",
-    "openapi-typescript": "^2.4.2",
     "swagger-cli": "^4.0.4",
     "ts-jest": "^26.5.1"
   }
