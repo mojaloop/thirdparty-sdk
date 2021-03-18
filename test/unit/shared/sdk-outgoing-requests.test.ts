@@ -34,11 +34,11 @@ describe('SDKOutgoingRequests', () => {
   let sdkRequest: SDKOutgoingRequests
 
   const config: SDKOutgoingRequestsConfig = {
-    dfspId: 'the-dfsp-id',
     logger: mockLogger(),
     scheme: Scheme.http,
     uri: 'backend-uri',
     // PATHS
+    requestAuthorizationPath: 'authorizations',
     requestPartiesInformationPath: 'parties/{Type}/{ID}/{SubId}',
     requestToPayTransferPath: 'request-to-pay-transfer'
   }

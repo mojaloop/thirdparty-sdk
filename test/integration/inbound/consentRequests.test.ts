@@ -29,7 +29,7 @@ import { Message, PubSub } from '~/shared/pub-sub'
 import Config from '~/shared/config'
 import axios from 'axios'
 import env from '../env'
-import mockLogger from '../../unit/mockLogger'
+import mockLogger from 'test/unit/mockLogger'
 
 describe('PUT /consentRequests/{ID}/error', (): void => {
   const scenarioUri = `${env.inbound.baseUri}/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fba/error`
@@ -42,7 +42,7 @@ describe('PUT /consentRequests/{ID}/error', (): void => {
     }
     const payload = {
       errorInformation: {
-        errorCode: "5100",
+        errorCode: '5100',
         errorDescription: 'This is an error description.',
         extensionList: {
           extension: [
@@ -71,14 +71,16 @@ describe('PUT /consentRequests/{ID}/error', (): void => {
         await pubSub.connect()
         expect(pubSub.isConnected).toBeTruthy()
 
-        pubSub.subscribe('consent_request_997c89f4-053c-4283-bfec-45a1a0a28fba', async (channel: string, message: Message, _id: number) => {
-          expect(channel).toEqual('consent_request_997c89f4-053c-4283-bfec-45a1a0a28fba')
-          expect(message).toEqual(payload)
-          await pubSub.disconnect()
-          expect(pubSub.isConnected).toBeFalsy()
+        pubSub.subscribe('consent_request_997c89f4-053c-4283-bfec-45a1a0a28fba',
+          async (channel: string, message: Message, _id: number) => {
+            expect(channel).toEqual('consent_request_997c89f4-053c-4283-bfec-45a1a0a28fba')
+            expect(message).toEqual(payload)
+            await pubSub.disconnect()
+            expect(pubSub.isConnected).toBeFalsy()
 
-          resolve()
-        })
+            resolve()
+          }
+        )
 
         // Act
         const response = await axios.put(scenarioUri, payload, axiosConfig)
@@ -94,7 +96,7 @@ describe('PATCH /consentRequests/{ID}', (): void => {
   const scenarioUri = `${env.inbound.baseUri}/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fba`
   describe('Inbound API', (): void => {
     const payload = {
-      authToken: "123456"
+      authToken: '123456'
     }
 
     const axiosConfig = {
