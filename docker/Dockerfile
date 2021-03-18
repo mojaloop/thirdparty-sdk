@@ -2,7 +2,8 @@ FROM node:14.15-alpine as builder
 USER root
 WORKDIR /opt/thirdparty-scheme-adapter
 
-RUN apk add --no-cache -t build-dependencies git make gcc g++ python libtool autoconf automake \
+RUN apk update \
+    && apk add --no-cache -t build-dependencies git make gcc g++ python libtool autoconf automake openssh \
     && cd $(npm root -g)/npm \
     && npm config set unsafe-perm true \
     && npm install -g node-gyp 
