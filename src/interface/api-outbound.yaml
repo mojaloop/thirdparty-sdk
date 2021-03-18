@@ -293,12 +293,18 @@ paths:
         '503':
           $ref: '#/components/responses/503'
   '/consentRequests/{ID}/validate':
-    post:
-      operationId: OutboundConsentRequestsValidatePost
+    patch:
+      operationId: OutboundConsentRequestsValidatePatch
       summary: Outbound consent requests validate endpoint
       description: PISP requests account linking using an OTP
       tags:
         - consentRequests
+      parameters:
+        - name: ID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/CorrelationId'
       requestBody:
         description: Consent requests validate request details
         required: true
@@ -1674,6 +1680,7 @@ components:
       required:
         - toParticipantId
         - authToken
+      additionalProperties: false
     ConsentScopeType:
       title: ConsentScopeType
       type: string

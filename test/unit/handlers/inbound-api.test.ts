@@ -47,7 +47,7 @@ import {
   OutboundAccountsModel
 } from '~/models/outbound/accounts.model'
 import { PISPTransactionPhase } from '~/models/pispTransaction.interface'
-import { notificationChannel } from '~/models/pispConsentRequest.model'
+import { notificationChannel } from '~/models/OTPValidate.model'
 import ThirdpartyAuthorizations from '~/handlers/inbound/thirdpartyRequests/transactions/{ID}/authorizations'
 import ConsentsHandler from '~/handlers/inbound/consents'
 import ConsentRequestsIdHandler from '~/handlers/inbound/consentRequests/{ID}'

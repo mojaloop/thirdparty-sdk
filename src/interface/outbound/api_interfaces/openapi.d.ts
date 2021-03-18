@@ -28,6 +28,9 @@ export interface paths {
   "/accounts/{fspId}/{userId}": {
     get: operations["GetAccountsByUserId"];
   };
+  "/consentRequests/{ID}/validate": {
+    patch: operations["OutboundConsentRequestsValidatePatch"];
+  };
 }
 
 export interface operations {
@@ -169,6 +172,28 @@ export interface operations {
     };
     responses: {
       200: components["responses"]["AccountsByUserIdResponse"];
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      405: components["responses"]["405"];
+      406: components["responses"]["406"];
+      501: components["responses"]["501"];
+      503: components["responses"]["503"];
+    };
+  };
+  /** PISP requests account linking using an OTP */
+  OutboundConsentRequestsValidatePatch: {
+    parameters: {
+      path: {
+        ID: components["schemas"]["CorrelationId"];
+      };
+    };
+    requestBody: {
+      "application/json": components["schemas"]["ConsentRequestsValidateRequest"];
+    };
+    responses: {
+      200: components["responses"]["ConsentRequestsValidateResponse"];
       400: components["responses"]["400"];
       401: components["responses"]["401"];
       403: components["responses"]["403"];
@@ -700,6 +725,39 @@ export interface components {
       id: components["schemas"]["AccountAddress"];
       currency: components["schemas"]["Currency"];
     }[];
+    /** POST /consentRequests/{ID}/validate Request object */
+    ConsentRequestsValidateRequest: {
+      toParticipantId: string;
+      authToken: string;
+    };
+    /**
+     * The scopes requested for a ConsentRequest.
+     * - "accounts.getBalance" - Get the balance of a given account.
+     * - "accounts.transfer" - Initiate a transfer from an account.
+     */
+    ConsentScopeType: "accounts.getBalance" | "accounts.transfer";
+    /** Scope + Account Identifier mapping for a Consent. */
+    Scope: {
+      accountId: components["schemas"]["AccountAddress"];
+      actions: components["schemas"]["ConsentScopeType"][];
+    };
+    /** The object sent in a `POST /consents` request. */
+    ConsentsPostRequest: {
+      /**
+       * Common ID between the PISP and FSP for the Consent object
+       * decided by the DFSP who creates the Consent
+       * This field is REQUIRED for POST /consent.
+       */
+      consentId: components["schemas"]["CorrelationId"];
+      /**
+       * The id of the ConsentRequest that was used to initiate the
+       * creation of this Consent.
+       */
+      consentRequestId: components["schemas"]["CorrelationId"];
+      scopes: components["schemas"]["Scope"][];
+    };
+    /** state of POST consent requests validate */
+    ConsentRequestsValidateState: string;
   };
   responses: {
     /** OK */
@@ -846,6 +904,15 @@ export interface components {
     AccountsByUserIdResponse: {
       content: {
         "application/json": components["schemas"]["AccountsIDPutResponse"];
+      };
+    };
+    /** Consent requests validate response */
+    ConsentRequestsValidateResponse: {
+      content: {
+        "application/json": {
+          consent?: components["schemas"]["ConsentsPostRequest"];
+          currentState?: components["schemas"]["ConsentRequestsValidateState"];
+        };
       };
     };
   };

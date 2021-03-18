@@ -29,11 +29,11 @@
 import {
   thirdparty as tpAPI
 } from '@mojaloop/api-snippets'
-import { Message } from '~/shared/pub-sub'
 import { Request, ResponseObject } from '@hapi/hapi'
 import { StateResponseToolkit } from '~/server/plugins/state'
-import { notificationChannel } from '../../models/pispConsentRequest.model';
+import OTPValidateModel from '../../models/OTPValidate.model';
 import { Enum } from '@mojaloop/central-services-shared';
+import deferredJob from '~/shared/deferred-job'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function post (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
@@ -42,13 +42,13 @@ async function post (_context: any, request: Request, h: StateResponseToolkit): 
 
   // POST /consents is a follow-up request to PATCH /consentRequests
   // so we publish the request on the PISPConsentRequestModel
-  const channel = notificationChannel(
-    payload.consentRequestId
+  const channel = OTPValidateModel.notificationChannel(
+    { "consentRequestId": payload.consentRequestId }
   )
   const pubSub = h.getPubSub()
-  // don't await on promise to resolve
-  // let finish publish in background
-  pubSub.publish(channel, payload as unknown as Message)
+
+  // Publish the scopes and accounts associated with the consentsRequestId.
+  deferredJob(pubSub, channel).trigger(payload)
   logger.info('PISPConsentRequestModel handled POST /consents request')
 
   // Note that we will have passed request validation, JWS etc... by this point

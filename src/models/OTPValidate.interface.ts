@@ -25,18 +25,33 @@
  --------------
  ******/
 
-// TODO: use Async2sync model for this.
-/**
- * @name channelName
- * @description generates the pub/sub channel name
- * @param {object} - args
- * @param {string} args.consentRequestId - the consent request  id
- * @returns {string} - the pub/sub channel name
- */
-export function notificationChannel (consentRequestId: string) {
-  if (!consentRequestId) {
-    throw new Error('PISPConsentRequest.notificationChannel: \'consentRequestId\' parameter is required')
-  }
-  // channel name
-  return `consent_request_${consentRequestId}`
+//import {
+//  thirdparty as tpAPI
+//} from '@mojaloop/api-snippets'
+import { Method } from 'javascript-state-machine';
+import { A2SStateMachine, A2SData, A2SModelConfig } from './a2s.model';
+import { PubSub } from '../shared/pub-sub';
+import { ThirdpartyRequests} from '@mojaloop/sdk-standard-components';
+import { StateData } from './persistent.model';
+
+export interface OTPValidateStateMachine extends A2SStateMachine {
+  requestOTPValidate: Method
+  onRequestOTPValidate: Method
+  failOTPValidate: Method
+  onFailOTPValidate: Method
+}
+
+export interface OTPValidateData extends A2SData<StateData>  {
+  consentRequestId?: string
+}
+
+// tpAPI.Schemas.ConsentsPostRequest
+export interface OTPValidateModelConfig extends A2SModelConfig<unknown, StateData> {
+  pubSub: PubSub
+  thirdpartyRequests: ThirdpartyRequests
+}
+
+export interface OutboundOTPValidateData extends StateData {
+  authToken: string
+  toParticipantId: string
 }

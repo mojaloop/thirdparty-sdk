@@ -27,7 +27,7 @@ import {
 } from '@mojaloop/api-snippets'
 import { Message } from '~/shared/pub-sub'
 import { StateResponseToolkit } from '~/server/plugins/state'
-import { notificationChannel } from '~/models/pispConsentRequest.model';
+import OTPValidateModel from '~/models/OTPValidate.model';
 import { Enum } from '@mojaloop/central-services-shared';
 
 /**
@@ -39,7 +39,7 @@ async function put (_context: any, request: Request, h: StateResponseToolkit): P
     // We publish the request on the PISPConsentRequestModel
     const payload = request.payload as fspiopAPI.Schemas.ErrorInformation
 
-    const channel = notificationChannel(
+    const channel = OTPValidateModel.notificationChannel(
       request.params.ID
     )
     const pubSub = h.getPubSub()

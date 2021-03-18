@@ -1,9 +1,15 @@
-post:
-  operationId: OutboundConsentRequestsValidatePost
+patch:
+  operationId: OutboundConsentRequestsValidatePatch
   summary: Outbound consent requests validate endpoint
   description: PISP requests account linking using an OTP
   tags:
     - consentRequests
+  parameters:
+    - name: ID
+      in: path
+      required: true
+      schema:
+        $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/schemas/CorrelationId.yaml'
   requestBody:
     description: Consent requests validate request details
     required: true
