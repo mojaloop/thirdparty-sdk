@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+### [11.28.2](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.28.1...v11.28.2) (2021-03-18)
+
+
+### Tests
+
+* integration of requestPartiesInformation ([#65](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/65)) ([6a30687](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/6a30687a901894f2a21aba7d2b9b95ded252379c))
+
 ### [11.28.1](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.28.0...v11.28.1) (2021-03-17)
 
 
