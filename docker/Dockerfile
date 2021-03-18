@@ -1,4 +1,4 @@
-FROM node:12.16.1-alpine as builder
+FROM node:14.15-alpine as builder
 USER root
 WORKDIR /opt/thirdparty-scheme-adapter
 
@@ -13,7 +13,7 @@ RUN npm prune --production
 
 COPY . /opt/thirdparty-scheme-adapter
 
-FROM node:12.16.1-alpine
+FROM node:14.15-alpine
 WORKDIR /opt/thirdparty-scheme-adapter
 
 # Create empty log file & link stdout to the application log file
