@@ -31,11 +31,9 @@ import {
   OutboundRequestToPayTransferPostRequest,
   OutboundRequestToPayTransferPostResponse
 } from '../models/thirdparty.transactions.interface'
-import {
-  RequestPartiesInformationResponse
-} from '~/models/pispTransaction.interface'
+import { OutboundAPI } from '@mojaloop/sdk-scheme-adapter'
 export interface SDKOutgoingRequestsConfig extends HttpRequestsConfig {
-  dfspId: string
+  // requestAuthorizationPath: string
   requestPartiesInformationPath: string
   requestToPayTransferPath: string
 }
@@ -70,14 +68,9 @@ export class SDKOutgoingRequests extends HttpRequests {
     return this.config.requestToPayTransferPath
   }
 
-  // dfspId getter
-  get dfspId (): string {
-    return this.config.dfspId
-  }
-
   // REQUESTS
   /**
-   * TODO: these requests will be used by DFSPTransactionModel
+   * TODO: these requests will be used by DFSPTransactionModel/PISPTransactionModel
    *  // these two will be done by calling ThirdpartyRequests interface, so not implemented here
    *  notifyThirdpartyAboutRejectedAuthorization
    *  notifyThirdpartyAboutTransfer
@@ -90,9 +83,17 @@ export class SDKOutgoingRequests extends HttpRequests {
    *
    * */
 
+  /**
+   * @method requestPartiesInformation
+   * @description used to retrieve information about the Party
+   * @param {string} type - type of party
+   * @param {string} id - id of party
+   * @param {string} [subId] - optional sub id of party
+   * @returns {Promise<OutboundAPI.Schemas.partiesByIdResponse | void>} information about the party
+   */
   async requestPartiesInformation (
     type: string, id: string, subId?: string
-  ): Promise<RequestPartiesInformationResponse | void> {
+  ): Promise<OutboundAPI.Schemas.partiesByIdResponse | void> {
     // generate uri from template
     const uri = this.fullUri(
       // config.SHARED.SDK_PARTIES_INFORMATION_URI
@@ -105,10 +106,10 @@ export class SDKOutgoingRequests extends HttpRequests {
           subId || ''
         )
     )
-    this.logger.push({ uri, template: this.requestPartiesInformationPath }).info('requestPartiesInformation')
+    this.logger.push({ uri }).info('requestPartiesInformation')
 
     // make the GET /parties/{Type}/{ID}[/{SubId}] call
-    return this.loggedRequest<RequestPartiesInformationResponse>({
+    return this.loggedRequest<OutboundAPI.Schemas.partiesByIdResponse>({
       uri,
       method: 'GET',
       headers: this.headers,

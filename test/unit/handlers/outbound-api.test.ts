@@ -34,13 +34,13 @@ import {
   v1_1 as fspiopAPI,
   thirdparty as tpAPI
 } from '@mojaloop/api-snippets'
+import { OutboundAPI } from '@mojaloop/sdk-scheme-adapter'
 import { HealthResponse } from '~/interface/types'
 import { NotificationCallback, Message, PubSub } from '~/shared/pub-sub'
 import {
   OutboundThirdpartyAuthorizationsModelState
 } from '~/models/thirdparty.authorizations.interface'
 import {
-  RequestPartiesInformationResponse,
   PISPTransactionModelState,
   ThirdpartyTransactionStatus,
   RequestPartiesInformationState
@@ -76,7 +76,7 @@ const putThirdpartyAuthResponse: tpAPI.Schemas.ThirdpartyRequestsTransactionsIDA
   status: 'VERIFIED',
   value: 'value'
 }
-const partyLookupResponse: RequestPartiesInformationResponse = {
+const partyLookupResponse: OutboundAPI.Schemas.partiesByIdResponse = {
   party: {
     partyIdInfo: {
       partyIdType: 'MSISDN',

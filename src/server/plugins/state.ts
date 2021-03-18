@@ -134,7 +134,6 @@ export const StatePlugin = {
 
     const sdkOutgoingRequests = new SDKOutgoingRequests({
       logger,
-      dfspId: config.SHARED.DFSP_ID,
       uri: config.SHARED.SDK_OUTGOING_URI,
       scheme: config.SHARED.SDK_OUTGOING_HTTP_SCHEME as Scheme,
       requestPartiesInformationPath: config.SHARED.SDK_PARTIES_INFORMATION_URI,
