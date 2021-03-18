@@ -31,9 +31,7 @@ import {
   OutboundRequestToPayTransferPostRequest,
   OutboundRequestToPayTransferPostResponse
 } from '../models/thirdparty.transactions.interface'
-import {
-  RequestPartiesInformationResponse
-} from '~/models/pispTransaction.interface'
+import { OutboundAPI } from '@mojaloop/sdk-scheme-adapter'
 export interface SDKOutgoingRequestsConfig extends HttpRequestsConfig {
   // requestAuthorizationPath: string
   requestPartiesInformationPath: string
@@ -91,11 +89,11 @@ export class SDKOutgoingRequests extends HttpRequests {
    * @param {string} type - type of party
    * @param {string} id - id of party
    * @param {string} [subId] - optional sub id of party
-   * @returns {Promise<RequestPartiesInformationResponse | void>} information about the party
+   * @returns {Promise<OutboundAPI.Schemas.partiesByIdResponse | void>} information about the party
    */
   async requestPartiesInformation (
     type: string, id: string, subId?: string
-  ): Promise<RequestPartiesInformationResponse | void> {
+  ): Promise<OutboundAPI.Schemas.partiesByIdResponse | void> {
     // generate uri from template
     const uri = this.fullUri(
       // config.SHARED.SDK_PARTIES_INFORMATION_URI
@@ -111,7 +109,7 @@ export class SDKOutgoingRequests extends HttpRequests {
     this.logger.push({ uri }).info('requestPartiesInformation')
 
     // make the GET /parties/{Type}/{ID}[/{SubId}] call
-    return this.loggedRequest<RequestPartiesInformationResponse>({
+    return this.loggedRequest<OutboundAPI.Schemas.partiesByIdResponse>({
       uri,
       method: 'GET',
       headers: this.headers,
