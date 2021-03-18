@@ -57,7 +57,7 @@ import {
   thirdparty as tpAPI
 } from '@mojaloop/api-snippets'
 import { HTTPResponseError } from '~/shared/http-response-error'
-import { SDKRequests } from '~/shared/sdk-requests'
+import { SDKOutgoingRequests } from '~/shared/sdk-outgoing-requests'
 
 // mock KVS default exported class
 jest.mock('~/shared/kvs')
@@ -89,12 +89,12 @@ describe('pipsTransactionModel', () => {
         getParties: jest.fn(() => Promise.resolve({ statusCode: 202 })),
         putAuthorizations: jest.fn(() => Promise.resolve({ statusCode: 202 }))
       } as unknown as MojaloopRequests,
-      sdkRequests: {
+      sdkOutgoingRequests: {
         requestPartiesInformation: jest.fn(() => Promise.resolve({
           party: { Iam: 'mocked-party' },
           currentStatus: 'COMPLETED'
         }))
-      } as unknown as SDKRequests
+      } as unknown as SDKOutgoingRequests
     }
     mocked(modelConfig.pubSub.subscribe).mockImplementationOnce(
       (_channel: string, cb: NotificationCallback) => {
@@ -191,7 +191,7 @@ describe('pipsTransactionModel', () => {
 
       it('should give response properly populated from backendRequests.requestPartiesInformation', async () => {
         const model = await create(lookupData, modelConfig)
-        mocked(modelConfig.sdkRequests.requestPartiesInformation).mockImplementationOnce(() => Promise.resolve({
+        mocked(modelConfig.sdkOutgoingRequests.requestPartiesInformation).mockImplementationOnce(() => Promise.resolve({
           party,
           currentState: RequestPartiesInformationState.COMPLETED
         }))
@@ -219,14 +219,14 @@ describe('pipsTransactionModel', () => {
         })
 
         // check we made a call to mojaloopRequest.getParties
-        expect(modelConfig.sdkRequests.requestPartiesInformation).toBeCalledWith(
+        expect(modelConfig.sdkOutgoingRequests.requestPartiesInformation).toBeCalledWith(
           'party-id-type', 'party-identifier', undefined
         )
       })
 
       it('should handle error', async () => {
         mocked(
-          modelConfig.sdkRequests.requestPartiesInformation
+          modelConfig.sdkOutgoingRequests.requestPartiesInformation
         ).mockImplementationOnce(
           () => {
             const err = new HTTPResponseError({
@@ -415,7 +415,8 @@ describe('pipsTransactionModel', () => {
 
       const transactionStatus: ThirdpartyTransactionStatus = {
         transactionId: '5678-5678',
-        transactionRequestState: 'ACCEPTED'
+        transactionRequestState: 'ACCEPTED',
+        transactionState: 'COMPLETED'
       }
 
       beforeEach(async () => {

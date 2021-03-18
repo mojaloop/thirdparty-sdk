@@ -31,27 +31,22 @@ import {
   OutboundRequestToPayTransferPostRequest,
   OutboundRequestToPayTransferPostResponse
 } from '../models/thirdparty.transactions.interface'
-import {
-  ThirdpartyTransactionStatus,
-  RequestPartiesInformationResponse
-} from '~/models/pispTransaction.interface'
-export interface SDKRequestConfig extends HttpRequestsConfig {
-  // TODO: SDK Requests Interfaces: MojaloopRequests & ThridpartyRequests
-  dfspId: string
+import { OutboundAPI } from '@mojaloop/sdk-scheme-adapter'
+export interface SDKOutgoingRequestsConfig extends HttpRequestsConfig {
+  // requestAuthorizationPath: string
   requestPartiesInformationPath: string
   requestToPayTransferPath: string
-  notifyAboutTransferPath: string
 }
 
 /**
- * @class SDKRequest
+ * @class SDKOutgoingRequest
  * @description tiny wrapper dedicated to make requests to SDK scheme adapter Outgoing
- *              and SDK MojaloopRequest/ThirdpartyRequest interfaces
+ *
  */
-export class SDKRequests extends HttpRequests {
+export class SDKOutgoingRequests extends HttpRequests {
   // we want this constructor for better code support
   // eslint-disable-next-line no-useless-constructor
-  constructor (config: SDKRequestConfig) {
+  constructor (config: SDKOutgoingRequestsConfig) {
     super(config)
   }
 
@@ -59,8 +54,8 @@ export class SDKRequests extends HttpRequests {
 
   // config getter
   // polymorphism for getters can be handy and saves a lot of type casting
-  protected get config (): SDKRequestConfig {
-    return super.config as unknown as SDKRequestConfig
+  protected get config (): SDKOutgoingRequestsConfig {
+    return super.config as unknown as SDKOutgoingRequestsConfig
   }
 
   // requestToPayTransfer path getter
@@ -73,21 +68,13 @@ export class SDKRequests extends HttpRequests {
     return this.config.requestToPayTransferPath
   }
 
-  // notifyAboutTransfer path getter
-  get notifyAboutTransferPath (): string {
-    return this.config.notifyAboutTransferPath
-  }
-
-  // dfspId getter
-  get dfspId (): string {
-    return this.config.dfspId
-  }
-
   // REQUESTS
   /**
-   * TODO: these requests will be used by DFSPTransactionModel
+   * TODO: these requests will be used by DFSPTransactionModel/PISPTransactionModel
+   *  // these two will be done by calling ThirdpartyRequests interface, so not implemented here
    *  notifyThirdpartyAboutRejectedAuthorization
    *  notifyThirdpartyAboutTransfer
+   *  // synchronous calls to SDKOutgoing
    *  requestAuthorization
    *  requestQuote,
    *  requestThirdpartyTransaction
@@ -95,29 +82,18 @@ export class SDKRequests extends HttpRequests {
    *  requestVerifyAuthorization
    *
    * */
-  async notifyThirdpartyAboutTransfer (
-    request: ThirdpartyTransactionStatus,
-    id: string
-  ): Promise<void> {
-    // TODO: replace by thirdpartyRequests.patchThridpartyRequestTransaction
-    return this.loggedRequest<void>({
-      //  uri: this.prependScheme(config.SHARED.NOTIFY_ABOUT_TRANSFER_URI.replace('{ID}', id)),
-      uri: this.prependScheme(this.notifyAboutTransferPath.replace('{ID}', id)),
-      method: 'PATCH',
-      body: requests.common.bodyStringifier(request),
-      headers: {
-        ...this.headers,
-        // 'fspiop-source': this.config.SHARED.DFSP_ID
-        'fspiop-source': this.dfspId
-      },
 
-      agent: this.agent
-    })
-  }
-
+  /**
+   * @method requestPartiesInformation
+   * @description used to retrieve information about the Party
+   * @param {string} type - type of party
+   * @param {string} id - id of party
+   * @param {string} [subId] - optional sub id of party
+   * @returns {Promise<OutboundAPI.Schemas.partiesByIdResponse | void>} information about the party
+   */
   async requestPartiesInformation (
     type: string, id: string, subId?: string
-  ): Promise<RequestPartiesInformationResponse | void> {
+  ): Promise<OutboundAPI.Schemas.partiesByIdResponse | void> {
     // generate uri from template
     const uri = this.fullUri(
       // config.SHARED.SDK_PARTIES_INFORMATION_URI
@@ -130,10 +106,10 @@ export class SDKRequests extends HttpRequests {
           subId || ''
         )
     )
-    this.logger.push({ uri, template: this.requestPartiesInformationPath }).info('requestPartiesInformation')
+    this.logger.push({ uri }).info('requestPartiesInformation')
 
     // make the GET /parties/{Type}/{ID}[/{SubId}] call
-    return this.loggedRequest<RequestPartiesInformationResponse>({
+    return this.loggedRequest<OutboundAPI.Schemas.partiesByIdResponse>({
       uri,
       method: 'GET',
       headers: this.headers,
@@ -141,7 +117,7 @@ export class SDKRequests extends HttpRequests {
     })
   }
 
-  // TODO drop it and replace by requestTransfer
+  // TODO: drop it and replace by requestTransfer
   async requestToPayTransfer (
     request: OutboundRequestToPayTransferPostRequest
   ): Promise<OutboundRequestToPayTransferPostResponse | void> {

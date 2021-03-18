@@ -25,7 +25,7 @@
  --------------
  ******/
 
-import { SDKRequests } from '~/shared/sdk-requests'
+import { SDKOutgoingRequests } from '~/shared/sdk-outgoing-requests'
 import {
   Logger as SDKLogger,
   MojaloopRequests,
@@ -36,12 +36,11 @@ import {
   OutboundRequestToPayTransferPostRequest,
   OutboundRequestToPayTransferPostResponse
 } from '../thirdparty.transactions.interface'
-import config from '~/shared/config'
 import { ThirdpartyTransactionStatus } from '../pispTransaction.interface'
 
 export interface InboundThridpartyTransactionsModelConfig {
   logger: SDKLogger.Logger
-  sdkRequests: SDKRequests
+  sdkOutgoingRequests: SDKOutgoingRequests
   mojaloopRequests: MojaloopRequests
   thirdpartyRequests: ThirdpartyRequests
 }
@@ -58,18 +57,23 @@ export class InboundThridpartyTransactionsModel {
     return this.config.logger
   }
 
-  protected get sdkRequests (): SDKRequests {
-    return this.config.sdkRequests
+  protected get sdkOutgoingRequests (): SDKOutgoingRequests {
+    return this.config.sdkOutgoingRequests
   }
 
   protected get mojaloopRequests (): MojaloopRequests {
     return this.config.mojaloopRequests
   }
 
+  protected get thirdpartyRequests (): ThirdpartyRequests {
+    return this.config.thirdpartyRequests
+  }
+
   // RequestToPay endpoint was used by POC PISPTransaction code
   // TODO: use it when PISPMerchantTransaction flow will be implemented in future
   async requestToPayTransfer (
-    inRequest: InboundThirdpartyTransactionPostRequest
+    inRequest: InboundThirdpartyTransactionPostRequest,
+    pispId: string
   ): Promise<OutboundRequestToPayTransferPostResponse> {
     this.logger.push({ inRequest }).info('requestToPayTransfer: inRequest')
     // propagate make the requestToPayTransfer on outbound sdk-scheme-adapter
@@ -101,20 +105,23 @@ export class InboundThridpartyTransactionsModel {
     }
     this.logger.push({ requestToPayTransfer }).info('requestToPayTransfer: requestToPayTransfer')
 
-    const response = await this.sdkRequests.requestToPayTransfer(
+    const response = await this.sdkOutgoingRequests.requestToPayTransfer(
       requestToPayTransfer
     ) as OutboundRequestToPayTransferPostResponse
 
     this.logger.push({ response }).info('requestToPayTransfer: response')
 
-    // optionally notify via PATCH
-    if (config.SHARED.SDK_NOTIFY_ABOUT_TRANSFER_URI) {
-      const transactionStatus: ThirdpartyTransactionStatus = {
-        transactionId: inRequest.transactionRequestId,
-        transactionRequestState: 'ACCEPTED'
-      }
-      await this.sdkRequests.notifyThirdpartyAboutTransfer(transactionStatus, inRequest.transactionRequestId)
+    // notifyThirdpartyAboutTransfer via PATCH
+    const transactionStatus: ThirdpartyTransactionStatus = {
+      transactionId: inRequest.transactionRequestId,
+      transactionRequestState: 'ACCEPTED',
+      transactionState: 'COMPLETED'
     }
+    await this.thirdpartyRequests.patchThirdpartyRequestsTransactions(
+      transactionStatus,
+      inRequest.transactionRequestId,
+      pispId
+    )
 
     return response
   }

@@ -34,22 +34,17 @@ import {
   v1_1 as fspiopAPI,
   thirdparty as tpAPI
 } from '@mojaloop/api-snippets'
+import { OutboundAPI } from '@mojaloop/sdk-scheme-adapter'
 import { Method } from 'javascript-state-machine'
 import { ErrorInformation } from '~/interface/types'
 import { ControlledStateMachine, StateData, PersistentModelConfig } from '~/models/persistent.model'
 import { PubSub } from '~/shared/pub-sub'
-import { SDKRequests } from '~/shared/sdk-requests'
+import { SDKOutgoingRequests } from '~/shared/sdk-outgoing-requests'
 
 export enum RequestPartiesInformationState {
   COMPLETED = 'COMPLETED',
   WAITING_FOR_REQUEST_PARTY_INFORMATION = 'WAITING_FOR_REQUEST_PARTY_INFORMATION',
   ERROR_OCCURRED = 'ERROR_OCCURRED'
-}
-
-export interface RequestPartiesInformationResponse {
-  party?: fspiopAPI.Schemas.Party
-  currentState: RequestPartiesInformationState
-  errorInformation?: ErrorInformation
 }
 
 export enum PISPTransactionModelState {
@@ -82,7 +77,7 @@ export interface PISPTransactionModelConfig extends PersistentModelConfig {
   pubSub: PubSub
   thirdpartyRequests: ThirdpartyRequests
   mojaloopRequests: MojaloopRequests
-  sdkRequests: SDKRequests
+  sdkOutgoingRequests: SDKOutgoingRequests
 }
 
 // derived from request body specification
@@ -100,7 +95,7 @@ export interface ThirdpartyTransactionPartyLookupRequest {
 }
 
 export interface ThirdpartyTransactionPartyLookupResponse {
-  party?: fspiopAPI.Schemas.Party
+  party?: tpAPI.Schemas.Party
   errorInformation?: ErrorInformation
   currentState: PISPTransactionModelState
 }
@@ -123,7 +118,8 @@ export interface ThirdpartyTransactionInitiateResponse {
 
 export interface ThirdpartyTransactionStatus {
   transactionId: string
-  transactionRequestState: 'RECEIVED' | 'PENDING' | 'ACCEPTED' | 'REJECTED'
+  transactionRequestState: 'RECEIVED' | 'PENDING' | 'ACCEPTED' | 'REJECTED',
+  transactionState: 'RECEIVED' | 'PENDING' | 'COMPLETED' | 'REJECTED'
 }
 
 export interface ThirdpartyTransactionApproveResponse {
@@ -140,7 +136,7 @@ export interface PISPTransactionData extends StateData {
 
   // party lookup
   payeeRequest?: PayeeLookupRequest
-  payeeResolved?: RequestPartiesInformationResponse
+  payeeResolved?: OutboundAPI.Schemas.partiesByIdResponse
   partyLookupResponse?: ThirdpartyTransactionPartyLookupResponse
 
   // initiate

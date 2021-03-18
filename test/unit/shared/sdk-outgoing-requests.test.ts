@@ -25,29 +25,22 @@
  --------------
  ******/
 
-import { SDKRequestConfig, SDKRequests } from '~/shared/sdk-requests'
+import { SDKOutgoingRequestsConfig, SDKOutgoingRequests } from '~/shared/sdk-outgoing-requests'
 import { Scheme } from '~/shared/http-scheme'
 import mockLogger from '../mockLogger'
-import { ThirdpartyTransactionStatus } from '~/models/pispTransaction.interface'
 import { uuid } from 'uuidv4'
 import { OutboundRequestToPayTransferPostRequest } from '~/models/thirdparty.transactions.interface'
-describe('SDKRequests', () => {
-  let sdkRequest: SDKRequests
+describe('SDKOutgoingRequests', () => {
+  let sdkRequest: SDKOutgoingRequests
 
-  const config: SDKRequestConfig = {
-    dfspId: 'the-dfsp-id',
+  const config: SDKOutgoingRequestsConfig = {
     logger: mockLogger(),
     scheme: Scheme.http,
     uri: 'backend-uri',
     // PATHS
-    notifyAboutTransferPath: 'notify-about-transfer/{ID}',
+    // requestAuthorizationPath: 'authorizations',
     requestPartiesInformationPath: 'parties/{Type}/{ID}/{SubId}',
     requestToPayTransferPath: 'request-to-pay-transfer'
-  }
-
-  const transactionStatus: ThirdpartyTransactionStatus = {
-    transactionId: 'mocked-transaction-id',
-    transactionRequestState: 'ACCEPTED'
   }
 
   const requestToPayTransfer: OutboundRequestToPayTransferPostRequest = {
@@ -69,7 +62,7 @@ describe('SDKRequests', () => {
   }
 
   beforeEach(() => {
-    sdkRequest = new SDKRequests(config)
+    sdkRequest = new SDKOutgoingRequests(config)
   })
 
   it('should create instance successfully', () => {
@@ -83,28 +76,7 @@ describe('SDKRequests', () => {
     expect(typeof sdkRequest.patch).toEqual('function')
     expect(typeof sdkRequest.post).toEqual('function')
     expect(typeof sdkRequest.put).toEqual('function')
-    expect(typeof sdkRequest.notifyThirdpartyAboutTransfer).toEqual('function')
     expect(typeof sdkRequest.requestPartiesInformation).toEqual('function')
-  })
-
-  describe('notifyAboutTransfer', () => {
-    it('should propagate call loggedRequest', async () => {
-      // TODO: should use proper method from ThirdpartyRequests class from SDK
-      const loggedRequestSpy = jest.spyOn(sdkRequest, 'loggedRequest').mockImplementationOnce(
-        () => Promise.resolve()
-      )
-      const transactionRequestId = uuid()
-      const result = await sdkRequest.notifyThirdpartyAboutTransfer(transactionStatus, transactionRequestId)
-      expect(result).toBeUndefined()
-      expect(loggedRequestSpy).toHaveBeenCalledWith({
-        method: 'PATCH',
-        // uri: 'http://localhost:9000/thridpartyRequests/transactions/mocked-transaction-request-id',
-        uri: `${config.scheme}://${config.notifyAboutTransferPath.replace('{ID}', transactionRequestId)}`,
-        body: JSON.stringify(transactionStatus),
-        agent: expect.anything(),
-        headers: expect.anything()
-      })
-    })
   })
 
   describe('requestPartiesInformation', () => {
