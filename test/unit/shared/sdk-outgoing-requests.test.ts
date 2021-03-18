@@ -38,7 +38,7 @@ describe('SDKOutgoingRequests', () => {
     scheme: Scheme.http,
     uri: 'backend-uri',
     // PATHS
-    requestAuthorizationPath: 'authorizations',
+    // requestAuthorizationPath: 'authorizations',
     requestPartiesInformationPath: 'parties/{Type}/{ID}/{SubId}',
     requestToPayTransferPath: 'request-to-pay-transfer'
   }
