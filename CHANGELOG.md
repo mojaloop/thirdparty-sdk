@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+### [11.28.1](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.28.0...v11.28.1) (2021-03-17)
+
+
+### Code Refactor
+
+* 2060 remove notifyThirdpartyAboutTransfer  ([#64](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/64)) ([7edc9ad](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/7edc9ad3bb957f9da4c1ec9d2f2d257f88beb501))
+
 ## [11.28.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.27.1...v11.28.0) (2021-03-16)
 
 
