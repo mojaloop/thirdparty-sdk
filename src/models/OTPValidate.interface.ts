@@ -24,10 +24,6 @@
  - Kevin Leyow <kevin.leyow@modusbox.com>
  --------------
  ******/
-
-//import {
-//  thirdparty as tpAPI
-//} from '@mojaloop/api-snippets'
 import { Method } from 'javascript-state-machine';
 import { A2SStateMachine, A2SData, A2SModelConfig } from './a2s.model';
 import { PubSub } from '../shared/pub-sub';
@@ -45,7 +41,6 @@ export interface OTPValidateData extends A2SData<StateData>  {
   consentRequestId?: string
 }
 
-// tpAPI.Schemas.ConsentsPostRequest
 export interface OTPValidateModelConfig extends A2SModelConfig<unknown, StateData> {
   pubSub: PubSub
   thirdpartyRequests: ThirdpartyRequests
