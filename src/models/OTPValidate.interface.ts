@@ -24,26 +24,11 @@
  - Kevin Leyow <kevin.leyow@modusbox.com>
  --------------
  ******/
-import { Method } from 'javascript-state-machine';
-import { A2SStateMachine, A2SData, A2SModelConfig } from './a2s.model';
-import { PubSub } from '../shared/pub-sub';
-import { ThirdpartyRequests} from '@mojaloop/sdk-standard-components';
 import { StateData } from './persistent.model';
-
-export interface OTPValidateStateMachine extends A2SStateMachine {
-  requestOTPValidate: Method
-  onRequestOTPValidate: Method
-  failOTPValidate: Method
-  onFailOTPValidate: Method
-}
+import { A2SData } from './a2s.model';
 
 export interface OTPValidateData extends A2SData<StateData>  {
   consentRequestId?: string
-}
-
-export interface OTPValidateModelConfig extends A2SModelConfig<unknown, StateData> {
-  pubSub: PubSub
-  thirdpartyRequests: ThirdpartyRequests
 }
 
 export interface OutboundOTPValidateData extends StateData {

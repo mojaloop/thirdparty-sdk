@@ -30,60 +30,66 @@ import {
   thirdparty as tpAPI
 } from '@mojaloop/api-snippets'
 import { resolve } from 'path';
+import { A2SModelConfig } from './a2s.model';
+import { KVS } from '../shared/kvs';
+import { PubSub, Message } from '../shared/pub-sub';
+import { StateData } from './persistent.model';
+import { Logger as SDKLogger } from '@mojaloop/sdk-standard-components'
 
 
-interface channelNameArgs {
-  consentRequestId: string
-}
-
- /**
- * @name channelName
- * @description generates the pub/sub channel name
- * @param {object} - args
- * @param {string} args.consentRequestId - the consent request  id
- * @returns {string} - the pub/sub channel name
- */
-function notificationChannel (args: channelNameArgs): string {
-  if (!args.consentRequestId) {
-    throw new Error('PISPConsentRequest.notificationChannel: \'consentRequestId\' parameter is required')
-  }
-  // channel name
-  return `consent_request_${args.consentRequestId}`
-}
-
-interface requestActionArgs {
-  requests: ThirdpartyRequests,
+export interface OTPValidateModelArgs {
   consentRequestId: string,
-  fspId: string,
-  consentRequest: tpAPI.Schemas.ConsentRequestsIDPatchRequest
+  fspId?: string,
+  consentRequest?: tpAPI.Schemas.ConsentRequestsIDPatchRequest
 }
 
-async function requestAction(args: requestActionArgs): Promise<void> {
-  if ( !args.fspId ) {
-      throw new Error('OTPValidate args requires \'fspId\' to be nonempty string');
-  }
-
-  if ( !(args.consentRequest  && typeof(args.consentRequest) === 'object') ) {
-      throw new Error('OTPValidate.requestAction args requires \'transfer\' to be specified');
-  }
-  args.requests.patchConsentRequests(args.consentRequestId, args.consentRequest, args.fspId);
-  resolve()
+interface TestResponse extends StateData {
+  the: string
+  message: Message
 }
 
+export class OTPValidateModelConfig implements A2SModelConfig<OTPValidateModelArgs, TestResponse> {
+  public readonly key: string
+  public readonly kvs: KVS
+  public readonly logger: SDKLogger.Logger
+  public readonly pubSub: PubSub
+  public readonly modelName = 'OTPValidate'
+  public readonly thirdpartyRequests: ThirdpartyRequests
+  public readonly requestProcessingTimeoutSeconds = 10000
 
-function argsValidation(args: requestActionArgs) {
-  if (!(args.consentRequestId && typeof(args.consentRequestId) === 'string' && args.consentRequestId.length > 0)) {
-      throw new Error('TransfersModel args requires \'args.consentRequestId\' is nonempty string and mandatory property');
+  constructor (key: string, kvs: KVS, logger: SDKLogger.Logger, pubSub: PubSub, thirdpartyRequests: ThirdpartyRequests) {
+    this.key = key
+    this.kvs = kvs
+    this.logger = logger
+    this.pubSub = pubSub
+    this.thirdpartyRequests = thirdpartyRequests
   }
-  if (args.fspId && !(typeof (args.fspId) === 'string' && args.fspId.length > 0)) {
-      throw new Error('TransfersModel args requires \'args.fspId\' to be nonempty string');
+
+  // generate a channel name
+  channelName (args: OTPValidateModelArgs): string {
+    const tokens = [this.modelName, args.consentRequestId]
+    return tokens.map(x => `${x}`).join('-')
+  }
+
+
+  async requestAction(args: OTPValidateModelArgs): Promise<void> {
+    if ( !args.fspId ) {
+        throw new Error('OTPValidate args requires \'fspId\' to be nonempty string');
+    }
+
+    if ( !(args.consentRequest  && typeof(args.consentRequest) === 'object') ) {
+        throw new Error('OTPValidate.requestAction args requires \'transfer\' to be specified');
+    }
+    this.thirdpartyRequests.patchConsentRequests(args.consentRequestId, args.consentRequest, args.fspId);
+    resolve()
+  }
+
+  throwIfInvalidArgs(args: OTPValidateModelArgs) {
+    if (!(args.consentRequestId && typeof(args.consentRequestId) === 'string' && args.consentRequestId.length > 0)) {
+        throw new Error('TransfersModel args requires \'args.consentRequestId\' is nonempty string and mandatory property');
+    }
+    if (args.fspId && !(typeof (args.fspId) === 'string' && args.fspId.length > 0)) {
+        throw new Error('TransfersModel args requires \'args.fspId\' to be nonempty string');
+    }
   }
 }
-
-const OTPValidateModel = {
-  notificationChannel: notificationChannel,
-  requestAction: requestAction,
-  argsValidation: argsValidation
-}
-
-export default OTPValidateModel;

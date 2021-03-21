@@ -25,10 +25,10 @@ import { Request, ResponseObject } from '@hapi/hapi'
 import {
   v1_1 as fspiopAPI
 } from '@mojaloop/api-snippets'
-import { Message } from '~/shared/pub-sub'
 import { StateResponseToolkit } from '~/server/plugins/state'
-import OTPValidateModel from '~/models/OTPValidate.model';
 import { Enum } from '@mojaloop/central-services-shared';
+import { OTPValidateModelConfig } from '~/models/OTPValidate.model';
+import deferredJob from '~/shared/deferred-job';
 
 /**
  * Handles a inbound PUT /consentRequests/{ID}/error request
@@ -38,14 +38,20 @@ async function put (_context: any, request: Request, h: StateResponseToolkit): P
     // when an OTP or secret failed to validate.
     // We publish the request on the PISPConsentRequestModel
     const payload = request.payload as fspiopAPI.Schemas.ErrorInformation
+    const consentRequestId = request.params.ID
 
-    const channel = OTPValidateModel.notificationChannel(
-      request.params.ID
+    const config: OTPValidateModelConfig = new OTPValidateModelConfig(
+      consentRequestId,
+      h.getKVS(),
+      h.getLogger(),
+      h.getPubSub(),
+      h.getThirdpartyRequests()
     )
+    const channel = config.channelName({consentRequestId: consentRequestId})
     const pubSub = h.getPubSub()
 
-    // don't await on promise to resolve, let finish publish in background
-    pubSub.publish(channel, payload as unknown as Message)
+    // Publish the scopes and accounts associated with the consentsRequestId.
+    deferredJob(pubSub, channel).trigger(payload)
     return h.response({}).code(Enum.Http.ReturnCodes.OK.CODE)
 }
 

@@ -31,20 +31,26 @@ import {
 } from '@mojaloop/api-snippets'
 import { Request, ResponseObject } from '@hapi/hapi'
 import { StateResponseToolkit } from '~/server/plugins/state'
-import OTPValidateModel from '../../models/OTPValidate.model';
 import { Enum } from '@mojaloop/central-services-shared';
 import deferredJob from '~/shared/deferred-job'
+import { OTPValidateModelConfig } from '~/models/OTPValidate.model';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function post (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const payload = request.payload as tpAPI.Schemas.ConsentsPostRequest
+  const consentRequestId = payload.consentRequestId
   const logger = h.getLogger()
 
   // POST /consents is a follow-up request to PATCH /consentRequests
   // so we publish the request on the PISPConsentRequestModel
-  const channel = OTPValidateModel.notificationChannel(
-    { "consentRequestId": payload.consentRequestId }
+  const config: OTPValidateModelConfig = new OTPValidateModelConfig(
+    consentRequestId,
+    h.getKVS(),
+    h.getLogger(),
+    h.getPubSub(),
+    h.getThirdpartyRequests()
   )
+  const channel = config.channelName({consentRequestId: consentRequestId})
   const pubSub = h.getPubSub()
 
   // Publish the scopes and accounts associated with the consentsRequestId.
