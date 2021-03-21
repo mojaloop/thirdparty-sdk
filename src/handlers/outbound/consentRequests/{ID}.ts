@@ -42,7 +42,7 @@ async function patch (_context: any, request: Request, h: StateResponseToolkit):
     logger: h.getLogger(),
     pubSub: h.getPubSub(),
     thirdpartyRequests: h.getThirdpartyRequests(),
-    requestProcessingTimeoutSeconds: 3
+    requestProcessingTimeoutSeconds: 30000
   }
 
   const model = await create(data, config)
