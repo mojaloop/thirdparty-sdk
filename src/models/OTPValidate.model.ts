@@ -65,7 +65,6 @@ export class OTPValidateModelConfig implements A2SModelConfig<OTPValidateModelAr
     this.thirdpartyRequests = thirdpartyRequests
   }
 
-  // generate a channel name
   channelName (args: OTPValidateModelArgs): string {
     const tokens = [this.modelName, args.consentRequestId]
     return tokens.map(x => `${x}`).join('-')

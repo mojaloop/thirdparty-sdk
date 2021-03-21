@@ -8,6 +8,7 @@ import {
   create
 } from '~/models/a2s.model'
 import { OTPValidateModelArgs, OTPValidateModelConfig } from '~/models/OTPValidate.model';
+import { OutboundOTPValidateResponse } from '../../../../models/OTPValidate.interface';
 
 /**
  * Handles outbound PATCH /consentRequests/{ID} request
@@ -40,11 +41,10 @@ async function patch (_context: any, request: Request, h: StateResponseToolkit):
 
   const model = await create(data, config)
 
-  const result = await model.run(args)
-  console.log(result)
+  const result = (await model.run(args)) as unknown as OutboundOTPValidateResponse
+  const statusCode = (result == undefined || result.errorInformation) ? 500 : 200
 
-  // TODO: handle errors
-  return h.response().code(200)
+  return h.response(result).code(statusCode)
 }
 
 export default {

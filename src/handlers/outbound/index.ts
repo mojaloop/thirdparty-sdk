@@ -32,7 +32,7 @@ import ThirdpartyTransactionPartyLookup from './thirdpartyTransaction/partyLooku
 import ThirdpartyTransactionInitiate from './thirdpartyTransaction/{ID}/initiate'
 import ThirdpartyTransactionApprove from './thirdpartyTransaction/{ID}/approve'
 import Accounts from './accounts/{fspId}/{userId}'
-import ConsentRequests from './consentRequests/{ID}'
+import ConsentRequestsIDValidate from './consentRequests/{ID}/validate'
 
 export default {
   OutboundAuthorizationsPost: Authorizations.post,
@@ -41,5 +41,5 @@ export default {
   InitiateThirdpartyTransaction: ThirdpartyTransactionInitiate.post,
   ApproveThirdpartyTransaction: ThirdpartyTransactionApprove.post,
   GetAccountsByUserId: Accounts.get,
-  OutboundConsentRequestsValidatePatch: ConsentRequests.patch
+  OutboundConsentRequestsValidatePatch: ConsentRequestsIDValidate.patch
 }
