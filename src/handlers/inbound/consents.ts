@@ -40,18 +40,18 @@ async function post (_context: any, request: Request, h: StateResponseToolkit): 
   const payload = request.payload as tpAPI.Schemas.ConsentsPostRequest
   const consentRequestId = payload.consentRequestId
   const logger = h.getLogger()
+  const pubSub = h.getPubSub()
 
   // POST /consents is a follow-up request to PATCH /consentRequests
   // so we publish the request on the PISPConsentRequestModel
   const config: OTPValidateModelConfig = new OTPValidateModelConfig(
     consentRequestId,
     h.getKVS(),
-    h.getLogger(),
-    h.getPubSub(),
+    logger,
+    pubSub,
     h.getThirdpartyRequests()
   )
   const channel = config.channelName({consentRequestId: consentRequestId})
-  const pubSub = h.getPubSub()
 
   // Publish the scopes and accounts associated with the consentsRequestId.
   deferredJob(pubSub, channel).trigger(payload)

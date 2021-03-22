@@ -132,7 +132,8 @@ jest.mock('@mojaloop/sdk-standard-components', () => {
       postAuthorizations: jest.fn(() => Promise.resolve(putResponse)),
       postThirdpartyRequestsTransactionsAuthorizations: jest.fn(() => Promise.resolve(putThirdpartyAuthResponse)),
       postThirdpartyRequestsTransactions: jest.fn(() => Promise.resolve(initiateResponse)),
-      getAccounts: jest.fn(() => Promise.resolve(mockData.accountsRequest.payload))
+      getAccounts: jest.fn(() => Promise.resolve(mockData.accountsRequest.payload)),
+      patchConsentRequests: jest.fn(() => Promise.resolve()),
     })),
     WSO2Auth: jest.fn(),
     Logger: {
@@ -507,5 +508,77 @@ describe('Outbound API routes', (): void => {
       errorInformation: errorResp.errorInformation
     }
     expect((response.result)).toEqual(expectedResp)
+  })
+
+  it('/consentRequests/{ID}/validate - success', async (): Promise<void> => {
+    const request = {
+      method: 'PATCH',
+      url: '/consentRequests/6988c34f-055b-4ed5-b223-b10c8a2e2329/validate',
+      payload: {
+        toParticipantId: 'dfpsa',
+        authToken: '123456'
+      }
+    }
+    const pubSub = new PubSub({} as RedisConnectionConfig)
+    // defer publication to notification channel
+    // the dfsp should respond to a PISP with a POST /consents request
+    // where the inbound handler will publish the message
+    setTimeout(() => pubSub.publish(
+      'OTPValidate-6988c34f-055b-4ed5-b223-b10c8a2e2329',
+      mockData.inboundConsentsPostRequest.payload as unknown as Message
+    ), 10)
+    const response = await server.inject(request)
+
+    expect(response.statusCode).toBe(200)
+    const expectedResp = {
+      consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
+      consentRequestId: '6988c34f-055b-4ed5-b223-b10c8a2e2329',
+      scopes: [{
+          accountId: 'some-id',
+          actions: [
+            'accounts.getBalance',
+            'accounts.transfer'
+          ]
+        }
+      ],
+      currentState: 'COMPLETED'
+    }
+    expect(response.result).toEqual(expectedResp)
+  })
+
+  it('/consentRequests/{ID}/validate - error', async (): Promise<void> => {
+    const request = {
+      method: 'PATCH',
+      url: '/consentRequests/6988c34f-055b-4ed5-b223-b10c8a2e2329/validate',
+      payload: {
+        toParticipantId: 'dfpsa',
+        authToken: '123456'
+      }
+    }
+
+    const errorResponse = {
+      errorInformation: {
+        errorCode: '6000',
+        errorDescription: 'Generic thirdparty error'
+      }
+    }
+
+    const pubSub = new PubSub({} as RedisConnectionConfig)
+    // defer publication to notification channel
+    // if the validation fails the dfsp will respond with a
+    // PUT /consentRequests/{ID}/error where the inbound handler will publish
+    // the error
+    setTimeout(() => pubSub.publish(
+      'OTPValidate-6988c34f-055b-4ed5-b223-b10c8a2e2329',
+      errorResponse as unknown as Message
+    ), 10)
+    const response = await server.inject(request)
+
+    expect(response.statusCode).toBe(500)
+    const expectedResp = {
+      currentState: OutboundAccountsModelState.succeeded,
+      errorInformation: errorResponse.errorInformation
+    }
+    expect(response.result).toEqual(expectedResp)
   })
 })
