@@ -70,7 +70,7 @@ defineFeature(feature, (test): void => {
       jest.mock('~/shared/pub-sub')
       const request = {
         method: 'PATCH',
-        url: '/consentRequests/123',
+        url: '/consentRequests/b01feb2d-8aab-423a-8c6c-74e484b7d198',
         headers: {
           'Content-Type': 'application/json',
           'FSPIOP-Source': 'switch',
@@ -100,7 +100,7 @@ defineFeature(feature, (test): void => {
       jest.mock('~/shared/pub-sub')
       const request = {
         method: 'PUT',
-        url: '/consentRequests/123/error',
+        url: '/consentRequests/b01feb2d-8aab-423a-8c6c-74e484b7d198/error',
         headers: {
           'Content-Type': 'application/json',
           'FSPIOP-Source': 'switch',
