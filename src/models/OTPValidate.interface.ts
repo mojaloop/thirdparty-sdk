@@ -24,7 +24,7 @@
  - Kevin Leyow <kevin.leyow@modusbox.com>
  --------------
  ******/
-import { StateData } from './persistent.model';
+import { StateData } from './persistent.model'
 import {
   v1_1 as fspiopAPI,
   thirdparty as tpAPI

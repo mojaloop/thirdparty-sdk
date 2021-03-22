@@ -1,4 +1,4 @@
-import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components';
+import { ThirdpartyRequests, Logger as SDKLogger } from '@mojaloop/sdk-standard-components'
 /*****
  License
  --------------
@@ -29,13 +29,12 @@ import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components';
 import {
   thirdparty as tpAPI
 } from '@mojaloop/api-snippets'
-import { resolve } from 'path';
-import { A2SModelConfig } from './a2s.model';
-import { KVS } from '../shared/kvs';
-import { PubSub, Message } from '../shared/pub-sub';
-import { Logger as SDKLogger } from '@mojaloop/sdk-standard-components'
-import { OutboundOTPValidateResponse } from './OTPValidate.interface';
+import { resolve } from 'path'
+import { A2SModelConfig } from './a2s.model'
+import { KVS } from '../shared/kvs'
+import { PubSub, Message } from '../shared/pub-sub'
 
+import { OutboundOTPValidateResponse } from './OTPValidate.interface'
 
 export interface OTPValidateModelArgs {
   consentRequestId: string,
@@ -65,37 +64,37 @@ export class OTPValidateModelConfig implements A2SModelConfig<OTPValidateModelAr
     return tokens.map(x => `${x}`).join('-')
   }
 
-  async requestAction(args: OTPValidateModelArgs): Promise<void> {
-    if ( !args.fspId ) {
-        throw new Error('OTPValidate args requires \'fspId\' to be nonempty string');
+  async requestAction (args: OTPValidateModelArgs): Promise<void> {
+    if (!args.fspId) {
+      throw new Error('OTPValidate args requires \'fspId\' to be nonempty string')
     }
 
-    if ( !(args.consentRequest  && typeof(args.consentRequest) === 'object') ) {
-        throw new Error('OTPValidate.requestAction args requires \'transfer\' to be specified');
+    if (!(args.consentRequest && typeof (args.consentRequest) === 'object')) {
+      throw new Error('OTPValidate.requestAction args requires \'transfer\' to be specified')
     }
-    this.thirdpartyRequests.patchConsentRequests(args.consentRequestId, args.consentRequest, args.fspId);
+    this.thirdpartyRequests.patchConsentRequests(args.consentRequestId, args.consentRequest, args.fspId)
     resolve()
   }
 
-  throwIfInvalidArgs(args: OTPValidateModelArgs) {
-    if (!(args.consentRequestId && typeof(args.consentRequestId) === 'string' && args.consentRequestId.length > 0)) {
-        throw new Error('TransfersModel args requires \'args.consentRequestId\' is nonempty string and mandatory property');
+  throwIfInvalidArgs (args: OTPValidateModelArgs) {
+    if (!(args.consentRequestId && typeof (args.consentRequestId) === 'string' && args.consentRequestId.length > 0)) {
+      throw new Error('TransfersModel args requires \'args.consentRequestId\' is nonempty string and mandatory property')
     }
     if (args.fspId && !(typeof (args.fspId) === 'string' && args.fspId.length > 0)) {
-        throw new Error('TransfersModel args requires \'args.fspId\' to be nonempty string');
+      throw new Error('TransfersModel args requires \'args.fspId\' to be nonempty string')
     }
   }
 
-  reformatMessage(message: Message) {
+  reformatMessage (message: Message) {
     const messageObj = message as Record<string, unknown>
     if (messageObj.errorInformation) {
       return {
         ...messageObj
-      } as OutboundOTPValidateResponse;
+      } as OutboundOTPValidateResponse
     }
 
     return {
-        consent: { ...messageObj }
-    } as OutboundOTPValidateResponse;
+      consent: { ...messageObj }
+    } as OutboundOTPValidateResponse
   }
 }
