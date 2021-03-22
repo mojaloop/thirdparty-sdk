@@ -1,4 +1,3 @@
-import { ThirdpartyRequests, Logger as SDKLogger } from '@mojaloop/sdk-standard-components'
 /*****
  License
  --------------
@@ -33,7 +32,7 @@ import { resolve } from 'path'
 import { A2SModelConfig } from './a2s.model'
 import { KVS } from '../shared/kvs'
 import { PubSub, Message } from '../shared/pub-sub'
-
+import { ThirdpartyRequests, Logger as SDKLogger } from '@mojaloop/sdk-standard-components'
 import { OutboundOTPValidateResponse } from './OTPValidate.interface'
 
 export interface OTPValidateModelArgs {
