@@ -36,6 +36,8 @@ const apiPath = path.resolve(__dirname, '../../src/interface/api-inbound.yaml')
 const featurePath = path.resolve(__dirname, '../features/consent-requests-inbound.feature')
 const feature = loadFeature(featurePath)
 
+jest.mock('~/models/inbound/consentRequests.model')
+
 async function prepareInboundAPIServer (): Promise<Server> {
   const serverConfig: ServerConfig = {
     port: Config.INBOUND.PORT,
@@ -68,6 +70,7 @@ defineFeature(feature, (test): void => {
     when('I receive a \'PatchConsentRequest\' request', async (): Promise<ServerInjectResponse> => {
       jest.mock('~/shared/kvs')
       jest.mock('~/shared/pub-sub')
+
       const request = {
         method: 'PATCH',
         url: '/consentRequests/b01feb2d-8aab-423a-8c6c-74e484b7d198',
@@ -98,6 +101,7 @@ defineFeature(feature, (test): void => {
     when('I receive a \'NotifyErrorConsentRequests\' request', async (): Promise<ServerInjectResponse> => {
       jest.mock('~/shared/kvs')
       jest.mock('~/shared/pub-sub')
+
       const request = {
         method: 'PUT',
         url: '/consentRequests/b01feb2d-8aab-423a-8c6c-74e484b7d198/error',
