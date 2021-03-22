@@ -32,6 +32,7 @@ import {
   Errors
 } from '@mojaloop/sdk-standard-components'
 import {
+  v1_1 as fspiopAPI,
   thirdparty as tpAPI
 } from '@mojaloop/api-snippets'
 import { HTTPResponseError } from '~/shared/http-response-error'
@@ -99,13 +100,11 @@ export class InboundConsentRequestsRequestModel {
       this.logger.push({ err }).error('Error in patchConsentRequest @ Inbound')
       const mojaloopError = this.reformatError(err)
       this.logger.push({ mojaloopError }).info(`Sending error response to ${srcDfspId}`)
-      // TODO: handle error. putConsentRequestsError needs to be added to
-      //       sdk-standard-components
-      // TODO: identify the errorCodes to match the error scenarios
-      // await this.thirdpartyRequests.putConsentRequestsError(
-      //  consentRequestsRequestId,
-      //  mojaloopError as unknown as fspiopAPI.Schemas.ErrorInformationObject,
-      //  srcDfspId
+      await this.thirdpartyRequests.putConsentRequestsError(
+        consentRequestsRequestId,
+        mojaloopError as unknown as fspiopAPI.Schemas.ErrorInformationObject,
+        srcDfspId
+      )
     }
   }
 

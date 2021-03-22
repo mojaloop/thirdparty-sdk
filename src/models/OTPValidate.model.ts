@@ -33,8 +33,8 @@ import { resolve } from 'path';
 import { A2SModelConfig } from './a2s.model';
 import { KVS } from '../shared/kvs';
 import { PubSub, Message } from '../shared/pub-sub';
-import { StateData } from './persistent.model';
 import { Logger as SDKLogger } from '@mojaloop/sdk-standard-components'
+import { OutboundOTPValidateResponse } from './OTPValidate.interface';
 
 
 export interface OTPValidateModelArgs {
@@ -43,12 +43,7 @@ export interface OTPValidateModelArgs {
   consentRequest?: tpAPI.Schemas.ConsentRequestsIDPatchRequest
 }
 
-interface TestResponse extends StateData {
-  the: string
-  message: Message
-}
-
-export class OTPValidateModelConfig implements A2SModelConfig<OTPValidateModelArgs, TestResponse> {
+export class OTPValidateModelConfig implements A2SModelConfig<OTPValidateModelArgs, OutboundOTPValidateResponse> {
   public readonly key: string
   public readonly kvs: KVS
   public readonly logger: SDKLogger.Logger
@@ -70,7 +65,6 @@ export class OTPValidateModelConfig implements A2SModelConfig<OTPValidateModelAr
     return tokens.map(x => `${x}`).join('-')
   }
 
-
   async requestAction(args: OTPValidateModelArgs): Promise<void> {
     if ( !args.fspId ) {
         throw new Error('OTPValidate args requires \'fspId\' to be nonempty string');
@@ -90,5 +84,18 @@ export class OTPValidateModelConfig implements A2SModelConfig<OTPValidateModelAr
     if (args.fspId && !(typeof (args.fspId) === 'string' && args.fspId.length > 0)) {
         throw new Error('TransfersModel args requires \'args.fspId\' to be nonempty string');
     }
+  }
+
+  reformatMessage(message: Message) {
+    const messageObj = message as Record<string, unknown>
+    if (messageObj.errorInformation) {
+      return {
+        ...messageObj
+      } as OutboundOTPValidateResponse;
+    }
+
+    return {
+        consent: { ...messageObj }
+    } as OutboundOTPValidateResponse;
   }
 }

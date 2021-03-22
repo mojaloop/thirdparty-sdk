@@ -1,14 +1,13 @@
 import { StateResponseToolkit } from '~/server/plugins/state'
 import { Request, ResponseObject } from '@hapi/hapi'
-import {
-  OTPValidateData
-} from '~/models/OTPValidate.interface'
 import { OutboundOTPValidateData } from '~/models/OTPValidate.interface';
 import {
   create
 } from '~/models/a2s.model'
 import { OTPValidateModelArgs, OTPValidateModelConfig } from '~/models/OTPValidate.model';
-import { OutboundOTPValidateResponse } from '../../../../models/OTPValidate.interface';
+import { OutboundOTPValidateResponse } from '~/models/OTPValidate.interface';
+import { A2SData } from '~/models/a2s.model';
+import { StateData } from '~/models/persistent.model';
 
 /**
  * Handles outbound PATCH /consentRequests/{ID} request
@@ -26,8 +25,7 @@ async function patch (_context: any, request: Request, h: StateResponseToolkit):
   }
 
   // prepare config
-  const data: OTPValidateData = {
-    consentRequestId: consentRequestId,
+  const data: A2SData<StateData> = {
     currentState: 'start'
   }
 

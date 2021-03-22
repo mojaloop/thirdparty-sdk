@@ -531,16 +531,18 @@ describe('Outbound API routes', (): void => {
 
     expect(response.statusCode).toBe(200)
     const expectedResp = {
-      consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
-      consentRequestId: '6988c34f-055b-4ed5-b223-b10c8a2e2329',
-      scopes: [{
-          accountId: 'some-id',
-          actions: [
-            'accounts.getBalance',
-            'accounts.transfer'
-          ]
-        }
-      ],
+      consent: {
+        consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
+        consentRequestId: '6988c34f-055b-4ed5-b223-b10c8a2e2329',
+        scopes: [{
+            accountId: 'some-id',
+            actions: [
+              'accounts.getBalance',
+              'accounts.transfer'
+            ]
+          }
+        ],
+      },
       currentState: 'COMPLETED'
     }
     expect(response.result).toEqual(expectedResp)
@@ -573,7 +575,6 @@ describe('Outbound API routes', (): void => {
       errorResponse as unknown as Message
     ), 10)
     const response = await server.inject(request)
-
     expect(response.statusCode).toBe(500)
     const expectedResp = {
       currentState: OutboundAccountsModelState.succeeded,

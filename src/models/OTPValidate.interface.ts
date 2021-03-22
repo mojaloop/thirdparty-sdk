@@ -25,22 +25,18 @@
  --------------
  ******/
 import { StateData } from './persistent.model';
-import { A2SData } from './a2s.model';
 import {
   v1_1 as fspiopAPI,
   thirdparty as tpAPI
 } from '@mojaloop/api-snippets'
-export interface OTPValidateData extends A2SData<StateData>  {
-  consentRequestId?: string
-}
 
 export interface OutboundOTPValidateData extends StateData {
   authToken: string
   toParticipantId: string
 }
 
-export interface OutboundOTPValidateResponse {
-  accounts: tpAPI.Schemas.ConsentsPostRequest
+export interface OutboundOTPValidateResponse extends StateData {
+  consent: tpAPI.Schemas.ConsentsPostRequest
   errorInformation?: fspiopAPI.Schemas.ErrorInformation
-  currentState: 'success' | 'error'
+  currentState: 'succeeded' | 'errored'
 }
