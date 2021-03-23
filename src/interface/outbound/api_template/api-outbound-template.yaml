@@ -15,19 +15,19 @@ info:
     url: 'TBD'
   version: 0.1.0
 paths:
-  '/health':
-    $ref: '../../inbound/api_template/paths/health.yaml'
-  '/metrics':
-    $ref: '../../inbound/api_template/paths/metrics.yaml'
-  '/authorizations':
+  /health:
+    $ref: '../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/paths/health.yaml'
+  /metrics:
+    $ref: '../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/paths/metrics.yaml'
+  /authorizations:
     $ref: paths/authorizations.yaml
-  '/thirdpartyTransaction/partyLookup':
+  /thirdpartyTransaction/partyLookup:
     $ref: paths/thirdpartyTransaction_partyLookup.yaml
-  '/thirdpartyTransaction/{ID}/initiate':
+  /thirdpartyTransaction/{ID}/initiate:
     $ref: paths/thirdpartyTransaction_initiate.yaml
-  '/thirdpartyTransaction/{ID}/approve':
+  /thirdpartyTransaction/{ID}/approve:
     $ref: paths/thirdpartyTransaction_approve.yaml
-  '/thirdpartyRequests/transactions/{ID}/authorizations':
+  /thirdpartyRequests/transactions/{ID}/authorizations:
     $ref: paths/thirdpartyRequests_transactions_ID_authorizations.yaml
-  '/accounts/{fspId}/{userId}':
+  /accounts/{fspId}/{userId}:
     $ref: paths/accounts_ID.yaml

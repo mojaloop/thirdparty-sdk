@@ -33,17 +33,17 @@ import InboundConsentRequestsId from './consentRequests/{ID}'
 import InboundConsentRequestsIdError from './consentRequests/{ID}/error'
 import ThirdpartyAuthorizations from './thirdpartyRequests/transactions/{ID}/authorizations'
 import NotifyThirdpartyTransactionRequests from './thirdpartyRequests/transactions/{ID}'
-import NotifyErrorThirdpartyTransactionRequests from './thirdpartyRequests/transactions/{ID}/error'
+import ThirdpartyTransactionRequestsError from './thirdpartyRequests/transactions/{ID}/error'
 import InboundAccounts from './accounts/{ID}'
 import InboundAccountsError from './accounts/{ID}/error'
 
 export default {
-  ThirdpartyRequestsTransactionsPost: ThirdpartyRequestsTransactions.post,
-  InboundAuthorizationsPostRequest: InboundAuthorizations.post,
+  CreateThirdpartyTransactionRequests: ThirdpartyRequestsTransactions.post,
+  AuthorizationsPostRequest: InboundAuthorizations.post,
   InboundAuthorizationsIDPutResponse: InboundAuthorizations.put,
   UpdateThirdpartyAuthorization: ThirdpartyAuthorizations.put,
   NotifyThirdpartyTransactionRequests: NotifyThirdpartyTransactionRequests.patch,
-  NotifyErrorThirdpartyTransactionRequests: NotifyErrorThirdpartyTransactionRequests.put,
+  ThirdpartyTransactionRequestsError: ThirdpartyTransactionRequestsError.put,
   GetAccountsByUserId: InboundAccounts.get,
   UpdateAccountsByUserId: InboundAccounts.put,
   UpdateAccountsByUserIdError: InboundAccountsError.put,

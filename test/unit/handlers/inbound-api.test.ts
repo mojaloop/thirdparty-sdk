@@ -158,12 +158,12 @@ const postConsentRequest: tpAPI.Schemas.ConsentsPostRequest = {
   consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
   consentRequestId: '997c89f4-053c-4283-bfec-45a1a0a28fba',
   scopes: [{
-      accountId: 'some-id',
-      actions: [
-        'accounts.getBalance',
-        'accounts.transfer'
-      ]
-    }
+    accountId: 'some-id',
+    actions: [
+      'accounts.getBalance',
+      'accounts.transfer'
+    ]
+  }
   ]
 }
 
@@ -548,7 +548,7 @@ describe('Inbound API routes', (): void => {
     })
   })
 
-  describe('/accounts/{dfspId}/{userId}', () => {
+  describe('/accounts/{ID}', () => {
     const request: Request = mockData.accountsRequest
     const errorRequest: Request = mockData.accountsRequestError
     it('PUT handler && pubSub invocation', async (): Promise<void> => {
@@ -654,6 +654,9 @@ describe('Inbound API routes', (): void => {
   describe('POST /consents', () => {
     it('handler && pubSub invocation', async (): Promise<void> => {
       const request = {
+        headers: {
+          'accept': 'application/json'
+        },
         payload: postConsentRequest
       }
       const pubSubMock = {
@@ -689,6 +692,7 @@ describe('Inbound API routes', (): void => {
         headers: {
           'Content-Type': 'application/json',
           'FSPIOP-Source': 'switch',
+          'Accept': 'application/json',
           Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
           'FSPIOP-Destination': 'dfspA'
         },
