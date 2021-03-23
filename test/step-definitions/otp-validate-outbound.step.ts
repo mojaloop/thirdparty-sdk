@@ -43,6 +43,38 @@ const apiPath = path.resolve(__dirname, '../../src/interface/api-outbound.yaml')
 const featurePath = path.resolve(__dirname, '../features/otp-validate-outbound.feature')
 const feature = loadFeature(featurePath)
 
+jest.mock('@mojaloop/sdk-standard-components', () => {
+  return {
+    MojaloopRequests: jest.fn(),
+    ThirdpartyRequests: jest.fn(() => ({
+      patchConsentRequests: jest.fn(() => Promise.resolve()),
+    })),
+    WSO2Auth: jest.fn(),
+    Logger: {
+      Logger: jest.fn(() => {
+        const methods = {
+          // log methods
+          log: jest.fn(),
+          configure: jest.fn(),
+          // generated methods from default levels
+          verbose: jest.fn(),
+          debug: jest.fn(),
+          warn: jest.fn(),
+          error: jest.fn(),
+          trace: jest.fn(),
+          info: jest.fn(),
+          fatal: jest.fn()
+        }
+        return {
+          ...methods,
+          push: jest.fn(() => methods)
+        }
+      })
+    },
+    request: jest.fn()
+  }
+})
+
 jest.mock('~/shared/pub-sub', () => {
   let handler: NotificationCallback
   let subId = 0
