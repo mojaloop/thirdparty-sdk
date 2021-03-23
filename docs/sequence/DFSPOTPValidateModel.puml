@@ -1,0 +1,20 @@
+@startuml DFSPOTPValidateModel
+
+title DFSPOTPValidateModel
+
+state isValid <<choice>>
+state scopesExist <<choice>>
+
+[*] --> patchConsentRequestIdReceived: on ""PATCH /consentRequests/{ID}"" from PISP
+patchConsentRequestIdReceived --> isOTPValid
+isOTPValid --> isOTPValidReceived: call ""validateOTPSecret()"" \n ""POST /validateOTP"" to DFSP backend
+isOTPValidReceived --> isValid: isValid?
+isValid --> getScopes:**TRUE**
+getScopes --> scopesReceived: call ""getScopes()""\n ""GET /{ID}/scopes"" to DFSP backend
+isValid --> [*]:**FALSE**\ncall ""putConsentRequestsError()""\n ""PUT /consentRequests/{ID}/error"" to PISP
+scopesReceived --> scopesExist: scopesExist?
+scopesExist --> [*]:**TRUE**\ncall ""postConsents()""\n ""POST /consents"" to PISP
+scopesExist --> [*]:**FALSE**\ncall ""putConsentRequestsError()""\n ""PUT /consentRequests/{ID}/error"" to PISP
+
+
+@enduml
