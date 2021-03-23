@@ -5,8 +5,7 @@ title PISPOTPValidateModel
 [*] --> outboundServer: ""PATCH /consentRequests/{ID}/validate""
 outboundServer --> start: on creation of state machine
 start --> requestAction
-requestAction --> succeeded:\ncall ""PATCH /consentRequests/{ID}/""\nwait for ""POST /CONSENTS""
-requestAction --> succeeded:\ncall ""PATCH /consentRequests/{ID}/""\nwait for ""PUT /consentRequests/{ID}/error""
+requestAction --> succeeded:\ncall ""PATCH /consentRequests/{ID}/""\nwait for ""POST /CONSENTS"" or ""PUT /consentRequests/{ID}/error""
 
 succeeded --> [*]
 
