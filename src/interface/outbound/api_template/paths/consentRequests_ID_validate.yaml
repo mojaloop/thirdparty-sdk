@@ -1,7 +1,9 @@
 patch:
   operationId: OutboundConsentRequestsValidatePatch
   summary: Outbound consent requests validate endpoint
-  description: PISP requests account linking using an OTP
+  description: |
+    Used in the authentication phase of account linking. Used by the PISP to pass
+    an OTP on behalf of the user to the DFSP to establish a chain of trust.
   tags:
     - consentRequests
   parameters:

@@ -182,7 +182,10 @@ export interface operations {
       503: components["responses"]["503"];
     };
   };
-  /** PISP requests account linking using an OTP */
+  /**
+   * Used in the authentication phase of account linking. Used by the PISP to pass
+   * an OTP on behalf of the user to the DFSP to establish a chain of trust.
+   */
   OutboundConsentRequestsValidatePatch: {
     parameters: {
       path: {
