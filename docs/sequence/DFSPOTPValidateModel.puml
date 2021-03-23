@@ -16,5 +16,4 @@ scopesReceived --> scopesExist: scopesExist?
 scopesExist --> [*]:**TRUE**\ncall ""postConsents()""\n ""POST /consents"" to PISP
 scopesExist --> [*]:**FALSE**\ncall ""putConsentRequestsError()""\n ""PUT /consentRequests/{ID}/error"" to PISP
 
-
 @enduml
