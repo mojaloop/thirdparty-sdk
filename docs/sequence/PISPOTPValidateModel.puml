@@ -3,10 +3,10 @@
 title PISPOTPValidateModel
 
 [*] --> outboundServer: ""PATCH /consentRequests/{ID}/validate""
-outboundServer --> start: on creation of state machine
+outboundServer --> start: creation of state machine
 start --> requestAction
-requestAction --> succeeded:\ncall ""PATCH /consentRequests/{ID}/""\nwait for ""POST /CONSENTS"" or ""PUT /consentRequests/{ID}/error""
-
-succeeded --> [*]
+requestAction --> succeeded:\ncall ""PATCH /consentRequests/{ID}/""\nrecieved ""POST /CONSENTS""
+requestAction --> errorFromCallback:\ncall ""PATCH /consentRequests/{ID}/""\nrecieved ""PUT /consentRequests/{ID}/error""
+succeeded --> PISPStoreConsent:\ncall ""POST /consents/"" to Auth service
 
 @enduml
