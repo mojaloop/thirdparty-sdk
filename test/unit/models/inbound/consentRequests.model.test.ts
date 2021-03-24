@@ -34,6 +34,8 @@ import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components';
 
 import mockLogger from '../../mockLogger'
 import { uuid } from 'uuidv4';
+import { mocked } from 'ts-jest/utils';
+import { HTTPResponseError } from '../../../../src/shared/http-response-error';
 
 describe('InboundConsentRequestsRequestModel', () => {
   const logger = mockLogger()
@@ -51,6 +53,7 @@ describe('InboundConsentRequestsRequestModel', () => {
     beforeEach(async () => {
       thirdpartyRequests = {
         postConsents: jest.fn(() => Promise.resolve()),
+        putConsentRequestsError: jest.fn(() => Promise.resolve()),
       } as unknown as ThirdpartyRequests
 
       dfspBackendRequests = {
@@ -101,6 +104,137 @@ describe('InboundConsentRequestsRequestModel', () => {
             }
           ]
          }),
+        dfspId
+      )
+    })
+
+    test('reformating of thrown exception when res.body present', async () => {
+      mocked(config.thirdpartyRequests.postConsents).mockImplementationOnce(
+        () => {
+          throw new HTTPResponseError({
+            msg: 'mocked-error',
+            res: {
+              body: JSON.stringify({ statusCode: '2003' })
+            }
+          })
+        }
+      )
+
+      const id = uuid()
+      await model.postConsentsRequest(
+        id,
+        dfspId,
+        patchConsentRequests.authToken
+      )
+
+      expect(config.dfspBackendRequests.validateOTPSecret).toHaveBeenCalledWith(id, patchConsentRequests.authToken)
+      expect(config.dfspBackendRequests.getScopes).toHaveBeenCalledWith(id)
+
+      expect(config.thirdpartyRequests.putConsentRequestsError).toHaveBeenCalledWith(
+        id,
+        {
+          errorInformation: {
+            errorCode: '2003',
+            errorDescription: 'Service currently unavailable'
+          }
+        },
+        dfspId
+      )
+    })
+
+    test('reformating of thrown exception when res.data present and using different statusCode', async () => {
+      mocked(config.thirdpartyRequests.postConsents).mockImplementationOnce(
+        () => {
+          throw new HTTPResponseError({
+            msg: 'mocked-error',
+            res: {
+              data: { statusCode: '2002' }
+            }
+          })
+        }
+      )
+
+      const id = uuid()
+      await model.postConsentsRequest(
+        id,
+        dfspId,
+        patchConsentRequests.authToken
+      )
+
+      expect(config.dfspBackendRequests.validateOTPSecret).toHaveBeenCalledWith(id, patchConsentRequests.authToken)
+      expect(config.dfspBackendRequests.getScopes).toHaveBeenCalledWith(id)
+
+      expect(config.thirdpartyRequests.putConsentRequestsError).toHaveBeenCalledWith(
+        id,
+        {
+          errorInformation: {
+            errorCode: '2002',
+            errorDescription: 'Not implemented'
+          }
+        },
+        dfspId
+      )
+    })
+
+    test('reformating of thrown generic Error', async () => {
+      mocked(config.thirdpartyRequests.postConsents).mockImplementationOnce(
+        () => {
+          throw new Error('generic-error')
+        }
+      )
+
+      const id = uuid()
+      await model.postConsentsRequest(
+        id,
+        dfspId,
+        patchConsentRequests.authToken
+      )
+
+      expect(config.dfspBackendRequests.validateOTPSecret).toHaveBeenCalledWith(id, patchConsentRequests.authToken)
+      expect(config.dfspBackendRequests.getScopes).toHaveBeenCalledWith(id)
+
+      expect(config.thirdpartyRequests.putConsentRequestsError).toHaveBeenCalledWith(
+        id,
+        {
+          errorInformation: {
+            errorCode: '2001',
+            errorDescription: 'Internal server error'
+          }
+        },
+        dfspId
+      )
+    })
+
+    test('reformating of thrown exception when res.body is not valid JSON string', async () => {
+      mocked(config.thirdpartyRequests.postConsents).mockImplementationOnce(
+        () => {
+          throw new HTTPResponseError({
+            msg: 'mocked-error',
+            res: {
+              body: { statusCode: '2002' }
+            }
+          })
+        }
+      )
+
+      const id = uuid()
+      await model.postConsentsRequest(
+        id,
+        dfspId,
+        patchConsentRequests.authToken
+      )
+
+      expect(config.dfspBackendRequests.validateOTPSecret).toHaveBeenCalledWith(id, patchConsentRequests.authToken)
+      expect(config.dfspBackendRequests.getScopes).toHaveBeenCalledWith(id)
+
+      expect(config.thirdpartyRequests.putConsentRequestsError).toHaveBeenCalledWith(
+        id,
+        {
+          errorInformation: {
+            errorCode: '2001',
+            errorDescription: 'Internal server error'
+          }
+        },
         dfspId
       )
     })

@@ -25,6 +25,7 @@
  --------------
  ******/
 import { StateData } from './persistent.model'
+import { A2SData } from './a2s.model';
 import {
   v1_1 as fspiopAPI,
   thirdparty as tpAPI
@@ -35,8 +36,7 @@ export interface OutboundOTPValidateData extends StateData {
   toParticipantId: string
 }
 
-export interface OutboundOTPValidateResponse extends StateData {
-  consent: tpAPI.Schemas.ConsentsPostRequest
+export interface OutboundOTPValidateResponse extends A2SData<StateData> {
+  consent?: tpAPI.Schemas.ConsentsPostRequest
   errorInformation?: fspiopAPI.Schemas.ErrorInformation
-  currentState: 'succeeded' | 'errored'
 }

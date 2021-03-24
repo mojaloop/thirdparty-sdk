@@ -28,8 +28,7 @@
 import {
   thirdparty as tpAPI
 } from '@mojaloop/api-snippets'
-import { resolve } from 'path'
-import { A2SModelConfig } from './a2s.model'
+import { A2SModelConfig, A2SModel } from './a2s.model';
 import { KVS } from '../shared/kvs'
 import { PubSub, Message } from '../shared/pub-sub'
 import { ThirdpartyRequests, Logger as SDKLogger } from '@mojaloop/sdk-standard-components'
@@ -40,6 +39,8 @@ export interface OTPValidateModelArgs {
   fspId?: string,
   consentRequest?: tpAPI.Schemas.ConsentRequestsIDPatchRequest
 }
+
+export type OTPValidateModel = A2SModel<OTPValidateModelArgs, OutboundOTPValidateResponse>
 
 export class OTPValidateModelConfig implements A2SModelConfig<OTPValidateModelArgs, OutboundOTPValidateResponse> {
   public readonly key: string
@@ -71,8 +72,8 @@ export class OTPValidateModelConfig implements A2SModelConfig<OTPValidateModelAr
     if (!(args.consentRequest && typeof (args.consentRequest) === 'object')) {
       throw new Error('OTPValidate.requestAction args requires \'transfer\' to be specified')
     }
-    this.thirdpartyRequests.patchConsentRequests(args.consentRequestId, args.consentRequest, args.fspId)
-    resolve()
+
+    await this.thirdpartyRequests.patchConsentRequests(args.consentRequestId, args.consentRequest, args.fspId)
   }
 
   throwIfInvalidArgs (args: OTPValidateModelArgs) {

@@ -64,10 +64,16 @@ async function patch (_context: any, request: Request, h: StateResponseToolkit):
     h.getThirdpartyRequests()
   )
 
-  const model = await create(data, config)
+  const model = await create<OTPValidateModelArgs, OutboundOTPValidateResponse>(data, config)
 
-  const result = (await model.run(args)) as unknown as OutboundOTPValidateResponse
+  const result: OutboundOTPValidateResponse | void = await model.run(args)
   const statusCode = (result == undefined || result.errorInformation) ? 500 : 200
+
+  // there is a risk the workflow fail and in that case result is undefined
+  if (!result) {
+    h.getLogger().error('outbound PATCH /consentRequests/{ID}/validate unexpected result from workflow')
+    return h.response({}).code(500)
+  }
 
   return h.response(result).code(statusCode)
 }

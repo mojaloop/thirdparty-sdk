@@ -35,6 +35,8 @@ import { StateData } from '~/models/persistent.model';
 import { OTPValidateModelConfig } from '~/models/OTPValidate.model';
 import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components';
 import { create, loadFromKVS } from '~/models/a2s.model'
+import { OTPValidateModelArgs } from '../../../src/models/OTPValidate.model';
+import { OutboundOTPValidateResponse } from '../../../src/models/OTPValidate.interface';
 
 // mock KVS default exported class
 jest.mock('~/shared/kvs')
@@ -81,7 +83,7 @@ describe('A2SModel', () => {
   })
   describe('create', () => {
     it('should be created properly', async () => {
-      const m = await create(data, config)
+      const m = await create<OTPValidateModelArgs, OutboundOTPValidateResponse>(data, config)
       expect(m).toBeDefined()
 
       // check getters
@@ -130,7 +132,7 @@ describe('A2SModel', () => {
 
   describe('run', () => {
     it('should perform as designed', async () => {
-      const m = await create(data, config)
+      const m = await create<OTPValidateModelArgs, OutboundOTPValidateResponse>(data, config)
       const result = await m.run({
         consentRequestId: '27f88eff-d958-44f4-a0cd-6930e402e2fc',
         fspId: 'dfspa',
@@ -156,7 +158,7 @@ describe('A2SModel', () => {
           }
           throw err
         })
-      const m = await create(data, config)
+      const m = await create<OTPValidateModelArgs, OutboundOTPValidateResponse>(data, config)
       try {
         await m.run({
           consentRequestId: '27f88eff-d958-44f4-a0cd-6930e402e2fc',
@@ -181,7 +183,7 @@ describe('A2SModel', () => {
     it('should handle the exception from requestAction', async () => {
       const spyRequestAction = jest.spyOn(config, 'requestAction')
         .mockImplementationOnce(() => { throw new Error('from-requestAction') })
-      const m = await create(data, config)
+      const m = await create<OTPValidateModelArgs, OutboundOTPValidateResponse>(data, config)
       try {
         await m.run({
           consentRequestId: '27f88eff-d958-44f4-a0cd-6930e402e2fc',
