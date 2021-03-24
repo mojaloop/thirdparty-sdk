@@ -28,7 +28,7 @@
 import {
   thirdparty as tpAPI
 } from '@mojaloop/api-snippets'
-import { A2SModelConfig, A2SModel } from './a2s.model';
+import { A2SModelConfig, A2SModel } from './a2s.model'
 import { KVS } from '../shared/kvs'
 import { PubSub, Message } from '../shared/pub-sub'
 import { ThirdpartyRequests, Logger as SDKLogger } from '@mojaloop/sdk-standard-components'

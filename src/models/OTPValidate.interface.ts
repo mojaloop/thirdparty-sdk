@@ -25,7 +25,7 @@
  --------------
  ******/
 import { StateData } from './persistent.model'
-import { A2SData } from './a2s.model';
+import { A2SData } from './a2s.model'
 import {
   v1_1 as fspiopAPI,
   thirdparty as tpAPI
