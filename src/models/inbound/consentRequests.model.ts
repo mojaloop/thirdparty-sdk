@@ -82,14 +82,14 @@ export class InboundConsentRequestsRequestModel {
         throw new Error('Invalid OTP')
       }
       const scopesGranted = await this.dfspBackendRequests.getScopes(consentRequestsRequestId)
-      if (!scopesGranted || scopesGranted.scopes.length < 1) {
+      if (!scopesGranted || scopesGranted.length < 1) {
         throw new Error('InvalidAuthToken')
       }
 
       const postConsentRequestsPayload: tpAPI.Schemas.ConsentsPostRequest = {
         consentId: uuid(),
         consentRequestId: consentRequestsRequestId,
-        scopes: scopesGranted.scopes
+        scopes: scopesGranted
       }
       await this.thirdpartyRequests.postConsents(
         postConsentRequestsPayload,

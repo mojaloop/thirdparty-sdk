@@ -38,10 +38,6 @@ export interface DFSPBackendConfig extends HttpRequestsConfig {
   getScopesPath: string
 }
 
-export interface GetScopesResponse {
-  scopes: tpAPI.Schemas.Scope[]
-}
-
 /**
  * @class DFSPBackendRequests
  * @description tiny wrapper dedicated to make requests to DFSP backend endpoint
@@ -120,15 +116,14 @@ export class DFSPBackendRequests extends HttpRequests {
     })
   }
 
-
   // retrieve the scopes that PISP is granted on a user's behalf
-  async getScopes (consentRequestId: string): Promise<GetScopesResponse | void> {
+  async getScopes (consentRequestId: string): Promise<tpAPI.Schemas.Scope[] | void> {
     const uri = this.fullUri(
       this.getScopesPath.replace('{ID}', consentRequestId)
     )
     this.logger.push({ uri, template: this.getScopesPath }).info('getScopes')
 
-    return this.loggedRequest<GetScopesResponse>({
+    return this.loggedRequest<tpAPI.Schemas.Scope[]>({
       uri,
       method: 'GET',
       headers: this.headers,
