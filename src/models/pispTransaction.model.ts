@@ -35,7 +35,6 @@ import {
 } from '@mojaloop/sdk-standard-components'
 import { OutboundAPI } from '@mojaloop/sdk-scheme-adapter'
 import {
-  v1_1 as fspiopAPI,
   thirdparty as tpAPI
 } from '@mojaloop/api-snippets'
 import {
@@ -260,7 +259,7 @@ export class PISPTransactionModel
         const res = await this.mojaloopRequests.putAuthorizations(
           this.data?.transactionRequestId as string,
           // propagate signed challenge
-          this.data?.approveRequest?.authorizationResponse as fspiopAPI.Schemas.AuthorizationsIDPutResponse,
+          this.data?.approveRequest?.authorizationResponse as tpAPI.Schemas.AuthorizationsIDPutResponse,
           this.data?.initiateRequest?.payer.partyIdInfo.fspId as string
         )
         this.logger.push({ res }).info('ThirdpartyRequests.postThirdpartyRequestsTransactions request sent to peer')

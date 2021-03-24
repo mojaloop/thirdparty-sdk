@@ -4,30 +4,6 @@
  */
 
 export interface paths {
-  "/health": {
-    get: operations["HealthGet"];
-  };
-  "/metrics": {
-    get: operations["MetricsGet"];
-  };
-  "/authorizations": {
-    post: operations["InboundAuthorizationsPostRequest"];
-  };
-  "/authorizations/{ID}": {
-    put: operations["InboundAuthorizationsIDPutResponse"];
-  };
-  "/thirdpartyRequests/transactions": {
-    post: operations["ThirdpartyRequestsTransactionsPost"];
-  };
-  "/thirdpartyRequests/transactions/{ID}/authorizations": {
-    put: operations["UpdateThirdpartyAuthorization"];
-  };
-  "/thirdpartyRequests/transactions/{ID}": {
-    patch: operations["NotifyThirdpartyTransactionRequests"];
-  };
-  "/thirdpartyRequests/transactions/{ID}/error": {
-    put: operations["NotifyErrorThirdpartyTransactionRequests"];
-  };
   "/accounts/{ID}": {
     get: operations["GetAccountsByUserId"];
     put: operations["UpdateAccountsByUserId"];
@@ -67,219 +43,118 @@ export interface paths {
       };
     };
   };
-  "/consents": {
-    post: operations["PostConsents"];
+  "/authorizations": {
+    post: operations["AuthorizationsPostRequest"];
+  };
+  "/authorizations/{ID}": {
+    put: operations["InboundAuthorizationsIDPutResponse"];
   };
   "/consentRequests/{ID}": {
+    put: operations["UpdateConsentRequest"];
     patch: operations["PatchConsentRequest"];
+    parameters: {
+      path: {
+        ID: components["parameters"]["ID"];
+      };
+      header: {
+        "Content-Length"?: components["parameters"]["Content-Length"];
+        "Content-Type": components["parameters"]["Content-Type"];
+        Date: components["parameters"]["Date"];
+        "X-Forwarded-For"?: components["parameters"]["X-Forwarded-For"];
+        "FSPIOP-Source": components["parameters"]["FSPIOP-Source"];
+        "FSPIOP-Destination"?: components["parameters"]["FSPIOP-Destination"];
+        "FSPIOP-Encryption"?: components["parameters"]["FSPIOP-Encryption"];
+        "FSPIOP-Signature"?: components["parameters"]["FSPIOP-Signature"];
+        "FSPIOP-URI"?: components["parameters"]["FSPIOP-URI"];
+        "FSPIOP-HTTP-Method"?: components["parameters"]["FSPIOP-HTTP-Method"];
+      };
+    };
   };
   "/consentRequests/{ID}/error": {
     put: operations["NotifyErrorConsentRequests"];
   };
+  "/consents": {
+    post: operations["PostConsents"];
+  };
+  "/health": {
+    get: operations["HealthGet"];
+  };
+  "/metrics": {
+    get: operations["MetricsGet"];
+  };
+  "/thirdpartyRequests/transactions": {
+    post: operations["CreateThirdpartyTransactionRequests"];
+    parameters: {
+      header: {
+        Accept: components["parameters"]["Accept"];
+        "Content-Length"?: components["parameters"]["Content-Length"];
+        "Content-Type": components["parameters"]["Content-Type"];
+        Date: components["parameters"]["Date"];
+        "X-Forwarded-For"?: components["parameters"]["X-Forwarded-For"];
+        "FSPIOP-Source": components["parameters"]["FSPIOP-Source"];
+        "FSPIOP-Destination"?: components["parameters"]["FSPIOP-Destination"];
+        "FSPIOP-Encryption"?: components["parameters"]["FSPIOP-Encryption"];
+        "FSPIOP-Signature"?: components["parameters"]["FSPIOP-Signature"];
+        "FSPIOP-URI"?: components["parameters"]["FSPIOP-URI"];
+        "FSPIOP-HTTP-Method"?: components["parameters"]["FSPIOP-HTTP-Method"];
+      };
+    };
+  };
+  "/thirdpartyRequests/transactions/{ID}/authorizations": {
+    post: operations["VerifyThirdPartyAuthorization"];
+    put: operations["UpdateThirdpartyAuthorization"];
+    parameters: {
+      path: {
+        ID: components["parameters"]["ID"];
+      };
+      header: {
+        "Content-Length"?: components["parameters"]["Content-Length"];
+        "Content-Type": components["parameters"]["Content-Type"];
+        Date: components["parameters"]["Date"];
+        "X-Forwarded-For"?: components["parameters"]["X-Forwarded-For"];
+        "FSPIOP-Source": components["parameters"]["FSPIOP-Source"];
+        "FSPIOP-Destination"?: components["parameters"]["FSPIOP-Destination"];
+        "FSPIOP-Encryption"?: components["parameters"]["FSPIOP-Encryption"];
+        "FSPIOP-Signature"?: components["parameters"]["FSPIOP-Signature"];
+        "FSPIOP-URI"?: components["parameters"]["FSPIOP-URI"];
+        "FSPIOP-HTTP-Method"?: components["parameters"]["FSPIOP-HTTP-Method"];
+      };
+    };
+  };
+  "/thirdpartyRequests/transactions/{ID}": {
+    get: operations["GetThirdpartyTransactionRequests"];
+    put: operations["UpdateThirdPartyTransactionRequests"];
+    patch: operations["NotifyThirdpartyTransactionRequests"];
+    parameters: {
+      path: {
+        ID: components["parameters"]["ID"];
+      };
+      header: {
+        Accept: components["parameters"]["Accept"];
+        Date: components["parameters"]["Date"];
+        "X-Forwarded-For"?: components["parameters"]["X-Forwarded-For"];
+        "FSPIOP-Source": components["parameters"]["FSPIOP-Source"];
+        "FSPIOP-Destination"?: components["parameters"]["FSPIOP-Destination"];
+        "FSPIOP-Encryption"?: components["parameters"]["FSPIOP-Encryption"];
+        "FSPIOP-Signature"?: components["parameters"]["FSPIOP-Signature"];
+        "FSPIOP-URI"?: components["parameters"]["FSPIOP-URI"];
+        "FSPIOP-HTTP-Method"?: components["parameters"]["FSPIOP-HTTP-Method"];
+      };
+    };
+  };
+  "/thirdpartyRequests/transactions/{ID}/error": {
+    put: operations["ThirdpartyTransactionRequestsError"];
+  };
 }
 
 export interface operations {
-  /** The HTTP request GET /health is used to return the current status of the API. */
-  HealthGet: {
-    responses: {
-      200: components["responses"]["200"];
-      400: components["responses"]["400"];
-      401: components["responses"]["401"];
-      403: components["responses"]["403"];
-      404: components["responses"]["404"];
-      405: components["responses"]["405"];
-      406: components["responses"]["406"];
-      501: components["responses"]["501"];
-      503: components["responses"]["503"];
-    };
-  };
-  /** The HTTP request GET /metrics is used to return metrics for the API. */
-  MetricsGet: {
-    responses: {
-      200: components["responses"]["200"];
-      400: components["responses"]["400"];
-      401: components["responses"]["401"];
-      403: components["responses"]["403"];
-      404: components["responses"]["404"];
-      405: components["responses"]["405"];
-      406: components["responses"]["406"];
-      501: components["responses"]["501"];
-      503: components["responses"]["503"];
-    };
-  };
-  /** The HTTP request `POST /authorizations` is used to request the Payer to enter the applicable credentials in the PISP system. */
-  InboundAuthorizationsPostRequest: {
-    requestBody: {
-      "application/json": components["schemas"]["InboundAuthorizationsPostRequest"];
-    };
-    responses: {
-      202: components["responses"]["202"];
-      400: components["responses"]["400"];
-      401: components["responses"]["401"];
-      403: components["responses"]["403"];
-      404: components["responses"]["404"];
-      405: components["responses"]["405"];
-      406: components["responses"]["406"];
-      501: components["responses"]["501"];
-      503: components["responses"]["503"];
-    };
-  };
-  /**
-   * The callback PUT /authorizations/ is used to inform the client of the
-   * result of a previously-requested authorization. The ID in the URI should
-   * contain the one that was used in the POST /authorizations/ requestBody.transactionRequestId @ OUTBOUND
-   */
-  InboundAuthorizationsIDPutResponse: {
-    parameters: {
-      path: {
-        ID: string;
-      };
-    };
-    responses: {
-      200: components["responses"]["InboundAuthorizationsIDPutResponse"];
-      400: components["responses"]["400"];
-      401: components["responses"]["401"];
-      403: components["responses"]["403"];
-      404: components["responses"]["404"];
-      405: components["responses"]["405"];
-      406: components["responses"]["406"];
-      501: components["responses"]["501"];
-      503: components["responses"]["503"];
-    };
-  };
-  /** The HTTP request POST `/thirdpartyRequests/transactions` is used to create a transaction. */
-  ThirdpartyRequestsTransactionsPost: {
-    requestBody: {
-      "application/json": components["schemas"]["ThirdpartyRequestsTransactionsPostRequest"];
-    };
-    responses: {
-      200: components["responses"]["200"];
-      400: components["responses"]["400"];
-      401: components["responses"]["401"];
-      403: components["responses"]["403"];
-      404: components["responses"]["404"];
-      405: components["responses"]["405"];
-      406: components["responses"]["406"];
-      501: components["responses"]["501"];
-      503: components["responses"]["503"];
-    };
-  };
-  /**
-   * The HTTP request `PUT /thirdpartyRequests/transactions/{id}/authorizations` is used by the auth-service to update a thirdparty authorization after successful validation.
-   * For an unsuccessful authorization result, the `PUT /thirdpartyRequests/transactions/{id}/authorizations/error` will be called by the auth-service, instead of this endpoint.
-   */
-  UpdateThirdpartyAuthorization: {
-    parameters: {
-      path: {
-        ID: components["parameters"]["ID"];
-      };
-      header: {
-        "Content-Length"?: components["parameters"]["Content-Length"];
-        "Content-Type": components["parameters"]["Content-Type"];
-        Date: components["parameters"]["Date"];
-        "X-Forwarded-For"?: components["parameters"]["X-Forwarded-For"];
-        "FSPIOP-Source": components["parameters"]["FSPIOP-Source"];
-        "FSPIOP-Destination"?: components["parameters"]["FSPIOP-Destination"];
-        "FSPIOP-Encryption"?: components["parameters"]["FSPIOP-Encryption"];
-        "FSPIOP-Signature"?: components["parameters"]["FSPIOP-Signature"];
-        "FSPIOP-URI"?: components["parameters"]["FSPIOP-URI"];
-        "FSPIOP-HTTP-Method"?: components["parameters"]["FSPIOP-HTTP-Method"];
-      };
-    };
-    requestBody: {
-      "application/json": components["schemas"]["ThirdpartyRequestsTransactionsIDAuthorizationsPutResponse"];
-    };
-    responses: {
-      200: components["responses"]["200"];
-      400: components["responses"]["400"];
-      401: components["responses"]["401"];
-      403: components["responses"]["403"];
-      404: components["responses"]["404"];
-      405: components["responses"]["405"];
-      406: components["responses"]["406"];
-      501: components["responses"]["501"];
-      503: components["responses"]["503"];
-    };
-  };
-  /**
-   * The HTTP request `PATCH /thirdpartyRequests/transactions/{ID}` is used to
-   * notify a thirdparty of the outcome of a transaction request.
-   *
-   * Switch(Thirdparty API Adapter) -> PISP
-   */
-  NotifyThirdpartyTransactionRequests: {
-    parameters: {
-      path: {
-        ID: components["parameters"]["ID"];
-      };
-      header: {
-        "Content-Length"?: components["parameters"]["Content-Length"];
-        "Content-Type": components["parameters"]["Content-Type"];
-        Date: components["parameters"]["Date"];
-        "X-Forwarded-For"?: components["parameters"]["X-Forwarded-For"];
-        "FSPIOP-Source": components["parameters"]["FSPIOP-Source"];
-        "FSPIOP-Destination"?: components["parameters"]["FSPIOP-Destination"];
-        "FSPIOP-Encryption"?: components["parameters"]["FSPIOP-Encryption"];
-        "FSPIOP-Signature"?: components["parameters"]["FSPIOP-Signature"];
-        "FSPIOP-URI"?: components["parameters"]["FSPIOP-URI"];
-        "FSPIOP-HTTP-Method"?: components["parameters"]["FSPIOP-HTTP-Method"];
-      };
-    };
-    requestBody: {
-      "application/json": components["schemas"]["ThirdpartyRequestsTransactionsIDPatchResponse"];
-    };
-    responses: {
-      200: components["responses"]["200"];
-      400: components["responses"]["400"];
-      401: components["responses"]["401"];
-      403: components["responses"]["403"];
-      404: components["responses"]["404"];
-      405: components["responses"]["405"];
-      406: components["responses"]["406"];
-      501: components["responses"]["501"];
-      503: components["responses"]["503"];
-    };
-  };
-  /**
-   * If the server is unable to find the transaction request, or another processing error occurs,
-   * the error callback `PUT /thirdpartyRequests/transactions/{ID}/error` is used.
-   * The `{ID}` in the URI should contain the `transactionRequestId` that was used for the creation of the transaction request.
-   */
-  NotifyErrorThirdpartyTransactionRequests: {
-    parameters: {
-      path: {
-        ID: components["parameters"]["ID"];
-      };
-      header: {
-        "Content-Length"?: components["parameters"]["Content-Length"];
-        "Content-Type": components["parameters"]["Content-Type"];
-        Date: components["parameters"]["Date"];
-        "X-Forwarded-For"?: components["parameters"]["X-Forwarded-For"];
-        "FSPIOP-Source": components["parameters"]["FSPIOP-Source"];
-        "FSPIOP-Destination"?: components["parameters"]["FSPIOP-Destination"];
-        "FSPIOP-Encryption"?: components["parameters"]["FSPIOP-Encryption"];
-        "FSPIOP-Signature"?: components["parameters"]["FSPIOP-Signature"];
-        "FSPIOP-URI"?: components["parameters"]["FSPIOP-URI"];
-        "FSPIOP-HTTP-Method"?: components["parameters"]["FSPIOP-HTTP-Method"];
-      };
-    };
-    requestBody: {
-      "application/json": components["schemas"]["ErrorInformationObject"];
-    };
-    responses: {
-      200: components["responses"]["200"];
-      400: components["responses"]["400"];
-      401: components["responses"]["401"];
-      403: components["responses"]["403"];
-      404: components["responses"]["404"];
-      405: components["responses"]["405"];
-      406: components["responses"]["406"];
-      501: components["responses"]["501"];
-      503: components["responses"]["503"];
-    };
-  };
   /** The HTTP request `GET /accounts/{ID}` is used to retrieve the list of potential accounts available for linking. */
   GetAccountsByUserId: {
+    parameters: {
+      header: {
+        Accept: components["parameters"]["Accept"];
+      };
+    };
     responses: {
       202: components["responses"]["202"];
       400: components["responses"]["400"];
@@ -317,12 +192,6 @@ export interface operations {
   };
   /** The HTTP request `PUT /accounts/{ID}/error` is used to return error information */
   UpdateAccountsByUserIdError: {
-    parameters: {
-      header: {
-        "Content-Length"?: components["parameters"]["Content-Length"];
-        "Content-Type": components["parameters"]["Content-Type"];
-      };
-    };
     requestBody: {
       "application/json": components["schemas"]["ErrorInformationObject"];
     };
@@ -338,24 +207,62 @@ export interface operations {
       503: components["responses"]["503"];
     };
   };
-  /** DFSP sends this request to the PISP after granting consent. */
-  PostConsents: {
+  /** The HTTP request `POST /authorizations` is used to request the Payer to enter the applicable credentials in the PISP system. */
+  AuthorizationsPostRequest: {
+    requestBody: {
+      "application/json": components["schemas"]["AuthorizationsPostRequest"];
+    };
+    responses: {
+      202: components["responses"]["202"];
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      405: components["responses"]["405"];
+      406: components["responses"]["406"];
+      501: components["responses"]["501"];
+      503: components["responses"]["503"];
+    };
+  };
+  /**
+   * The callback PUT /authorizations/ is used to inform the client of the
+   * result of a previously-requested authorization. The ID in the URI should
+   * contain the one that was used in the POST /authorizations/ requestBody.transactionRequestId @ OUTBOUND
+   */
+  InboundAuthorizationsIDPutResponse: {
     parameters: {
-      header: {
-        "Content-Length"?: components["parameters"]["Content-Length"];
-        "Content-Type": components["parameters"]["Content-Type"];
-        Date: components["parameters"]["Date"];
-        "X-Forwarded-For"?: components["parameters"]["X-Forwarded-For"];
-        "FSPIOP-Source": components["parameters"]["FSPIOP-Source"];
-        "FSPIOP-Destination"?: components["parameters"]["FSPIOP-Destination"];
-        "FSPIOP-Encryption"?: components["parameters"]["FSPIOP-Encryption"];
-        "FSPIOP-Signature"?: components["parameters"]["FSPIOP-Signature"];
-        "FSPIOP-URI"?: components["parameters"]["FSPIOP-URI"];
-        "FSPIOP-HTTP-Method"?: components["parameters"]["FSPIOP-HTTP-Method"];
+      path: {
+        ID: string;
       };
     };
+    responses: {
+      /** information about result of required (via POST) /authorization */
+      200: {
+        "application/json": components["schemas"]["AuthorizationsIDPutResponse"];
+      };
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      405: components["responses"]["405"];
+      406: components["responses"]["406"];
+      501: components["responses"]["501"];
+      503: components["responses"]["503"];
+    };
+  };
+  /**
+   * DFSP updates auth channels and/or auth uri in response to consentRequest.
+   *
+   * PISP updates the consentRequest to include authorization token from their user,
+   * which the DFSP is to then verify.
+   */
+  UpdateConsentRequest: {
     requestBody: {
-      "application/json": components["schemas"]["ConsentsPostRequest"];
+      "application/json":
+        | components["schemas"]["ConsentRequestsIDPutResponseWeb"]
+        | components["schemas"]["ConsentRequestsIDPutResponseWebAuth"]
+        | components["schemas"]["ConsentRequestsIDPutResponseOTP"]
+        | components["schemas"]["ConsentRequestsIDPutResponseOTPAuth"];
     };
     responses: {
       202: components["responses"]["202"];
@@ -371,23 +278,6 @@ export interface operations {
   };
   /** PISP sends user's OTP token to a DFSP to verify user trusts aforementioned PISP */
   PatchConsentRequest: {
-    parameters: {
-      path: {
-        ID: components["parameters"]["ID"];
-      };
-      header: {
-        "Content-Length"?: components["parameters"]["Content-Length"];
-        "Content-Type": components["parameters"]["Content-Type"];
-        Date: components["parameters"]["Date"];
-        "X-Forwarded-For"?: components["parameters"]["X-Forwarded-For"];
-        "FSPIOP-Source": components["parameters"]["FSPIOP-Source"];
-        "FSPIOP-Destination"?: components["parameters"]["FSPIOP-Destination"];
-        "FSPIOP-Encryption"?: components["parameters"]["FSPIOP-Encryption"];
-        "FSPIOP-Signature"?: components["parameters"]["FSPIOP-Signature"];
-        "FSPIOP-URI"?: components["parameters"]["FSPIOP-URI"];
-        "FSPIOP-HTTP-Method"?: components["parameters"]["FSPIOP-HTTP-Method"];
-      };
-    };
     requestBody: {
       "application/json": components["schemas"]["ConsentRequestsIDPatchRequest"];
     };
@@ -437,20 +327,242 @@ export interface operations {
       503: components["responses"]["503"];
     };
   };
+  /** DFSP sends this request to the PISP after granting consent. */
+  PostConsents: {
+    parameters: {
+      header: {
+        Accept: components["parameters"]["Accept"];
+        "Content-Length"?: components["parameters"]["Content-Length"];
+        "Content-Type": components["parameters"]["Content-Type"];
+        Date: components["parameters"]["Date"];
+        "X-Forwarded-For"?: components["parameters"]["X-Forwarded-For"];
+        "FSPIOP-Source": components["parameters"]["FSPIOP-Source"];
+        "FSPIOP-Destination"?: components["parameters"]["FSPIOP-Destination"];
+        "FSPIOP-Encryption"?: components["parameters"]["FSPIOP-Encryption"];
+        "FSPIOP-Signature"?: components["parameters"]["FSPIOP-Signature"];
+        "FSPIOP-URI"?: components["parameters"]["FSPIOP-URI"];
+        "FSPIOP-HTTP-Method"?: components["parameters"]["FSPIOP-HTTP-Method"];
+      };
+    };
+    requestBody: {
+      "application/json": components["schemas"]["ConsentsPostRequest"];
+    };
+    responses: {
+      202: components["responses"]["202"];
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      405: components["responses"]["405"];
+      406: components["responses"]["406"];
+      501: components["responses"]["501"];
+      503: components["responses"]["503"];
+    };
+  };
+  /** The HTTP request GET /health is used to return the current status of the API. */
+  HealthGet: {
+    responses: {
+      200: components["responses"]["200"];
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      405: components["responses"]["405"];
+      406: components["responses"]["406"];
+      501: components["responses"]["501"];
+      503: components["responses"]["503"];
+    };
+  };
+  /** The HTTP request GET /metrics is used to return metrics for the API. */
+  MetricsGet: {
+    responses: {
+      200: components["responses"]["200"];
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      405: components["responses"]["405"];
+      406: components["responses"]["406"];
+      501: components["responses"]["501"];
+      503: components["responses"]["503"];
+    };
+  };
+  /** The HTTP request POST `/thirdpartyRequests/transactions` is used to create a transaction. */
+  CreateThirdpartyTransactionRequests: {
+    requestBody: {
+      "application/json": components["schemas"]["ThirdpartyRequestsTransactionsPostRequest"];
+    };
+    responses: {
+      202: components["responses"]["202"];
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      405: components["responses"]["405"];
+      406: components["responses"]["406"];
+      501: components["responses"]["501"];
+      503: components["responses"]["503"];
+    };
+  };
+  /** The HTTP request `POST /thirdpartyRequests/transactions/{id}/authorizations` is used by the DFSP to verify a third party authorization. */
+  VerifyThirdPartyAuthorization: {
+    parameters: {
+      header: {
+        Accept: components["parameters"]["Accept"];
+      };
+    };
+    requestBody: {
+      "application/json": components["schemas"]["ThirdpartyRequestsTransactionsIDAuthorizationsPostRequest"];
+    };
+    responses: {
+      202: components["responses"]["202"];
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      405: components["responses"]["405"];
+      406: components["responses"]["406"];
+      501: components["responses"]["501"];
+      503: components["responses"]["503"];
+    };
+  };
+  /**
+   * The HTTP request `PUT /thirdpartyRequests/transactions/{id}/authorizations` is used by the auth-service to update a thirdparty authorization after successful validation.
+   * For an unsuccessful authorization result, the `PUT /thirdpartyRequests/transactions/{id}/authorizations/error` will be called by the auth-service, instead of this endpoint.
+   */
+  UpdateThirdpartyAuthorization: {
+    requestBody: {
+      "application/json": components["schemas"]["ThirdpartyRequestsTransactionsIDAuthorizationsPutResponse"];
+    };
+    responses: {
+      200: components["responses"]["200"];
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      405: components["responses"]["405"];
+      406: components["responses"]["406"];
+      501: components["responses"]["501"];
+      503: components["responses"]["503"];
+    };
+  };
+  /**
+   * The HTTP request `GET /thirdpartyRequests/transactions/{ID}` is used to request the
+   * retrieval of a third party transaction.
+   */
+  GetThirdpartyTransactionRequests: {
+    responses: {
+      202: components["responses"]["202"];
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      405: components["responses"]["405"];
+      406: components["responses"]["406"];
+      501: components["responses"]["501"];
+      503: components["responses"]["503"];
+    };
+  };
+  /**
+   * The HTTP request `PUT /thirdpartyRequests/transactions/{ID}` is used to inform the client about
+   * status of a previously requested thirdparty transaction.
+   *
+   * Switch(Thirdparty API Adapter) -> PISP
+   */
+  UpdateThirdPartyTransactionRequests: {
+    parameters: {
+      header: {
+        "Content-Length"?: components["parameters"]["Content-Length"];
+        "Content-Type": components["parameters"]["Content-Type"];
+      };
+    };
+    requestBody: {
+      "application/json": components["schemas"]["ThirdpartyRequestsTransactionsIDPutResponse"];
+    };
+    responses: {
+      200: components["responses"]["200"];
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      405: components["responses"]["405"];
+      406: components["responses"]["406"];
+      501: components["responses"]["501"];
+      503: components["responses"]["503"];
+    };
+  };
+  /**
+   * The HTTP request `PATCH /thirdpartyRequests/transactions/{ID}` is used to
+   * notify a thirdparty of the outcome of a transaction request.
+   *
+   * Switch(Thirdparty API Adapter) -> PISP
+   */
+  NotifyThirdpartyTransactionRequests: {
+    parameters: {
+      header: {
+        "Content-Length"?: components["parameters"]["Content-Length"];
+        "Content-Type": components["parameters"]["Content-Type"];
+      };
+    };
+    requestBody: {
+      "application/json": components["schemas"]["ThirdpartyRequestsTransactionsIDPutResponse"];
+    };
+    responses: {
+      200: components["responses"]["200"];
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      405: components["responses"]["405"];
+      406: components["responses"]["406"];
+      501: components["responses"]["501"];
+      503: components["responses"]["503"];
+    };
+  };
+  /**
+   * If the server is unable to find the transaction request, or another processing error occurs,
+   * the error callback `PUT /thirdpartyRequests/transactions/{ID}/error` is used.
+   * The `{ID}` in the URI should contain the `transactionRequestId` that was used for the creation of the transaction request.
+   */
+  ThirdpartyTransactionRequestsError: {
+    parameters: {
+      path: {
+        ID: components["parameters"]["ID"];
+      };
+      header: {
+        "Content-Length"?: components["parameters"]["Content-Length"];
+        "Content-Type": components["parameters"]["Content-Type"];
+        Date: components["parameters"]["Date"];
+        "X-Forwarded-For"?: components["parameters"]["X-Forwarded-For"];
+        "FSPIOP-Source": components["parameters"]["FSPIOP-Source"];
+        "FSPIOP-Destination"?: components["parameters"]["FSPIOP-Destination"];
+        "FSPIOP-Encryption"?: components["parameters"]["FSPIOP-Encryption"];
+        "FSPIOP-Signature"?: components["parameters"]["FSPIOP-Signature"];
+        "FSPIOP-URI"?: components["parameters"]["FSPIOP-URI"];
+        "FSPIOP-HTTP-Method"?: components["parameters"]["FSPIOP-HTTP-Method"];
+      };
+    };
+    requestBody: {
+      "application/json": components["schemas"]["ErrorInformationObject"];
+    };
+    responses: {
+      200: components["responses"]["200"];
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      405: components["responses"]["405"];
+      406: components["responses"]["406"];
+      501: components["responses"]["501"];
+      503: components["responses"]["503"];
+    };
+  };
 }
 
 export interface components {
   parameters: {
     /** The identifier value. */
     ID: string;
-    /**
-     * The `Content-Length` header field indicates the anticipated size of the payload body. Only sent if there is a body.
-     *
-     * **Note:** The API supports a maximum size of 5242880 bytes (5 Megabytes).
-     */
-    "Content-Length": number;
-    /** The `Content-Type` header indicates the specific version of the API used to send the payload body. */
-    "Content-Type": string;
     /** The `Date` header field indicates the date when the request was sent. */
     Date: string;
     /**
@@ -471,6 +583,16 @@ export interface components {
     "FSPIOP-URI": string;
     /** The `FSPIOP-HTTP-Method` header field is a non-HTTP standard field used by the API for signature verification, should contain the service HTTP method. Required if signature verification is used, for more information, see [the API Signature document](https://github.com/mojaloop/docs/tree/master/Specification%20Document%20Set). */
     "FSPIOP-HTTP-Method": string;
+    /** The `Accept` header field indicates the version of the API the client would like the server to use. */
+    Accept: string;
+    /**
+     * The `Content-Length` header field indicates the anticipated size of the payload body. Only sent if there is a body.
+     *
+     * **Note:** The API supports a maximum size of 5242880 bytes (5 Megabytes).
+     */
+    "Content-Length": number;
+    /** The `Content-Type` header indicates the specific version of the API used to send the payload body. */
+    "Content-Type": string;
   };
   schemas: {
     /** The API data type ErrorCode is a JSON String of four characters, consisting of digits only. Negative numbers are not allowed. A leading zero is not allowed. Each error code in the API is a four-digit number, for example, 1234, where the first number (1 in the example) represents the high-level error category, the second number (2 in the example) represents the low-level error category, and the last two numbers (34 in the example) represent the specific error. */
@@ -502,16 +624,11 @@ export interface components {
       errorInformation?: components["schemas"]["ErrorInformation"];
     };
     /**
-     * Below are the allowed values for the enumeration AuthorizationChannelType.
-     * - OTP - One-time password generated by the Payer FSP.
-     * - QRCODE - QR code used as One Time Password.
-     * - U2F - U2F is a new addition isolated to Thirdparty stream.
-     *
-     * This is based on FSPIOP `AuthenticationType` with U2F added.
+     * A long-lived unique account identifier provided by the DFSP. This MUST NOT
+     * be Bank Account Number or anything that may expose a User's private bank
+     * account information.
      */
-    AuthorizationChannelType: "OTP" | "QRCODE" | "U2F";
-    /** The API data type Integer is a JSON String consisting of digits only. Negative numbers and leading zeroes are not allowed. The data type is always limited to a specific number of digits. */
-    Integer: string;
+    AccountAddress: string;
     /** The currency codes defined in [ISO 4217](https://www.iso.org/iso-4217-currency-codes.html) as three-letter alphabetic codes are used as the standard naming representation for currencies. */
     Currency:
       | "AED"
@@ -676,6 +793,24 @@ export interface components {
       | "ZAR"
       | "ZMW"
       | "ZWD";
+    AccountsIDPutResponse: {
+      accountNickname: components["schemas"]["AccountAddress"];
+      id: components["schemas"]["AccountAddress"];
+      currency: components["schemas"]["Currency"];
+    }[];
+    /** Data model for the complex type object that contains ErrorInformation. */
+    ErrorInformationObject: {
+      errorInformation: components["schemas"]["ErrorInformation"];
+    };
+    /**
+     * Below are the allowed values for the enumeration AuthenticationType.
+     * - OTP - One-time password generated by the Payer FSP.
+     * - QRCODE - QR code used as One Time Password.
+     * - U2F - U2F is a new addition isolated to Thirdparty stream.
+     */
+    AuthenticationType: "OTP" | "QRCODE" | "U2F";
+    /** The API data type Integer is a JSON String consisting of digits only. Negative numbers and leading zeroes are not allowed. The data type is always limited to a specific number of digits. */
+    Integer: string;
     /** The API data type Amount is a JSON String in a canonical format that is restricted by a regular expression for interoperability reasons. This pattern does not allow any trailing zeroes at all, but allows an amount without a minor currency unit. It also only allows four digits in the minor currency unit; a negative value is not allowed. Using more than 18 digits in the major currency unit is not allowed. */
     Amount: string;
     /** Data model for the complex type Money. */
@@ -712,23 +847,15 @@ export interface components {
       condition: components["schemas"]["IlpCondition"];
       extensionList?: components["schemas"]["ExtensionList"];
     };
-    /** POST /authorizations Request object */
-    InboundAuthorizationsPostRequest: {
-      toParticipantId?: string;
-      authenticationType: components["schemas"]["AuthorizationChannelType"];
+    /** POST /authorizations request object. */
+    AuthorizationsPostRequest: {
+      authenticationType: components["schemas"]["AuthenticationType"];
       retriesLeft: components["schemas"]["Integer"];
       amount: components["schemas"]["Money"];
       transactionId: components["schemas"]["CorrelationId"];
       transactionRequestId: components["schemas"]["CorrelationId"];
       quote: components["schemas"]["QuotesIDPutResponse"];
     };
-    /**
-     * Below are the allowed values for the enumeration AuthenticationType.
-     * - OTP - One-time password generated by the Payer FSP.
-     * - QRCODE - QR code used as One Time Password.
-     * - U2F - U2F is a new addition isolated to Thirdparty stream.
-     */
-    AuthenticationType: "OTP" | "QRCODE" | "U2F";
     /** The API data type OtpValue is a JSON String of 3 to 10 characters, consisting of digits only. Negative numbers are not allowed. One or more leading zeros are allowed. */
     OtpValue: string;
     /** QR code used as a One Time Password. */
@@ -764,11 +891,106 @@ export interface components {
       responseType: components["schemas"]["AuthorizationResponse"];
     };
     /**
-     * A long-lived unique account identifier provided by the DFSP. This MUST NOT
-     * be Bank Account Number or anything that may expose a User's private bank
-     * account information.
+     * The scopes requested for a ConsentRequest.
+     * - "accounts.getBalance" - Get the balance of a given account.
+     * - "accounts.transfer" - Initiate a transfer from an account.
      */
-    AccountAddress: string;
+    ConsentScopeType: "accounts.getBalance" | "accounts.transfer";
+    /** Scope + Account Identifier mapping for a Consent. */
+    Scope: {
+      accountId: components["schemas"]["AccountAddress"];
+      actions: components["schemas"]["ConsentScopeType"][];
+    };
+    /** The web auth channel being used for PUT consentRequest/{ID} request. */
+    ConsentRequestChannelTypeWeb: "WEB";
+    /**
+     * The object sent in a `PUT /consentRequests/{ID}` request.
+     *
+     * Schema used in the request consent phase of the account linking web flow,
+     * the result is the PISP being instructed on a specific URL where this
+     * supposed user should be redirected. This URL should be a place where
+     * the user can prove their identity (e.g., by logging in).
+     */
+    ConsentRequestsIDPutResponseWeb: {
+      /** The id of the PISP who will initiate transactions on a user's behalf. */
+      initiatorId: string;
+      scopes: components["schemas"]["Scope"][];
+      authChannels: components["schemas"]["ConsentRequestChannelTypeWeb"][];
+      /** The callback uri that the user will be redirected to after completing the WEB auth channel. */
+      callbackUri: string;
+      /** The callback uri that the pisp app redirects to for user to complete their login. */
+      authUri: string;
+    };
+    /**
+     * The object sent in a `PUT /consentRequests/{ID}` request.
+     *
+     * Schema used in the authentication phase of the account linking flow,
+     * the user is expected to prove their identity to the DFSP by passing a OTP
+     * or secret to the PISP.
+     */
+    ConsentRequestsIDPutResponseWebAuth: {
+      /** The id of the PISP who will initiate transactions on a user's behalf. */
+      initiatorId: string;
+      scopes: components["schemas"]["Scope"][];
+      authChannels: components["schemas"]["ConsentRequestChannelTypeWeb"][];
+      /** The callback uri that the user will be redirected to after completing the WEB auth channel. */
+      callbackUri: string;
+      /** The callback uri that the pisp app redirects to for user to complete their login. */
+      authUri: string;
+      /** The Auth token from the OTP or redirect to pisp app. */
+      authToken: string;
+    };
+    /** The OTP auth channel being used for PUT consentRequest/{ID} request. */
+    ConsentRequestChannelTypeOTP: "OTP";
+    /**
+     * The object sent in a `PUT /consentRequests/{ID}` request.
+     *
+     * Schema used in the request consent phase of the account linking OTP/SMS flow.
+     */
+    ConsentRequestsIDPutResponseOTP: {
+      /** The id of the PISP who will initiate transactions on a user's behalf. */
+      initiatorId: string;
+      scopes: components["schemas"]["Scope"][];
+      authChannels: components["schemas"]["ConsentRequestChannelTypeOTP"][];
+      /** The callback uri that the user will be redirected to after completing the WEB auth channel. */
+      callbackUri: string;
+    };
+    /**
+     * The object sent in a `PUT /consentRequests/{ID}` request.
+     *
+     * Schema used in the authentication phase of the account linking flow,
+     * the user is expected to prove their identity to the DFSP by passing a OTP
+     * or secret to the PISP.
+     */
+    ConsentRequestsIDPutResponseOTPAuth: {
+      /** The id of the PISP who will initiate transactions on a user's behalf. */
+      initiatorId: string;
+      scopes: components["schemas"]["Scope"][];
+      authChannels: components["schemas"]["ConsentRequestChannelTypeOTP"][];
+      /** The callback uri that the user will be redirected to after completing the WEB auth channel. */
+      callbackUri: string;
+      /** The Auth token from the OTP or redirect to pisp app. */
+      authToken: string;
+    };
+    /** The object sent in a `PATCH /consentRequests/{ID}` request. */
+    ConsentRequestsIDPatchRequest: {
+      authToken: components["schemas"]["OtpValue"];
+    };
+    /** The object sent in a `POST /consents` request. */
+    ConsentsPostRequest: {
+      /**
+       * Common ID between the PISP and FSP for the Consent object
+       * decided by the DFSP who creates the Consent
+       * This field is REQUIRED for POST /consent.
+       */
+      consentId: components["schemas"]["CorrelationId"];
+      /**
+       * The id of the ConsentRequest that was used to initiate the
+       * creation of this Consent.
+       */
+      consentRequestId: components["schemas"]["CorrelationId"];
+      scopes: components["schemas"]["Scope"][];
+    };
     /**
      * The API data type Name is a JSON String, restricted by a regular expression to avoid characters which are generally not used in a name.
      *
@@ -887,6 +1109,28 @@ export interface components {
       personalInfo?: components["schemas"]["PartyPersonalInfo"];
     };
     /**
+     * This is a variant based on FSPIOP `PartyIdType` specification.
+     * This validation interface should be use by `POST /thirdpartyRequests/transactions`
+     * - THIRD_PARTY_LINK - is the DFSP's internal reference which allows DFSP to find out the corresponding consent
+     */
+    PartyIdTypeTPLink: "THIRD_PARTY_LINK";
+    /** Data model for the complex type PartyIdInfo. */
+    PartyIdInfoTPLink: {
+      partyIdType: components["schemas"]["PartyIdTypeTPLink"];
+      partyIdentifier: components["schemas"]["PartyIdentifier"];
+      partySubIdOrType?: components["schemas"]["PartySubIdOrType"];
+      fspId?: components["schemas"]["FspId"];
+      extensionList?: components["schemas"]["ExtensionList"];
+    };
+    /** Data model for the complex type Party. */
+    PartyTPLink: {
+      accounts?: components["schemas"]["AccountList"];
+      partyIdInfo: components["schemas"]["PartyIdInfoTPLink"];
+      merchantClassificationCode?: components["schemas"]["MerchantClassificationCode"];
+      name?: components["schemas"]["PartyName"];
+      personalInfo?: components["schemas"]["PartyPersonalInfo"];
+    };
+    /**
      * Below are the allowed values for the enumeration AmountType.
      * - SEND - Amount the Payer would like to send, that is, the amount that should be withdrawn from the Payer account including any fees.
      * - RECEIVE - Amount the Payer would like the Payee to receive, that is, the amount that should be sent to the receiver exclusive of any fees.
@@ -944,14 +1188,10 @@ export interface components {
     ThirdpartyRequestsTransactionsPostRequest: {
       /** Common ID between the FSPs for the transaction request object. The ID should be reused for resends of the same transaction request. A new ID should be generated for each new transaction request. */
       transactionRequestId: components["schemas"]["CorrelationId"];
-      /** DFSP specific account identifiers, e.g. `dfspa.alice.1234` */
-      sourceAccountId: components["schemas"]["AccountAddress"];
-      /** Common ID between the PISP and FSP for the Consent object This tells DFSP and auth-service which constent allows the PISP to initiate transaction. */
-      consentId: components["schemas"]["CorrelationId"];
       /** Information about the Payee in the proposed financial transaction. */
       payee: components["schemas"]["Party"];
       /** Information about the Payer in the proposed financial transaction. */
-      payer: components["schemas"]["Party"];
+      payer: components["schemas"]["PartyTPLink"];
       /** SEND for sendAmount, RECEIVE for receiveAmount. */
       amountType: components["schemas"]["AmountType"];
       /** Requested amount to be transferred from the Payer to Payee. */
@@ -976,6 +1216,19 @@ export interface components {
       /** The status of the authorization. This value must be `VERIFIED` for a PUT request. */
       status: "VERIFIED";
     };
+    /** The object sent in the POST /thirdpartyRequests/transactions/{id}/authorizations request. */
+    ThirdpartyRequestsTransactionsIDAuthorizationsPostRequest: {
+      /** Base64 encoded binary string - the original challenge. */
+      challenge: string;
+      /** Base64 encoded binary string - the signed challenge */
+      value: components["schemas"]["BinaryString"];
+      /** Common ID between the PISP and FSP for the Consent object This tells DFSP and auth-service which constent allows the PISP to initiate transaction. */
+      consentId: components["schemas"]["CorrelationId"];
+      /** DFSP specific account identifiers, e.g. `dfspa.alice.1234` */
+      sourceAccountId: components["schemas"]["AccountAddress"];
+      /** The status of the authorization. This MUST be PENDING for a POST request */
+      status: "PENDING";
+    };
     /**
      * Below are the allowed values for the enumeration.
      * - RECEIVED - Payer FSP has received the transaction from the Payee FSP.
@@ -984,49 +1237,10 @@ export interface components {
      * - REJECTED - Payer has rejected the transaction.
      */
     TransactionRequestState: "RECEIVED" | "PENDING" | "ACCEPTED" | "REJECTED";
-    /** The object sent in the PATCH /thirdpartyRequests/transactions/{ID} callback. */
-    ThirdpartyRequestsTransactionsIDPatchResponse: {
+    /** The object sent in the PUT /thirdPartyRequests/transactions/{ID} request. */
+    ThirdpartyRequestsTransactionsIDPutResponse: {
       transactionId: components["schemas"]["CorrelationId"];
       transactionRequestState: components["schemas"]["TransactionRequestState"];
-    };
-    /** Data model for the complex type object that contains ErrorInformation. */
-    ErrorInformationObject: {
-      errorInformation: components["schemas"]["ErrorInformation"];
-    };
-    AccountsIDPutResponse: {
-      accountNickname: components["schemas"]["AccountAddress"];
-      id: components["schemas"]["AccountAddress"];
-      currency: components["schemas"]["Currency"];
-    }[];
-    /**
-     * The scopes requested for a ConsentRequest.
-     * - "accounts.getBalance" - Get the balance of a given account.
-     * - "accounts.transfer" - Initiate a transfer from an account.
-     */
-    ConsentScopeType: "accounts.getBalance" | "accounts.transfer";
-    /** Scope + Account Identifier mapping for a Consent. */
-    Scope: {
-      accountId: components["schemas"]["AccountAddress"];
-      actions: components["schemas"]["ConsentScopeType"][];
-    };
-    /** The object sent in a `POST /consents` request. */
-    ConsentsPostRequest: {
-      /**
-       * Common ID between the PISP and FSP for the Consent object
-       * decided by the DFSP who creates the Consent
-       * This field is REQUIRED for POST /consent.
-       */
-      consentId: components["schemas"]["CorrelationId"];
-      /**
-       * The id of the ConsentRequest that was used to initiate the
-       * creation of this Consent.
-       */
-      consentRequestId: components["schemas"]["CorrelationId"];
-      scopes: components["schemas"]["Scope"][];
-    };
-    /** The object sent in a `PATCH /consentRequests/{ID}` request. */
-    ConsentRequestsIDPatchRequest: {
-      authToken: components["schemas"]["OtpValue"];
     };
   };
   responses: {
@@ -1112,12 +1326,6 @@ export interface components {
       headers: {
         "Content-Length": components["headers"]["Content-Length"];
         "Content-Type": components["headers"]["Content-Type"];
-      };
-    };
-    /** information about result of required (via POST) /authorization */
-    InboundAuthorizationsIDPutResponse: {
-      content: {
-        "application/json": components["schemas"]["AuthorizationsIDPutResponse"];
       };
     };
   };

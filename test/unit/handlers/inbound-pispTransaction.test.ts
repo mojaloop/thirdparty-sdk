@@ -5,7 +5,7 @@ import {
 } from '~/models/pispTransaction.model'
 import { PISPTransactionPhase, ThirdpartyTransactionStatus } from '~/models/pispTransaction.interface'
 import NotifyThirdpartyTransactionRequests from '~/handlers/inbound/thirdpartyRequests/transactions/{ID}'
-import NotifyErrorThirdpartyTransactionRequests from '~/handlers/inbound/thirdpartyRequests/transactions/{ID}/error'
+import ThirdpartyTransactionRequestsError from '~/handlers/inbound/thirdpartyRequests/transactions/{ID}/error'
 import { Request } from '@hapi/hapi'
 
 describe('Inbound PISP transaction handlers', (): void => {
@@ -83,7 +83,7 @@ describe('Inbound PISP transaction handlers', (): void => {
       },
       payload: errorResponse
     }
-    const result = await NotifyErrorThirdpartyTransactionRequests.put(
+    const result = await ThirdpartyTransactionRequestsError.put(
       {},
       request as unknown as Request,
       toolkit as unknown as StateResponseToolkit

@@ -11,7 +11,7 @@ content:
       additionalProperties: false
       properties:
         authenticationInfo:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/schemas/AuthenticationInfo.yaml'
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/AuthenticationInfo.yaml'
         responseType:
           $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/schemas/AuthorizationResponse.yaml'
         currentState:

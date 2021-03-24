@@ -31,7 +31,6 @@ import {
   MojaloopRequests
 } from '@mojaloop/sdk-standard-components'
 import {
-  v1_1 as fspiopAPI,
   thirdparty as tpAPI
 } from '@mojaloop/api-snippets'
 import { OutboundAPI } from '@mojaloop/sdk-scheme-adapter'
@@ -103,11 +102,11 @@ export interface ThirdpartyTransactionPartyLookupResponse {
 export interface ThirdpartyTransactionInitiateRequest {
   sourceAccountId: string
   consentId: string
-  payee: fspiopAPI.Schemas.Party
-  payer: fspiopAPI.Schemas.Party
-  amountType: fspiopAPI.Schemas.AmountType
-  amount: fspiopAPI.Schemas.Money
-  transactionType: fspiopAPI.Schemas.TransactionType
+  payee: tpAPI.Schemas.Party
+  payer: tpAPI.Schemas.PartyTPLink
+  amountType: tpAPI.Schemas.AmountType
+  amount: tpAPI.Schemas.Money
+  transactionType: tpAPI.Schemas.TransactionType
   expiration: string
 }
 
@@ -128,7 +127,7 @@ export interface ThirdpartyTransactionApproveResponse {
 }
 
 export interface ThirdpartyTransactionApproveRequest {
-  authorizationResponse: fspiopAPI.Schemas.AuthorizationsIDPutResponse
+  authorizationResponse: tpAPI.Schemas.AuthorizationsIDPutResponse
 }
 
 export interface PISPTransactionData extends StateData {

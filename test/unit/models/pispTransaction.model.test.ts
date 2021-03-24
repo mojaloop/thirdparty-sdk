@@ -162,7 +162,7 @@ describe('pipsTransactionModel', () => {
   })
 
   describe('transaction flow', () => {
-    const party: fspiopAPI.Schemas.Party = {
+    const party: tpAPI.Schemas.Party = {
       partyIdInfo: {
         fspId: 'fsp-id',
         partyIdType: 'PERSONAL_ID',
@@ -301,11 +301,11 @@ describe('pipsTransactionModel', () => {
             payer: {
               partyIdInfo: {
                 fspId: 'payer-fsp-id',
-                partyIdType: 'PERSONAL_ID',
+                partyIdType: 'THIRD_PARTY_LINK',
                 partyIdentifier: 'payer-party-identifier'
               }
             },
-            amountType: 'SEND' as fspiopAPI.Schemas.AmountType,
+            amountType: 'SEND' as tpAPI.Schemas.AmountType,
             amount: {
               amount: '123.00',
               currency: 'USD'
@@ -402,7 +402,7 @@ describe('pipsTransactionModel', () => {
       let data: PISPTransactionData
       let channel: string
 
-      const authorizationResponse: fspiopAPI.Schemas.AuthorizationsIDPutResponse = {
+      const authorizationResponse: tpAPI.Schemas.AuthorizationsIDPutResponse = {
         authenticationInfo: {
           authentication: 'U2F',
           authenticationValue: {
@@ -438,11 +438,11 @@ describe('pipsTransactionModel', () => {
             payer: {
               partyIdInfo: {
                 fspId: 'payer-fsp-id',
-                partyIdType: 'PERSONAL_ID',
+                partyIdType: 'THIRD_PARTY_LINK',
                 partyIdentifier: 'payer-party-identifier'
               }
             },
-            amountType: 'SEND' as fspiopAPI.Schemas.AmountType,
+            amountType: 'SEND' as tpAPI.Schemas.AmountType,
             amount: {
               amount: '123.00',
               currency: 'USD'

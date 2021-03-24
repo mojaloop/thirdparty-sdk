@@ -88,7 +88,8 @@
   "accountsRequest": {
     "headers": {
       "fspiop-source": "pispA",
-      "fspiop-destination": "dfspA"
+      "fspiop-destination": "dfspA",
+      "accept": "application/json"
     },
     "params": {
       "ID": "username1234"
