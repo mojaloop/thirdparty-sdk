@@ -26,10 +26,10 @@
  --------------
  ******/
 import { StateResponseToolkit } from '~/server/plugins/state'
+import * as OutboundAPI from '~/interface/outbound/api_interfaces'
 import {
   PISPTransactionModelConfig,
-  PISPTransactionData,
-  ThirdpartyTransactionPartyLookupRequest
+  PISPTransactionData
 } from '~/models/pispTransaction.interface'
 import {
   PISPTransactionModel,
@@ -38,14 +38,16 @@ import {
 } from '~/models/pispTransaction.model'
 import { Request, ResponseObject } from '@hapi/hapi'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function post (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
-  const payload = request.payload as ThirdpartyTransactionPartyLookupRequest
+async function post (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+  const payload = request.payload as OutboundAPI.Schemas.ThirdpartyTransactionPartyLookupRequest
 
   // prepare model data
   const data: PISPTransactionData = {
     transactionRequestId: payload.transactionRequestId,
-    payeeRequest: payload.payee,
+    payeeRequest: {
+      // TODO refactor api-snippets to have this field mandatory!
+      payee: payload.payee
+    },
     currentState: 'start'
   }
 
@@ -53,7 +55,8 @@ async function post (_context: any, request: Request, h: StateResponseToolkit): 
   const modelConfig: PISPTransactionModelConfig = {
     kvs: h.getKVS(),
     pubSub: h.getPubSub(),
-    key: payload.transactionRequestId,
+    // TODO refactor api-snippets to have this field mandatory!
+    key: payload.transactionRequestId as string,
     logger: h.getLogger(),
     thirdpartyRequests: h.getThirdpartyRequests(),
     mojaloopRequests: h.getMojaloopRequests(),

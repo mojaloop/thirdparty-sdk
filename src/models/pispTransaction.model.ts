@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /*****
  License
  --------------
@@ -38,7 +39,6 @@ import {
   thirdparty as tpAPI
 } from '@mojaloop/api-snippets'
 import {
-  PayeeLookupRequest,
   PISPTransactionData,
   PISPTransactionModelConfig,
   PISPTransactionModelState,
@@ -55,15 +55,15 @@ import { SDKOutgoingRequests } from '~/shared/sdk-outgoing-requests'
 import { HTTPResponseError } from '~/shared/http-response-error'
 
 export class InvalidPISPTransactionDataError extends Error {
-  public data: PISPTransactionData
+  public data: Record<string, unknown>
   public propertyName: string
-  constructor (data: PISPTransactionData, propertyName: string) {
+  constructor (data: Record<string, unknown>, propertyName: string) {
     super(`invalid ${propertyName} data`)
     this.data = data
     this.propertyName = propertyName
   }
 
-  static throwIfInvalidProperty (data: PISPTransactionData, propertyName: string): void {
+  static throwIfInvalidProperty (data: Record<string, unknown>, propertyName: string): void {
     // eslint-disable-next-line no-prototype-builtins
     if (!data.hasOwnProperty(propertyName)) {
       throw new InvalidPISPTransactionDataError(data, propertyName)
@@ -132,14 +132,21 @@ export class PISPTransactionModel
 
   async onRequestPartyLookup (): Promise<void> {
     InvalidPISPTransactionDataError.throwIfInvalidProperty(this.data, 'payeeRequest')
+    InvalidPISPTransactionDataError.throwIfInvalidProperty(this.data!.payeeRequest as Record<string, unknown>, 'payee')
+    InvalidPISPTransactionDataError.throwIfInvalidProperty(
+      this.data!.payeeRequest!.payee as Record<string, unknown>, 'partyIdType'
+    )
+    InvalidPISPTransactionDataError.throwIfInvalidProperty(
+      this.data!.payeeRequest!.payee as Record<string, unknown>, 'partyIdentifier'
+    )
 
     // extract params for GET /parties
-    const { partyIdType, partyIdentifier, partySubIdOrType } = this.data?.payeeRequest as PayeeLookupRequest
+    const payee = this.data!.payeeRequest!.payee
 
     try {
       // call GET /parties on sdk-scheme-adapter Outbound service
       const response = this.data.payeeResolved = await this.sdkOutgoingRequests.requestPartiesInformation(
-        partyIdType, partyIdentifier, partySubIdOrType
+        payee!.partyIdType, payee!.partyIdentifier, payee!.partySubIdOrType
       ) as OutboundAPI.Schemas.partiesByIdResponse
 
       this.data.partyLookupResponse = {
