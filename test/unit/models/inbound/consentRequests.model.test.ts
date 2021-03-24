@@ -57,16 +57,15 @@ describe('InboundConsentRequestsRequestModel', () => {
         validateOTPSecret: jest.fn(() => Promise.resolve({
           isValid: true
         })),
-        getScopes: jest.fn(() => Promise.resolve(
-          [
-            {
-              accountId: "35ad7f40-1646-4237-b24c-d6b2d507fe59",
-              actions: [
-                'accounts.getBalance',
-                'accounts.transfer'
-              ]
-            }]
-        ))
+        getScopes: jest.fn(() => Promise.resolve({
+          scopes: [{
+            accountId: "35ad7f40-1646-4237-b24c-d6b2d507fe59",
+            actions: [
+              'accounts.getBalance',
+              'accounts.transfer'
+            ]
+          }]
+        }))
       } as unknown as DFSPBackendRequests
 
       config = {
@@ -85,7 +84,6 @@ describe('InboundConsentRequestsRequestModel', () => {
         dfspId,
         patchConsentRequests.authToken
       )
-
       expect(config.dfspBackendRequests.validateOTPSecret).toHaveBeenCalledWith(id, patchConsentRequests.authToken)
       expect(config.dfspBackendRequests.getScopes).toHaveBeenCalledWith(id)
 
