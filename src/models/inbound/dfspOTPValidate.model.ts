@@ -265,7 +265,6 @@ export class DFSPOTPValidateModel
       switch (data.currentState) {
         case 'start':
           await this.saveToKVS()
-
           this.logger.info(
             `validateOTP requested for ${data.consentRequestsRequestId},  currentState: ${data.currentState}`
           )
