@@ -32,10 +32,11 @@ import {
 import { Request, ResponseObject } from '@hapi/hapi'
 import { StateResponseToolkit } from '~/server/plugins/state'
 import { Enum } from '@mojaloop/central-services-shared'
+import { DFSPOTPValidateModel } from '../../../models/inbound/dfspOTPValidate.model';
 import {
-  InboundConsentRequestsRequestModel,
-  InboundConsentRequestsRequestModelConfig
-} from '~/models/inbound/consentRequests.model'
+  DFSPOTPValidateData,
+  DFSPOTPValidateModelConfig
+} from '~/models/inbound/dfspOTPValidate.interface'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function patch (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
@@ -46,18 +47,26 @@ async function patch (_context: unknown, request: Request, h: StateResponseToolk
   // pull the PISP's ID to send back the POST /consents
   const sourceFspId = request.headers['fspiop-source']
 
+  const data: DFSPOTPValidateData = {
+    currentState: 'start',
+    consentRequestsRequestId: consentRequestsRequestId,
+    authToken: authToken,
+    toParticipantId: sourceFspId
+  }
   // if the OTP is valid the DFSP issues out a POST /consents request.
-  const modelConfig: InboundConsentRequestsRequestModelConfig = {
+  const modelConfig: DFSPOTPValidateModelConfig = {
+    kvs: h.getKVS(),
+    pubSub: h.getPubSub(),
+    key: consentRequestsRequestId,
     logger: h.getLogger(),
     dfspBackendRequests: h.getDFSPBackendRequests(),
-    thirdpartyRequests: h.getThirdpartyRequests()
+    thirdpartyRequests: h.getThirdpartyRequests(),
   }
-  const model = new InboundConsentRequestsRequestModel(modelConfig)
+  const model = new DFSPOTPValidateModel(data, modelConfig)
 
   // don't await on promise to be resolved
   setImmediate(async () => {
-    const result = await model.postConsentsRequest(consentRequestsRequestId, sourceFspId, authToken)
-    modelConfig.logger.push({ result }).info('postConsentsRequest done')
+    await model.run()
   })
 
   // Note that we will have passed request validation, JWS etc... by this point
