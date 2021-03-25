@@ -44,6 +44,9 @@ import {
 import { DFSPBackendRequests } from '../../shared/dfsp-backend-requests';
 import { uuid } from 'uuidv4'
 
+// DFSPOTPValidateModel is the passive inbound handler for inbound
+// PATCH /consentRequests/{ID} requests and no response is generated from
+// `model.run()`
 export class DFSPOTPValidateModel
   extends PersistentModel<DFSPOTPValidateStateMachine, DFSPOTPValidateData> {
   protected config: DFSPOTPValidateModelConfig
@@ -57,13 +60,13 @@ export class DFSPOTPValidateModel
       transitions: [
         { name: 'validateOTP', from: 'start', to: 'OTPIsValid' },
         { name: 'requestScopes', from: 'OTPIsValid', to: 'scopesReceived' },
-        { name: 'sendConsent', from: 'scopesReceived', to: 'consentSent' },
+        { name: 'registerConsent', from: 'scopesReceived', to: 'consentSent' },
       ],
       methods: {
         // specific transitions handlers methods
         onValidateOTP: () => this.onValidateOTP(),
         onRequestScopes: () => this.onRequestScopes(),
-        onSendConsent: () => this.onSendConsent()
+        onRegisterConsent: () => this.onRegisterConsent()
       }
     }
     super(data, config, spec)
@@ -83,7 +86,7 @@ export class DFSPOTPValidateModel
     return this.config.thirdpartyRequests
   }
 
-  // this is only used in the sendConsent step since that is the only transition
+  // this is only used in the registerConsent step since that is the only transition
   // that uses a pub/sub call.
   static notificationChannel (consentRequestId: string): string {
     if (!consentRequestId) {
@@ -156,7 +159,7 @@ export class DFSPOTPValidateModel
     }
   }
 
-  async onSendConsent (): Promise<void> {
+  async onRegisterConsent (): Promise<void> {
     const { consentRequestsRequestId, toParticipantId, scopes } = this.data
 
     const postConsentRequestsPayload: tpAPI.Schemas.ConsentsPostRequest = {
@@ -218,16 +221,6 @@ export class DFSPOTPValidateModel
 
   }
 
-  /**
-   * depending on current state of model returns proper result
-   */
-  getResponse (): void {
-    switch (this.data.currentState) {
-      default:
-        return
-    }
-  }
-
   reformatError (err: Error): Errors.MojaloopApiErrorObject {
     let mojaloopErrorCode = Errors.MojaloopApiErrorCodes.INTERNAL_SERVER_ERROR
     if (err instanceof HTTPResponseError) {
@@ -270,7 +263,7 @@ export class DFSPOTPValidateModel
           )
           await this.fsm.validateOTP()
           await this.saveToKVS()
-          break
+          return this.run()
 
         case 'OTPIsValid':
           this.logger.info(
@@ -278,13 +271,13 @@ export class DFSPOTPValidateModel
           )
           await this.fsm.requestScopes()
           await this.saveToKVS()
-          break;
+          return this.run()
 
         case 'scopesReceived':
           this.logger.info(
-            `sendConsent requested for ${data.consentRequestsRequestId},  currentState: ${data.currentState}`
+            `registerConsent requested for ${data.consentRequestsRequestId},  currentState: ${data.currentState}`
           )
-          await this.fsm.sendConsent()
+          await this.fsm.registerConsent()
           await this.saveToKVS()
           // workflow is finished
           return
@@ -293,8 +286,6 @@ export class DFSPOTPValidateModel
           this.logger.info('State machine in errored state')
           return
       }
-      this.logger.info(`Transfer model state machine transition completed in state: ${this.fsm.state}. Recursing to handle next transition.`)
-      this.run()
     } catch (err) {
       this.logger.info(`Error running DFSPOTPValidateModel : ${inspect(err)}`)
 

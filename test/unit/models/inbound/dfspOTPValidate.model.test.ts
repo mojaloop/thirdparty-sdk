@@ -121,12 +121,12 @@ describe('pipsTransactionModel', () => {
     expect(typeof dfspOTPmodel.fsm.init).toEqual('function')
     expect(typeof dfspOTPmodel.fsm.validateOTP).toEqual('function')
     expect(typeof dfspOTPmodel.fsm.requestScopes).toEqual('function')
-    expect(typeof dfspOTPmodel.fsm.sendConsent).toEqual('function')
+    expect(typeof dfspOTPmodel.fsm.registerConsent).toEqual('function')
 
     // check fsm notification handler
     expect(typeof dfspOTPmodel.onValidateOTP).toEqual('function')
     expect(typeof dfspOTPmodel.onRequestScopes).toEqual('function')
-    expect(typeof dfspOTPmodel.onSendConsent).toEqual('function')
+    expect(typeof dfspOTPmodel.onRegisterConsent).toEqual('function')
 
     expect(sortedArray(dfspOTPmodel.fsm.allStates())).toEqual([
       'OTPIsValid',
@@ -139,8 +139,8 @@ describe('pipsTransactionModel', () => {
     expect(sortedArray(dfspOTPmodel.fsm.allTransitions())).toEqual([
       'error',
       'init',
+      'registerConsent',
       'requestScopes',
-      'sendConsent',
       'validateOTP'
     ])
   }
@@ -365,11 +365,11 @@ describe('pipsTransactionModel', () => {
       checkDFSPOTPModelLayout(model, validateData)
     })
 
-    it('sendConsent() should transition from scopes received to sent consent when successful', async () => {
+    it('registerConsent() should transition from scopes received to sent consent when successful', async () => {
       const model = await create(validateData, modelConfig)
 
       // start send consent step
-      await model.fsm.sendConsent()
+      await model.fsm.registerConsent()
 
       // check that the fsm was able to transition properly
       expect(model.data.currentState).toEqual('consentSent')
@@ -401,7 +401,7 @@ describe('pipsTransactionModel', () => {
       const model = await create(validateData, modelConfig)
       try {
         // start send consent step
-        await model.fsm.sendConsent()
+        await model.fsm.registerConsent()
         shouldNotBeExecuted()
       } catch (err) {
         expect(err.message).toEqual('mocked postConsents exception')

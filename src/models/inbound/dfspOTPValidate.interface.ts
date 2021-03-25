@@ -40,7 +40,7 @@ export enum DFSPOTPValidateModelState {
   start = 'start',
   validateOTP = 'validateOTP',
   requestScopes = 'requestScopes',
-  sendConsent = 'sendConsent',
+  registerConsent = 'registerConsent',
   errored = 'errored'
 }
 
@@ -57,8 +57,8 @@ export interface DFSPOTPValidateStateMachine extends ControlledStateMachine {
   onValidateOTP: Method
   requestScopes: Method
   onRequestScopes: Method
-  sendConsent: Method
-  onSendConsent: Method
+  registerConsent: Method
+  onRegisterConsent: Method
 }
 
 export interface DFSPOTPValidateModelConfig extends PersistentModelConfig {
@@ -67,7 +67,6 @@ export interface DFSPOTPValidateModelConfig extends PersistentModelConfig {
   dfspBackendRequests: DFSPBackendRequests
 }
 
-// state machine does not return a response as an inbound handler state machine
 export interface DFSPOTPValidateData extends StateData {
   toParticipantId: string
   consentRequestsRequestId: string
