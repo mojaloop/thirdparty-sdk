@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+### [11.30.2](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.30.1...v11.30.2) (2021-03-25)
+
+
+### Code Refactor
+
+* rework inbound DFSP otp validate workflow ([#72](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/72)) ([b98816b](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/b98816bd86a1cd773c5a09fcf19663bfb2b4182d))
+
 ### [11.30.1](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.30.0...v11.30.1) (2021-03-25)
 
 
