@@ -41,7 +41,7 @@ export enum DFSPOTPValidateModelState {
   validateOTP = 'validateOTP',
   requestScopes = 'requestScopes',
   sendConsent = 'sendConsent',
-  errored = 'ERROR_OCCURRED'
+  errored = 'errored'
 }
 
 export interface BackendValidateOTPResponse {
