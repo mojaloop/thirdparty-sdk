@@ -80,14 +80,6 @@ export interface PISPTransactionModelConfig extends PersistentModelConfig {
   sdkOutgoingRequests: SDKOutgoingRequests
 }
 
-// derived from request body specification
-// '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/PartyIdInfo.yaml'
-// export interface PayeeLookupRequest {
-//   partyIdType: string,
-//   partyIdentifier: string,
-//   partySubIdOrType?: string
-//   // `fspId` optional field intentionally skipped
-// }
 export interface ThirdpartyTransactionPartyLookupResponse {
   party?: tpAPI.Schemas.Party
   errorInformation?: ErrorInformation

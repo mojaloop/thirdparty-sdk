@@ -1,4 +1,18 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+## [11.30.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.29.1...v11.30.0) (2021-03-25)
+
+
+### Features
+
+* use api-snippets for partyLookup endpoint ([#71](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/71)) ([4677e3e](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/4677e3e08da00175cd77f5706e8f6eb3c6202304))
+
+### [11.29.1](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.29.0...v11.29.1) (2021-03-25)
+
+
+### Maintenance
+
+* introduce patch /consentRequests and update ttk spec ([#69](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/69)) ([42fcfc7](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/42fcfc7933eb59cc2fc421c961eb30871166ff3f))
+
 ## [11.29.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.28.2...v11.29.0) (2021-03-24)
 
 

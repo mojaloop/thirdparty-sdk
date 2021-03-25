@@ -31,3 +31,5 @@ paths:
     $ref: paths/thirdpartyRequests_transactions_ID_authorizations.yaml
   /accounts/{fspId}/{userId}:
     $ref: paths/accounts_ID.yaml
+  /consentRequests/{ID}/validate:
+    $ref: paths/consentRequests_ID_validate.yaml
