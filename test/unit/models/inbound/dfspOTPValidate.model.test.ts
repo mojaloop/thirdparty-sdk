@@ -44,7 +44,7 @@ import mockLogger from 'test/unit/mockLogger'
 import sortedArray from 'test/unit/sortedArray'
 import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests';
 import { DFSPOTPValidateModelConfig, DFSPOTPValidateData } from '~/models/inbound/dfspOTPValidate.interface';
-import shouldNotBeExecuted from '../../../../dist/test/unit/shouldNotBeExecuted';
+import shouldNotBeExecuted from 'test/unit/shouldNotBeExecuted'
 
 // mock KVS default exported class
 jest.mock('~/shared/kvs')
