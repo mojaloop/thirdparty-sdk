@@ -178,8 +178,10 @@ describe('pipsTransactionModel', () => {
           transactionRequestId: '1234-1234',
           currentState: 'start',
           payeeRequest: {
-            partyIdType: 'party-id-type',
-            partyIdentifier: 'party-identifier'
+            payee: {
+              partyIdType: 'MSISDN',
+              partyIdentifier: 'party-identifier'
+            }
           }
         }
       })
@@ -220,7 +222,7 @@ describe('pipsTransactionModel', () => {
 
         // check we made a call to mojaloopRequest.getParties
         expect(modelConfig.sdkOutgoingRequests.requestPartiesInformation).toBeCalledWith(
-          'party-id-type', 'party-identifier', undefined
+          'MSISDN', 'party-identifier', undefined
         )
       })
 
@@ -287,16 +289,16 @@ describe('pipsTransactionModel', () => {
           transactionRequestId: '1234-1234',
           currentState: 'partyLookupSuccess',
           payeeRequest: {
-            partyIdType: 'party-id-type',
-            partyIdentifier: 'party-identifier'
+            payee: {
+              partyIdType: 'MSISDN',
+              partyIdentifier: 'party-identifier'
+            }
           },
           payeeResolved: {
             party,
             currentState: RequestPartiesInformationState.COMPLETED
           },
           initiateRequest: {
-            sourceAccountId: 'source-account-id',
-            consentId: 'consent-id',
             payee: party,
             payer: {
               partyIdInfo: {
@@ -424,16 +426,16 @@ describe('pipsTransactionModel', () => {
           transactionRequestId: '1234-1234',
           currentState: 'authorizationReceived',
           payeeRequest: {
-            partyIdType: 'party-id-type',
-            partyIdentifier: 'party-identifier'
+            payee: {
+              partyIdType: 'MSISDN',
+              partyIdentifier: 'party-identifier'
+            }
           },
           payeeResolved: {
             party,
             currentState: RequestPartiesInformationState.COMPLETED
           },
           initiateRequest: {
-            sourceAccountId: 'source-account-id',
-            consentId: 'consent-id',
             payee: party,
             payer: {
               partyIdInfo: {
