@@ -33,8 +33,9 @@ import {
 import {
   thirdparty as tpAPI
 } from '@mojaloop/api-snippets'
-import { OutboundAPI } from '@mojaloop/sdk-scheme-adapter'
+import { OutboundAPI as SDKOutboundAPI } from '@mojaloop/sdk-scheme-adapter'
 import { Method } from 'javascript-state-machine'
+import * as OutboundAPI from '~/interface/outbound/api_interfaces'
 import { ErrorInformation } from '~/interface/types'
 import { ControlledStateMachine, StateData, PersistentModelConfig } from '~/models/persistent.model'
 import { PubSub } from '~/shared/pub-sub'
@@ -79,20 +80,6 @@ export interface PISPTransactionModelConfig extends PersistentModelConfig {
   sdkOutgoingRequests: SDKOutgoingRequests
 }
 
-// derived from request body specification
-// '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/PartyIdInfo.yaml'
-export interface PayeeLookupRequest {
-  partyIdType: string,
-  partyIdentifier: string,
-  partySubIdOrType?: string
-  // `fspId` optional field intentionally skipped
-}
-
-export interface ThirdpartyTransactionPartyLookupRequest {
-  transactionRequestId: string
-  payee: PayeeLookupRequest
-}
-
 export interface ThirdpartyTransactionPartyLookupResponse {
   party?: tpAPI.Schemas.Party
   errorInformation?: ErrorInformation
@@ -100,8 +87,6 @@ export interface ThirdpartyTransactionPartyLookupResponse {
 }
 
 export interface ThirdpartyTransactionInitiateRequest {
-  sourceAccountId: string
-  consentId: string
   payee: tpAPI.Schemas.Party
   payer: tpAPI.Schemas.PartyTPLink
   amountType: tpAPI.Schemas.AmountType
@@ -134,8 +119,8 @@ export interface PISPTransactionData extends StateData {
   transactionRequestId?: string
 
   // party lookup
-  payeeRequest?: PayeeLookupRequest
-  payeeResolved?: OutboundAPI.Schemas.partiesByIdResponse
+  payeeRequest?: OutboundAPI.Schemas.ThirdpartyTransactionPartyLookupRequest
+  payeeResolved?: SDKOutboundAPI.Schemas.partiesByIdResponse
   partyLookupResponse?: ThirdpartyTransactionPartyLookupResponse
 
   // initiate
