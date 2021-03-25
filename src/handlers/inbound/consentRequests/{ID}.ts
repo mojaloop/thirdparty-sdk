@@ -39,6 +39,7 @@ import {
   DFSPOTPValidateData,
   DFSPOTPValidateModelConfig
 } from '~/models/inbound/dfspOTPValidate.interface'
+import inspect from '~/shared/inspect';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function patch (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
@@ -71,14 +72,7 @@ async function patch (_context: unknown, request: Request, h: StateResponseToolk
     try {
       await model.run()
     } catch (error) {
-      // return an error if the state machine doesn't run
-      await h.getThirdpartyRequests().putConsentRequestsError(
-        consentRequestsRequestId,
-        Errors.MojaloopApiErrorObjectFromCode(
-          Errors.MojaloopApiErrorCodes.SERVER_ERROR
-        ) as unknown as fspiopAPI.Schemas.ErrorInformationObject,
-        sourceFspId
-      )
+      h.getLogger().info(`Error running DFSPOTPValidateModel : ${inspect(error)}`)
     }
   })
 
