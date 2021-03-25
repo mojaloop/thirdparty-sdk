@@ -71,9 +71,9 @@ describe('PUT /consentRequests/{ID}/error', (): void => {
         await pubSub.connect()
         expect(pubSub.isConnected).toBeTruthy()
 
-        pubSub.subscribe('consent_request_997c89f4-053c-4283-bfec-45a1a0a28fba',
+        pubSub.subscribe('PISPOTPValidate-997c89f4-053c-4283-bfec-45a1a0a28fba',
           async (channel: string, message: Message, _id: number) => {
-            expect(channel).toEqual('consent_request_997c89f4-053c-4283-bfec-45a1a0a28fba')
+            expect(channel).toEqual('PISPOTPValidate-997c89f4-053c-4283-bfec-45a1a0a28fba')
             expect(message).toEqual(payload)
             await pubSub.disconnect()
             expect(pubSub.isConnected).toBeFalsy()

@@ -20,63 +20,55 @@
  optionally within square brackets <email>.
  * Gates Foundation
  - Name Surname <name.surname@gatesfoundation.com>
-
  - Kevin Leyow <kevin.leyow@modusbox.com>
-
  --------------
  ******/
 
-import {
-  thirdparty as tpAPI
-} from '@mojaloop/api-snippets'
-import { Request, ResponseObject } from '@hapi/hapi'
 import { StateResponseToolkit } from '~/server/plugins/state'
-import { Enum } from '@mojaloop/central-services-shared'
-import { DFSPOTPValidateModel } from '~/models/inbound/dfspOTPValidate.model';
+import { Request, ResponseObject } from '@hapi/hapi'
+import { PISPOTPValidateModel, create } from '~/models/outbound/pispOTPValidate.model';
+import { PISPOTPValidateModelState } from '../../../../models/outbound/pispOTPValidate.interface';
 import {
-  DFSPOTPValidateData,
-  DFSPOTPValidateModelConfig
-} from '~/models/inbound/dfspOTPValidate.interface'
-import inspect from '~/shared/inspect';
+  PISPOTPValidateData,
+  PISPOTPValidateModelConfig,
+  OutboundOTPValidateData
+} from '~/models/outbound/pispOTPValidate.interface'
 
+/**
+ * Handles outbound PATCH /consentRequests/{ID} request
+ */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function patch (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
-  const payload = request.payload as tpAPI.Schemas.ConsentRequestsIDPatchRequest
+async function patch (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+  const payload = request.payload as OutboundOTPValidateData
   const consentRequestsRequestId = request.params.ID
   const authToken = payload.authToken
+  const toDFSPParticipantId = payload.toParticipantId
 
-  // pull the PISP's ID to send back the POST /consents
-  const sourceFspId = request.headers['fspiop-source']
-
-  const data: DFSPOTPValidateData = {
+  // prepare config
+  const data: PISPOTPValidateData = {
     currentState: 'start',
     consentRequestsRequestId: consentRequestsRequestId,
     authToken: authToken,
-    toParticipantId: sourceFspId
+    toDFSPParticipantId: toDFSPParticipantId
   }
-  // if the OTP is valid the DFSP issues out a POST /consents request.
-  const modelConfig: DFSPOTPValidateModelConfig = {
+
+  const modelConfig: PISPOTPValidateModelConfig = {
     kvs: h.getKVS(),
     pubSub: h.getPubSub(),
     key: consentRequestsRequestId,
     logger: h.getLogger(),
-    dfspBackendRequests: h.getDFSPBackendRequests(),
     thirdpartyRequests: h.getThirdpartyRequests(),
   }
-  const model = new DFSPOTPValidateModel(data, modelConfig)
 
-  // don't await on promise to be resolved
-  setImmediate(async () => {
-    try {
-      await model.run()
-    } catch (error) {
-      h.getLogger().info(`Error running DFSPOTPValidateModel : ${inspect(error)}`)
-    }
-  })
+  const model: PISPOTPValidateModel = await create(data, modelConfig)
 
-  // Note that we will have passed request validation, JWS etc... by this point
-  // so it is safe to return 202
-  return h.response().code(Enum.Http.ReturnCodes.ACCEPTED.CODE)
+  const result = await model.run()
+  if (!result) {
+    h.getLogger().error('outbound PATCH /consentRequests/{ID}/validate unexpected result from workflow')
+    return h.response({}).code(500)
+  }
+  const statusCode = (result.currentState == PISPOTPValidateModelState.errored) ? 500 : 200
+  return h.response(result).code(statusCode)
 }
 
 export default {

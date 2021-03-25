@@ -21,41 +21,55 @@
  * Gates Foundation
  - Name Surname <name.surname@gatesfoundation.com>
 
- - Kevin Leyow <kevin.leyow@modusbox.com>
-
+ - Kevin Leyow - kevin.leyow@modusbox.com
  --------------
  ******/
-
+import {
+  ControlledStateMachine,
+  PersistentModelConfig, StateData
+} from '~/models/persistent.model'
+import { Method } from 'javascript-state-machine'
+import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components';
 import {
   thirdparty as tpAPI
 } from '@mojaloop/api-snippets'
-import { Message } from '~/shared/pub-sub'
-import { Request, ResponseObject } from '@hapi/hapi'
-import { StateResponseToolkit } from '~/server/plugins/state'
-import { Enum } from '@mojaloop/central-services-shared';
-import { PISPOTPValidateModel } from '~/models/outbound/pispOTPValidate.model';
+import { PubSub } from '~/shared/pub-sub'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function post (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
-  const payload = request.payload as tpAPI.Schemas.ConsentsPostRequest
-  const logger = h.getLogger()
-
-  // POST /consents is a follow-up request to PATCH /consentRequests
-  // so we publish the request on the PISPConsentRequestModel
-  const channel = PISPOTPValidateModel.notificationChannel(
-    payload.consentRequestId
-  )
-  const pubSub = h.getPubSub()
-  // don't await on promise to resolve
-  // let finish publish in background
-  pubSub.publish(channel, payload as unknown as Message)
-  logger.info('PISPConsentRequestModel handled POST /consents request')
-
-  // Note that we will have passed request validation, JWS etc... by this point
-  // so it is safe to return 202
-  return h.response().code(Enum.Http.ReturnCodes.ACCEPTED.CODE)
+export enum PISPOTPValidateModelState {
+  start = 'start',
+  OTPIsValid = 'OTPIsValid',
+  errored = 'errored'
 }
 
-export default {
-  post
+export interface PISPOTPValidateStateMachine extends ControlledStateMachine {
+  validateOTP: Method
+  onValidateOTP: Method
+}
+
+export interface PISPOTPValidateModelConfig extends PersistentModelConfig {
+  pubSub: PubSub
+  thirdpartyRequests: ThirdpartyRequests
+}
+
+export interface PISPOTPValidateData extends StateData {
+  toDFSPParticipantId: string
+  consentRequestsRequestId: string
+  authToken: string
+  consent?: tpAPI.Schemas.ConsentsPostRequest
+  errorInformation?: tpAPI.Schemas.ErrorInformation
+}
+
+export interface OutboundOTPValidateData extends StateData {
+  authToken: string
+  toParticipantId: string
+}
+
+export interface OutboundOTPValidateConsentResponse {
+  consent: tpAPI.Schemas.ConsentsPostRequest
+  currentState: PISPOTPValidateModelState
+}
+
+export interface OutboundOTPValidateErrorResponse {
+  errorInformation: tpAPI.Schemas.ErrorInformation
+  currentState: PISPOTPValidateModelState
 }

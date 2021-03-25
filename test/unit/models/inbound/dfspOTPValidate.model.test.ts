@@ -52,7 +52,7 @@ jest.mock('~/shared/kvs')
 // mock PubSub default exported class
 jest.mock('~/shared/pub-sub')
 
-describe('pipsTransactionModel', () => {
+describe('dfspOTPValidateModel', () => {
   const connectionConfig: RedisConnectionConfig = {
     port: 6789,
     host: 'localhost',
