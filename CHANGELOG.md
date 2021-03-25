@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+### [11.30.1](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.30.0...v11.30.1) (2021-03-25)
+
+
+### Bug Fixes
+
+* move dependency and fix mocking in tests ([#70](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/70)) ([50087ad](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/50087adefb7d3a8bc6df1d4de8852eb5ea2828f6))
+
 ## [11.30.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.29.1...v11.30.0) (2021-03-25)
 
 
