@@ -27,14 +27,12 @@
  ******/
 
 import {
-  v1_1 as fspiopAPI,
   thirdparty as tpAPI
 } from '@mojaloop/api-snippets'
 import { Request, ResponseObject } from '@hapi/hapi'
 import { StateResponseToolkit } from '~/server/plugins/state'
 import { Enum } from '@mojaloop/central-services-shared'
 import { DFSPOTPValidateModel } from '../../../models/inbound/dfspOTPValidate.model';
-import { Errors } from '@mojaloop/sdk-standard-components';
 import {
   DFSPOTPValidateData,
   DFSPOTPValidateModelConfig
