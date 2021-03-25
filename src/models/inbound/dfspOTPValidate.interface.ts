@@ -34,7 +34,7 @@ import {
   thirdparty as tpAPI
 } from '@mojaloop/api-snippets'
 import { PubSub } from '~/shared/pub-sub'
-import { DFSPBackendRequests } from '../../shared/dfsp-backend-requests';
+import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests';
 
 export enum DFSPOTPValidateModelState {
   start = 'start',
