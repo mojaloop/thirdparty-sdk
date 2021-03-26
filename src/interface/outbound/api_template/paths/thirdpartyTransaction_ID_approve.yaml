@@ -1,5 +1,5 @@
 post:
-  operationId: ApproveThirdpartyTransaction
+  operationId: ThirdpartyTransactionIDApprove
   summary: Approve a third party transaction.
   description: >
     The HTTP request `POST /thirdpartyTransaction/{ID}/approve` is used to approve a third party transaction .

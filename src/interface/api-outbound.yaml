@@ -140,7 +140,7 @@ paths:
           $ref: '#/components/responses/503'
   '/thirdpartyTransaction/{ID}/initiate':
     post:
-      operationId: InitiateThirdpartyTransaction
+      operationId: ThirdpartyTransactionIDInitiate
       summary: Initiates a third party transaction.
       description: >
         The HTTP request `POST /thirdpartyTransaction/{ID}/initiate` is sent to
@@ -155,7 +155,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ThirdpartyRequestsTransactionsPostRequest'
+              $ref: '#/components/schemas/ThirdpartyTransactionInitiateRequest'
       responses:
         '200':
           $ref: '#/components/responses/ThirdpartyRequestsTransactionsPostResponse'
@@ -177,7 +177,7 @@ paths:
           $ref: '#/components/responses/503'
   '/thirdpartyTransaction/{ID}/approve':
     post:
-      operationId: ApproveThirdpartyTransaction
+      operationId: ThirdpartyTransactionIDApprove
       summary: Approve a third party transaction.
       description: >
         The HTTP request `POST /thirdpartyTransaction/{ID}/approve` is used to
@@ -1459,7 +1459,7 @@ components:
         - scenario
         - initiator
         - initiatorType
-    ThirdpartyRequestsTransactionsPostRequest:
+    ThirdpartyTransactionInitiateRequest:
       title: ThirdpartyRequestsTransactionsPostRequest
       type: object
       description: >-

@@ -17,10 +17,10 @@ export interface paths {
     post: operations["ThirdpartyTransactionPartyLookup"];
   };
   "/thirdpartyTransaction/{ID}/initiate": {
-    post: operations["InitiateThirdpartyTransaction"];
+    post: operations["ThirdpartyTransactionIDInitiate"];
   };
   "/thirdpartyTransaction/{ID}/approve": {
-    post: operations["ApproveThirdpartyTransaction"];
+    post: operations["ThirdpartyTransactionIDApprove"];
   };
   "/thirdpartyRequests/transactions/{ID}/authorizations": {
     post: operations["VerifyThirdPartyAuthorization"];
@@ -97,14 +97,14 @@ export interface operations {
     };
   };
   /** The HTTP request `POST /thirdpartyTransaction/{ID}/initiate` is sent to the Switch to initiate a third party request transaction. */
-  InitiateThirdpartyTransaction: {
+  ThirdpartyTransactionIDInitiate: {
     parameters: {
       path: {
         ID: components["parameters"]["ID"];
       };
     };
     requestBody: {
-      "application/json": components["schemas"]["ThirdpartyRequestsTransactionsPostRequest"];
+      "application/json": components["schemas"]["ThirdpartyTransactionInitiateRequest"];
     };
     responses: {
       200: components["responses"]["ThirdpartyRequestsTransactionsPostResponse"];
@@ -119,7 +119,7 @@ export interface operations {
     };
   };
   /** The HTTP request `POST /thirdpartyTransaction/{ID}/approve` is used to approve a third party transaction . */
-  ApproveThirdpartyTransaction: {
+  ThirdpartyTransactionIDApprove: {
     parameters: {
       path: {
         ID: components["parameters"]["ID"];
@@ -648,7 +648,7 @@ export interface components {
       balanceOfPayments?: components["schemas"]["BalanceOfPayments"];
     };
     /** The object sent in the POST `/thirdpartyTransaction/{ID}/initiate` request. */
-    ThirdpartyRequestsTransactionsPostRequest: {
+    ThirdpartyTransactionInitiateRequest: {
       sourceAccountId: components["schemas"]["AccountAddress"];
       consentId: components["schemas"]["CorrelationId"];
       payee: components["schemas"]["Party"];

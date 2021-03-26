@@ -1,5 +1,5 @@
 post:
-  operationId: InitiateThirdpartyTransaction
+  operationId: ThirdpartyTransactionIDInitiate
   summary: Initiates a third party transaction.
   description: >
     The HTTP request `POST /thirdpartyTransaction/{ID}/initiate` is sent to the Switch to initiate a third party request transaction.
@@ -14,7 +14,7 @@ post:
     content:
       application/json:
         schema:
-          $ref: '../components/schemas/ThirdpartyRequestsTransactionsPostRequest.yaml'
+          $ref: '../components/schemas/ThirdpartyTransactionInitiateRequest.yaml'
   responses:
     '200':
       $ref: '../components/responses/ThirdpartyRequestsTransactionsPostResponse.yaml'
