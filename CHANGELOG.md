@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+### [11.30.3](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.30.2...v11.30.3) (2021-03-26)
+
+
+### Bug Fixes
+
+* correct getUserAccounts url in dfsp-backend-requests ([#73](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/73)) ([be86853](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/be8685362942439729dba44606cf9975057f295f))
+
 ### [11.30.2](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.30.1...v11.30.2) (2021-03-25)
 
 
