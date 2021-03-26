@@ -69,16 +69,22 @@ describe('backendRequests', () => {
   })
 
   describe('getUserAccounts', () => {
-    it('should propagate call to get', async () => {
+    it('should propagate call to loggedRequest:GET', async () => {
       const mockData = JSON.parse(JSON.stringify(TestData))
       const userId = mockData.accountsRequest.params.ID
       const response = mockData.accountsRequest.payload
-      const getSpy = jest.spyOn(dfspBackendRequests, 'get').mockImplementationOnce(
+      const loggedRequestSpy = jest.spyOn(dfspBackendRequests, 'loggedRequest').mockImplementationOnce(
         () => Promise.resolve(response)
       )
+      const uri = `http://backend-uri/accounts/${userId}`
       const result = await dfspBackendRequests.getUserAccounts(userId)
       expect(result).toEqual(response)
-      expect(getSpy).toBeCalledWith(`http://backend-uri/accounts/${userId}`)
+      expect(loggedRequestSpy).toHaveBeenCalledWith({
+        method: 'GET',
+        uri,
+        agent: expect.anything(),
+        headers: expect.anything()
+      })
     })
   })
 })
