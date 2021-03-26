@@ -78,7 +78,7 @@ describe('backendRequests', () => {
       )
       const result = await dfspBackendRequests.getUserAccounts(userId)
       expect(result).toEqual(response)
-      expect(getSpy).toBeCalledWith(`http://backend-uri/accounts/${userId}`)
+      expect(getSpy).toBeCalledWith(`accounts/${userId}`)
     })
   })
 })

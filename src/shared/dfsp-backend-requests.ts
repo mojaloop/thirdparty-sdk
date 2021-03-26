@@ -91,7 +91,7 @@ export class DFSPBackendRequests extends HttpRequests {
 
   // request user's accounts details from DFSP Backend
   async getUserAccounts (userId: string): Promise<tpAPI.Schemas.AccountsIDPutResponse | void> {
-    const accountsPath = this.fullUri(this.getUserAccountsPath.replace('{ID}', userId))
+    const accountsPath = this.getUserAccountsPath.replace('{ID}', userId)
     return this.get<tpAPI.Schemas.AccountsIDPutResponse>(accountsPath)
   }
 
