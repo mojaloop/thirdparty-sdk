@@ -16,7 +16,7 @@
     "build:openapi:inbound": "openapi bundle --output ./src/interface/api-inbound.yaml --ext yaml ./src/interface/inbound/api_template/api-inbound-template.yaml",
     "build:dto:inbound": "openapi-typescript ./src/interface/api-inbound.yaml --output ./src/interface/inbound/api_interfaces/openapi.d.ts",
     "build:openapi:outbound": "openapi bundle --output ./src/interface/api-outbound.yaml --ext yaml ./src/interface/outbound/api_template/api-outbound-template.yaml",
-    "build:dto:outbound": "openapi-typescript ./src/interface/api-outbound.yaml --output ./src/interface/outbound/api_interfaces/openapi.d.ts",
+    "build:dto:outbound": "openapi-typescript ./src/interface/api-outbound.yaml --output ./src/interface/outbound/api_interfaces/openapi.d.ts; eslint ./src/interface/outbound/api_interfaces/openapi.d.ts --fix",
     "validate:api": "npm run validate:api:in; npm run validate:api:out",
     "validate:api:in": "swagger-cli validate ./src/interface/api-inbound.yaml",
     "validate:api:out": "swagger-cli validate ./src/interface/api-outbound.yaml",
