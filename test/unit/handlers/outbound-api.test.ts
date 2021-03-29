@@ -378,17 +378,9 @@ describe('Outbound API routes', (): void => {
           }
         },
         payer: {
-          personalInfo: {
-            complexName: {
-              firstName: 'Alice',
-              lastName: 'K'
-            }
-          },
-          partyIdInfo: {
-            partyIdType: 'MSISDN',
-            partyIdentifier: '+44 8765 4321',
-            fspId: 'dfspa'
-          }
+          partyIdType: 'THIRD_PARTY_LINK',
+          partyIdentifier: 'querty-123456',
+          fspId: 'dfspa'
         },
         amountType: 'SEND',
         amount: {

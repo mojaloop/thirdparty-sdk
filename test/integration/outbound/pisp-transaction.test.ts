@@ -55,17 +55,9 @@ describe('PISP Transaction', (): void => {
           }
         },
         payer: {
-          personalInfo: {
-            complexName: {
-              firstName: 'Alice',
-              lastName: 'K'
-            }
-          },
-          partyIdInfo: {
-            partyIdType: 'MSISDN',
-            partyIdentifier: '+44 8765 4321',
-            fspId: 'dfspa'
-          }
+          partyIdType: 'THIRD_PARTY_LINK',
+          partyIdentifier: 'qwerty-123456',
+          fspId: 'dfspa'
         },
         amountType: 'SEND',
         amount: {

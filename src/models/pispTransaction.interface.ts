@@ -88,7 +88,7 @@ export interface ThirdpartyTransactionPartyLookupResponse {
 
 export interface ThirdpartyTransactionInitiateRequest {
   payee: tpAPI.Schemas.Party
-  payer: tpAPI.Schemas.PartyTPLink
+  payer: tpAPI.Schemas.PartyIdInfoTPLink
   amountType: tpAPI.Schemas.AmountType
   amount: tpAPI.Schemas.Money
   transactionType: tpAPI.Schemas.TransactionType

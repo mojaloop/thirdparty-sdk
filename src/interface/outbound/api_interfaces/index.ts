@@ -62,7 +62,6 @@ export namespace Schemas {
   export type Refund = components['schemas']['Refund']
   export type BalanceOfPayments = components['schemas']['BalanceOfPayments']
   export type TransactionType = components['schemas']['TransactionType']
-  export type ThirdpartyRequestsTransactionsPostRequest = components['schemas']['ThirdpartyRequestsTransactionsPostRequest']
   export type AuthorizationsPostRequest = components['schemas']['AuthorizationsPostRequest']
   export type AuthorizationsIDPutResponse = components['schemas']['AuthorizationsIDPutResponse']
   export type ThirdpartyTransactionApproveRequest = components['schemas']['ThirdpartyTransactionApproveRequest']

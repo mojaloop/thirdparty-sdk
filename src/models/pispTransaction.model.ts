@@ -220,7 +220,7 @@ export class PISPTransactionModel
         }
         const res = await this.thirdpartyRequests.postThirdpartyRequestsTransactions(
           request,
-          this.data.initiateRequest?.payer.partyIdInfo.fspId as string
+          this.data.initiateRequest?.payer.fspId as string
         )
         this.logger.push({ res }).info('ThirdpartyRequests.postThirdpartyRequestsTransactions request sent to peer')
       } catch (error) {
@@ -267,7 +267,7 @@ export class PISPTransactionModel
           this.data?.transactionRequestId as string,
           // propagate signed challenge
           this.data?.approveRequest?.authorizationResponse as tpAPI.Schemas.AuthorizationsIDPutResponse,
-          this.data?.initiateRequest?.payer.partyIdInfo.fspId as string
+          this.data?.initiateRequest?.payer.fspId as string
         )
         this.logger.push({ res }).info('ThirdpartyRequests.postThirdpartyRequestsTransactions request sent to peer')
       } catch (error) {

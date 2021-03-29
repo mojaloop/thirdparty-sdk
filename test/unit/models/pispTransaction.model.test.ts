@@ -301,11 +301,9 @@ describe('pipsTransactionModel', () => {
           initiateRequest: {
             payee: party,
             payer: {
-              partyIdInfo: {
-                fspId: 'payer-fsp-id',
-                partyIdType: 'THIRD_PARTY_LINK',
-                partyIdentifier: 'payer-party-identifier'
-              }
+              fspId: 'payer-fsp-id',
+              partyIdType: 'THIRD_PARTY_LINK',
+              partyIdentifier: 'payer-party-identifier'
             },
             amountType: 'SEND' as tpAPI.Schemas.AmountType,
             amount: {
@@ -371,7 +369,7 @@ describe('pipsTransactionModel', () => {
             transactionRequestId: data.transactionRequestId,
             ...data.initiateRequest
           },
-          data.initiateRequest?.payer.partyIdInfo.fspId
+          data.initiateRequest?.payer.fspId
         )
       })
 
@@ -438,11 +436,9 @@ describe('pipsTransactionModel', () => {
           initiateRequest: {
             payee: party,
             payer: {
-              partyIdInfo: {
-                fspId: 'payer-fsp-id',
-                partyIdType: 'THIRD_PARTY_LINK',
-                partyIdentifier: 'payer-party-identifier'
-              }
+              fspId: 'payer-fsp-id',
+              partyIdType: 'THIRD_PARTY_LINK',
+              partyIdentifier: 'payer-party-identifier'
             },
             amountType: 'SEND' as tpAPI.Schemas.AmountType,
             amount: {
@@ -509,7 +505,7 @@ describe('pipsTransactionModel', () => {
         expect(modelConfig.mojaloopRequests.putAuthorizations).toBeCalledWith(
           data.transactionRequestId,
           authorizationResponse,
-          data.initiateRequest?.payer.partyIdInfo.fspId
+          data.initiateRequest?.payer.fspId
         )
       })
 
