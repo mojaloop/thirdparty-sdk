@@ -95,10 +95,10 @@ export class PISPOTPValidateModel
       let subId = 0
       try {
         // this handler will be executed when POST /consents @ Inbound server
-        // what if it's an error?
         subId = this.pubSub.subscribe(channel, async (channel: string, message: Message, sid: number) => {
           // first unsubscribe
           this.pubSub.unsubscribe(channel, sid)
+
           type PutResponseOrError = tpAPI.Schemas.ConsentsPostRequest & fspiopAPI.Schemas.ErrorInformationObject
           const putResponse = message as unknown as PutResponseOrError
           if (putResponse.errorInformation) {
@@ -143,7 +143,7 @@ export class PISPOTPValidateModel
   }
 
   // utility function to check if an error after a transistion which
-  // that pub/subs for a response that can return a mojaloop error
+  // pub/subs for a response that can return a mojaloop error
   async checkModelDataForErrorInformation(): Promise<void> {
     if (this.data.errorInformation) {
       await this.fsm.error()
