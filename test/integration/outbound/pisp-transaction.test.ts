@@ -32,7 +32,6 @@ describe('PISP Transaction', (): void => {
         payee: {
           partyIdType: 'MSISDN',
           partyIdentifier: '4412345678'
-
         },
         transactionRequestId: transactionRequestId
       }
@@ -45,8 +44,6 @@ describe('PISP Transaction', (): void => {
 
       const initiateURI = `${env.outbound.baseUri}/thirdpartyTransaction/${transactionRequestId}/initiate`
       const initiateRequest = {
-        sourceAccountId: 'dfspa.alice.1234',
-        consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
         payee: {
           partyIdInfo: {
             partyIdType: 'MSISDN',

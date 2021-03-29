@@ -1122,14 +1122,6 @@ export interface components {
       fspId?: components["schemas"]["FspId"];
       extensionList?: components["schemas"]["ExtensionList"];
     };
-    /** Data model for the complex type Party. */
-    PartyTPLink: {
-      accounts?: components["schemas"]["AccountList"];
-      partyIdInfo: components["schemas"]["PartyIdInfoTPLink"];
-      merchantClassificationCode?: components["schemas"]["MerchantClassificationCode"];
-      name?: components["schemas"]["PartyName"];
-      personalInfo?: components["schemas"]["PartyPersonalInfo"];
-    };
     /**
      * Below are the allowed values for the enumeration AmountType.
      * - SEND - Amount the Payer would like to send, that is, the amount that should be withdrawn from the Payer account including any fees.
@@ -1191,7 +1183,7 @@ export interface components {
       /** Information about the Payee in the proposed financial transaction. */
       payee: components["schemas"]["Party"];
       /** Information about the Payer in the proposed financial transaction. */
-      payer: components["schemas"]["PartyTPLink"];
+      payer: components["schemas"]["PartyIdInfoTPLink"];
       /** SEND for sendAmount, RECEIVE for receiveAmount. */
       amountType: components["schemas"]["AmountType"];
       /** Requested amount to be transferred from the Payer to Payee. */
