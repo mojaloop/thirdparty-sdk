@@ -26,19 +26,17 @@
  --------------
  ******/
 import { StateResponseToolkit } from '~/server/plugins/state'
-import {
-  PISPTransactionModelConfig,
-  ThirdpartyTransactionInitiateRequest
-} from '~/models/pispTransaction.interface'
+import { PISPTransactionModelConfig } from '~/models/pispTransaction.interface'
 import {
   PISPTransactionModel,
   loadFromKVS
 } from '~/models/pispTransaction.model'
 import { Request, ResponseObject } from '@hapi/hapi'
+import * as OutboundAPI from '~/interface/outbound/api_interfaces'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function post (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
-  const payload = request.payload as ThirdpartyTransactionInitiateRequest
+  const payload = request.payload as OutboundAPI.Schemas.ThirdpartyTransactionIDInitiateRequest
   // prepare model config
   const modelConfig: PISPTransactionModelConfig = {
     kvs: h.getKVS(),

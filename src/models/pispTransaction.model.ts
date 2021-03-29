@@ -34,7 +34,9 @@ import {
   MojaloopRequests,
   ThirdpartyRequests
 } from '@mojaloop/sdk-standard-components'
-import { OutboundAPI } from '@mojaloop/sdk-scheme-adapter'
+import { OutboundAPI as SDKOutboundAPI } from '@mojaloop/sdk-scheme-adapter'
+import * as OutboundAPI from '~/interface/outbound/api_interfaces'
+
 import {
   thirdparty as tpAPI
 } from '@mojaloop/api-snippets'
@@ -45,7 +47,6 @@ import {
   PISPTransactionPhase,
   PISPTransactionStateMachine,
   ThirdpartyTransactionApproveResponse,
-  ThirdpartyTransactionInitiateRequest,
   ThirdpartyTransactionInitiateResponse,
   ThirdpartyTransactionPartyLookupResponse,
   ThirdpartyTransactionStatus
@@ -147,7 +148,7 @@ export class PISPTransactionModel
       // call GET /parties on sdk-scheme-adapter Outbound service
       const response = this.data.payeeResolved = await this.sdkOutgoingRequests.requestPartiesInformation(
         payee!.partyIdType, payee!.partyIdentifier, payee!.partySubIdOrType
-      ) as OutboundAPI.Schemas.partiesByIdResponse
+      ) as SDKOutboundAPI.Schemas.partiesByIdResponse
 
       this.data.partyLookupResponse = {
         party: response.party,
@@ -216,7 +217,7 @@ export class PISPTransactionModel
 
         const request: tpAPI.Schemas.ThirdpartyRequestsTransactionsPostRequest = {
           transactionRequestId: this.data?.transactionRequestId as string,
-          ...this.data?.initiateRequest as ThirdpartyTransactionInitiateRequest
+          ...this.data?.initiateRequest as OutboundAPI.Schemas.ThirdpartyTransactionIDInitiateRequest
         }
         const res = await this.thirdpartyRequests.postThirdpartyRequestsTransactions(
           request,

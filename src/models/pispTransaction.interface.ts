@@ -86,15 +86,6 @@ export interface ThirdpartyTransactionPartyLookupResponse {
   currentState: PISPTransactionModelState
 }
 
-export interface ThirdpartyTransactionInitiateRequest {
-  payee: tpAPI.Schemas.Party
-  payer: tpAPI.Schemas.PartyIdInfoTPLink
-  amountType: tpAPI.Schemas.AmountType
-  amount: tpAPI.Schemas.Money
-  transactionType: tpAPI.Schemas.TransactionType
-  expiration: string
-}
-
 export interface ThirdpartyTransactionInitiateResponse {
   authorization: tpAPI.Schemas.AuthorizationsPostRequest
   currentState: PISPTransactionModelState
@@ -124,7 +115,7 @@ export interface PISPTransactionData extends StateData {
   partyLookupResponse?: ThirdpartyTransactionPartyLookupResponse
 
   // initiate
-  initiateRequest?: ThirdpartyTransactionInitiateRequest
+  initiateRequest?: OutboundAPI.Schemas.ThirdpartyTransactionIDInitiateRequest
   authorizationRequest?: tpAPI.Schemas.AuthorizationsPostRequest
   initiateResponse?: ThirdpartyTransactionInitiateResponse
 
