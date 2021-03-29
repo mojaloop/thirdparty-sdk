@@ -178,6 +178,7 @@ describe('pipsTransactionModel', () => {
           transactionRequestId: '1234-1234',
           currentState: 'start',
           payeeRequest: {
+            transactionRequestId: '1234-1234',
             payee: {
               partyIdType: 'MSISDN',
               partyIdentifier: 'party-identifier'
@@ -289,6 +290,7 @@ describe('pipsTransactionModel', () => {
           transactionRequestId: '1234-1234',
           currentState: 'partyLookupSuccess',
           payeeRequest: {
+            transactionRequestId: '1234-1234',
             payee: {
               partyIdType: 'MSISDN',
               partyIdentifier: 'party-identifier'
@@ -424,6 +426,7 @@ describe('pipsTransactionModel', () => {
           transactionRequestId: '1234-1234',
           currentState: 'authorizationReceived',
           payeeRequest: {
+            transactionRequestId: '1234-1234',
             payee: {
               partyIdType: 'MSISDN',
               partyIdentifier: 'party-identifier'
