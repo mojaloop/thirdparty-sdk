@@ -14,10 +14,10 @@ post:
     content:
       application/json:
         schema:
-          $ref: '../components/schemas/ThirdpartyTransactionInitiateRequest.yaml'
+          $ref: '../components/schemas/ThirdpartyTransactionIDInitiateRequest.yaml'
   responses:
     '200':
-      $ref: '../components/responses/ThirdpartyRequestsTransactionsPostResponse.yaml'
+      $ref: '../components/responses/ThirdpartyTransactionIDInitiateResponse.yaml'
     '400':
       $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/400.yaml'
     '401':

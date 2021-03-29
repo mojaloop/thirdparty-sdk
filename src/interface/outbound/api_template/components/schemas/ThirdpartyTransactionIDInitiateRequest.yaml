@@ -1,4 +1,4 @@
-  title: ThirdpartyRequestsTransactionsPostRequest
+  title: ThirdpartyTransactionIDInitiateRequest
   type: object
   description: The object sent in the POST `/thirdpartyTransaction/{ID}/initiate` request.
   properties:

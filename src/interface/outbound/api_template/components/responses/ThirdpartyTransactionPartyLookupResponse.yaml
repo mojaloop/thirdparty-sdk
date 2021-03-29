@@ -1,4 +1,4 @@
-description: Thirdparty transaction party lookup response
+description: ThirdpartyTransaction partyLookup response
 content:
   application/json:
     schema:
@@ -8,13 +8,13 @@ content:
           type: object
           properties:
             partyIdInfo:
-              $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/schemas/PartyIdInfo.yaml'
+              $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/PartyIdInfo.yaml'
             merchantClassificationCode:
-              $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/schemas/MerchantClassificationCode.yaml'
+              $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/MerchantClassificationCode.yaml'
             name:
-              $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/schemas/PartyName.yaml'
+              $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/PartyName.yaml'
             personalInfo:
-              $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/schemas/PartyPersonalInfo.yaml'
+              $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/PartyPersonalInfo.yaml'
             accounts:
               $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/AccountList.yaml'
         currentState: 

@@ -104,10 +104,10 @@ export interface operations {
       };
     };
     requestBody: {
-      "application/json": components["schemas"]["ThirdpartyTransactionInitiateRequest"];
+      "application/json": components["schemas"]["ThirdpartyTransactionIDInitiateRequest"];
     };
     responses: {
-      200: components["responses"]["ThirdpartyRequestsTransactionsPostResponse"];
+      200: components["responses"]["ThirdpartyTransactionIDInitiateResponse"];
       400: components["responses"]["400"];
       401: components["responses"]["401"];
       403: components["responses"]["403"];
@@ -494,15 +494,46 @@ export interface components {
       | "COMPLETED"
       | "ERROR_OCCURRED";
     /**
+     * This is a variant based on FSPIOP `PartyIdType` specification.
+     * Main difference being the CONSENT and THIRD_PARTY_LINK enums.
+     *
      * Below are the allowed values for the enumeration.
-     * - MSISDN - An MSISDN (Mobile Station International Subscriber Directory Number, that is, the phone number) is used as reference to a participant. The MSISDN identifier should be in international format according to the [ITU-T E.164 standard](https://www.itu.int/rec/T-REC-E.164/en). Optionally, the MSISDN may be prefixed by a single plus sign, indicating the international prefix.
-     * - EMAIL - An email is used as reference to a participant. The format of the email should be according to the informational [RFC 3696](https://tools.ietf.org/html/rfc3696).
-     * - PERSONAL_ID - A personal identifier is used as reference to a participant. Examples of personal identification are passport number, birth certificate number, and national registration number. The identifier number is added in the PartyIdentifier element. The personal identifier type is added in the PartySubIdOrType element.
-     * - BUSINESS - A specific Business (for example, an organization or a company) is used as reference to a participant. The BUSINESS identifier can be in any format. To make a transaction connected to a specific username or bill number in a Business, the PartySubIdOrType element should be used.
-     * - DEVICE - A specific device (for example, a POS or ATM) ID connected to a specific business or organization is used as reference to a Party. For referencing a specific device under a specific business or organization, use the PartySubIdOrType element.
-     * - ACCOUNT_ID - A bank account number or FSP account ID should be used as reference to a participant. The ACCOUNT_ID identifier can be in any format, as formats can greatly differ depending on country and FSP.
-     * - IBAN - A bank account number or FSP account ID is used as reference to a participant. The IBAN identifier can consist of up to 34 alphanumeric characters and should be entered without whitespace.
-     * - ALIAS An alias is used as reference to a participant. The alias should be created in the FSP as an alternative reference to an account owner. Another example of an alias is a username in the FSP system. The ALIAS identifier can be in any format. It is also possible to use the PartySubIdOrType element for identifying an account under an Alias defined by the PartyIdentifier.
+     * - MSISDN - An MSISDN (Mobile Station International Subscriber Directory
+     * Number, that is, the phone number) is used as reference to a participant.
+     * The MSISDN identifier should be in international format according to the
+     * [ITU-T E.164 standard](https://www.itu.int/rec/T-REC-E.164/en).
+     * Optionally, the MSISDN may be prefixed by a single plus sign, indicating the
+     * international prefix.
+     * - EMAIL - An email is used as reference to a
+     * participant. The format of the email should be according to the informational
+     * [RFC 3696](https://tools.ietf.org/html/rfc3696).
+     * - PERSONAL_ID - A personal identifier is used as reference to a participant.
+     * Examples of personal identification are passport number, birth certificate
+     * number, and national registration number. The identifier number is added in
+     * the PartyIdentifier element. The personal identifier type is added in the
+     * PartySubIdOrType element.
+     * - BUSINESS - A specific Business (for example, an organization or a company)
+     * is used as reference to a participant. The BUSINESS identifier can be in any
+     * format. To make a transaction connected to a specific username or bill number
+     * in a Business, the PartySubIdOrType element should be used.
+     * - DEVICE - A specific device (for example, a POS or ATM) ID connected to a
+     * specific business or organization is used as reference to a Party.
+     * For referencing a specific device under a specific business or organization,
+     * use the PartySubIdOrType element.
+     * - ACCOUNT_ID - A bank account number or FSP account ID should be used as
+     * reference to a participant. The ACCOUNT_ID identifier can be in any format,
+     * as formats can greatly differ depending on country and FSP.
+     * - IBAN - A bank account number or FSP account ID is used as reference to a
+     * participant. The IBAN identifier can consist of up to 34 alphanumeric
+     * characters and should be entered without whitespace.
+     * - ALIAS An alias is used as reference to a participant. The alias should be
+     * created in the FSP as an alternative reference to an account owner.
+     * Another example of an alias is a username in the FSP system.
+     * The ALIAS identifier can be in any format. It is also possible to use the
+     * PartySubIdOrType element for identifying an account under an Alias defined
+     * by the PartyIdentifier.
+     * - CONSENT - TBD
+     * - THIRD_PARTY_LINK - TBD
      */
     PartyIdType:
       | "MSISDN"
@@ -512,14 +543,16 @@ export interface components {
       | "DEVICE"
       | "ACCOUNT_ID"
       | "IBAN"
-      | "ALIAS";
+      | "ALIAS"
+      | "CONSENT"
+      | "THIRD_PARTY_LINK";
     /** Identifier of the Party. */
     PartyIdentifier: string;
     /** Either a sub-identifier of a PartyIdentifier, or a sub-type of the PartyIdType, normally a PersonalIdentifierType. */
     PartySubIdOrType: string;
     /** FSP identifier. */
     FspId: string;
-    /** Data model for the complex type PartyIdInfo. An ExtensionList element has been added to this reqeust in version v1.1 */
+    /** Data model for the complex type PartyIdInfo. */
     PartyIdInfo: {
       partyIdType: components["schemas"]["PartyIdType"];
       partyIdentifier: components["schemas"]["PartyIdentifier"];
@@ -527,10 +560,10 @@ export interface components {
       fspId?: components["schemas"]["FspId"];
       extensionList?: components["schemas"]["ExtensionList"];
     };
-    /** Thirdparty transaction party lookup request */
+    /** ThirdpartyTransaction partyLookup request */
     ThirdpartyTransactionPartyLookupRequest: {
-      payee?: components["schemas"]["PartyIdInfo"];
-      transactionRequestId?: components["schemas"]["CorrelationId"];
+      payee: components["schemas"]["PartyIdInfo"];
+      transactionRequestId: components["schemas"]["CorrelationId"];
     };
     /** A limited set of pre-defined numbers. This list would be a limited set of numbers identifying a set of popular merchant types like School Fees, Pubs and Restaurants, Groceries, etc. */
     MerchantClassificationCode: string;
@@ -586,71 +619,10 @@ export interface components {
       | "partyLookupSuccess"
       | "authorizationReceived"
       | "transactionSuccess";
-    /**
-     * This is a variant based on FSPIOP `PartyIdType` specification.
-     * Main difference being the CONSENT and THIRD_PARTY_LINK enums.
-     *
-     * Below are the allowed values for the enumeration.
-     * - MSISDN - An MSISDN (Mobile Station International Subscriber Directory
-     * Number, that is, the phone number) is used as reference to a participant.
-     * The MSISDN identifier should be in international format according to the
-     * [ITU-T E.164 standard](https://www.itu.int/rec/T-REC-E.164/en).
-     * Optionally, the MSISDN may be prefixed by a single plus sign, indicating the
-     * international prefix.
-     * - EMAIL - An email is used as reference to a
-     * participant. The format of the email should be according to the informational
-     * [RFC 3696](https://tools.ietf.org/html/rfc3696).
-     * - PERSONAL_ID - A personal identifier is used as reference to a participant.
-     * Examples of personal identification are passport number, birth certificate
-     * number, and national registration number. The identifier number is added in
-     * the PartyIdentifier element. The personal identifier type is added in the
-     * PartySubIdOrType element.
-     * - BUSINESS - A specific Business (for example, an organization or a company)
-     * is used as reference to a participant. The BUSINESS identifier can be in any
-     * format. To make a transaction connected to a specific username or bill number
-     * in a Business, the PartySubIdOrType element should be used.
-     * - DEVICE - A specific device (for example, a POS or ATM) ID connected to a
-     * specific business or organization is used as reference to a Party.
-     * For referencing a specific device under a specific business or organization,
-     * use the PartySubIdOrType element.
-     * - ACCOUNT_ID - A bank account number or FSP account ID should be used as
-     * reference to a participant. The ACCOUNT_ID identifier can be in any format,
-     * as formats can greatly differ depending on country and FSP.
-     * - IBAN - A bank account number or FSP account ID is used as reference to a
-     * participant. The IBAN identifier can consist of up to 34 alphanumeric
-     * characters and should be entered without whitespace.
-     * - ALIAS An alias is used as reference to a participant. The alias should be
-     * created in the FSP as an alternative reference to an account owner.
-     * Another example of an alias is a username in the FSP system.
-     * The ALIAS identifier can be in any format. It is also possible to use the
-     * PartySubIdOrType element for identifying an account under an Alias defined
-     * by the PartyIdentifier.
-     * - CONSENT - TBD
-     * - THIRD_PARTY_LINK - TBD
-     */
-    "PartyIdType-2":
-      | "MSISDN"
-      | "EMAIL"
-      | "PERSONAL_ID"
-      | "BUSINESS"
-      | "DEVICE"
-      | "ACCOUNT_ID"
-      | "IBAN"
-      | "ALIAS"
-      | "CONSENT"
-      | "THIRD_PARTY_LINK";
-    /** Data model for the complex type PartyIdInfo. */
-    "PartyIdInfo-2": {
-      partyIdType: components["schemas"]["PartyIdType-2"];
-      partyIdentifier: components["schemas"]["PartyIdentifier"];
-      partySubIdOrType?: components["schemas"]["PartySubIdOrType"];
-      fspId?: components["schemas"]["FspId"];
-      extensionList?: components["schemas"]["ExtensionList"];
-    };
     /** Data model for the complex type Party. */
     Party: {
       accounts?: components["schemas"]["AccountList"];
-      partyIdInfo: components["schemas"]["PartyIdInfo-2"];
+      partyIdInfo: components["schemas"]["PartyIdInfo"];
       merchantClassificationCode?: components["schemas"]["MerchantClassificationCode"];
       name?: components["schemas"]["PartyName"];
       personalInfo?: components["schemas"]["PartyPersonalInfo"];
@@ -724,7 +696,7 @@ export interface components {
       balanceOfPayments?: components["schemas"]["BalanceOfPayments"];
     };
     /** The object sent in the POST `/thirdpartyTransaction/{ID}/initiate` request. */
-    ThirdpartyTransactionInitiateRequest: {
+    ThirdpartyTransactionIDInitiateRequest: {
       payee: components["schemas"]["Party"];
       payer: components["schemas"]["PartyIdInfoTPLink"];
       amountType: components["schemas"]["AmountType"];
@@ -920,7 +892,7 @@ export interface components {
         };
       };
     };
-    /** Thirdparty transaction party lookup response */
+    /** ThirdpartyTransaction partyLookup response */
     ThirdpartyTransactionPartyLookupResponse: {
       content: {
         "application/json": {
@@ -935,12 +907,12 @@ export interface components {
         };
       };
     };
-    /** Thirdparty transaction initiate response */
-    ThirdpartyRequestsTransactionsPostResponse: {
+    /** ThirdpartyTransactionIDInitiate response */
+    ThirdpartyTransactionIDInitiateResponse: {
       content: {
         "application/json": {
-          authorization?: components["schemas"]["AuthorizationsPostRequest"];
-          currentState?: components["schemas"]["ThirdpartyTransactionState"];
+          authorization: components["schemas"]["AuthorizationsPostRequest"];
+          currentState: components["schemas"]["ThirdpartyTransactionState"];
         };
       };
     };
