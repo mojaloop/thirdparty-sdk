@@ -14,10 +14,10 @@ post:
     content:
       application/json:
         schema:
-          $ref: '../components/schemas/ThirdpartyTransactionApproveRequest.yaml'
+          $ref: '../components/schemas/ThirdpartyTransactionIDApproveRequest.yaml'
   responses:
     '200':
-      $ref: '../components/responses/ThirdpartyTransactionApproveResponse.yaml'
+      $ref: '../components/responses/ThirdpartyTransactionIDApproveResponse.yaml'
     '400':
       $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/400.yaml'
     '401':

@@ -126,10 +126,10 @@ export interface operations {
       };
     };
     requestBody: {
-      "application/json": components["schemas"]["ThirdpartyTransactionApproveRequest"];
+      "application/json": components["schemas"]["ThirdpartyTransactionIDApproveRequest"];
     };
     responses: {
-      200: components["responses"]["ThirdpartyTransactionApproveResponse"];
+      200: components["responses"]["ThirdpartyTransactionIDApproveResponse"];
       400: components["responses"]["400"];
       401: components["responses"]["401"];
       403: components["responses"]["403"];
@@ -718,8 +718,8 @@ export interface components {
       authenticationInfo?: components["schemas"]["AuthenticationInfo"];
       responseType: components["schemas"]["AuthorizationResponse"];
     };
-    ThirdpartyTransactionApproveRequest: {
-      authorizationResponse?: components["schemas"]["AuthorizationsIDPutResponse"];
+    ThirdpartyTransactionIDApproveRequest: {
+      authorizationResponse: components["schemas"]["AuthorizationsIDPutResponse"];
     };
     /**
      * Below are the allowed values for the enumeration.
@@ -916,8 +916,8 @@ export interface components {
         };
       };
     };
-    /** Thirdparty transaction approve response */
-    ThirdpartyTransactionApproveResponse: {
+    /** ThirdpartyTransactionIDApprove response */
+    ThirdpartyTransactionIDApproveResponse: {
       content: {
         "application/json": {
           transactionStatus?: {

@@ -64,7 +64,6 @@ export namespace Schemas {
   export type TransactionType = components['schemas']['TransactionType']
   export type AuthorizationsPostRequest = components['schemas']['AuthorizationsPostRequest']
   export type AuthorizationsIDPutResponse = components['schemas']['AuthorizationsIDPutResponse']
-  export type ThirdpartyTransactionApproveRequest = components['schemas']['ThirdpartyTransactionApproveRequest']
   export type TransactionRequestState = components['schemas']['TransactionRequestState']
   export type BinaryString = components['schemas']['BinaryString']
   export type ThirdpartyRequestsTransactionsIDAuthorizationsPostRequest = components['schemas']['ThirdpartyRequestsTransactionsIDAuthorizationsPostRequest']

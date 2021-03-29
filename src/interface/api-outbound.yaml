@@ -194,10 +194,10 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ThirdpartyTransactionApproveRequest'
+              $ref: '#/components/schemas/ThirdpartyTransactionIDApproveRequest'
       responses:
         '200':
-          $ref: '#/components/responses/ThirdpartyTransactionApproveResponse'
+          $ref: '#/components/responses/ThirdpartyTransactionIDApproveResponse'
         '400':
           $ref: '#/components/responses/400'
         '401':
@@ -483,8 +483,8 @@ components:
             required:
               - authorization
               - currentState
-    ThirdpartyTransactionApproveResponse:
-      description: Thirdparty transaction approve response
+    ThirdpartyTransactionIDApproveResponse:
+      description: ThirdpartyTransactionIDApprove response
       content:
         application/json:
           schema:
@@ -1613,11 +1613,13 @@ components:
           $ref: '#/components/schemas/AuthorizationResponse'
       required:
         - responseType
-    ThirdpartyTransactionApproveRequest:
+    ThirdpartyTransactionIDApproveRequest:
       type: object
       properties:
         authorizationResponse:
           $ref: '#/components/schemas/AuthorizationsIDPutResponse'
+      required:
+        - authorizationResponse
     TransactionRequestState:
       title: TransactionRequestState
       type: string
