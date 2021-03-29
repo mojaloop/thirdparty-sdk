@@ -32,7 +32,7 @@ import Config from '~/shared/config'
 import mockLogger from '../../unit/mockLogger'
 import { PISPOTPValidateModelState } from '~/models/outbound/pispOTPValidate.interface';
 
-describe('PISP OTP Validate', (): void => {
+describe.only('PISP OTP Validate', (): void => {
   const config: RedisConnectionConfig = {
     host: Config.REDIS.HOST,
     port: Config.REDIS.PORT,
@@ -54,7 +54,7 @@ describe('PISP OTP Validate', (): void => {
     await kvs.disconnect()
   })
 
-  describe('/consentRequests/{ID}/validate: requestAction->succeeded', (): void => {
+  describe('/consentRequests/{ID}/validate: requestAction->OTPIsValid', (): void => {
     it('OTPValidateState should be OTPIsValid', async (): Promise<void> => {
       const consentRequestsRequest = {
         toParticipantId: 'dfspa',
@@ -79,7 +79,7 @@ describe('PISP OTP Validate', (): void => {
     })
   })
 
-  describe('/consentRequests/{ID}/validate: requestAction->succeeded error return', (): void => {
+  describe.only('/consentRequests/{ID}/validate: requestAction->errored error return', (): void => {
     it('OTPValidateState should be errored', async (): Promise<void> => {
       const consentRequestsRequest = {
         toParticipantId: 'dfspa',

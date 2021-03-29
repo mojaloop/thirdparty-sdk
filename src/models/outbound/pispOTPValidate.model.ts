@@ -39,7 +39,9 @@ import {
 import { Message } from '../../shared/pub-sub';
 import { OutboundOTPValidateConsentResponse, OutboundOTPValidateErrorResponse } from './pispOTPValidate.interface';
 
-
+// note: may need to rename this model once this handles more of the account
+//       linking flow. this model only covers steps in the authentication stage
+//       of account linking and the name might not be suitable in the future
 export class PISPOTPValidateModel
   extends PersistentModel<PISPOTPValidateStateMachine, PISPOTPValidateData> {
   protected config: PISPOTPValidateModelConfig
@@ -71,8 +73,6 @@ export class PISPOTPValidateModel
     return this.config.thirdpartyRequests
   }
 
-  // this is only used in the registerConsent step since that is the only transition
-  // that uses a pub/sub call.
   static notificationChannel (consentRequestsRequestId: string): string {
     if (!consentRequestsRequestId) {
       throw new Error('PISPOTPValidateModel.notificationChannel: \'consentRequestsRequestId\' parameter is required')
@@ -142,6 +142,14 @@ export class PISPOTPValidateModel
     }
   }
 
+  // utility function to check if an error after a transistion which
+  // that pub/subs for a response that can return a mojaloop error
+  async checkModelDataForErrorInformation(): Promise<void> {
+    if (this.data.errorInformation) {
+      await this.fsm.error()
+    }
+  }
+
   /**
    * runs the workflow
    */
@@ -160,9 +168,7 @@ export class PISPOTPValidateModel
           )
           await this.fsm.validateOTP()
           await this.saveToKVS()
-          if (this.data.errorInformation) {
-            await this.fsm.error()
-          }
+          await this.checkModelDataForErrorInformation()
           return this.getResponse()
 
         default:
