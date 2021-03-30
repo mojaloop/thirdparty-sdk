@@ -46,14 +46,10 @@ export enum RequestPartiesInformationState {
   ERROR_OCCURRED = 'ERROR_OCCURRED'
 }
 
-export enum PISPTransactionModelState {
-  start = 'start',
-  partyLookupSuccess = 'partyLookupSuccess',
-  partyLookupFailure = 'partyLookupFailure',
-  authorizationReceived = 'authorizationReceived',
-  transactionStatusReceived = 'transactionStatusReceived',
-  errored = 'errored'
-}
+export type PISPTransactionModelState =
+  OutboundAPI.Schemas.ThirdpartyTransactionPartyLookupState
+  & OutboundAPI.Schemas.ThirdpartyTransactionIDInitiateState
+  & OutboundAPI.Schemas.ThirdpartyTransactionIDApproveState
 
 export enum PISPTransactionPhase {
   lookup = 'lookup',

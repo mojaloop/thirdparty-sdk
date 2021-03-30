@@ -43,7 +43,6 @@ import {
 import {
   PISPTransactionData,
   PISPTransactionModelConfig,
-  PISPTransactionModelState,
   PISPTransactionPhase,
   PISPTransactionStateMachine,
   ThirdpartyTransactionStatus
@@ -174,7 +173,7 @@ export class PISPTransactionModel
 
   onFailPartyLookup (): void {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    this.data!.partyLookupResponse!.currentState = PISPTransactionModelState.partyLookupFailure
+    this.data!.partyLookupResponse!.currentState = 'partyLookupFailure'
   }
 
   async onInitiate (): Promise<void> {

@@ -41,7 +41,6 @@ import {
   OutboundThirdpartyAuthorizationsModelState
 } from '~/models/thirdparty.authorizations.interface'
 import {
-  PISPTransactionModelState,
   ThirdpartyTransactionStatus,
   RequestPartiesInformationState
 } from '~/models/pispTransaction.interface'
@@ -336,7 +335,7 @@ describe('Outbound API routes', (): void => {
     expect(response.statusCode).toBe(200)
     expect(response.result).toEqual({
       party: { ...partyLookupResponse.party },
-      currentState: PISPTransactionModelState.partyLookupSuccess
+      currentState: 'partyLookupSuccess'
     })
   })
 
@@ -403,7 +402,7 @@ describe('Outbound API routes', (): void => {
     expect(response.statusCode).toBe(200)
     expect(response.result).toEqual({
       authorization: { ...initiateResponse },
-      currentState: PISPTransactionModelState.authorizationReceived
+      currentState: 'authorizationReceived'
     })
   })
 
@@ -437,7 +436,7 @@ describe('Outbound API routes', (): void => {
     expect(response.statusCode).toBe(200)
     expect(response.result).toEqual({
       transactionStatus: { ...approveResponse },
-      currentState: PISPTransactionModelState.transactionStatusReceived
+      currentState: 'transactionStatusReceived'
     })
   })
 
