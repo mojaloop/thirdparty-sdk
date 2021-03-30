@@ -33,6 +33,7 @@ import {
   OutboundOTPValidateData,
   PISPOTPValidateModelState
 } from '~/models/outbound/pispOTPValidate.interface'
+import config from '~/shared/config';
 
 /**
  * Handles outbound PATCH /consentRequests/{ID} request
@@ -58,7 +59,7 @@ async function patch (_context: any, request: Request, h: StateResponseToolkit):
     key: consentRequestsRequestId,
     logger: h.getLogger(),
     thirdpartyRequests: h.getThirdpartyRequests(),
-    requestProcessingTimeoutSeconds: 3
+    requestProcessingTimeoutSeconds: config.REQUEST_PROCESSING_TIMEOUT_SECONDS
   }
 
   const model: PISPOTPValidateModel = await create(data, modelConfig)

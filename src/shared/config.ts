@@ -60,6 +60,7 @@ export interface ServiceConfig {
   ENV: string
   INBOUND: InConfig
   OUTBOUND: OutConfig
+  REQUEST_PROCESSING_TIMEOUT_SECONDS: number
   WSO2_AUTH: {
     staticToken: string
     tokenEndpoint: string
@@ -148,6 +149,11 @@ export const ConvictConfig = Convict<ServiceConfig>({
       default: 3002,
       env: 'OUTBOUND_PORT'
     }
+  },
+  REQUEST_PROCESSING_TIMEOUT_SECONDS: {
+    doc: 'The timeout for waiting for a response to a request',
+    env: 'REQUEST_PROCESSING_TIMEOUT_SECONDS',
+    default: 30
   },
   WSO2_AUTH: {
     staticToken: {

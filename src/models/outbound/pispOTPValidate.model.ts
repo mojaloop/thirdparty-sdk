@@ -95,15 +95,14 @@ export class PISPOTPValidateModel
     .init(async (channel) => {
       const res = await this.thirdpartyRequests.patchConsentRequests(
         consentRequestsRequestId,
-        { authToken: authToken }  as tpAPI.Schemas.ConsentRequestsIDPatchRequest,
+        { authToken },
         toParticipantId
       )
 
       this.logger.push({ res, channel })
         .log('ThirdpartyRequests.patchConsentRequests request call sent to peer, listening on response')
-      return Promise.resolve()
     })
-    .job((message: Message): Promise<void> => {
+    .job(async (message: Message): Promise<void> => {
       try {
         type PutResponseOrError = tpAPI.Schemas.ConsentsPostRequest & fspiopAPI.Schemas.ErrorInformationObject
         const putResponse = message as unknown as PutResponseOrError
@@ -112,7 +111,6 @@ export class PISPOTPValidateModel
         } else {
           this.data.consent = { ...message as unknown as tpAPI.Schemas.ConsentsPostRequest }
         }
-        return Promise.resolve()
 
       } catch (error) {
         this.logger.push(error).error('ThirdpartyRequests.patchConsentRequests request error')
