@@ -155,7 +155,7 @@ describe('pispOTPValidateModel', () => {
       validateData = {
         consentRequestsRequestId: '45789d6b-9423-4876-ab98-a12ff5b54195',
         authToken: '123456',
-        toDFSPParticipantId: 'pispa',
+        toParticipantId: 'pispa',
         currentState: 'start'
       }
     })

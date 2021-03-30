@@ -27,11 +27,11 @@
 import { StateResponseToolkit } from '~/server/plugins/state'
 import { Request, ResponseObject } from '@hapi/hapi'
 import { PISPOTPValidateModel, create } from '~/models/outbound/pispOTPValidate.model';
-import { PISPOTPValidateModelState } from '../../../../models/outbound/pispOTPValidate.interface';
 import {
   PISPOTPValidateData,
   PISPOTPValidateModelConfig,
-  OutboundOTPValidateData
+  OutboundOTPValidateData,
+  PISPOTPValidateModelState
 } from '~/models/outbound/pispOTPValidate.interface'
 
 /**
@@ -42,14 +42,14 @@ async function patch (_context: any, request: Request, h: StateResponseToolkit):
   const payload = request.payload as OutboundOTPValidateData
   const consentRequestsRequestId = request.params.ID
   const authToken = payload.authToken
-  const toDFSPParticipantId = payload.toParticipantId
+  const toParticipantId = payload.toParticipantId
 
   // prepare config
   const data: PISPOTPValidateData = {
     currentState: 'start',
-    consentRequestsRequestId: consentRequestsRequestId,
-    authToken: authToken,
-    toDFSPParticipantId: toDFSPParticipantId
+    consentRequestsRequestId,
+    authToken,
+    toParticipantId
   }
 
   const modelConfig: PISPOTPValidateModelConfig = {

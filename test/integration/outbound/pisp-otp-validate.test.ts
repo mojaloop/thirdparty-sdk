@@ -62,7 +62,7 @@ describe.only('PISP OTP Validate', (): void => {
       }
       const expectedResponse = {
         "consentId": "8e34f91d-d078-4077-8263-2c047876fcf6",
-        "consentRequestId": "ab049ac1-b936-4327-ab76-3e66e608beb8",
+        "consentRequestId": consentRequestsRequestId,
         "scopes": [{
             "accountId": "some-id",
             "actions": [

@@ -52,7 +52,7 @@ export interface PISPOTPValidateModelConfig extends PersistentModelConfig {
 }
 
 export interface PISPOTPValidateData extends StateData {
-  toDFSPParticipantId: string
+  toParticipantId: string
   consentRequestsRequestId: string
   authToken: string
   consent?: tpAPI.Schemas.ConsentsPostRequest

@@ -36,7 +36,7 @@ import {
   PISPOTPValidateStateMachine,
   PISPOTPValidateModelConfig
 } from './pispOTPValidate.interface';
-import { Message } from '../../shared/pub-sub';
+import { Message } from '~/shared/pub-sub';
 import { OutboundOTPValidateConsentResponse, OutboundOTPValidateErrorResponse } from './pispOTPValidate.interface';
 
 // note: may need to rename this model once this handles more of the account
@@ -82,7 +82,7 @@ export class PISPOTPValidateModel
   }
 
   async onValidateOTP (): Promise<void> {
-    const { consentRequestsRequestId, authToken, toDFSPParticipantId } = this.data
+    const { consentRequestsRequestId, authToken, toParticipantId } = this.data
 
     const channel = PISPOTPValidateModel.notificationChannel(
       consentRequestsRequestId
@@ -112,7 +112,7 @@ export class PISPOTPValidateModel
         const res = await this.thirdpartyRequests.patchConsentRequests(
           consentRequestsRequestId,
           { authToken: authToken }  as tpAPI.Schemas.ConsentRequestsIDPatchRequest,
-          toDFSPParticipantId
+          toParticipantId
         )
         this.logger.push({ res }).info('ThirdpartyRequests.patchConsentRequests request sent to peer')
       } catch (error) {
