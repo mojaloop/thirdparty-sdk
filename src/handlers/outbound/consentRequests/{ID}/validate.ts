@@ -34,6 +34,7 @@ import {
   PISPOTPValidateModelState
 } from '~/models/outbound/pispOTPValidate.interface'
 import config from '~/shared/config';
+import inspect from '~/shared/inspect';
 
 /**
  * Handles outbound PATCH /consentRequests/{ID} request
@@ -62,15 +63,21 @@ async function patch (_context: any, request: Request, h: StateResponseToolkit):
     requestProcessingTimeoutSeconds: config.REQUEST_PROCESSING_TIMEOUT_SECONDS
   }
 
-  const model: PISPOTPValidateModel = await create(data, modelConfig)
+  try {
+    const model: PISPOTPValidateModel = await create(data, modelConfig)
 
-  const result = await model.run()
-  if (!result) {
-    h.getLogger().error('outbound PATCH /consentRequests/{ID}/validate unexpected result from workflow')
+    const result = await model.run()
+    if (!result) {
+      h.getLogger().error('outbound PATCH /consentRequests/{ID}/validate unexpected result from workflow')
+      return h.response({}).code(500)
+    }
+
+    const statusCode = (result.currentState == PISPOTPValidateModelState.errored) ? 500 : 200
+    return h.response(result).code(statusCode)
+  } catch(error) {
+    h.getLogger().info(`Error running PISPOTPValidateModel : ${inspect(error)}`)
     return h.response({}).code(500)
   }
-  const statusCode = (result.currentState == PISPOTPValidateModelState.errored) ? 500 : 200
-  return h.response(result).code(statusCode)
 }
 
 export default {
