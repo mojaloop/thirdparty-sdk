@@ -1651,6 +1651,7 @@ components:
       required:
         - responseType
     ThirdpartyTransactionIDApproveRequest:
+      title: ThirdpartyTransactionIDApproveRequest
       type: object
       properties:
         authorizationResponse:
