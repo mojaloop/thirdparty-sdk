@@ -38,6 +38,7 @@ import {
 } from './pispOTPValidate.interface';
 import { Message } from '~/shared/pub-sub';
 import { OutboundOTPValidateConsentResponse, OutboundOTPValidateErrorResponse } from './pispOTPValidate.interface';
+import deferredJob from '~/shared/deferred-job';
 
 // note: may need to rename this model once this handles more of the account
 //       linking flow. this model only covers steps in the authentication stage
@@ -90,37 +91,35 @@ export class PISPOTPValidateModel
 
     this.logger.push({ channel }).info('onValidateOTP - subscribe to channel')
 
-    // eslint-disable-next-line no-async-promise-executor
-    return new Promise(async (resolve, reject) => {
-      let subId = 0
+    return deferredJob(this.pubSub, channel)
+    .init(async (channel) => {
+      const res = await this.thirdpartyRequests.patchConsentRequests(
+        consentRequestsRequestId,
+        { authToken: authToken }  as tpAPI.Schemas.ConsentRequestsIDPatchRequest,
+        toParticipantId
+      )
+
+      this.logger.push({ res, channel })
+        .log('ThirdpartyRequests.patchConsentRequests request call sent to peer, listening on response')
+      return Promise.resolve()
+    })
+    .job((message: Message): Promise<void> => {
       try {
-        // this handler will be executed when POST /consents @ Inbound server
-        subId = this.pubSub.subscribe(channel, async (channel: string, message: Message, sid: number) => {
-          // first unsubscribe
-          this.pubSub.unsubscribe(channel, sid)
+        type PutResponseOrError = tpAPI.Schemas.ConsentsPostRequest & fspiopAPI.Schemas.ErrorInformationObject
+        const putResponse = message as unknown as PutResponseOrError
+        if (putResponse.errorInformation) {
+          this.data.errorInformation = putResponse.errorInformation
+        } else {
+          this.data.consent = { ...message as unknown as tpAPI.Schemas.ConsentsPostRequest }
+        }
+        return Promise.resolve()
 
-          type PutResponseOrError = tpAPI.Schemas.ConsentsPostRequest & fspiopAPI.Schemas.ErrorInformationObject
-          const putResponse = message as unknown as PutResponseOrError
-          if (putResponse.errorInformation) {
-            this.data.errorInformation = putResponse.errorInformation
-          } else {
-            this.data.consent = { ...message as unknown as tpAPI.Schemas.ConsentsPostRequest }
-          }
-          resolve()
-        })
-
-        const res = await this.thirdpartyRequests.patchConsentRequests(
-          consentRequestsRequestId,
-          { authToken: authToken }  as tpAPI.Schemas.ConsentRequestsIDPatchRequest,
-          toParticipantId
-        )
-        this.logger.push({ res }).info('ThirdpartyRequests.patchConsentRequests request sent to peer')
       } catch (error) {
         this.logger.push(error).error('ThirdpartyRequests.patchConsentRequests request error')
-        this.pubSub.unsubscribe(channel, subId)
-        reject(error)
+        return Promise.reject(error)
       }
     })
+    .wait(this.config.requestProcessingTimeoutSeconds * 1000)
   }
 
   getResponse ():
@@ -146,7 +145,7 @@ export class PISPOTPValidateModel
   // pub/subs for a response that can return a mojaloop error
   async checkModelDataForErrorInformation(): Promise<void> {
     if (this.data.errorInformation) {
-      await this.fsm.error()
+      await this.fsm.error(this.data.errorInformation)
     }
   }
 
@@ -195,10 +194,6 @@ export class PISPOTPValidateModel
   }
 }
 
-export async function existsInKVS (config: PISPOTPValidateModelConfig): Promise<boolean> {
-  return config.kvs.exists(config.key)
-}
-
 export async function create (
   data: PISPOTPValidateData,
   config: PISPOTPValidateModelConfig
@@ -211,26 +206,8 @@ export async function create (
   return model
 }
 
-// loads PersistentModel from KVS storage using given `config` and `spec`
-export async function loadFromKVS (
-  config: PISPOTPValidateModelConfig
-): Promise<PISPOTPValidateModel> {
-  try {
-    const data = await config.kvs.get<PISPOTPValidateData>(config.key)
-    if (!data) {
-      throw new Error(`No data found in KVS for: ${config.key}`)
-    }
-    config.logger.push({ data }).info('data loaded from KVS')
-    return create(data, config)
-  } catch (err) {
-    config.logger.push({ err }).info(`Error loading data from KVS for key: ${config.key}`)
-    throw err
-  }
-}
 
 export default {
   PISPOTPValidateModel,
-  existsInKVS,
   create,
-  loadFromKVS
 }

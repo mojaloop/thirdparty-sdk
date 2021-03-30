@@ -58,6 +58,7 @@ async function patch (_context: any, request: Request, h: StateResponseToolkit):
     key: consentRequestsRequestId,
     logger: h.getLogger(),
     thirdpartyRequests: h.getThirdpartyRequests(),
+    requestProcessingTimeoutSeconds: 3
   }
 
   const model: PISPOTPValidateModel = await create(data, modelConfig)

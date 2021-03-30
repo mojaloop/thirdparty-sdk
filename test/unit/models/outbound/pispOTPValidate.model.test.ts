@@ -39,7 +39,6 @@ import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
 import {
   PISPOTPValidateModel,
   create,
-  loadFromKVS
 } from '~/models/outbound/pispOTPValidate.model'
 import { RedisConnectionConfig } from '~/shared/redis-connection'
 import { mocked } from 'ts-jest/utils'
@@ -74,6 +73,7 @@ describe('pispOTPValidateModel', () => {
       thirdpartyRequests: {
         patchConsentRequests: jest.fn(() => Promise.resolve({ statusCode: 202 })),
       } as unknown as ThirdpartyRequests,
+      requestProcessingTimeoutSeconds: 3
     }
     mocked(modelConfig.pubSub.subscribe).mockImplementationOnce(
       (_channel: string, cb: NotificationCallback) => {
@@ -125,7 +125,6 @@ describe('pispOTPValidateModel', () => {
 
   it('module layout', () => {
     expect(typeof PISPOTPValidateModel).toEqual('function')
-    expect(typeof loadFromKVS).toEqual('function')
     expect(typeof create).toEqual('function')
   })
 

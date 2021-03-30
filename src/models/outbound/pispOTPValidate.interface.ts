@@ -49,6 +49,7 @@ export interface PISPOTPValidateStateMachine extends ControlledStateMachine {
 export interface PISPOTPValidateModelConfig extends PersistentModelConfig {
   pubSub: PubSub
   thirdpartyRequests: ThirdpartyRequests
+  requestProcessingTimeoutSeconds: number
 }
 
 export interface PISPOTPValidateData extends StateData {
