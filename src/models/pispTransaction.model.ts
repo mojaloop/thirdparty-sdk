@@ -48,7 +48,6 @@ import {
   PISPTransactionStateMachine,
   ThirdpartyTransactionApproveResponse,
   ThirdpartyTransactionInitiateResponse,
-  ThirdpartyTransactionPartyLookupResponse,
   ThirdpartyTransactionStatus
 } from './pispTransaction.interface'
 import inspect from '~/shared/inspect'
@@ -147,14 +146,12 @@ export class PISPTransactionModel
     try {
       // call GET /parties on sdk-scheme-adapter Outbound service
       const response = this.data.payeeResolved = await this.sdkOutgoingRequests.requestPartiesInformation(
-        payee!.partyIdType, payee!.partyIdentifier, payee!.partySubIdOrType
+        payee.partyIdType, payee.partyIdentifier, payee.partySubIdOrType
       ) as SDKOutboundAPI.Schemas.partiesByIdResponse
 
       this.data.partyLookupResponse = {
         party: response.party,
-        currentState: PISPTransactionModelState[
-          this.data.currentState as keyof typeof PISPTransactionModelState
-        ]
+        currentState: this.data.currentState as OutboundAPI.Schemas.ThirdpartyTransactionPartyLookupState
       }
     } catch (error) {
       this.logger.push({ error }).error('onRequestPartyLookup -> requestPartiesInformation')
@@ -166,9 +163,7 @@ export class PISPTransactionModel
           await this.fsm.error()
           this.data.partyLookupResponse = {
             errorInformation: errorData.res.data.errorInformation,
-            currentState: PISPTransactionModelState[
-              this.data.currentState as keyof typeof PISPTransactionModelState
-            ]
+            currentState: this.data.currentState as OutboundAPI.Schemas.ThirdpartyTransactionPartyLookupState
           }
           // error handled, no need to rethrow
           return
@@ -282,7 +277,7 @@ export class PISPTransactionModel
   /**
    * depending on current state of model returns proper result
    */
-  getResponse (): ThirdpartyTransactionPartyLookupResponse |
+  getResponse (): OutboundAPI.Schemas.ThirdpartyTransactionPartyLookupResponse |
   ThirdpartyTransactionInitiateResponse |
   ThirdpartyTransactionApproveResponse |
   void {
@@ -302,7 +297,7 @@ export class PISPTransactionModel
    * runs the workflow
    */
   async run (): Promise<
-  ThirdpartyTransactionPartyLookupResponse |
+  OutboundAPI.Schemas.ThirdpartyTransactionPartyLookupResponse |
   ThirdpartyTransactionInitiateResponse |
   ThirdpartyTransactionApproveResponse |
   void
@@ -320,7 +315,11 @@ export class PISPTransactionModel
             `requestPartyLookup requested for ${data.transactionRequestId},  currentState: ${data.currentState}`
           )
           await this.fsm.requestPartyLookup()
-          if (this.data.partyLookupResponse?.errorInformation) {
+          if (
+            (
+              this.data.partyLookupResponse as OutboundAPI.Schemas.ThirdpartyTransactionPartyLookupResponseError
+            ).errorInformation
+          ) {
             await this.fsm.failPartyLookup()
             this.logger.info('requestPartyLookup failed')
           } else {

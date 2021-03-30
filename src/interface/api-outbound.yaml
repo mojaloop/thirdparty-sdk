@@ -452,23 +452,7 @@ components:
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              party:
-                type: object
-                properties:
-                  partyIdInfo:
-                    $ref: '#/components/schemas/PartyIdInfo'
-                  merchantClassificationCode:
-                    $ref: '#/components/schemas/MerchantClassificationCode'
-                  name:
-                    $ref: '#/components/schemas/PartyName'
-                  personalInfo:
-                    $ref: '#/components/schemas/PartyPersonalInfo'
-                  accounts:
-                    $ref: '#/components/schemas/AccountList'
-              currentState:
-                $ref: '#/components/schemas/ThirdpartyTransactionState'
+            $ref: '#/components/schemas/ThirdpartyTransactionPartyLookupResponse'
     ThirdpartyTransactionIDInitiateResponse:
       description: ThirdpartyTransactionIDInitiate response
       content:
@@ -1230,6 +1214,25 @@ components:
       required:
         - payee
         - transactionRequestId
+    ThirdpartyTransactionPartyLookupState:
+      title: ThirdpartyTransactionPartyLookupState
+      description: state of thirdparty transaction partyLookup phase
+      type: string
+      enum:
+        - start
+        - partyLookupSuccess
+        - partyLookupFailure
+        - errored
+    ThirdpartyTransactionPartyLookupResponseError:
+      type: object
+      properties:
+        currentState:
+          $ref: '#/components/schemas/ThirdpartyTransactionPartyLookupState'
+        errorInformation:
+          $ref: '#/components/schemas/ErrorInformation'
+      required:
+        - errorInformation
+        - currentState
     MerchantClassificationCode:
       title: MerchantClassificationCode
       type: string
@@ -1354,15 +1357,31 @@ components:
           description: Accounts associated with the Party.
       required:
         - account
-    ThirdpartyTransactionState:
-      title: ThirdpartyTransactionState
-      description: state of thirdparty transaction
-      type: string
-      enum:
-        - start
-        - partyLookupSuccess
-        - authorizationReceived
-        - transactionSuccess
+    ThirdpartyTransactionPartyLookupResponseSuccess:
+      type: object
+      properties:
+        currentState:
+          $ref: '#/components/schemas/ThirdpartyTransactionPartyLookupState'
+        party:
+          type: object
+          properties:
+            partyIdInfo:
+              $ref: '#/components/schemas/PartyIdInfo'
+            merchantClassificationCode:
+              $ref: '#/components/schemas/MerchantClassificationCode'
+            name:
+              $ref: '#/components/schemas/PartyName'
+            personalInfo:
+              $ref: '#/components/schemas/PartyPersonalInfo'
+            accounts:
+              $ref: '#/components/schemas/AccountList'
+      required:
+        - party
+        - currentState
+    ThirdpartyTransactionPartyLookupResponse:
+      oneOf:
+        - $ref: '#/components/schemas/ThirdpartyTransactionPartyLookupResponseError'
+        - $ref: '#/components/schemas/ThirdpartyTransactionPartyLookupResponseSuccess'
     Party:
       title: Party
       type: object
@@ -1602,6 +1621,17 @@ components:
         - transactionRequestId
         - quote
       additionalProperties: false
+    ThirdpartyTransactionState:
+      title: ThirdpartyTransactionState
+      description: state of thirdparty transaction
+      type: string
+      enum:
+        - start
+        - partyLookupSuccess
+        - partyLookupFailure
+        - authorizationReceived
+        - transactionStatusReceived
+        - errored
     AuthorizationsIDPutResponse:
       title: AuthorizationsIDPutResponse
       type: object

@@ -565,6 +565,16 @@ export interface components {
       payee: components['schemas']['PartyIdInfo'];
       transactionRequestId: components['schemas']['CorrelationId'];
     };
+    /** state of thirdparty transaction partyLookup phase */
+    ThirdpartyTransactionPartyLookupState:
+    | 'start'
+    | 'partyLookupSuccess'
+    | 'partyLookupFailure'
+    | 'errored';
+    ThirdpartyTransactionPartyLookupResponseError: {
+      currentState: components['schemas']['ThirdpartyTransactionPartyLookupState'];
+      errorInformation: components['schemas']['ErrorInformation'];
+    };
     /** A limited set of pre-defined numbers. This list would be a limited set of numbers identifying a set of popular merchant types like School Fees, Pubs and Restaurants, Groceries, etc. */
     MerchantClassificationCode: string;
     /** Name of the Party. Could be a real name or a nickname. */
@@ -613,12 +623,19 @@ export interface components {
       /** Accounts associated with the Party. */
       account: components['schemas']['Account'][];
     };
-    /** state of thirdparty transaction */
-    ThirdpartyTransactionState:
-    | 'start'
-    | 'partyLookupSuccess'
-    | 'authorizationReceived'
-    | 'transactionSuccess';
+    ThirdpartyTransactionPartyLookupResponseSuccess: {
+      currentState: components['schemas']['ThirdpartyTransactionPartyLookupState'];
+      party: {
+        partyIdInfo?: components['schemas']['PartyIdInfo'];
+        merchantClassificationCode?: components['schemas']['MerchantClassificationCode'];
+        name?: components['schemas']['PartyName'];
+        personalInfo?: components['schemas']['PartyPersonalInfo'];
+        accounts?: components['schemas']['AccountList'];
+      };
+    };
+    ThirdpartyTransactionPartyLookupResponse:
+    | components['schemas']['ThirdpartyTransactionPartyLookupResponseError']
+    | components['schemas']['ThirdpartyTransactionPartyLookupResponseSuccess'];
     /** Data model for the complex type Party. */
     Party: {
       accounts?: components['schemas']['AccountList'];
@@ -713,6 +730,14 @@ export interface components {
       transactionRequestId: components['schemas']['CorrelationId'];
       quote: components['schemas']['QuotesIDPutResponse'];
     };
+    /** state of thirdparty transaction */
+    ThirdpartyTransactionState:
+    | 'start'
+    | 'partyLookupSuccess'
+    | 'partyLookupFailure'
+    | 'authorizationReceived'
+    | 'transactionStatusReceived'
+    | 'errored';
     /** The object sent in the PUT /authorizations/{ID} callback. */
     AuthorizationsIDPutResponse: {
       authenticationInfo?: components['schemas']['AuthenticationInfo'];
@@ -895,16 +920,7 @@ export interface components {
     /** ThirdpartyTransaction partyLookup response */
     ThirdpartyTransactionPartyLookupResponse: {
       content: {
-        'application/json': {
-          party?: {
-            partyIdInfo?: components['schemas']['PartyIdInfo'];
-            merchantClassificationCode?: components['schemas']['MerchantClassificationCode'];
-            name?: components['schemas']['PartyName'];
-            personalInfo?: components['schemas']['PartyPersonalInfo'];
-            accounts?: components['schemas']['AccountList'];
-          };
-          currentState?: components['schemas']['ThirdpartyTransactionState'];
-        };
+        'application/json': components['schemas']['ThirdpartyTransactionPartyLookupResponse'];
       };
     };
     /** ThirdpartyTransactionIDInitiate response */

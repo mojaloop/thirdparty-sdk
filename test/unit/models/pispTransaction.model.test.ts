@@ -38,7 +38,6 @@ import {
   RequestPartiesInformationState,
   ThirdpartyTransactionApproveResponse,
   ThirdpartyTransactionInitiateResponse,
-  ThirdpartyTransactionPartyLookupResponse,
   ThirdpartyTransactionStatus
 } from '~/models/pispTransaction.interface'
 import {
@@ -58,6 +57,7 @@ import {
 } from '@mojaloop/api-snippets'
 import { HTTPResponseError } from '~/shared/http-response-error'
 import { SDKOutgoingRequests } from '~/shared/sdk-outgoing-requests'
+import * as OutboundAPI from '~/interface/outbound/api_interfaces'
 
 // mock KVS default exported class
 jest.mock('~/shared/kvs')
@@ -599,7 +599,7 @@ describe('pipsTransactionModel', () => {
       expect(model.getResponse()).toBeUndefined()
 
       model.data.currentState = 'partyLookupSuccess'
-      model.data.partyLookupResponse = { am: 'party-lookup-mocked-response' } as unknown as ThirdpartyTransactionPartyLookupResponse
+      model.data.partyLookupResponse = { am: 'party-lookup-mocked-response' } as unknown as OutboundAPI.Schemas.ThirdpartyTransactionPartyLookupResponse
       expect(model.getResponse()).toEqual({ am: 'party-lookup-mocked-response' })
 
       model.data.currentState = 'authorizationReceived'

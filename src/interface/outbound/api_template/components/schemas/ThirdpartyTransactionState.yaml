@@ -4,5 +4,7 @@ type: string
 enum:
   - start
   - partyLookupSuccess
+  - partyLookupFailure
   - authorizationReceived
-  - transactionSuccess  
+  - transactionStatusReceived
+  - errored  

@@ -442,60 +442,62 @@ describe('Inbound API routes', (): void => {
     )
   })
 
-  it('/thirdpartyRequests/transactions should error on failed verifyConsentId', async (): Promise<void> => {
-    jest.mock('~/domain/thirdpartyRequests/transactions', () => ({
-      verifySourceAccountId: jest.fn(() => false)
-    }))
-    const request = {
-      method: 'POST',
-      url: '/thirdpartyRequests/transactions',
-      payload: JSON.stringify(postThirdpartyRequestsTransactionRequest)
-    }
+  describe('/thirdpartyRequests/transactions', () => {
+    it('/thirdpartyRequests/transactions should error on failed verifyConsentId', async (): Promise<void> => {
+      jest.mock('~/domain/thirdpartyRequests/transactions', () => ({
+        verifySourceAccountId: jest.fn(() => false)
+      }))
+      const request = {
+        method: 'POST',
+        url: '/thirdpartyRequests/transactions',
+        payload: JSON.stringify(postThirdpartyRequestsTransactionRequest)
+      }
 
-    const response = await server.inject(request)
-    expect(response.statusCode).toBe(400)
-  })
+      const response = await server.inject(request)
+      expect(response.statusCode).toBe(400)
+    })
 
-  it('/thirdpartyRequests/transactions should error on failed verifyPispId', async (): Promise<void> => {
-    jest.mock('~/domain/thirdpartyRequests/transactions', () => ({
-      verifyPispId: jest.fn(() => false)
-    }))
-    const request = {
-      method: 'POST',
-      url: '/thirdpartyRequests/transactions',
-      payload: JSON.stringify(postThirdpartyRequestsTransactionRequest)
-    }
+    it('/thirdpartyRequests/transactions should error on failed verifyPispId', async (): Promise<void> => {
+      jest.mock('~/domain/thirdpartyRequests/transactions', () => ({
+        verifyPispId: jest.fn(() => false)
+      }))
+      const request = {
+        method: 'POST',
+        url: '/thirdpartyRequests/transactions',
+        payload: JSON.stringify(postThirdpartyRequestsTransactionRequest)
+      }
 
-    const response = await server.inject(request)
-    expect(response.statusCode).toBe(400)
-  })
+      const response = await server.inject(request)
+      expect(response.statusCode).toBe(400)
+    })
 
-  it('/thirdpartyRequests/transactions should error on failed verifySourceAccountId', async (): Promise<void> => {
-    jest.mock('~/domain/thirdpartyRequests/transactions', () => ({
-      verifySourceAccountId: jest.fn(() => false)
-    }))
-    const request = {
-      method: 'POST',
-      url: '/thirdpartyRequests/transactions',
-      payload: JSON.stringify(postThirdpartyRequestsTransactionRequest)
-    }
+    it('/thirdpartyRequests/transactions should error on failed verifySourceAccountId', async (): Promise<void> => {
+      jest.mock('~/domain/thirdpartyRequests/transactions', () => ({
+        verifySourceAccountId: jest.fn(() => false)
+      }))
+      const request = {
+        method: 'POST',
+        url: '/thirdpartyRequests/transactions',
+        payload: JSON.stringify(postThirdpartyRequestsTransactionRequest)
+      }
 
-    const response = await server.inject(request)
-    expect(response.statusCode).toBe(400)
-  })
+      const response = await server.inject(request)
+      expect(response.statusCode).toBe(400)
+    })
 
-  it('/thirdpartyRequests/transactions should error on failed validateGrantedConsent', async (): Promise<void> => {
-    jest.mock('~/domain/thirdpartyRequests/transactions', () => ({
-      validateGrantedConsent: jest.fn(() => false)
-    }))
-    const request = {
-      method: 'POST',
-      url: '/thirdpartyRequests/transactions',
-      payload: JSON.stringify(postThirdpartyRequestsTransactionRequest)
-    }
+    it('/thirdpartyRequests/transactions should error on failed validateGrantedConsent', async (): Promise<void> => {
+      jest.mock('~/domain/thirdpartyRequests/transactions', () => ({
+        validateGrantedConsent: jest.fn(() => false)
+      }))
+      const request = {
+        method: 'POST',
+        url: '/thirdpartyRequests/transactions',
+        payload: JSON.stringify(postThirdpartyRequestsTransactionRequest)
+      }
 
-    const response = await server.inject(request)
-    expect(response.statusCode).toBe(400)
+      const response = await server.inject(request)
+      expect(response.statusCode).toBe(400)
+    })
   })
 
   describe('/thirdpartyRequests/transactions/{ID}/authorizations', () => {
@@ -655,7 +657,7 @@ describe('Inbound API routes', (): void => {
     it('handler && pubSub invocation', async (): Promise<void> => {
       const request = {
         headers: {
-          'accept': 'application/json'
+          accept: 'application/json'
         },
         payload: postConsentRequest
       }
@@ -692,7 +694,7 @@ describe('Inbound API routes', (): void => {
         headers: {
           'Content-Type': 'application/json',
           'FSPIOP-Source': 'switch',
-          'Accept': 'application/json',
+          Accept: 'application/json',
           Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
           'FSPIOP-Destination': 'dfspA'
         },
@@ -708,14 +710,14 @@ describe('Inbound API routes', (): void => {
       const request = {
         payload: patchConsentRequestsRequest,
         params: {
-          ID: "520f9165-7be6-4a40-9fc8-b30fcf4f62ab"
+          ID: '520f9165-7be6-4a40-9fc8-b30fcf4f62ab'
         },
         headers: {
           'Content-Type': 'application/json',
           'FSPIOP-Source': 'switch',
           Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
           'FSPIOP-Destination': 'dfspA'
-        },
+        }
       }
       const pubSubMock = {
         publish: jest.fn()
@@ -729,7 +731,7 @@ describe('Inbound API routes', (): void => {
         })),
         getLogger: jest.fn(() => logger),
         getDFSPBackendRequests: jest.fn(),
-        getThirdpartyRequests: jest.fn(),
+        getThirdpartyRequests: jest.fn()
       }
 
       const result = await ConsentRequestsIdHandler.patch(

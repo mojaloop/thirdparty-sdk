@@ -2,20 +2,4 @@ description: ThirdpartyTransaction partyLookup response
 content:
   application/json:
     schema:
-      type: object
-      properties:
-        party:
-          type: object
-          properties:
-            partyIdInfo:
-              $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/PartyIdInfo.yaml'
-            merchantClassificationCode:
-              $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/MerchantClassificationCode.yaml'
-            name:
-              $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/PartyName.yaml'
-            personalInfo:
-              $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/PartyPersonalInfo.yaml'
-            accounts:
-              $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/AccountList.yaml'
-        currentState: 
-          $ref: '../../components/schemas/ThirdpartyTransactionState.yaml'
+      $ref: '../schemas/ThirdpartyTransactionPartyLookupResponse.yaml'

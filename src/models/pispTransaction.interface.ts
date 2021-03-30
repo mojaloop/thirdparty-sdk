@@ -36,7 +36,6 @@ import {
 import { OutboundAPI as SDKOutboundAPI } from '@mojaloop/sdk-scheme-adapter'
 import { Method } from 'javascript-state-machine'
 import * as OutboundAPI from '~/interface/outbound/api_interfaces'
-import { ErrorInformation } from '~/interface/types'
 import { ControlledStateMachine, StateData, PersistentModelConfig } from '~/models/persistent.model'
 import { PubSub } from '~/shared/pub-sub'
 import { SDKOutgoingRequests } from '~/shared/sdk-outgoing-requests'
@@ -79,13 +78,6 @@ export interface PISPTransactionModelConfig extends PersistentModelConfig {
   mojaloopRequests: MojaloopRequests
   sdkOutgoingRequests: SDKOutgoingRequests
 }
-
-export interface ThirdpartyTransactionPartyLookupResponse {
-  party?: tpAPI.Schemas.Party
-  errorInformation?: ErrorInformation
-  currentState: PISPTransactionModelState
-}
-
 export interface ThirdpartyTransactionInitiateResponse {
   authorization: tpAPI.Schemas.AuthorizationsPostRequest
   currentState: PISPTransactionModelState
@@ -112,7 +104,7 @@ export interface PISPTransactionData extends StateData {
   // party lookup
   payeeRequest?: OutboundAPI.Schemas.ThirdpartyTransactionPartyLookupRequest
   payeeResolved?: SDKOutboundAPI.Schemas.partiesByIdResponse
-  partyLookupResponse?: ThirdpartyTransactionPartyLookupResponse
+  partyLookupResponse?: OutboundAPI.Schemas.ThirdpartyTransactionPartyLookupResponse
 
   // initiate
   initiateRequest?: OutboundAPI.Schemas.ThirdpartyTransactionIDInitiateRequest
