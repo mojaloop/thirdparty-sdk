@@ -300,7 +300,7 @@ export const ConvictConfig = Convict<ServiceConfig>({
     DFSP_BACKEND_GET_SCOPES_PATH: {
       doc: 'uri to sdk-scheme-adapter getScopes endpoint',
       format: '*',
-      default: '{ID}/scopes'
+      default: 'scopes/{ID}'
     },
     PISP_BACKEND_URI: {
       doc: 'host address of DFSP\'s ',
