@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+### [11.30.4](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.30.3...v11.30.4) (2021-03-30)
+
+
+### Code Refactor
+
+* 2060 pisp transaction model transaction request ([#74](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/74)) ([6a38727](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/6a387270fd46909af8bad5a43193eb8532a29d18))
+
 ### [11.30.3](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.30.2...v11.30.3) (2021-03-26)
 
 
