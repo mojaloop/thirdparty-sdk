@@ -1,4 +1,25 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+### [11.30.3](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.30.2...v11.30.3) (2021-03-26)
+
+
+### Bug Fixes
+
+* correct getUserAccounts url in dfsp-backend-requests ([#73](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/73)) ([be86853](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/be8685362942439729dba44606cf9975057f295f))
+
+### [11.30.2](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.30.1...v11.30.2) (2021-03-25)
+
+
+### Code Refactor
+
+* rework inbound DFSP otp validate workflow ([#72](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/72)) ([b98816b](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/b98816bd86a1cd773c5a09fcf19663bfb2b4182d))
+
+### [11.30.1](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.30.0...v11.30.1) (2021-03-25)
+
+
+### Bug Fixes
+
+* move dependency and fix mocking in tests ([#70](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/70)) ([50087ad](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/50087adefb7d3a8bc6df1d4de8852eb5ea2828f6))
+
 ## [11.30.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.29.1...v11.30.0) (2021-03-25)
 
 

@@ -129,11 +129,12 @@ jest.mock('~/models/inbound/authorizations.model', () => ({
   }))
 }))
 
-const mockInboundPostConsents = jest.fn(() => Promise.resolve())
-jest.mock('~/models/inbound/consentRequests.model', () => ({
-  InboundConsentRequestsRequestModel: jest.fn(() => ({
-    postConsentsRequest: mockInboundPostConsents
-  }))
+jest.mock('~/models/inbound/dfspOTPValidate.model', () => ({
+  DFSPOTPValidateModel: jest.fn(() => {
+    return {
+      run: jest.fn()
+    }
+  }),
 }))
 
 const putResponse: fspiopAPI.Schemas.AuthorizationsIDPutResponse = {
@@ -730,8 +731,26 @@ describe('Inbound API routes', (): void => {
           }))
         })),
         getLogger: jest.fn(() => logger),
-        getDFSPBackendRequests: jest.fn(),
-        getThirdpartyRequests: jest.fn()
+        getDFSPBackendRequests: jest.fn(() => ({
+          validateOTPSecret: jest.fn(() => Promise.resolve({
+            isValid: true
+          })),
+          getScopes: jest.fn(() => Promise.resolve({
+            scopes: [{
+              "accountId": "some-id",
+              "actions": [
+                "accounts.getBalance",
+                "accounts.transfer"
+              ]
+            }]
+          })),
+        })),
+        getThirdpartyRequests: jest.fn(() => ({
+          postConsents: jest.fn()
+        })),
+        getKVS: jest.fn(() => ({
+          set: jest.fn()
+        })),
       }
 
       const result = await ConsentRequestsIdHandler.patch(
