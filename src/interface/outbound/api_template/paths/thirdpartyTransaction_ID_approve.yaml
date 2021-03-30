@@ -1,5 +1,5 @@
 post:
-  operationId: ApproveThirdpartyTransaction
+  operationId: ThirdpartyTransactionIDApprove
   summary: Approve a third party transaction.
   description: >
     The HTTP request `POST /thirdpartyTransaction/{ID}/approve` is used to approve a third party transaction .
@@ -14,10 +14,10 @@ post:
     content:
       application/json:
         schema:
-          $ref: '../components/schemas/ThirdpartyTransactionApproveRequest.yaml'
+          $ref: '../components/schemas/ThirdpartyTransactionIDApproveRequest.yaml'
   responses:
     '200':
-      $ref: '../components/responses/ThirdpartyTransactionApproveResponse.yaml'
+      $ref: '../components/responses/ThirdpartyTransactionIDApproveResponse.yaml'
     '400':
       $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/400.yaml'
     '401':

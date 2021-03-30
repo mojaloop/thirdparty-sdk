@@ -1,0 +1,10 @@
+title: ThirdpartyTransactionPartyLookupResponseError
+type: object
+properties:
+  currentState: 
+    $ref: './ThirdpartyTransactionPartyLookupState.yaml'
+  errorInformation:
+    $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/ErrorInformation.yaml'
+required: 
+  - errorInformation
+  - currentState

@@ -36,9 +36,6 @@ import {
   PISPTransactionModelConfig,
   PISPTransactionPhase,
   RequestPartiesInformationState,
-  ThirdpartyTransactionApproveResponse,
-  ThirdpartyTransactionInitiateResponse,
-  ThirdpartyTransactionPartyLookupResponse,
   ThirdpartyTransactionStatus
 } from '~/models/pispTransaction.interface'
 import {
@@ -58,6 +55,7 @@ import {
 } from '@mojaloop/api-snippets'
 import { HTTPResponseError } from '~/shared/http-response-error'
 import { SDKOutgoingRequests } from '~/shared/sdk-outgoing-requests'
+import * as OutboundAPI from '~/interface/outbound/api_interfaces'
 
 // mock KVS default exported class
 jest.mock('~/shared/kvs')
@@ -178,6 +176,7 @@ describe('pipsTransactionModel', () => {
           transactionRequestId: '1234-1234',
           currentState: 'start',
           payeeRequest: {
+            transactionRequestId: '1234-1234',
             payee: {
               partyIdType: 'MSISDN',
               partyIdentifier: 'party-identifier'
@@ -289,6 +288,7 @@ describe('pipsTransactionModel', () => {
           transactionRequestId: '1234-1234',
           currentState: 'partyLookupSuccess',
           payeeRequest: {
+            transactionRequestId: '1234-1234',
             payee: {
               partyIdType: 'MSISDN',
               partyIdentifier: 'party-identifier'
@@ -301,11 +301,9 @@ describe('pipsTransactionModel', () => {
           initiateRequest: {
             payee: party,
             payer: {
-              partyIdInfo: {
-                fspId: 'payer-fsp-id',
-                partyIdType: 'THIRD_PARTY_LINK',
-                partyIdentifier: 'payer-party-identifier'
-              }
+              fspId: 'payer-fsp-id',
+              partyIdType: 'THIRD_PARTY_LINK',
+              partyIdentifier: 'payer-party-identifier'
             },
             amountType: 'SEND' as tpAPI.Schemas.AmountType,
             amount: {
@@ -371,7 +369,7 @@ describe('pipsTransactionModel', () => {
             transactionRequestId: data.transactionRequestId,
             ...data.initiateRequest
           },
-          data.initiateRequest?.payer.partyIdInfo.fspId
+          data.initiateRequest?.payer.fspId
         )
       })
 
@@ -426,6 +424,7 @@ describe('pipsTransactionModel', () => {
           transactionRequestId: '1234-1234',
           currentState: 'authorizationReceived',
           payeeRequest: {
+            transactionRequestId: '1234-1234',
             payee: {
               partyIdType: 'MSISDN',
               partyIdentifier: 'party-identifier'
@@ -438,11 +437,9 @@ describe('pipsTransactionModel', () => {
           initiateRequest: {
             payee: party,
             payer: {
-              partyIdInfo: {
-                fspId: 'payer-fsp-id',
-                partyIdType: 'THIRD_PARTY_LINK',
-                partyIdentifier: 'payer-party-identifier'
-              }
+              fspId: 'payer-fsp-id',
+              partyIdType: 'THIRD_PARTY_LINK',
+              partyIdentifier: 'payer-party-identifier'
             },
             amountType: 'SEND' as tpAPI.Schemas.AmountType,
             amount: {
@@ -509,7 +506,7 @@ describe('pipsTransactionModel', () => {
         expect(modelConfig.mojaloopRequests.putAuthorizations).toBeCalledWith(
           data.transactionRequestId,
           authorizationResponse,
-          data.initiateRequest?.payer.partyIdInfo.fspId
+          data.initiateRequest?.payer.fspId
         )
       })
 
@@ -600,15 +597,15 @@ describe('pipsTransactionModel', () => {
       expect(model.getResponse()).toBeUndefined()
 
       model.data.currentState = 'partyLookupSuccess'
-      model.data.partyLookupResponse = { am: 'party-lookup-mocked-response' } as unknown as ThirdpartyTransactionPartyLookupResponse
+      model.data.partyLookupResponse = { am: 'party-lookup-mocked-response' } as unknown as OutboundAPI.Schemas.ThirdpartyTransactionPartyLookupResponse
       expect(model.getResponse()).toEqual({ am: 'party-lookup-mocked-response' })
 
       model.data.currentState = 'authorizationReceived'
-      model.data.initiateResponse = { am: 'authorization-received-mocked-response' } as unknown as ThirdpartyTransactionInitiateResponse
+      model.data.initiateResponse = { am: 'authorization-received-mocked-response' } as unknown as OutboundAPI.Schemas.ThirdpartyTransactionIDInitiateResponse
       expect(model.getResponse()).toEqual({ am: 'authorization-received-mocked-response' })
 
       model.data.currentState = 'transactionStatusReceived'
-      model.data.approveResponse = { am: 'transaction-status-mocked-response' } as unknown as ThirdpartyTransactionApproveResponse
+      model.data.approveResponse = { am: 'transaction-status-mocked-response' } as unknown as OutboundAPI.Schemas.ThirdpartyTransactionIDApproveResponse
       expect(model.getResponse()).toEqual({ am: 'transaction-status-mocked-response' })
     })
   })

@@ -485,22 +485,15 @@ paths:
               $ref: '#/components/schemas/ThirdpartyRequestsTransactionsPostRequest'
             example:
               transactionRequestId: 8d34f91d-d078-4077-8263-2c047876fcf6
-              sourceAccountId: dfspa.alice.1234
-              consentId: '111'
               payee:
                 partyIdInfo:
                   partyIdType: MSISDN
                   partyIdentifier: +44 1234 5678
                   fspId: dfspb
               payer:
-                personalInfo:
-                  complexName:
-                    firstName: Alice
-                    lastName: K
-                partyIdInfo:
-                  partyIdType: MSISDN
-                  partyIdentifier: +44 8765 4321
-                  fspId: dfspa
+                partyIdType: THIRD_PARTY_LINK
+                partyIdentifier: qwerty-123456
+                fspId: dfspa
               amountType: SEND
               amount:
                 amount: '100'
@@ -2181,23 +2174,6 @@ components:
       required:
         - partyIdType
         - partyIdentifier
-    PartyTPLink:
-      title: Party
-      type: object
-      description: Data model for the complex type Party.
-      properties:
-        accounts:
-          $ref: '#/components/schemas/AccountList'
-        partyIdInfo:
-          $ref: '#/components/schemas/PartyIdInfoTPLink'
-        merchantClassificationCode:
-          $ref: '#/components/schemas/MerchantClassificationCode'
-        name:
-          $ref: '#/components/schemas/PartyName'
-        personalInfo:
-          $ref: '#/components/schemas/PartyPersonalInfo'
-      required:
-        - partyIdInfo
     AmountType:
       title: AmountType
       type: string
@@ -2354,7 +2330,7 @@ components:
           description: Information about the Payee in the proposed financial transaction.
         payer:
           allOf:
-            - $ref: '#/components/schemas/PartyTPLink'
+            - $ref: '#/components/schemas/PartyIdInfoTPLink'
           description: Information about the Payer in the proposed financial transaction.
         amountType:
           allOf:

@@ -1,0 +1,10 @@
+title: ThirdpartyTransactionIDApproveResponseError
+type: object
+properties:
+  currentState:
+    $ref: './ThirdpartyTransactionIDApproveState.yaml'
+  errorInformation:
+      $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/ErrorInformation.yaml'
+required: 
+  - currentState
+  - errorInformation

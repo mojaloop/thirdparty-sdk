@@ -45,7 +45,7 @@ async function post (_context: unknown, request: Request, h: StateResponseToolki
   const data: PISPTransactionData = {
     transactionRequestId: payload.transactionRequestId,
     payeeRequest: {
-      // TODO refactor api-snippets to have this field mandatory!
+      transactionRequestId: payload.transactionRequestId,
       payee: payload.payee
     },
     currentState: 'start'

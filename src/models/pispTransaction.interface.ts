@@ -36,7 +36,6 @@ import {
 import { OutboundAPI as SDKOutboundAPI } from '@mojaloop/sdk-scheme-adapter'
 import { Method } from 'javascript-state-machine'
 import * as OutboundAPI from '~/interface/outbound/api_interfaces'
-import { ErrorInformation } from '~/interface/types'
 import { ControlledStateMachine, StateData, PersistentModelConfig } from '~/models/persistent.model'
 import { PubSub } from '~/shared/pub-sub'
 import { SDKOutgoingRequests } from '~/shared/sdk-outgoing-requests'
@@ -47,14 +46,10 @@ export enum RequestPartiesInformationState {
   ERROR_OCCURRED = 'ERROR_OCCURRED'
 }
 
-export enum PISPTransactionModelState {
-  start = 'start',
-  partyLookupSuccess = 'partyLookupSuccess',
-  partyLookupFailure = 'partyLookupFailure',
-  authorizationReceived = 'authorizationReceived',
-  transactionStatusReceived = 'transactionStatusReceived',
-  errored = 'errored'
-}
+export type PISPTransactionModelState =
+  OutboundAPI.Schemas.ThirdpartyTransactionPartyLookupState
+  & OutboundAPI.Schemas.ThirdpartyTransactionIDInitiateState
+  & OutboundAPI.Schemas.ThirdpartyTransactionIDApproveState
 
 export enum PISPTransactionPhase {
   lookup = 'lookup',
@@ -80,39 +75,10 @@ export interface PISPTransactionModelConfig extends PersistentModelConfig {
   sdkOutgoingRequests: SDKOutgoingRequests
 }
 
-export interface ThirdpartyTransactionPartyLookupResponse {
-  party?: tpAPI.Schemas.Party
-  errorInformation?: ErrorInformation
-  currentState: PISPTransactionModelState
-}
-
-export interface ThirdpartyTransactionInitiateRequest {
-  payee: tpAPI.Schemas.Party
-  payer: tpAPI.Schemas.PartyTPLink
-  amountType: tpAPI.Schemas.AmountType
-  amount: tpAPI.Schemas.Money
-  transactionType: tpAPI.Schemas.TransactionType
-  expiration: string
-}
-
-export interface ThirdpartyTransactionInitiateResponse {
-  authorization: tpAPI.Schemas.AuthorizationsPostRequest
-  currentState: PISPTransactionModelState
-}
-
 export interface ThirdpartyTransactionStatus {
   transactionId: string
   transactionRequestState: 'RECEIVED' | 'PENDING' | 'ACCEPTED' | 'REJECTED',
   transactionState: 'RECEIVED' | 'PENDING' | 'COMPLETED' | 'REJECTED'
-}
-
-export interface ThirdpartyTransactionApproveResponse {
-  transactionStatus: ThirdpartyTransactionStatus
-  currentState: PISPTransactionModelState
-}
-
-export interface ThirdpartyTransactionApproveRequest {
-  authorizationResponse: tpAPI.Schemas.AuthorizationsIDPutResponse
 }
 
 export interface PISPTransactionData extends StateData {
@@ -121,15 +87,15 @@ export interface PISPTransactionData extends StateData {
   // party lookup
   payeeRequest?: OutboundAPI.Schemas.ThirdpartyTransactionPartyLookupRequest
   payeeResolved?: SDKOutboundAPI.Schemas.partiesByIdResponse
-  partyLookupResponse?: ThirdpartyTransactionPartyLookupResponse
+  partyLookupResponse?: OutboundAPI.Schemas.ThirdpartyTransactionPartyLookupResponse
 
   // initiate
-  initiateRequest?: ThirdpartyTransactionInitiateRequest
+  initiateRequest?: OutboundAPI.Schemas.ThirdpartyTransactionIDInitiateRequest
   authorizationRequest?: tpAPI.Schemas.AuthorizationsPostRequest
-  initiateResponse?: ThirdpartyTransactionInitiateResponse
+  initiateResponse?: OutboundAPI.Schemas.ThirdpartyTransactionIDInitiateResponse
 
   // approve
-  approveRequest?: ThirdpartyTransactionApproveRequest
+  approveRequest?: OutboundAPI.Schemas.ThirdpartyTransactionIDApproveRequest
   transactionStatus?: ThirdpartyTransactionStatus
-  approveResponse?: ThirdpartyTransactionApproveResponse
+  approveResponse?: OutboundAPI.Schemas.ThirdpartyTransactionIDApproveResponse
 }

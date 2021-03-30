@@ -1,0 +1,8 @@
+title: ThirdpartyTransactionPartyLookupState
+description: state of thirdparty transaction partyLookup phase
+type: string
+enum:
+  - start
+  - partyLookupSuccess
+  - partyLookupFailure
+  - errored  

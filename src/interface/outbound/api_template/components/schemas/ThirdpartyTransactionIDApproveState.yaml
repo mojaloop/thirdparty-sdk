@@ -1,0 +1,7 @@
+title: ThirdpartyTransactionIDApproveState
+description: state of thirdparty transaction
+type: string
+enum:
+  - authorizationReceived
+  - transactionStatusReceived
+  - errored  
