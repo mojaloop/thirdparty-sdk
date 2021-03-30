@@ -458,15 +458,7 @@ components:
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              authorization:
-                $ref: '#/components/schemas/AuthorizationsPostRequest'
-              currentState:
-                $ref: '#/components/schemas/ThirdpartyTransactionState'
-            required:
-              - authorization
-              - currentState
+            $ref: '#/components/schemas/ThirdpartyTransactionIDInitiateResponse'
     ThirdpartyTransactionIDApproveResponse:
       description: ThirdpartyTransactionIDApprove response
       content:
@@ -1596,6 +1588,24 @@ components:
         - amount
         - transactionType
         - expiration
+    ThirdpartyTransactionIDInitiateState:
+      title: ThirdpartyTransactionIDInitiateState
+      description: state of thirdparty transaction for initiate phase
+      type: string
+      enum:
+        - partyLookupSuccess
+        - authorizationReceived
+        - errored
+    ThirdpartyTransactionIDInitiateResponseError:
+      type: object
+      properties:
+        currentState:
+          $ref: '#/components/schemas/ThirdpartyTransactionIDInitiateState'
+        errorInformation:
+          $ref: '#/components/schemas/ErrorInformation'
+      required:
+        - currentState
+        - errorInformation
     AuthorizationsPostRequest:
       title: AuthorizationsPostRequest
       description: POST /authorizations request object.
@@ -1621,17 +1631,20 @@ components:
         - transactionRequestId
         - quote
       additionalProperties: false
-    ThirdpartyTransactionState:
-      title: ThirdpartyTransactionState
-      description: state of thirdparty transaction
-      type: string
-      enum:
-        - start
-        - partyLookupSuccess
-        - partyLookupFailure
-        - authorizationReceived
-        - transactionStatusReceived
-        - errored
+    ThirdpartyTransactionIDInitiateResponseSuccess:
+      type: object
+      properties:
+        currentState:
+          $ref: '#/components/schemas/ThirdpartyTransactionIDInitiateState'
+        authorization:
+          $ref: '#/components/schemas/AuthorizationsPostRequest'
+      required:
+        - currentState
+        - authorization
+    ThirdpartyTransactionIDInitiateResponse:
+      oneOf:
+        - $ref: '#/components/schemas/ThirdpartyTransactionIDInitiateResponseError'
+        - $ref: '#/components/schemas/ThirdpartyTransactionIDInitiateResponseSuccess'
     AuthorizationsIDPutResponse:
       title: AuthorizationsIDPutResponse
       type: object
@@ -1664,6 +1677,17 @@ components:
         - PENDING - Payer FSP has sent the transaction request to the Payer.
         - ACCEPTED - Payer has approved the transaction.
         - REJECTED - Payer has rejected the transaction.
+    ThirdpartyTransactionState:
+      title: ThirdpartyTransactionState
+      description: state of thirdparty transaction
+      type: string
+      enum:
+        - start
+        - partyLookupSuccess
+        - partyLookupFailure
+        - authorizationReceived
+        - transactionStatusReceived
+        - errored
     BinaryString:
       type: string
       pattern: '^[A-Za-z0-9-_]+[=]{0,2}$'

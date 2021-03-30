@@ -47,7 +47,6 @@ import {
   PISPTransactionPhase,
   PISPTransactionStateMachine,
   ThirdpartyTransactionApproveResponse,
-  ThirdpartyTransactionInitiateResponse,
   ThirdpartyTransactionStatus
 } from './pispTransaction.interface'
 import inspect from '~/shared/inspect'
@@ -202,9 +201,7 @@ export class PISPTransactionModel
           this.data.authorizationRequest = { ...message as unknown as tpAPI.Schemas.AuthorizationsPostRequest }
           this.data.initiateResponse = {
             authorization: { ...this.data.authorizationRequest },
-            currentState: PISPTransactionModelState[
-              this.data.currentState as keyof typeof PISPTransactionModelState
-            ]
+            currentState: this.data.currentState as OutboundAPI.Schemas.ThirdpartyTransactionIDInitiateState
           }
           resolve()
           // state machine should be in authorizationReceived state
@@ -278,7 +275,7 @@ export class PISPTransactionModel
    * depending on current state of model returns proper result
    */
   getResponse (): OutboundAPI.Schemas.ThirdpartyTransactionPartyLookupResponse |
-  ThirdpartyTransactionInitiateResponse |
+  OutboundAPI.Schemas.ThirdpartyTransactionIDInitiateResponse |
   ThirdpartyTransactionApproveResponse |
   void {
     switch (this.data.currentState) {
@@ -298,7 +295,7 @@ export class PISPTransactionModel
    */
   async run (): Promise<
   OutboundAPI.Schemas.ThirdpartyTransactionPartyLookupResponse |
-  ThirdpartyTransactionInitiateResponse |
+  OutboundAPI.Schemas.ThirdpartyTransactionIDInitiateResponse |
   ThirdpartyTransactionApproveResponse |
   void
   > {

@@ -78,10 +78,6 @@ export interface PISPTransactionModelConfig extends PersistentModelConfig {
   mojaloopRequests: MojaloopRequests
   sdkOutgoingRequests: SDKOutgoingRequests
 }
-export interface ThirdpartyTransactionInitiateResponse {
-  authorization: tpAPI.Schemas.AuthorizationsPostRequest
-  currentState: PISPTransactionModelState
-}
 
 export interface ThirdpartyTransactionStatus {
   transactionId: string
@@ -109,7 +105,7 @@ export interface PISPTransactionData extends StateData {
   // initiate
   initiateRequest?: OutboundAPI.Schemas.ThirdpartyTransactionIDInitiateRequest
   authorizationRequest?: tpAPI.Schemas.AuthorizationsPostRequest
-  initiateResponse?: ThirdpartyTransactionInitiateResponse
+  initiateResponse?: OutboundAPI.Schemas.ThirdpartyTransactionIDInitiateResponse
 
   // approve
   approveRequest?: ThirdpartyTransactionApproveRequest

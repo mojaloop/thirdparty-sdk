@@ -2,12 +2,4 @@ description: ThirdpartyTransactionIDInitiate response
 content:
   application/json:
     schema:
-      type: object
-      properties:
-        authorization:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/AuthorizationsPostRequest.yaml'
-        currentState:
-          $ref: '../../components/schemas/ThirdpartyTransactionState.yaml'
-      required:
-        - authorization
-        - currentState
+      $ref: '../schemas/ThirdpartyTransactionIDInitiateResponse.yaml'

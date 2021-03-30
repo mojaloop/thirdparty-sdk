@@ -1,0 +1,9 @@
+  type: object
+  properties:
+    currentState:
+      $ref: './ThirdpartyTransactionIDInitiateState.yaml'
+    errorInformation:
+      $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/ErrorInformation.yaml'
+  required:
+    - currentState
+    - errorInformation

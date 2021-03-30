@@ -37,7 +37,6 @@ import {
   PISPTransactionPhase,
   RequestPartiesInformationState,
   ThirdpartyTransactionApproveResponse,
-  ThirdpartyTransactionInitiateResponse,
   ThirdpartyTransactionStatus
 } from '~/models/pispTransaction.interface'
 import {
@@ -603,7 +602,7 @@ describe('pipsTransactionModel', () => {
       expect(model.getResponse()).toEqual({ am: 'party-lookup-mocked-response' })
 
       model.data.currentState = 'authorizationReceived'
-      model.data.initiateResponse = { am: 'authorization-received-mocked-response' } as unknown as ThirdpartyTransactionInitiateResponse
+      model.data.initiateResponse = { am: 'authorization-received-mocked-response' } as unknown as OutboundAPI.Schemas.ThirdpartyTransactionIDInitiateResponse
       expect(model.getResponse()).toEqual({ am: 'authorization-received-mocked-response' })
 
       model.data.currentState = 'transactionStatusReceived'

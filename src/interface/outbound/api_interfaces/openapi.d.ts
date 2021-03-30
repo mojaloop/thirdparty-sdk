@@ -721,6 +721,15 @@ export interface components {
       transactionType: components['schemas']['TransactionType'];
       expiration: string;
     };
+    /** state of thirdparty transaction for initiate phase */
+    ThirdpartyTransactionIDInitiateState:
+    | 'partyLookupSuccess'
+    | 'authorizationReceived'
+    | 'errored';
+    ThirdpartyTransactionIDInitiateResponseError: {
+      currentState: components['schemas']['ThirdpartyTransactionIDInitiateState'];
+      errorInformation: components['schemas']['ErrorInformation'];
+    };
     /** POST /authorizations request object. */
     AuthorizationsPostRequest: {
       authenticationType: components['schemas']['AuthenticationType'];
@@ -730,14 +739,13 @@ export interface components {
       transactionRequestId: components['schemas']['CorrelationId'];
       quote: components['schemas']['QuotesIDPutResponse'];
     };
-    /** state of thirdparty transaction */
-    ThirdpartyTransactionState:
-    | 'start'
-    | 'partyLookupSuccess'
-    | 'partyLookupFailure'
-    | 'authorizationReceived'
-    | 'transactionStatusReceived'
-    | 'errored';
+    ThirdpartyTransactionIDInitiateResponseSuccess: {
+      currentState: components['schemas']['ThirdpartyTransactionIDInitiateState'];
+      authorization: components['schemas']['AuthorizationsPostRequest'];
+    };
+    ThirdpartyTransactionIDInitiateResponse:
+    | components['schemas']['ThirdpartyTransactionIDInitiateResponseError']
+    | components['schemas']['ThirdpartyTransactionIDInitiateResponseSuccess'];
     /** The object sent in the PUT /authorizations/{ID} callback. */
     AuthorizationsIDPutResponse: {
       authenticationInfo?: components['schemas']['AuthenticationInfo'];
@@ -754,6 +762,14 @@ export interface components {
      * - REJECTED - Payer has rejected the transaction.
      */
     TransactionRequestState: 'RECEIVED' | 'PENDING' | 'ACCEPTED' | 'REJECTED';
+    /** state of thirdparty transaction */
+    ThirdpartyTransactionState:
+    | 'start'
+    | 'partyLookupSuccess'
+    | 'partyLookupFailure'
+    | 'authorizationReceived'
+    | 'transactionStatusReceived'
+    | 'errored';
     /** The API data type BinaryString is a JSON String. The string is a base64url  encoding of a string of raw bytes, where padding (character ‘=’) is added at the end of the data if needed to ensure that the string is a multiple of 4 characters. The length restriction indicates the allowed number of characters. */
     BinaryString: string;
     /** The object sent in the POST /thirdpartyRequests/transactions/{id}/authorizations request. */
@@ -926,10 +942,7 @@ export interface components {
     /** ThirdpartyTransactionIDInitiate response */
     ThirdpartyTransactionIDInitiateResponse: {
       content: {
-        'application/json': {
-          authorization: components['schemas']['AuthorizationsPostRequest'];
-          currentState: components['schemas']['ThirdpartyTransactionState'];
-        };
+        'application/json': components['schemas']['ThirdpartyTransactionIDInitiateResponse'];
       };
     };
     /** ThirdpartyTransactionIDApprove response */
