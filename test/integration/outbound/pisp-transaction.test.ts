@@ -40,7 +40,7 @@ describe('PISP Transaction', (): void => {
 
       const lookupResponse = await axios.post(lookupURI, lookupRequest)
       expect(lookupResponse.status).toEqual(200)
-      expect(lookupResponse.data.currentState).toEqual(PISPTransactionModelState.partyLookupSuccess)
+      expect(lookupResponse.data.currentState).toEqual('partyLookupSuccess')
 
       const initiateURI = `${env.outbound.baseUri}/thirdpartyTransaction/${transactionRequestId}/initiate`
       const initiateRequest = {
@@ -70,7 +70,7 @@ describe('PISP Transaction', (): void => {
       }
       const initiateresponse = await axios.post(initiateURI, initiateRequest)
       expect(initiateresponse.status).toEqual(200)
-      expect(initiateresponse.data.currentState).toEqual(PISPTransactionModelState.authorizationReceived)
+      expect(initiateresponse.data.currentState).toEqual('authorizationReceived')
 
       const approveURI = `${env.outbound.baseUri}/thirdpartyTransaction/${transactionRequestId}/approve`
       const approveRequest = {
@@ -87,7 +87,7 @@ describe('PISP Transaction', (): void => {
       }
       const approveResponse = await axios.post(approveURI, approveRequest)
       expect(approveResponse.status).toEqual(200)
-      expect(approveResponse.data.currentState).toEqual(PISPTransactionModelState.transactionStatusReceived)
+      expect(approveResponse.data.currentState).toEqual('transactionStatusReceived')
       expect(approveResponse.data.transactionStatus.transactionRequestState).toEqual('ACCEPTED')
     })
   })
