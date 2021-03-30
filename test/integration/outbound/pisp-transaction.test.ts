@@ -1,6 +1,5 @@
 import axios from 'axios'
 import env from '../env'
-import { PISPTransactionModelState } from '~/models/pispTransaction.interface'
 import { KVS } from '~/shared/kvs'
 import { RedisConnectionConfig } from '~/shared/redis-connection'
 import Config from '~/shared/config'
