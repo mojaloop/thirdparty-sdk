@@ -1,0 +1,5 @@
+description: ThirdpartyTransactionIDApproveResponse
+content:
+  application/json:
+    schema:
+      $ref: '../../components/schemas/ThirdpartyTransactionIDApproveResponse.yaml'

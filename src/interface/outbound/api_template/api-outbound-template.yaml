@@ -21,12 +21,15 @@ paths:
     $ref: '../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/paths/metrics.yaml'
   /authorizations:
     $ref: paths/authorizations.yaml
+
+  # pispTransaction.model
   /thirdpartyTransaction/partyLookup:
     $ref: paths/thirdpartyTransaction_partyLookup.yaml
   /thirdpartyTransaction/{ID}/initiate:
-    $ref: paths/thirdpartyTransaction_initiate.yaml
+    $ref: paths/thirdpartyTransaction_ID_initiate.yaml
   /thirdpartyTransaction/{ID}/approve:
-    $ref: paths/thirdpartyTransaction_approve.yaml
+    $ref: paths/thirdpartyTransaction_ID_approve.yaml
+    
   /thirdpartyRequests/transactions/{ID}/authorizations:
     $ref: paths/thirdpartyRequests_transactions_ID_authorizations.yaml
   /accounts/{fspId}/{userId}:

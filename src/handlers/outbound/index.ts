@@ -29,8 +29,8 @@
 import Authorizations from './authorizations'
 import ThirdpartyAuthorizations from './thirdpartyRequests/transactions/{ID}/authorizations'
 import ThirdpartyTransactionPartyLookup from './thirdpartyTransaction/partyLookup'
-import ThirdpartyTransactionInitiate from './thirdpartyTransaction/{ID}/initiate'
-import ThirdpartyTransactionApprove from './thirdpartyTransaction/{ID}/approve'
+import ThirdpartyTransactionIDInitiate from './thirdpartyTransaction/{ID}/initiate'
+import ThirdpartyTransactionIDApprove from './thirdpartyTransaction/{ID}/approve'
 import Accounts from './accounts/{fspId}/{userId}'
 import ConsentRequestsIDValidate from './consentRequests/{ID}/validate'
 
@@ -38,8 +38,8 @@ export default {
   OutboundAuthorizationsPost: Authorizations.post,
   VerifyThirdPartyAuthorization: ThirdpartyAuthorizations.post,
   ThirdpartyTransactionPartyLookup: ThirdpartyTransactionPartyLookup.post,
-  InitiateThirdpartyTransaction: ThirdpartyTransactionInitiate.post,
-  ApproveThirdpartyTransaction: ThirdpartyTransactionApprove.post,
+  ThirdpartyTransactionIDInitiate: ThirdpartyTransactionIDInitiate.post,
+  ThirdpartyTransactionIDApprove: ThirdpartyTransactionIDApprove.post,
   GetAccountsByUserId: Accounts.get,
   OutboundConsentRequestsValidatePatch: ConsentRequestsIDValidate.patch,
 }

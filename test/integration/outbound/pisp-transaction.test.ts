@@ -1,6 +1,5 @@
 import axios from 'axios'
 import env from '../env'
-import { PISPTransactionModelState } from '~/models/pispTransaction.interface'
 import { KVS } from '~/shared/kvs'
 import { RedisConnectionConfig } from '~/shared/redis-connection'
 import Config from '~/shared/config'
@@ -32,7 +31,6 @@ describe('PISP Transaction', (): void => {
         payee: {
           partyIdType: 'MSISDN',
           partyIdentifier: '4412345678'
-
         },
         transactionRequestId: transactionRequestId
       }
@@ -41,12 +39,10 @@ describe('PISP Transaction', (): void => {
 
       const lookupResponse = await axios.post(lookupURI, lookupRequest)
       expect(lookupResponse.status).toEqual(200)
-      expect(lookupResponse.data.currentState).toEqual(PISPTransactionModelState.partyLookupSuccess)
+      expect(lookupResponse.data.currentState).toEqual('partyLookupSuccess')
 
       const initiateURI = `${env.outbound.baseUri}/thirdpartyTransaction/${transactionRequestId}/initiate`
       const initiateRequest = {
-        sourceAccountId: 'dfspa.alice.1234',
-        consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
         payee: {
           partyIdInfo: {
             partyIdType: 'MSISDN',
@@ -55,17 +51,9 @@ describe('PISP Transaction', (): void => {
           }
         },
         payer: {
-          personalInfo: {
-            complexName: {
-              firstName: 'Alice',
-              lastName: 'K'
-            }
-          },
-          partyIdInfo: {
-            partyIdType: 'MSISDN',
-            partyIdentifier: '+44 8765 4321',
-            fspId: 'dfspa'
-          }
+          partyIdType: 'THIRD_PARTY_LINK',
+          partyIdentifier: 'qwerty-123456',
+          fspId: 'dfspa'
         },
         amountType: 'SEND',
         amount: {
@@ -81,7 +69,7 @@ describe('PISP Transaction', (): void => {
       }
       const initiateresponse = await axios.post(initiateURI, initiateRequest)
       expect(initiateresponse.status).toEqual(200)
-      expect(initiateresponse.data.currentState).toEqual(PISPTransactionModelState.authorizationReceived)
+      expect(initiateresponse.data.currentState).toEqual('authorizationReceived')
 
       const approveURI = `${env.outbound.baseUri}/thirdpartyTransaction/${transactionRequestId}/approve`
       const approveRequest = {
@@ -98,7 +86,7 @@ describe('PISP Transaction', (): void => {
       }
       const approveResponse = await axios.post(approveURI, approveRequest)
       expect(approveResponse.status).toEqual(200)
-      expect(approveResponse.data.currentState).toEqual(PISPTransactionModelState.transactionStatusReceived)
+      expect(approveResponse.data.currentState).toEqual('transactionStatusReceived')
       expect(approveResponse.data.transactionStatus.transactionRequestState).toEqual('ACCEPTED')
     })
   })

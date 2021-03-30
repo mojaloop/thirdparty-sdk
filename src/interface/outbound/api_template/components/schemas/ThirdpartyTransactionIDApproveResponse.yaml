@@ -1,0 +1,3 @@
+oneOf:
+  - $ref: './ThirdpartyTransactionIDApproveResponseError.yaml'
+  - $ref: './ThirdpartyTransactionIDApproveResponseSuccess.yaml'

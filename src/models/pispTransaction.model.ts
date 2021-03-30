@@ -34,20 +34,17 @@ import {
   MojaloopRequests,
   ThirdpartyRequests
 } from '@mojaloop/sdk-standard-components'
-import { OutboundAPI } from '@mojaloop/sdk-scheme-adapter'
+import { OutboundAPI as SDKOutboundAPI } from '@mojaloop/sdk-scheme-adapter'
+import * as OutboundAPI from '~/interface/outbound/api_interfaces'
+
 import {
   thirdparty as tpAPI
 } from '@mojaloop/api-snippets'
 import {
   PISPTransactionData,
   PISPTransactionModelConfig,
-  PISPTransactionModelState,
   PISPTransactionPhase,
   PISPTransactionStateMachine,
-  ThirdpartyTransactionApproveResponse,
-  ThirdpartyTransactionInitiateRequest,
-  ThirdpartyTransactionInitiateResponse,
-  ThirdpartyTransactionPartyLookupResponse,
   ThirdpartyTransactionStatus
 } from './pispTransaction.interface'
 import inspect from '~/shared/inspect'
@@ -146,14 +143,12 @@ export class PISPTransactionModel
     try {
       // call GET /parties on sdk-scheme-adapter Outbound service
       const response = this.data.payeeResolved = await this.sdkOutgoingRequests.requestPartiesInformation(
-        payee!.partyIdType, payee!.partyIdentifier, payee!.partySubIdOrType
-      ) as OutboundAPI.Schemas.partiesByIdResponse
+        payee.partyIdType, payee.partyIdentifier, payee.partySubIdOrType
+      ) as SDKOutboundAPI.Schemas.partiesByIdResponse
 
       this.data.partyLookupResponse = {
         party: response.party,
-        currentState: PISPTransactionModelState[
-          this.data.currentState as keyof typeof PISPTransactionModelState
-        ]
+        currentState: this.data.currentState as OutboundAPI.Schemas.ThirdpartyTransactionPartyLookupState
       }
     } catch (error) {
       this.logger.push({ error }).error('onRequestPartyLookup -> requestPartiesInformation')
@@ -165,9 +160,7 @@ export class PISPTransactionModel
           await this.fsm.error()
           this.data.partyLookupResponse = {
             errorInformation: errorData.res.data.errorInformation,
-            currentState: PISPTransactionModelState[
-              this.data.currentState as keyof typeof PISPTransactionModelState
-            ]
+            currentState: this.data.currentState as OutboundAPI.Schemas.ThirdpartyTransactionPartyLookupState
           }
           // error handled, no need to rethrow
           return
@@ -180,7 +173,7 @@ export class PISPTransactionModel
 
   onFailPartyLookup (): void {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    this.data!.partyLookupResponse!.currentState = PISPTransactionModelState.partyLookupFailure
+    this.data!.partyLookupResponse!.currentState = 'partyLookupFailure'
   }
 
   async onInitiate (): Promise<void> {
@@ -206,9 +199,7 @@ export class PISPTransactionModel
           this.data.authorizationRequest = { ...message as unknown as tpAPI.Schemas.AuthorizationsPostRequest }
           this.data.initiateResponse = {
             authorization: { ...this.data.authorizationRequest },
-            currentState: PISPTransactionModelState[
-              this.data.currentState as keyof typeof PISPTransactionModelState
-            ]
+            currentState: this.data.currentState as OutboundAPI.Schemas.ThirdpartyTransactionIDInitiateState
           }
           resolve()
           // state machine should be in authorizationReceived state
@@ -216,11 +207,11 @@ export class PISPTransactionModel
 
         const request: tpAPI.Schemas.ThirdpartyRequestsTransactionsPostRequest = {
           transactionRequestId: this.data?.transactionRequestId as string,
-          ...this.data?.initiateRequest as ThirdpartyTransactionInitiateRequest
+          ...this.data?.initiateRequest as OutboundAPI.Schemas.ThirdpartyTransactionIDInitiateRequest
         }
         const res = await this.thirdpartyRequests.postThirdpartyRequestsTransactions(
           request,
-          this.data.initiateRequest?.payer.partyIdInfo.fspId as string
+          this.data.initiateRequest?.payer.fspId as string
         )
         this.logger.push({ res }).info('ThirdpartyRequests.postThirdpartyRequestsTransactions request sent to peer')
       } catch (error) {
@@ -255,9 +246,7 @@ export class PISPTransactionModel
           this.data.transactionStatus = { ...message as unknown as ThirdpartyTransactionStatus }
           this.data.approveResponse = {
             transactionStatus: { ...this.data.transactionStatus },
-            currentState: PISPTransactionModelState[
-              this.data.currentState as keyof typeof PISPTransactionModelState
-            ]
+            currentState: this.data.currentState as OutboundAPI.Schemas.ThirdpartyTransactionIDApproveState
           }
           resolve()
           // state machine should be in transactionSuccess state
@@ -267,7 +256,7 @@ export class PISPTransactionModel
           this.data?.transactionRequestId as string,
           // propagate signed challenge
           this.data?.approveRequest?.authorizationResponse as tpAPI.Schemas.AuthorizationsIDPutResponse,
-          this.data?.initiateRequest?.payer.partyIdInfo.fspId as string
+          this.data?.initiateRequest?.payer.fspId as string
         )
         this.logger.push({ res }).info('ThirdpartyRequests.postThirdpartyRequestsTransactions request sent to peer')
       } catch (error) {
@@ -281,9 +270,9 @@ export class PISPTransactionModel
   /**
    * depending on current state of model returns proper result
    */
-  getResponse (): ThirdpartyTransactionPartyLookupResponse |
-  ThirdpartyTransactionInitiateResponse |
-  ThirdpartyTransactionApproveResponse |
+  getResponse (): OutboundAPI.Schemas.ThirdpartyTransactionPartyLookupResponse |
+  OutboundAPI.Schemas.ThirdpartyTransactionIDInitiateResponse |
+  OutboundAPI.Schemas.ThirdpartyTransactionIDApproveResponse |
   void {
     switch (this.data.currentState) {
       case 'partyLookupSuccess':
@@ -301,9 +290,9 @@ export class PISPTransactionModel
    * runs the workflow
    */
   async run (): Promise<
-  ThirdpartyTransactionPartyLookupResponse |
-  ThirdpartyTransactionInitiateResponse |
-  ThirdpartyTransactionApproveResponse |
+  OutboundAPI.Schemas.ThirdpartyTransactionPartyLookupResponse |
+  OutboundAPI.Schemas.ThirdpartyTransactionIDInitiateResponse |
+  OutboundAPI.Schemas.ThirdpartyTransactionIDApproveResponse |
   void
   > {
     const data = this.data
@@ -319,7 +308,11 @@ export class PISPTransactionModel
             `requestPartyLookup requested for ${data.transactionRequestId},  currentState: ${data.currentState}`
           )
           await this.fsm.requestPartyLookup()
-          if (this.data.partyLookupResponse?.errorInformation) {
+          if (
+            (
+              this.data.partyLookupResponse as OutboundAPI.Schemas.ThirdpartyTransactionPartyLookupResponseError
+            ).errorInformation
+          ) {
             await this.fsm.failPartyLookup()
             this.logger.info('requestPartyLookup failed')
           } else {

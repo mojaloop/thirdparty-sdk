@@ -1,4 +1,7 @@
+title: ThirdpartyTransactionIDApproveRequest
 type: object
 properties:
   authorizationResponse:
     $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/AuthorizationsIDPutResponse.yaml'
+required: 
+  - authorizationResponse
