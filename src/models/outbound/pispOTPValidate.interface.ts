@@ -64,13 +64,3 @@ export interface OutboundOTPValidateData extends StateData {
   authToken: string
   toParticipantId: string
 }
-
-export interface OutboundOTPValidateConsentResponse {
-  consent: tpAPI.Schemas.ConsentsPostRequest
-  currentState: PISPOTPValidateModelState
-}
-
-export interface OutboundOTPValidateErrorResponse {
-  errorInformation: tpAPI.Schemas.ErrorInformation
-  currentState: PISPOTPValidateModelState
-}

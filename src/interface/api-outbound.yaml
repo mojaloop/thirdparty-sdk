@@ -525,12 +525,7 @@ components:
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              consent:
-                $ref: '#/components/schemas/ConsentsPostRequest'
-              currentState:
-                $ref: '#/components/schemas/ConsentRequestsValidateState'
+            $ref: '#/components/schemas/ConsentRequestsValidateResponse'
   headers:
     Content-Length:
       required: false
@@ -1663,6 +1658,21 @@ components:
         - toParticipantId
         - authToken
       additionalProperties: false
+    ConsentRequestsValidateState:
+      title: ConsentRequestsValidateState
+      description: State of POST consent requests validate
+      type: string
+    ConsentRequestsValidateResponseError:
+      title: ConsentRequestsValidateResponseError
+      type: object
+      properties:
+        errorInformation:
+          $ref: '#/components/schemas/ErrorInformation'
+        currentState:
+          $ref: '#/components/schemas/ConsentRequestsValidateState'
+      required:
+        - errorInformation
+        - currentState
     ConsentScopeType:
       title: ConsentScopeType
       type: string
@@ -1718,10 +1728,21 @@ components:
         - consentId
         - consentRequestId
         - scopes
-    ConsentRequestsValidateState:
-      title: ConsentRequestsValidateState
-      description: State of POST consent requests validate
-      type: string
+    ConsentRequestsValidateResponseSuccess:
+      title: ConsentRequestsValidateResponse
+      type: object
+      properties:
+        consent:
+          $ref: '#/components/schemas/ConsentsPostRequest'
+        currentState:
+          $ref: '#/components/schemas/ConsentRequestsValidateState'
+      required:
+        - consent
+        - currentState
+    ConsentRequestsValidateResponse:
+      oneOf:
+        - $ref: '#/components/schemas/ConsentRequestsValidateResponseError'
+        - $ref: '#/components/schemas/ConsentRequestsValidateResponseSuccess'
   parameters:
     ID:
       name: ID

@@ -71,4 +71,5 @@ export namespace Schemas {
   export type ThirdpartyRequestsTransactionsIDAuthorizationsPostRequest = components['schemas']['ThirdpartyRequestsTransactionsIDAuthorizationsPostRequest']
   export type ThirdpartyRequestsTransactionsIDAuthorizationsPutResponse = components['schemas']['ThirdpartyRequestsTransactionsIDAuthorizationsPutResponse']
   export type AccountsIDPutResponse = components['schemas']['AccountsIDPutResponse']
+  export type ConsentRequestsValidateResponse = components['schemas']['ConsentRequestsValidateResponse']
 }

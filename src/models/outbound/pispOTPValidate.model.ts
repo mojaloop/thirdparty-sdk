@@ -37,8 +37,8 @@ import {
   PISPOTPValidateModelConfig
 } from './pispOTPValidate.interface';
 import { Message } from '~/shared/pub-sub';
-import { OutboundOTPValidateConsentResponse, OutboundOTPValidateErrorResponse } from './pispOTPValidate.interface';
 import deferredJob from '~/shared/deferred-job';
+import * as OutboundAPI from '~/interface/outbound/api_interfaces'
 
 // note: may need to rename this model once this handles more of the account
 //       linking flow. this model only covers steps in the authentication stage
@@ -121,20 +121,19 @@ export class PISPOTPValidateModel
   }
 
   getResponse ():
-  OutboundOTPValidateConsentResponse |
-  OutboundOTPValidateErrorResponse |
+  OutboundAPI.Schemas.ConsentRequestsValidateResponse |
   void {
     switch (this.data.currentState) {
       case 'OTPIsValid':
         return {
           consent: this.data.consent,
           currentState: this.data.currentState
-        } as OutboundOTPValidateConsentResponse
+        } as OutboundAPI.Schemas.ConsentRequestsValidateResponse
       case 'errored':
         return {
           errorInformation: this.data.errorInformation,
           currentState: this.data.currentState
-        } as OutboundOTPValidateErrorResponse
+        } as OutboundAPI.Schemas.ConsentRequestsValidateResponse
       default:
     }
   }
@@ -151,8 +150,7 @@ export class PISPOTPValidateModel
    * runs the workflow
    */
   async run (): Promise<
-  OutboundOTPValidateConsentResponse |
-  OutboundOTPValidateErrorResponse |
+  OutboundAPI.Schemas.ConsentRequestsValidateResponse |
   void> {
     const data = this.data
     try {
