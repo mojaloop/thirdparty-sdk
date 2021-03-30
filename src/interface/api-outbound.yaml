@@ -460,21 +460,11 @@ components:
           schema:
             $ref: '#/components/schemas/ThirdpartyTransactionIDInitiateResponse'
     ThirdpartyTransactionIDApproveResponse:
-      description: ThirdpartyTransactionIDApprove response
+      description: ThirdpartyTransactionIDApproveResponse
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              transactionStatus:
-                type: object
-                properties:
-                  transactionId:
-                    $ref: '#/components/schemas/CorrelationId'
-                  transactionRequestState:
-                    $ref: '#/components/schemas/TransactionRequestState'
-              currentState:
-                $ref: '#/components/schemas/ThirdpartyTransactionState'
+            $ref: '#/components/schemas/ThirdpartyTransactionIDApproveResponse'
     ThirdpartyRequestsTransactionsIDAuthzResponse:
       description: Thirdparty requests transactions authorizations response
       content:
@@ -1216,6 +1206,7 @@ components:
         - partyLookupFailure
         - errored
     ThirdpartyTransactionPartyLookupResponseError:
+      title: ThirdpartyTransactionPartyLookupResponseError
       type: object
       properties:
         currentState:
@@ -1350,6 +1341,7 @@ components:
       required:
         - account
     ThirdpartyTransactionPartyLookupResponseSuccess:
+      title: ThirdpartyTransactionPartyLookupResponseSuccess
       type: object
       properties:
         currentState:
@@ -1597,6 +1589,7 @@ components:
         - authorizationReceived
         - errored
     ThirdpartyTransactionIDInitiateResponseError:
+      title: ThirdpartyTransactionIDInitateResponseError
       type: object
       properties:
         currentState:
@@ -1632,6 +1625,7 @@ components:
         - quote
       additionalProperties: false
     ThirdpartyTransactionIDInitiateResponseSuccess:
+      title: ThirdpartyTransactionIDInitateResponseSuccess
       type: object
       properties:
         currentState:
@@ -1663,6 +1657,25 @@ components:
           $ref: '#/components/schemas/AuthorizationsIDPutResponse'
       required:
         - authorizationResponse
+    ThirdpartyTransactionIDApproveState:
+      title: ThirdpartyTransactionIDApproveState
+      description: state of thirdparty transaction
+      type: string
+      enum:
+        - authorizationReceived
+        - transactionStatusReceived
+        - errored
+    ThirdpartyTransactionIDApproveResponseError:
+      title: ThirdpartyTransactionIDApproveResponseError
+      type: object
+      properties:
+        currentState:
+          $ref: '#/components/schemas/ThirdpartyTransactionIDApproveState'
+        errorInformation:
+          $ref: '#/components/schemas/ErrorInformation'
+      required:
+        - currentState
+        - errorInformation
     TransactionRequestState:
       title: TransactionRequestState
       type: string
@@ -1677,17 +1690,29 @@ components:
         - PENDING - Payer FSP has sent the transaction request to the Payer.
         - ACCEPTED - Payer has approved the transaction.
         - REJECTED - Payer has rejected the transaction.
-    ThirdpartyTransactionState:
-      title: ThirdpartyTransactionState
-      description: state of thirdparty transaction
-      type: string
-      enum:
-        - start
-        - partyLookupSuccess
-        - partyLookupFailure
-        - authorizationReceived
-        - transactionStatusReceived
-        - errored
+    ThirdpartyTransactionIDApproveResponseSuccess:
+      title: ThirdpartyTransactionIDApproveResponseSuccess
+      type: object
+      properties:
+        transactionStatus:
+          type: object
+          properties:
+            transactionId:
+              $ref: '#/components/schemas/CorrelationId'
+            transactionRequestState:
+              $ref: '#/components/schemas/TransactionRequestState'
+          required:
+            - transactionId
+            - transactionRequestState
+        currentState:
+          $ref: '#/components/schemas/ThirdpartyTransactionIDApproveState'
+      required:
+        - currentState
+        - transactionStatus
+    ThirdpartyTransactionIDApproveResponse:
+      oneOf:
+        - $ref: '#/components/schemas/ThirdpartyTransactionIDApproveResponseError'
+        - $ref: '#/components/schemas/ThirdpartyTransactionIDApproveResponseSuccess'
     BinaryString:
       type: string
       pattern: '^[A-Za-z0-9-_]+[=]{0,2}$'

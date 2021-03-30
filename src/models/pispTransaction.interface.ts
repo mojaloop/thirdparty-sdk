@@ -85,15 +85,6 @@ export interface ThirdpartyTransactionStatus {
   transactionState: 'RECEIVED' | 'PENDING' | 'COMPLETED' | 'REJECTED'
 }
 
-export interface ThirdpartyTransactionApproveResponse {
-  transactionStatus: ThirdpartyTransactionStatus
-  currentState: PISPTransactionModelState
-}
-
-export interface ThirdpartyTransactionApproveRequest {
-  authorizationResponse: tpAPI.Schemas.AuthorizationsIDPutResponse
-}
-
 export interface PISPTransactionData extends StateData {
   transactionRequestId?: string
 
@@ -108,7 +99,7 @@ export interface PISPTransactionData extends StateData {
   initiateResponse?: OutboundAPI.Schemas.ThirdpartyTransactionIDInitiateResponse
 
   // approve
-  approveRequest?: ThirdpartyTransactionApproveRequest
+  approveRequest?: OutboundAPI.Schemas.ThirdpartyTransactionIDApproveRequest
   transactionStatus?: ThirdpartyTransactionStatus
-  approveResponse?: ThirdpartyTransactionApproveResponse
+  approveResponse?: OutboundAPI.Schemas.ThirdpartyTransactionIDApproveResponse
 }

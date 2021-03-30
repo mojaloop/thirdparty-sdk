@@ -1,3 +1,4 @@
+title: ThirdpartyTransactionIDApproveRequest
 type: object
 properties:
   authorizationResponse:

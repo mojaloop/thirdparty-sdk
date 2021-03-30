@@ -1,3 +1,4 @@
+  title: ThirdpartyTransactionIDInitateResponseSuccess
   type: object
   properties:
     currentState:

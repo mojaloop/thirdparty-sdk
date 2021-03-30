@@ -46,7 +46,6 @@ import {
   PISPTransactionModelState,
   PISPTransactionPhase,
   PISPTransactionStateMachine,
-  ThirdpartyTransactionApproveResponse,
   ThirdpartyTransactionStatus
 } from './pispTransaction.interface'
 import inspect from '~/shared/inspect'
@@ -248,9 +247,7 @@ export class PISPTransactionModel
           this.data.transactionStatus = { ...message as unknown as ThirdpartyTransactionStatus }
           this.data.approveResponse = {
             transactionStatus: { ...this.data.transactionStatus },
-            currentState: PISPTransactionModelState[
-              this.data.currentState as keyof typeof PISPTransactionModelState
-            ]
+            currentState: this.data.currentState as OutboundAPI.Schemas.ThirdpartyTransactionIDApproveState
           }
           resolve()
           // state machine should be in transactionSuccess state
@@ -276,7 +273,7 @@ export class PISPTransactionModel
    */
   getResponse (): OutboundAPI.Schemas.ThirdpartyTransactionPartyLookupResponse |
   OutboundAPI.Schemas.ThirdpartyTransactionIDInitiateResponse |
-  ThirdpartyTransactionApproveResponse |
+  OutboundAPI.Schemas.ThirdpartyTransactionIDApproveResponse |
   void {
     switch (this.data.currentState) {
       case 'partyLookupSuccess':
@@ -296,7 +293,7 @@ export class PISPTransactionModel
   async run (): Promise<
   OutboundAPI.Schemas.ThirdpartyTransactionPartyLookupResponse |
   OutboundAPI.Schemas.ThirdpartyTransactionIDInitiateResponse |
-  ThirdpartyTransactionApproveResponse |
+  OutboundAPI.Schemas.ThirdpartyTransactionIDApproveResponse |
   void
   > {
     const data = this.data

@@ -1,3 +1,4 @@
+title: ThirdpartyTransactionPartyLookupResponseError
 type: object
 properties:
   currentState: 

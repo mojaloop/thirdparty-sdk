@@ -754,6 +754,15 @@ export interface components {
     ThirdpartyTransactionIDApproveRequest: {
       authorizationResponse: components['schemas']['AuthorizationsIDPutResponse'];
     };
+    /** state of thirdparty transaction */
+    ThirdpartyTransactionIDApproveState:
+    | 'authorizationReceived'
+    | 'transactionStatusReceived'
+    | 'errored';
+    ThirdpartyTransactionIDApproveResponseError: {
+      currentState: components['schemas']['ThirdpartyTransactionIDApproveState'];
+      errorInformation: components['schemas']['ErrorInformation'];
+    };
     /**
      * Below are the allowed values for the enumeration.
      * - RECEIVED - Payer FSP has received the transaction from the Payee FSP.
@@ -762,14 +771,16 @@ export interface components {
      * - REJECTED - Payer has rejected the transaction.
      */
     TransactionRequestState: 'RECEIVED' | 'PENDING' | 'ACCEPTED' | 'REJECTED';
-    /** state of thirdparty transaction */
-    ThirdpartyTransactionState:
-    | 'start'
-    | 'partyLookupSuccess'
-    | 'partyLookupFailure'
-    | 'authorizationReceived'
-    | 'transactionStatusReceived'
-    | 'errored';
+    ThirdpartyTransactionIDApproveResponseSuccess: {
+      transactionStatus: {
+        transactionId: components['schemas']['CorrelationId'];
+        transactionRequestState: components['schemas']['TransactionRequestState'];
+      };
+      currentState: components['schemas']['ThirdpartyTransactionIDApproveState'];
+    };
+    ThirdpartyTransactionIDApproveResponse:
+    | components['schemas']['ThirdpartyTransactionIDApproveResponseError']
+    | components['schemas']['ThirdpartyTransactionIDApproveResponseSuccess'];
     /** The API data type BinaryString is a JSON String. The string is a base64url  encoding of a string of raw bytes, where padding (character ‘=’) is added at the end of the data if needed to ensure that the string is a multiple of 4 characters. The length restriction indicates the allowed number of characters. */
     BinaryString: string;
     /** The object sent in the POST /thirdpartyRequests/transactions/{id}/authorizations request. */
@@ -945,16 +956,10 @@ export interface components {
         'application/json': components['schemas']['ThirdpartyTransactionIDInitiateResponse'];
       };
     };
-    /** ThirdpartyTransactionIDApprove response */
+    /** ThirdpartyTransactionIDApproveResponse */
     ThirdpartyTransactionIDApproveResponse: {
       content: {
-        'application/json': {
-          transactionStatus?: {
-            transactionId?: components['schemas']['CorrelationId'];
-            transactionRequestState?: components['schemas']['TransactionRequestState'];
-          };
-          currentState?: components['schemas']['ThirdpartyTransactionState'];
-        };
+        'application/json': components['schemas']['ThirdpartyTransactionIDApproveResponse'];
       };
     };
     /** Thirdparty requests transactions authorizations response */

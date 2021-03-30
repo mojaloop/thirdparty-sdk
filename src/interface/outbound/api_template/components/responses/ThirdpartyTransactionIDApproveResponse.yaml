@@ -1,15 +1,5 @@
-description: ThirdpartyTransactionIDApprove response
+description: ThirdpartyTransactionIDApproveResponse
 content:
   application/json:
     schema:
-      type: object
-      properties:
-        transactionStatus:
-          type: object
-          properties:
-            transactionId:
-              $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/CorrelationId.yaml'
-            transactionRequestState:
-              $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/schemas/TransactionRequestState.yaml'
-        currentState:
-          $ref: '../../components/schemas/ThirdpartyTransactionState.yaml'
+      $ref: '../../components/schemas/ThirdpartyTransactionIDApproveResponse.yaml'
