@@ -393,6 +393,7 @@ const config: ServiceConfig = {
   ENV: ConvictConfig.get('ENV'),
   INBOUND: ConvictConfig.get('INBOUND'),
   OUTBOUND: ConvictConfig.get('OUTBOUND'),
+  REQUEST_PROCESSING_TIMEOUT_SECONDS: ConvictConfig.get('REQUEST_PROCESSING_TIMEOUT_SECONDS'),
   WSO2_AUTH: ConvictConfig.get('WSO2_AUTH'),
   REDIS: ConvictConfig.get('REDIS'),
   INSPECT: ConvictConfig.get('INSPECT'),
