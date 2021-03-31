@@ -1,3 +1,7 @@
 title: ConsentRequestsValidateState
 description: State of POST consent requests validate
 type: string
+enum:
+  - errored
+  - success
+  - OTPIsValid

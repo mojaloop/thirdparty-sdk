@@ -1646,6 +1646,7 @@ components:
       required:
         - responseType
     ThirdpartyTransactionIDApproveRequest:
+      title: ThirdpartyTransactionIDApproveRequest
       type: object
       properties:
         authorizationResponse:
@@ -1828,6 +1829,10 @@ components:
       title: ConsentRequestsValidateState
       description: State of POST consent requests validate
       type: string
+      enum:
+        - errored
+        - success
+        - OTPIsValid
     ConsentRequestsValidateResponseError:
       title: ConsentRequestsValidateResponseError
       type: object

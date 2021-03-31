@@ -73,10 +73,10 @@
     "conditions": {
       "all": [
         {
-          "fact": "pathParams",
+          "fact": "body",
           "operator": "equal",
-          "value": "ab049ac1-b936-4327-ab76-3e66e608beb8",
-          "path": "ID"
+          "value": "123456",
+          "path": "authToken"
         },
         {
           "fact": "operationPath",
@@ -147,10 +147,10 @@
     "conditions": {
       "all": [
         {
-          "fact": "pathParams",
+          "fact": "body",
           "operator": "equal",
-          "value": "cd049ac1-b936-4327-ab76-3e66e608beb8",
-          "path": "ID"
+          "value": "654321",
+          "path": "authToken"
         },
         {
           "fact": "operationPath",

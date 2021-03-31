@@ -129,10 +129,16 @@ describe('pispOTPValidateModel', () => {
   })
 
   describe('Validate OTP with DFSP Phase', () => {
-    let validateData: PISPOTPValidateData
+    const consentRequestsRequestId = '45789d6b-9423-4876-ab98-a12ff5b54195'
+    const validateData: PISPOTPValidateData = {
+      consentRequestsRequestId,
+      authToken: '123456',
+      toParticipantId: 'pispa',
+      currentState: 'start'
+    }
     const consentPostResponse: tpAPI.Schemas.ConsentsPostRequest = {
       consentId: "8e34f91d-d078-4077-8263-2c047876fcf6",
-      consentRequestId: "6988c34f-055b-4ed5-b223-b10c8a2e2329",
+      consentRequestId: consentRequestsRequestId,
       scopes: [{
           accountId: "some-id",
           actions: [
@@ -150,15 +156,6 @@ describe('pispOTPValidateModel', () => {
       }
     }
 
-    beforeEach(async () => {
-      validateData = {
-        consentRequestsRequestId: '45789d6b-9423-4876-ab98-a12ff5b54195',
-        authToken: '123456',
-        toParticipantId: 'pispa',
-        currentState: 'start'
-      }
-    })
-
     it('should be well constructed', async () => {
       const model = await create(validateData, modelConfig)
       checkPISPOTPModelLayout(model, validateData)
@@ -168,7 +165,7 @@ describe('pispOTPValidateModel', () => {
       const model = await create(validateData, modelConfig)
       // defer publication to notification channel
       setImmediate(() => model.pubSub.publish(
-        PISPOTPValidateModel.notificationChannel('45789d6b-9423-4876-ab98-a12ff5b54195'),
+        PISPOTPValidateModel.notificationChannel(consentRequestsRequestId),
         consentPostResponse as unknown as Message
       ))
       const result = await model.run()
@@ -178,7 +175,7 @@ describe('pispOTPValidateModel', () => {
 
       // check we made a call to thirdpartyRequests.patchConsentRequests
       expect(modelConfig.thirdpartyRequests.patchConsentRequests).toBeCalledWith(
-        '45789d6b-9423-4876-ab98-a12ff5b54195',
+        consentRequestsRequestId,
         {authToken: "123456"},
         "pispa"
       )
@@ -186,7 +183,7 @@ describe('pispOTPValidateModel', () => {
       expect(result).toEqual({
         "consent": {
             "consentId": "8e34f91d-d078-4077-8263-2c047876fcf6",
-            "consentRequestId": "6988c34f-055b-4ed5-b223-b10c8a2e2329",
+            "consentRequestId": consentRequestsRequestId,
             "scopes": [
               {
                 "accountId": "some-id",
@@ -203,7 +200,7 @@ describe('pispOTPValidateModel', () => {
 
     it('should handle a PUT /consentsRequest/{ID}/error response', async () => {
       setImmediate(() => model.pubSub.publish(
-        PISPOTPValidateModel.notificationChannel('45789d6b-9423-4876-ab98-a12ff5b54195'),
+        PISPOTPValidateModel.notificationChannel(consentRequestsRequestId),
         genericErrorResponse as unknown as Message
       ))
 

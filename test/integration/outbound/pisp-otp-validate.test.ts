@@ -31,8 +31,9 @@ import { RedisConnectionConfig } from '~/shared/redis-connection'
 import Config from '~/shared/config'
 import mockLogger from '../../unit/mockLogger'
 import { PISPOTPValidateModelState } from '~/models/outbound/pispOTPValidate.interface';
+import { uuid } from 'uuidv4'
 
-describe.only('PISP OTP Validate', (): void => {
+describe('PISP OTP Validate', (): void => {
   const config: RedisConnectionConfig = {
     host: Config.REDIS.HOST,
     port: Config.REDIS.PORT,
@@ -40,10 +41,8 @@ describe.only('PISP OTP Validate', (): void => {
     timeout: Config.REDIS.TIMEOUT
   }
   let kvs: KVS
-  const consentRequestsRequestId = 'ab049ac1-b936-4327-ab76-3e66e608beb8'
-  const consentRequestsRequestIdError = 'cd049ac1-b936-4327-ab76-3e66e608beb8'
+  const consentRequestsRequestId = uuid()
   const consentRequestsURI = `${env.outbound.baseUri}/consentRequests/${consentRequestsRequestId}/validate`
-  const consentRequestsURIError = `${env.outbound.baseUri}/consentRequests/${consentRequestsRequestIdError}/validate`
 
   beforeAll(async (): Promise<void> => {
     kvs = new KVS(config)
@@ -56,6 +55,7 @@ describe.only('PISP OTP Validate', (): void => {
 
   describe('/consentRequests/{ID}/validate: requestAction->OTPIsValid', (): void => {
     it('OTPValidateState should be OTPIsValid', async (): Promise<void> => {
+      // ttk uses an authToken of 123456 to return a valid response
       const consentRequestsRequest = {
         toParticipantId: 'dfspa',
         authToken: '123456'
@@ -79,17 +79,18 @@ describe.only('PISP OTP Validate', (): void => {
     })
   })
 
-  describe.only('/consentRequests/{ID}/validate: requestAction->errored error return', (): void => {
+  describe('/consentRequests/{ID}/validate: requestAction->errored error return', (): void => {
+    // ttk uses an authToken of 654321 to return a invalid response
     it('OTPValidateState should be errored', async (): Promise<void> => {
       const consentRequestsRequest = {
         toParticipantId: 'dfspa',
-        authToken: '123456'
+        authToken: '654321'
       }
       const expectedResponse = {
         "errorCode": "6000",
         "errorDescription": "Generic thirdparty error"
       }
-      await axios.patch(consentRequestsURIError, consentRequestsRequest)
+      await axios.patch(consentRequestsURI, consentRequestsRequest)
         .catch(error => {
           expect(error.response.status).toEqual(500)
           expect(error.response.data.currentState).toEqual(PISPOTPValidateModelState.errored)

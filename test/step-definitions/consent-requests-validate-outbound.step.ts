@@ -31,8 +31,8 @@ import Config from '~/shared/config'
 import Handlers from '~/handlers'
 import index from '~/index'
 import path from 'path'
-import { NotificationCallback, Message, PubSub } from '../../src/shared/pub-sub';
-import { RedisConnectionConfig } from '../../src/shared/redis-connection';
+import { NotificationCallback, Message, PubSub } from '~/shared/pub-sub';
+import { RedisConnectionConfig } from '~/shared/redis-connection';
 import { thirdparty as tpAPI } from '@mojaloop/api-snippets';
 
 const apiPath = path.resolve(__dirname, '../../src/interface/api-outbound.yaml')
