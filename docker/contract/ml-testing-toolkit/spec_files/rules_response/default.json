@@ -98,6 +98,7 @@
           "exec": [
             "const userConfig = JSON.parse(pm.globals.get('userConfig'))",
             "const curDate = (new Date()).toUTCString()",
+            "const consentRequestId = pm.request.url.path[1]",
             "const consentRequest = {",
             "  url: userConfig.CALLBACK_ENDPOINT + '/consents',",
             "  method: 'post',",
@@ -111,7 +112,7 @@
             "    mode: 'raw',",
             "    raw: JSON.stringify({",
             "      \"consentId\": \"8e34f91d-d078-4077-8263-2c047876fcf6\",",
-            "      \"consentRequestId\": \"ab049ac1-b936-4327-ab76-3e66e608beb8\",",
+            "      \"consentRequestId\": consentRequestId,",
             "      \"scopes\": [{",
             "          \"accountId\": \"some-id\",",
             "          \"actions\": [",
@@ -172,8 +173,9 @@
           "exec": [
             "const userConfig = JSON.parse(pm.globals.get('userConfig'))",
             "const curDate = (new Date()).toUTCString()",
+            "const consentRequestId = pm.request.url.path[1]",
             "const consentRequest = {",
-            "  url: userConfig.CALLBACK_ENDPOINT + '/consentRequests/cd049ac1-b936-4327-ab76-3e66e608beb8/error',",
+            "  url: userConfig.CALLBACK_ENDPOINT + '/consentRequests/' + consentRequestId + '/error',",
             "  method: 'put',",
             "  header: {",
             "    'FSPIOP-Source': 'switch',",
