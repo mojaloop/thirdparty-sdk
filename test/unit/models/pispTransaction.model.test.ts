@@ -92,7 +92,8 @@ describe('pipsTransactionModel', () => {
           party: { Iam: 'mocked-party' },
           currentStatus: 'COMPLETED'
         }))
-      } as unknown as SDKOutgoingRequests
+      } as unknown as SDKOutgoingRequests,
+      initiateTimeoutInSeconds: 3
     }
     mocked(modelConfig.pubSub.subscribe).mockImplementationOnce(
       (_channel: string, cb: NotificationCallback) => {

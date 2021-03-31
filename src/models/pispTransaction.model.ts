@@ -50,6 +50,7 @@ import {
 import inspect from '~/shared/inspect'
 import { SDKOutgoingRequests } from '~/shared/sdk-outgoing-requests'
 import { HTTPResponseError } from '~/shared/http-response-error'
+import deferredJob from '~/shared/deferred-job'
 
 export class InvalidPISPTransactionDataError extends Error {
   public data: Record<string, unknown>
@@ -172,7 +173,6 @@ export class PISPTransactionModel
   }
 
   onFailPartyLookup (): void {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     this.data!.partyLookupResponse!.currentState = 'partyLookupFailure'
   }
 
@@ -187,24 +187,8 @@ export class PISPTransactionModel
 
     this.logger.push({ channel }).info('onInitiate - subscribe to channel')
 
-    // eslint-disable-next-line no-async-promise-executor
-    return new Promise(async (resolve, reject) => {
-      let subId = 0
-      try {
-        // this handler will be executed when POST /authorizations @ Inbound server
-        subId = this.pubSub.subscribe(channel, async (channel: string, message: Message, sid: number) => {
-          // first unsubscribe
-          this.pubSub.unsubscribe(channel, sid)
-
-          this.data.authorizationRequest = { ...message as unknown as tpAPI.Schemas.AuthorizationsPostRequest }
-          this.data.initiateResponse = {
-            authorization: { ...this.data.authorizationRequest },
-            currentState: this.data.currentState as OutboundAPI.Schemas.ThirdpartyTransactionIDInitiateState
-          }
-          resolve()
-          // state machine should be in authorizationReceived state
-        })
-
+    return deferredJob(this.pubSub, channel)
+      .init(async (): Promise<void> => {
         const request: tpAPI.Schemas.ThirdpartyRequestsTransactionsPostRequest = {
           transactionRequestId: this.data?.transactionRequestId as string,
           ...this.data?.initiateRequest as OutboundAPI.Schemas.ThirdpartyTransactionIDInitiateRequest
@@ -214,12 +198,49 @@ export class PISPTransactionModel
           this.data.initiateRequest?.payer.fspId as string
         )
         this.logger.push({ res }).info('ThirdpartyRequests.postThirdpartyRequestsTransactions request sent to peer')
-      } catch (error) {
-        this.logger.push(error).error('ThirdpartyRequests.postThirdpartyRequestsTransactions request error')
-        this.pubSub.unsubscribe(channel, subId)
-        reject(error)
-      }
-    })
+      })
+      .job(async (message: Message): Promise<void> => {
+        this.data.authorizationRequest = { ...message as unknown as tpAPI.Schemas.AuthorizationsPostRequest }
+        this.data.initiateResponse = {
+          authorization: { ...this.data.authorizationRequest },
+          currentState: this.data.currentState as OutboundAPI.Schemas.ThirdpartyTransactionIDInitiateState
+        }
+      })
+      .wait(this.config.initiateTimeoutInSeconds * 1000)
+
+    // eslint-disable-next-line no-async-promise-executor
+    // return new Promise(async (resolve, reject) => {
+    //   let subId = 0
+    //   try {
+    //     // this handler will be executed when POST /authorizations @ Inbound server
+    //     subId = this.pubSub.subscribe(channel, async (channel: string, message: Message, sid: number) => {
+    //       // first unsubscribe
+    //       this.pubSub.unsubscribe(channel, sid)
+
+    //       this.data.authorizationRequest = { ...message as unknown as tpAPI.Schemas.AuthorizationsPostRequest }
+    //       this.data.initiateResponse = {
+    //         authorization: { ...this.data.authorizationRequest },
+    //         currentState: this.data.currentState as OutboundAPI.Schemas.ThirdpartyTransactionIDInitiateState
+    //       }
+    //       resolve()
+    //       // state machine should be in authorizationReceived state
+    //     })
+
+    //     const request: tpAPI.Schemas.ThirdpartyRequestsTransactionsPostRequest = {
+    //       transactionRequestId: this.data?.transactionRequestId as string,
+    //       ...this.data?.initiateRequest as OutboundAPI.Schemas.ThirdpartyTransactionIDInitiateRequest
+    //     }
+    //     const res = await this.thirdpartyRequests.postThirdpartyRequestsTransactions(
+    //       request,
+    //       this.data.initiateRequest?.payer.fspId as string
+    //     )
+    //     this.logger.push({ res }).info('ThirdpartyRequests.postThirdpartyRequestsTransactions request sent to peer')
+    //   } catch (error) {
+    //     this.logger.push(error).error('ThirdpartyRequests.postThirdpartyRequestsTransactions request error')
+    //     this.pubSub.unsubscribe(channel, subId)
+    //     reject(error)
+    //   }
+    // })
   }
 
   async onApprove (): Promise<void> {

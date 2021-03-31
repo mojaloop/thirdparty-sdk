@@ -94,6 +94,7 @@ export interface ServiceConfig {
     PISP_BACKEND_URI: string
     PISP_BACKEND_HTTP_SCHEME: string
     PISP_BACKEND_SIGN_AUTHORIZATION_PATH: string
+    PISP_TRANSACTION_INITIATE_TIMEOUT_IN_SECONDS: number
     SDK_OUTGOING_URI: string
     SDK_OUTGOING_HTTP_SCHEME: string
     SDK_REQUEST_TO_PAY_TRANSFER_URI: string
@@ -317,6 +318,12 @@ export const ConvictConfig = Convict<ServiceConfig>({
       format: ['http', 'https'],
       default: 'http'
     },
+    PISP_TRANSACTION_INITIATE_TIMEOUT_IN_SECONDS: {
+      doc: 'Timeout for Transaction Initiate phase',
+      format: 'nat',
+      default: 3
+    },
+
     SDK_OUTGOING_URI: {
       doc: 'host address of SDK scheme-adapter Outgoing service\'s ',
       format: '*',
