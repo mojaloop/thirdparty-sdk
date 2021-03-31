@@ -367,8 +367,6 @@ export class PISPTransactionModel
   }
 }
 
-
-
 export async function existsInKVS (config: PISPTransactionModelConfig): Promise<boolean> {
   return config.kvs.exists(config.key)
 }
