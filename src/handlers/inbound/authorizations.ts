@@ -52,14 +52,22 @@ async function put (_context: any, request: Request, h: StateResponseToolkit): P
   const payload = request.payload as unknown as fspiopAPI.Schemas.AuthorizationsIDPutResponse
   const pubSub = h.getPubSub()
 
-  // select proper channel name where message will be published
-  const channel = config.INBOUND.PISP_TRANSACTION_MODE
-    ? PISPTransactionModel.notificationChannel(PISPTransactionPhase.initiation, request.params.ID)
-    : OutboundAuthorizationsModel.notificationChannel(request.params.ID)
-
-  // don't await on promise to resolve
-  // let finish publish in background
-  pubSub.publish(channel, payload as unknown as Message)
+  // select proper workflow to where message will be published
+  if (config.INBOUND.PISP_TRANSACTION_MODE) {
+    // don't await on promise to resolve
+    // let finish publish in background
+    PISPTransactionModel.triggerWorkflow(
+      PISPTransactionPhase.initiation,
+      request.params.ID,
+      pubSub,
+      payload as unknown as Message
+    )
+  } else {
+    const channel = OutboundAuthorizationsModel.notificationChannel(request.params.ID)
+    // don't await on promise to resolve
+    // let finish publish in background
+    pubSub.publish(channel, payload as unknown as Message)
+  }
 
   // return asap
   return h.response().code(200)
