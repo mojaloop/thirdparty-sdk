@@ -31,16 +31,12 @@ import {
   thirdparty as tpAPI
 } from '@mojaloop/api-snippets'
 import { Message } from '~/shared/pub-sub'
-import {
-  OutboundAuthorizationsModel
-} from '~/models/outbound/authorizations.model'
+import { OutboundAuthorizationsModel } from '~/models/outbound/authorizations.model'
 import {
   InboundAuthorizationsModel,
   InboundAuthorizationsModelConfig
 } from '~/models/inbound/authorizations.model'
-import {
-  PISPTransactionModel
-} from '~/models/pispTransaction.model'
+import { PISPTransactionModel } from '~/models/pispTransaction.model'
 import { PISPTransactionPhase } from '~/models/pispTransaction.interface'
 import { Request, ResponseObject } from '@hapi/hapi'
 import { StateResponseToolkit } from '~/server/plugins/state'
@@ -52,14 +48,22 @@ async function put (_context: any, request: Request, h: StateResponseToolkit): P
   const payload = request.payload as unknown as fspiopAPI.Schemas.AuthorizationsIDPutResponse
   const pubSub = h.getPubSub()
 
-  // select proper channel name where message will be published
-  const channel = config.INBOUND.PISP_TRANSACTION_MODE
-    ? PISPTransactionModel.notificationChannel(PISPTransactionPhase.initiation, request.params.ID)
-    : OutboundAuthorizationsModel.notificationChannel(request.params.ID)
-
-  // don't await on promise to resolve
-  // let finish publish in background
-  pubSub.publish(channel, payload as unknown as Message)
+  // select proper workflow to where message will be published
+  if (config.INBOUND.PISP_TRANSACTION_MODE) {
+    // don't await on promise to resolve
+    // let finish publish in background
+    PISPTransactionModel.triggerWorkflow(
+      PISPTransactionPhase.initiation,
+      request.params.ID,
+      pubSub,
+      payload as unknown as Message
+    )
+  } else {
+    const channel = OutboundAuthorizationsModel.notificationChannel(request.params.ID)
+    // don't await on promise to resolve
+    // let finish publish in background
+    pubSub.publish(channel, payload as unknown as Message)
+  }
 
   // return asap
   return h.response().code(200)
