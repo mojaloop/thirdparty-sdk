@@ -31,16 +31,12 @@ import {
   thirdparty as tpAPI
 } from '@mojaloop/api-snippets'
 import { Message } from '~/shared/pub-sub'
-import {
-  OutboundAuthorizationsModel
-} from '~/models/outbound/authorizations.model'
+import { OutboundAuthorizationsModel } from '~/models/outbound/authorizations.model'
 import {
   InboundAuthorizationsModel,
   InboundAuthorizationsModelConfig
 } from '~/models/inbound/authorizations.model'
-import {
-  PISPTransactionModel
-} from '~/models/pispTransaction.model'
+import { PISPTransactionModel } from '~/models/pispTransaction.model'
 import { PISPTransactionPhase } from '~/models/pispTransaction.interface'
 import { Request, ResponseObject } from '@hapi/hapi'
 import { StateResponseToolkit } from '~/server/plugins/state'
