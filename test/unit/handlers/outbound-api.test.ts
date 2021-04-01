@@ -56,7 +56,6 @@ import TestData from 'test/unit/data/mockData.json'
 import index from '~/index'
 import path from 'path'
 import SDK from '@mojaloop/sdk-standard-components'
-import { PISPOTPValidateModelState } from '~/models/outbound/pispOTPValidate.interface';
 
 const mockData = JSON.parse(JSON.stringify(TestData))
 const putResponse: fspiopAPI.Schemas.AuthorizationsIDPutResponse = {
@@ -533,7 +532,7 @@ describe('Outbound API routes', (): void => {
           }
         ],
       },
-      currentState: PISPOTPValidateModelState.OTPIsValid
+      currentState: 'OTPIsValid'
     }
     expect(response.result).toEqual(expectedResp)
   })
@@ -567,7 +566,7 @@ describe('Outbound API routes', (): void => {
     const response = await server.inject(request)
     expect(response.statusCode).toBe(500)
     const expectedResp = {
-      currentState: PISPOTPValidateModelState.errored,
+      currentState: 'errored',
       errorInformation: errorResponse.errorInformation
     }
     expect(response.result).toEqual(expectedResp)

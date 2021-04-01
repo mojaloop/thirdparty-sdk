@@ -30,8 +30,7 @@ import { PISPOTPValidateModel, create } from '~/models/outbound/pispOTPValidate.
 import {
   PISPOTPValidateData,
   PISPOTPValidateModelConfig,
-  OutboundOTPValidateData,
-  PISPOTPValidateModelState
+  OutboundOTPValidateData
 } from '~/models/outbound/pispOTPValidate.interface'
 import config from '~/shared/config';
 import inspect from '~/shared/inspect';
@@ -72,7 +71,7 @@ async function patch (_context: any, request: Request, h: StateResponseToolkit):
       return h.response({}).code(500)
     }
 
-    const statusCode = (result.currentState == PISPOTPValidateModelState.errored) ? 500 : 200
+    const statusCode = (result.currentState == 'errored') ? 500 : 200
     return h.response(result).code(statusCode)
   } catch(error) {
     h.getLogger().info(`Error running PISPOTPValidateModel : ${inspect(error)}`)

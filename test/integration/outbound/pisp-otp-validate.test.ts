@@ -30,7 +30,6 @@ import { KVS } from '~/shared/kvs'
 import { RedisConnectionConfig } from '~/shared/redis-connection'
 import Config from '~/shared/config'
 import mockLogger from '../../unit/mockLogger'
-import { PISPOTPValidateModelState } from '~/models/outbound/pispOTPValidate.interface';
 import { uuid } from 'uuidv4'
 
 describe('PISP OTP Validate', (): void => {
@@ -74,7 +73,7 @@ describe('PISP OTP Validate', (): void => {
       }
       const consentRequestsResponse = await axios.patch(consentRequestsURI, consentRequestsRequest)
       expect(consentRequestsResponse.status).toEqual(200)
-      expect(consentRequestsResponse.data.currentState).toEqual(PISPOTPValidateModelState.OTPIsValid)
+      expect(consentRequestsResponse.data.currentState).toEqual('OTPIsValid')
       expect(consentRequestsResponse.data.consent).toEqual(expectedResponse)
     })
   })
@@ -93,7 +92,7 @@ describe('PISP OTP Validate', (): void => {
       await axios.patch(consentRequestsURI, consentRequestsRequest)
         .catch(error => {
           expect(error.response.status).toEqual(500)
-          expect(error.response.data.currentState).toEqual(PISPOTPValidateModelState.errored)
+          expect(error.response.data.currentState).toEqual('errored')
           expect(error.response.data.errorInformation).toEqual(expectedResponse)
         })
     })

@@ -34,13 +34,6 @@ import {
   thirdparty as tpAPI
 } from '@mojaloop/api-snippets'
 import { PubSub } from '~/shared/pub-sub'
-
-export enum PISPOTPValidateModelState {
-  start = 'start',
-  OTPIsValid = 'OTPIsValid',
-  errored = 'errored'
-}
-
 export interface PISPOTPValidateStateMachine extends ControlledStateMachine {
   validateOTP: Method
   onValidateOTP: Method
@@ -53,6 +46,7 @@ export interface PISPOTPValidateModelConfig extends PersistentModelConfig {
 }
 
 export interface PISPOTPValidateData extends StateData {
+  currentState: 'start' | 'OTPIsValid' | 'errored',
   toParticipantId: string
   consentRequestsRequestId: string
   authToken: string
