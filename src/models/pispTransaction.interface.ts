@@ -54,9 +54,10 @@ export type PISPTransactionModelState =
 export enum PISPTransactionPhase {
   lookup = 'lookup',
   initiation = 'initiation',
+  waitOnTransactionPut = 'waitOnTransactionPut',
+  waitOnAuthorizationPost = 'waitOnAuthorizationPost',
   approval = 'approval',
 }
-
 export interface PISPTransactionStateMachine extends ControlledStateMachine {
   requestPartyLookup: Method
   onRequestPartyLookup: Method
