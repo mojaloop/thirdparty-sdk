@@ -43,6 +43,7 @@ import {
 import {
   PISPTransactionData,
   PISPTransactionModelConfig,
+  PISPTransactionModelState,
   PISPTransactionPhase,
   PISPTransactionStateMachine,
   ThirdpartyTransactionStatus
@@ -281,6 +282,7 @@ export class PISPTransactionModel
         return this.data.initiateResponse
       case 'transactionStatusReceived':
         return this.data.approveResponse
+      case 'errored':
       default:
     }
   }

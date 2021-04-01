@@ -48,8 +48,8 @@ export enum RequestPartiesInformationState {
 
 export type PISPTransactionModelState =
   OutboundAPI.Schemas.ThirdpartyTransactionPartyLookupState
-  & OutboundAPI.Schemas.ThirdpartyTransactionIDInitiateState
-  & OutboundAPI.Schemas.ThirdpartyTransactionIDApproveState
+  | OutboundAPI.Schemas.ThirdpartyTransactionIDInitiateState
+  | OutboundAPI.Schemas.ThirdpartyTransactionIDApproveState
 
 export enum PISPTransactionPhase {
   lookup = 'lookup',
@@ -82,7 +82,7 @@ export interface ThirdpartyTransactionStatus {
   transactionState: 'RECEIVED' | 'PENDING' | 'COMPLETED' | 'REJECTED'
 }
 
-export interface PISPTransactionData extends StateData {
+export interface PISPTransactionData extends StateData<PISPTransactionModelState> {
   transactionRequestId?: string
 
   // party lookup
