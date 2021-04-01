@@ -32,8 +32,8 @@ import {
 import { Message } from '~/shared/pub-sub'
 import { Request, ResponseObject } from '@hapi/hapi'
 import { StateResponseToolkit } from '~/server/plugins/state'
-import { notificationChannel } from '../../models/pispConsentRequest.model';
-import { Enum } from '@mojaloop/central-services-shared';
+import { Enum } from '@mojaloop/central-services-shared'
+import { PISPOTPValidateModel } from '~/models/outbound/pispOTPValidate.model'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function post (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
@@ -42,7 +42,7 @@ async function post (_context: any, request: Request, h: StateResponseToolkit): 
 
   // POST /consents is a follow-up request to PATCH /consentRequests
   // so we publish the request on the PISPConsentRequestModel
-  const channel = notificationChannel(
+  const channel = PISPOTPValidateModel.notificationChannel(
     payload.consentRequestId
   )
   const pubSub = h.getPubSub()

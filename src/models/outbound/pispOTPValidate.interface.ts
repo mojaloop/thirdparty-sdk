@@ -21,22 +21,41 @@
  * Gates Foundation
  - Name Surname <name.surname@gatesfoundation.com>
 
- - Kevin Leyow <kevin.leyow@modusbox.com>
+ - Kevin Leyow - kevin.leyow@modusbox.com
  --------------
  ******/
+import {
+  ControlledStateMachine,
+  PersistentModelConfig, StateData
+} from '~/models/persistent.model'
+import { Method } from 'javascript-state-machine'
+import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components';
+import {
+  thirdparty as tpAPI
+} from '@mojaloop/api-snippets'
+import { PubSub } from '~/shared/pub-sub'
+import * as OutboundAPI from '~/interface/outbound/api_interfaces'
 
-// TODO: use Async2sync model for this.
-/**
- * @name channelName
- * @description generates the pub/sub channel name
- * @param {object} - args
- * @param {string} args.consentRequestId - the consent request  id
- * @returns {string} - the pub/sub channel name
- */
-export function notificationChannel (consentRequestId: string) {
-  if (!consentRequestId) {
-    throw new Error('PISPConsentRequest.notificationChannel: \'consentRequestId\' parameter is required')
-  }
-  // channel name
-  return `consent_request_${consentRequestId}`
+export interface PISPOTPValidateStateMachine extends ControlledStateMachine {
+  validateOTP: Method
+  onValidateOTP: Method
+}
+
+export interface PISPOTPValidateModelConfig extends PersistentModelConfig {
+  pubSub: PubSub
+  thirdpartyRequests: ThirdpartyRequests
+  requestProcessingTimeoutSeconds: number
+}
+
+export interface PISPOTPValidateData extends StateData<OutboundAPI.Schemas.ConsentRequestsValidateState> {
+  toParticipantId: string
+  consentRequestsRequestId: string
+  authToken: string
+  consent?: tpAPI.Schemas.ConsentsPostRequest
+  errorInformation?: tpAPI.Schemas.ErrorInformation
+}
+
+export interface OutboundOTPValidateData extends StateData {
+  authToken: string
+  toParticipantId: string
 }

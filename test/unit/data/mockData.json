@@ -173,5 +173,23 @@
         ]
       }]
     }
+  },
+  "inboundConsentsPostRequest": {
+    "headers": {
+    },
+    "params": {
+    },
+    "payload": {
+      "consentId": "8e34f91d-d078-4077-8263-2c047876fcf6",
+      "consentRequestId": "6988c34f-055b-4ed5-b223-b10c8a2e2329",
+      "scopes": [{
+          "accountId": "some-id",
+          "actions": [
+            "accounts.getBalance",
+            "accounts.transfer"
+          ]
+        }
+      ]
+    }
   }
 }

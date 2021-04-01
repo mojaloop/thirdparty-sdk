@@ -31,6 +31,7 @@ import { OutboundAuthorizationsModelState } from '~/models/authorizations.interf
 import { OutboundAuthorizationsModel } from '~/models/outbound/authorizations.model'
 import { OutboundThirdpartyAuthorizationsModel } from '~/models/outbound/thirdparty.authorizations.model'
 import { OutboundAccountsModel } from '~/models/outbound/accounts.model'
+import { PISPOTPValidateModel } from '~/models/outbound/pispOTPValidate.model'
 import {
   v1_1 as fspiopAPI,
   thirdparty as tpAPI
@@ -43,8 +44,9 @@ import {
 } from '~/models/thirdparty.authorizations.interface'
 import {
   RequestPartiesInformationState
+  , PISPTransactionPhase
 } from '~/models/pispTransaction.interface'
-import PTM from '~/models/pispTransaction.model'
+import PTM, { PISPTransactionModel } from '~/models/pispTransaction.model'
 import { OutboundAccountsModelState } from '~/models/accounts.interface'
 
 import { RedisConnectionConfig } from '~/shared/redis-connection'
@@ -56,8 +58,7 @@ import TestData from 'test/unit/data/mockData.json'
 import index from '~/index'
 import path from 'path'
 import SDK from '@mojaloop/sdk-standard-components'
-import { PISPTransactionModel } from '~/models/pispTransaction.model'
-import { PISPTransactionPhase } from '~/models/pispTransaction.interface'
+
 const mockData = JSON.parse(JSON.stringify(TestData))
 const putResponse: fspiopAPI.Schemas.AuthorizationsIDPutResponse = {
   authenticationInfo: {
@@ -132,7 +133,8 @@ jest.mock('@mojaloop/sdk-standard-components', () => {
       postAuthorizations: jest.fn(() => Promise.resolve(putResponse)),
       postThirdpartyRequestsTransactionsAuthorizations: jest.fn(() => Promise.resolve(putThirdpartyAuthResponse)),
       postThirdpartyRequestsTransactions: jest.fn(() => Promise.resolve(initiateResponse)),
-      getAccounts: jest.fn(() => Promise.resolve(mockData.accountsRequest.payload))
+      getAccounts: jest.fn(() => Promise.resolve(mockData.accountsRequest.payload)),
+      patchConsentRequests: jest.fn(() => Promise.resolve(mockData.inboundConsentsPostRequest))
     })),
     WSO2Auth: jest.fn(),
     Logger: {
@@ -551,5 +553,84 @@ describe('Outbound API routes', (): void => {
       errorInformation: errorResp.errorInformation
     }
     expect((response.result)).toEqual(expectedResp)
+  })
+
+  it('/consentRequests/{ID}/validate - success', async (): Promise<void> => {
+    const consentRequestId = '6988c34f-055b-4ed5-b223-b10c8a2e2329'
+    const request = {
+      method: 'PATCH',
+      url: `/consentRequests/${consentRequestId}/validate`,
+      payload: {
+        toParticipantId: 'dfpsa',
+        authToken: '123456'
+      }
+    }
+    const pubSub = new PubSub({} as RedisConnectionConfig)
+    // defer publication to notification channel
+    // the dfsp should respond to a PISP with a POST /consents request
+    // where the inbound handler will publish the message
+    setTimeout(() => pubSub.publish(
+      PISPOTPValidateModel.notificationChannel(
+        consentRequestId
+      ),
+      mockData.inboundConsentsPostRequest.payload as unknown as Message
+    ), 10)
+    const response = await server.inject(request)
+
+    expect(response.statusCode).toBe(200)
+    const expectedResp = {
+      consent: {
+        consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
+        consentRequestId,
+        scopes: [{
+          accountId: 'some-id',
+          actions: [
+            'accounts.getBalance',
+            'accounts.transfer'
+          ]
+        }
+        ]
+      },
+      currentState: 'OTPIsValid'
+    }
+    expect(response.result).toEqual(expectedResp)
+  })
+
+  it('/consentRequests/{ID}/validate - error', async (): Promise<void> => {
+    const consentRequestId = '6988c34f-055b-4ed5-b223-b10c8a2e2329'
+    const request = {
+      method: 'PATCH',
+      url: `/consentRequests/${consentRequestId}/validate`,
+      payload: {
+        toParticipantId: 'dfpsa',
+        authToken: '123456'
+      }
+    }
+
+    const errorResponse = {
+      errorInformation: {
+        errorCode: '6000',
+        errorDescription: 'Generic thirdparty error'
+      }
+    }
+
+    const pubSub = new PubSub({} as RedisConnectionConfig)
+    // defer publication to notification channel
+    // if the validation fails the dfsp will respond with a
+    // PUT /consentRequests/{ID}/error where the inbound handler will publish
+    // the error
+    setTimeout(() => pubSub.publish(
+      PISPOTPValidateModel.notificationChannel(
+        consentRequestId
+      ),
+      errorResponse as unknown as Message
+    ), 10)
+    const response = await server.inject(request)
+    expect(response.statusCode).toBe(500)
+    const expectedResp = {
+      currentState: 'errored',
+      errorInformation: errorResponse.errorInformation
+    }
+    expect(response.result).toEqual(expectedResp)
   })
 })
