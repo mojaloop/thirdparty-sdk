@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+## [11.31.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.30.5...v11.31.0) (2021-04-01)
+
+
+### Features
+
+* add model and handler of outbound pisp otp validate ([#75](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/75)) ([443cb23](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/443cb23fcd22929f31d421baaa7dbbee65fbe70e))
+
 ### [11.30.5](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.30.4...v11.30.5) (2021-04-01)
 
 
