@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+### [11.30.5](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.30.4...v11.30.5) (2021-04-01)
+
+
+### Code Refactor
+
+* 2060 use deferredJob in PISPTransactionModel ([#76](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/76)) ([b7ac714](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/b7ac714843f745baf7d4069175b4260438720c11))
+
 ### [11.30.4](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.30.3...v11.30.4) (2021-03-30)
 
 
