@@ -37,6 +37,7 @@ import {
   existsInKVS
 } from '~/models/pispTransaction.model'
 import { Request, ResponseObject } from '@hapi/hapi'
+import config from '~/shared/config'
 
 async function post (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const payload = request.payload as OutboundAPI.Schemas.ThirdpartyTransactionPartyLookupRequest
@@ -60,7 +61,9 @@ async function post (_context: unknown, request: Request, h: StateResponseToolki
     logger: h.getLogger(),
     thirdpartyRequests: h.getThirdpartyRequests(),
     mojaloopRequests: h.getMojaloopRequests(),
-    sdkOutgoingRequests: h.getSDKOutgoingRequests()
+    sdkOutgoingRequests: h.getSDKOutgoingRequests(),
+    initiateTimeoutInSeconds: config.SHARED.PISP_TRANSACTION_INITIATE_TIMEOUT_IN_SECONDS,
+    approveTimeoutInSeconds: config.SHARED.PISP_TRANSACTION_APPROVE_TIMEOUT_IN_SECONDS
   }
   const exists = await existsInKVS(modelConfig)
   if (exists) {

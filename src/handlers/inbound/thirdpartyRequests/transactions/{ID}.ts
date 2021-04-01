@@ -32,15 +32,19 @@ import { PISPTransactionModel } from '~/models/pispTransaction.model'
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function patch (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
-  const partyRequest = request.payload as ThirdpartyTransactionStatus
-  const channel = PISPTransactionModel.notificationChannel(
-    PISPTransactionPhase.approval,
-    request.params.ID
-  )
-  h.getLogger().push({ channel, partyRequest }).info('PATCH /thirdpartyRequests/transactions/ pushing to channel')
+  const payload = request.payload as ThirdpartyTransactionStatus
   const pubSub = h.getPubSub()
+
+  h.getLogger().push({ payload }).info('PATCH /thirdpartyRequests/transactions/ pushing to channel')
+
   // don't await on promise to resolve, let finish publish in background
-  pubSub.publish(channel, partyRequest as unknown as Message)
+  PISPTransactionModel.triggerWorkflow(
+    PISPTransactionPhase.approval,
+    request.params.ID,
+    pubSub,
+    payload as unknown as Message
+  )
+
   return h.response({}).code(200)
 }
 

@@ -92,7 +92,9 @@ describe('pipsTransactionModel', () => {
           party: { Iam: 'mocked-party' },
           currentStatus: 'COMPLETED'
         }))
-      } as unknown as SDKOutgoingRequests
+      } as unknown as SDKOutgoingRequests,
+      initiateTimeoutInSeconds: 3,
+      approveTimeoutInSeconds: 3
     }
     mocked(modelConfig.pubSub.subscribe).mockImplementationOnce(
       (_channel: string, cb: NotificationCallback) => {
@@ -534,7 +536,7 @@ describe('pipsTransactionModel', () => {
     })
 
     it('errored state', async () => {
-      const erroredData = {
+      const erroredData: PISPTransactionData = {
         transactionRequestId: '123',
         currentState: 'errored'
       }
@@ -546,7 +548,7 @@ describe('pipsTransactionModel', () => {
     })
 
     it('should do throw if requestLookup was not done before calling initialization', async () => {
-      const invalidData = {
+      const invalidData: PISPTransactionData = {
         transactionRequestId: '1234-1234',
         currentState: 'partyLookupSuccess'
         // lack of these properties
@@ -583,7 +585,7 @@ describe('pipsTransactionModel', () => {
 
   describe('getResponse', () => {
     it('should give valid response', async () => {
-      const data = {
+      const data: PISPTransactionData = {
         transactionRequestId: '1234-1234',
         currentState: 'start'
       }

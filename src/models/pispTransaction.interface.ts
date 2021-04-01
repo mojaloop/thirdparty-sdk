@@ -48,8 +48,8 @@ export enum RequestPartiesInformationState {
 
 export type PISPTransactionModelState =
   OutboundAPI.Schemas.ThirdpartyTransactionPartyLookupState
-  & OutboundAPI.Schemas.ThirdpartyTransactionIDInitiateState
-  & OutboundAPI.Schemas.ThirdpartyTransactionIDApproveState
+  | OutboundAPI.Schemas.ThirdpartyTransactionIDInitiateState
+  | OutboundAPI.Schemas.ThirdpartyTransactionIDApproveState
 
 export enum PISPTransactionPhase {
   lookup = 'lookup',
@@ -73,6 +73,8 @@ export interface PISPTransactionModelConfig extends PersistentModelConfig {
   thirdpartyRequests: ThirdpartyRequests
   mojaloopRequests: MojaloopRequests
   sdkOutgoingRequests: SDKOutgoingRequests
+  initiateTimeoutInSeconds: number
+  approveTimeoutInSeconds: number
 }
 
 export interface ThirdpartyTransactionStatus {
@@ -81,7 +83,7 @@ export interface ThirdpartyTransactionStatus {
   transactionState: 'RECEIVED' | 'PENDING' | 'COMPLETED' | 'REJECTED'
 }
 
-export interface PISPTransactionData extends StateData {
+export interface PISPTransactionData extends StateData<PISPTransactionModelState> {
   transactionRequestId?: string
 
   // party lookup
