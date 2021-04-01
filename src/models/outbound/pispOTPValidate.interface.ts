@@ -34,6 +34,8 @@ import {
   thirdparty as tpAPI
 } from '@mojaloop/api-snippets'
 import { PubSub } from '~/shared/pub-sub'
+import * as OutboundAPI from '~/interface/outbound/api_interfaces'
+
 export interface PISPOTPValidateStateMachine extends ControlledStateMachine {
   validateOTP: Method
   onValidateOTP: Method
@@ -45,8 +47,7 @@ export interface PISPOTPValidateModelConfig extends PersistentModelConfig {
   requestProcessingTimeoutSeconds: number
 }
 
-export interface PISPOTPValidateData extends StateData {
-  currentState: 'start' | 'OTPIsValid' | 'errored',
+export interface PISPOTPValidateData extends StateData<OutboundAPI.Schemas.ConsentRequestsValidateState> {
   toParticipantId: string
   consentRequestsRequestId: string
   authToken: string

@@ -820,7 +820,11 @@ export interface components {
       authToken: string;
     };
     /** State of POST consent requests validate */
-    ConsentRequestsValidateState: 'errored' | 'success' | 'OTPIsValid';
+    ConsentRequestsValidateState:
+    | 'start'
+    | 'errored'
+    | 'success'
+    | 'OTPIsValid';
     ConsentRequestsValidateResponseError: {
       errorInformation: components['schemas']['ErrorInformation'];
       currentState: components['schemas']['ConsentRequestsValidateState'];

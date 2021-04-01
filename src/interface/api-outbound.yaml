@@ -1830,6 +1830,7 @@ components:
       description: State of POST consent requests validate
       type: string
       enum:
+        - start
         - errored
         - success
         - OTPIsValid
