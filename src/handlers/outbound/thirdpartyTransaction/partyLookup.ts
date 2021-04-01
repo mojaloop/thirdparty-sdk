@@ -62,7 +62,8 @@ async function post (_context: unknown, request: Request, h: StateResponseToolki
     thirdpartyRequests: h.getThirdpartyRequests(),
     mojaloopRequests: h.getMojaloopRequests(),
     sdkOutgoingRequests: h.getSDKOutgoingRequests(),
-    initiateTimeoutInSeconds: config.SHARED.PISP_TRANSACTION_INITIATE_TIMEOUT_IN_SECONDS
+    initiateTimeoutInSeconds: config.SHARED.PISP_TRANSACTION_INITIATE_TIMEOUT_IN_SECONDS,
+    approveTimeoutInSeconds: config.SHARED.PISP_TRANSACTION_APPROVE_TIMEOUT_IN_SECONDS
   }
   const exists = await existsInKVS(modelConfig)
   if (exists) {

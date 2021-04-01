@@ -93,7 +93,8 @@ describe('pipsTransactionModel', () => {
           currentStatus: 'COMPLETED'
         }))
       } as unknown as SDKOutgoingRequests,
-      initiateTimeoutInSeconds: 3
+      initiateTimeoutInSeconds: 3,
+      approveTimeoutInSeconds: 3
     }
     mocked(modelConfig.pubSub.subscribe).mockImplementationOnce(
       (_channel: string, cb: NotificationCallback) => {

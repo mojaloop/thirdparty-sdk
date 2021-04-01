@@ -74,6 +74,7 @@ export interface PISPTransactionModelConfig extends PersistentModelConfig {
   mojaloopRequests: MojaloopRequests
   sdkOutgoingRequests: SDKOutgoingRequests
   initiateTimeoutInSeconds: number
+  approveTimeoutInSeconds: number
 }
 
 export interface ThirdpartyTransactionStatus {

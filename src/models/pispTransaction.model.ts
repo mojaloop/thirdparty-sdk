@@ -43,7 +43,6 @@ import {
 import {
   PISPTransactionData,
   PISPTransactionModelConfig,
-  PISPTransactionModelState,
   PISPTransactionPhase,
   PISPTransactionStateMachine,
   ThirdpartyTransactionStatus
@@ -140,6 +139,7 @@ export class PISPTransactionModel
   }
 
   async onRequestPartyLookup (): Promise<void> {
+    // input validation
     InvalidPISPTransactionDataError.throwIfInvalidProperty(this.data, 'payeeRequest')
     InvalidPISPTransactionDataError.throwIfInvalidProperty(this.data!.payeeRequest as Record<string, unknown>, 'payee')
     InvalidPISPTransactionDataError.throwIfInvalidProperty(
@@ -158,6 +158,7 @@ export class PISPTransactionModel
         payee.partyIdType, payee.partyIdentifier, payee.partySubIdOrType
       ) as SDKOutboundAPI.Schemas.partiesByIdResponse
 
+      // store results
       this.data.partyLookupResponse = {
         party: response.party,
         currentState: this.data.currentState as OutboundAPI.Schemas.ThirdpartyTransactionPartyLookupState
@@ -193,7 +194,7 @@ export class PISPTransactionModel
 
     const channel = PISPTransactionModel.notificationChannel(
       PISPTransactionPhase.initiation,
-      this.data.transactionRequestId as string
+      this.data.transactionRequestId!
     )
 
     this.logger.push({ channel }).info('onInitiate - subscribe to channel')
@@ -207,7 +208,7 @@ export class PISPTransactionModel
         }
         const res = await this.thirdpartyRequests.postThirdpartyRequestsTransactions(
           request,
-          this.data.initiateRequest?.payer.fspId as string
+          this.data.initiateRequest!.payer.fspId!
         )
         this.logger.push({ res }).info('ThirdpartyRequests.postThirdpartyRequestsTransactions request sent to peer')
       })
@@ -229,42 +230,29 @@ export class PISPTransactionModel
 
     const channel = PISPTransactionModel.notificationChannel(
       PISPTransactionPhase.approval,
-      this.data.transactionRequestId as string
+      this.data.transactionRequestId!
     )
 
     this.logger.push({ channel }).info('onApprove - subscribe to channel')
 
-    // eslint-disable-next-line no-async-promise-executor
-    return new Promise(async (resolve, reject) => {
-      let subId = 0
-      try {
-        // this handler will be executed when PATCH /thirdpartyRequests/transactions/{ID} @ Inbound server
-        subId = this.pubSub.subscribe(channel, async (channel: string, message: Message, sid: number) => {
-          // first unsubscribe
-          this.pubSub.unsubscribe(channel, sid)
-
-          this.data.transactionStatus = { ...message as unknown as ThirdpartyTransactionStatus }
-          this.data.approveResponse = {
-            transactionStatus: { ...this.data.transactionStatus },
-            currentState: this.data.currentState as OutboundAPI.Schemas.ThirdpartyTransactionIDApproveState
-          }
-          resolve()
-          // state machine should be in transactionSuccess state
-        })
-
+    return deferredJob(this.pubSub, channel)
+      .init(async (): Promise<void> => {
         const res = await this.mojaloopRequests.putAuthorizations(
-          this.data?.transactionRequestId as string,
+          this.data.transactionRequestId!,
           // propagate signed challenge
-          this.data?.approveRequest?.authorizationResponse as tpAPI.Schemas.AuthorizationsIDPutResponse,
-          this.data?.initiateRequest?.payer.fspId as string
+          this.data.approveRequest!.authorizationResponse,
+          this.data.initiateRequest!.payer.fspId!
         )
         this.logger.push({ res }).info('ThirdpartyRequests.postThirdpartyRequestsTransactions request sent to peer')
-      } catch (error) {
-        this.logger.push(error).error('ThirdpartyRequests.postThirdpartyRequestsTransactions request error')
-        this.pubSub.unsubscribe(channel, subId)
-        reject(error)
-      }
-    })
+      })
+      .job(async (message: Message): Promise<void> => {
+        this.data.transactionStatus = { ...message as unknown as ThirdpartyTransactionStatus }
+        this.data.approveResponse = {
+          transactionStatus: { ...this.data.transactionStatus },
+          currentState: this.data.currentState as OutboundAPI.Schemas.ThirdpartyTransactionIDApproveState
+        }
+      })
+      .wait(this.config.approveTimeoutInSeconds * 1000)
   }
 
   /**
@@ -282,7 +270,6 @@ export class PISPTransactionModel
         return this.data.initiateResponse
       case 'transactionStatusReceived':
         return this.data.approveResponse
-      case 'errored':
       default:
     }
   }
