@@ -43,6 +43,7 @@ export default {
   InboundAuthorizationsIDPutResponse: InboundAuthorizations.put,
   UpdateThirdpartyAuthorization: ThirdpartyAuthorizations.put,
   NotifyThirdpartyTransactionRequests: NotifyThirdpartyTransactionRequests.patch,
+  UpdateThirdPartyTransactionRequests: NotifyThirdpartyTransactionRequests.put,
   ThirdpartyTransactionRequestsError: ThirdpartyTransactionRequestsError.put,
   GetAccountsByUserId: InboundAccounts.get,
   UpdateAccountsByUserId: InboundAccounts.put,

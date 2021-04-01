@@ -55,7 +55,10 @@ async function post (_context: any, request: Request, h: StateResponseToolkit): 
   const model: PISPTransactionModel = await loadFromKVS(modelConfig)
   model.data.initiateRequest = payload
 
-  // run workflow and await on synchronous POST /authorizations response from Switch incoming on Inbound Service
+  // run workflow and await on two callbacks
+  // POST /authorizations request
+  // PUT /thirdpartyRequests/{ID}/transaction update
+  // from Switch incoming on Inbound Service
   const result = await model.run()
 
   // there is a risk the workflow fail and in that case result is undefined

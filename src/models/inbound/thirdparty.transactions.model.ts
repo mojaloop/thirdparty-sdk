@@ -36,7 +36,7 @@ import {
   OutboundRequestToPayTransferPostRequest,
   OutboundRequestToPayTransferPostResponse
 } from '../thirdparty.transactions.interface'
-import { ThirdpartyTransactionStatus } from '../pispTransaction.interface'
+import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
 
 export interface InboundThridpartyTransactionsModelConfig {
   logger: SDKLogger.Logger
@@ -112,7 +112,7 @@ export class InboundThridpartyTransactionsModel {
     this.logger.push({ response }).info('requestToPayTransfer: response')
 
     // notifyThirdpartyAboutTransfer via PATCH
-    const transactionStatus: ThirdpartyTransactionStatus = {
+    const transactionStatus: tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPatchResponse = {
       transactionId: inRequest.transactionRequestId,
       transactionRequestState: 'ACCEPTED',
       transactionState: 'COMPLETED'

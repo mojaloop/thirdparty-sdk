@@ -35,8 +35,7 @@ import {
   PISPTransactionData,
   PISPTransactionModelConfig,
   PISPTransactionPhase,
-  RequestPartiesInformationState,
-  ThirdpartyTransactionStatus
+  RequestPartiesInformationState
 } from '~/models/pispTransaction.interface'
 import {
   PISPTransactionModel,
@@ -286,12 +285,9 @@ describe('pipsTransactionModel', () => {
           condition: 'quote-condition'
         }
       }
-      const transactionStatus: ThirdpartyTransactionStatus = {
+      const transactionStatus: tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPutResponse = {
         transactionId,
-        transactionRequestState: 'RECEIVED',
-        // TODO: error case -> shouldn't transactionState be optional field
-        // - we are receiving this update before transaction is started
-        transactionState: 'PENDING'
+        transactionRequestState: 'RECEIVED'
       }
       beforeEach(async () => {
         data = {
@@ -382,7 +378,7 @@ describe('pipsTransactionModel', () => {
 
         // check we got needed part of response stored
         expect(model.data.authorizationRequest).toEqual(authorizationRequest)
-        expect(model.data.transactionStatus).toEqual(transactionStatus)
+        expect(model.data.transactionStatusPut).toEqual(transactionStatus)
 
         // check we got initiate response phase response stored
         expect(model.data.initiateResponse).toEqual({
@@ -453,7 +449,7 @@ describe('pipsTransactionModel', () => {
         responseType: 'ENTERED'
       }
 
-      const transactionStatus: ThirdpartyTransactionStatus = {
+      const transactionStatus: tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPatchResponse = {
         transactionId: '5678-5678',
         transactionRequestState: 'ACCEPTED',
         transactionState: 'COMPLETED'
@@ -534,7 +530,7 @@ describe('pipsTransactionModel', () => {
         expect(modelConfig.pubSub.unsubscribe).toBeCalledWith(channel, 1)
 
         // check we got needed part of response stored
-        expect(model.data.transactionStatus).toEqual(transactionStatus)
+        expect(model.data.transactionStatusPatch).toEqual(transactionStatus)
 
         // check we got initiate response phase response stored
         expect(model.data.approveResponse).toEqual({

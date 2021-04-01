@@ -44,8 +44,7 @@ import {
   PISPTransactionData,
   PISPTransactionModelConfig,
   PISPTransactionPhase,
-  PISPTransactionStateMachine,
-  ThirdpartyTransactionStatus
+  PISPTransactionStateMachine
 } from './pispTransaction.interface'
 import inspect from '~/shared/inspect'
 import { SDKOutgoingRequests } from '~/shared/sdk-outgoing-requests'
@@ -220,7 +219,9 @@ export class PISPTransactionModel
       })
       .job(async (message: Message): Promise<void> => {
         // receive the transfer state update from PUT /thirdpartyRequests/{ID}/transaction
-        this.data.transactionStatus = { ...message as unknown as ThirdpartyTransactionStatus }
+        this.data.transactionStatusPut = {
+          ...message as unknown as tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPutResponse
+        }
         // TODO: error case when transactionRequestState !== 'RECEIVED'
         this.saveToKVS()
       })
@@ -283,9 +284,11 @@ export class PISPTransactionModel
         this.logger.push({ res }).info('ThirdpartyRequests.postThirdpartyRequestsTransactions request sent to peer')
       })
       .job(async (message: Message): Promise<void> => {
-        this.data.transactionStatus = { ...message as unknown as ThirdpartyTransactionStatus }
+        this.data.transactionStatusPatch = {
+          ...message as unknown as tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPatchResponse
+        }
         this.data.approveResponse = {
-          transactionStatus: { ...this.data.transactionStatus },
+          transactionStatus: { ...this.data.transactionStatusPatch },
           currentState: this.data.currentState as OutboundAPI.Schemas.ThirdpartyTransactionIDApproveState
         }
       })

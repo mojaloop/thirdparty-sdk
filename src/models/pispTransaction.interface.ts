@@ -30,9 +30,7 @@ import {
   ThirdpartyRequests,
   MojaloopRequests
 } from '@mojaloop/sdk-standard-components'
-import {
-  thirdparty as tpAPI
-} from '@mojaloop/api-snippets'
+import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
 import { OutboundAPI as SDKOutboundAPI } from '@mojaloop/sdk-scheme-adapter'
 import { Method } from 'javascript-state-machine'
 import * as OutboundAPI from '~/interface/outbound/api_interfaces'
@@ -78,12 +76,6 @@ export interface PISPTransactionModelConfig extends PersistentModelConfig {
   approveTimeoutInSeconds: number
 }
 
-export interface ThirdpartyTransactionStatus {
-  transactionId: string
-  transactionRequestState: 'RECEIVED' | 'PENDING' | 'ACCEPTED' | 'REJECTED',
-  transactionState: 'RECEIVED' | 'PENDING' | 'COMPLETED' | 'REJECTED'
-}
-
 export interface PISPTransactionData extends StateData<PISPTransactionModelState> {
   transactionRequestId?: string
 
@@ -99,6 +91,7 @@ export interface PISPTransactionData extends StateData<PISPTransactionModelState
 
   // approve
   approveRequest?: OutboundAPI.Schemas.ThirdpartyTransactionIDApproveRequest
-  transactionStatus?: ThirdpartyTransactionStatus
+  transactionStatusPut?: tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPutResponse
+  transactionStatusPatch?: tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPatchResponse
   approveResponse?: OutboundAPI.Schemas.ThirdpartyTransactionIDApproveResponse
 }

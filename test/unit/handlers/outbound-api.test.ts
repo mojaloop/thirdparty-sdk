@@ -27,9 +27,10 @@
  --------------
  ******/
 
-import {
-  OutboundAuthorizationsModelState
-} from '~/models/authorizations.interface'
+import { OutboundAuthorizationsModelState } from '~/models/authorizations.interface'
+import { OutboundAuthorizationsModel } from '~/models/outbound/authorizations.model'
+import { OutboundThirdpartyAuthorizationsModel } from '~/models/outbound/thirdparty.authorizations.model'
+import { OutboundAccountsModel } from '~/models/outbound/accounts.model'
 import {
   v1_1 as fspiopAPI,
   thirdparty as tpAPI
@@ -41,7 +42,6 @@ import {
   OutboundThirdpartyAuthorizationsModelState
 } from '~/models/thirdparty.authorizations.interface'
 import {
-  ThirdpartyTransactionStatus,
   RequestPartiesInformationState
 } from '~/models/pispTransaction.interface'
 import PTM from '~/models/pispTransaction.model'
@@ -56,7 +56,8 @@ import TestData from 'test/unit/data/mockData.json'
 import index from '~/index'
 import path from 'path'
 import SDK from '@mojaloop/sdk-standard-components'
-
+import { PISPTransactionModel } from '~/models/pispTransaction.model'
+import { PISPTransactionPhase } from '~/models/pispTransaction.interface'
 const mockData = JSON.parse(JSON.stringify(TestData))
 const putResponse: fspiopAPI.Schemas.AuthorizationsIDPutResponse = {
   authenticationInfo: {
@@ -114,7 +115,7 @@ const initiateResponse: tpAPI.Schemas.AuthorizationsPostRequest = {
     condition: 'f5sqb7tBTWPd5Y8BDFdMm9BJR_MNI4isf8p8n4D5pHA'
   }
 }
-const approveResponse: ThirdpartyTransactionStatus = {
+const approveResponse: tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPatchResponse = {
   transactionId: 'b51ec534-ee48-4575-b6a9-ead2955b8069',
   transactionRequestState: 'ACCEPTED',
   transactionState: 'COMPLETED'
@@ -160,21 +161,26 @@ jest.mock('@mojaloop/sdk-standard-components', () => {
 })
 
 jest.mock('~/shared/pub-sub', () => {
-  let handler: NotificationCallback
+  const handlers: {[key: string]: NotificationCallback } = {}
+
   let subId = 0
   return {
     PubSub: jest.fn(() => ({
       isConnected: true,
       subscribe: jest.fn(
-        (_channel: string, cb: NotificationCallback) => {
-          handler = cb
+        (channel: string, cb: NotificationCallback) => {
+          handlers[channel] = cb
           return ++subId
         }
       ),
       unsubscribe: jest.fn(),
       publish: jest.fn(
         async (channel: string, message: Message) => {
-          return handler(channel, message, subId)
+          const h = handlers[channel]
+          if (!h) {
+            throw new Error(`PubSub.publish: no handler for channel: ${channel}`)
+          }
+          h(channel, message, subId)
         }
       ),
       connect: jest.fn(() => Promise.resolve()),
@@ -268,7 +274,7 @@ describe('Outbound API routes', (): void => {
 
     // defer publication to notification channel
     setTimeout(() => pubSub.publish(
-      'some-channel',
+      OutboundAuthorizationsModel.notificationChannel(request.payload.transactionRequestId),
       putResponse as unknown as Message // TODO: think about generic Message so casting will not be necessary
     ), 10)
     const response = await server.inject(request)
@@ -298,7 +304,7 @@ describe('Outbound API routes', (): void => {
     const pubSub = new PubSub({} as RedisConnectionConfig)
     // defer publication to notification channel
     setTimeout(() => pubSub.publish(
-      'some-channel',
+      OutboundThirdpartyAuthorizationsModel.notificationChannel('123'),
       putThirdpartyAuthResponse as unknown as Message
     ), 10)
     const response = await server.inject(request)
@@ -360,9 +366,11 @@ describe('Outbound API routes', (): void => {
   })
 
   it('/thirdpartyTransaction/{ID}/initiate', async (): Promise<void> => {
+    const transactionRequestId = 'b51ec534-ee48-4575-b6a9-ead2955b8069'
+    const transactionId = '52933d2c-f22f-4494-a7ae-99fc560357df'
     const request = {
       method: 'POST',
-      url: '/thirdpartyTransaction/b51ec534-ee48-4575-b6a9-ead2955b8069/initiate',
+      url: `/thirdpartyTransaction/${transactionRequestId}/initiate`,
       headers: {
         'Content-Type': 'application/json'
       },
@@ -392,24 +400,65 @@ describe('Outbound API routes', (): void => {
         expiration: '2020-07-15T22:17:28.985-01:00'
       }
     }
+
+    const authorizationRequest: tpAPI.Schemas.AuthorizationsPostRequest = {
+      transactionRequestId,
+      transactionId: transactionId,
+      authenticationType: 'U2F',
+      retriesLeft: '1',
+      amount: {
+        amount: '123.00',
+        currency: 'USD'
+      },
+      quote: {
+        transferAmount: {
+          amount: '123.00',
+          currency: 'USD'
+        },
+        expiration: 'quote-expiration',
+        ilpPacket: 'quote-ilp-packet',
+        condition: 'quote-condition'
+      }
+    }
+    const transactionStatus: tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPutResponse = {
+      transactionId,
+      transactionRequestState: 'RECEIVED'
+    }
+    const channelTransPut = PISPTransactionModel.notificationChannel(
+      PISPTransactionPhase.waitOnTransactionPut,
+      transactionRequestId
+    )
+    const channelAuthPost = PISPTransactionModel.notificationChannel(
+      PISPTransactionPhase.waitOnAuthorizationPost,
+      transactionRequestId
+    )
     const pubSub = new PubSub({} as RedisConnectionConfig)
     // defer publication to notification channel
-    setTimeout(() => pubSub.publish(
-      'some-channel',
-      initiateResponse as unknown as Message
-    ), 10)
+    setTimeout(() => {
+      // publish authorization request
+      pubSub.publish(
+        channelAuthPost,
+        authorizationRequest as unknown as Message
+      )
+      // publish transaction status update
+      pubSub.publish(
+        channelTransPut,
+        transactionStatus as unknown as Message
+      )
+    }, 100)
     const response = await server.inject(request)
     expect(response.statusCode).toBe(200)
     expect(response.result).toEqual({
-      authorization: { ...initiateResponse },
+      authorization: expect.anything(),
       currentState: 'authorizationReceived'
     })
   })
 
   it('/thirdpartyTransaction/{ID}/approve', async (): Promise<void> => {
+    const transactionRequestId = 'b51ec534-ee48-4575-b6a9-ead2955b8069'
     const request = {
       method: 'POST',
-      url: '/thirdpartyTransaction/b51ec534-ee48-4575-b6a9-ead2955b8069/approve',
+      url: `/thirdpartyTransaction/${transactionRequestId}/approve`,
       headers: {
         'Content-Type': 'application/json'
       },
@@ -427,9 +476,13 @@ describe('Outbound API routes', (): void => {
       }
     }
     const pubSub = new PubSub({} as RedisConnectionConfig)
+    const channelApprove = PISPTransactionModel.notificationChannel(
+      PISPTransactionPhase.approval,
+      transactionRequestId
+    )
     // defer publication to notification channel
     setTimeout(() => pubSub.publish(
-      'some-channel',
+      channelApprove,
       approveResponse as unknown as Message
     ), 10)
     const response = await server.inject(request)
@@ -441,14 +494,15 @@ describe('Outbound API routes', (): void => {
   })
 
   it('/accounts/{fspId}/{userId} -success', async (): Promise<void> => {
+    const userId = 'username1234'
     const request = {
       method: 'GET',
-      url: '/accounts/dfspa/username1234'
+      url: `/accounts/dfspa/${userId}`
     }
     const pubSub = new PubSub({} as RedisConnectionConfig)
     // defer publication to notification channel
     setTimeout(() => pubSub.publish(
-      'some-channel',
+      OutboundAccountsModel.notificationChannel(userId),
       mockData.accountsRequest.payload as unknown as Message
     ), 10)
     const response = await server.inject(request)
@@ -472,9 +526,10 @@ describe('Outbound API routes', (): void => {
   })
 
   it('/accounts/{fspId}/{userId} -fail', async (): Promise<void> => {
+    const userId = 'test'
     const request = {
       method: 'GET',
-      url: '/accounts/dfspa/test'
+      url: `/accounts/dfspa/${userId}`
     }
     const errorResp = {
       errorInformation: {
@@ -485,7 +540,7 @@ describe('Outbound API routes', (): void => {
     const pubSub = new PubSub({} as RedisConnectionConfig)
     // defer publication to notification channel
     setTimeout(() => pubSub.publish(
-      'some-channel',
+      OutboundAccountsModel.notificationChannel(userId),
       errorResp as unknown as Message
     ), 10)
     const response = await server.inject(request)
