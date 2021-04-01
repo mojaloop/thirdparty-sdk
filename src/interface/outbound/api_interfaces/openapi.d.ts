@@ -819,6 +819,16 @@ export interface components {
       toParticipantId: string;
       authToken: string;
     };
+    /** State of POST consent requests validate */
+    ConsentRequestsValidateState:
+    | 'start'
+    | 'errored'
+    | 'success'
+    | 'OTPIsValid';
+    ConsentRequestsValidateResponseError: {
+      errorInformation: components['schemas']['ErrorInformation'];
+      currentState: components['schemas']['ConsentRequestsValidateState'];
+    };
     /**
      * The scopes requested for a ConsentRequest.
      * - "accounts.getBalance" - Get the balance of a given account.
@@ -845,8 +855,13 @@ export interface components {
       consentRequestId: components['schemas']['CorrelationId'];
       scopes: components['schemas']['Scope'][];
     };
-    /** State of POST consent requests validate */
-    ConsentRequestsValidateState: string;
+    ConsentRequestsValidateResponseSuccess: {
+      consent: components['schemas']['ConsentsPostRequest'];
+      currentState: components['schemas']['ConsentRequestsValidateState'];
+    };
+    ConsentRequestsValidateResponse:
+    | components['schemas']['ConsentRequestsValidateResponseError']
+    | components['schemas']['ConsentRequestsValidateResponseSuccess'];
   };
   responses: {
     /** OK */
@@ -980,10 +995,7 @@ export interface components {
     /** Consent requests validate response */
     ConsentRequestsValidateResponse: {
       content: {
-        'application/json': {
-          consent?: components['schemas']['ConsentsPostRequest'];
-          currentState?: components['schemas']['ConsentRequestsValidateState'];
-        };
+        'application/json': components['schemas']['ConsentRequestsValidateResponse'];
       };
     };
   };

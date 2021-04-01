@@ -59,5 +59,149 @@
     },
     "type": "response",
     "version": 1
+  },
+  {
+    "ruleId": 2,
+    "priority": 1,
+    "description": "patch /consentRequests/{ID}",
+    "apiVersion": {
+      "minorVersion": 1,
+      "majorVersion": 0,
+      "type": "thirdparty_pisp",
+      "asynchronous": true
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "body",
+          "operator": "equal",
+          "value": "123456",
+          "path": "authToken"
+        },
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/consentRequests/{ID}"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "patch"
+        }
+      ]
+    },
+    "event": {
+      "method": null,
+      "path": null,
+      "params": {
+        "scripts": {
+          "exec": [
+            "const userConfig = JSON.parse(pm.globals.get('userConfig'))",
+            "const curDate = (new Date()).toUTCString()",
+            "const consentRequestId = pm.request.url.path[1]",
+            "const consentRequest = {",
+            "  url: userConfig.CALLBACK_ENDPOINT + '/consents',",
+            "  method: 'post',",
+            "  header: {",
+            "    'FSPIOP-Source': 'switch',",
+            "    'Accept': 'application/vnd.interoperability.thirdparty+json;version=1.0',",
+            "    'Content-Type': 'application/vnd.interoperability.thirdparty+json;version=1.0',",
+            "    'Date': curDate",
+            "  },",
+            "  body: {",
+            "    mode: 'raw',",
+            "    raw: JSON.stringify({",
+            "      \"consentId\": \"8e34f91d-d078-4077-8263-2c047876fcf6\",",
+            "      \"consentRequestId\": consentRequestId,",
+            "      \"scopes\": [{",
+            "          \"accountId\": \"some-id\",",
+            "          \"actions\": [",
+            "            \"accounts.getBalance\",",
+            "            \"accounts.transfer\"",
+            "          ]",
+            "        }",
+            "      ]",
+            "    })",
+            "  }",
+            "}",
+            "pm.sendRequest(consentRequest, function (err, response) {",
+            "console.log('consent response : '+JSON.stringify(response.json()))",
+            "});"
+          ]
+        }
+      },
+      "type": "MOCK_RESPONSE"
+    },
+    "type": "response",
+    "version": 1
+  },
+  {
+    "ruleId": 3,
+    "priority": 1,
+    "description": "patch /consentRequests/{ID} - error returned",
+    "apiVersion": {
+      "minorVersion": 1,
+      "majorVersion": 0,
+      "type": "thirdparty_pisp",
+      "asynchronous": true
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "body",
+          "operator": "equal",
+          "value": "654321",
+          "path": "authToken"
+        },
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/consentRequests/{ID}"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "patch"
+        }
+      ]
+    },
+    "event": {
+      "method": null,
+      "path": null,
+      "params": {
+        "scripts": {
+          "exec": [
+            "const userConfig = JSON.parse(pm.globals.get('userConfig'))",
+            "const curDate = (new Date()).toUTCString()",
+            "const consentRequestId = pm.request.url.path[1]",
+            "const consentRequest = {",
+            "  url: userConfig.CALLBACK_ENDPOINT + '/consentRequests/' + consentRequestId + '/error',",
+            "  method: 'put',",
+            "  header: {",
+            "    'FSPIOP-Source': 'switch',",
+            "    'Accept': 'application/vnd.interoperability.thirdparty+json;version=1.0',",
+            "    'Content-Type': 'application/vnd.interoperability.thirdparty+json;version=1.0',",
+            "    'Date': curDate",
+            "  },",
+            "  body: {",
+            "    mode: 'raw',",
+            "    raw: JSON.stringify({",
+            "      \"errorInformation\": {",
+            "        \"errorCode\": \"6000\",",
+            "        \"errorDescription\": \"Generic thirdparty error\"",
+            "      }",
+            "    })",
+            "  }",
+            "}",
+            "pm.sendRequest(consentRequest, function (err, response) {",
+            "console.log('consent response : '+JSON.stringify(response.json()))",
+            "});"
+          ]
+        }
+      },
+      "type": "MOCK_RESPONSE"
+    },
+    "type": "response",
+    "version": 1
   }
 ]

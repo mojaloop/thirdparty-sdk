@@ -60,6 +60,7 @@ export interface ServiceConfig {
   ENV: string
   INBOUND: InConfig
   OUTBOUND: OutConfig
+  REQUEST_PROCESSING_TIMEOUT_SECONDS: number
   WSO2_AUTH: {
     staticToken: string
     tokenEndpoint: string
@@ -150,6 +151,11 @@ export const ConvictConfig = Convict<ServiceConfig>({
       default: 3002,
       env: 'OUTBOUND_PORT'
     }
+  },
+  REQUEST_PROCESSING_TIMEOUT_SECONDS: {
+    doc: 'The timeout for waiting for a response to a request',
+    env: 'REQUEST_PROCESSING_TIMEOUT_SECONDS',
+    default: 30
   },
   WSO2_AUTH: {
     staticToken: {
@@ -302,7 +308,7 @@ export const ConvictConfig = Convict<ServiceConfig>({
     DFSP_BACKEND_GET_SCOPES_PATH: {
       doc: 'uri to sdk-scheme-adapter getScopes endpoint',
       format: '*',
-      default: '{ID}/scopes'
+      default: 'scopes/{ID}'
     },
     PISP_BACKEND_URI: {
       doc: 'host address of DFSP\'s ',
@@ -399,6 +405,7 @@ const config: ServiceConfig = {
   ENV: ConvictConfig.get('ENV'),
   INBOUND: ConvictConfig.get('INBOUND'),
   OUTBOUND: ConvictConfig.get('OUTBOUND'),
+  REQUEST_PROCESSING_TIMEOUT_SECONDS: ConvictConfig.get('REQUEST_PROCESSING_TIMEOUT_SECONDS'),
   WSO2_AUTH: ConvictConfig.get('WSO2_AUTH'),
   REDIS: ConvictConfig.get('REDIS'),
   INSPECT: ConvictConfig.get('INSPECT'),

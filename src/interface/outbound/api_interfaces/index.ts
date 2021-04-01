@@ -89,4 +89,5 @@ export namespace Schemas {
   export type Scope = components['schemas']['Scope']
   export type ConsentsPostRequest = components['schemas']['ConsentsPostRequest']
   export type ConsentRequestsValidateState = components['schemas']['ConsentRequestsValidateState']
+  export type ConsentRequestsValidateResponse = components['schemas']['ConsentRequestsValidateResponse']
 }
