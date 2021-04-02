@@ -110,7 +110,8 @@ export class DFSPOTPValidateModel
           null as unknown as string,
           null as unknown as string,
           null as unknown as string,
-          Errors.MojaloopApiErrorCodes.TP_FSP_OTP_VALIDATION_ERROR)
+          Errors.MojaloopApiErrorCodes.TP_FSP_OTP_VALIDATION_ERROR
+        )
       }
 
       if (!isValidOTP.isValid) {
@@ -127,8 +128,6 @@ export class DFSPOTPValidateModel
       this.logger.push({ error }).error('start -> OTPIsValid')
       this.logger.push({ mojaloopError }).info(`Sending error response to ${toParticipantId}`)
 
-      // note: this is an error code scenario that will need to be addressed.
-      //       something along the lines 6xxx "OTP failed validation"
       await this.thirdpartyRequests.putConsentRequestsError(
         consentRequestsRequestId,
         mojaloopError as unknown as fspiopAPI.Schemas.ErrorInformationObject,
@@ -150,7 +149,8 @@ export class DFSPOTPValidateModel
           null as unknown as string,
           null as unknown as string,
           null as unknown as string,
-          Errors.MojaloopApiErrorCodes.TP_FSP_CONSENT_SCOPES_ERROR)
+          Errors.MojaloopApiErrorCodes.TP_FSP_CONSENT_SCOPES_ERROR
+        )
       }
 
       this.data.scopes = scopesGranted
