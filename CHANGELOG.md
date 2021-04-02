@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+## [11.32.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.31.0...v11.32.0) (2021-04-02)
+
+
+### Features
+
+* update error codes for authentication step of account linking ([#78](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/78)) ([44e5dc3](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/44e5dc38bdaaf22da10d9bc0cdc73b5ca9b8c39e))
+
 ## [11.31.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.30.5...v11.31.0) (2021-04-01)
 
 
