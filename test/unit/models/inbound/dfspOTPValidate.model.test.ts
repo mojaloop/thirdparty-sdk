@@ -79,10 +79,10 @@ describe('dfspOTPValidateModel', () => {
         })),
         getScopes: jest.fn(() => Promise.resolve({
           scopes: [{
-            accountId: "some-id",
+            accountId: 'some-id',
             actions: [
-              "accounts.getBalance",
-              "accounts.transfer"
+              'accounts.getBalance',
+              'accounts.transfer'
             ]
           }]
         }))
@@ -199,15 +199,48 @@ describe('dfspOTPValidateModel', () => {
         await model.fsm.validateOTP()
         shouldNotBeExecuted()
       } catch (err) {
-        expect(err.message).toEqual('Invalid OTP')
+        expect(err.apiErrorCode.code).toEqual('7205')
       }
 
       // check a PUT /consentsRequest/{ID}/error response was sent to source participant
       // todo: better and more descriptive error handling
       expect(modelConfig.thirdpartyRequests.putConsentRequestsError).toBeCalledWith(
         '0c9d9e95-b7ee-4813-87a7-a6a1ab7fc0ab',
-        {"errorInformation": {"errorCode": "2001", "errorDescription": "Internal server error"}},
-        "pispa"
+        {
+          errorInformation: {
+            errorCode: '7205',
+            errorDescription: 'OTP failed validation'
+          }
+        },
+        'pispa'
+      )
+    })
+
+    it('should handle empty OTP validation response and send PUT /consentsRequest/{ID}/error response', async () => {
+      mocked(
+        modelConfig.dfspBackendRequests.validateOTPSecret
+      ).mockImplementationOnce(() => Promise.resolve())
+
+      const model = await create(validateData, modelConfig)
+      try {
+        // start validation step
+        await model.fsm.validateOTP()
+        shouldNotBeExecuted()
+      } catch (err) {
+        expect(err.apiErrorCode.code).toEqual('7206')
+      }
+
+      // check a PUT /consentsRequest/{ID}/error response was sent to source participant
+      // todo: better and more descriptive error handling
+      expect(modelConfig.thirdpartyRequests.putConsentRequestsError).toBeCalledWith(
+        '0c9d9e95-b7ee-4813-87a7-a6a1ab7fc0ab',
+        {
+          errorInformation: {
+            errorCode: '7206',
+            errorDescription: 'FSP failed to validate OTP'
+          }
+        },
+        'pispa'
       )
     })
 
@@ -232,8 +265,13 @@ describe('dfspOTPValidateModel', () => {
       // check a PUT /consentsRequest/{ID}/error response was sent to source participant
       expect(modelConfig.thirdpartyRequests.putConsentRequestsError).toBeCalledWith(
         '0c9d9e95-b7ee-4813-87a7-a6a1ab7fc0ab',
-        {"errorInformation": {"errorCode": "2001", "errorDescription": "Internal server error"}},
-        "pispa"
+        {
+          errorInformation: {
+            errorCode: '2001',
+            errorDescription: 'Internal server error'
+          }
+        },
+        'pispa'
       )
     })
   })
@@ -255,14 +293,14 @@ describe('dfspOTPValidateModel', () => {
       checkDFSPOTPModelLayout(model, validateData)
     })
 
-    it('requestScopes() should transition from valid OTp to scopes received when successful', async () => {
+    it('requestScopes() should transition from valid OTP to scopes received when successful', async () => {
       const model = await create(validateData, modelConfig)
       mocked(modelConfig.dfspBackendRequests.getScopes).mockImplementationOnce(() => Promise.resolve({
-        "scopes": [{
-          accountId: "some-id",
+        scopes: [{
+          accountId: 'some-id',
           actions: [
-            "accounts.getBalance",
-            "accounts.transfer"
+            'accounts.getBalance',
+            'accounts.transfer'
           ]
         }]
       }))
@@ -275,11 +313,11 @@ describe('dfspOTPValidateModel', () => {
 
       // check that scopes were stored in the state machine
       expect(model.data.scopes).toEqual({
-        "scopes": [{
-          accountId: "some-id",
+        scopes: [{
+          accountId: 'some-id',
           actions: [
-            "accounts.getBalance",
-            "accounts.transfer"
+            'accounts.getBalance',
+            'accounts.transfer'
           ]
         }]
       })
@@ -292,7 +330,7 @@ describe('dfspOTPValidateModel', () => {
 
     it('should handle no scopes being returned and send PUT /consentsRequest/{ID}/error response', async () => {
       mocked(modelConfig.dfspBackendRequests.getScopes).mockImplementationOnce(() => Promise.resolve({
-        "scopes": []
+        'scopes': []
       }))
 
       const model = await create(validateData, modelConfig)
@@ -301,15 +339,20 @@ describe('dfspOTPValidateModel', () => {
         await model.fsm.requestScopes()
         shouldNotBeExecuted()
       } catch (err) {
-        expect(err.message).toEqual('InvalidAuthToken')
+        expect(err.apiErrorCode.code).toEqual('7207')
       }
 
       // check a PUT /consentsRequest/{ID}/error response was sent to source participant
       // todo: better and more descriptive error handling
       expect(modelConfig.thirdpartyRequests.putConsentRequestsError).toBeCalledWith(
         '0c9d9e95-b7ee-4813-87a7-a6a1ab7fc0ab',
-        {"errorInformation": {"errorCode": "2001", "errorDescription": "Internal server error"}},
-        "pispa"
+        {
+          errorInformation: {
+            errorCode: '7207',
+            errorDescription: 'FSP failed retrieve scopes for consent request'
+          }
+        },
+        'pispa'
       )
     })
 
@@ -335,8 +378,13 @@ describe('dfspOTPValidateModel', () => {
       // check a PUT /consentsRequest/{ID}/error response was sent to source participant
       expect(modelConfig.thirdpartyRequests.putConsentRequestsError).toBeCalledWith(
         '0c9d9e95-b7ee-4813-87a7-a6a1ab7fc0ab',
-        {"errorInformation": {"errorCode": "2001", "errorDescription": "Internal server error"}},
-        "pispa"
+        {
+          errorInformation: {
+            errorCode: '2001',
+            errorDescription: 'Internal server error'
+          }
+        },
+        'pispa'
       )
     })
   })
@@ -351,10 +399,10 @@ describe('dfspOTPValidateModel', () => {
         toParticipantId: 'pispa',
         currentState: 'scopesReceived',
         scopes: { scopes: [{
-          accountId: "some-id",
+          accountId: 'some-id',
           actions: [
-            "accounts.getBalance",
-            "accounts.transfer"
+            'accounts.getBalance',
+            'accounts.transfer'
           ]
         }]}
       }
@@ -380,10 +428,10 @@ describe('dfspOTPValidateModel', () => {
           consentId: '00000000-0000-1000-8000-000000000001',
           consentRequestId: '0c9d9e95-b7ee-4813-87a7-a6a1ab7fc0ab',
           scopes: [{
-            accountId: "some-id",
+            accountId: 'some-id',
             actions: [
-              "accounts.getBalance",
-              "accounts.transfer"
+              'accounts.getBalance',
+              'accounts.transfer'
             ]
           }]
         },
@@ -408,11 +456,15 @@ describe('dfspOTPValidateModel', () => {
       }
 
       // check a PUT /consentsRequest/{ID}/error response was sent to source participant
-      // todo: better and more descriptive error handling
       expect(modelConfig.thirdpartyRequests.putConsentRequestsError).toBeCalledWith(
         '0c9d9e95-b7ee-4813-87a7-a6a1ab7fc0ab',
-        {"errorInformation": {"errorCode": "2001", "errorDescription": "Internal server error"}},
-        "pispa"
+        {
+          errorInformation: {
+            errorCode: '2001',
+            errorDescription: 'Internal server error'
+          }
+        },
+        'pispa'
       )
     })
 

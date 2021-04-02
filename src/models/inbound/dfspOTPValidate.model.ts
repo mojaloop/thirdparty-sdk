@@ -28,7 +28,7 @@
 import { PubSub } from '~/shared/pub-sub'
 import { PersistentModel } from '~/models/persistent.model'
 import { StateMachineConfig } from 'javascript-state-machine'
-import { ThirdpartyRequests, Errors } from '@mojaloop/sdk-standard-components';
+import { ThirdpartyRequests, Errors } from '@mojaloop/sdk-standard-components'
 import {
   v1_1 as fspiopAPI,
   thirdparty as tpAPI
@@ -40,8 +40,8 @@ import {
   DFSPOTPValidateStateMachine,
   DFSPOTPValidateModelConfig,
   BackendValidateOTPResponse,
-} from './dfspOTPValidate.interface';
-import { DFSPBackendRequests } from '../../shared/dfsp-backend-requests';
+} from './dfspOTPValidate.interface'
+import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
 import { uuid } from 'uuidv4'
 
 // DFSPOTPValidateModel is the passive inbound handler for inbound
@@ -106,11 +106,21 @@ export class DFSPOTPValidateModel
       ) as BackendValidateOTPResponse
 
       if (!isValidOTP) {
-        throw new Error('No response returned')
+        throw new Errors.MojaloopFSPIOPError(
+          null as unknown as string,
+          null as unknown as string,
+          null as unknown as string,
+          Errors.MojaloopApiErrorCodes.TP_FSP_OTP_VALIDATION_ERROR
+        )
       }
 
       if (!isValidOTP.isValid) {
-        throw new Error('Invalid OTP')
+        throw new Errors.MojaloopFSPIOPError(
+          null as unknown as string,
+          null as unknown as string,
+          null as unknown as string,
+          Errors.MojaloopApiErrorCodes.TP_OTP_VALIDATION_ERROR
+        )
       }
     } catch (error) {
       const mojaloopError = this.reformatError(error)
@@ -118,8 +128,6 @@ export class DFSPOTPValidateModel
       this.logger.push({ error }).error('start -> OTPIsValid')
       this.logger.push({ mojaloopError }).info(`Sending error response to ${toParticipantId}`)
 
-      // note: this is an error code scenario that will need to be addressed.
-      //       something along the lines 6xxx "OTP failed validation"
       await this.thirdpartyRequests.putConsentRequestsError(
         consentRequestsRequestId,
         mojaloopError as unknown as fspiopAPI.Schemas.ErrorInformationObject,
@@ -137,7 +145,12 @@ export class DFSPOTPValidateModel
       const scopesGranted = await this.dfspBackendRequests.getScopes(consentRequestsRequestId)
 
       if (!scopesGranted || scopesGranted.scopes.length < 1) {
-        throw new Error('InvalidAuthToken')
+        throw new Errors.MojaloopFSPIOPError(
+          null as unknown as string,
+          null as unknown as string,
+          null as unknown as string,
+          Errors.MojaloopApiErrorCodes.TP_FSP_CONSENT_SCOPES_ERROR
+        )
       }
 
       this.data.scopes = scopesGranted
@@ -147,8 +160,6 @@ export class DFSPOTPValidateModel
       this.logger.push({ error }).error('OTPIsValid -> scopesReceived')
       this.logger.push({ mojaloopError }).info(`Sending error response to ${toParticipantId}`)
 
-      // note: this is an error code scenario that will need to be addressed.
-      //       something along the lines 6xxx "No scopes granted"
       await this.thirdpartyRequests.putConsentRequestsError(
         consentRequestsRequestId,
         mojaloopError as unknown as fspiopAPI.Schemas.ErrorInformationObject,
@@ -222,7 +233,12 @@ export class DFSPOTPValidateModel
   }
 
   reformatError (err: Error): Errors.MojaloopApiErrorObject {
+    if (err instanceof Errors.MojaloopFSPIOPError) {
+      return err.toApiErrorObject()
+    }
+
     let mojaloopErrorCode = Errors.MojaloopApiErrorCodes.INTERNAL_SERVER_ERROR
+
     if (err instanceof HTTPResponseError) {
       const e = err.getData()
       if (e.res && (e.res.body || e.res.data)) {
