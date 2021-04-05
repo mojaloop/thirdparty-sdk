@@ -1,0 +1,11 @@
+
+title: ConsentRequestsValidateResponse
+type: object
+properties:
+  consent:
+    $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/ConsentsPostRequest.yaml'
+  currentState:
+    $ref: '../../components/schemas/ConsentRequestsValidateState.yaml'
+required:
+  - consent
+  - currentState

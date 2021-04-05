@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /*****
  License
  --------------
@@ -33,38 +34,34 @@ import {
   MojaloopRequests,
   ThirdpartyRequests
 } from '@mojaloop/sdk-standard-components'
+import { OutboundAPI as SDKOutboundAPI } from '@mojaloop/sdk-scheme-adapter'
+import * as OutboundAPI from '~/interface/outbound/api_interfaces'
+
 import {
-  v1_1 as fspiopAPI,
   thirdparty as tpAPI
 } from '@mojaloop/api-snippets'
 import {
-  PayeeLookupRequest,
   PISPTransactionData,
   PISPTransactionModelConfig,
-  PISPTransactionModelState,
   PISPTransactionPhase,
   PISPTransactionStateMachine,
-  RequestPartiesInformationResponse,
-  ThirdpartyTransactionApproveResponse,
-  ThirdpartyTransactionInitiateRequest,
-  ThirdpartyTransactionInitiateResponse,
-  ThirdpartyTransactionPartyLookupResponse,
   ThirdpartyTransactionStatus
 } from './pispTransaction.interface'
 import inspect from '~/shared/inspect'
-import { SDKRequests } from '~/shared/sdk-requests'
+import { SDKOutgoingRequests } from '~/shared/sdk-outgoing-requests'
 import { HTTPResponseError } from '~/shared/http-response-error'
+import deferredJob from '~/shared/deferred-job'
 
 export class InvalidPISPTransactionDataError extends Error {
-  public data: PISPTransactionData
+  public data: Record<string, unknown>
   public propertyName: string
-  constructor (data: PISPTransactionData, propertyName: string) {
+  constructor (data: Record<string, unknown>, propertyName: string) {
     super(`invalid ${propertyName} data`)
     this.data = data
     this.propertyName = propertyName
   }
 
-  static throwIfInvalidProperty (data: PISPTransactionData, propertyName: string): void {
+  static throwIfInvalidProperty (data: Record<string, unknown>, propertyName: string): void {
     // eslint-disable-next-line no-prototype-builtins
     if (!data.hasOwnProperty(propertyName)) {
       throw new InvalidPISPTransactionDataError(data, propertyName)
@@ -119,8 +116,8 @@ export class PISPTransactionModel
     return this.config.mojaloopRequests
   }
 
-  get sdkRequests (): SDKRequests {
-    return this.config.sdkRequests
+  get sdkOutgoingRequests (): SDKOutgoingRequests {
+    return this.config.sdkOutgoingRequests
   }
 
   static notificationChannel (phase: PISPTransactionPhase, transactionRequestId: string): string {
@@ -131,23 +128,40 @@ export class PISPTransactionModel
     return `pisp_transaction_${phase}_${transactionRequestId}`
   }
 
+  static async triggerWorkflow (
+    phase: PISPTransactionPhase,
+    transactionRequestId: string,
+    pubSub: PubSub,
+    message: Message
+  ): Promise<void> {
+    const channel = PISPTransactionModel.notificationChannel(phase, transactionRequestId)
+    return deferredJob(pubSub, channel).trigger(message)
+  }
+
   async onRequestPartyLookup (): Promise<void> {
+    // input validation
     InvalidPISPTransactionDataError.throwIfInvalidProperty(this.data, 'payeeRequest')
+    InvalidPISPTransactionDataError.throwIfInvalidProperty(this.data!.payeeRequest as Record<string, unknown>, 'payee')
+    InvalidPISPTransactionDataError.throwIfInvalidProperty(
+      this.data!.payeeRequest!.payee as Record<string, unknown>, 'partyIdType'
+    )
+    InvalidPISPTransactionDataError.throwIfInvalidProperty(
+      this.data!.payeeRequest!.payee as Record<string, unknown>, 'partyIdentifier'
+    )
 
     // extract params for GET /parties
-    const { partyIdType, partyIdentifier, partySubIdOrType } = this.data?.payeeRequest as PayeeLookupRequest
+    const payee = this.data!.payeeRequest!.payee
 
     try {
       // call GET /parties on sdk-scheme-adapter Outbound service
-      const response = this.data.payeeResolved = await this.sdkRequests.requestPartiesInformation(
-        partyIdType, partyIdentifier, partySubIdOrType
-      ) as RequestPartiesInformationResponse
+      const response = this.data.payeeResolved = await this.sdkOutgoingRequests.requestPartiesInformation(
+        payee.partyIdType, payee.partyIdentifier, payee.partySubIdOrType
+      ) as SDKOutboundAPI.Schemas.partiesByIdResponse
 
+      // store results
       this.data.partyLookupResponse = {
         party: response.party,
-        currentState: PISPTransactionModelState[
-          this.data.currentState as keyof typeof PISPTransactionModelState
-        ]
+        currentState: this.data.currentState as OutboundAPI.Schemas.ThirdpartyTransactionPartyLookupState
       }
     } catch (error) {
       this.logger.push({ error }).error('onRequestPartyLookup -> requestPartiesInformation')
@@ -159,9 +173,7 @@ export class PISPTransactionModel
           await this.fsm.error()
           this.data.partyLookupResponse = {
             errorInformation: errorData.res.data.errorInformation,
-            currentState: PISPTransactionModelState[
-              this.data.currentState as keyof typeof PISPTransactionModelState
-            ]
+            currentState: this.data.currentState as OutboundAPI.Schemas.ThirdpartyTransactionPartyLookupState
           }
           // error handled, no need to rethrow
           return
@@ -173,8 +185,7 @@ export class PISPTransactionModel
   }
 
   onFailPartyLookup (): void {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    this.data!.partyLookupResponse!.currentState = PISPTransactionModelState.partyLookupFailure
+    this.data!.partyLookupResponse!.currentState = 'partyLookupFailure'
   }
 
   async onInitiate (): Promise<void> {
@@ -183,46 +194,33 @@ export class PISPTransactionModel
 
     const channel = PISPTransactionModel.notificationChannel(
       PISPTransactionPhase.initiation,
-      this.data.transactionRequestId as string
+      this.data.transactionRequestId!
     )
 
     this.logger.push({ channel }).info('onInitiate - subscribe to channel')
 
-    // eslint-disable-next-line no-async-promise-executor
-    return new Promise(async (resolve, reject) => {
-      let subId = 0
-      try {
-        // this handler will be executed when POST /authorizations @ Inbound server
-        subId = this.pubSub.subscribe(channel, async (channel: string, message: Message, sid: number) => {
-          // first unsubscribe
-          this.pubSub.unsubscribe(channel, sid)
-
-          this.data.authorizationRequest = { ...message as unknown as tpAPI.Schemas.AuthorizationsPostRequest }
-          this.data.initiateResponse = {
-            authorization: { ...this.data.authorizationRequest },
-            currentState: PISPTransactionModelState[
-              this.data.currentState as keyof typeof PISPTransactionModelState
-            ]
-          }
-          resolve()
-          // state machine should be in authorizationReceived state
-        })
-
+    return deferredJob(this.pubSub, channel)
+      .init(async (): Promise<void> => {
+        // initiate the workflow
         const request: tpAPI.Schemas.ThirdpartyRequestsTransactionsPostRequest = {
           transactionRequestId: this.data?.transactionRequestId as string,
-          ...this.data?.initiateRequest as ThirdpartyTransactionInitiateRequest
+          ...this.data?.initiateRequest as OutboundAPI.Schemas.ThirdpartyTransactionIDInitiateRequest
         }
         const res = await this.thirdpartyRequests.postThirdpartyRequestsTransactions(
           request,
-          this.data.initiateRequest?.payer.partyIdInfo.fspId as string
+          this.data.initiateRequest!.payer.fspId!
         )
         this.logger.push({ res }).info('ThirdpartyRequests.postThirdpartyRequestsTransactions request sent to peer')
-      } catch (error) {
-        this.logger.push(error).error('ThirdpartyRequests.postThirdpartyRequestsTransactions request error')
-        this.pubSub.unsubscribe(channel, subId)
-        reject(error)
-      }
-    })
+      })
+      .job(async (message: Message): Promise<void> => {
+        // receive authorization request message
+        this.data.authorizationRequest = { ...message as unknown as tpAPI.Schemas.AuthorizationsPostRequest }
+        this.data.initiateResponse = {
+          authorization: { ...this.data.authorizationRequest },
+          currentState: this.data.currentState as OutboundAPI.Schemas.ThirdpartyTransactionIDInitiateState
+        }
+      })
+      .wait(this.config.initiateTimeoutInSeconds * 1000)
   }
 
   async onApprove (): Promise<void> {
@@ -232,52 +230,37 @@ export class PISPTransactionModel
 
     const channel = PISPTransactionModel.notificationChannel(
       PISPTransactionPhase.approval,
-      this.data.transactionRequestId as string
+      this.data.transactionRequestId!
     )
 
     this.logger.push({ channel }).info('onApprove - subscribe to channel')
 
-    // eslint-disable-next-line no-async-promise-executor
-    return new Promise(async (resolve, reject) => {
-      let subId = 0
-      try {
-        // this handler will be executed when PATCH /thirdpartyRequests/transactions/{ID} @ Inbound server
-        subId = this.pubSub.subscribe(channel, async (channel: string, message: Message, sid: number) => {
-          // first unsubscribe
-          this.pubSub.unsubscribe(channel, sid)
-
-          this.data.transactionStatus = { ...message as unknown as ThirdpartyTransactionStatus }
-          this.data.approveResponse = {
-            transactionStatus: { ...this.data.transactionStatus },
-            currentState: PISPTransactionModelState[
-              this.data.currentState as keyof typeof PISPTransactionModelState
-            ]
-          }
-          resolve()
-          // state machine should be in transactionSuccess state
-        })
-
+    return deferredJob(this.pubSub, channel)
+      .init(async (): Promise<void> => {
         const res = await this.mojaloopRequests.putAuthorizations(
-          this.data?.transactionRequestId as string,
+          this.data.transactionRequestId!,
           // propagate signed challenge
-          this.data?.approveRequest?.authorizationResponse as fspiopAPI.Schemas.AuthorizationsIDPutResponse,
-          this.data?.initiateRequest?.payer.partyIdInfo.fspId as string
+          this.data.approveRequest!.authorizationResponse,
+          this.data.initiateRequest!.payer.fspId!
         )
         this.logger.push({ res }).info('ThirdpartyRequests.postThirdpartyRequestsTransactions request sent to peer')
-      } catch (error) {
-        this.logger.push(error).error('ThirdpartyRequests.postThirdpartyRequestsTransactions request error')
-        this.pubSub.unsubscribe(channel, subId)
-        reject(error)
-      }
-    })
+      })
+      .job(async (message: Message): Promise<void> => {
+        this.data.transactionStatus = { ...message as unknown as ThirdpartyTransactionStatus }
+        this.data.approveResponse = {
+          transactionStatus: { ...this.data.transactionStatus },
+          currentState: this.data.currentState as OutboundAPI.Schemas.ThirdpartyTransactionIDApproveState
+        }
+      })
+      .wait(this.config.approveTimeoutInSeconds * 1000)
   }
 
   /**
    * depending on current state of model returns proper result
    */
-  getResponse (): ThirdpartyTransactionPartyLookupResponse |
-  ThirdpartyTransactionInitiateResponse |
-  ThirdpartyTransactionApproveResponse |
+  getResponse (): OutboundAPI.Schemas.ThirdpartyTransactionPartyLookupResponse |
+  OutboundAPI.Schemas.ThirdpartyTransactionIDInitiateResponse |
+  OutboundAPI.Schemas.ThirdpartyTransactionIDApproveResponse |
   void {
     switch (this.data.currentState) {
       case 'partyLookupSuccess':
@@ -295,9 +278,9 @@ export class PISPTransactionModel
    * runs the workflow
    */
   async run (): Promise<
-  ThirdpartyTransactionPartyLookupResponse |
-  ThirdpartyTransactionInitiateResponse |
-  ThirdpartyTransactionApproveResponse |
+  OutboundAPI.Schemas.ThirdpartyTransactionPartyLookupResponse |
+  OutboundAPI.Schemas.ThirdpartyTransactionIDInitiateResponse |
+  OutboundAPI.Schemas.ThirdpartyTransactionIDApproveResponse |
   void
   > {
     const data = this.data
@@ -313,7 +296,11 @@ export class PISPTransactionModel
             `requestPartyLookup requested for ${data.transactionRequestId},  currentState: ${data.currentState}`
           )
           await this.fsm.requestPartyLookup()
-          if (this.data.partyLookupResponse?.errorInformation) {
+          if (
+            (
+              this.data.partyLookupResponse as OutboundAPI.Schemas.ThirdpartyTransactionPartyLookupResponseError
+            ).errorInformation
+          ) {
             await this.fsm.failPartyLookup()
             this.logger.info('requestPartyLookup failed')
           } else {

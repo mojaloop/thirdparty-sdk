@@ -298,15 +298,15 @@ describe('OutboundAccountsModel', () => {
       })
 
       it('exceptions - Error', async () => {
-        const error = new Error()
+        const error = new Error('the-exception')
         mocked(modelConfig.thirdpartyRequests.getAccounts).mockImplementationOnce(
           () => {
             throw error
           }
         )
-        const model = await create({ ...data, currentState: 'errored' }, modelConfig)
+        const model = await create({ ...data, currentState: 'start' }, modelConfig)
 
-        expect(async () => await model.run()).rejects.toEqual(error)
+        expect(model.run()).rejects.toEqual(error)
       })
     })
   })

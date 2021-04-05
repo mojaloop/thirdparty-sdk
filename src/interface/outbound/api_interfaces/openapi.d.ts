@@ -4,29 +4,32 @@
  */
 
 export interface paths {
-  "/health": {
-    get: operations["HealthGet"];
+  '/health': {
+    get: operations['HealthGet'];
   };
-  "/metrics": {
-    get: operations["MetricsGet"];
+  '/metrics': {
+    get: operations['MetricsGet'];
   };
-  "/authorizations": {
-    post: operations["OutboundAuthorizationsPost"];
+  '/authorizations': {
+    post: operations['OutboundAuthorizationsPost'];
   };
-  "/thirdpartyTransaction/partyLookup": {
-    post: operations["ThirdpartyTransactionPartyLookup"];
+  '/thirdpartyTransaction/partyLookup': {
+    post: operations['ThirdpartyTransactionPartyLookup'];
   };
-  "/thirdpartyTransaction/{ID}/initiate": {
-    post: operations["InitiateThirdpartyTransaction"];
+  '/thirdpartyTransaction/{ID}/initiate': {
+    post: operations['ThirdpartyTransactionIDInitiate'];
   };
-  "/thirdpartyTransaction/{ID}/approve": {
-    post: operations["ApproveThirdpartyTransaction"];
+  '/thirdpartyTransaction/{ID}/approve': {
+    post: operations['ThirdpartyTransactionIDApprove'];
   };
-  "/thirdpartyRequests/transactions/{ID}/authorizations": {
-    post: operations["VerifyThirdPartyAuthorization"];
+  '/thirdpartyRequests/transactions/{ID}/authorizations': {
+    post: operations['VerifyThirdPartyAuthorization'];
   };
-  "/accounts/{fspId}/{userId}": {
-    get: operations["GetAccountsByUserId"];
+  '/accounts/{fspId}/{userId}': {
+    get: operations['GetAccountsByUserId'];
+  };
+  '/consentRequests/{ID}/validate': {
+    patch: operations['OutboundConsentRequestsValidatePatch'];
   };
 }
 
@@ -34,149 +37,171 @@ export interface operations {
   /** The HTTP request GET /health is used to return the current status of the API. */
   HealthGet: {
     responses: {
-      200: components["responses"]["200"];
-      400: components["responses"]["400"];
-      401: components["responses"]["401"];
-      403: components["responses"]["403"];
-      404: components["responses"]["404"];
-      405: components["responses"]["405"];
-      406: components["responses"]["406"];
-      501: components["responses"]["501"];
-      503: components["responses"]["503"];
+      200: components['responses']['200'];
+      400: components['responses']['400'];
+      401: components['responses']['401'];
+      403: components['responses']['403'];
+      404: components['responses']['404'];
+      405: components['responses']['405'];
+      406: components['responses']['406'];
+      501: components['responses']['501'];
+      503: components['responses']['503'];
     };
   };
   /** The HTTP request GET /metrics is used to return metrics for the API. */
   MetricsGet: {
     responses: {
-      200: components["responses"]["200"];
-      400: components["responses"]["400"];
-      401: components["responses"]["401"];
-      403: components["responses"]["403"];
-      404: components["responses"]["404"];
-      405: components["responses"]["405"];
-      406: components["responses"]["406"];
-      501: components["responses"]["501"];
-      503: components["responses"]["503"];
+      200: components['responses']['200'];
+      400: components['responses']['400'];
+      401: components['responses']['401'];
+      403: components['responses']['403'];
+      404: components['responses']['404'];
+      405: components['responses']['405'];
+      406: components['responses']['406'];
+      501: components['responses']['501'];
+      503: components['responses']['503'];
     };
   };
   /** DFSP Requests Authorization of Transaction from the End User */
   OutboundAuthorizationsPost: {
     requestBody: {
-      "application/json": components["schemas"]["AuthorizationsRequest"];
+      'application/json': components['schemas']['AuthorizationsRequest'];
     };
     responses: {
-      200: components["responses"]["AuthorizationsResponse"];
-      400: components["responses"]["400"];
-      401: components["responses"]["401"];
-      403: components["responses"]["403"];
-      404: components["responses"]["404"];
-      405: components["responses"]["405"];
-      406: components["responses"]["406"];
-      501: components["responses"]["501"];
-      503: components["responses"]["503"];
+      200: components['responses']['AuthorizationsResponse'];
+      400: components['responses']['400'];
+      401: components['responses']['401'];
+      403: components['responses']['403'];
+      404: components['responses']['404'];
+      405: components['responses']['405'];
+      406: components['responses']['406'];
+      501: components['responses']['501'];
+      503: components['responses']['503'];
     };
   };
   /** The HTTP request `POST /thirdpartyTransaction/partyLookup` is used to lookup information regarding the requested Party, defined by `Type`, `ID` and optionally `SubId`. */
   ThirdpartyTransactionPartyLookup: {
     requestBody: {
-      "application/json": components["schemas"]["ThirdpartyTransactionPartyLookupRequest"];
+      'application/json': components['schemas']['ThirdpartyTransactionPartyLookupRequest'];
     };
     responses: {
-      200: components["responses"]["ThirdpartyTransactionPartyLookupResponse"];
-      400: components["responses"]["400"];
-      401: components["responses"]["401"];
-      403: components["responses"]["403"];
-      404: components["responses"]["404"];
-      405: components["responses"]["405"];
-      406: components["responses"]["406"];
-      501: components["responses"]["501"];
-      503: components["responses"]["503"];
+      200: components['responses']['ThirdpartyTransactionPartyLookupResponse'];
+      400: components['responses']['400'];
+      401: components['responses']['401'];
+      403: components['responses']['403'];
+      404: components['responses']['404'];
+      405: components['responses']['405'];
+      406: components['responses']['406'];
+      501: components['responses']['501'];
+      503: components['responses']['503'];
     };
   };
   /** The HTTP request `POST /thirdpartyTransaction/{ID}/initiate` is sent to the Switch to initiate a third party request transaction. */
-  InitiateThirdpartyTransaction: {
+  ThirdpartyTransactionIDInitiate: {
     parameters: {
       path: {
-        ID: components["parameters"]["ID"];
+        ID: components['parameters']['ID'];
       };
     };
     requestBody: {
-      "application/json": components["schemas"]["ThirdpartyRequestsTransactionsPostRequest"];
+      'application/json': components['schemas']['ThirdpartyTransactionIDInitiateRequest'];
     };
     responses: {
-      200: components["responses"]["ThirdpartyRequestsTransactionsPostResponse"];
-      400: components["responses"]["400"];
-      401: components["responses"]["401"];
-      403: components["responses"]["403"];
-      404: components["responses"]["404"];
-      405: components["responses"]["405"];
-      406: components["responses"]["406"];
-      501: components["responses"]["501"];
-      503: components["responses"]["503"];
+      200: components['responses']['ThirdpartyTransactionIDInitiateResponse'];
+      400: components['responses']['400'];
+      401: components['responses']['401'];
+      403: components['responses']['403'];
+      404: components['responses']['404'];
+      405: components['responses']['405'];
+      406: components['responses']['406'];
+      501: components['responses']['501'];
+      503: components['responses']['503'];
     };
   };
   /** The HTTP request `POST /thirdpartyTransaction/{ID}/approve` is used to approve a third party transaction . */
-  ApproveThirdpartyTransaction: {
+  ThirdpartyTransactionIDApprove: {
     parameters: {
       path: {
-        ID: components["parameters"]["ID"];
+        ID: components['parameters']['ID'];
       };
     };
     requestBody: {
-      "application/json": components["schemas"]["ThirdpartyTransactionApproveRequest"];
+      'application/json': components['schemas']['ThirdpartyTransactionIDApproveRequest'];
     };
     responses: {
-      200: components["responses"]["ThirdpartyTransactionApproveResponse"];
-      400: components["responses"]["400"];
-      401: components["responses"]["401"];
-      403: components["responses"]["403"];
-      404: components["responses"]["404"];
-      405: components["responses"]["405"];
-      406: components["responses"]["406"];
-      501: components["responses"]["501"];
-      503: components["responses"]["503"];
+      200: components['responses']['ThirdpartyTransactionIDApproveResponse'];
+      400: components['responses']['400'];
+      401: components['responses']['401'];
+      403: components['responses']['403'];
+      404: components['responses']['404'];
+      405: components['responses']['405'];
+      406: components['responses']['406'];
+      501: components['responses']['501'];
+      503: components['responses']['503'];
     };
   };
   /** The HTTP request `POST /thirdpartyRequests/transactions/{ID}/authorizations` is used by the DFSP to verify a third party authorization. */
   VerifyThirdPartyAuthorization: {
     parameters: {
       path: {
-        ID: components["parameters"]["ID"];
+        ID: components['parameters']['ID'];
       };
     };
     requestBody: {
-      "application/json": components["schemas"]["ThirdpartyRequestsTransactionsIDAuthorizationsPostRequest"];
+      'application/json': components['schemas']['ThirdpartyRequestsTransactionsIDAuthorizationsPostRequest'];
     };
     responses: {
-      200: components["responses"]["ThirdpartyRequestsTransactionsIDAuthzResponse"];
-      400: components["responses"]["400"];
-      401: components["responses"]["401"];
-      403: components["responses"]["403"];
-      404: components["responses"]["404"];
-      405: components["responses"]["405"];
-      406: components["responses"]["406"];
-      501: components["responses"]["501"];
-      503: components["responses"]["503"];
+      200: components['responses']['ThirdpartyRequestsTransactionsIDAuthzResponse'];
+      400: components['responses']['400'];
+      401: components['responses']['401'];
+      403: components['responses']['403'];
+      404: components['responses']['404'];
+      405: components['responses']['405'];
+      406: components['responses']['406'];
+      501: components['responses']['501'];
+      503: components['responses']['503'];
     };
   };
   /** The HTTP request `GET /accounts/{fspId}/{userId}` is used to retrieve the list of potential accounts available for linking. */
   GetAccountsByUserId: {
     parameters: {
       path: {
-        fspId: components["schemas"]["FspId"];
-        userId: components["schemas"]["AccountAddress"];
+        fspId: components['schemas']['FspId'];
+        userId: components['schemas']['AccountAddress'];
       };
     };
     responses: {
-      200: components["responses"]["AccountsByUserIdResponse"];
-      400: components["responses"]["400"];
-      401: components["responses"]["401"];
-      403: components["responses"]["403"];
-      404: components["responses"]["404"];
-      405: components["responses"]["405"];
-      406: components["responses"]["406"];
-      501: components["responses"]["501"];
-      503: components["responses"]["503"];
+      200: components['responses']['AccountsByUserIdResponse'];
+      400: components['responses']['400'];
+      401: components['responses']['401'];
+      403: components['responses']['403'];
+      404: components['responses']['404'];
+      405: components['responses']['405'];
+      406: components['responses']['406'];
+      501: components['responses']['501'];
+      503: components['responses']['503'];
+    };
+  };
+  /** Used in the authentication phase of account linking. Used by the PISP to pass an OTP on behalf of the user to the DFSP to establish a chain of trust. */
+  OutboundConsentRequestsValidatePatch: {
+    parameters: {
+      path: {
+        ID: components['schemas']['CorrelationId'];
+      };
+    };
+    requestBody: {
+      'application/json': components['schemas']['ConsentRequestsValidateRequest'];
+    };
+    responses: {
+      200: components['responses']['ConsentRequestsValidateResponse'];
+      400: components['responses']['400'];
+      401: components['responses']['401'];
+      403: components['responses']['403'];
+      404: components['responses']['404'];
+      405: components['responses']['405'];
+      406: components['responses']['406'];
+      501: components['responses']['501'];
+      503: components['responses']['503'];
     };
   };
 }
@@ -197,205 +222,203 @@ export interface components {
     ExtensionValue: string;
     /** Data model for the complex type Extension. */
     Extension: {
-      key: components["schemas"]["ExtensionKey"];
-      value: components["schemas"]["ExtensionValue"];
+      key: components['schemas']['ExtensionKey'];
+      value: components['schemas']['ExtensionValue'];
     };
     /** Data model for the complex type ExtensionList. An optional list of extensions, specific to deployment. */
     ExtensionList: {
       /** Number of Extension elements. */
-      extension: components["schemas"]["Extension"][];
+      extension: components['schemas']['Extension'][];
     };
     /** Data model for the complex type ErrorInformation. */
     ErrorInformation: {
-      errorCode: components["schemas"]["ErrorCode"];
-      errorDescription: components["schemas"]["ErrorDescription"];
-      extensionList?: components["schemas"]["ExtensionList"];
+      errorCode: components['schemas']['ErrorCode'];
+      errorDescription: components['schemas']['ErrorDescription'];
+      extensionList?: components['schemas']['ExtensionList'];
     };
     /** Data model for the complex type object that contains an optional element ErrorInformation used along with 4xx and 5xx responses. */
     ErrorInformationResponse: {
-      errorInformation?: components["schemas"]["ErrorInformation"];
+      errorInformation?: components['schemas']['ErrorInformation'];
     };
     /**
-     * Below are the allowed values for the enumeration AuthorizationChannelType.
+     * Below are the allowed values for the enumeration AuthenticationType.
      * - OTP - One-time password generated by the Payer FSP.
      * - QRCODE - QR code used as One Time Password.
      * - U2F - U2F is a new addition isolated to Thirdparty stream.
-     *
-     * This is based on FSPIOP `AuthenticationType` with U2F added.
      */
-    AuthorizationChannelType: "OTP" | "QRCODE" | "U2F";
+    AuthenticationType: 'OTP' | 'QRCODE' | 'U2F';
     /** The API data type Integer is a JSON String consisting of digits only. Negative numbers and leading zeroes are not allowed. The data type is always limited to a specific number of digits. */
     Integer: string;
     /** The currency codes defined in [ISO 4217](https://www.iso.org/iso-4217-currency-codes.html) as three-letter alphabetic codes are used as the standard naming representation for currencies. */
     Currency:
-      | "AED"
-      | "AFN"
-      | "ALL"
-      | "AMD"
-      | "ANG"
-      | "AOA"
-      | "ARS"
-      | "AUD"
-      | "AWG"
-      | "AZN"
-      | "BAM"
-      | "BBD"
-      | "BDT"
-      | "BGN"
-      | "BHD"
-      | "BIF"
-      | "BMD"
-      | "BND"
-      | "BOB"
-      | "BRL"
-      | "BSD"
-      | "BTN"
-      | "BWP"
-      | "BYN"
-      | "BZD"
-      | "CAD"
-      | "CDF"
-      | "CHF"
-      | "CLP"
-      | "CNY"
-      | "COP"
-      | "CRC"
-      | "CUC"
-      | "CUP"
-      | "CVE"
-      | "CZK"
-      | "DJF"
-      | "DKK"
-      | "DOP"
-      | "DZD"
-      | "EGP"
-      | "ERN"
-      | "ETB"
-      | "EUR"
-      | "FJD"
-      | "FKP"
-      | "GBP"
-      | "GEL"
-      | "GGP"
-      | "GHS"
-      | "GIP"
-      | "GMD"
-      | "GNF"
-      | "GTQ"
-      | "GYD"
-      | "HKD"
-      | "HNL"
-      | "HRK"
-      | "HTG"
-      | "HUF"
-      | "IDR"
-      | "ILS"
-      | "IMP"
-      | "INR"
-      | "IQD"
-      | "IRR"
-      | "ISK"
-      | "JEP"
-      | "JMD"
-      | "JOD"
-      | "JPY"
-      | "KES"
-      | "KGS"
-      | "KHR"
-      | "KMF"
-      | "KPW"
-      | "KRW"
-      | "KWD"
-      | "KYD"
-      | "KZT"
-      | "LAK"
-      | "LBP"
-      | "LKR"
-      | "LRD"
-      | "LSL"
-      | "LYD"
-      | "MAD"
-      | "MDL"
-      | "MGA"
-      | "MKD"
-      | "MMK"
-      | "MNT"
-      | "MOP"
-      | "MRO"
-      | "MUR"
-      | "MVR"
-      | "MWK"
-      | "MXN"
-      | "MYR"
-      | "MZN"
-      | "NAD"
-      | "NGN"
-      | "NIO"
-      | "NOK"
-      | "NPR"
-      | "NZD"
-      | "OMR"
-      | "PAB"
-      | "PEN"
-      | "PGK"
-      | "PHP"
-      | "PKR"
-      | "PLN"
-      | "PYG"
-      | "QAR"
-      | "RON"
-      | "RSD"
-      | "RUB"
-      | "RWF"
-      | "SAR"
-      | "SBD"
-      | "SCR"
-      | "SDG"
-      | "SEK"
-      | "SGD"
-      | "SHP"
-      | "SLL"
-      | "SOS"
-      | "SPL"
-      | "SRD"
-      | "STD"
-      | "SVC"
-      | "SYP"
-      | "SZL"
-      | "THB"
-      | "TJS"
-      | "TMT"
-      | "TND"
-      | "TOP"
-      | "TRY"
-      | "TTD"
-      | "TVD"
-      | "TWD"
-      | "TZS"
-      | "UAH"
-      | "UGX"
-      | "USD"
-      | "UYU"
-      | "UZS"
-      | "VEF"
-      | "VND"
-      | "VUV"
-      | "WST"
-      | "XAF"
-      | "XCD"
-      | "XDR"
-      | "XOF"
-      | "XPF"
-      | "YER"
-      | "ZAR"
-      | "ZMW"
-      | "ZWD";
+    | 'AED'
+    | 'AFN'
+    | 'ALL'
+    | 'AMD'
+    | 'ANG'
+    | 'AOA'
+    | 'ARS'
+    | 'AUD'
+    | 'AWG'
+    | 'AZN'
+    | 'BAM'
+    | 'BBD'
+    | 'BDT'
+    | 'BGN'
+    | 'BHD'
+    | 'BIF'
+    | 'BMD'
+    | 'BND'
+    | 'BOB'
+    | 'BRL'
+    | 'BSD'
+    | 'BTN'
+    | 'BWP'
+    | 'BYN'
+    | 'BZD'
+    | 'CAD'
+    | 'CDF'
+    | 'CHF'
+    | 'CLP'
+    | 'CNY'
+    | 'COP'
+    | 'CRC'
+    | 'CUC'
+    | 'CUP'
+    | 'CVE'
+    | 'CZK'
+    | 'DJF'
+    | 'DKK'
+    | 'DOP'
+    | 'DZD'
+    | 'EGP'
+    | 'ERN'
+    | 'ETB'
+    | 'EUR'
+    | 'FJD'
+    | 'FKP'
+    | 'GBP'
+    | 'GEL'
+    | 'GGP'
+    | 'GHS'
+    | 'GIP'
+    | 'GMD'
+    | 'GNF'
+    | 'GTQ'
+    | 'GYD'
+    | 'HKD'
+    | 'HNL'
+    | 'HRK'
+    | 'HTG'
+    | 'HUF'
+    | 'IDR'
+    | 'ILS'
+    | 'IMP'
+    | 'INR'
+    | 'IQD'
+    | 'IRR'
+    | 'ISK'
+    | 'JEP'
+    | 'JMD'
+    | 'JOD'
+    | 'JPY'
+    | 'KES'
+    | 'KGS'
+    | 'KHR'
+    | 'KMF'
+    | 'KPW'
+    | 'KRW'
+    | 'KWD'
+    | 'KYD'
+    | 'KZT'
+    | 'LAK'
+    | 'LBP'
+    | 'LKR'
+    | 'LRD'
+    | 'LSL'
+    | 'LYD'
+    | 'MAD'
+    | 'MDL'
+    | 'MGA'
+    | 'MKD'
+    | 'MMK'
+    | 'MNT'
+    | 'MOP'
+    | 'MRO'
+    | 'MUR'
+    | 'MVR'
+    | 'MWK'
+    | 'MXN'
+    | 'MYR'
+    | 'MZN'
+    | 'NAD'
+    | 'NGN'
+    | 'NIO'
+    | 'NOK'
+    | 'NPR'
+    | 'NZD'
+    | 'OMR'
+    | 'PAB'
+    | 'PEN'
+    | 'PGK'
+    | 'PHP'
+    | 'PKR'
+    | 'PLN'
+    | 'PYG'
+    | 'QAR'
+    | 'RON'
+    | 'RSD'
+    | 'RUB'
+    | 'RWF'
+    | 'SAR'
+    | 'SBD'
+    | 'SCR'
+    | 'SDG'
+    | 'SEK'
+    | 'SGD'
+    | 'SHP'
+    | 'SLL'
+    | 'SOS'
+    | 'SPL'
+    | 'SRD'
+    | 'STD'
+    | 'SVC'
+    | 'SYP'
+    | 'SZL'
+    | 'THB'
+    | 'TJS'
+    | 'TMT'
+    | 'TND'
+    | 'TOP'
+    | 'TRY'
+    | 'TTD'
+    | 'TVD'
+    | 'TWD'
+    | 'TZS'
+    | 'UAH'
+    | 'UGX'
+    | 'USD'
+    | 'UYU'
+    | 'UZS'
+    | 'VEF'
+    | 'VND'
+    | 'VUV'
+    | 'WST'
+    | 'XAF'
+    | 'XCD'
+    | 'XDR'
+    | 'XOF'
+    | 'XPF'
+    | 'YER'
+    | 'ZAR'
+    | 'ZMW'
+    | 'ZWD';
     /** The API data type Amount is a JSON String in a canonical format that is restricted by a regular expression for interoperability reasons. This pattern does not allow any trailing zeroes at all, but allows an amount without a minor currency unit. It also only allows four digits in the minor currency unit; a negative value is not allowed. Using more than 18 digits in the major currency unit is not allowed. */
     Amount: string;
     /** Data model for the complex type Money. */
     Money: {
-      currency: components["schemas"]["Currency"];
-      amount: components["schemas"]["Amount"];
+      currency: components['schemas']['Currency'];
+      amount: components['schemas']['Amount'];
     };
     /** Identifier that correlates all messages of the same sequence. The API data type UUID (Universally Unique Identifier) is a JSON String in canonical format, conforming to [RFC 4122](https://tools.ietf.org/html/rfc4122), that is restricted by a regular expression for interoperability reasons. A UUID is always 36 characters long, 32 hexadecimal symbols and 4 dashes (‘-‘). */
     CorrelationId: string;
@@ -407,8 +430,8 @@ export interface components {
     Longitude: string;
     /** Data model for the complex type GeoCode. Indicates the geographic location from where the transaction was initiated. */
     GeoCode: {
-      latitude: components["schemas"]["Latitude"];
-      longitude: components["schemas"]["Longitude"];
+      latitude: components['schemas']['Latitude'];
+      longitude: components['schemas']['Longitude'];
     };
     /** Information for recipient (transport layer information). */
     IlpPacket: string;
@@ -416,33 +439,26 @@ export interface components {
     IlpCondition: string;
     /** The object sent in the PUT /quotes/{ID} callback. */
     QuotesIDPutResponse: {
-      transferAmount: components["schemas"]["Money"];
-      payeeReceiveAmount?: components["schemas"]["Money"];
-      payeeFspFee?: components["schemas"]["Money"];
-      payeeFspCommission?: components["schemas"]["Money"];
-      expiration: components["schemas"]["DateTime"];
-      geoCode?: components["schemas"]["GeoCode"];
-      ilpPacket: components["schemas"]["IlpPacket"];
-      condition: components["schemas"]["IlpCondition"];
-      extensionList?: components["schemas"]["ExtensionList"];
+      transferAmount: components['schemas']['Money'];
+      payeeReceiveAmount?: components['schemas']['Money'];
+      payeeFspFee?: components['schemas']['Money'];
+      payeeFspCommission?: components['schemas']['Money'];
+      expiration: components['schemas']['DateTime'];
+      geoCode?: components['schemas']['GeoCode'];
+      ilpPacket: components['schemas']['IlpPacket'];
+      condition: components['schemas']['IlpCondition'];
+      extensionList?: components['schemas']['ExtensionList'];
     };
     /** POST /authorizations Request object */
     AuthorizationsRequest: {
       toParticipantId?: string;
-      authenticationType: components["schemas"]["AuthorizationChannelType"];
-      retriesLeft: components["schemas"]["Integer"];
-      amount: components["schemas"]["Money"];
-      transactionId: components["schemas"]["CorrelationId"];
-      transactionRequestId: components["schemas"]["CorrelationId"];
-      quote: components["schemas"]["QuotesIDPutResponse"];
+      authenticationType: components['schemas']['AuthenticationType'];
+      retriesLeft: components['schemas']['Integer'];
+      amount: components['schemas']['Money'];
+      transactionId: components['schemas']['CorrelationId'];
+      transactionRequestId: components['schemas']['CorrelationId'];
+      quote: components['schemas']['QuotesIDPutResponse'];
     };
-    /**
-     * Below are the allowed values for the enumeration AuthenticationType.
-     * - OTP - One-time password generated by the Payer FSP.
-     * - QRCODE - QR code used as One Time Password.
-     * - U2F - U2F is a new addition isolated to Thirdparty stream.
-     */
-    AuthenticationType: "OTP" | "QRCODE" | "U2F";
     /** The API data type OtpValue is a JSON String of 3 to 10 characters, consisting of digits only. Negative numbers are not allowed. One or more leading zeros are allowed. */
     OtpValue: string;
     /** QR code used as a One Time Password. */
@@ -452,18 +468,18 @@ export interface components {
     /** U2F challenge-response, where payer FSP verifies if the response provided by end-user device matches the previously registered key. */
     U2FPinValue: {
       /** U2F challenge-response. */
-      pinValue: components["schemas"]["U2FPIN"];
+      pinValue: components['schemas']['U2FPIN'];
       /** Sequential counter used for cloning detection. Present only for U2F authentication. */
-      counter: components["schemas"]["Integer"];
+      counter: components['schemas']['Integer'];
     };
     /** Contains the authentication value. The format depends on the authentication type used in the AuthenticationInfo complex type. */
-    AuthenticationValue: Partial<components["schemas"]["OtpValue"]> &
-      Partial<components["schemas"]["QRCODE"]> &
-      Partial<components["schemas"]["U2FPinValue"]>;
+    AuthenticationValue: Partial<components['schemas']['OtpValue']> &
+    Partial<components['schemas']['QRCODE']> &
+    Partial<components['schemas']['U2FPinValue']>;
     /** Data model for the complex type AuthenticationInfo. */
     AuthenticationInfo: {
-      authentication: components["schemas"]["AuthenticationType"];
-      authenticationValue: components["schemas"]["AuthenticationValue"];
+      authentication: components['schemas']['AuthenticationType'];
+      authenticationValue: components['schemas']['AuthenticationValue'];
     };
     /**
      * Below are the allowed values for the enumeration.
@@ -471,50 +487,93 @@ export interface components {
      * - REJECTED - Consumer rejected the transaction.
      * - RESEND - Consumer requested to resend the authentication value.
      */
-    AuthorizationResponse: "ENTERED" | "REJECTED" | "RESEND";
+    AuthorizationResponse: 'ENTERED' | 'REJECTED' | 'RESEND';
     /** state of POST authorizations */
     AuthorizationsState:
-      | "WAITING_FOR_AUTHORIZATION_REQUEST"
-      | "COMPLETED"
-      | "ERROR_OCCURRED";
+    | 'WAITING_FOR_AUTHORIZATION_REQUEST'
+    | 'COMPLETED'
+    | 'ERROR_OCCURRED';
     /**
+     * This is a variant based on FSPIOP `PartyIdType` specification.
+     * Main difference being the CONSENT and THIRD_PARTY_LINK enums.
+     *
      * Below are the allowed values for the enumeration.
-     * - MSISDN - An MSISDN (Mobile Station International Subscriber Directory Number, that is, the phone number) is used as reference to a participant. The MSISDN identifier should be in international format according to the [ITU-T E.164 standard](https://www.itu.int/rec/T-REC-E.164/en). Optionally, the MSISDN may be prefixed by a single plus sign, indicating the international prefix.
-     * - EMAIL - An email is used as reference to a participant. The format of the email should be according to the informational [RFC 3696](https://tools.ietf.org/html/rfc3696).
-     * - PERSONAL_ID - A personal identifier is used as reference to a participant. Examples of personal identification are passport number, birth certificate number, and national registration number. The identifier number is added in the PartyIdentifier element. The personal identifier type is added in the PartySubIdOrType element.
-     * - BUSINESS - A specific Business (for example, an organization or a company) is used as reference to a participant. The BUSINESS identifier can be in any format. To make a transaction connected to a specific username or bill number in a Business, the PartySubIdOrType element should be used.
-     * - DEVICE - A specific device (for example, a POS or ATM) ID connected to a specific business or organization is used as reference to a Party. For referencing a specific device under a specific business or organization, use the PartySubIdOrType element.
-     * - ACCOUNT_ID - A bank account number or FSP account ID should be used as reference to a participant. The ACCOUNT_ID identifier can be in any format, as formats can greatly differ depending on country and FSP.
-     * - IBAN - A bank account number or FSP account ID is used as reference to a participant. The IBAN identifier can consist of up to 34 alphanumeric characters and should be entered without whitespace.
-     * - ALIAS An alias is used as reference to a participant. The alias should be created in the FSP as an alternative reference to an account owner. Another example of an alias is a username in the FSP system. The ALIAS identifier can be in any format. It is also possible to use the PartySubIdOrType element for identifying an account under an Alias defined by the PartyIdentifier.
+     * - MSISDN - An MSISDN (Mobile Station International Subscriber Directory
+     * Number, that is, the phone number) is used as reference to a participant.
+     * The MSISDN identifier should be in international format according to the
+     * [ITU-T E.164 standard](https://www.itu.int/rec/T-REC-E.164/en).
+     * Optionally, the MSISDN may be prefixed by a single plus sign, indicating the
+     * international prefix.
+     * - EMAIL - An email is used as reference to a
+     * participant. The format of the email should be according to the informational
+     * [RFC 3696](https://tools.ietf.org/html/rfc3696).
+     * - PERSONAL_ID - A personal identifier is used as reference to a participant.
+     * Examples of personal identification are passport number, birth certificate
+     * number, and national registration number. The identifier number is added in
+     * the PartyIdentifier element. The personal identifier type is added in the
+     * PartySubIdOrType element.
+     * - BUSINESS - A specific Business (for example, an organization or a company)
+     * is used as reference to a participant. The BUSINESS identifier can be in any
+     * format. To make a transaction connected to a specific username or bill number
+     * in a Business, the PartySubIdOrType element should be used.
+     * - DEVICE - A specific device (for example, a POS or ATM) ID connected to a
+     * specific business or organization is used as reference to a Party.
+     * For referencing a specific device under a specific business or organization,
+     * use the PartySubIdOrType element.
+     * - ACCOUNT_ID - A bank account number or FSP account ID should be used as
+     * reference to a participant. The ACCOUNT_ID identifier can be in any format,
+     * as formats can greatly differ depending on country and FSP.
+     * - IBAN - A bank account number or FSP account ID is used as reference to a
+     * participant. The IBAN identifier can consist of up to 34 alphanumeric
+     * characters and should be entered without whitespace.
+     * - ALIAS An alias is used as reference to a participant. The alias should be
+     * created in the FSP as an alternative reference to an account owner.
+     * Another example of an alias is a username in the FSP system.
+     * The ALIAS identifier can be in any format. It is also possible to use the
+     * PartySubIdOrType element for identifying an account under an Alias defined
+     * by the PartyIdentifier.
+     * - CONSENT - TBD
+     * - THIRD_PARTY_LINK - TBD
      */
     PartyIdType:
-      | "MSISDN"
-      | "EMAIL"
-      | "PERSONAL_ID"
-      | "BUSINESS"
-      | "DEVICE"
-      | "ACCOUNT_ID"
-      | "IBAN"
-      | "ALIAS";
+    | 'MSISDN'
+    | 'EMAIL'
+    | 'PERSONAL_ID'
+    | 'BUSINESS'
+    | 'DEVICE'
+    | 'ACCOUNT_ID'
+    | 'IBAN'
+    | 'ALIAS'
+    | 'CONSENT'
+    | 'THIRD_PARTY_LINK';
     /** Identifier of the Party. */
     PartyIdentifier: string;
     /** Either a sub-identifier of a PartyIdentifier, or a sub-type of the PartyIdType, normally a PersonalIdentifierType. */
     PartySubIdOrType: string;
     /** FSP identifier. */
     FspId: string;
-    /** Data model for the complex type PartyIdInfo. An ExtensionList element has been added to this reqeust in version v1.1 */
+    /** Data model for the complex type PartyIdInfo. */
     PartyIdInfo: {
-      partyIdType: components["schemas"]["PartyIdType"];
-      partyIdentifier: components["schemas"]["PartyIdentifier"];
-      partySubIdOrType?: components["schemas"]["PartySubIdOrType"];
-      fspId?: components["schemas"]["FspId"];
-      extensionList?: components["schemas"]["ExtensionList"];
+      partyIdType: components['schemas']['PartyIdType'];
+      partyIdentifier: components['schemas']['PartyIdentifier'];
+      partySubIdOrType?: components['schemas']['PartySubIdOrType'];
+      fspId?: components['schemas']['FspId'];
+      extensionList?: components['schemas']['ExtensionList'];
     };
-    /** Thirdparty transaction party lookup request */
+    /** ThirdpartyTransaction partyLookup request */
     ThirdpartyTransactionPartyLookupRequest: {
-      payee?: components["schemas"]["PartyIdInfo"];
-      transactionRequestId?: components["schemas"]["CorrelationId"];
+      payee: components['schemas']['PartyIdInfo'];
+      transactionRequestId: components['schemas']['CorrelationId'];
+    };
+    /** state of thirdparty transaction partyLookup phase */
+    ThirdpartyTransactionPartyLookupState:
+    | 'start'
+    | 'partyLookupSuccess'
+    | 'partyLookupFailure'
+    | 'errored';
+    ThirdpartyTransactionPartyLookupResponseError: {
+      currentState: components['schemas']['ThirdpartyTransactionPartyLookupState'];
+      errorInformation: components['schemas']['ErrorInformation'];
     };
     /** A limited set of pre-defined numbers. This list would be a limited set of numbers identifying a set of popular merchant types like School Fees, Pubs and Restaurants, Groceries, etc. */
     MerchantClassificationCode: string;
@@ -528,16 +587,16 @@ export interface components {
     LastName: string;
     /** Data model for the complex type PartyComplexName. */
     PartyComplexName: {
-      firstName?: components["schemas"]["FirstName"];
-      middleName?: components["schemas"]["MiddleName"];
-      lastName?: components["schemas"]["LastName"];
+      firstName?: components['schemas']['FirstName'];
+      middleName?: components['schemas']['MiddleName'];
+      lastName?: components['schemas']['LastName'];
     };
     /** Date of Birth of the Party. */
     DateOfBirth: string;
     /** Data model for the complex type PartyPersonalInfo. */
     PartyPersonalInfo: {
-      complexName?: components["schemas"]["PartyComplexName"];
-      dateOfBirth?: components["schemas"]["DateOfBirth"];
+      complexName?: components['schemas']['PartyComplexName'];
+      dateOfBirth?: components['schemas']['DateOfBirth'];
     };
     /**
      * A long-lived unique account identifier provided by the DFSP. This MUST NOT
@@ -555,34 +614,56 @@ export interface components {
     Name: string;
     /** Data model for the complex type Account. */
     Account: {
-      address?: components["schemas"]["AccountAddress"];
-      currency: components["schemas"]["Currency"];
-      description?: components["schemas"]["Name"];
+      address?: components['schemas']['AccountAddress'];
+      currency: components['schemas']['Currency'];
+      description?: components['schemas']['Name'];
     };
     /** Data model for the complex type AccountList. */
     AccountList: {
       /** Accounts associated with the Party. */
-      account: components["schemas"]["Account"][];
+      account: components['schemas']['Account'][];
     };
-    /** state of thirdparty transaction */
-    ThirdpartyTransactionState:
-      | "start"
-      | "partyLookupSuccess"
-      | "authorizationReceived"
-      | "transactionSuccess";
+    ThirdpartyTransactionPartyLookupResponseSuccess: {
+      currentState: components['schemas']['ThirdpartyTransactionPartyLookupState'];
+      party: {
+        partyIdInfo?: components['schemas']['PartyIdInfo'];
+        merchantClassificationCode?: components['schemas']['MerchantClassificationCode'];
+        name?: components['schemas']['PartyName'];
+        personalInfo?: components['schemas']['PartyPersonalInfo'];
+        accounts?: components['schemas']['AccountList'];
+      };
+    };
+    ThirdpartyTransactionPartyLookupResponse:
+    | components['schemas']['ThirdpartyTransactionPartyLookupResponseError']
+    | components['schemas']['ThirdpartyTransactionPartyLookupResponseSuccess'];
     /** Data model for the complex type Party. */
     Party: {
-      partyIdInfo: components["schemas"]["PartyIdInfo"];
-      merchantClassificationCode?: components["schemas"]["MerchantClassificationCode"];
-      name?: components["schemas"]["PartyName"];
-      personalInfo?: components["schemas"]["PartyPersonalInfo"];
+      accounts?: components['schemas']['AccountList'];
+      partyIdInfo: components['schemas']['PartyIdInfo'];
+      merchantClassificationCode?: components['schemas']['MerchantClassificationCode'];
+      name?: components['schemas']['PartyName'];
+      personalInfo?: components['schemas']['PartyPersonalInfo'];
+    };
+    /**
+     * This is a variant based on FSPIOP `PartyIdType` specification.
+     * This validation interface should be use by `POST /thirdpartyRequests/transactions`
+     * - THIRD_PARTY_LINK - is the DFSP's internal reference which allows DFSP to find out the corresponding consent
+     */
+    PartyIdTypeTPLink: 'THIRD_PARTY_LINK';
+    /** Data model for the complex type PartyIdInfo. */
+    PartyIdInfoTPLink: {
+      partyIdType: components['schemas']['PartyIdTypeTPLink'];
+      partyIdentifier: components['schemas']['PartyIdentifier'];
+      partySubIdOrType?: components['schemas']['PartySubIdOrType'];
+      fspId?: components['schemas']['FspId'];
+      extensionList?: components['schemas']['ExtensionList'];
     };
     /**
      * Below are the allowed values for the enumeration AmountType.
      * - SEND - Amount the Payer would like to send, that is, the amount that should be withdrawn from the Payer account including any fees.
      * - RECEIVE - Amount the Payer would like the Payee to receive, that is, the amount that should be sent to the receiver exclusive of any fees.
      */
-    AmountType: "SEND" | "RECEIVE";
+    AmountType: 'SEND' | 'RECEIVE';
     /**
      * Below are the allowed values for the enumeration.
      * - DEPOSIT - Used for performing a Cash-In (deposit) transaction. In a normal scenario, electronic funds are transferred from a Business account to a Consumer account, and physical cash is given from the Consumer to the Business User.
@@ -592,11 +673,11 @@ export interface components {
      * - REFUND - Used for performing a refund of transaction.
      */
     TransactionScenario:
-      | "DEPOSIT"
-      | "WITHDRAWAL"
-      | "TRANSFER"
-      | "PAYMENT"
-      | "REFUND";
+    | 'DEPOSIT'
+    | 'WITHDRAWAL'
+    | 'TRANSFER'
+    | 'PAYMENT'
+    | 'REFUND';
     /** Possible sub-scenario, defined locally within the scheme (UndefinedEnum Type). */
     TransactionSubScenario: string;
     /**
@@ -604,7 +685,7 @@ export interface components {
      * - PAYER - Sender of funds is initiating the transaction. The account to send from is either owned by the Payer or is connected to the Payer in some way.
      * - PAYEE - Recipient of the funds is initiating the transaction by sending a transaction request. The Payer must approve the transaction, either automatically by a pre-generated OTP or by pre-approval of the Payee, or by manually approving in his or her own Device.
      */
-    TransactionInitiator: "PAYER" | "PAYEE";
+    TransactionInitiator: 'PAYER' | 'PAYEE';
     /**
      * Below are the allowed values for the enumeration.
      * - CONSUMER - Consumer is the initiator of the transaction.
@@ -612,52 +693,75 @@ export interface components {
      * - BUSINESS - Business is the initiator of the transaction.
      * - DEVICE - Device is the initiator of the transaction.
      */
-    TransactionInitiatorType: "CONSUMER" | "AGENT" | "BUSINESS" | "DEVICE";
+    TransactionInitiatorType: 'CONSUMER' | 'AGENT' | 'BUSINESS' | 'DEVICE';
     /** Reason for the refund. */
     RefundReason: string;
     /** Data model for the complex type Refund. */
     Refund: {
-      originalTransactionId: components["schemas"]["CorrelationId"];
-      refundReason?: components["schemas"]["RefundReason"];
+      originalTransactionId: components['schemas']['CorrelationId'];
+      refundReason?: components['schemas']['RefundReason'];
     };
     /** (BopCode) The API data type [BopCode](https://www.imf.org/external/np/sta/bopcode/) is a JSON String of 3 characters, consisting of digits only. Negative numbers are not allowed. A leading zero is not allowed. */
     BalanceOfPayments: string;
     /** Data model for the complex type TransactionType. */
     TransactionType: {
-      scenario: components["schemas"]["TransactionScenario"];
-      subScenario?: components["schemas"]["TransactionSubScenario"];
-      initiator: components["schemas"]["TransactionInitiator"];
-      initiatorType: components["schemas"]["TransactionInitiatorType"];
-      refundInfo?: components["schemas"]["Refund"];
-      balanceOfPayments?: components["schemas"]["BalanceOfPayments"];
+      scenario: components['schemas']['TransactionScenario'];
+      subScenario?: components['schemas']['TransactionSubScenario'];
+      initiator: components['schemas']['TransactionInitiator'];
+      initiatorType: components['schemas']['TransactionInitiatorType'];
+      refundInfo?: components['schemas']['Refund'];
+      balanceOfPayments?: components['schemas']['BalanceOfPayments'];
     };
     /** The object sent in the POST `/thirdpartyTransaction/{ID}/initiate` request. */
-    ThirdpartyRequestsTransactionsPostRequest: {
-      sourceAccountId: components["schemas"]["AccountAddress"];
-      consentId: components["schemas"]["CorrelationId"];
-      payee: components["schemas"]["Party"];
-      payer: components["schemas"]["Party"];
-      amountType: components["schemas"]["AmountType"];
-      amount: components["schemas"]["Money"];
-      transactionType: components["schemas"]["TransactionType"];
+    ThirdpartyTransactionIDInitiateRequest: {
+      payee: components['schemas']['Party'];
+      payer: components['schemas']['PartyIdInfoTPLink'];
+      amountType: components['schemas']['AmountType'];
+      amount: components['schemas']['Money'];
+      transactionType: components['schemas']['TransactionType'];
       expiration: string;
+    };
+    /** state of thirdparty transaction for initiate phase */
+    ThirdpartyTransactionIDInitiateState:
+    | 'partyLookupSuccess'
+    | 'authorizationReceived'
+    | 'errored';
+    ThirdpartyTransactionIDInitiateResponseError: {
+      currentState: components['schemas']['ThirdpartyTransactionIDInitiateState'];
+      errorInformation: components['schemas']['ErrorInformation'];
     };
     /** POST /authorizations request object. */
     AuthorizationsPostRequest: {
-      authenticationType: components["schemas"]["AuthorizationChannelType"];
-      retriesLeft: components["schemas"]["Integer"];
-      amount: components["schemas"]["Money"];
-      transactionId: components["schemas"]["CorrelationId"];
-      transactionRequestId: components["schemas"]["CorrelationId"];
-      quote: components["schemas"]["QuotesIDPutResponse"];
+      authenticationType: components['schemas']['AuthenticationType'];
+      retriesLeft: components['schemas']['Integer'];
+      amount: components['schemas']['Money'];
+      transactionId: components['schemas']['CorrelationId'];
+      transactionRequestId: components['schemas']['CorrelationId'];
+      quote: components['schemas']['QuotesIDPutResponse'];
     };
+    ThirdpartyTransactionIDInitiateResponseSuccess: {
+      currentState: components['schemas']['ThirdpartyTransactionIDInitiateState'];
+      authorization: components['schemas']['AuthorizationsPostRequest'];
+    };
+    ThirdpartyTransactionIDInitiateResponse:
+    | components['schemas']['ThirdpartyTransactionIDInitiateResponseError']
+    | components['schemas']['ThirdpartyTransactionIDInitiateResponseSuccess'];
     /** The object sent in the PUT /authorizations/{ID} callback. */
     AuthorizationsIDPutResponse: {
-      authenticationInfo?: components["schemas"]["AuthenticationInfo"];
-      responseType: components["schemas"]["AuthorizationResponse"];
+      authenticationInfo?: components['schemas']['AuthenticationInfo'];
+      responseType: components['schemas']['AuthorizationResponse'];
     };
-    ThirdpartyTransactionApproveRequest: {
-      authorizationResponse?: components["schemas"]["AuthorizationsIDPutResponse"];
+    ThirdpartyTransactionIDApproveRequest: {
+      authorizationResponse: components['schemas']['AuthorizationsIDPutResponse'];
+    };
+    /** state of thirdparty transaction */
+    ThirdpartyTransactionIDApproveState:
+    | 'authorizationReceived'
+    | 'transactionStatusReceived'
+    | 'errored';
+    ThirdpartyTransactionIDApproveResponseError: {
+      currentState: components['schemas']['ThirdpartyTransactionIDApproveState'];
+      errorInformation: components['schemas']['ErrorInformation'];
     };
     /**
      * Below are the allowed values for the enumeration.
@@ -666,7 +770,17 @@ export interface components {
      * - ACCEPTED - Payer has approved the transaction.
      * - REJECTED - Payer has rejected the transaction.
      */
-    TransactionRequestState: "RECEIVED" | "PENDING" | "ACCEPTED" | "REJECTED";
+    TransactionRequestState: 'RECEIVED' | 'PENDING' | 'ACCEPTED' | 'REJECTED';
+    ThirdpartyTransactionIDApproveResponseSuccess: {
+      transactionStatus: {
+        transactionId: components['schemas']['CorrelationId'];
+        transactionRequestState: components['schemas']['TransactionRequestState'];
+      };
+      currentState: components['schemas']['ThirdpartyTransactionIDApproveState'];
+    };
+    ThirdpartyTransactionIDApproveResponse:
+    | components['schemas']['ThirdpartyTransactionIDApproveResponseError']
+    | components['schemas']['ThirdpartyTransactionIDApproveResponseSuccess'];
     /** The API data type BinaryString is a JSON String. The string is a base64url  encoding of a string of raw bytes, where padding (character ‘=’) is added at the end of the data if needed to ensure that the string is a multiple of 4 characters. The length restriction indicates the allowed number of characters. */
     BinaryString: string;
     /** The object sent in the POST /thirdpartyRequests/transactions/{id}/authorizations request. */
@@ -674,114 +788,162 @@ export interface components {
       /** Base64 encoded binary string - the original challenge. */
       challenge: string;
       /** Base64 encoded binary string - the signed challenge */
-      value: components["schemas"]["BinaryString"];
+      value: components['schemas']['BinaryString'];
       /** Common ID between the PISP and FSP for the Consent object This tells DFSP and auth-service which constent allows the PISP to initiate transaction. */
-      consentId: components["schemas"]["CorrelationId"];
+      consentId: components['schemas']['CorrelationId'];
       /** DFSP specific account identifiers, e.g. `dfspa.alice.1234` */
-      sourceAccountId: components["schemas"]["AccountAddress"];
+      sourceAccountId: components['schemas']['AccountAddress'];
       /** The status of the authorization. This MUST be PENDING for a POST request */
-      status: "PENDING";
+      status: 'PENDING';
     };
     /** The object sent in the PUT /thirdpartyRequests/transactions/{id}/authorizations request. */
     ThirdpartyRequestsTransactionsIDAuthorizationsPutResponse: {
       /** Base64 encoded binary string - the original challenge. */
       challenge: string;
       /** Base64 encoded binary string - the signed challenge. */
-      value: components["schemas"]["BinaryString"];
+      value: components['schemas']['BinaryString'];
       /** Common ID between the PISP and FSP for the Consent object This tells DFSP and auth-service which consent allows the PISP to initiate transaction. */
-      consentId: components["schemas"]["CorrelationId"];
+      consentId: components['schemas']['CorrelationId'];
       /** DFSP specific account identifiers, e.g. `dfspa.alice.1234` */
-      sourceAccountId: components["schemas"]["AccountAddress"];
+      sourceAccountId: components['schemas']['AccountAddress'];
       /** The status of the authorization. This value must be `VERIFIED` for a PUT request. */
-      status: "VERIFIED";
+      status: 'VERIFIED';
     };
     AccountsIDPutResponse: {
-      accountNickname: components["schemas"]["AccountAddress"];
-      id: components["schemas"]["AccountAddress"];
-      currency: components["schemas"]["Currency"];
+      accountNickname: components['schemas']['AccountAddress'];
+      id: components['schemas']['AccountAddress'];
+      currency: components['schemas']['Currency'];
     }[];
+    /** POST /consentRequests/{ID}/validate Request object */
+    ConsentRequestsValidateRequest: {
+      toParticipantId: string;
+      authToken: string;
+    };
+    /** State of POST consent requests validate */
+    ConsentRequestsValidateState:
+    | 'start'
+    | 'errored'
+    | 'success'
+    | 'OTPIsValid';
+    ConsentRequestsValidateResponseError: {
+      errorInformation: components['schemas']['ErrorInformation'];
+      currentState: components['schemas']['ConsentRequestsValidateState'];
+    };
+    /**
+     * The scopes requested for a ConsentRequest.
+     * - "accounts.getBalance" - Get the balance of a given account.
+     * - "accounts.transfer" - Initiate a transfer from an account.
+     */
+    ConsentScopeType: 'accounts.getBalance' | 'accounts.transfer';
+    /** Scope + Account Identifier mapping for a Consent. */
+    Scope: {
+      accountId: components['schemas']['AccountAddress'];
+      actions: components['schemas']['ConsentScopeType'][];
+    };
+    /** The object sent in a `POST /consents` request. */
+    ConsentsPostRequest: {
+      /**
+       * Common ID between the PISP and FSP for the Consent object
+       * decided by the DFSP who creates the Consent
+       * This field is REQUIRED for POST /consent.
+       */
+      consentId: components['schemas']['CorrelationId'];
+      /**
+       * The id of the ConsentRequest that was used to initiate the
+       * creation of this Consent.
+       */
+      consentRequestId: components['schemas']['CorrelationId'];
+      scopes: components['schemas']['Scope'][];
+    };
+    ConsentRequestsValidateResponseSuccess: {
+      consent: components['schemas']['ConsentsPostRequest'];
+      currentState: components['schemas']['ConsentRequestsValidateState'];
+    };
+    ConsentRequestsValidateResponse:
+    | components['schemas']['ConsentRequestsValidateResponseError']
+    | components['schemas']['ConsentRequestsValidateResponseSuccess'];
   };
   responses: {
     /** OK */
-    "200": {};
+    '200': {};
     /** Bad Request */
-    "400": {
+    '400': {
       content: {
-        "application/json": components["schemas"]["ErrorInformationResponse"];
+        'application/json': components['schemas']['ErrorInformationResponse'];
       };
       headers: {
-        "Content-Length": components["headers"]["Content-Length"];
-        "Content-Type": components["headers"]["Content-Type"];
+        'Content-Length': components['headers']['Content-Length'];
+        'Content-Type': components['headers']['Content-Type'];
       };
     };
     /** Unauthorized */
-    "401": {
+    '401': {
       content: {
-        "application/json": components["schemas"]["ErrorInformationResponse"];
+        'application/json': components['schemas']['ErrorInformationResponse'];
       };
       headers: {
-        "Content-Length": components["headers"]["Content-Length"];
-        "Content-Type": components["headers"]["Content-Type"];
+        'Content-Length': components['headers']['Content-Length'];
+        'Content-Type': components['headers']['Content-Type'];
       };
     };
     /** Forbidden */
-    "403": {
+    '403': {
       content: {
-        "application/json": components["schemas"]["ErrorInformationResponse"];
+        'application/json': components['schemas']['ErrorInformationResponse'];
       };
       headers: {
-        "Content-Length": components["headers"]["Content-Length"];
-        "Content-Type": components["headers"]["Content-Type"];
+        'Content-Length': components['headers']['Content-Length'];
+        'Content-Type': components['headers']['Content-Type'];
       };
     };
     /** Not Found */
-    "404": {
+    '404': {
       content: {
-        "application/json": components["schemas"]["ErrorInformationResponse"];
+        'application/json': components['schemas']['ErrorInformationResponse'];
       };
       headers: {
-        "Content-Length": components["headers"]["Content-Length"];
-        "Content-Type": components["headers"]["Content-Type"];
+        'Content-Length': components['headers']['Content-Length'];
+        'Content-Type': components['headers']['Content-Type'];
       };
     };
     /** Method Not Allowed */
-    "405": {
+    '405': {
       content: {
-        "application/json": components["schemas"]["ErrorInformationResponse"];
+        'application/json': components['schemas']['ErrorInformationResponse'];
       };
       headers: {
-        "Content-Length": components["headers"]["Content-Length"];
-        "Content-Type": components["headers"]["Content-Type"];
+        'Content-Length': components['headers']['Content-Length'];
+        'Content-Type': components['headers']['Content-Type'];
       };
     };
     /** Not Acceptable */
-    "406": {
+    '406': {
       content: {
-        "application/json": components["schemas"]["ErrorInformationResponse"];
+        'application/json': components['schemas']['ErrorInformationResponse'];
       };
       headers: {
-        "Content-Length": components["headers"]["Content-Length"];
-        "Content-Type": components["headers"]["Content-Type"];
+        'Content-Length': components['headers']['Content-Length'];
+        'Content-Type': components['headers']['Content-Type'];
       };
     };
     /** Not Implemented */
-    "501": {
+    '501': {
       content: {
-        "application/json": components["schemas"]["ErrorInformationResponse"];
+        'application/json': components['schemas']['ErrorInformationResponse'];
       };
       headers: {
-        "Content-Length": components["headers"]["Content-Length"];
-        "Content-Type": components["headers"]["Content-Type"];
+        'Content-Length': components['headers']['Content-Length'];
+        'Content-Type': components['headers']['Content-Type'];
       };
     };
     /** Service Unavailable */
-    "503": {
+    '503': {
       content: {
-        "application/json": components["schemas"]["ErrorInformationResponse"];
+        'application/json': components['schemas']['ErrorInformationResponse'];
       };
       headers: {
-        "Content-Length": components["headers"]["Content-Length"];
-        "Content-Type": components["headers"]["Content-Type"];
+        'Content-Length': components['headers']['Content-Length'];
+        'Content-Type': components['headers']['Content-Type'];
       };
     };
     /**
@@ -790,53 +952,35 @@ export interface components {
      */
     AuthorizationsResponse: {
       content: {
-        "application/json": {
-          authenticationInfo?: components["schemas"]["AuthenticationInfo"];
-          responseType: components["schemas"]["AuthorizationResponse"];
-          currentState?: components["schemas"]["AuthorizationsState"];
+        'application/json': {
+          authenticationInfo?: components['schemas']['AuthenticationInfo'];
+          responseType: components['schemas']['AuthorizationResponse'];
+          currentState?: components['schemas']['AuthorizationsState'];
         };
       };
     };
-    /** Thirdparty transaction party lookup response */
+    /** ThirdpartyTransaction partyLookup response */
     ThirdpartyTransactionPartyLookupResponse: {
       content: {
-        "application/json": {
-          party?: {
-            partyIdInfo?: components["schemas"]["PartyIdInfo"];
-            merchantClassificationCode?: components["schemas"]["MerchantClassificationCode"];
-            name?: components["schemas"]["PartyName"];
-            personalInfo?: components["schemas"]["PartyPersonalInfo"];
-            accounts?: components["schemas"]["AccountList"];
-          };
-          currentState?: components["schemas"]["ThirdpartyTransactionState"];
-        };
+        'application/json': components['schemas']['ThirdpartyTransactionPartyLookupResponse'];
       };
     };
-    /** Thirdparty transaction initiate response */
-    ThirdpartyRequestsTransactionsPostResponse: {
+    /** ThirdpartyTransactionIDInitiate response */
+    ThirdpartyTransactionIDInitiateResponse: {
       content: {
-        "application/json": {
-          authorization?: components["schemas"]["AuthorizationsPostRequest"];
-          currentState?: components["schemas"]["ThirdpartyTransactionState"];
-        };
+        'application/json': components['schemas']['ThirdpartyTransactionIDInitiateResponse'];
       };
     };
-    /** Thirdparty transaction approve response */
-    ThirdpartyTransactionApproveResponse: {
+    /** ThirdpartyTransactionIDApproveResponse */
+    ThirdpartyTransactionIDApproveResponse: {
       content: {
-        "application/json": {
-          transactionStatus?: {
-            transactionId?: components["schemas"]["CorrelationId"];
-            transactionRequestState?: components["schemas"]["TransactionRequestState"];
-          };
-          currentState?: components["schemas"]["ThirdpartyTransactionState"];
-        };
+        'application/json': components['schemas']['ThirdpartyTransactionIDApproveResponse'];
       };
     };
     /** Thirdparty requests transactions authorizations response */
     ThirdpartyRequestsTransactionsIDAuthzResponse: {
       content: {
-        "application/json": components["schemas"]["ThirdpartyRequestsTransactionsIDAuthorizationsPutResponse"];
+        'application/json': components['schemas']['ThirdpartyRequestsTransactionsIDAuthorizationsPutResponse'];
       };
     };
     /**
@@ -845,7 +989,13 @@ export interface components {
      */
     AccountsByUserIdResponse: {
       content: {
-        "application/json": components["schemas"]["AccountsIDPutResponse"];
+        'application/json': components['schemas']['AccountsIDPutResponse'];
+      };
+    };
+    /** Consent requests validate response */
+    ConsentRequestsValidateResponse: {
+      content: {
+        'application/json': components['schemas']['ConsentRequestsValidateResponse'];
       };
     };
   };

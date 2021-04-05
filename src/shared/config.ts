@@ -60,6 +60,7 @@ export interface ServiceConfig {
   ENV: string
   INBOUND: InConfig
   OUTBOUND: OutConfig
+  REQUEST_PROCESSING_TIMEOUT_SECONDS: number
   WSO2_AUTH: {
     staticToken: string
     tokenEndpoint: string
@@ -94,6 +95,8 @@ export interface ServiceConfig {
     PISP_BACKEND_URI: string
     PISP_BACKEND_HTTP_SCHEME: string
     PISP_BACKEND_SIGN_AUTHORIZATION_PATH: string
+    PISP_TRANSACTION_INITIATE_TIMEOUT_IN_SECONDS: number
+    PISP_TRANSACTION_APPROVE_TIMEOUT_IN_SECONDS: number
     SDK_OUTGOING_URI: string
     SDK_OUTGOING_HTTP_SCHEME: string
     SDK_REQUEST_TO_PAY_TRANSFER_URI: string
@@ -148,6 +151,11 @@ export const ConvictConfig = Convict<ServiceConfig>({
       default: 3002,
       env: 'OUTBOUND_PORT'
     }
+  },
+  REQUEST_PROCESSING_TIMEOUT_SECONDS: {
+    doc: 'The timeout for waiting for a response to a request',
+    env: 'REQUEST_PROCESSING_TIMEOUT_SECONDS',
+    default: 30
   },
   WSO2_AUTH: {
     staticToken: {
@@ -300,7 +308,7 @@ export const ConvictConfig = Convict<ServiceConfig>({
     DFSP_BACKEND_GET_SCOPES_PATH: {
       doc: 'uri to sdk-scheme-adapter getScopes endpoint',
       format: '*',
-      default: '{ID}/scopes'
+      default: 'scopes/{ID}'
     },
     PISP_BACKEND_URI: {
       doc: 'host address of DFSP\'s ',
@@ -316,6 +324,16 @@ export const ConvictConfig = Convict<ServiceConfig>({
       doc: 'Http scheme ',
       format: ['http', 'https'],
       default: 'http'
+    },
+    PISP_TRANSACTION_INITIATE_TIMEOUT_IN_SECONDS: {
+      doc: 'Timeout for Transaction Initiate phase',
+      format: 'nat',
+      default: 3
+    },
+    PISP_TRANSACTION_APPROVE_TIMEOUT_IN_SECONDS: {
+      doc: 'Timeout for Transaction Approve phase',
+      format: 'nat',
+      default: 3
     },
     SDK_OUTGOING_URI: {
       doc: 'host address of SDK scheme-adapter Outgoing service\'s ',
@@ -387,6 +405,7 @@ const config: ServiceConfig = {
   ENV: ConvictConfig.get('ENV'),
   INBOUND: ConvictConfig.get('INBOUND'),
   OUTBOUND: ConvictConfig.get('OUTBOUND'),
+  REQUEST_PROCESSING_TIMEOUT_SECONDS: ConvictConfig.get('REQUEST_PROCESSING_TIMEOUT_SECONDS'),
   WSO2_AUTH: ConvictConfig.get('WSO2_AUTH'),
   REDIS: ConvictConfig.get('REDIS'),
   INSPECT: ConvictConfig.get('INSPECT'),

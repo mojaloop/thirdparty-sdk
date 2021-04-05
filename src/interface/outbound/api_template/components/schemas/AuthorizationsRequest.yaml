@@ -5,7 +5,7 @@ properties:
   toParticipantId: 
     type: string
   authenticationType:
-    $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/AuthorizationChannelType.yaml'
+    $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/AuthenticationType.yaml'
   retriesLeft:
     $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/schemas/Integer.yaml'
   amount:

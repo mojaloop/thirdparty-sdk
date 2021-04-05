@@ -59,6 +59,7 @@ describe('backendRequests', () => {
     expect(typeof dfspBackendRequests.patch).toEqual('function')
     expect(typeof dfspBackendRequests.post).toEqual('function')
     expect(typeof dfspBackendRequests.put).toEqual('function')
+    expect(typeof dfspBackendRequests.getUserAccounts).toEqual('function')
 
     /**
      * TODO: check for methods
@@ -77,7 +78,7 @@ describe('backendRequests', () => {
       )
       const result = await dfspBackendRequests.getUserAccounts(userId)
       expect(result).toEqual(response)
-      expect(getSpy).toBeCalledWith(`http://backend-uri/accounts/${userId}`)
+      expect(getSpy).toBeCalledWith(`accounts/${userId}`)
     })
   })
 })

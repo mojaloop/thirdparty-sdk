@@ -48,7 +48,7 @@ import { InboundThirdpartyTransactionPostRequest } from '~/models/thirdparty.tra
  */
 async function post (_context: Context, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const transactionRequest = request.payload as InboundThirdpartyTransactionPostRequest
-
+  const pispId = request.headers['FSPIOP-Source']
   // input validation - mocked
   if (!(await verifyConsentId(transactionRequest.consentId)) ||
       !(await verifyPispId(request.headers['FSPIOP-Source'])) ||
@@ -60,14 +60,14 @@ async function post (_context: Context, request: Request, h: StateResponseToolki
 
   const modelConfig: InboundThridpartyTransactionsModelConfig = {
     logger: h.getLogger(),
-    sdkRequests: h.getSDKRequests(),
+    sdkOutgoingRequests: h.getSDKOutgoingRequests(),
     mojaloopRequests: h.getMojaloopRequests(),
     thirdpartyRequests: h.getThirdpartyRequests()
   }
   const model = new InboundThridpartyTransactionsModel(modelConfig)
   // don't await on promise to be resolved
   setImmediate(async () => {
-    const result = await model.requestToPayTransfer(transactionRequest)
+    const result = await model.requestToPayTransfer(transactionRequest, pispId)
     modelConfig.logger.push({ result }).info('requestToPayTransfer done')
 
     // TODO: should we process result somewhere ? PUT ?

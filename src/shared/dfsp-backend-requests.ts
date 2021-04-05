@@ -28,7 +28,7 @@
 import { HttpRequestsConfig, HttpRequests } from '~/shared/http-requests'
 import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
 import { requests } from '@mojaloop/sdk-standard-components'
-import { ValidateOTPResponse } from '../models/inbound/consentRequests.model'
+import { BackendValidateOTPResponse, BackendGetScopesResponse } from '../models/inbound/dfspOTPValidate.interface'
 
 export interface DFSPBackendConfig extends HttpRequestsConfig {
   verifyAuthorizationPath: string
@@ -91,14 +91,14 @@ export class DFSPBackendRequests extends HttpRequests {
 
   // request user's accounts details from DFSP Backend
   async getUserAccounts (userId: string): Promise<tpAPI.Schemas.AccountsIDPutResponse | void> {
-    const accountsPath = this.fullUri(this.getUserAccountsPath.replace('{ID}', userId))
+    const accountsPath = this.getUserAccountsPath.replace('{ID}', userId)
     return this.get<tpAPI.Schemas.AccountsIDPutResponse>(accountsPath)
   }
 
   // POST the consent request ID and authToken for a DFSP to validate.
   // This check is needed to continue the flow of responding to a /consentRequest
   // with either a POST /consents or PUT /consentRequests/{ID}/error
-  async validateOTPSecret (consentRequestId: string, authToken: string): Promise<ValidateOTPResponse | void> {
+  async validateOTPSecret (consentRequestId: string, authToken: string): Promise<BackendValidateOTPResponse | void> {
     const uri = this.fullUri(this.validateOTPPath)
     this.logger.push({ uri, template: this.validateOTPPath }).info('validateOTPSecret')
 
@@ -107,7 +107,7 @@ export class DFSPBackendRequests extends HttpRequests {
       authToken: authToken
     })
 
-    return this.loggedRequest<ValidateOTPResponse>({
+    return this.loggedRequest<BackendValidateOTPResponse>({
       uri,
       method: 'POST',
       headers: this.headers,
@@ -117,13 +117,13 @@ export class DFSPBackendRequests extends HttpRequests {
   }
 
   // retrieve the scopes that PISP is granted on a user's behalf
-  async getScopes (consentRequestId: string): Promise<tpAPI.Schemas.Scope[] | void> {
+  async getScopes (consentRequestId: string): Promise<BackendGetScopesResponse | void> {
     const uri = this.fullUri(
       this.getScopesPath.replace('{ID}', consentRequestId)
     )
     this.logger.push({ uri, template: this.getScopesPath }).info('getScopes')
 
-    return this.loggedRequest<tpAPI.Schemas.Scope[]>({
+    return this.loggedRequest<BackendGetScopesResponse>({
       uri,
       method: 'GET',
       headers: this.headers,

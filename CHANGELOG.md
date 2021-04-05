@@ -1,4 +1,88 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+## [11.32.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.31.0...v11.32.0) (2021-04-02)
+
+
+### Features
+
+* update error codes for authentication step of account linking ([#78](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/78)) ([44e5dc3](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/44e5dc38bdaaf22da10d9bc0cdc73b5ca9b8c39e))
+
+## [11.31.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.30.5...v11.31.0) (2021-04-01)
+
+
+### Features
+
+* add model and handler of outbound pisp otp validate ([#75](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/75)) ([443cb23](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/443cb23fcd22929f31d421baaa7dbbee65fbe70e))
+
+### [11.30.5](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.30.4...v11.30.5) (2021-04-01)
+
+
+### Code Refactor
+
+* 2060 use deferredJob in PISPTransactionModel ([#76](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/76)) ([b7ac714](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/b7ac714843f745baf7d4069175b4260438720c11))
+
+### [11.30.4](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.30.3...v11.30.4) (2021-03-30)
+
+
+### Code Refactor
+
+* 2060 pisp transaction model transaction request ([#74](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/74)) ([6a38727](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/6a387270fd46909af8bad5a43193eb8532a29d18))
+
+### [11.30.3](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.30.2...v11.30.3) (2021-03-26)
+
+
+### Bug Fixes
+
+* correct getUserAccounts url in dfsp-backend-requests ([#73](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/73)) ([be86853](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/be8685362942439729dba44606cf9975057f295f))
+
+### [11.30.2](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.30.1...v11.30.2) (2021-03-25)
+
+
+### Code Refactor
+
+* rework inbound DFSP otp validate workflow ([#72](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/72)) ([b98816b](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/b98816bd86a1cd773c5a09fcf19663bfb2b4182d))
+
+### [11.30.1](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.30.0...v11.30.1) (2021-03-25)
+
+
+### Bug Fixes
+
+* move dependency and fix mocking in tests ([#70](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/70)) ([50087ad](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/50087adefb7d3a8bc6df1d4de8852eb5ea2828f6))
+
+## [11.30.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.29.1...v11.30.0) (2021-03-25)
+
+
+### Features
+
+* use api-snippets for partyLookup endpoint ([#71](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/71)) ([4677e3e](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/4677e3e08da00175cd77f5706e8f6eb3c6202304))
+
+### [11.29.1](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.29.0...v11.29.1) (2021-03-25)
+
+
+### Maintenance
+
+* introduce patch /consentRequests and update ttk spec ([#69](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/69)) ([42fcfc7](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/42fcfc7933eb59cc2fc421c961eb30871166ff3f))
+
+## [11.29.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.28.2...v11.29.0) (2021-03-24)
+
+
+### Features
+
+* use api-snippets(thirdparty-api paths) instead of local defs ([#68](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/68)) ([47f9025](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/47f9025a313b5983811eb7698dc81af3eef07b12))
+
+### [11.28.2](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.28.1...v11.28.2) (2021-03-18)
+
+
+### Tests
+
+* integration of requestPartiesInformation ([#65](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/65)) ([6a30687](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/6a30687a901894f2a21aba7d2b9b95ded252379c))
+
+### [11.28.1](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.28.0...v11.28.1) (2021-03-17)
+
+
+### Code Refactor
+
+* 2060 remove notifyThirdpartyAboutTransfer  ([#64](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/64)) ([7edc9ad](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/7edc9ad3bb957f9da4c1ec9d2f2d257f88beb501))
+
 ## [11.28.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.27.1...v11.28.0) (2021-03-16)
 
 

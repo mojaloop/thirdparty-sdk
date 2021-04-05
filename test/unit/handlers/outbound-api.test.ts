@@ -34,14 +34,13 @@ import {
   v1_1 as fspiopAPI,
   thirdparty as tpAPI
 } from '@mojaloop/api-snippets'
+import { OutboundAPI } from '@mojaloop/sdk-scheme-adapter'
 import { HealthResponse } from '~/interface/types'
 import { NotificationCallback, Message, PubSub } from '~/shared/pub-sub'
 import {
   OutboundThirdpartyAuthorizationsModelState
 } from '~/models/thirdparty.authorizations.interface'
 import {
-  RequestPartiesInformationResponse,
-  PISPTransactionModelState,
   ThirdpartyTransactionStatus,
   RequestPartiesInformationState
 } from '~/models/pispTransaction.interface'
@@ -76,7 +75,7 @@ const putThirdpartyAuthResponse: tpAPI.Schemas.ThirdpartyRequestsTransactionsIDA
   status: 'VERIFIED',
   value: 'value'
 }
-const partyLookupResponse: RequestPartiesInformationResponse = {
+const partyLookupResponse: OutboundAPI.Schemas.partiesByIdResponse = {
   party: {
     partyIdInfo: {
       partyIdType: 'MSISDN',
@@ -117,7 +116,8 @@ const initiateResponse: tpAPI.Schemas.AuthorizationsPostRequest = {
 }
 const approveResponse: ThirdpartyTransactionStatus = {
   transactionId: 'b51ec534-ee48-4575-b6a9-ead2955b8069',
-  transactionRequestState: 'ACCEPTED'
+  transactionRequestState: 'ACCEPTED',
+  transactionState: 'COMPLETED'
 }
 
 jest.mock('redis')
@@ -131,7 +131,8 @@ jest.mock('@mojaloop/sdk-standard-components', () => {
       postAuthorizations: jest.fn(() => Promise.resolve(putResponse)),
       postThirdpartyRequestsTransactionsAuthorizations: jest.fn(() => Promise.resolve(putThirdpartyAuthResponse)),
       postThirdpartyRequestsTransactions: jest.fn(() => Promise.resolve(initiateResponse)),
-      getAccounts: jest.fn(() => Promise.resolve(mockData.accountsRequest.payload))
+      getAccounts: jest.fn(() => Promise.resolve(mockData.accountsRequest.payload)),
+      patchConsentRequests: jest.fn(() => Promise.resolve(mockData.inboundConsentsPostRequest)),
     })),
     WSO2Auth: jest.fn(),
     Logger: {
@@ -335,7 +336,7 @@ describe('Outbound API routes', (): void => {
     expect(response.statusCode).toBe(200)
     expect(response.result).toEqual({
       party: { ...partyLookupResponse.party },
-      currentState: PISPTransactionModelState.partyLookupSuccess
+      currentState: 'partyLookupSuccess'
     })
   })
 
@@ -367,8 +368,6 @@ describe('Outbound API routes', (): void => {
         'Content-Type': 'application/json'
       },
       payload: {
-        sourceAccountId: 'dfspa.alice.1234',
-        consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
         payee: {
           partyIdInfo: {
             partyIdType: 'MSISDN',
@@ -377,17 +376,9 @@ describe('Outbound API routes', (): void => {
           }
         },
         payer: {
-          personalInfo: {
-            complexName: {
-              firstName: 'Alice',
-              lastName: 'K'
-            }
-          },
-          partyIdInfo: {
-            partyIdType: 'MSISDN',
-            partyIdentifier: '+44 8765 4321',
-            fspId: 'dfspa'
-          }
+          partyIdType: 'THIRD_PARTY_LINK',
+          partyIdentifier: 'querty-123456',
+          fspId: 'dfspa'
         },
         amountType: 'SEND',
         amount: {
@@ -412,7 +403,7 @@ describe('Outbound API routes', (): void => {
     expect(response.statusCode).toBe(200)
     expect(response.result).toEqual({
       authorization: { ...initiateResponse },
-      currentState: PISPTransactionModelState.authorizationReceived
+      currentState: 'authorizationReceived'
     })
   })
 
@@ -446,7 +437,7 @@ describe('Outbound API routes', (): void => {
     expect(response.statusCode).toBe(200)
     expect(response.result).toEqual({
       transactionStatus: { ...approveResponse },
-      currentState: PISPTransactionModelState.transactionStatusReceived
+      currentState: 'transactionStatusReceived'
     })
   })
 
@@ -506,5 +497,78 @@ describe('Outbound API routes', (): void => {
       errorInformation: errorResp.errorInformation
     }
     expect((response.result)).toEqual(expectedResp)
+  })
+
+  it('/consentRequests/{ID}/validate - success', async (): Promise<void> => {
+    const request = {
+      method: 'PATCH',
+      url: '/consentRequests/6988c34f-055b-4ed5-b223-b10c8a2e2329/validate',
+      payload: {
+        toParticipantId: 'dfpsa',
+        authToken: '123456'
+      }
+    }
+    const pubSub = new PubSub({} as RedisConnectionConfig)
+    // defer publication to notification channel
+    // the dfsp should respond to a PISP with a POST /consents request
+    // where the inbound handler will publish the message
+    setTimeout(() => pubSub.publish(
+      'pispOTPValidate_6988c34f-055b-4ed5-b223-b10c8a2e2329',
+      mockData.inboundConsentsPostRequest.payload as unknown as Message
+    ), 10)
+    const response = await server.inject(request)
+
+    expect(response.statusCode).toBe(200)
+    const expectedResp = {
+      consent: {
+        consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
+        consentRequestId: '6988c34f-055b-4ed5-b223-b10c8a2e2329',
+        scopes: [{
+            accountId: 'some-id',
+            actions: [
+              'accounts.getBalance',
+              'accounts.transfer'
+            ]
+          }
+        ],
+      },
+      currentState: 'OTPIsValid'
+    }
+    expect(response.result).toEqual(expectedResp)
+  })
+
+  it('/consentRequests/{ID}/validate - error', async (): Promise<void> => {
+    const request = {
+      method: 'PATCH',
+      url: '/consentRequests/6988c34f-055b-4ed5-b223-b10c8a2e2329/validate',
+      payload: {
+        toParticipantId: 'dfpsa',
+        authToken: '123456'
+      }
+    }
+
+    const errorResponse = {
+      errorInformation: {
+        errorCode: '6000',
+        errorDescription: 'Generic thirdparty error'
+      }
+    }
+
+    const pubSub = new PubSub({} as RedisConnectionConfig)
+    // defer publication to notification channel
+    // if the validation fails the dfsp will respond with a
+    // PUT /consentRequests/{ID}/error where the inbound handler will publish
+    // the error
+    setTimeout(() => pubSub.publish(
+      'pispOTPValidate_6988c34f-055b-4ed5-b223-b10c8a2e2329',
+      errorResponse as unknown as Message
+    ), 10)
+    const response = await server.inject(request)
+    expect(response.statusCode).toBe(500)
+    const expectedResp = {
+      currentState: 'errored',
+      errorInformation: errorResponse.errorInformation
+    }
+    expect(response.result).toEqual(expectedResp)
   })
 })

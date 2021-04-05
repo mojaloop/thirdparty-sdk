@@ -31,14 +31,14 @@ import {
   MojaloopRequests
 } from '@mojaloop/sdk-standard-components'
 import {
-  v1_1 as fspiopAPI,
   thirdparty as tpAPI
 } from '@mojaloop/api-snippets'
+import { OutboundAPI as SDKOutboundAPI } from '@mojaloop/sdk-scheme-adapter'
 import { Method } from 'javascript-state-machine'
-import { ErrorInformation } from '~/interface/types'
+import * as OutboundAPI from '~/interface/outbound/api_interfaces'
 import { ControlledStateMachine, StateData, PersistentModelConfig } from '~/models/persistent.model'
 import { PubSub } from '~/shared/pub-sub'
-import { SDKRequests } from '~/shared/sdk-requests'
+import { SDKOutgoingRequests } from '~/shared/sdk-outgoing-requests'
 
 export enum RequestPartiesInformationState {
   COMPLETED = 'COMPLETED',
@@ -46,20 +46,10 @@ export enum RequestPartiesInformationState {
   ERROR_OCCURRED = 'ERROR_OCCURRED'
 }
 
-export interface RequestPartiesInformationResponse {
-  party?: fspiopAPI.Schemas.Party
-  currentState: RequestPartiesInformationState
-  errorInformation?: ErrorInformation
-}
-
-export enum PISPTransactionModelState {
-  start = 'start',
-  partyLookupSuccess = 'partyLookupSuccess',
-  partyLookupFailure = 'partyLookupFailure',
-  authorizationReceived = 'authorizationReceived',
-  transactionStatusReceived = 'transactionStatusReceived',
-  errored = 'errored'
-}
+export type PISPTransactionModelState =
+  OutboundAPI.Schemas.ThirdpartyTransactionPartyLookupState
+  | OutboundAPI.Schemas.ThirdpartyTransactionIDInitiateState
+  | OutboundAPI.Schemas.ThirdpartyTransactionIDApproveState
 
 export enum PISPTransactionPhase {
   lookup = 'lookup',
@@ -82,74 +72,32 @@ export interface PISPTransactionModelConfig extends PersistentModelConfig {
   pubSub: PubSub
   thirdpartyRequests: ThirdpartyRequests
   mojaloopRequests: MojaloopRequests
-  sdkRequests: SDKRequests
-}
-
-// derived from request body specification
-// '../../node_modules/@mojaloop/api-snippets/v1.0/openapi3/schemas/PartyIdInfo.yaml'
-export interface PayeeLookupRequest {
-  partyIdType: string,
-  partyIdentifier: string,
-  partySubIdOrType?: string
-  // `fspId` optional field intentionally skipped
-}
-
-export interface ThirdpartyTransactionPartyLookupRequest {
-  transactionRequestId: string
-  payee: PayeeLookupRequest
-}
-
-export interface ThirdpartyTransactionPartyLookupResponse {
-  party?: fspiopAPI.Schemas.Party
-  errorInformation?: ErrorInformation
-  currentState: PISPTransactionModelState
-}
-
-export interface ThirdpartyTransactionInitiateRequest {
-  sourceAccountId: string
-  consentId: string
-  payee: fspiopAPI.Schemas.Party
-  payer: fspiopAPI.Schemas.Party
-  amountType: fspiopAPI.Schemas.AmountType
-  amount: fspiopAPI.Schemas.Money
-  transactionType: fspiopAPI.Schemas.TransactionType
-  expiration: string
-}
-
-export interface ThirdpartyTransactionInitiateResponse {
-  authorization: tpAPI.Schemas.AuthorizationsPostRequest
-  currentState: PISPTransactionModelState
+  sdkOutgoingRequests: SDKOutgoingRequests
+  initiateTimeoutInSeconds: number
+  approveTimeoutInSeconds: number
 }
 
 export interface ThirdpartyTransactionStatus {
   transactionId: string
-  transactionRequestState: 'RECEIVED' | 'PENDING' | 'ACCEPTED' | 'REJECTED'
+  transactionRequestState: 'RECEIVED' | 'PENDING' | 'ACCEPTED' | 'REJECTED',
+  transactionState: 'RECEIVED' | 'PENDING' | 'COMPLETED' | 'REJECTED'
 }
 
-export interface ThirdpartyTransactionApproveResponse {
-  transactionStatus: ThirdpartyTransactionStatus
-  currentState: PISPTransactionModelState
-}
-
-export interface ThirdpartyTransactionApproveRequest {
-  authorizationResponse: fspiopAPI.Schemas.AuthorizationsIDPutResponse
-}
-
-export interface PISPTransactionData extends StateData {
+export interface PISPTransactionData extends StateData<PISPTransactionModelState> {
   transactionRequestId?: string
 
   // party lookup
-  payeeRequest?: PayeeLookupRequest
-  payeeResolved?: RequestPartiesInformationResponse
-  partyLookupResponse?: ThirdpartyTransactionPartyLookupResponse
+  payeeRequest?: OutboundAPI.Schemas.ThirdpartyTransactionPartyLookupRequest
+  payeeResolved?: SDKOutboundAPI.Schemas.partiesByIdResponse
+  partyLookupResponse?: OutboundAPI.Schemas.ThirdpartyTransactionPartyLookupResponse
 
   // initiate
-  initiateRequest?: ThirdpartyTransactionInitiateRequest
+  initiateRequest?: OutboundAPI.Schemas.ThirdpartyTransactionIDInitiateRequest
   authorizationRequest?: tpAPI.Schemas.AuthorizationsPostRequest
-  initiateResponse?: ThirdpartyTransactionInitiateResponse
+  initiateResponse?: OutboundAPI.Schemas.ThirdpartyTransactionIDInitiateResponse
 
   // approve
-  approveRequest?: ThirdpartyTransactionApproveRequest
+  approveRequest?: OutboundAPI.Schemas.ThirdpartyTransactionIDApproveRequest
   transactionStatus?: ThirdpartyTransactionStatus
-  approveResponse?: ThirdpartyTransactionApproveResponse
+  approveResponse?: OutboundAPI.Schemas.ThirdpartyTransactionIDApproveResponse
 }

@@ -8,17 +8,17 @@ module.exports = {
     'eslint:recommended',
     'standard',
     'plugin:@typescript-eslint/eslint-recommended',
-    'plugin:@typescript-eslint/recommended',    
+    'plugin:@typescript-eslint/recommended',
     // Enforces ES6+ import/export syntax
     'plugin:import/errors',
     'plugin:import/warnings',
-    'plugin:import/typescript',
+    'plugin:import/typescript'
   ],
   parserOptions: {
     ecmaVersion: 2018, // Allows for the parsing of modern ECMAScript features
     sourceType: 'module', // Allows for the use of imports
-    project: "./tsconfig.json",
-    tsConfigRootDir: "./"
+    project: './tsconfig.json',
+    tsConfigRootDir: './'
   },
   rules: {
     indent: 'off',
@@ -26,21 +26,21 @@ module.exports = {
     '@typescript-eslint/no-explicit-any': 'error',
     '@typescript-eslint/no-var-requires': 'error',
     'no-console': 'off',
-    'quotes': ['error', 'single'],
+    quotes: ['error', 'single'],
     'linebreak-style': ['error', 'unix'],
-    'semi': ['error', 'never'],
+    semi: ['error', 'never'],
     'cucumber/async-then': 2,
     'cucumber/expression-type': 2,
     'cucumber/no-restricted-tags': [2, 'wip', 'broken', 'foo'],
     'cucumber/no-arrow-functions': 2,
     'import/default': 'warn',
     'import/extensions': 'off',
-    'max-len': ['warn', { 'code': 120 }]
+    'max-len': ['warn', { code: 120 }]
   },
   settings: {
-    "import/resolver": {
+    'import/resolver': {
       typescript: {} // this loads <rootdir>/tsconfig.json to eslint
-    },
+    }
   },
   overrides: [
     {
@@ -49,16 +49,26 @@ module.exports = {
         'test /**/*.ts'
       ],
       rules: {
-        '@typescript-eslint/explicit-function-return-type': 'off',
-      },
+        '@typescript-eslint/explicit-function-return-type': 'off'
+      }
+    },
+    {
+      files: [
+        'src/interface/**/*.ts'
+      ],
+      rules: {
+        'no-use-before-define': 'off',
+        'max-len': ['warn', { code: 500 }],
+        '@typescript-eslint/ban-types': 'off'
+      }
     },
     {
       files: [
         '*.js'
       ],
       rules: {
-        '@typescript-eslint/no-var-requires': 'off',
+        '@typescript-eslint/no-var-requires': 'off'
       }
-    },
-  ],
-};
+    }
+  ]
+}

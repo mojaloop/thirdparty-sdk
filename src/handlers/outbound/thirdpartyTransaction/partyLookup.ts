@@ -26,10 +26,10 @@
  --------------
  ******/
 import { StateResponseToolkit } from '~/server/plugins/state'
+import * as OutboundAPI from '~/interface/outbound/api_interfaces'
 import {
   PISPTransactionModelConfig,
-  PISPTransactionData,
-  ThirdpartyTransactionPartyLookupRequest
+  PISPTransactionData
 } from '~/models/pispTransaction.interface'
 import {
   PISPTransactionModel,
@@ -37,15 +37,18 @@ import {
   existsInKVS
 } from '~/models/pispTransaction.model'
 import { Request, ResponseObject } from '@hapi/hapi'
+import config from '~/shared/config'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function post (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
-  const payload = request.payload as ThirdpartyTransactionPartyLookupRequest
+async function post (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+  const payload = request.payload as OutboundAPI.Schemas.ThirdpartyTransactionPartyLookupRequest
 
   // prepare model data
   const data: PISPTransactionData = {
     transactionRequestId: payload.transactionRequestId,
-    payeeRequest: payload.payee,
+    payeeRequest: {
+      transactionRequestId: payload.transactionRequestId,
+      payee: payload.payee
+    },
     currentState: 'start'
   }
 
@@ -53,11 +56,14 @@ async function post (_context: any, request: Request, h: StateResponseToolkit): 
   const modelConfig: PISPTransactionModelConfig = {
     kvs: h.getKVS(),
     pubSub: h.getPubSub(),
-    key: payload.transactionRequestId,
+    // TODO refactor api-snippets to have this field mandatory!
+    key: payload.transactionRequestId as string,
     logger: h.getLogger(),
     thirdpartyRequests: h.getThirdpartyRequests(),
     mojaloopRequests: h.getMojaloopRequests(),
-    sdkRequests: h.getSDKRequests()
+    sdkOutgoingRequests: h.getSDKOutgoingRequests(),
+    initiateTimeoutInSeconds: config.SHARED.PISP_TRANSACTION_INITIATE_TIMEOUT_IN_SECONDS,
+    approveTimeoutInSeconds: config.SHARED.PISP_TRANSACTION_APPROVE_TIMEOUT_IN_SECONDS
   }
   const exists = await existsInKVS(modelConfig)
   if (exists) {

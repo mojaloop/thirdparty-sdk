@@ -139,7 +139,7 @@ export class A2SModel<Args, A2SActionResponse extends StateData>
     this.logger.push({ args: this.args }).log('onRequestAction - arguments')
     const channel = this.config.channelName(this.args)
     return deferredJob(this.pubSub, channel)
-      .init(async (channel) => {
+      .init(async (channel: string) => {
         const res = await this.config.requestAction(this.args)
         this.logger.push({ res, channel, args: this.args })
           .log('RequestAction call sent to peer, listening on response')

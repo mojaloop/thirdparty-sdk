@@ -36,9 +36,6 @@ import {
   PISPTransactionModelConfig,
   PISPTransactionPhase,
   RequestPartiesInformationState,
-  ThirdpartyTransactionApproveResponse,
-  ThirdpartyTransactionInitiateResponse,
-  ThirdpartyTransactionPartyLookupResponse,
   ThirdpartyTransactionStatus
 } from '~/models/pispTransaction.interface'
 import {
@@ -57,7 +54,8 @@ import {
   thirdparty as tpAPI
 } from '@mojaloop/api-snippets'
 import { HTTPResponseError } from '~/shared/http-response-error'
-import { SDKRequests } from '~/shared/sdk-requests'
+import { SDKOutgoingRequests } from '~/shared/sdk-outgoing-requests'
+import * as OutboundAPI from '~/interface/outbound/api_interfaces'
 
 // mock KVS default exported class
 jest.mock('~/shared/kvs')
@@ -89,12 +87,14 @@ describe('pipsTransactionModel', () => {
         getParties: jest.fn(() => Promise.resolve({ statusCode: 202 })),
         putAuthorizations: jest.fn(() => Promise.resolve({ statusCode: 202 }))
       } as unknown as MojaloopRequests,
-      sdkRequests: {
+      sdkOutgoingRequests: {
         requestPartiesInformation: jest.fn(() => Promise.resolve({
           party: { Iam: 'mocked-party' },
           currentStatus: 'COMPLETED'
         }))
-      } as unknown as SDKRequests
+      } as unknown as SDKOutgoingRequests,
+      initiateTimeoutInSeconds: 3,
+      approveTimeoutInSeconds: 3
     }
     mocked(modelConfig.pubSub.subscribe).mockImplementationOnce(
       (_channel: string, cb: NotificationCallback) => {
@@ -162,7 +162,7 @@ describe('pipsTransactionModel', () => {
   })
 
   describe('transaction flow', () => {
-    const party: fspiopAPI.Schemas.Party = {
+    const party: tpAPI.Schemas.Party = {
       partyIdInfo: {
         fspId: 'fsp-id',
         partyIdType: 'PERSONAL_ID',
@@ -178,8 +178,11 @@ describe('pipsTransactionModel', () => {
           transactionRequestId: '1234-1234',
           currentState: 'start',
           payeeRequest: {
-            partyIdType: 'party-id-type',
-            partyIdentifier: 'party-identifier'
+            transactionRequestId: '1234-1234',
+            payee: {
+              partyIdType: 'MSISDN',
+              partyIdentifier: 'party-identifier'
+            }
           }
         }
       })
@@ -191,7 +194,7 @@ describe('pipsTransactionModel', () => {
 
       it('should give response properly populated from backendRequests.requestPartiesInformation', async () => {
         const model = await create(lookupData, modelConfig)
-        mocked(modelConfig.sdkRequests.requestPartiesInformation).mockImplementationOnce(() => Promise.resolve({
+        mocked(modelConfig.sdkOutgoingRequests.requestPartiesInformation).mockImplementationOnce(() => Promise.resolve({
           party,
           currentState: RequestPartiesInformationState.COMPLETED
         }))
@@ -219,14 +222,14 @@ describe('pipsTransactionModel', () => {
         })
 
         // check we made a call to mojaloopRequest.getParties
-        expect(modelConfig.sdkRequests.requestPartiesInformation).toBeCalledWith(
-          'party-id-type', 'party-identifier', undefined
+        expect(modelConfig.sdkOutgoingRequests.requestPartiesInformation).toBeCalledWith(
+          'MSISDN', 'party-identifier', undefined
         )
       })
 
       it('should handle error', async () => {
         mocked(
-          modelConfig.sdkRequests.requestPartiesInformation
+          modelConfig.sdkOutgoingRequests.requestPartiesInformation
         ).mockImplementationOnce(
           () => {
             const err = new HTTPResponseError({
@@ -287,25 +290,24 @@ describe('pipsTransactionModel', () => {
           transactionRequestId: '1234-1234',
           currentState: 'partyLookupSuccess',
           payeeRequest: {
-            partyIdType: 'party-id-type',
-            partyIdentifier: 'party-identifier'
+            transactionRequestId: '1234-1234',
+            payee: {
+              partyIdType: 'MSISDN',
+              partyIdentifier: 'party-identifier'
+            }
           },
           payeeResolved: {
             party,
             currentState: RequestPartiesInformationState.COMPLETED
           },
           initiateRequest: {
-            sourceAccountId: 'source-account-id',
-            consentId: 'consent-id',
             payee: party,
             payer: {
-              partyIdInfo: {
-                fspId: 'payer-fsp-id',
-                partyIdType: 'PERSONAL_ID',
-                partyIdentifier: 'payer-party-identifier'
-              }
+              fspId: 'payer-fsp-id',
+              partyIdType: 'THIRD_PARTY_LINK',
+              partyIdentifier: 'payer-party-identifier'
             },
-            amountType: 'SEND' as fspiopAPI.Schemas.AmountType,
+            amountType: 'SEND' as tpAPI.Schemas.AmountType,
             amount: {
               amount: '123.00',
               currency: 'USD'
@@ -369,7 +371,7 @@ describe('pipsTransactionModel', () => {
             transactionRequestId: data.transactionRequestId,
             ...data.initiateRequest
           },
-          data.initiateRequest?.payer.partyIdInfo.fspId
+          data.initiateRequest?.payer.fspId
         )
       })
 
@@ -402,7 +404,7 @@ describe('pipsTransactionModel', () => {
       let data: PISPTransactionData
       let channel: string
 
-      const authorizationResponse: fspiopAPI.Schemas.AuthorizationsIDPutResponse = {
+      const authorizationResponse: tpAPI.Schemas.AuthorizationsIDPutResponse = {
         authenticationInfo: {
           authentication: 'U2F',
           authenticationValue: {
@@ -415,7 +417,8 @@ describe('pipsTransactionModel', () => {
 
       const transactionStatus: ThirdpartyTransactionStatus = {
         transactionId: '5678-5678',
-        transactionRequestState: 'ACCEPTED'
+        transactionRequestState: 'ACCEPTED',
+        transactionState: 'COMPLETED'
       }
 
       beforeEach(async () => {
@@ -423,25 +426,24 @@ describe('pipsTransactionModel', () => {
           transactionRequestId: '1234-1234',
           currentState: 'authorizationReceived',
           payeeRequest: {
-            partyIdType: 'party-id-type',
-            partyIdentifier: 'party-identifier'
+            transactionRequestId: '1234-1234',
+            payee: {
+              partyIdType: 'MSISDN',
+              partyIdentifier: 'party-identifier'
+            }
           },
           payeeResolved: {
             party,
             currentState: RequestPartiesInformationState.COMPLETED
           },
           initiateRequest: {
-            sourceAccountId: 'source-account-id',
-            consentId: 'consent-id',
             payee: party,
             payer: {
-              partyIdInfo: {
-                fspId: 'payer-fsp-id',
-                partyIdType: 'PERSONAL_ID',
-                partyIdentifier: 'payer-party-identifier'
-              }
+              fspId: 'payer-fsp-id',
+              partyIdType: 'THIRD_PARTY_LINK',
+              partyIdentifier: 'payer-party-identifier'
             },
-            amountType: 'SEND' as fspiopAPI.Schemas.AmountType,
+            amountType: 'SEND' as tpAPI.Schemas.AmountType,
             amount: {
               amount: '123.00',
               currency: 'USD'
@@ -506,7 +508,7 @@ describe('pipsTransactionModel', () => {
         expect(modelConfig.mojaloopRequests.putAuthorizations).toBeCalledWith(
           data.transactionRequestId,
           authorizationResponse,
-          data.initiateRequest?.payer.partyIdInfo.fspId
+          data.initiateRequest?.payer.fspId
         )
       })
 
@@ -534,7 +536,7 @@ describe('pipsTransactionModel', () => {
     })
 
     it('errored state', async () => {
-      const erroredData = {
+      const erroredData: PISPTransactionData = {
         transactionRequestId: '123',
         currentState: 'errored'
       }
@@ -546,7 +548,7 @@ describe('pipsTransactionModel', () => {
     })
 
     it('should do throw if requestLookup was not done before calling initialization', async () => {
-      const invalidData = {
+      const invalidData: PISPTransactionData = {
         transactionRequestId: '1234-1234',
         currentState: 'partyLookupSuccess'
         // lack of these properties
@@ -583,7 +585,7 @@ describe('pipsTransactionModel', () => {
 
   describe('getResponse', () => {
     it('should give valid response', async () => {
-      const data = {
+      const data: PISPTransactionData = {
         transactionRequestId: '1234-1234',
         currentState: 'start'
       }
@@ -597,15 +599,15 @@ describe('pipsTransactionModel', () => {
       expect(model.getResponse()).toBeUndefined()
 
       model.data.currentState = 'partyLookupSuccess'
-      model.data.partyLookupResponse = { am: 'party-lookup-mocked-response' } as unknown as ThirdpartyTransactionPartyLookupResponse
+      model.data.partyLookupResponse = { am: 'party-lookup-mocked-response' } as unknown as OutboundAPI.Schemas.ThirdpartyTransactionPartyLookupResponse
       expect(model.getResponse()).toEqual({ am: 'party-lookup-mocked-response' })
 
       model.data.currentState = 'authorizationReceived'
-      model.data.initiateResponse = { am: 'authorization-received-mocked-response' } as unknown as ThirdpartyTransactionInitiateResponse
+      model.data.initiateResponse = { am: 'authorization-received-mocked-response' } as unknown as OutboundAPI.Schemas.ThirdpartyTransactionIDInitiateResponse
       expect(model.getResponse()).toEqual({ am: 'authorization-received-mocked-response' })
 
       model.data.currentState = 'transactionStatusReceived'
-      model.data.approveResponse = { am: 'transaction-status-mocked-response' } as unknown as ThirdpartyTransactionApproveResponse
+      model.data.approveResponse = { am: 'transaction-status-mocked-response' } as unknown as OutboundAPI.Schemas.ThirdpartyTransactionIDApproveResponse
       expect(model.getResponse()).toEqual({ am: 'transaction-status-mocked-response' })
     })
   })

@@ -15,29 +15,29 @@ info:
     url: 'TBD'
   version: 0.1.0
 paths:
-  '/health':
-    $ref: paths/health.yaml
-  '/metrics':
-    $ref: paths/metrics.yaml
-  '/authorizations':
-    $ref: paths/authorizations.yaml
-  '/authorizations/{ID}':
-    $ref: paths/authorizations_ID.yaml
-  '/thirdpartyRequests/transactions':
-    $ref: paths/thirdpartyRequests_transactions.yaml
-  '/thirdpartyRequests/transactions/{ID}/authorizations':
-    $ref: paths/thirdpartyRequests_transactions_ID_authz.yaml
-  '/thirdpartyRequests/transactions/{ID}':
-    $ref: paths/thirdpartyRequests_transactions_ID.yaml
-  '/thirdpartyRequests/transactions/{ID}/error':
-    $ref: paths/thirdpartyRequests_transactions_ID_error.yaml
-  '/accounts/{ID}':
-    $ref: paths/accounts_ID.yaml
-  '/accounts/{ID}/error':
-    $ref: paths/accounts_ID_error.yaml
-  '/consents':
-    $ref: paths/consents.yaml
-  '/consentRequests/{ID}':
-    $ref: paths/consentRequests_ID.yaml
-  '/consentRequests/{ID}/error':
-    $ref: paths/consentRequests_ID_error.yaml
+  /accounts/{ID}:
+    $ref: '../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/paths/accounts_ID.yaml'
+  /accounts/{ID}/error:
+    $ref: '../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/paths/accounts_ID_error.yaml'
+  /authorizations:
+    $ref: '../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/paths/authorizations.yaml'
+  /authorizations/{ID}:
+    $ref: '../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/paths/authorizations_ID.yaml'
+  /consentRequests/{ID}:
+    $ref: '../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/paths/consentRequests_ID.yaml'
+  /consentRequests/{ID}/error:
+    $ref: '../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/paths/consentRequests_ID_error.yaml'
+  /consents:
+    $ref: '../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/paths/consents.yaml'
+  /health:
+    $ref: '../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/paths/health.yaml'
+  /metrics:
+    $ref: '../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/paths/metrics.yaml'
+  /thirdpartyRequests/transactions:
+    $ref: '../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/paths/thirdpartyRequests_transactions.yaml'
+  /thirdpartyRequests/transactions/{ID}/authorizations:
+    $ref: '../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/paths/thirdpartyRequests_transactions_ID_authz.yaml'
+  /thirdpartyRequests/transactions/{ID}:
+    $ref: '../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/paths/thirdpartyRequests_transactions_ID.yaml'
+  /thirdpartyRequests/transactions/{ID}/error:
+    $ref: '../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/paths/thirdpartyRequests_transactions_ID_error.yaml'

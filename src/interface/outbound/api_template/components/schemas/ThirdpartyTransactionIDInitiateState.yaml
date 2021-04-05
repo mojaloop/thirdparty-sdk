@@ -1,0 +1,7 @@
+title: ThirdpartyTransactionIDInitiateState
+description: state of thirdparty transaction for initiate phase
+type: string
+enum:
+  - partyLookupSuccess
+  - authorizationReceived
+  - errored  

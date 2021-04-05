@@ -73,12 +73,12 @@ export interface ControlledStateMachine extends StateMachineInterface {
  * @interface StateData
  * @description data interface to represent the model's state data
  */
-export interface StateData extends Record<string, unknown> {
+export interface StateData<StateType extends string = string> extends Record<string, unknown> {
   /**
-   * @property {string} currentState
+   * @property {StateType=string} currentState
    * @description the model's current state value
    */
-  currentState: string
+  currentState: StateType
 }
 
 /**

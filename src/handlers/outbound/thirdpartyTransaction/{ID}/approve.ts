@@ -27,18 +27,19 @@
  ******/
 import { StateResponseToolkit } from '~/server/plugins/state'
 import {
-  PISPTransactionModelConfig,
-  ThirdpartyTransactionApproveRequest
+  PISPTransactionModelConfig
 } from '~/models/pispTransaction.interface'
 import {
   PISPTransactionModel,
   loadFromKVS
 } from '~/models/pispTransaction.model'
 import { Request, ResponseObject } from '@hapi/hapi'
+import * as OutboundAPI from '~/interface/outbound/api_interfaces'
+import config from '~/shared/config'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function post (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
-  const payload = request.payload as ThirdpartyTransactionApproveRequest
+  const payload = request.payload as OutboundAPI.Schemas.ThirdpartyTransactionIDApproveRequest
 
   // prepare model config
   const modelConfig: PISPTransactionModelConfig = {
@@ -48,7 +49,9 @@ async function post (_context: any, request: Request, h: StateResponseToolkit): 
     logger: h.getLogger(),
     thirdpartyRequests: h.getThirdpartyRequests(),
     mojaloopRequests: h.getMojaloopRequests(),
-    sdkRequests: h.getSDKRequests()
+    sdkOutgoingRequests: h.getSDKOutgoingRequests(),
+    initiateTimeoutInSeconds: config.SHARED.PISP_TRANSACTION_INITIATE_TIMEOUT_IN_SECONDS,
+    approveTimeoutInSeconds: config.SHARED.PISP_TRANSACTION_APPROVE_TIMEOUT_IN_SECONDS
   }
 
   // load model
