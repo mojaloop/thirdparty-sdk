@@ -175,6 +175,36 @@
               ]
             }
           }
+        },
+        "scripts": {
+          "exec": [
+            "",
+            "const userConfig = JSON.parse(pm.globals.get('userConfig'))",
+            "const curDate = (new Date()).toUTCString();",
+            "const reqBody = JSON.parse(pm.request.body);",
+            "const transactionRequestId = reqBody.transactionRequestId",
+            "const puthThirdpartyRequestIDTransactionReq = {",
+            "  url: userConfig.CALLBACK_ENDPOINT + '/thirdpartyRequests/transactions/' + transactionRequestId,",
+            "  method: 'PUT',",
+            "  header: {",
+            "    'Accept': 'application/vnd.interoperability.thirdparty+json;version=1.0',",
+            "    'Content-Type': 'application/vnd.interoperability.thirdparty+json;version=1.0',",
+            "    'Date': curDate,",
+            "    'FSPIOP-Source': 'DFSPA'",
+            "  },",
+            "  body: {",
+            "    mode: 'raw',",
+            "    raw: JSON.stringify({",
+            "      transactionId: '2f169631-ef99-4cb1-96dc-91e8fc08f539' ,",
+            "      transactionRequestState: 'RECEIVED'",
+            "    })",
+            "  }",
+            "}",
+            "  ",
+            "pm.sendRequest(puthThirdpartyRequestIDTransactionReq, function (err, resp) {",
+            "  console.error('PUT /thridpartyRequests/{ID}/transaction response', resp.json(), err)",
+            "})"
+          ]
         }
       },
       "delay": 0,

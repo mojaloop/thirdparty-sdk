@@ -35,8 +35,7 @@ import {
   PISPTransactionData,
   PISPTransactionModelConfig,
   PISPTransactionPhase,
-  RequestPartiesInformationState,
-  ThirdpartyTransactionStatus
+  RequestPartiesInformationState
 } from '~/models/pispTransaction.interface'
 import {
   PISPTransactionModel,
@@ -56,7 +55,7 @@ import {
 import { HTTPResponseError } from '~/shared/http-response-error'
 import { SDKOutgoingRequests } from '~/shared/sdk-outgoing-requests'
 import * as OutboundAPI from '~/interface/outbound/api_interfaces'
-
+import { v4 } from 'uuid'
 // mock KVS default exported class
 jest.mock('~/shared/kvs')
 
@@ -73,7 +72,7 @@ describe('pipsTransactionModel', () => {
 
   beforeEach(async () => {
     let subId = 0
-    let handler: NotificationCallback
+    const handlers: {[key: string]: NotificationCallback } = {}
 
     modelConfig = {
       key: 'cache-key',
@@ -96,15 +95,15 @@ describe('pipsTransactionModel', () => {
       initiateTimeoutInSeconds: 3,
       approveTimeoutInSeconds: 3
     }
-    mocked(modelConfig.pubSub.subscribe).mockImplementationOnce(
-      (_channel: string, cb: NotificationCallback) => {
-        handler = cb
+    mocked(modelConfig.pubSub.subscribe).mockImplementation(
+      (channel: string, cb: NotificationCallback) => {
+        handlers[channel] = cb
         return ++subId
       }
     )
 
-    mocked(modelConfig.pubSub.publish).mockImplementationOnce(
-      async (channel: string, message: Message) => handler(channel, message, subId)
+    mocked(modelConfig.pubSub.publish).mockImplementation(
+      async (channel: string, message: Message) => handlers[channel](channel, message, subId)
     )
     await modelConfig.kvs.connect()
     await modelConfig.pubSub.connect()
@@ -263,11 +262,13 @@ describe('pipsTransactionModel', () => {
 
     describe('Initiate Transaction Phase', () => {
       let data: PISPTransactionData
-      let channel: string
-
+      let channelTransPut: string
+      let channelAuthPost: string
+      const transactionRequestId = v4()
+      const transactionId = v4()
       const authorizationRequest: tpAPI.Schemas.AuthorizationsPostRequest = {
-        transactionRequestId: '1234-1234',
-        transactionId: '5678-5678',
+        transactionRequestId,
+        transactionId: transactionId,
         authenticationType: 'U2F',
         retriesLeft: '1',
         amount: {
@@ -284,13 +285,16 @@ describe('pipsTransactionModel', () => {
           condition: 'quote-condition'
         }
       }
-
+      const transactionStatus: tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPutResponse = {
+        transactionId,
+        transactionRequestState: 'RECEIVED'
+      }
       beforeEach(async () => {
         data = {
-          transactionRequestId: '1234-1234',
+          transactionRequestId,
           currentState: 'partyLookupSuccess',
           payeeRequest: {
-            transactionRequestId: '1234-1234',
+            transactionRequestId,
             payee: {
               partyIdType: 'MSISDN',
               partyIdentifier: 'party-identifier'
@@ -320,27 +324,41 @@ describe('pipsTransactionModel', () => {
             expiration: 'expiration'
           }
         }
-        channel = PISPTransactionModel.notificationChannel(
-          PISPTransactionPhase.initiation,
-          '1234-1234'
+        channelTransPut = PISPTransactionModel.notificationChannel(
+          PISPTransactionPhase.waitOnTransactionPut,
+          transactionRequestId
+        )
+        channelAuthPost = PISPTransactionModel.notificationChannel(
+          PISPTransactionPhase.waitOnAuthorizationPost,
+          transactionRequestId
         )
       })
 
       it('should be well constructed', async () => {
         const model = await create(data, modelConfig)
         checkPTMLayout(model, data)
-        expect(channel).toEqual('pisp_transaction_initiation_1234-1234')
+        expect(channelTransPut).toEqual(`pisp_transaction_waitOnTransactionPut_${transactionRequestId}`)
+        expect(channelAuthPost).toEqual(`pisp_transaction_waitOnAuthorizationPost_${transactionRequestId}`)
       })
 
       it('should give response properly populated from notification channel', async () => {
         const model = await create(data, modelConfig)
         // defer publication to notification channel
-        setImmediate(() => model.pubSub.publish(
-          channel,
-          authorizationRequest as unknown as Message
-        ))
+        setImmediate(() => {
+          // publish authorization request
+          model.pubSub.publish(
+            channelAuthPost,
+            authorizationRequest as unknown as Message
+          )
+          // publish transaction status update
+          model.pubSub.publish(
+            channelTransPut,
+            transactionStatus as unknown as Message
+          )
+        })
         // let be sure we don't have expected data yet
         expect(model.data.authorizationRequest).toBeFalsy()
+        expect(model.data.transactionStatus).toBeFalsy()
         expect(model.data.initiateResponse).toBeFalsy()
 
         // do a request and await on published Message
@@ -351,13 +369,16 @@ describe('pipsTransactionModel', () => {
         })
 
         // check that correct subscription has been done
-        expect(modelConfig.pubSub.subscribe).toBeCalledWith(channel, expect.anything())
+        expect(modelConfig.pubSub.subscribe).toBeCalledWith(channelAuthPost, expect.anything())
+        expect(modelConfig.pubSub.subscribe).toBeCalledWith(channelTransPut, expect.anything())
 
         // check that correct unsubscription has been done
-        expect(modelConfig.pubSub.unsubscribe).toBeCalledWith(channel, 1)
+        expect(modelConfig.pubSub.unsubscribe).toBeCalledWith(channelAuthPost, expect.anything())
+        expect(modelConfig.pubSub.unsubscribe).toBeCalledWith(channelTransPut, expect.anything())
 
         // check we got needed part of response stored
         expect(model.data.authorizationRequest).toEqual(authorizationRequest)
+        expect(model.data.transactionStatusPut).toEqual(transactionStatus)
 
         // check we got initiate response phase response stored
         expect(model.data.initiateResponse).toEqual({
@@ -365,7 +386,7 @@ describe('pipsTransactionModel', () => {
           currentState: 'authorizationReceived'
         })
 
-        // check we made a call to mojaloopRequest.getParties
+        // check we made a call to hirdpartyRequests.postThirdpartyRequestsTransactions
         expect(modelConfig.thirdpartyRequests.postThirdpartyRequestsTransactions).toBeCalledWith(
           {
             transactionRequestId: data.transactionRequestId,
@@ -375,7 +396,19 @@ describe('pipsTransactionModel', () => {
         )
       })
 
-      it('should handle error', async () => {
+      it('should handle error', async (done) => {
+        setImmediate(() => {
+          // publish authorization request
+          model.pubSub.publish(
+            channelAuthPost,
+            authorizationRequest as unknown as Message
+          )
+          // publish transaction status update
+          model.pubSub.publish(
+            channelTransPut,
+            transactionStatus as unknown as Message
+          )
+        })
         mocked(
           modelConfig.thirdpartyRequests.postThirdpartyRequestsTransactions
         ).mockImplementationOnce(
@@ -390,13 +423,14 @@ describe('pipsTransactionModel', () => {
           shouldNotBeExecuted()
         } catch (err) {
           expect(err.message).toEqual('mocked postThirdpartyRequestsTransactions exception')
+
+          // check that correct subscription has been done
+          expect(modelConfig.pubSub.subscribe).toBeCalledWith(channelTransPut, expect.anything())
+
+          // check that correct unsubscription has been done
+          expect(modelConfig.pubSub.unsubscribe).toBeCalledWith(channelTransPut, expect.anything())
+          done()
         }
-
-        // check that correct subscription has been done
-        expect(modelConfig.pubSub.subscribe).toBeCalledWith(channel, expect.anything())
-
-        // check that correct unsubscription has been done
-        expect(modelConfig.pubSub.unsubscribe).toBeCalledWith(channel, 1)
       })
     })
 
@@ -415,7 +449,7 @@ describe('pipsTransactionModel', () => {
         responseType: 'ENTERED'
       }
 
-      const transactionStatus: ThirdpartyTransactionStatus = {
+      const transactionStatus: tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPatchResponse = {
         transactionId: '5678-5678',
         transactionRequestState: 'ACCEPTED',
         transactionState: 'COMPLETED'
@@ -496,7 +530,7 @@ describe('pipsTransactionModel', () => {
         expect(modelConfig.pubSub.unsubscribe).toBeCalledWith(channel, 1)
 
         // check we got needed part of response stored
-        expect(model.data.transactionStatus).toEqual(transactionStatus)
+        expect(model.data.transactionStatusPatch).toEqual(transactionStatus)
 
         // check we got initiate response phase response stored
         expect(model.data.approveResponse).toEqual({

@@ -32,8 +32,8 @@ import {
 import { Message } from '~/shared/pub-sub'
 import { Request, ResponseObject } from '@hapi/hapi'
 import { StateResponseToolkit } from '~/server/plugins/state'
-import { Enum } from '@mojaloop/central-services-shared';
-import { PISPOTPValidateModel } from '~/models/outbound/pispOTPValidate.model';
+import { Enum } from '@mojaloop/central-services-shared'
+import { PISPOTPValidateModel } from '~/models/outbound/pispOTPValidate.model'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function post (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {

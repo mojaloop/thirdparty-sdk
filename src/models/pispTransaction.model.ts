@@ -44,8 +44,7 @@ import {
   PISPTransactionData,
   PISPTransactionModelConfig,
   PISPTransactionPhase,
-  PISPTransactionStateMachine,
-  ThirdpartyTransactionStatus
+  PISPTransactionStateMachine
 } from './pispTransaction.interface'
 import inspect from '~/shared/inspect'
 import { SDKOutgoingRequests } from '~/shared/sdk-outgoing-requests'
@@ -124,6 +123,7 @@ export class PISPTransactionModel
     if (!transactionRequestId) {
       throw new Error('PISPTransactionModel.notificationChannel: \'transactionRequestId\' parameter is required')
     }
+
     // channel name
     return `pisp_transaction_${phase}_${transactionRequestId}`
   }
@@ -192,16 +192,20 @@ export class PISPTransactionModel
     InvalidPISPTransactionDataError.throwIfInvalidProperty(this.data, 'payeeRequest')
     InvalidPISPTransactionDataError.throwIfInvalidProperty(this.data, 'initiateRequest')
 
-    const channel = PISPTransactionModel.notificationChannel(
-      PISPTransactionPhase.initiation,
+    // we need to mitigate the hazard, we don't know from which callback we will get messages first
+    // so let have a barrier and wait for both messages
+
+    // waiting on PUT /thirdpartyRequests/{ID}/transaction callback
+    // first channel
+    const channelWaitOnTransPut = PISPTransactionModel.notificationChannel(
+      PISPTransactionPhase.waitOnTransactionPut,
       this.data.transactionRequestId!
     )
-
-    this.logger.push({ channel }).info('onInitiate - subscribe to channel')
-
-    return deferredJob(this.pubSub, channel)
+    // first deferredJob will only listen on first channel
+    // where the message from PUT /thirdpartyRequests/{ID}/transaction should be published
+    const waitOnTransPut = deferredJob(this.pubSub, channelWaitOnTransPut)
       .init(async (): Promise<void> => {
-        // initiate the workflow
+        // initiate the workflow - forward request to DFSP
         const request: tpAPI.Schemas.ThirdpartyRequestsTransactionsPostRequest = {
           transactionRequestId: this.data?.transactionRequestId as string,
           ...this.data?.initiateRequest as OutboundAPI.Schemas.ThirdpartyTransactionIDInitiateRequest
@@ -213,14 +217,47 @@ export class PISPTransactionModel
         this.logger.push({ res }).info('ThirdpartyRequests.postThirdpartyRequestsTransactions request sent to peer')
       })
       .job(async (message: Message): Promise<void> => {
-        // receive authorization request message
-        this.data.authorizationRequest = { ...message as unknown as tpAPI.Schemas.AuthorizationsPostRequest }
-        this.data.initiateResponse = {
-          authorization: { ...this.data.authorizationRequest },
-          currentState: this.data.currentState as OutboundAPI.Schemas.ThirdpartyTransactionIDInitiateState
+        // receive the transfer state update from PUT /thirdpartyRequests/{ID}/transaction
+        this.data.transactionStatusPut = {
+          ...message as unknown as tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPutResponse
         }
+        // TODO: error case when transactionRequestState !== 'RECEIVED'
+        this.saveToKVS()
       })
       .wait(this.config.initiateTimeoutInSeconds * 1000)
+
+    // waiting on POST /authorizations callback
+    // second channel
+    const channelWaitOnAuthPost = PISPTransactionModel.notificationChannel(
+      PISPTransactionPhase.waitOnAuthorizationPost,
+      this.data.transactionRequestId!
+    )
+
+    // second deferredJob will listen only on second channel
+    // where the message from POST /authorization should be published
+    const waitOnAuthPost = deferredJob(this.pubSub, channelWaitOnAuthPost)
+      .init(async (): Promise<void> => {
+        // do nothing - workflow will be initiated by waitOnTrans.init above ^^^
+        return Promise.resolve()
+      })
+      .job(async (message: Message): Promise<void> => {
+        // receive auth request from POST /authorization
+        this.data.authorizationRequest = { ...message as unknown as tpAPI.Schemas.AuthorizationsPostRequest }
+        this.saveToKVS()
+      })
+      .wait(this.config.initiateTimeoutInSeconds * 1000)
+
+    // barrier is build up on waiting for two promises to be resolved
+    // each promise resolves when receives message from corresponding callback or timeout
+    // so wait until we will receive and consume both messages
+    await Promise.all([waitOnAuthPost, waitOnTransPut])
+
+    // when both messages from callbacks comes successfully on barrier
+    // we can prepare the Initiate response
+    this.data.initiateResponse = {
+      authorization: { ...this.data.authorizationRequest! },
+      currentState: this.data.currentState as OutboundAPI.Schemas.ThirdpartyTransactionIDInitiateState
+    }
   }
 
   async onApprove (): Promise<void> {
@@ -246,9 +283,11 @@ export class PISPTransactionModel
         this.logger.push({ res }).info('ThirdpartyRequests.postThirdpartyRequestsTransactions request sent to peer')
       })
       .job(async (message: Message): Promise<void> => {
-        this.data.transactionStatus = { ...message as unknown as ThirdpartyTransactionStatus }
+        this.data.transactionStatusPatch = {
+          ...message as unknown as tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPatchResponse
+        }
         this.data.approveResponse = {
-          transactionStatus: { ...this.data.transactionStatus },
+          transactionStatus: { ...this.data.transactionStatusPatch },
           currentState: this.data.currentState as OutboundAPI.Schemas.ThirdpartyTransactionIDApproveState
         }
       })

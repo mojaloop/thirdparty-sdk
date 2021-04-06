@@ -31,9 +31,9 @@ import Config from '~/shared/config'
 import Handlers from '~/handlers'
 import index from '~/index'
 import path from 'path'
-import { NotificationCallback, Message, PubSub } from '~/shared/pub-sub';
-import { RedisConnectionConfig } from '~/shared/redis-connection';
-import { thirdparty as tpAPI } from '@mojaloop/api-snippets';
+import { NotificationCallback, Message, PubSub } from '~/shared/pub-sub'
+import { RedisConnectionConfig } from '~/shared/redis-connection'
+import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
 
 const apiPath = path.resolve(__dirname, '../../src/interface/api-outbound.yaml')
 const featurePath = path.resolve(__dirname, '../features/consent-requests-validate-outbound.feature')
@@ -43,7 +43,7 @@ jest.mock('@mojaloop/sdk-standard-components', () => {
   return {
     MojaloopRequests: jest.fn(),
     ThirdpartyRequests: jest.fn(() => ({
-      patchConsentRequests: jest.fn(() => Promise.resolve()),
+      patchConsentRequests: jest.fn(() => Promise.resolve())
     })),
     WSO2Auth: jest.fn(),
     Logger: {
@@ -124,12 +124,12 @@ defineFeature(feature, (test): void => {
       consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
       consentRequestId: '997c89f4-053c-4283-bfec-45a1a0a28fba',
       scopes: [{
-          accountId: 'some-id',
-          actions: [
-            'accounts.getBalance',
-            'accounts.transfer'
-          ]
-        }
+        accountId: 'some-id',
+        actions: [
+          'accounts.getBalance',
+          'accounts.transfer'
+        ]
+      }
       ]
     }
 

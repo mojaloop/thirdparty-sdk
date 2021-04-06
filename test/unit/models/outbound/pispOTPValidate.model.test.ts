@@ -38,14 +38,14 @@ import {
 import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
 import {
   PISPOTPValidateModel,
-  create,
+  create
 } from '~/models/outbound/pispOTPValidate.model'
 import { RedisConnectionConfig } from '~/shared/redis-connection'
 import { mocked } from 'ts-jest/utils'
 
 import mockLogger from 'test/unit/mockLogger'
 import sortedArray from 'test/unit/sortedArray'
-import { PISPOTPValidateModelConfig, PISPOTPValidateData } from '~/models/outbound/pispOTPValidate.interface';
+import { PISPOTPValidateModelConfig, PISPOTPValidateData } from '~/models/outbound/pispOTPValidate.interface'
 
 // mock KVS default exported class
 jest.mock('~/shared/kvs')
@@ -71,7 +71,7 @@ describe('pispOTPValidateModel', () => {
       pubSub: new PubSub(connectionConfig),
       logger: connectionConfig.logger,
       thirdpartyRequests: {
-        patchConsentRequests: jest.fn(() => Promise.resolve({ statusCode: 202 })),
+        patchConsentRequests: jest.fn(() => Promise.resolve({ statusCode: 202 }))
       } as unknown as ThirdpartyRequests,
       requestProcessingTimeoutSeconds: 3
     }
@@ -137,15 +137,15 @@ describe('pispOTPValidateModel', () => {
       currentState: 'start'
     }
     const consentPostResponse: tpAPI.Schemas.ConsentsPostRequest = {
-      consentId: "8e34f91d-d078-4077-8263-2c047876fcf6",
+      consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
       consentRequestId: consentRequestsRequestId,
       scopes: [{
-          accountId: "some-id",
-          actions: [
-            "accounts.getBalance",
-            "accounts.transfer"
-          ]
-        }
+        accountId: 'some-id',
+        actions: [
+          'accounts.getBalance',
+          'accounts.transfer'
+        ]
+      }
       ]
     }
 
@@ -176,25 +176,25 @@ describe('pispOTPValidateModel', () => {
       // check we made a call to thirdpartyRequests.patchConsentRequests
       expect(modelConfig.thirdpartyRequests.patchConsentRequests).toBeCalledWith(
         consentRequestsRequestId,
-        {authToken: "123456"},
-        "pispa"
+        { authToken: '123456' },
+        'pispa'
       )
 
       expect(result).toEqual({
-        "consent": {
-            "consentId": "8e34f91d-d078-4077-8263-2c047876fcf6",
-            "consentRequestId": consentRequestsRequestId,
-            "scopes": [
-              {
-                "accountId": "some-id",
-                "actions": [
-                  "accounts.getBalance",
-                  "accounts.transfer",
-                ],
-              },
-            ],
-          },
-          "currentState": "OTPIsValid",
+        consent: {
+          consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
+          consentRequestId: consentRequestsRequestId,
+          scopes: [
+            {
+              accountId: 'some-id',
+              actions: [
+                'accounts.getBalance',
+                'accounts.transfer'
+              ]
+            }
+          ]
+        },
+        currentState: 'OTPIsValid'
       })
     })
 
@@ -208,11 +208,11 @@ describe('pispOTPValidateModel', () => {
       const result = await model.run()
 
       expect(result).toEqual({
-        "currentState": "errored",
-        "errorInformation": {
-          "errorCode": "6000",
-          "errorDescription": "Generic thirdparty error",
-        },
+        currentState: 'errored',
+        errorInformation: {
+          errorCode: '6000',
+          errorDescription: 'Generic thirdparty error'
+        }
       })
     })
   })

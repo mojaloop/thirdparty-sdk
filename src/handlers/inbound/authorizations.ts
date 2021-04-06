@@ -50,14 +50,7 @@ async function put (_context: any, request: Request, h: StateResponseToolkit): P
 
   // select proper workflow to where message will be published
   if (config.INBOUND.PISP_TRANSACTION_MODE) {
-    // don't await on promise to resolve
-    // let finish publish in background
-    PISPTransactionModel.triggerWorkflow(
-      PISPTransactionPhase.initiation,
-      request.params.ID,
-      pubSub,
-      payload as unknown as Message
-    )
+    console.log('TODO: propagate put to DFSPTransactionModel')
   } else {
     const channel = OutboundAuthorizationsModel.notificationChannel(request.params.ID)
     // don't await on promise to resolve
@@ -75,17 +68,15 @@ async function post (_context: any, request: Request, h: StateResponseToolkit): 
   // to properly handle two different models here - via configuration flag
   const payload = request.payload as tpAPI.Schemas.AuthorizationsPostRequest
   const logger = h.getLogger()
+  const pubSub = h.getPubSub()
+
   if (config.INBOUND.PISP_TRANSACTION_MODE) {
-    // PISP transaction mode
-    const channel = PISPTransactionModel.notificationChannel(
-      PISPTransactionPhase.initiation,
-      payload.transactionRequestId
+    PISPTransactionModel.triggerWorkflow(
+      PISPTransactionPhase.waitOnAuthorizationPost,
+      payload.transactionRequestId,
+      pubSub,
+      payload as unknown as Message
     )
-    const pubSub = h.getPubSub()
-    // don't await on promise to resolve
-    // let finish publish in background
-    pubSub.publish(channel, payload as unknown as Message)
-    logger.info('PISPTransactionModel handled POST /authorization request')
   } else {
     // authorization mode
     const sourceFspId = request.headers['fspiop-source']

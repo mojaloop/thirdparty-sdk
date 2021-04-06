@@ -65,8 +65,8 @@ describe('Outbound Consent request otp validate handlers', () => {
     }))
   }
   const validateRequest = {
-    'authToken': '123456',
-    'toParticipantId': 'dfspa'
+    authToken: '123456',
+    toParticipantId: 'dfspa'
   }
 
   it('/consentRequests/{ID}/validate should report error when result from \'run\' is undefined', async () => {

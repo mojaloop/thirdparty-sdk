@@ -3,10 +3,11 @@ import { StateResponseToolkit } from '~/server/plugins/state'
 import {
   PISPTransactionModel
 } from '~/models/pispTransaction.model'
-import { PISPTransactionPhase, ThirdpartyTransactionStatus } from '~/models/pispTransaction.interface'
+import { PISPTransactionPhase } from '~/models/pispTransaction.interface'
 import NotifyThirdpartyTransactionRequests from '~/handlers/inbound/thirdpartyRequests/transactions/{ID}'
 import ThirdpartyTransactionRequestsError from '~/handlers/inbound/thirdpartyRequests/transactions/{ID}/error'
 import { Request } from '@hapi/hapi'
+import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
 
 describe('Inbound PISP transaction handlers', (): void => {
   const pubSubMock = {
@@ -24,7 +25,7 @@ describe('Inbound PISP transaction handlers', (): void => {
     }))
   }
 
-  const approveResponse: ThirdpartyTransactionStatus = {
+  const approveResponse: tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPatchResponse = {
     transactionId: 'x42ec534-ae48-6575-g6a9-tad2955b8065',
     transactionRequestState: 'ACCEPTED',
     transactionState: 'COMPLETED'

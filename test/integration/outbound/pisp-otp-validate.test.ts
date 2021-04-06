@@ -60,15 +60,15 @@ describe('PISP OTP Validate', (): void => {
         authToken: '123456'
       }
       const expectedResponse = {
-        "consentId": "8e34f91d-d078-4077-8263-2c047876fcf6",
-        "consentRequestId": consentRequestsRequestId,
-        "scopes": [{
-            "accountId": "some-id",
-            "actions": [
-              "accounts.getBalance",
-              "accounts.transfer"
-            ]
-          }
+        consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
+        consentRequestId: consentRequestsRequestId,
+        scopes: [{
+          accountId: 'some-id',
+          actions: [
+            'accounts.getBalance',
+            'accounts.transfer'
+          ]
+        }
         ]
       }
       const consentRequestsResponse = await axios.patch(consentRequestsURI, consentRequestsRequest)
@@ -80,20 +80,21 @@ describe('PISP OTP Validate', (): void => {
 
   describe('/consentRequests/{ID}/validate: requestAction->errored error return', (): void => {
     // ttk uses an authToken of 654321 to return a invalid response
-    it('OTPValidateState should be errored', async (): Promise<void> => {
+    it('OTPValidateState should be errored', async (done): Promise<void> => {
       const consentRequestsRequest = {
         toParticipantId: 'dfspa',
         authToken: '654321'
       }
       const expectedResponse = {
-        "errorCode": "6000",
-        "errorDescription": "Generic thirdparty error"
+        errorCode: '6000',
+        errorDescription: 'Generic thirdparty error'
       }
       await axios.patch(consentRequestsURI, consentRequestsRequest)
         .catch(error => {
           expect(error.response.status).toEqual(500)
           expect(error.response.data.currentState).toEqual('errored')
           expect(error.response.data.errorInformation).toEqual(expectedResponse)
+          done()
         })
     })
   })
