@@ -24,24 +24,12 @@
  * Paweł Marzec <pawel.marzec@modusbox.com>
  --------------
  ******/
-import { RedisConnectionConfig } from '~/shared/redis-connection'
-import { Message, PubSub } from '~/shared/pub-sub'
-import Config from '~/shared/config'
 import axios from 'axios'
 import env from '../env'
-import mockLogger from '../../unit/mockLogger'
-import { PISPTransactionModel } from '~/models/pispTransaction.model'
-import { PISPTransactionPhase } from '~/models/pispTransaction.interface'
 
 describe('PUT /authorizations', (): void => {
   const scenarioUri = `${env.inbound.baseUri}/authorizations/123`
   describe('Inbound API', (): void => {
-    const config: RedisConnectionConfig = {
-      host: Config.REDIS.HOST,
-      port: Config.REDIS.PORT,
-      logger: mockLogger(),
-      timeout: Config.REDIS.TIMEOUT
-    }
     const payload = {
       authenticationInfo: {
         authentication: 'U2F',
@@ -52,27 +40,15 @@ describe('PUT /authorizations', (): void => {
       },
       responseType: 'ENTERED'
     }
-    it('should propagate message via Redis PUB/SUB', async (): Promise<void> => {
-      // eslint-disable-next-line no-async-promise-executor
-      return new Promise(async (resolve) => {
-        const channel123 = PISPTransactionModel.notificationChannel(PISPTransactionPhase.initiation, '123')
-        const pubSub = new PubSub(config)
-        await pubSub.connect()
-        expect(pubSub.isConnected).toBeTruthy()
-        pubSub.subscribe(channel123, async (channel: string, message: Message, _id: number) => {
-          expect(channel).toEqual(channel123)
-          expect(message).toEqual(payload)
-          await pubSub.disconnect()
-          expect(pubSub.isConnected).toBeFalsy()
 
-          resolve()
-        })
-        // Act
-        const response = await axios.put(scenarioUri, payload)
+    // TODO: add more cases when DFSPTransactionModel will be implemented
 
-        // Assert
-        expect(response.status).toEqual(200)
-      })
+    it('should accept payload', async (): Promise<void> => {
+      // Act
+      const response = await axios.put(scenarioUri, payload)
+
+      // Assert
+      expect(response.status).toEqual(200)
     })
   })
 })
