@@ -1,0 +1,22 @@
+@startuml DFSPOTPValidateModel
+skinparam linetype polyline
+
+title DFSPOTPValidateModel
+
+state isValid <<choice>>
+state scopesExist <<choice>>
+state sentConsent <<choice>>
+
+isValid --> errored:**FALSE**\ncall ""putConsentRequestsError()""\n ""PUT /consentRequests/{ID}/error"" to PISP
+scopesExist --> errored:**FALSE**\ncall ""putConsentRequestsError()""\n ""PUT /consentRequests/{ID}/error"" to PISP
+sentConsent --> errored:**FALSE**\ncall ""putConsentRequestsError()""\n ""PUT /consentRequests/{ID}/error"" to PISP
+
+[*] --> start: on ""PATCH /consentRequests/{ID}"" from PISP. creation of state machine.
+start --> isValid: validateOTP() \n ""POST /validateOTP"" to DFSP backend \n isValid?
+isValid --> OTPIsValid:**TRUE**
+OTPIsValid --> scopesExist: \nrequestScopes()\n ""GET /{ID}/scopes"" to DFSP backend \n scopesExist?
+scopesExist --> scopesReceived:**TRUE** \n
+scopesReceived --> sentConsent:\nregisterConsent() \n ""POST /consents"" to Switch\n Request sent?
+sentConsent --> consentSent:**TRUE**
+
+@enduml

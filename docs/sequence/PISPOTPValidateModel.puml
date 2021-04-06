@@ -1,0 +1,11 @@
+@startuml PISPOTPValidateModel
+skinparam linetype polyline
+
+title PISPOTPValidateModel
+
+[*] --> outboundServer: ""PATCH /consentRequests/{ID}/validate""
+outboundServer --> start: creation of state machine
+start --> OTPIsValid:\ncall ""PATCH /consentRequests/{ID}/""\nrecieved ""POST /CONSENTS""
+start --> errored:\ncall ""PATCH /consentRequests/{ID}/""\nrecieved ""PUT /consentRequests/{ID}/error""
+
+@enduml
