@@ -30,6 +30,8 @@ import Config from '~/shared/config'
 import axios from 'axios'
 import env from '../env'
 import mockLogger from '../../unit/mockLogger'
+import { PISPTransactionModel } from '~/models/pispTransaction.model'
+import { PISPTransactionPhase } from '~/models/pispTransaction.interface'
 
 describe('PUT /authorizations', (): void => {
   const scenarioUri = `${env.inbound.baseUri}/authorizations/123`
@@ -53,11 +55,12 @@ describe('PUT /authorizations', (): void => {
     it('should propagate message via Redis PUB/SUB', async (): Promise<void> => {
       // eslint-disable-next-line no-async-promise-executor
       return new Promise(async (resolve) => {
+        const channel123 = PISPTransactionModel.notificationChannel(PISPTransactionPhase.initiation, '123')
         const pubSub = new PubSub(config)
         await pubSub.connect()
         expect(pubSub.isConnected).toBeTruthy()
-        pubSub.subscribe('pisp_transaction_initiation_123', async (channel: string, message: Message, _id: number) => {
-          expect(channel).toEqual('pisp_transaction_initiation_123')
+        pubSub.subscribe(channel123, async (channel: string, message: Message, _id: number) => {
+          expect(channel).toEqual(channel123)
           expect(message).toEqual(payload)
           await pubSub.disconnect()
           expect(pubSub.isConnected).toBeFalsy()
