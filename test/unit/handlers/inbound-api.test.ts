@@ -384,7 +384,7 @@ describe('Inbound API routes', (): void => {
 
       // check pisp transaction mode
       const pispChannel = PISPTransactionModel.notificationChannel(
-        PISPTransactionPhase.initiation,
+        PISPTransactionPhase.waitOnAuthorizationPost,
         postRequest.transactionRequestId
       )
       expect(pubSubMock.publish).toBeCalledWith(pispChannel, postRequest)

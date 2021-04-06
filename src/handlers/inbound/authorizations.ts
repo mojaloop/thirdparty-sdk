@@ -72,13 +72,11 @@ async function post (_context: any, request: Request, h: StateResponseToolkit): 
 
   if (config.INBOUND.PISP_TRANSACTION_MODE) {
     PISPTransactionModel.triggerWorkflow(
-      PISPTransactionPhase.initiation,
+      PISPTransactionPhase.waitOnAuthorizationPost,
       payload.transactionRequestId,
       pubSub,
       payload as unknown as Message
     )
-
-    logger.info('PISPTransactionModel should handle POST /authorization request')
   } else {
     // authorization mode
     const sourceFspId = request.headers['fspiop-source']

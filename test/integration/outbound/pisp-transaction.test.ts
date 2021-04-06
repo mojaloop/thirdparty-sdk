@@ -37,6 +37,7 @@ describe('PISP Transaction', (): void => {
       // be sure we disable guard
       await kvs.del(transactionRequestId)
 
+      // lookup and resolve payee
       const lookupResponse = await axios.post(lookupURI, lookupRequest)
       expect(lookupResponse.status).toEqual(200)
       expect(lookupResponse.data.currentState).toEqual('partyLookupSuccess')
@@ -67,6 +68,9 @@ describe('PISP Transaction', (): void => {
         },
         expiration: '2020-07-15T22:17:28.985-01:00'
       }
+
+      // TTK allows to setup only one callback by standardsimulate
+      // initiate - receive authorization to sign
       const initiateresponse = await axios.post(initiateURI, initiateRequest)
       expect(initiateresponse.status).toEqual(200)
       expect(initiateresponse.data.currentState).toEqual('authorizationReceived')
@@ -84,6 +88,7 @@ describe('PISP Transaction', (): void => {
           responseType: 'ENTERED'
         }
       }
+      // send approve with signed authorization and wait for transfer to complete
       const approveResponse = await axios.post(approveURI, approveRequest)
       expect(approveResponse.status).toEqual(200)
       expect(approveResponse.data.currentState).toEqual('transactionStatusReceived')

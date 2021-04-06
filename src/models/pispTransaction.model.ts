@@ -201,7 +201,6 @@ export class PISPTransactionModel
       PISPTransactionPhase.waitOnTransactionPut,
       this.data.transactionRequestId!
     )
-
     // first deferredJob will only listen on first channel
     // where the message from PUT /thirdpartyRequests/{ID}/transaction should be published
     const waitOnTransPut = deferredJob(this.pubSub, channelWaitOnTransPut)
