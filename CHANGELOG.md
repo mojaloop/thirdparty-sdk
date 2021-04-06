@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+## [11.33.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.32.1...v11.33.0) (2021-04-06)
+
+
+### Features
+
+* 2060 hazard mitigation ([#77](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/77)) ([71a32ee](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/71a32ee213c7d4a25a87bce4a468f32a6b8f8ddd))
+
 ### [11.32.1](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.32.0...v11.32.1) (2021-04-06)
 
 ## [11.32.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.31.0...v11.32.0) (2021-04-02)
