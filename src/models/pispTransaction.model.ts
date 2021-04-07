@@ -50,23 +50,7 @@ import inspect from '~/shared/inspect'
 import { SDKOutgoingRequests } from '~/shared/sdk-outgoing-requests'
 import { HTTPResponseError } from '~/shared/http-response-error'
 import deferredJob from '~/shared/deferred-job'
-
-export class InvalidPISPTransactionDataError extends Error {
-  public data: Record<string, unknown>
-  public propertyName: string
-  constructor (data: Record<string, unknown>, propertyName: string) {
-    super(`invalid ${propertyName} data`)
-    this.data = data
-    this.propertyName = propertyName
-  }
-
-  static throwIfInvalidProperty (data: Record<string, unknown>, propertyName: string): void {
-    // eslint-disable-next-line no-prototype-builtins
-    if (!data.hasOwnProperty(propertyName)) {
-      throw new InvalidPISPTransactionDataError(data, propertyName)
-    }
-  }
-}
+import { InvalidDataError } from '~/shared/invalid-data-error'
 
 export class PISPTransactionModel
   extends PersistentModel<PISPTransactionStateMachine, PISPTransactionData> {
@@ -140,12 +124,12 @@ export class PISPTransactionModel
 
   async onRequestPartyLookup (): Promise<void> {
     // input validation
-    InvalidPISPTransactionDataError.throwIfInvalidProperty(this.data, 'payeeRequest')
-    InvalidPISPTransactionDataError.throwIfInvalidProperty(this.data!.payeeRequest as Record<string, unknown>, 'payee')
-    InvalidPISPTransactionDataError.throwIfInvalidProperty(
+    InvalidDataError.throwIfInvalidProperty(this.data, 'payeeRequest')
+    InvalidDataError.throwIfInvalidProperty(this.data!.payeeRequest as Record<string, unknown>, 'payee')
+    InvalidDataError.throwIfInvalidProperty(
       this.data!.payeeRequest!.payee as Record<string, unknown>, 'partyIdType'
     )
-    InvalidPISPTransactionDataError.throwIfInvalidProperty(
+    InvalidDataError.throwIfInvalidProperty(
       this.data!.payeeRequest!.payee as Record<string, unknown>, 'partyIdentifier'
     )
 
@@ -189,8 +173,8 @@ export class PISPTransactionModel
   }
 
   async onInitiate (): Promise<void> {
-    InvalidPISPTransactionDataError.throwIfInvalidProperty(this.data, 'payeeRequest')
-    InvalidPISPTransactionDataError.throwIfInvalidProperty(this.data, 'initiateRequest')
+    InvalidDataError.throwIfInvalidProperty(this.data, 'payeeRequest')
+    InvalidDataError.throwIfInvalidProperty(this.data, 'initiateRequest')
 
     // we need to mitigate the hazard, we don't know from which callback we will get messages first
     // so let have a barrier and wait for both messages
@@ -261,9 +245,9 @@ export class PISPTransactionModel
   }
 
   async onApprove (): Promise<void> {
-    InvalidPISPTransactionDataError.throwIfInvalidProperty(this.data, 'payeeRequest')
-    InvalidPISPTransactionDataError.throwIfInvalidProperty(this.data, 'initiateRequest')
-    InvalidPISPTransactionDataError.throwIfInvalidProperty(this.data, 'approveRequest')
+    InvalidDataError.throwIfInvalidProperty(this.data, 'payeeRequest')
+    InvalidDataError.throwIfInvalidProperty(this.data, 'initiateRequest')
+    InvalidDataError.throwIfInvalidProperty(this.data, 'approveRequest')
 
     const channel = PISPTransactionModel.notificationChannel(
       PISPTransactionPhase.approval,
@@ -429,7 +413,7 @@ export async function loadFromKVS (
 }
 
 export default {
-  InvalidPISPTransactionDataError,
+  InvalidDataError,
   PISPTransactionModel,
   existsInKVS,
   create,
