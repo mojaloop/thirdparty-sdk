@@ -124,13 +124,13 @@ describe('pipsTransactionModel', () => {
     expect(ptm.mojaloopRequests).toEqual(modelConfig.mojaloopRequests)
     expect(ptm.thirdpartyRequests).toEqual(modelConfig.thirdpartyRequests)
 
-    // check is fsm correctly constructed
+    // check fsm transitions
     expect(typeof ptm.fsm.init).toEqual('function')
     expect(typeof ptm.fsm.requestPartyLookup).toEqual('function')
     expect(typeof ptm.fsm.initiate).toEqual('function')
     expect(typeof ptm.fsm.approve).toEqual('function')
 
-    // check fsm notification handler
+    // check fsm notification handlers
     expect(typeof ptm.onRequestPartyLookup).toEqual('function')
     expect(typeof ptm.onInitiate).toEqual('function')
     expect(typeof ptm.onApprove).toEqual('function')
