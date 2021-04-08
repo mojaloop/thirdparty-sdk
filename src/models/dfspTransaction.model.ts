@@ -40,6 +40,7 @@ import {
 import { InvalidDataError } from '~/shared/invalid-data-error'
 import { SDKOutgoingRequests } from '~/shared/sdk-outgoing-requests'
 import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
+import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
 
 export class DFSPTransactionModel
   extends PersistentModel<DFSPTransactionStateMachine, DFSPTransactionData> {
@@ -111,9 +112,14 @@ export class DFSPTransactionModel
     return this.config.dfspBackendRequests
   }
 
+  get thirdpartyRequests (): ThirdpartyRequests {
+    return this.config.thirdpartyRequests
+  }
+
   // transitions handlers
   async onValidateTransactionRequest (): Promise<void> {
     InvalidDataError.throwIfInvalidProperty(this.data, 'transactionRequestId')
+    InvalidDataError.throwIfInvalidProperty(this.data, 'participantId')
     InvalidDataError.throwIfInvalidProperty(this.data, 'transactionRequestRequest')
 
     // validation of transactionRequestRequest
@@ -122,6 +128,7 @@ export class DFSPTransactionModel
     )
     if (!(validationResult && validationResult.isValid)) {
       // TODO: throw proper error when transactionRequestRequest is not valid
+      // TODO: error should be transformed to call PUT /thirdpartyRequests/{ID}/transactions/error
       throw new Error('transactionRequestRequest is not valid')
     }
 
@@ -136,7 +143,18 @@ export class DFSPTransactionModel
   async onNotifyTransactionRequestIsValid (): Promise<void> {
     InvalidDataError.throwIfInvalidProperty(this.data, 'transactionRequestPutUpdate')
 
-    // TODO: make a notification call PUT /thirdpartyRequests/{ID}/transaction
+    // this field will be present what is guaranted by InvalidDataError validation above
+    const update = this.data.transactionRequestPutUpdate as tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPutResponse
+    const updateResult = await this.thirdpartyRequests.putThirdpartyRequestsTransactions(
+      update,
+      this.data.transactionRequestId,
+      this.data.participantId
+    )
+    if (!(updateResult && updateResult.statusCode === 202)) {
+      // TODO: throw proper error when notification failed
+      // TODO: error should be transformed to call PUT /thirdpartyRequests/{ID}/transactions/error
+      throw new Error(`PUT /thirdpartyRequests/${this.data.transactionRequestId}/transactions failed`)
+    }
 
     // TODO: prepare this.data.requestQuoteRequest
     this.data.requestQuoteRequest = {}

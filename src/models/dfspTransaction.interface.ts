@@ -29,6 +29,7 @@ import { ControlledStateMachine, StateData, PersistentModelConfig } from '~/mode
 import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
 import { SDKOutgoingRequests } from '~/shared/sdk-outgoing-requests'
 import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
+import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
 
 export type DFSPTransactionModelState =
   'start' |
@@ -63,13 +64,19 @@ export interface DFSPTransactionStateMachine extends ControlledStateMachine {
 }
 
 export interface DFSPTransactionModelConfig extends PersistentModelConfig {
+  thirdpartyRequests: ThirdpartyRequests
   sdkOutgoingRequests: SDKOutgoingRequests
   dfspBackendRequests: DFSPBackendRequests
 }
 
 export interface DFSPTransactionData extends StateData<DFSPTransactionModelState> {
-  // used by validateTransactionRequest
   transactionRequestId: string
+
+  // id of participant (PISP) which sends ThirdpartyTransactionRequest to us
+  // used as target dfspId param for calls to switch via thirdpartyRequests
+  participantId: string
+
+  // used by validateTransactionRequest
   transactionRequestRequest: tpAPI.Schemas.ThirdpartyRequestsTransactionsPostRequest
   transactionRequestPutUpdate?: tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPutResponse
 

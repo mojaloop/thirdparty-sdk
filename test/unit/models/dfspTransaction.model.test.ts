@@ -40,6 +40,7 @@ import mockLogger from 'test/unit/mockLogger'
 import sortedArray from 'test/unit/sortedArray'
 import shouldNotBeExecuted from 'test/unit/shouldNotBeExecuted'
 import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
+import { GenericRequestResponse, ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
 
 // mock KVS default exported class
 jest.mock('~/shared/kvs')
@@ -53,13 +54,17 @@ describe('DFSPTransactionModel', () => {
 
   let modelConfig: DFSPTransactionModelConfig
   let transactionRequestId: string
+  let participantId: string
   let transactionRequestRequest: tpAPI.Schemas.ThirdpartyRequestsTransactionsPostRequest
-
+  let transactionRequestPutUpdate: tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPutResponse
   beforeEach(async () => {
     modelConfig = {
       key: 'cache-key',
       kvs: new KVS(connectionConfig),
       logger: connectionConfig.logger,
+      thirdpartyRequests: {
+        putThirdpartyRequestsTransactions: jest.fn(() => Promise.resolve({ statusCode: 202 }))
+      } as unknown as ThirdpartyRequests,
       sdkOutgoingRequests: {
       } as unknown as SDKOutgoingRequests,
       dfspBackendRequests: {
@@ -67,6 +72,7 @@ describe('DFSPTransactionModel', () => {
       } as unknown as DFSPBackendRequests
     }
     transactionRequestId = uuid()
+    participantId = uuid()
     transactionRequestRequest = {
       transactionRequestId,
       payee: {
@@ -90,6 +96,10 @@ describe('DFSPTransactionModel', () => {
         initiatorType: 'CONSUMER'
       },
       expiration: (new Date()).toISOString()
+    }
+    transactionRequestPutUpdate = {
+      transactionId: uuid(),
+      transactionRequestState: 'RECEIVED'
     }
     await modelConfig.kvs.connect()
   })
@@ -162,6 +172,7 @@ describe('DFSPTransactionModel', () => {
       mocked(modelConfig.kvs.set).mockImplementation(() => Promise.resolve(true))
       const data: DFSPTransactionData = {
         transactionRequestId,
+        participantId,
         transactionRequestRequest,
         currentState: 'start'
       }
@@ -186,10 +197,18 @@ describe('DFSPTransactionModel', () => {
         transactionId: expect.anything(),
         transactionRequestState: 'RECEIVED'
       })
+      expect(modelConfig.dfspBackendRequests.validateThirdpartyTransactionRequest)
+        .toBeCalledWith(transactionRequestRequest)
 
       // onNotifyTransactionRequestIsValid
       // TODO: check properly requestQuoteRequest
       expect(model.data.requestQuoteRequest).toBeDefined()
+      expect(modelConfig.thirdpartyRequests.putThirdpartyRequestsTransactions)
+        .toBeCalledWith(
+          model.data.transactionRequestPutUpdate,
+          model.data.transactionRequestId,
+          model.data.participantId
+        )
 
       // onRequestQuote
       // TODO: check properly requestQuoteResponse
@@ -219,6 +238,7 @@ describe('DFSPTransactionModel', () => {
 
       const data: DFSPTransactionData = {
         transactionRequestId,
+        participantId,
         transactionRequestRequest,
         currentState: 'start'
       }
@@ -233,10 +253,33 @@ describe('DFSPTransactionModel', () => {
       }
     })
 
+    it('should throw if PUT /thirdpartyRequests/{ID}/transactions failed', async (done) => {
+      mocked(modelConfig.kvs.set).mockImplementationOnce(() => Promise.resolve(true))
+      mocked(modelConfig.thirdpartyRequests.putThirdpartyRequestsTransactions)
+        .mockImplementationOnce(() => Promise.resolve({ statusCode: 400 } as GenericRequestResponse))
+      const data: DFSPTransactionData = {
+        transactionRequestId,
+        participantId,
+        transactionRequestRequest,
+        transactionRequestPutUpdate,
+        currentState: 'transactionRequestIsValid'
+      }
+      const model = await create(data, modelConfig)
+      try {
+        await model.fsm.notifyTransactionRequestIsValid()
+        shouldNotBeExecuted()
+      } catch (err) {
+        // TODO: fix assert when proper error is thrown
+        expect(err.message).toEqual(`PUT /thirdpartyRequests/${transactionRequestId}/transactions failed`)
+        done()
+      }
+    })
+
     it('should handle errored state', async () => {
       mocked(modelConfig.kvs.set).mockImplementation(() => Promise.resolve(true))
       const data: DFSPTransactionData = {
         transactionRequestId,
+        participantId,
         transactionRequestRequest,
         currentState: 'errored'
       }
@@ -261,6 +304,7 @@ describe('DFSPTransactionModel', () => {
     it('should properly call `KVS.get`, get expected data in `context.data` and setup state of machine', async () => {
       const dataFromCache: DFSPTransactionData = {
         transactionRequestId,
+        participantId,
         transactionRequestRequest,
         currentState: 'start'
       }
@@ -291,6 +335,7 @@ describe('DFSPTransactionModel', () => {
       mocked(modelConfig.kvs.set).mockImplementationOnce(() => Promise.resolve(true))
       const data: DFSPTransactionData = {
         transactionRequestId,
+        participantId,
         transactionRequestRequest,
         currentState: 'start'
       }
@@ -305,6 +350,7 @@ describe('DFSPTransactionModel', () => {
       mocked(modelConfig.kvs.set).mockImplementationOnce(() => { throw new Error('error from KVS.set') })
       const data: DFSPTransactionData = {
         transactionRequestId,
+        participantId,
         transactionRequestRequest,
         currentState: 'errored'
       }
