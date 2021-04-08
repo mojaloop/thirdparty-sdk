@@ -153,6 +153,85 @@ describe('DFSPTransactionModel', () => {
     expect(typeof loadFromKVS).toEqual('function')
   })
 
+  describe('workflow', () => {
+    it('should do a happy flow', async () => {
+      mocked(modelConfig.kvs.set).mockImplementation(() => Promise.resolve(true))
+      const data: DFSPTransactionData = {
+        transactionRequestId,
+        transactionRequestRequest,
+        currentState: 'start'
+      }
+      const model = await create(data, modelConfig)
+      checkDTMLayout(model, data)
+
+      // ensure state data is correct before starting workflow
+      expect(model.data).toEqual(data)
+
+      // execute workflow
+      await model.run()
+
+      // the end state for workflow: transactionRequestIsDone
+      expect(model.data.currentState).toEqual('transactionRequestIsDone')
+
+      // there are seven steps in workflow
+      expect(mocked(modelConfig.kvs.set)).toBeCalledTimes(7)
+
+      // state data should be extended by workflow transition handlers
+      // onValidateTransactionRequest
+      expect(model.data.transactionRequestPutUpdate).toEqual({
+        transactionId: expect.anything(),
+        transactionRequestState: 'RECEIVED'
+      })
+
+      // onNotifyTransactionRequestIsValid
+      // TODO: check properly requestQuoteRequest
+      expect(model.data.requestQuoteRequest).toBeDefined()
+
+      // onRequestQuote
+      // TODO: check properly requestQuoteResponse
+      expect(model.data.requestQuoteResponse).toBeDefined()
+
+      // onRequestAuthorization
+      // TODO: check properly requestAuthorizationPostRequest & requestAuthorizationPostResponse
+      expect(model.data.requestAuthorizationPostRequest).toBeDefined()
+      expect(model.data.requestAuthorizationPostResponse).toBeDefined()
+
+      // onVerifyAuthorization
+      // TODO: check properly transferRequest
+      expect(model.data.transferRequest).toBeDefined()
+
+      // onRequestTransfer
+      // TODO: check properly transferResponse & transactionRequestPatchUpdate
+      expect(model.data.transferResponse).toBeDefined()
+      expect(model.data.transactionRequestPatchUpdate).toBeDefined()
+
+      // onNotifyTransferIsDone - nothing to check
+    })
+
+    it('should handle errored state', async () => {
+      mocked(modelConfig.kvs.set).mockImplementation(() => Promise.resolve(true))
+      const data: DFSPTransactionData = {
+        transactionRequestId,
+        transactionRequestRequest,
+        currentState: 'errored'
+      }
+      const model = await create(data, modelConfig)
+      checkDTMLayout(model, data)
+
+      // execute workflow
+      await model.run()
+
+      // the state shouldn't be changed
+      expect(model.data.currentState).toEqual('errored')
+
+      // errored state should be saved
+      expect(mocked(modelConfig.kvs.set)).toBeCalledTimes(1)
+
+      // state data shouldn't be modified
+      expect(model.data).toEqual(data)
+    })
+  })
+
   describe('loadFromKVS', () => {
     it('should properly call `KVS.get`, get expected data in `context.data` and setup state of machine', async () => {
       const dataFromCache: DFSPTransactionData = {

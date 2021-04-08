@@ -166,7 +166,8 @@ export class DFSPTransactionModel
     this.data.transferResponse = {}
 
     // TODO: prepare this.data.transactionRequestPatchUpdate
-    this.data.transactionRequestPatchUpdate = {} as unknown as tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPatchResponse
+    this.data.transactionRequestPatchUpdate =
+      {} as unknown as tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPatchResponse
   }
 
   async onNotifyTransferIsDone (): Promise<void> {
