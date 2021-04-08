@@ -39,6 +39,7 @@ import { DFSPTransactionModel, create, loadFromKVS } from '~/models/dfspTransact
 import mockLogger from 'test/unit/mockLogger'
 import sortedArray from 'test/unit/sortedArray'
 import shouldNotBeExecuted from 'test/unit/shouldNotBeExecuted'
+import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
 
 // mock KVS default exported class
 jest.mock('~/shared/kvs')
@@ -60,7 +61,10 @@ describe('DFSPTransactionModel', () => {
       kvs: new KVS(connectionConfig),
       logger: connectionConfig.logger,
       sdkOutgoingRequests: {
-      } as unknown as SDKOutgoingRequests
+      } as unknown as SDKOutgoingRequests,
+      dfspBackendRequests: {
+        validateThirdpartyTransactionRequest: jest.fn(() => Promise.resolve({ isValid: true }))
+      } as unknown as DFSPBackendRequests
     }
     transactionRequestId = uuid()
     transactionRequestRequest = {
@@ -206,6 +210,27 @@ describe('DFSPTransactionModel', () => {
       expect(model.data.transactionRequestPatchUpdate).toBeDefined()
 
       // onNotifyTransferIsDone - nothing to check
+    })
+
+    it('should throw if transactionRequestRequest is not valid', async (done) => {
+      mocked(modelConfig.kvs.set).mockImplementationOnce(() => Promise.resolve(true))
+      mocked(modelConfig.dfspBackendRequests.validateThirdpartyTransactionRequest)
+        .mockImplementationOnce(() => Promise.resolve({ isValid: false }))
+
+      const data: DFSPTransactionData = {
+        transactionRequestId,
+        transactionRequestRequest,
+        currentState: 'start'
+      }
+      const model = await create(data, modelConfig)
+      try {
+        await model.fsm.validateTransactionRequest()
+        shouldNotBeExecuted()
+      } catch (err) {
+        // TODO: fix assert when proper error is thrown
+        expect(err.message).toEqual('transactionRequestRequest is not valid')
+        done()
+      }
     })
 
     it('should handle errored state', async () => {

@@ -39,6 +39,7 @@ import {
 } from './dfspTransaction.interface'
 import { InvalidDataError } from '~/shared/invalid-data-error'
 import { SDKOutgoingRequests } from '~/shared/sdk-outgoing-requests'
+import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
 
 export class DFSPTransactionModel
   extends PersistentModel<DFSPTransactionStateMachine, DFSPTransactionData> {
@@ -106,13 +107,23 @@ export class DFSPTransactionModel
     return this.config.sdkOutgoingRequests
   }
 
+  get dfspBackendRequests (): DFSPBackendRequests {
+    return this.config.dfspBackendRequests
+  }
+
   // transitions handlers
   async onValidateTransactionRequest (): Promise<void> {
     InvalidDataError.throwIfInvalidProperty(this.data, 'transactionRequestId')
     InvalidDataError.throwIfInvalidProperty(this.data, 'transactionRequestRequest')
 
-    // TODO: make validation of transactionRequestRequest
-    // TODO: error scenario: transactionRequestRequest is not valid
+    // validation of transactionRequestRequest
+    const validationResult = await this.dfspBackendRequests.validateThirdpartyTransactionRequest(
+      this.data.transactionRequestRequest
+    )
+    if (!(validationResult && validationResult.isValid)) {
+      // TODO: throw proper error when transactionRequestRequest is not valid
+      throw new Error('transactionRequestRequest is not valid')
+    }
 
     // happy path - transactionRequestRequest is valid,
     // so let prepare notification payload to be send to PISPTransactionModel

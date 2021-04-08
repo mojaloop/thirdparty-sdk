@@ -28,6 +28,7 @@ import { Method } from 'javascript-state-machine'
 import { ControlledStateMachine, StateData, PersistentModelConfig } from '~/models/persistent.model'
 import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
 import { SDKOutgoingRequests } from '~/shared/sdk-outgoing-requests'
+import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
 
 export type DFSPTransactionModelState =
   'start' |
@@ -63,6 +64,7 @@ export interface DFSPTransactionStateMachine extends ControlledStateMachine {
 
 export interface DFSPTransactionModelConfig extends PersistentModelConfig {
   sdkOutgoingRequests: SDKOutgoingRequests
+  dfspBackendRequests: DFSPBackendRequests
 }
 
 export interface DFSPTransactionData extends StateData<DFSPTransactionModelState> {
