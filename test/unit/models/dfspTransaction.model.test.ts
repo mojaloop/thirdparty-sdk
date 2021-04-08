@@ -577,6 +577,29 @@ describe('DFSPTransactionModel', () => {
       }
     })
 
+    it('should throw if transactionRequestRequest is not valid', async (done) => {
+      mocked(modelConfig.kvs.set).mockImplementationOnce(() => Promise.resolve(true))
+      mocked(modelConfig.dfspBackendRequests.validateThirdpartyTransactionRequest)
+        .mockImplementationOnce(() => Promise.resolve({ isValid: false }))
+
+      const data: DFSPTransactionData = {
+        transactionRequestId,
+        transactionRequestRequest,
+        transactionRequestState: 'RECEIVED',
+        participantId,
+        currentState: 'start'
+      }
+      const model = await create(data, modelConfig)
+      try {
+        await model.fsm.validateTransactionRequest()
+        shouldNotBeExecuted()
+      } catch (err) {
+        // TODO: fix assert when proper error is thrown
+        expect(err.message).toEqual('transactionRequestRequest is not valid')
+        done()
+      }
+    })
+
     it('should handle errored state', async () => {
       mocked(modelConfig.kvs.set).mockImplementation(() => Promise.resolve(true))
       const data: DFSPTransactionData = {
