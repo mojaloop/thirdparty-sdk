@@ -91,6 +91,7 @@ export interface ServiceConfig {
     DFSP_BACKEND_HTTP_SCHEME: string
     DFSP_BACKEND_VERIFY_AUTHORIZATION_PATH: string
     DFSP_BACKEND_VERIFY_CONSENT_PATH: string
+    DFSP_BACKEND_VALIDATE_THIRDPARTY_TRANSACTION_REQUEST: string
     DFSP_BACKEND_GET_USER_ACCOUNTS_PATH: string
     PISP_BACKEND_URI: string
     PISP_BACKEND_HTTP_SCHEME: string
@@ -309,6 +310,11 @@ export const ConvictConfig = Convict<ServiceConfig>({
       doc: 'uri to sdk-scheme-adapter getScopes endpoint',
       format: '*',
       default: 'scopes/{ID}'
+    },
+    DFSP_BACKEND_VALIDATE_THIRDPARTY_TRANSACTION_REQUEST: {
+      doc: 'path used by DFSPBackendRequests.validateThirdpartyTransactionRequest',
+      format: '*',
+      default: 'validate-thirdparty-transaction-request'
     },
     PISP_BACKEND_URI: {
       doc: 'host address of DFSP\'s ',

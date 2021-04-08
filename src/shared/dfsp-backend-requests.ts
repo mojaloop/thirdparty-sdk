@@ -27,15 +27,18 @@
 
 import { HttpRequestsConfig, HttpRequests } from '~/shared/http-requests'
 import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
-import { requests } from '@mojaloop/sdk-standard-components'
 import { BackendValidateOTPResponse, BackendGetScopesResponse } from '../models/inbound/dfspOTPValidate.interface'
 
+export interface IsValidResponse {
+  isValid: boolean
+}
 export interface DFSPBackendConfig extends HttpRequestsConfig {
   verifyAuthorizationPath: string
   verifyConsentPath: string
   getUserAccountsPath: string
   validateOTPPath: string
   getScopesPath: string
+  validateThirdpartyTransactionRequestPath: string
 }
 
 /**
@@ -82,10 +85,14 @@ export class DFSPBackendRequests extends HttpRequests {
     return this.config.getScopesPath
   }
 
+  // get path for validation of ThirdpartyTransactionRequest
+  get validateThirdpartyTransactionRequestPath (): string {
+    return this.config.validateThirdpartyTransactionRequestPath
+  }
+
   // REQUESTS
   /**
    * TODO:
-   *  verifyConsent
    *  verifyAuthorization
    */
 
@@ -99,35 +106,25 @@ export class DFSPBackendRequests extends HttpRequests {
   // This check is needed to continue the flow of responding to a /consentRequest
   // with either a POST /consents or PUT /consentRequests/{ID}/error
   async validateOTPSecret (consentRequestId: string, authToken: string): Promise<BackendValidateOTPResponse | void> {
-    const uri = this.fullUri(this.validateOTPPath)
-    this.logger.push({ uri, template: this.validateOTPPath }).info('validateOTPSecret')
-
-    const validateRequest = requests.common.bodyStringifier({
+    const validateRequest = {
       consentRequestId: consentRequestId,
       authToken: authToken
-    })
+    }
 
-    return this.loggedRequest<BackendValidateOTPResponse>({
-      uri,
-      method: 'POST',
-      headers: this.headers,
-      agent: this.agent,
-      body: validateRequest
-    })
+    return this.post(this.validateOTPPath, validateRequest)
   }
 
   // retrieve the scopes that PISP is granted on a user's behalf
   async getScopes (consentRequestId: string): Promise<BackendGetScopesResponse | void> {
-    const uri = this.fullUri(
-      this.getScopesPath.replace('{ID}', consentRequestId)
-    )
-    this.logger.push({ uri, template: this.getScopesPath }).info('getScopes')
+    const uri = this.getScopesPath.replace('{ID}', consentRequestId)
 
-    return this.loggedRequest<BackendGetScopesResponse>({
-      uri,
-      method: 'GET',
-      headers: this.headers,
-      agent: this.agent
-    })
+    return this.get(uri)
+  }
+
+  // validate ThirdpartyTransactionRequest
+  async validateThirdpartyTransactionRequest (
+    request: tpAPI.Schemas.ThirdpartyRequestsTransactionsPostRequest
+  ): Promise<IsValidResponse | void> {
+    return this.post(this.validateThirdpartyTransactionRequestPath, request)
   }
 }
