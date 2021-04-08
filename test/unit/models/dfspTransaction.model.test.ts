@@ -269,6 +269,12 @@ describe('DFSPTransactionModel', () => {
 
       // check properly requestQuoteRequest
       expect(model.data.requestQuoteRequest).toBeDefined()
+      expect(modelConfig.thirdpartyRequests.putThirdpartyRequestsTransactions)
+        .toBeCalledWith(
+          model.data.transactionRequestPutUpdate,
+          model.data.transactionRequestId,
+          model.data.participantId
+        )
 
       // shortcuts
       const rq = model.data.requestQuoteRequest!
@@ -584,9 +590,9 @@ describe('DFSPTransactionModel', () => {
 
       const data: DFSPTransactionData = {
         transactionRequestId,
+        participantId,
         transactionRequestRequest,
         transactionRequestState: 'RECEIVED',
-        participantId,
         currentState: 'start'
       }
       const model = await create(data, modelConfig)
@@ -596,6 +602,29 @@ describe('DFSPTransactionModel', () => {
       } catch (err) {
         // TODO: fix assert when proper error is thrown
         expect(err.message).toEqual('transactionRequestRequest is not valid')
+        done()
+      }
+    })
+
+    it('should throw if PUT /thirdpartyRequests/{ID}/transactions failed', async (done) => {
+      mocked(modelConfig.kvs.set).mockImplementationOnce(() => Promise.resolve(true))
+      mocked(modelConfig.thirdpartyRequests.putThirdpartyRequestsTransactions)
+        .mockImplementationOnce(() => Promise.resolve({ statusCode: 400 } as GenericRequestResponse))
+      const data: DFSPTransactionData = {
+        transactionRequestId,
+        participantId,
+        transactionRequestRequest,
+        transactionRequestPutUpdate,
+        transactionRequestState: 'RECEIVED',
+        currentState: 'transactionRequestIsValid'
+      }
+      const model = await create(data, modelConfig)
+      try {
+        await model.fsm.notifyTransactionRequestIsValid()
+        shouldNotBeExecuted()
+      } catch (err) {
+        // TODO: fix assert when proper error is thrown
+        expect(err.message).toEqual(`PUT /thirdpartyRequests/transactions/${transactionRequestId} failed`)
         done()
       }
     })
