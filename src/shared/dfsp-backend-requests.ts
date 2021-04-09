@@ -124,8 +124,7 @@ export class DFSPBackendRequests extends HttpRequests {
 
   async validateConsentRequests (request: tpAPI.Schemas.ConsentRequestsPostRequest): Promise<BackendValidateConsentRequestsResponse | void> {
     const path = this.validateConsentRequestsPath
-    return this.post
-      <tpAPI.Schemas.ConsentRequestsPostRequest, BackendValidateConsentRequestsResponse>(path, request)
+    return this.post<tpAPI.Schemas.ConsentRequestsPostRequest, BackendValidateConsentRequestsResponse>(path, request)
   }
 
   async sendOTP (request: tpAPI.Schemas.ConsentRequestsPostRequest): Promise<BackendSendOTPResponse | void> {
@@ -142,8 +141,7 @@ export class DFSPBackendRequests extends HttpRequests {
     const scopesReq: BackendStoreScopesRequest = {
       scopes: request.scopes
     }
-    return this.post
-      <BackendStoreScopesRequest, Promise<void>>(path, scopesReq)
+    return this.post<BackendStoreScopesRequest, Promise<void>>(path, scopesReq)
   }
 
   // POST the consent request ID and authToken for a DFSP to validate.

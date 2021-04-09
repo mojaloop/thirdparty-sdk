@@ -13,7 +13,7 @@ describe('PISP Transaction', (): void => {
     timeout: Config.REDIS.TIMEOUT
   }
   let kvs: KVS
-  const transactionRequestId = 'b51ec534-ee48-4575-b6a9-ead2955b8069'
+  const transactionRequestId = 'e46e1b45-ac4d-4117-b952-10cd376cda75'
   const lookupURI = `${env.outbound.baseUri}/thirdpartyTransaction/partyLookup`
 
   beforeAll(async (): Promise<void> => {

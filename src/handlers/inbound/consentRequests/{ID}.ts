@@ -41,7 +41,6 @@ import inspect from '~/shared/inspect';
 import { PISPConsentRequestsModel } from '~/models/outbound/pispConsentRequests.model';
 import { Message } from '~/shared/pub-sub'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function patch (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const payload = request.payload as tpAPI.Schemas.ConsentRequestsIDPatchRequest
   const consentRequestsRequestId = request.params.ID
@@ -84,9 +83,7 @@ async function patch (_context: unknown, request: Request, h: StateResponseToolk
 /**
  * Handles an inbound `PUT /consentRequests/{ID}` request
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function put (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
-  //const payload = request.payload as tpAPI.Schemas.ConsentRequestsIDPutResponseWeb
   const consentRequesttId = request.params.ID
 
   const channel = PISPConsentRequestsModel.notificationChannel(consentRequesttId)

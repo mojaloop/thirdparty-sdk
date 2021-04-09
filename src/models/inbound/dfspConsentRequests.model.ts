@@ -39,7 +39,6 @@ import {
   DFSPConsentRequestsData,
   DFSPConsentRequestsStateMachine,
   DFSPConsentRequestsModelConfig
-  //BackendValidateConsentRequestsResponse
 } from '~/models/inbound/dfspConsentRequests.interface'
 import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
 

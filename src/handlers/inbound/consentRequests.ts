@@ -42,7 +42,6 @@ import inspect from '~/shared/inspect';
 /**
  * Handles an inbound `POST /consentRequests` request
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function post (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const payload = request.payload as tpAPI.Schemas.ConsentRequestsPostRequest
 
