@@ -30,6 +30,7 @@ import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
 import { SDKOutgoingRequests } from '~/shared/sdk-outgoing-requests'
 import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
 import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
+import { OutboundAPI as SDKOutboundAPI } from '@mojaloop/sdk-scheme-adapter'
 
 export type DFSPTransactionModelState =
   'start' |
@@ -81,10 +82,8 @@ export interface DFSPTransactionData extends StateData<DFSPTransactionModelState
   transactionRequestPutUpdate?: tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPutResponse
 
   // used by requestQuote
-  // TODO: proper type for requestQuoteRequest
-  requestQuoteRequest?: unknown
-  // TODO: proper type for requestQuoteResponse
-  requestQuoteResponse?: unknown
+  requestQuoteRequest?: SDKOutboundAPI.Schemas.quotesPostRequest
+  requestQuoteResponse?: SDKOutboundAPI.Schemas.quotesPostResponse
 
   // used by requestAuthorization & verifyAuthorization
   // TODO: proper type for requestAuthorizationPostRequest

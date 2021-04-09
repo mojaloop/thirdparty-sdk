@@ -41,6 +41,7 @@ import sortedArray from 'test/unit/sortedArray'
 import shouldNotBeExecuted from 'test/unit/shouldNotBeExecuted'
 import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
 import { GenericRequestResponse, ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
+import { OutboundAPI as SDKOutboundAPI } from '@mojaloop/sdk-scheme-adapter'
 
 // mock KVS default exported class
 jest.mock('~/shared/kvs')
@@ -57,15 +58,18 @@ describe('DFSPTransactionModel', () => {
   let participantId: string
   let transactionRequestRequest: tpAPI.Schemas.ThirdpartyRequestsTransactionsPostRequest
   let transactionRequestPutUpdate: tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPutResponse
+  let requestQuoteRequest: SDKOutboundAPI.Schemas.quotesPostRequest
+  let quotesResponse: SDKOutboundAPI.Schemas.quotesPostResponse
   beforeEach(async () => {
     modelConfig = {
       key: 'cache-key',
       kvs: new KVS(connectionConfig),
       logger: connectionConfig.logger,
       thirdpartyRequests: {
-        putThirdpartyRequestsTransactions: jest.fn(() => Promise.resolve({ statusCode: 202 }))
+        putThirdpartyRequestsTransactions: jest.fn(() => Promise.resolve({ statusCode: 200 }))
       } as unknown as ThirdpartyRequests,
       sdkOutgoingRequests: {
+        requestQuote: jest.fn(() => Promise.resolve(quotesResponse))
       } as unknown as SDKOutgoingRequests,
       dfspBackendRequests: {
         validateThirdpartyTransactionRequest: jest.fn(() => Promise.resolve({ isValid: true }))
@@ -78,7 +82,8 @@ describe('DFSPTransactionModel', () => {
       payee: {
         partyIdInfo: {
           partyIdType: 'MSISDN',
-          partyIdentifier: '+44 1234 5678'
+          partyIdentifier: '+44 1234 5678',
+          fspId: 'dfspb'
         }
       },
       payer: {
@@ -100,6 +105,28 @@ describe('DFSPTransactionModel', () => {
     transactionRequestPutUpdate = {
       transactionId: uuid(),
       transactionRequestState: 'RECEIVED'
+    }
+    requestQuoteRequest = {
+      fspId: transactionRequestRequest.payee.partyIdInfo.fspId!,
+      quotesPostRequest: {
+        quoteId: uuid(),
+        transactionId: transactionRequestPutUpdate.transactionId,
+        transactionRequestId,
+        payee: { ...transactionRequestRequest.payee },
+        payer: { partyIdInfo: { ...transactionRequestRequest.payer } },
+        amountType: transactionRequestRequest.amountType,
+        amount: { ...transactionRequestRequest.amount },
+        transactionType: { ...transactionRequestRequest.transactionType }
+      }
+    }
+    quotesResponse = {
+      quotes: {
+        transferAmount: { ...transactionRequestRequest.amount },
+        ilpPacket: 'abcd...',
+        condition: 'xyz....',
+        expiration: (new Date()).toISOString()
+      },
+      currentState: 'COMPLETED'
     }
     await modelConfig.kvs.connect()
   })
@@ -201,18 +228,55 @@ describe('DFSPTransactionModel', () => {
         .toBeCalledWith(transactionRequestRequest)
 
       // onNotifyTransactionRequestIsValid
-      // TODO: check properly requestQuoteRequest
-      expect(model.data.requestQuoteRequest).toBeDefined()
       expect(modelConfig.thirdpartyRequests.putThirdpartyRequestsTransactions)
         .toBeCalledWith(
           model.data.transactionRequestPutUpdate,
           model.data.transactionRequestId,
           model.data.participantId
         )
+      // check properly requestQuoteRequest
+      expect(model.data.requestQuoteRequest).toBeDefined()
+
+      // shortcuts
+      const rq = model.data.requestQuoteRequest!
+      const tr = model.data.transactionRequestRequest
+
+      // payee's DFSP should be asked for quote
+      expect(rq.fspId).toEqual(tr.payee.partyIdInfo.fspId)
+
+      // quote id should be allocated
+      expect(rq.quotesPostRequest.quoteId).toBeDefined()
+
+      // shortcut
+      const rqr = rq.quotesPostRequest
+
+      // transactionId should be the same as sent to PISP
+      expect(rqr.transactionId)
+        .toEqual(model.data.transactionRequestPutUpdate!.transactionId)
+
+      // transactionRequestId should be the same as received
+      expect(rqr.transactionRequestId)
+        .toEqual(tr.transactionRequestId)
+
+      // payee should be the same as received
+      expect(rqr.payee).toEqual(tr.payee)
+
+      // payer should be build from received payer.partyIdInfo
+      expect(rqr.payer).toEqual({ partyIdInfo: { ...tr.payer } })
+
+      // amountType should be the same as received
+      expect(rqr.amountType).toEqual(tr.amountType)
+
+      // amount should be the same as received
+      expect(rqr.amount).toEqual(tr.amount)
+
+      // transactionType should be the same as received
+      expect(rqr.transactionType).toEqual(tr.transactionType)
 
       // onRequestQuote
-      // TODO: check properly requestQuoteResponse
       expect(model.data.requestQuoteResponse).toBeDefined()
+      expect(model.data.requestQuoteResponse!.quotes).toBeDefined()
+      expect(model.data.requestQuoteResponse!.currentState).toEqual('COMPLETED')
 
       // onRequestAuthorization
       // TODO: check properly requestAuthorizationPostRequest & requestAuthorizationPostResponse
@@ -271,6 +335,30 @@ describe('DFSPTransactionModel', () => {
       } catch (err) {
         // TODO: fix assert when proper error is thrown
         expect(err.message).toEqual(`PUT /thirdpartyRequests/${transactionRequestId}/transactions failed`)
+        done()
+      }
+    })
+
+    it('should throw if requestQuotes failed', async (done) => {
+      mocked(modelConfig.kvs.set).mockImplementationOnce(() => Promise.resolve(true))
+      mocked(modelConfig.sdkOutgoingRequests.requestQuote).mockImplementationOnce(
+        () => Promise.resolve({ currentState: 'ERROR_OCCURRED' } as SDKOutboundAPI.Schemas.quotesPostResponse)
+      )
+      const data: DFSPTransactionData = {
+        transactionRequestId,
+        participantId,
+        transactionRequestRequest,
+        transactionRequestPutUpdate,
+        requestQuoteRequest,
+        currentState: 'notifiedTransactionRequestIsValid'
+      }
+      const model = await create(data, modelConfig)
+      try {
+        await model.fsm.requestQuote()
+        shouldNotBeExecuted()
+      } catch (err) {
+        // TODO: fix assert when proper error is thrown
+        expect(err.message).toEqual('POST /quotes failed')
         done()
       }
     })

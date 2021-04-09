@@ -143,6 +143,11 @@ export class DFSPTransactionModel
   async onNotifyTransactionRequestIsValid (): Promise<void> {
     InvalidDataError.throwIfInvalidProperty(this.data, 'transactionRequestPutUpdate')
 
+    // TODO: fspId field for payee.partyIdInfo should be mandatory, now it is optional
+    InvalidDataError.throwIfInvalidProperty(
+      this.data.transactionRequestRequest.payee.partyIdInfo, 'fspId'
+    )
+
     // this field will be present what is guaranted by InvalidDataError validation above
     const update = this.data.transactionRequestPutUpdate as tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPutResponse
     const updateResult = await this.thirdpartyRequests.putThirdpartyRequestsTransactions(
@@ -150,22 +155,54 @@ export class DFSPTransactionModel
       this.data.transactionRequestId,
       this.data.participantId
     )
-    if (!(updateResult && updateResult.statusCode === 202)) {
+
+    // check result and throw if invalid
+    if (!(updateResult && updateResult.statusCode === 200)) {
       // TODO: throw proper error when notification failed
       // TODO: error should be transformed to call PUT /thirdpartyRequests/{ID}/transactions/error
       throw new Error(`PUT /thirdpartyRequests/${this.data.transactionRequestId}/transactions failed`)
     }
 
-    // TODO: prepare this.data.requestQuoteRequest
-    this.data.requestQuoteRequest = {}
+    // shortcut
+    const tr = this.data.transactionRequestRequest
+
+    // prepare request for quote
+    this.data.requestQuoteRequest = {
+      // TODO: fspId field for payee.partyIdInfo should be mandatory, now it is optional
+      fspId: tr.payee.partyIdInfo.fspId!,
+      quotesPostRequest: {
+        // allocate quoteId
+        quoteId: uuid(),
+
+        // copy from previously allocated
+        transactionId: this.data.transactionRequestPutUpdate!.transactionId,
+
+        // copy from request
+        transactionRequestId: tr.transactionRequestId,
+        payee: { ...tr.payee },
+        // TODO: investigate quotes interface and payer 'THIRD_PARTY_LINK' problem
+        payer: { partyIdInfo: { ...tr.payer } },
+        amountType: tr.amountType,
+        amount: { ...tr.amount },
+        transactionType: { ...tr.transactionType }
+      }
+    }
   }
 
   async onRequestQuote (): Promise<void> {
     InvalidDataError.throwIfInvalidProperty(this.data, 'requestQuoteRequest')
 
-    // TODO: make a call to get quotes from SDKOutgoingRequests
-    // TODO: store results from call
-    this.data.requestQuoteResponse = {}
+    // request quote via sync interface on sdk-scheme-adapter
+    const resultQuote = await this.sdkOutgoingRequests.requestQuote(this.data.requestQuoteRequest!)
+
+    // check result and throw if invalid
+    if (!(resultQuote && resultQuote.currentState === 'COMPLETED')) {
+      // TODO: throw proper error when quotes
+      throw new Error('POST /quotes failed')
+    }
+
+    // store result in state
+    this.data.requestQuoteResponse = resultQuote
   }
 
   async onRequestAuthorization (): Promise<void> {
