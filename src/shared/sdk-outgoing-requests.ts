@@ -36,6 +36,7 @@ export interface SDKOutgoingRequestsConfig extends HttpRequestsConfig {
   // requestAuthorizationPath: string
   requestPartiesInformationPath: string
   requestToPayTransferPath: string
+  requestQuotePath: string
 }
 
 /**
@@ -68,18 +69,16 @@ export class SDKOutgoingRequests extends HttpRequests {
     return this.config.requestToPayTransferPath
   }
 
+  // requestQuote path getter
+  get requestQuotePath (): string {
+    return this.config.requestQuotePath
+  }
+
   // REQUESTS
   /**
-   * TODO: these requests will be used by DFSPTransactionModel/PISPTransactionModel
-   *  // these two will be done by calling ThirdpartyRequests interface, so not implemented here
-   *  notifyThirdpartyAboutRejectedAuthorization
-   *  notifyThirdpartyAboutTransfer
    *  // synchronous calls to SDKOutgoing
    *  requestAuthorization
-   *  requestQuote,
-   *  requestThirdpartyTransaction
    *  requestTransfer,
-   *  requestVerifyAuthorization
    *
    * */
 
@@ -96,7 +95,7 @@ export class SDKOutgoingRequests extends HttpRequests {
   ): Promise<OutboundAPI.Schemas.partiesByIdResponse | void> {
     // generate uri from template
     const uri = this.fullUri(
-      // config.SHARED.SDK_PARTIES_INFORMATION_URI
+      // config.SHARED.SDK_OUTGOING_PARTIES_INFORMATION_PATH
       this.requestPartiesInformationPath
         .replace('{Type}', type)
         .replace('{ID}', id)
@@ -115,6 +114,17 @@ export class SDKOutgoingRequests extends HttpRequests {
       headers: this.headers,
       agent: this.agent
     })
+  }
+
+  /**
+   * @method requestQuote
+   * @param {OutboundAPI.Schemas.quotesPostRequest} request - quotes request
+   * @returns {Promise<<OutboundAPI.Schemas.quotesPostResponse|void>} - quotes response
+   */
+  async requestQuote (
+    request: OutboundAPI.Schemas.quotesPostRequest
+  ): Promise<OutboundAPI.Schemas.quotesPostResponse | void> {
+    return this.post(this.requestQuotePath, request)
   }
 
   // TODO: drop it and replace by requestTransfer

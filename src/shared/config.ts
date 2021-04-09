@@ -100,8 +100,9 @@ export interface ServiceConfig {
     PISP_TRANSACTION_APPROVE_TIMEOUT_IN_SECONDS: number
     SDK_OUTGOING_URI: string
     SDK_OUTGOING_HTTP_SCHEME: string
+    SDK_OUTGOING_REQUEST_QUOTE_PATH: string
     SDK_REQUEST_TO_PAY_TRANSFER_URI: string
-    SDK_PARTIES_INFORMATION_URI: string
+    SDK_OUTGOING_PARTIES_INFORMATION_PATH: string
     SDK_NOTIFY_ABOUT_TRANSFER_URI: string
     DFSP_BACKEND_VALIDATE_OTP_PATH: string
     DFSP_BACKEND_GET_SCOPES_PATH: string
@@ -351,12 +352,17 @@ export const ConvictConfig = Convict<ServiceConfig>({
       format: ['http', 'https'],
       default: 'http'
     },
+    SDK_OUTGOING_REQUEST_QUOTE_PATH: {
+      doc: 'path to sdk outgoing quote sync interface',
+      format: '*',
+      default: 'quote'
+    },
     SDK_REQUEST_TO_PAY_TRANSFER_URI: {
       doc: 'uri to sdk-scheme-adapter requestToPayTransfer endpoint',
       format: '*',
       default: 'localhost:9000/requestToPayTransfer'
     },
-    SDK_PARTIES_INFORMATION_URI: {
+    SDK_OUTGOING_PARTIES_INFORMATION_PATH: {
       doc: 'uri to sdk-scheme-adapter requestToPayTransfer endpoint',
       format: '*',
       default: 'localhost:7002/parties/{Type}/{ID}/{SubId}'

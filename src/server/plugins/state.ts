@@ -137,8 +137,9 @@ export const StatePlugin = {
       logger,
       uri: config.SHARED.SDK_OUTGOING_URI,
       scheme: config.SHARED.SDK_OUTGOING_HTTP_SCHEME as Scheme,
-      requestPartiesInformationPath: config.SHARED.SDK_PARTIES_INFORMATION_URI,
-      requestToPayTransferPath: config.SHARED.SDK_REQUEST_TO_PAY_TRANSFER_URI
+      requestPartiesInformationPath: config.SHARED.SDK_OUTGOING_PARTIES_INFORMATION_PATH,
+      requestToPayTransferPath: config.SHARED.SDK_REQUEST_TO_PAY_TRANSFER_URI,
+      requestQuotePath: config.SHARED.SDK_OUTGOING_REQUEST_QUOTE_PATH
     })
 
     try {

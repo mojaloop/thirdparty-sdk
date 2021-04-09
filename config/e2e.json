@@ -43,7 +43,7 @@
     "SDK_REQUEST_TO_PAY_TRANSFER_URI": "0.0.0.0:9000/requestToPayTransfer",
     "SDK_OUTGOING_URI": "0.0.0.0:7002",
     "SDK_OUTGOING_HTTP_SCHEME": "http",
-    "SDK_PARTIES_INFORMATION_URI": "parties/{Type}/{ID}/{SubId}",
+    "SDK_OUTGOING_PARTIES_INFORMATION_PATH": "parties/{Type}/{ID}/{SubId}",
     "SDK_NOTIFY_ABOUT_TRANSFER_URI": "0.0.0.0:9000/thridpartyRequests/transactions/{ID}",
     "JWS_SIGN": false,
     "JWS_SIGNING_KEY": "./secrets/jwsSigningKey.key",

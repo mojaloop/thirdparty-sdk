@@ -30,6 +30,8 @@ import { Scheme } from '~/shared/http-scheme'
 import mockLogger from '../mockLogger'
 import { uuid } from 'uuidv4'
 import { OutboundRequestToPayTransferPostRequest } from '~/models/thirdparty.transactions.interface'
+import { OutboundAPI } from '@mojaloop/sdk-scheme-adapter'
+
 describe('SDKOutgoingRequests', () => {
   let sdkRequest: SDKOutgoingRequests
 
@@ -40,7 +42,8 @@ describe('SDKOutgoingRequests', () => {
     // PATHS
     // requestAuthorizationPath: 'authorizations',
     requestPartiesInformationPath: 'parties/{Type}/{ID}/{SubId}',
-    requestToPayTransferPath: 'request-to-pay-transfer'
+    requestToPayTransferPath: 'request-to-pay-transfer',
+    requestQuotePath: 'request-quote'
   }
 
   const requestToPayTransfer: OutboundRequestToPayTransferPostRequest = {
@@ -105,6 +108,59 @@ describe('SDKOutgoingRequests', () => {
         agent: expect.anything(),
         headers: expect.anything()
       })
+    })
+  })
+
+  describe('requestQuote', () => {
+    it('should propagate the call to post', async () => {
+      const request: OutboundAPI.Schemas.quotesPostRequest = {
+        fspId: uuid(),
+        quotesPostRequest: {
+          quoteId: uuid(),
+          transactionId: uuid(),
+          payee: {
+            partyIdInfo: {
+              partyIdType: 'MSISDN',
+              partyIdentifier: '+44 1234 5678'
+            }
+          },
+          payer: {
+            partyIdInfo: {
+              partyIdType: 'THIRD_PARTY_LINK',
+              partyIdentifier: 'qwerty-0987'
+            }
+          },
+          amountType: 'SEND',
+          amount: {
+            currency: 'USD',
+            amount: '100'
+          },
+          transactionType: {
+            scenario: 'TRANSFER',
+            initiator: 'PAYER',
+            initiatorType: 'CONSUMER'
+          }
+        }
+      }
+      const response: OutboundAPI.Schemas.quotesPostResponse = {
+        quotes: {
+          transferAmount: {
+            currency: 'USD',
+            amount: '100'
+          },
+          ilpPacket: 'abcd...',
+          condition: 'xyz....',
+          expiration: (new Date()).toISOString()
+        },
+        currentState: 'COMPLETED'
+      }
+      const postSpy = jest.spyOn(sdkRequest, 'post').mockImplementationOnce(
+        () => Promise.resolve(response)
+      )
+
+      const result = await sdkRequest.requestQuote(request)
+      expect(result).toEqual(response)
+      expect(postSpy).toHaveBeenCalledWith(sdkRequest.requestQuotePath, request)
     })
   })
 
