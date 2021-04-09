@@ -216,7 +216,7 @@ describe('SDKOutgoingRequests', () => {
 
   describe('requestTransfer', () => {
     it('should propagate the call to post', async () => {
-      const transferId = uuid();
+      const transferId = uuid()
       const request: OutboundAPI.Schemas.simpleTransfersPostRequest = {
         fspId: 'dfspa',
         transfersPostRequest: {
