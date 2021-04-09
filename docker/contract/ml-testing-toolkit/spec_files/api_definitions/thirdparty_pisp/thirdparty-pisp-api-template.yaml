@@ -428,7 +428,6 @@ paths:
         #Path
         - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/parameters/ID.yaml'
         #Headers
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/parameters/Accept.yaml'
         - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/parameters/Content-Length.yaml'
         - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/parameters/Content-Type.yaml'
         - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/parameters/Date.yaml'
@@ -516,6 +515,8 @@ paths:
           $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/501.yaml'
         '503':
           $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/503.yaml'
+  /consentRequests/{ID}/error:
+    $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/paths/consentRequests_ID_error.yaml'
   /consents:
     post:
       description: >

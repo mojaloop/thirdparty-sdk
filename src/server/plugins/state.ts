@@ -96,7 +96,7 @@ export const StatePlugin = {
       dfspId: config.SHARED.DFSP_ID,
       tls: config.SHARED.TLS,
       jwsSign: config.SHARED.JWS_SIGN,
-      jwsSigningKey: <Buffer> config.SHARED.JWS_SIGNING_KEY
+      jwsSigningKey: <Buffer>config.SHARED.JWS_SIGNING_KEY
     })
 
     const thirdpartyRequest = new SDK.ThirdpartyRequests({
@@ -111,7 +111,7 @@ export const StatePlugin = {
       dfspId: config.SHARED.DFSP_ID,
       tls: config.SHARED.TLS,
       jwsSign: config.SHARED.JWS_SIGN,
-      jwsSigningKey: <Buffer> config.SHARED.JWS_SIGNING_KEY
+      jwsSigningKey: <Buffer>config.SHARED.JWS_SIGNING_KEY
     })
 
     const pispBackendRequests = new PISPBackendRequests({
@@ -129,7 +129,10 @@ export const StatePlugin = {
       verifyConsentPath: config.SHARED.DFSP_BACKEND_VERIFY_CONSENT_PATH,
       getUserAccountsPath: config.SHARED.DFSP_BACKEND_GET_USER_ACCOUNTS_PATH,
       validateOTPPath: config.SHARED.DFSP_BACKEND_VALIDATE_OTP_PATH,
-      getScopesPath: config.SHARED.DFSP_BACKEND_GET_SCOPES_PATH
+      getScopesPath: config.SHARED.DFSP_BACKEND_GET_SCOPES_PATH,
+      validateConsentRequestsPath: config.SHARED.DFSP_BACKEND_VALIDATE_CONS_REQ_PATH,
+      sendOTPPath: config.SHARED.DFSP_BACKEND_SEND_OTP_REQ_PATH,
+      storeConsentRequestsPath: config.SHARED.DFSP_BACKEND_STORE_CONS_REQ_PATH,
     })
 
     const sdkOutgoingRequests = new SDKOutgoingRequests({

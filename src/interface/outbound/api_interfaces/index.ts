@@ -90,4 +90,8 @@ export namespace Schemas {
   export type ConsentsPostRequest = components['schemas']['ConsentsPostRequest']
   export type ConsentRequestsValidateState = components['schemas']['ConsentRequestsValidateState']
   export type ConsentRequestsValidateResponse = components['schemas']['ConsentRequestsValidateResponse']
+  export type ConsentRequestsPostRequest = components['schemas']['ConsentRequestsPostRequest']
+  export type AuthChannels = components['schemas']['ConsentRequestChannelType'][]
+  export type ConsentRequestsState = components['schemas']['ConsentRequestsState']
+  export type ConsentRequestsResponse = components['schemas']['ConsentRequestsResponse']
 }

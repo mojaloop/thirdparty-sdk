@@ -31,6 +31,9 @@ export interface paths {
   '/consentRequests/{ID}/validate': {
     patch: operations['OutboundConsentRequestsValidatePatch'];
   };
+  '/consentRequests': {
+    post: operations['OutboundConsentRequestsPost'];
+  };
 }
 
 export interface operations {
@@ -194,6 +197,23 @@ export interface operations {
     };
     responses: {
       200: components['responses']['ConsentRequestsValidateResponse'];
+      400: components['responses']['400'];
+      401: components['responses']['401'];
+      403: components['responses']['403'];
+      404: components['responses']['404'];
+      405: components['responses']['405'];
+      406: components['responses']['406'];
+      501: components['responses']['501'];
+      503: components['responses']['503'];
+    };
+  };
+  /** A request from a PISP to a DFSP to start the process of delegating consent */
+  OutboundConsentRequestsPost: {
+    requestBody: {
+      'application/json': components['schemas']['ConsentRequestsPostRequest'];
+    };
+    responses: {
+      200: components['responses']['ConsentRequestsResponse'];
       400: components['responses']['400'];
       401: components['responses']['401'];
       403: components['responses']['403'];
@@ -862,6 +882,111 @@ export interface components {
     ConsentRequestsValidateResponse:
     | components['schemas']['ConsentRequestsValidateResponseError']
     | components['schemas']['ConsentRequestsValidateResponseSuccess'];
+    /**
+     * The auth channel being used for the consentRequest.
+     * - "WEB" - The Web auth channel.
+     * - "OTP" - The OTP auth channel.
+     */
+    ConsentRequestChannelType: 'WEB' | 'OTP';
+    /** The object sent in a `POST /consentRequests` request. */
+    ConsentRequestsPostRequest: {
+      toParticipantId: string;
+      id: components['schemas']['CorrelationId'];
+      /** The id of the PISP who will initiate transactions on a user's behalf. */
+      initiatorId: string;
+      scopes: components['schemas']['Scope'][];
+      authChannels: components['schemas']['ConsentRequestChannelType'][];
+      /** The callback uri that the user will be redirected to after completing the WEB auth channel. */
+      callbackUri: string;
+    };
+    /** State of POST consent requests */
+    ConsentRequestsState: 'start' | 'errored' | 'success' | 'RequestIsValid';
+    ConsentRequestsResponseError: {
+      errorInformation: components['schemas']['ErrorInformation'];
+      currentState: components['schemas']['ConsentRequestsState'];
+    };
+    /** The web auth channel being used for PUT consentRequest/{ID} request. */
+    ConsentRequestChannelTypeWeb: 'WEB';
+    /**
+     * The object sent in a `PUT /consentRequests/{ID}` request.
+     *
+     * Schema used in the request consent phase of the account linking web flow,
+     * the result is the PISP being instructed on a specific URL where this
+     * supposed user should be redirected. This URL should be a place where
+     * the user can prove their identity (e.g., by logging in).
+     */
+    ConsentRequestsIDPutResponseWeb: {
+      /** The id of the PISP who will initiate transactions on a user's behalf. */
+      initiatorId: string;
+      scopes: components['schemas']['Scope'][];
+      authChannels: components['schemas']['ConsentRequestChannelTypeWeb'][];
+      /** The callback uri that the user will be redirected to after completing the WEB auth channel. */
+      callbackUri: string;
+      /** The callback uri that the pisp app redirects to for user to complete their login. */
+      authUri: string;
+    };
+    /**
+     * The object sent in a `PUT /consentRequests/{ID}` request.
+     *
+     * Schema used in the authentication phase of the account linking flow,
+     * the user is expected to prove their identity to the DFSP by passing a OTP
+     * or secret to the PISP.
+     */
+    ConsentRequestsIDPutResponseWebAuth: {
+      /** The id of the PISP who will initiate transactions on a user's behalf. */
+      initiatorId: string;
+      scopes: components['schemas']['Scope'][];
+      authChannels: components['schemas']['ConsentRequestChannelTypeWeb'][];
+      /** The callback uri that the user will be redirected to after completing the WEB auth channel. */
+      callbackUri: string;
+      /** The callback uri that the pisp app redirects to for user to complete their login. */
+      authUri: string;
+      /** The Auth token from the OTP or redirect to pisp app. */
+      authToken: string;
+    };
+    /** The OTP auth channel being used for PUT consentRequest/{ID} request. */
+    ConsentRequestChannelTypeOTP: 'OTP';
+    /**
+     * The object sent in a `PUT /consentRequests/{ID}` request.
+     *
+     * Schema used in the request consent phase of the account linking OTP/SMS flow.
+     */
+    ConsentRequestsIDPutResponseOTP: {
+      /** The id of the PISP who will initiate transactions on a user's behalf. */
+      initiatorId: string;
+      scopes: components['schemas']['Scope'][];
+      authChannels: components['schemas']['ConsentRequestChannelTypeOTP'][];
+      /** The callback uri that the user will be redirected to after completing the WEB auth channel. */
+      callbackUri: string;
+    };
+    /**
+     * The object sent in a `PUT /consentRequests/{ID}` request.
+     *
+     * Schema used in the authentication phase of the account linking flow,
+     * the user is expected to prove their identity to the DFSP by passing a OTP
+     * or secret to the PISP.
+     */
+    ConsentRequestsIDPutResponseOTPAuth: {
+      /** The id of the PISP who will initiate transactions on a user's behalf. */
+      initiatorId: string;
+      scopes: components['schemas']['Scope'][];
+      authChannels: components['schemas']['ConsentRequestChannelTypeOTP'][];
+      /** The callback uri that the user will be redirected to after completing the WEB auth channel. */
+      callbackUri: string;
+      /** The Auth token from the OTP or redirect to pisp app. */
+      authToken: string;
+    };
+    ConsentRequestsResponseSuccess: {
+      consentRequests:
+      | components['schemas']['ConsentRequestsIDPutResponseWeb']
+      | components['schemas']['ConsentRequestsIDPutResponseWebAuth']
+      | components['schemas']['ConsentRequestsIDPutResponseOTP']
+      | components['schemas']['ConsentRequestsIDPutResponseOTPAuth'];
+      currentState: components['schemas']['ConsentRequestsState'];
+    };
+    ConsentRequestsResponse:
+    | components['schemas']['ConsentRequestsResponseError']
+    | components['schemas']['ConsentRequestsResponseSuccess'];
   };
   responses: {
     /** OK */
@@ -996,6 +1121,15 @@ export interface components {
     ConsentRequestsValidateResponse: {
       content: {
         'application/json': components['schemas']['ConsentRequestsValidateResponse'];
+      };
+    };
+    /**
+     * response body of POST /consentRequests
+     * derived from PostConsentRequest by Inbound Service via Pub/Sub channel
+     */
+    ConsentRequestsResponse: {
+      content: {
+        'application/json': components['schemas']['ConsentRequestsResponse'];
       };
     };
   };

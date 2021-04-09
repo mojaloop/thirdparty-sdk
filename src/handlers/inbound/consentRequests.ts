@@ -21,7 +21,7 @@
  * Gates Foundation
  - Name Surname <name.surname@gatesfoundation.com>
 
- - Kevin Leyow <kevin.leyow@modusbox.com>
+ - Sridhar Voruganti - sridhar.voruganti@modusbox.com
 
  --------------
  ******/
@@ -32,47 +32,45 @@ import {
 import { Request, ResponseObject } from '@hapi/hapi'
 import { StateResponseToolkit } from '~/server/plugins/state'
 import { Enum } from '@mojaloop/central-services-shared'
-import { DFSPOTPValidateModel } from '~/models/inbound/dfspOTPValidate.model';
 import {
-  DFSPOTPValidateData,
-  DFSPOTPValidateModelConfig
-} from '~/models/inbound/dfspOTPValidate.interface'
+  DFSPConsentRequestsData,
+  DFSPConsentRequestsModelConfig
+} from '~/models/inbound/dfspConsentRequests.interface'
+import { DFSPConsentRequestsModel } from '~/models/inbound/dfspConsentRequests.model';
 import inspect from '~/shared/inspect';
-import { PISPConsentRequestsModel } from '~/models/outbound/pispConsentRequests.model';
-import { Message } from '~/shared/pub-sub'
 
+/**
+ * Handles an inbound `POST /consentRequests` request
+ */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function patch (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
-  const payload = request.payload as tpAPI.Schemas.ConsentRequestsIDPatchRequest
-  const consentRequestsRequestId = request.params.ID
-  const authToken = payload.authToken
+async function post (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+  const payload = request.payload as tpAPI.Schemas.ConsentRequestsPostRequest
 
-  // pull the PISP's ID to send back the POST /consents
+  // pull the PISP's ID to send back the PUT /consentRequests/{ID}
   const sourceFspId = request.headers['fspiop-source']
 
-  const data: DFSPOTPValidateData = {
+  const data: DFSPConsentRequestsData = {
     currentState: 'start',
-    consentRequestsRequestId: consentRequestsRequestId,
-    authToken: authToken,
-    toParticipantId: sourceFspId
+    toParticipantId: sourceFspId,
+    request: payload
   }
-  // if the OTP is valid the DFSP issues out a POST /consents request.
-  const modelConfig: DFSPOTPValidateModelConfig = {
+  // if the request is valid then DFSP returns response via PUT /consentRequests/{ID} call.
+  const modelConfig: DFSPConsentRequestsModelConfig = {
     kvs: h.getKVS(),
     pubSub: h.getPubSub(),
-    key: consentRequestsRequestId,
+    key: payload.id,
     logger: h.getLogger(),
     dfspBackendRequests: h.getDFSPBackendRequests(),
     thirdpartyRequests: h.getThirdpartyRequests(),
   }
-  const model = new DFSPOTPValidateModel(data, modelConfig)
+  const model = new DFSPConsentRequestsModel(data, modelConfig)
 
   // don't await on promise to be resolved
   setImmediate(async () => {
     try {
       await model.run()
     } catch (error) {
-      h.getLogger().info(`Error running DFSPOTPValidateModel : ${inspect(error)}`)
+      h.getLogger().info(`Error running DFSPConsentRequestsModel : ${inspect(error)}`)
     }
   })
 
@@ -81,23 +79,6 @@ async function patch (_context: unknown, request: Request, h: StateResponseToolk
   return h.response().code(Enum.Http.ReturnCodes.ACCEPTED.CODE)
 }
 
-/**
- * Handles an inbound `PUT /consentRequests/{ID}` request
- */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function put (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
-  //const payload = request.payload as tpAPI.Schemas.ConsentRequestsIDPutResponseWeb
-  const consentRequesttId = request.params.ID
-
-  const channel = PISPConsentRequestsModel.notificationChannel(consentRequesttId)
-  const pubSub = h.getPubSub()
-  // don't await on promise to resolve, let finish publish in background
-  pubSub.publish(channel, request.payload as unknown as Message)
-  h.getLogger().info(`Inbound received PUT /consentRequests/{ID} response and published to channel : ${channel}`)
-  return h.response().code(200)
-}
-
 export default {
-  patch,
-  put
+  post
 }

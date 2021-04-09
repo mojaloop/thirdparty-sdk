@@ -123,66 +123,40 @@
     }
   },
   "backendValidateOTPRequest": {
-    "headers": {
-    },
-    "params": {
-    },
+    "headers": {},
+    "params": {},
     "payload": {
       "consentRequestId": "3356cdc5-ee8f-4fcf-b7b6-aee68ac56a42",
       "authToken": "12345"
     }
   },
   "backendValidateOTPResponseValid": {
-    "headers": {
-    },
-    "params": {
-    },
+    "headers": {},
+    "params": {},
     "payload": {
       "isValid": true
     }
   },
   "backendValidateOTPResponseInvalid": {
-    "headers": {
-    },
-    "params": {
-    },
+    "headers": {},
+    "params": {},
     "payload": {
       "isValid": false
     }
   },
   "backendGetScopesRequest": {
-    "headers": {
-    },
+    "headers": {},
     "params": {
       "ID": "079ede98-e587-4af8-98a5-6eb0b9b45cad"
     },
-    "payload": {
-    }
+    "payload": {}
   },
   "backendGetScopesResponse": {
-    "headers": {
-    },
-    "params": {
-    },
+    "headers": {},
+    "params": {},
     "payload": {
-      "scopes": [{
-        "accountId": "some-id",
-        "actions": [
-          "accounts.getBalance",
-          "accounts.transfer"
-        ]
-      }]
-    }
-  },
-  "inboundConsentsPostRequest": {
-    "headers": {
-    },
-    "params": {
-    },
-    "payload": {
-      "consentId": "8e34f91d-d078-4077-8263-2c047876fcf6",
-      "consentRequestId": "6988c34f-055b-4ed5-b223-b10c8a2e2329",
-      "scopes": [{
+      "scopes": [
+        {
           "accountId": "some-id",
           "actions": [
             "accounts.getBalance",
@@ -190,6 +164,152 @@
           ]
         }
       ]
+    }
+  },
+  "inboundConsentsPostRequest": {
+    "headers": {},
+    "params": {},
+    "payload": {
+      "consentId": "8e34f91d-d078-4077-8263-2c047876fcf6",
+      "consentRequestId": "6988c34f-055b-4ed5-b223-b10c8a2e2329",
+      "scopes": [
+        {
+          "accountId": "some-id",
+          "actions": [
+            "accounts.getBalance",
+            "accounts.transfer"
+          ]
+        }
+      ]
+    }
+  },
+  "consentRequestsPost": {
+    "headers": {},
+    "params": {},
+    "payload": {
+      "toParticipantId": "dfspA",
+      "id": "b51ec534-ee48-4575-b6a9-ead2955b8069",
+      "initiatorId": "pispA",
+      "authChannels": [
+        "WEB",
+        "OTP"
+      ],
+      "scopes": [
+        {
+          "accountId": "dfspa.username.1234",
+          "actions": [
+            "accounts.transfer",
+            "accounts.getBalance"
+          ]
+        },
+        {
+          "accountId": "dfspa.username.5678",
+          "actions": [
+            "accounts.transfer",
+            "accounts.getBalance"
+          ]
+        }
+      ],
+      "callbackUri": "pisp-app://callback.com"
+    },
+    "response": {
+      "isValid": true,
+      "authChannels": [
+        "WEB"
+      ],
+      "authUri": "dfspa.com/authorize?consentRequestId=456"
+    },
+    "responseOTP": {
+      "isValid": true,
+      "authChannels": [
+        "OTP"
+      ]
+    },
+    "responseError": {
+      "isValid": false,
+      "authChannels": []
+    },
+    "otpRequest": {
+      "consentRequestId": "b51ec534-ee48-4575-b6a9-ead2955b8069",
+      "username": "TBD",
+      "message": "TBD"
+    },
+    "otpResponse": {
+      "otp": "98765"
+    }
+  },
+  "consentRequestsPut": {
+    "headers": {},
+    "params": {
+      "ID": "b51ec534-ee48-4575-b6a9-ead2955b8069"
+    },
+    "payload": {
+      "scopes": [
+        {
+          "accountId": "dfspa.username.1234",
+          "actions": [
+            "accounts.transfer",
+            "accounts.getBalance"
+          ]
+        },
+        {
+          "accountId": "dfspa.username.5678",
+          "actions": [
+            "accounts.transfer",
+            "accounts.getBalance"
+          ]
+        }
+      ],
+      "callbackUri": "pisp-app://callback.com",
+      "authUri": "dfspa.com/authorize?consentRequestId=456",
+      "authChannels": [
+        "WEB"
+      ],
+      "initiatorId": "pisp"
+    }
+  },
+  "consentRequestsPutOTP": {
+    "headers": {},
+    "params": {
+      "ID": "b51ec534-ee48-4575-b6a9-ead2955b8069"
+    },
+    "payload": {
+      "scopes": [
+        {
+          "accountId": "dfspa.username.1234",
+          "actions": [
+            "accounts.transfer",
+            "accounts.getBalance"
+          ]
+        },
+        {
+          "accountId": "dfspa.username.5678",
+          "actions": [
+            "accounts.transfer",
+            "accounts.getBalance"
+          ]
+        }
+      ],
+      "callbackUri": "pisp-app://callback.com",
+      "authChannels": [
+        "OTP"
+      ],
+      "initiatorId": "pisp"
+    }
+  },
+  "consentRequestsPutError": {
+    "headers": {
+      "fspiop-source": "switch",
+      "fspiop-destination": "dfspA"
+    },
+    "params": {
+      "ID": "b51ec534-ee48-4575-b6a9-ead2955b8069"
+    },
+    "payload": {
+      "errorInformation": {
+        "errorCode": "7204",
+        "errorDescription": "FSP does not support any requested scope actions"
+      }
     }
   }
 }

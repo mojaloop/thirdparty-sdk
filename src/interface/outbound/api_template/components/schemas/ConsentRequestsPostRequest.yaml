@@ -1,0 +1,31 @@
+title: ConsentRequestsPostRequest
+type: object
+description: The object sent in a `POST /consentRequests` request.
+properties:
+  toParticipantId: 
+    type: string
+  id:
+    $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/schemas/CorrelationId.yaml'
+  initiatorId:
+    type: string
+    description: The id of the PISP who will initiate transactions on a user's behalf.
+  scopes:
+    type: array
+    items:
+      $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/Scope.yaml'
+  authChannels:
+    type: array
+    items:
+      $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/ConsentRequestChannelType.yaml'
+  callbackUri:
+    type: string
+    description: >-
+      The callback uri that the user will be redirected to after completing the
+      WEB auth channel.
+required:
+  - toParticipantId
+  - id
+  - initiatorId
+  - scopes
+  - authChannels
+  - callbackUri

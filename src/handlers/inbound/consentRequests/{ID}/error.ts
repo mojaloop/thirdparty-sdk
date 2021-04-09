@@ -29,26 +29,31 @@ import { Message } from '~/shared/pub-sub'
 import { StateResponseToolkit } from '~/server/plugins/state'
 import { PISPOTPValidateModel } from '~/models/outbound/pispOTPValidate.model';
 import { Enum } from '@mojaloop/central-services-shared';
+import { PISPConsentRequestsModel } from '~/models/outbound/pispConsentRequests.model'
 
 /**
  * Handles a inbound PUT /consentRequests/{ID}/error request
  */
 async function put (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
-    // PUT /consentsRequests/{ID}/error is a response to PATCH /consentRequests
-    // when an OTP or secret failed to validate.
-    // We publish the request on the PISPConsentRequestModel
-    const payload = request.payload as fspiopAPI.Schemas.ErrorInformation
+  // PUT /consentsRequests/{ID}/error is a response to PATCH /consentRequests
+  // when an OTP or secret failed to validate.
+  // We publish the request on the PISPConsentRequestModel
+  const payload = request.payload as fspiopAPI.Schemas.ErrorInformation
 
-    const channel = PISPOTPValidateModel.notificationChannel(
-      request.params.ID
-    )
-    const pubSub = h.getPubSub()
+  const channel = PISPOTPValidateModel.notificationChannel(
+    request.params.ID
+  )
+  const pubSub = h.getPubSub()
 
-    // don't await on promise to resolve, let finish publish in background
-    pubSub.publish(channel, payload as unknown as Message)
-    return h.response({}).code(Enum.Http.ReturnCodes.OK.CODE)
+  // don't await on promise to resolve, let finish publish in background
+  pubSub.publish(channel, payload as unknown as Message)
+
+  const consentReqChannel = PISPConsentRequestsModel.notificationChannel(request.params.ID)
+  pubSub.publish(consentReqChannel, payload as unknown as Message)
+
+  return h.response({}).code(Enum.Http.ReturnCodes.OK.CODE)
 }
 
 export default {
-    put
+  put
 }

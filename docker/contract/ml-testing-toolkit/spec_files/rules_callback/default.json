@@ -271,5 +271,147 @@
     },
     "type": "callback",
     "version": 1
+  },
+  {
+    "ruleId": 5,
+    "priority": 1,
+    "description": "post /consentRequests -WEB",
+    "apiVersion": {
+      "minorVersion": 1,
+      "majorVersion": 0,
+      "type": "thirdparty_pisp",
+      "asynchronous": true
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "body",
+          "operator": "equal",
+          "value": "b51ec534-ee48-4575-b6a9-ead2955b8069",
+          "path": "id"
+        },
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/consentRequests"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "post"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/consentRequests/{ID}",
+      "params": {
+        "headers": {
+          "Accept": "application/vnd.interoperability.thirdparty+json;version=1.0",
+          "Content-Type": "application/vnd.interoperability.thirdparty+json;version=1.0",
+          "Date": "Wed, 27 May 2020 11:13:34 GMT",
+          "FSPIOP-Source": "DFSPA"
+        },
+        "body": {
+          "initiatorId": "pispA",
+          "authChannels": [
+            "WEB"
+          ],
+          "scopes": [
+            {
+              "accountId": "dfspa.username.1234",
+              "actions": [
+                "accounts.transfer",
+                "accounts.getBalance"
+              ]
+            },
+            {
+              "accountId": "dfspa.username.5678",
+              "actions": [
+                "accounts.transfer",
+                "accounts.getBalance"
+              ]
+            }
+          ],
+          "callbackUri": "pisp-app://callback.com",
+          "authUri": "dfspa.com/authorize?consentRequestId=456"
+        },
+        "scripts": {}
+      },
+      "delay": 0,
+      "type": "FIXED_CALLBACK"
+    },
+    "type": "callback",
+    "version": 1
+  },
+  {
+    "ruleId": 6,
+    "priority": 1,
+    "description": "post /consentRequests -OTP",
+    "apiVersion": {
+      "minorVersion": 1,
+      "majorVersion": 0,
+      "type": "thirdparty_pisp",
+      "asynchronous": true
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/consentRequests"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "post"
+        },
+        {
+          "fact": "body",
+          "operator": "equal",
+          "value": "c51ec534-ee48-4575-b6a9-ead2955b8069",
+          "path": "id"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/consentRequests/{ID}",
+      "params": {
+        "headers": {
+          "Accept": "application/vnd.interoperability.thirdparty+json;version=1.0",
+          "Content-Type": "application/vnd.interoperability.thirdparty+json;version=1.0",
+          "Date": "Wed, 27 May 2020 11:13:34 GMT",
+          "FSPIOP-Source": "DFSPA"
+        },
+        "body": {
+          "initiatorId": "pispA",
+          "authChannels": [
+            "OTP"
+          ],
+          "scopes": [
+            {
+              "accountId": "dfspa.username.1234",
+              "actions": [
+                "accounts.transfer",
+                "accounts.getBalance"
+              ]
+            },
+            {
+              "accountId": "dfspa.username.5678",
+              "actions": [
+                "accounts.transfer",
+                "accounts.getBalance"
+              ]
+            }
+          ],
+          "callbackUri": "pisp-app://callback.com"
+        }
+      },
+      "delay": 0,
+      "type": "FIXED_CALLBACK"
+    },
+    "type": "callback",
+    "version": 1
   }
 ]

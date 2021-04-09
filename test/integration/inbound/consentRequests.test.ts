@@ -30,6 +30,9 @@ import Config from '~/shared/config'
 import axios from 'axios'
 import env from '../env'
 import mockLogger from 'test/unit/mockLogger'
+import TestData from 'test/unit/data/mockData.json'
+
+const mockData = JSON.parse(JSON.stringify(TestData))
 
 describe('PUT /consentRequests/{ID}/error', (): void => {
   const scenarioUri = `${env.inbound.baseUri}/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fba/error`
@@ -82,6 +85,16 @@ describe('PUT /consentRequests/{ID}/error', (): void => {
           }
         )
 
+        pubSub.subscribe('PISPConsentRequests_997c89f4-053c-4283-bfec-45a1a0a28fba',
+        async (channel: string, message: Message, _id: number) => {
+          expect(channel).toEqual('PISPConsentRequests_997c89f4-053c-4283-bfec-45a1a0a28fba')
+          expect(message).toEqual(payload)
+          await pubSub.disconnect()
+          expect(pubSub.isConnected).toBeFalsy()
+
+          resolve()
+        }
+      )
         // Act
         const response = await axios.put(scenarioUri, payload, axiosConfig)
 
@@ -114,6 +127,48 @@ describe('PATCH /consentRequests/{ID}', (): void => {
 
       // Assert
       expect(response.status).toEqual(202)
+    })
+  })
+})
+
+describe('PUT /consentRequests/{ID}', (): void => {
+  const scenarioUri = `${env.inbound.baseUri}/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fba`
+  describe('Inbound API', (): void => {
+    const config: RedisConnectionConfig = {
+      host: Config.REDIS.HOST,
+      port: Config.REDIS.PORT,
+      logger: mockLogger(),
+      timeout: Config.REDIS.TIMEOUT
+    }
+    const axiosConfig = {
+      headers: {
+        'Content-Type': 'application/json',
+        'FSPIOP-Source': 'switch',
+        Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
+        'FSPIOP-Destination': 'dfspA'
+      }
+    }
+
+    it('should propagate message via Redis PUB/SUB', async (): Promise<void> => {
+
+      return new Promise(async (resolve) => {
+        const pubSub = new PubSub(config)
+        await pubSub.connect()
+        expect(pubSub.isConnected).toBeTruthy()
+        pubSub.subscribe('PISPConsentRequests_997c89f4-053c-4283-bfec-45a1a0a28fba', async (channel: string, message: Message, _id: number) => {
+          expect(channel).toEqual('PISPConsentRequests_997c89f4-053c-4283-bfec-45a1a0a28fba')
+          expect(message).toEqual(mockData.consentRequestsPut.payload)
+          await pubSub.disconnect()
+          expect(pubSub.isConnected).toBeFalsy()
+
+          resolve()
+        })
+        // Act
+        const response = await axios.put(scenarioUri, mockData.consentRequestsPut.payload, axiosConfig)
+
+        // Assert
+        expect(response.status).toEqual(200)
+      })
     })
   })
 })

@@ -1,0 +1,27 @@
+description: |
+  response body of POST /consentRequests
+  derived from PostConsentRequest by Inbound Service via Pub/Sub channel
+content:
+  application/json:
+    schema: 
+      $ref: '../schemas/ConsentRequestsResponse.yaml'
+    examples:
+      success:
+        value:
+          authChannels: ['WEB']
+          scopes:
+            - accountId: dfspa.username.1234
+              actions:
+                - accounts.transfer
+                - accounts.getBalance
+            - accountId: dfspa.username.5678
+              actions:
+                - accounts.transfer
+                - accounts.getBalance
+          callbackUri: 'pisp-app://callback.com'
+          authUri: 'dfspa.com/authorize?consentRequestId=456'
+      error:
+        value:
+          errorInformation:
+            errorCode: '3200'
+            errorDescription: 'Generic ID not found'
