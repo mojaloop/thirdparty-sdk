@@ -86,15 +86,15 @@ describe('PUT /consentRequests/{ID}/error', (): void => {
         )
 
         pubSub.subscribe('PISPConsentRequests_997c89f4-053c-4283-bfec-45a1a0a28fba',
-        async (channel: string, message: Message, _id: number) => {
-          expect(channel).toEqual('PISPConsentRequests_997c89f4-053c-4283-bfec-45a1a0a28fba')
-          expect(message).toEqual(payload)
-          await pubSub.disconnect()
-          expect(pubSub.isConnected).toBeFalsy()
+          async (channel: string, message: Message, _id: number) => {
+            expect(channel).toEqual('PISPConsentRequests_997c89f4-053c-4283-bfec-45a1a0a28fba')
+            expect(message).toEqual(payload)
+            await pubSub.disconnect()
+            expect(pubSub.isConnected).toBeFalsy()
 
-          resolve()
-        }
-      )
+            resolve()
+          }
+        )
         // Act
         const response = await axios.put(scenarioUri, payload, axiosConfig)
 
@@ -132,7 +132,7 @@ describe('PATCH /consentRequests/{ID}', (): void => {
 })
 
 describe('PUT /consentRequests/{ID}', (): void => {
-  const scenarioUri = `${env.inbound.baseUri}/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fba`
+  const scenarioUri = `${env.inbound.baseUri}/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fbb`
   describe('Inbound API', (): void => {
     const config: RedisConnectionConfig = {
       host: Config.REDIS.HOST,
@@ -149,26 +149,26 @@ describe('PUT /consentRequests/{ID}', (): void => {
       }
     }
 
-    it('should propagate message via Redis PUB/SUB', async (): Promise<void> => {
-
-      return new Promise(async (resolve) => {
-        const pubSub = new PubSub(config)
-        await pubSub.connect()
-        expect(pubSub.isConnected).toBeTruthy()
-        pubSub.subscribe('PISPConsentRequests_997c89f4-053c-4283-bfec-45a1a0a28fba', async (channel: string, message: Message, _id: number) => {
-          expect(channel).toEqual('PISPConsentRequests_997c89f4-053c-4283-bfec-45a1a0a28fba')
+    it('should propagate message via Redis PUB/SUB', async (done): Promise<void> => {
+      const pubSub = new PubSub(config)
+      await pubSub.connect()
+      expect(pubSub.isConnected).toBeTruthy()
+      pubSub.subscribe(
+        'PISPConsentRequests_997c89f4-053c-4283-bfec-45a1a0a28fbb',
+        async (channel: string, message: Message, _id: number
+        ) => {
+          expect(channel).toEqual('PISPConsentRequests_997c89f4-053c-4283-bfec-45a1a0a28fbb')
           expect(message).toEqual(mockData.consentRequestsPut.payload)
           await pubSub.disconnect()
           expect(pubSub.isConnected).toBeFalsy()
 
-          resolve()
+          done()
         })
-        // Act
-        const response = await axios.put(scenarioUri, mockData.consentRequestsPut.payload, axiosConfig)
+      // Act
+      const response = await axios.put(scenarioUri, mockData.consentRequestsPut.payload, axiosConfig)
 
-        // Assert
-        expect(response.status).toEqual(200)
-      })
+      // Assert
+      expect(response.status).toEqual(200)
     })
   })
 })
