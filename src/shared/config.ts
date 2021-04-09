@@ -355,7 +355,7 @@ export const ConvictConfig = Convict<ServiceConfig>({
     SDK_OUTGOING_REQUEST_QUOTE_PATH: {
       doc: 'path to sdk outgoing quote sync interface',
       format: '*',
-      default: 'quote'
+      default: 'quotes'
     },
     SDK_REQUEST_TO_PAY_TRANSFER_URI: {
       doc: 'uri to sdk-scheme-adapter requestToPayTransfer endpoint',

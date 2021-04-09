@@ -20,6 +20,7 @@ services:
     extra_hosts:
       - "inbound-thirdparty-scheme-adapter:172.17.0.1"
       - "outbound-thirdparty-scheme-adapter:172.17.0.1"
+      - "inbound-sdk-scheme-adapter:172.17.0.1"
       - "ml-testing-toolkit:172.17.0.1"
 
   ml-testing-toolkit-ui:

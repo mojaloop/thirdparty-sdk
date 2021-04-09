@@ -7,12 +7,12 @@
       {
         "method": "put",
         "path": "/parties/{Type}/{ID}",
-        "endpoint": "http://172.17.0.1:7000"
+        "endpoint": "http://inbound-sdk-scheme-adapter:7000"
       },
       {
         "method": "put",
         "path": "/quotes/{ID}",
-        "endpoint": "http://localhost:3002"
+        "endpoint": "http://inbound-sdk-scheme-adapter:7000"
       },
       {
         "method": "put",

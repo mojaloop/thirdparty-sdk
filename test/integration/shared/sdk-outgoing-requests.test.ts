@@ -63,7 +63,7 @@ describe('SDKOutgoingRequests', () => {
   describe('requestQuote', () => {
     it('should return quotes information', async () => {
       const request: OutboundAPI.Schemas.quotesPostRequest = {
-        fspId: uuid(),
+        fspId: uuid().substr(0, 32), // fspid has limited length
         quotesPostRequest: {
           quoteId: uuid(),
           transactionId: uuid(),
@@ -75,8 +75,9 @@ describe('SDKOutgoingRequests', () => {
           },
           payer: {
             partyIdInfo: {
-              partyIdType: 'THIRD_PARTY_LINK',
-              partyIdentifier: 'qwerty-0987'
+              // TODO: investigate quotes interface and 'THIRD_PARTY_LINK'
+              partyIdType: 'MSISDN',
+              partyIdentifier: '+44 5678 1234'
             }
           },
           amountType: 'SEND',
