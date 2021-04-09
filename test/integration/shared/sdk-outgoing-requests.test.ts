@@ -29,22 +29,23 @@ import { SDKOutgoingRequestsConfig, SDKOutgoingRequests } from '~/shared/sdk-out
 import config from '~/shared/config'
 import { Scheme } from '~/shared/http-scheme'
 import mockLogger from 'test/unit/mockLogger'
+import { OutboundAPI } from '@mojaloop/sdk-scheme-adapter'
+import { uuid } from 'uuidv4'
 
 describe('SDKOutgoingRequests', () => {
+  const sdkConfig: SDKOutgoingRequestsConfig = {
+    logger: mockLogger(),
+    scheme: Scheme.http,
+    uri: config.SHARED.SDK_OUTGOING_URI,
+    // requestAuthorizationPath: string
+    requestPartiesInformationPath: config.SHARED.SDK_OUTGOING_PARTIES_INFORMATION_PATH,
+    requestToPayTransferPath: config.SHARED.SDK_REQUEST_TO_PAY_TRANSFER_URI,
+    requestQuotePath: config.SHARED.SDK_OUTGOING_REQUEST_QUOTE_PATH
+  }
+  const sdkOutRequest = new SDKOutgoingRequests(sdkConfig)
+
   describe('requestPartiesInformation', () => {
-    const sdkConfig: SDKOutgoingRequestsConfig = {
-      logger: mockLogger(),
-      scheme: Scheme.http,
-      uri: config.SHARED.SDK_OUTGOING_URI,
-      // requestAuthorizationPath: string
-      requestPartiesInformationPath: config.SHARED.SDK_OUTGOING_PARTIES_INFORMATION_PATH,
-      requestToPayTransferPath: config.SHARED.SDK_REQUEST_TO_PAY_TRANSFER_URI,
-      requestQuotePath: config.SHARED.SDK_OUTGOING_REQUEST_QUOTE_PATH
-    }
-
     it('should return parties information', async () => {
-      const sdkOutRequest = new SDKOutgoingRequests(sdkConfig)
-
       // Act
       const result = await sdkOutRequest.requestPartiesInformation('MSISDN', '4412345678')
 
@@ -54,6 +55,51 @@ describe('SDKOutgoingRequests', () => {
       // result could be void, so Typescript enforce code branching
       if (result) {
         expect(result.party).toBeDefined()
+        expect(result.currentState).toEqual('COMPLETED')
+      }
+    })
+  })
+
+  describe('requestQuote', () => {
+    it('should return quotes information', async () => {
+      const request: OutboundAPI.Schemas.quotesPostRequest = {
+        fspId: uuid(),
+        quotesPostRequest: {
+          quoteId: uuid(),
+          transactionId: uuid(),
+          payee: {
+            partyIdInfo: {
+              partyIdType: 'MSISDN',
+              partyIdentifier: '+44 1234 5678'
+            }
+          },
+          payer: {
+            partyIdInfo: {
+              partyIdType: 'THIRD_PARTY_LINK',
+              partyIdentifier: 'qwerty-0987'
+            }
+          },
+          amountType: 'SEND',
+          amount: {
+            currency: 'USD',
+            amount: '100'
+          },
+          transactionType: {
+            scenario: 'TRANSFER',
+            initiator: 'PAYER',
+            initiatorType: 'CONSUMER'
+          }
+        }
+      }
+
+      // Act
+      const result = await sdkOutRequest.requestQuote(request)
+
+      // Assert
+      expect(result).toBeDefined()
+      // result could be void, so Typescript enforce code branching
+      if (result) {
+        expect(result.quotes).toBeDefined()
         expect(result.currentState).toEqual('COMPLETED')
       }
     })
