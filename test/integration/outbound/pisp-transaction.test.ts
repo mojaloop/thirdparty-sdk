@@ -5,7 +5,7 @@ import { RedisConnectionConfig } from '~/shared/redis-connection'
 import Config from '~/shared/config'
 import mockLogger from '../../unit/mockLogger'
 
-describe('PISP Transaction', (): void => {
+describe.skip('PISP Transaction', (): void => {
   const config: RedisConnectionConfig = {
     host: Config.REDIS.HOST,
     port: Config.REDIS.PORT,
@@ -13,7 +13,7 @@ describe('PISP Transaction', (): void => {
     timeout: Config.REDIS.TIMEOUT
   }
   let kvs: KVS
-  const transactionRequestId = 'e46e1b45-ac4d-4117-b952-10cd376cda75'
+  const transactionRequestId = 'b51ec534-ee48-4575-b6a9-ead2955b8069'
   const lookupURI = `${env.outbound.baseUri}/thirdpartyTransaction/partyLookup`
 
   beforeAll(async (): Promise<void> => {
