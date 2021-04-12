@@ -34,7 +34,7 @@ import {
   thirdparty as tpAPI
 } from '@mojaloop/api-snippets'
 import inspect from '~/shared/inspect'
-import { HTTPResponseError } from '~/shared/http-response-error'
+import { reformatError } from '~/shared/util'
 import {
   DFSPConsentRequestsData,
   DFSPConsentRequestsStateMachine,
@@ -104,29 +104,22 @@ export class DFSPConsentRequestsModel
           Errors.MojaloopApiErrorCodes.TP_NO_SUPPORTED_SCOPE_ACTIONS
         )
       }
-
       this.data.response = response
-      if (response.authChannels.includes('WEB')) {
-        const webConsentRequestResponse: tpAPI.Schemas.ConsentRequestsIDPutResponseWeb = {
-          scopes: request.scopes,
-          callbackUri: request.callbackUri,
-          authChannels: ['WEB'],
-          authUri: response.authUri!,
-          initiatorId: toParticipantId
-        }
-        await this.thirdpartyRequests.putConsentRequests(request.id, webConsentRequestResponse, toParticipantId)
-      } else {
-        const otpConsentRequestResponse: tpAPI.Schemas.ConsentRequestsIDPutResponseOTP = {
-          scopes: request.scopes,
-          callbackUri: request.callbackUri,
-          authChannels: ['OTP'],
-          initiatorId: toParticipantId
-        }
-        await this.thirdpartyRequests.putConsentRequests(request.id, otpConsentRequestResponse, toParticipantId)
-      }
+
+      type consentRequestResponseType = tpAPI.Schemas.ConsentRequestsIDPutResponseOTP &
+        tpAPI.Schemas.ConsentRequestsIDPutResponseWeb
+      const consentRequestResponse = {
+        scopes: request.scopes,
+        callbackUri: request.callbackUri,
+        authChannels: response.authChannels,
+        authUri: response.authUri,
+        initiatorId: toParticipantId
+      } as consentRequestResponseType
+      await this.thirdpartyRequests.putConsentRequests(request.id, consentRequestResponse, toParticipantId)
+
 
     } catch (error) {
-      const mojaloopError = this.reformatError(error)
+      const mojaloopError = await reformatError(error)
 
       this.logger.push({ error }).error('start -> RequestIsValid')
       this.logger.push({ mojaloopError }).info(`Sending error response to ${toParticipantId}`)
@@ -157,38 +150,6 @@ export class DFSPConsentRequestsModel
       // throw error to stop state machine
       throw error
     }
-  }
-
-  reformatError (err: Error): Errors.MojaloopApiErrorObject {
-    if (err instanceof Errors.MojaloopFSPIOPError) {
-      return err.toApiErrorObject()
-    }
-
-    let mojaloopErrorCode = Errors.MojaloopApiErrorCodes.INTERNAL_SERVER_ERROR
-
-    if (err instanceof HTTPResponseError) {
-      const e = err.getData()
-      if (e.res && (e.res.body || e.res.data)) {
-        if (e.res.body) {
-          try {
-            const bodyObj = JSON.parse(e.res.body)
-            mojaloopErrorCode = Errors.MojaloopApiErrorCodeFromCode(`${bodyObj.statusCode}`)
-          } catch (ex) {
-            // do nothing
-            this.logger.push({ ex }).error('Error parsing error message body as JSON')
-          }
-        } else if (e.res.data) {
-          mojaloopErrorCode = Errors.MojaloopApiErrorCodeFromCode(`${e.res.data.statusCode}`)
-        }
-      }
-    }
-
-    return new Errors.MojaloopFSPIOPError(
-      err,
-      null as unknown as string,
-      null as unknown as string,
-      mojaloopErrorCode
-    ).toApiErrorObject()
   }
 
   /**
