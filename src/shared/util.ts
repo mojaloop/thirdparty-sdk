@@ -64,7 +64,6 @@ async function reformatError (err: Error): Promise<Errors.MojaloopApiErrorObject
   ).toApiErrorObject()
 }
 
-
 export {
   reformatError
 }
