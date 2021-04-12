@@ -83,11 +83,7 @@ describe('shared/reformatError', (): void => {
       }
     }
 
-    const result = await reformatError(new Errors.MojaloopFSPIOPError(
-      null as unknown as string,
-      null as unknown as string,
-      null as unknown as string,
-      Errors.MojaloopApiErrorCodes.TP_NO_SUPPORTED_SCOPE_ACTIONS
+    const result = await reformatError(new Errors.MojaloopFSPIOPError('', '', '', Errors.MojaloopApiErrorCodes.TP_NO_SUPPORTED_SCOPE_ACTIONS
     ))
     expect(result).toEqual(expected)
   })

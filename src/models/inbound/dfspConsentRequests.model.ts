@@ -88,22 +88,13 @@ export class DFSPConsentRequestsModel
       const response = await this.dfspBackendRequests.validateConsentRequests(request)
 
       if (!response) {
-        throw new Errors.MojaloopFSPIOPError(
-          null as unknown as string,
-          null as unknown as string,
-          null as unknown as string,
-          Errors.MojaloopApiErrorCodes.TP_FSP_CONSENT_SCOPES_ERROR
-        )
+        throw new Errors.MojaloopFSPIOPError('', '', '', Errors.MojaloopApiErrorCodes.TP_FSP_CONSENT_SCOPES_ERROR)
       }
 
       if (!response.isValid) {
-        throw new Errors.MojaloopFSPIOPError(
-          null as unknown as string,
-          null as unknown as string,
-          null as unknown as string,
-          Errors.MojaloopApiErrorCodes.TP_NO_SUPPORTED_SCOPE_ACTIONS
-        )
+        throw new Errors.MojaloopFSPIOPError('', '', '', Errors.MojaloopApiErrorCodes.TP_NO_SUPPORTED_SCOPE_ACTIONS)
       }
+
       this.data.response = response
 
       type consentRequestResponseType = tpAPI.Schemas.ConsentRequestsIDPutResponseOTP &
@@ -139,10 +130,20 @@ export class DFSPConsentRequestsModel
     const { request, response } = this.data
 
     try {
-      if (response?.authChannels.includes('WEB')) {
-        await this.dfspBackendRequests.storeConsentRequests(request)
-      } else {
-        await this.dfspBackendRequests.sendOTP(request)
+      const channel = [...response!.authChannels].pop()
+      switch (channel) {
+        case 'WEB': {
+          await this.dfspBackendRequests.storeConsentRequests(request)
+          break
+        }
+        case 'OTP': {
+          await this.dfspBackendRequests.sendOTP(request)
+          break
+        }
+        default: {
+          console.log(`Invalid authChannel ${channel}`)
+          break
+        }
       }
 
     } catch (error) {
