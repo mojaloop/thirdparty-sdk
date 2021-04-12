@@ -772,6 +772,7 @@ describe('Inbound API routes', (): void => {
   })
 
   describe('PUT /consentRequests/{ID}', () => {
+    jest.useFakeTimers()
     const request: Request = mockData.consentRequestsPut
     const errorRequest: Request = mockData.consentRequestsPutError
     it('PUT handler && pubSub invocation', async (): Promise<void> => {
@@ -797,6 +798,7 @@ describe('Inbound API routes', (): void => {
       )
 
       expect(result.statusCode).toEqual(200)
+      jest.runAllImmediates()
       expect(toolkit.getPubSub).toBeCalledTimes(1)
 
       const channel = PISPConsentRequestsModel.notificationChannel(request.params.ID)
@@ -841,6 +843,7 @@ describe('Inbound API routes', (): void => {
       )
 
       expect(result.statusCode).toEqual(200)
+      jest.runAllImmediates()
       expect(toolkit.getPubSub).toBeCalledTimes(1)
 
       const otpChannel = PISPOTPValidateModel.notificationChannel(errorRequest.params.ID)

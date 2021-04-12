@@ -39,18 +39,19 @@ async function put (_context: any, request: Request, h: StateResponseToolkit): P
   // when an OTP or secret failed to validate.
   // We publish the request on the PISPConsentRequestModel
   const payload = request.payload as fspiopAPI.Schemas.ErrorInformation
-
   const channel = PISPOTPValidateModel.notificationChannel(
     request.params.ID
   )
   const pubSub = h.getPubSub()
 
+  const consentReqChannel = PISPConsentRequestsModel.notificationChannel(
+    request.params.ID
+  )
   // don't await on promise to resolve, let finish publish in background
-  pubSub.publish(channel, payload as unknown as Message)
-
-  const consentReqChannel = PISPConsentRequestsModel.notificationChannel(request.params.ID)
-  pubSub.publish(consentReqChannel, payload as unknown as Message)
-
+  setImmediate(async () => {
+    pubSub.publish(channel, payload as unknown as Message)
+    pubSub.publish(consentReqChannel, payload as unknown as Message)
+  })
   return h.response({}).code(Enum.Http.ReturnCodes.OK.CODE)
 }
 

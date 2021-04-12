@@ -89,8 +89,11 @@ async function put (_context: unknown, request: Request, h: StateResponseToolkit
   const channel = PISPConsentRequestsModel.notificationChannel(consentRequesttId)
   const pubSub = h.getPubSub()
   // don't await on promise to resolve, let finish publish in background
-  pubSub.publish(channel, request.payload as unknown as Message)
-  h.getLogger().info(`Inbound received PUT /consentRequests/{ID} response and published to channel : ${channel}`)
+  setImmediate(async () => {
+    pubSub.publish(channel, request.payload as unknown as Message)
+    h.getLogger().info(`Inbound received PUT /consentRequests/{ID} response and published to channel : ${channel}`)
+  })
+
   return h.response().code(200)
 }
 
