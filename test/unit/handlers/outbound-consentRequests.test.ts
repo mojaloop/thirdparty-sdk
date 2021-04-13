@@ -74,7 +74,7 @@ describe('Outbound Consent request handler', () => {
       headers: {
         'Content-Type': 'application/json'
       },
-      payload: { ...mockData.consentRequestsPost.payload, toParticipantId: 'dfpsa' }
+      payload: { ...mockData.consentRequestsPost.payload, toParticipantId: 'dfspa' }
     }
 
     const result = await ConsentRequests.post(

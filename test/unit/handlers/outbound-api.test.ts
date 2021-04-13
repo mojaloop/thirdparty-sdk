@@ -644,7 +644,7 @@ describe('Outbound API routes', (): void => {
         'Content-Type': 'application/json'
       },
       url: '/consentRequests',
-      payload: { ...mockData.consentRequestsPost.payload, toParticipantId: 'dfpsa' }
+      payload: { ...mockData.consentRequestsPost.payload, toParticipantId: 'dfspa' }
     }
 
     const pubSub = new PubSub({} as RedisConnectionConfig)
@@ -668,7 +668,7 @@ describe('Outbound API routes', (): void => {
     const request = {
       method: 'POST',
       url: '/consentRequests',
-      payload: { ...mockData.consentRequestsPost.payload, toParticipantId: 'dfpsa' }
+      payload: { ...mockData.consentRequestsPost.payload, toParticipantId: 'dfspa' }
     }
 
     const pubSub = new PubSub({} as RedisConnectionConfig)

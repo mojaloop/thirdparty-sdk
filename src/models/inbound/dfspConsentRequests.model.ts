@@ -141,7 +141,7 @@ export class DFSPConsentRequestsModel
           break
         }
         default: {
-          console.log(`Invalid authChannel ${channel}`)
+          console.error(`Invalid authChannel ${channel}`)
           break
         }
       }

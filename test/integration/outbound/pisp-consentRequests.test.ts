@@ -58,7 +58,7 @@ describe('PISP requests DFSP to validate user consentRequests for linking', (): 
     const consentRequest = {
       ...mockData.consentRequestsPost.payload,
       id: 'b51ec534-ee48-4575-b6a9-ead2955b8069',
-      toParticipantId: 'dfpsa'
+      toParticipantId: 'dfspa'
     }
     const expectedResponse = {
       consentRequests: { ...mockData.consentRequestsPut.payload, initiatorId: 'pispA' },
@@ -74,7 +74,7 @@ describe('PISP requests DFSP to validate user consentRequests for linking', (): 
     const consentRequest = {
       ...mockData.consentRequestsPost.payload,
       id: 'c51ec534-ee48-4575-b6a9-ead2955b8069',
-      toParticipantId: 'dfpsa'
+      toParticipantId: 'dfspa'
     }
     const expectedResponse = {
       consentRequests: { ...mockData.consentRequestsPutOTP.payload, initiatorId: 'pispA' },
@@ -90,7 +90,7 @@ describe('PISP requests DFSP to validate user consentRequests for linking', (): 
     const consentRequest = {
       ...mockData.consentRequestsPost.payload,
       id: 'd51ec534-ee48-4575-b6a9-ead2955b8069',
-      toParticipantId: 'dfpsa'
+      toParticipantId: 'dfspa'
     }
     const expectedResponse = {
       ...mockData.consentRequestsPutError.payload,
