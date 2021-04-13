@@ -5,38 +5,42 @@ title PISP Pre-linking
 participant "PISP Backend" as PISP
 box "PISP tp-scheme-adapter"
   participant "outbound-server" as PISP_TP_OUT
-  participant "PISPPrelinkingModel" as PISP_PLM
+  participant "PISPLinkingModel" as PISP_LM
   participant "inbound-server" as PISP_TP_IN
 end box
 box "Mojaloop"
     participant Switch
 end box
+box "DFSP tp-scheme-adapter"
+  participant "inbound-server" as DFSP_TP_IN
+  participant "DFSPLinkingModel" as DFSP_LM
+end box
+participant DFSPAuthorizeSimulator
 
 == Pre-Linking ==
-autonumber 1 "<b>LOOK-#</b>"
-rnote right of PISP #LightBlue
-GET /services/THIRD_PARTY_DFSP
-NOTE: Should we just make this request the same as ML's API?
-end note
+autonumber 1 "<b>PRELINKING-#</b>"
 
-PISP -> PISP_TP_OUT: GET /services/THIRD_PARTY_DFSP
+PISP -> PISP_TP_OUT: GET /linking/get-dfsps
 
 activate PISP
 activate PISP_TP_OUT
 
+rnote right of PISP_TP_OUT: We will need a uuid from the start of the model to link all steps
+PISP_TP_OUT -> PISP_TP_OUT: const uuid = uuidv4() ex: 6789
 PISP_TP_OUT -> PISP_TP_OUT: const model = await create()
-PISP_TP_OUT -> PISP_PLM: model.getThirdpartyEnabledDFSPs()
+rnote right of PISP_TP_OUT: state: start
+PISP_TP_OUT -> PISP_LM: model.getThirdpartyEnabledDFSPs()
 
-activate PISP_PLM
+activate PISP_LM
 
-rnote right of PISP_PLM: state: requestTPEnabledDFSPs
-PISP_PLM -> PISP_PLM: Check cache.\nDFSPs not stored in cache or cache is stale.
-PISP_PLM -> PISP_PLM: ThirdpartyRequests.getServicesById()
-PISP_PLM -> Switch: GET /services/THIRD_PARTY_DFSP
+rnote right of PISP_LM: state: requestEnabledDFSPLookup
+PISP_LM -> PISP_LM: Check cache.\nDFSPs not stored in cache or cache is stale.
+PISP_LM -> PISP_LM: ThirdpartyRequests.getServicesById()
+PISP_LM -> Switch: GET /services/THIRD_PARTY_DFSP
 
 activate Switch
-Switch --> PISP_PLM: 202 Accepted
-deactivate PISP_PLM
+Switch --> PISP_LM: 202 Accepted
+deactivate PISP_LM
 
 note over PISP, Switch
   HAPPY_SCENARIO: Switch returns a non-empty list
@@ -57,16 +61,17 @@ PISP_TP_IN --> Switch: 200 OK
 
 deactivate Switch
 
-PISP_TP_IN -> PISP_PLM: Services request recieved
+PISP_TP_IN -> PISP_LM: Services request recieved
 
 deactivate PISP_TP_IN
-activate PISP_PLM
+activate PISP_LM
 
-PISP_PLM -> PISP_PLM: Store DFSPs in cache
-rnote right of PISP_PLM: state: TPEnabledDFSPsResolved
-PISP_PLM -> PISP_TP_OUT: return TPEnabledDFSPs
+PISP_LM -> PISP_LM: Store DFSPs in cache
+PISP_LM -> PISP_LM: Store DFSPs in model data
+rnote right of PISP_LM: state: enabledDFSPLookupSuccess
+PISP_LM -> PISP_TP_OUT: return TPEnabledDFSPs
 
-deactivate PISP_PLM
+deactivate PISP_LM
 
 PISP_TP_OUT --> PISP: 200 OK TPEnabledDFSPs
 
@@ -91,13 +96,13 @@ PISP_TP_IN --> Switch: 200 OK
 
 deactivate Switch
 
-PISP_TP_IN -> PISP_PLM: ErrorInformationObject recieved
+PISP_TP_IN -> PISP_LM: ErrorInformationObject recieved
 
 deactivate PISP_TP_IN
-activate PISP_PLM
+activate PISP_LM
 
-PISP_PLM -> PISP_PLM: throw same error
-rnote right of PISP_PLM #LightCoral
+PISP_LM -> PISP_LM: throw same error
+rnote right of PISP_LM #LightCoral
 {
   errorInformation: {
     errorCode: '7201',
@@ -105,10 +110,10 @@ rnote right of PISP_PLM #LightCoral
   }
 }
 end note
-rnote right of PISP_PLM: state: errored
-PISP_PLM -> PISP_TP_OUT: catch MojaloopFSPIOPError
+rnote right of PISP_LM: state: errored
+PISP_LM -> PISP_TP_OUT: catch MojaloopFSPIOPError
 
-deactivate PISP_PLM
+deactivate PISP_LM
 
 PISP_TP_OUT --> PISP: 500 Internal Server Error ErrorInformationObject
 
@@ -133,13 +138,13 @@ PISP_TP_IN --> Switch: 200 OK
 
 deactivate Switch
 
-PISP_TP_IN -> PISP_PLM: Services request recieved
+PISP_TP_IN -> PISP_LM: Services request recieved
 
 deactivate PISP_TP_IN
-activate PISP_PLM
+activate PISP_LM
 
-PISP_PLM -> PISP_PLM: throw account linking generic error
-rnote right of PISP_PLM #LightCoral
+PISP_LM -> PISP_LM: throw account linking generic error
+rnote right of PISP_LM #LightCoral
 {
   errorInformation: {
     errorCode: '7200',
@@ -147,10 +152,10 @@ rnote right of PISP_PLM #LightCoral
   }
 }
 end note
-rnote right of PISP_PLM: state: errored
-PISP_PLM -> PISP_TP_OUT: catch MojaloopFSPIOPError
+rnote right of PISP_LM: state: errored
+PISP_LM -> PISP_TP_OUT: catch MojaloopFSPIOPError
 
-deactivate PISP_PLM
+deactivate PISP_LM
 
 PISP_TP_OUT --> PISP: 500 Internal Server Error ErrorInformationObject
 
@@ -158,29 +163,27 @@ deactivate PISP_TP_OUT
 deactivate PISP
 
 == Pre-Linking - Cached ==
-autonumber 1 "<b>LOOK-#</b>"
-rnote right of PISP #LightBlue
-GET /services/THIRD_PARTY_DFSP
-NOTE: Should we just make this request the same as ML's API?
-end note
+autonumber 1 "<b>PRELINKING-#</b>"
 
-PISP -> PISP_TP_OUT: GET /services/THIRD_PARTY_DFSP
+PISP -> PISP_TP_OUT: GET /linking/get-dfsps
 
 activate PISP
 activate PISP_TP_OUT
 
+rnote right of PISP_TP_OUT: We will need a uuid from the start of the model to link all steps
+PISP_TP_OUT -> PISP_TP_OUT: const uuid = uuidv4()
 PISP_TP_OUT -> PISP_TP_OUT: const model = await create()
-PISP_TP_OUT -> PISP_PLM: model.getThirdpartyEnabledDFSPs()
+PISP_TP_OUT -> PISP_LM: model.getThirdpartyEnabledDFSPs()
 
-activate PISP_PLM
+activate PISP_LM
 
-rnote right of PISP_PLM: state: requestTPEnabledDFSPs
-PISP_PLM -> PISP_PLM: Check cache.\nDFSPs is stored in cache.
-PISP_PLM -> PISP_PLM: Retrieve from cache
-rnote right of PISP_PLM: state: TPEnabledDFSPsResolved
-PISP_PLM -> PISP_TP_OUT: return TPEnabledDFSPs
+rnote right of PISP_LM: state: requestTPEnabledDFSPs
+PISP_LM -> PISP_LM: Check cache.\nDFSPs is stored in cache.
+PISP_LM -> PISP_LM: Retrieve from cache
+rnote right of PISP_LM: state: enabledDFSPLookupSuccess
+PISP_LM -> PISP_TP_OUT: return TPEnabledDFSPs
 
-deactivate PISP_PLM
+deactivate PISP_LM
 
 PISP_TP_OUT --> PISP: 200 OK TPEnabledDFSPs
 
@@ -189,4 +192,342 @@ deactivate PISP
 
 ...PISP presents DFSPs to User. User selects their DFSP. This is a natural break point in the account linking flow due to needing end-user input...
 
+== Discovery ==
+autonumber 1 "<b>DISCOVERY-#</b>"
+PISP -> PISP_TP_OUT: GET /linking/accounts/dfspa/username1234
+
+activate PISP
+activate PISP_TP_OUT
+
+PISP_TP_OUT -> PISP_TP_OUT: const model = await loadFromKVS()
+PISP_TP_OUT -> PISP_LM: model.getAccounts()
+
+activate PISP_LM
+
+rnote right of PISP_LM: state: requestAccounts
+PISP_LM -> PISP_LM: ThirdpartyRequests.getAccounts()
+PISP_LM -> Switch: GET /accounts/username1234
+rnote right of PISP_LM #LightBlue
+GET /accounts/username1234
+FSIOP-Source: pispa
+FSIOP-Destination: dfspa
+end note
+
+activate Switch
+Switch --> PISP_LM: 202 Accepted
+deactivate PISP_LM
+
+Switch -> DFSP_TP_IN: GET /accounts/username1234
+activate DFSP_TP_IN
+DFSP_TP_IN --> Switch: 202 Accepted
+deactivate Switch
+
+rnote right of DFSP_TP_IN #LightBlue
+NOTE: What identifier do we use that this state machine can be
+      pulled from cache so that we can have one giant state machine?
+      Do we pass the DFSP the uuid made in PRELINKING-2 so it can use that
+      as a key?
+end note
+DFSP_TP_IN -> DFSP_TP_IN: const model = await create()
+DFSP_TP_IN -> DFSP_LM: model.retrieveAccounts()
+deactivate DFSP_TP_IN
+
+note over PISP, DFSP_LM
+  HAPPY_SCENARIO: DFSP returns list of accounts.
+end note
+
+activate DFSP_LM
+DFSP_LM -> DFSP_LM: DFSPBackendRequests.getUserAccounts('username1234')
+DFSP_LM -> DFSP_LM: Accounts returned.
+rnote right of DFSP_LM: state: accountsRetrieved
+
+rnote left of DFSP_LM #LightBlue
+NOTE: This deviates from the original design document.
+      Which has the response as a top-level array which
+      is a security and expandability risk.
+      Fixing that here.
+PUT /accounts/username1234
+FSIOP-Source: dfspa
+FSIOP-Destination: pispa
+{
+  "accounts": [
+    { accountNickname: "XXXXXXnt", id: "dfspa.username.1234", currency: "ZAR" },
+    { accountNickname: "SpeXXXXXXXXnt", id: "dfspa.username.5678", currency: "USD" }
+  ]
+}
+end note
+
+DFSP_LM -> Switch: PUT /accounts/username1234
+activate Switch
+Switch --> DFSP_LM: 200 OK
+deactivate DFSP_LM
+
+Switch --> PISP_TP_IN: PUT /accounts/username1234
+activate PISP_TP_IN
+PISP_TP_IN --> Switch: 200 OK
+deactivate Switch
+
+PISP_TP_IN -> PISP_LM: Accounts response recieved
+rnote right of PISP_LM: state: accountLookupSuccess
+deactivate PISP_TP_IN
+activate PISP_LM
+PISP_LM -> PISP_TP_OUT: return Accounts
+deactivate PISP_LM
+PISP_TP_OUT --> PISP: 200 OK Accounts
+
+note over PISP, DFSP_LM
+  ERROR_SCENARIO: Switch receives 7202 No accounts found for generic ID error.
+end note
+
+activate DFSP_LM
+DFSP_LM -> DFSP_LM: DFSPBackendRequests.getUserAccounts('username1234')
+DFSP_LM -> DFSP_LM: No accounts returned.
+DFSP_LM -> DFSP_LM: throw MojaloopFSPIOPError
+
+rnote right of DFSP_LM: state: errored
+rnote left of DFSP_LM #LightCoral
+PUT /accounts/username1234/error
+FSIOP-Source: dfspa
+FSIOP-Destination: pispa
+{
+  errorInformation: {
+    errorCode: '7202',
+    errorDescription: 'No accounts found for generic ID'
+  }
+}
+end note
+
+DFSP_LM -> Switch: PUT /accounts/username1234/error
+activate Switch
+Switch --> DFSP_LM: 200 OK
+deactivate DFSP_LM
+
+Switch --> PISP_TP_IN: PUT /accounts/username1234/error
+activate PISP_TP_IN
+PISP_TP_IN --> Switch: 200 OK
+deactivate Switch
+
+PISP_TP_IN -> PISP_LM: MojaloopFSPIOPError response recieved
+deactivate PISP_TP_IN
+activate PISP_LM
+PISP_LM -> PISP_TP_OUT: return MojaloopFSPIOPError
+rnote right of PISP_LM: state: errored
+deactivate PISP_LM
+PISP_TP_OUT --> PISP: 500 Internal Server Error ErrorInformationObject
+deactivate PISP_TP_OUT
+deactivate PISP
+
+== Request Consent - Web ==
+autonumber 1 "<b>REQUEST-CONSENT-#</b>"
+PISP -> PISP_TP_OUT: POST /linking/request-consent
+rnote right of PISP #LightBlue
+POST /linking/request-consent
+{
+  scopes: [{
+    accountId: 'dfspa.username.1234',
+    actions: [
+      'accounts.getBalance',
+      'accounts.transfer'
+    ],
+    accountId: 'dfspa.username.5678',
+    actions: [
+      'accounts.getBalance',
+      'accounts.transfer'
+    ]
+  }],
+  callbackURI: 'pisp-app://callback'
+}
+end note
+
+
+activate PISP
+activate PISP_TP_OUT
+
+PISP_TP_OUT -> PISP_TP_OUT: const model = await loadFromKVS()
+PISP_TP_OUT -> PISP_LM: model.requestConsent()
+
+activate PISP_LM
+
+rnote right of PISP_LM: state: requestConsent
+PISP_LM -> PISP_LM: ThirdpartyRequests.postConsentRequests()
+PISP_LM -> Switch: POST /consentRequests
+rnote right of PISP_LM #LightBlue
+POST /consentRequests
+FSIOP-Source: pispa
+FSIOP-Destination: dfspa
+{
+  // consentRequestId will be the uuid created
+  // at the PRELINKING-2
+  consentRequestId: 6789
+  scopes: [{
+    accountId: 'dfspa.username.1234',
+    actions: ['accounts.getBalance', 'accounts.transfer'],
+    accountId: 'dfspa.username.5678',
+    actions: ['accounts.getBalance', 'accounts.transfer'],
+  }],
+  // model will add `authChannels`
+  authChannels: ["WEB", "OTP"],
+  callbackURI: 'pisp-app://callback...'
+}
+end note
+
+activate Switch
+Switch --> PISP_LM: 202 Accepted
+deactivate PISP_LM
+
+Switch -> DFSP_TP_IN: POST /consentRequests
+activate DFSP_TP_IN
+DFSP_TP_IN --> Switch: 202 Accepted
+deactivate Switch
+
+DFSP_TP_IN -> DFSP_TP_IN: const model = await loadFromKVS()
+activate DFSP_LM
+DFSP_TP_IN -> DFSP_LM: model.requestConsent()
+
+activate DFSPAuthorizeSimulator
+DFSP_LM -> DFSPAuthorizeSimulator: ""POST /store/consentRequests/6789""
+DFSPAuthorizeSimulator -> DFSPAuthorizeSimulator: store consentRequest details
+DFSPAuthorizeSimulator -> DFSP_LM: 201 Created
+deactivate DFSPAuthorizeSimulator
+
+DFSP_TP_IN --> Switch: 202 Accepted
+deactivate DFSP_TP_IN
+
+
+activate Switch
+DFSP_LM -> Switch: PUT /consentRequests/6789
+
+rnote left of DFSP_LM #LightBlue
+PUT /consentRequests/6789
+FSIOP-Source: pispa
+FSIOP-Destination: dfspa
+{
+  consentRequestId: 6789
+  scopes: [{
+    accountId: 'dfspa.username.1234',
+    actions: ['accounts.getBalance', 'accounts.transfer'],
+    accountId: 'dfspa.username.5678',
+    actions: ['accounts.getBalance', 'accounts.transfer'],
+  }],
+  authChannels: ["WEB"],
+  callbackURI: 'pisp-app://callback...',
+  authURI: 'dfspa.com/authorize?consentRequestId=6789' // this is new
+}
+end note
+Switch --> DFSP_LM: 202 ACCEPTED
+
+activate PISP_TP_IN
+Switch ->  PISP_TP_IN: PUT /consentRequests/6789
+deactivate Switch
+PISP_TP_IN --> Switch: 200 OK
+PISP_TP_IN --> PISP_LM: Consent Request response recieved
+rnote right of PISP_LM: state: webAuthenticationChannelResponseRecieved
+deactivate PISP_TP_IN
+
+== Request Consent - OTP ==
+autonumber 1 "<b>REQUEST-CONSENT-#</b>"
+PISP -> PISP_TP_OUT: POST /linking/request-consent
+rnote right of PISP #LightBlue
+POST /linking/request-consent
+{
+  scopes: [{
+    accountId: 'dfspa.username.1234',
+    actions: [
+      'accounts.getBalance',
+      'accounts.transfer'
+    ],
+    accountId: 'dfspa.username.5678',
+    actions: [
+      'accounts.getBalance',
+      'accounts.transfer'
+    ]
+  }],
+  callbackURI: 'pisp-app://callback'
+}
+end note
+
+
+activate PISP
+activate PISP_TP_OUT
+
+PISP_TP_OUT -> PISP_TP_OUT: const model = await loadFromKVS()
+PISP_TP_OUT -> PISP_LM: model.requestConsent()
+
+activate PISP_LM
+
+rnote right of PISP_LM: state: requestConsent
+PISP_LM -> PISP_LM: ThirdpartyRequests.postConsentRequests()
+PISP_LM -> Switch: POST /consentRequests
+rnote right of PISP_LM #LightBlue
+POST /consentRequests
+FSIOP-Source: pispa
+FSIOP-Destination: dfspa
+{
+  // consentRequestId will be the uuid created
+  // at the PRELINKING-2
+  consentRequestId: 6789
+  scopes: [{
+    accountId: 'dfspa.username.1234',
+    actions: ['accounts.getBalance', 'accounts.transfer'],
+    accountId: 'dfspa.username.5678',
+    actions: ['accounts.getBalance', 'accounts.transfer'],
+  }],
+  // model will add `authChannels`
+  authChannels: ["OTP"],
+  callbackURI: 'pisp-app://callback...'
+}
+end note
+
+activate Switch
+Switch --> PISP_LM: 202 Accepted
+deactivate PISP_LM
+
+Switch -> DFSP_TP_IN: POST /consentRequests
+activate DFSP_TP_IN
+DFSP_TP_IN --> Switch: 202 Accepted
+deactivate Switch
+
+DFSP_TP_IN -> DFSP_TP_IN: const model = await loadFromKVS()
+activate DFSP_LM
+DFSP_TP_IN -> DFSP_LM: model.requestConsent()
+
+activate DFSPAuthorizeSimulator
+DFSP_LM -> DFSPAuthorizeSimulator: ""POST /store/consentRequests/6789""
+DFSPAuthorizeSimulator -> DFSPAuthorizeSimulator: store consentRequest details
+DFSPAuthorizeSimulator -> DFSP_LM: 201 Created
+deactivate DFSPAuthorizeSimulator
+
+DFSP_TP_IN --> Switch: 202 Accepted
+deactivate DFSP_TP_IN
+
+
+activate Switch
+DFSP_LM -> Switch: PUT /consentRequests/6789
+
+rnote left of DFSP_LM #LightBlue
+PUT /consentRequests/6789
+FSIOP-Source: pispa
+FSIOP-Destination: dfspa
+{
+  consentRequestId: 6789
+  scopes: [{
+    accountId: 'dfspa.username.1234',
+    actions: ['accounts.getBalance', 'accounts.transfer'],
+    accountId: 'dfspa.username.5678',
+    actions: ['accounts.getBalance', 'accounts.transfer'],
+  }],
+  authChannels: ["OTP"],
+  callbackURI: 'pisp-app://callback...',
+  authURI: 'dfspa.com/authorize?consentRequestId=6789' // this is new
+}
+end note
+Switch --> DFSP_LM: 202 ACCEPTED
+
+activate PISP_TP_IN
+Switch ->  PISP_TP_IN: PUT /consentRequests/6789
+deactivate Switch
+PISP_TP_IN --> Switch: 200 OK
+PISP_TP_IN --> PISP_LM: Consent Request response recieved
+rnote right of PISP_LM: state: OTPAuthenticationChannelResponseRecieved
+deactivate PISP_TP_IN
 @enduml
