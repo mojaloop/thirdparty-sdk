@@ -32,6 +32,7 @@ import { OutboundAuthorizationsModel } from '~/models/outbound/authorizations.mo
 import { OutboundThirdpartyAuthorizationsModel } from '~/models/outbound/thirdparty.authorizations.model'
 import { OutboundAccountsModel } from '~/models/outbound/accounts.model'
 import { PISPOTPValidateModel } from '~/models/outbound/pispOTPValidate.model'
+import { PISPConsentRequestsModel } from '~/models/outbound/pispConsentRequests.model'
 import {
   v1_1 as fspiopAPI,
   thirdparty as tpAPI
@@ -134,7 +135,8 @@ jest.mock('@mojaloop/sdk-standard-components', () => {
       postThirdpartyRequestsTransactionsAuthorizations: jest.fn(() => Promise.resolve(putThirdpartyAuthResponse)),
       postThirdpartyRequestsTransactions: jest.fn(() => Promise.resolve(initiateResponse)),
       getAccounts: jest.fn(() => Promise.resolve(mockData.accountsRequest.payload)),
-      patchConsentRequests: jest.fn(() => Promise.resolve(mockData.inboundConsentsPostRequest))
+      patchConsentRequests: jest.fn(() => Promise.resolve(mockData.inboundConsentsPostRequest)),
+      postConsentRequests: jest.fn(() => Promise.resolve(mockData.consentRequestsPut.payload))
     })),
     WSO2Auth: jest.fn(),
     Logger: {
@@ -163,7 +165,7 @@ jest.mock('@mojaloop/sdk-standard-components', () => {
 })
 
 jest.mock('~/shared/pub-sub', () => {
-  const handlers: {[key: string]: NotificationCallback } = {}
+  const handlers: { [key: string]: NotificationCallback } = {}
 
   let subId = 0
   return {
@@ -633,4 +635,59 @@ describe('Outbound API routes', (): void => {
     }
     expect(response.result).toEqual(expectedResp)
   })
+
+  it('/consentRequests - success', async (): Promise<void> => {
+    // const consentRequestId = '6988c34f-055b-4ed5-b223-b10c8a2e2329'
+    const request = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      url: '/consentRequests',
+      payload: { ...mockData.consentRequestsPost.payload, toParticipantId: 'dfspa' }
+    }
+
+    const pubSub = new PubSub({} as RedisConnectionConfig)
+    // defer publication to notification channel
+    setTimeout(() => pubSub.publish(
+      PISPConsentRequestsModel.notificationChannel(mockData.consentRequestsPost.payload.id),
+      mockData.consentRequestsPut.payload as unknown as Message
+    ), 10)
+
+    const response = await server.inject(request)
+
+    expect(response.statusCode).toBe(200)
+    const expectedResp = {
+      consentRequests: { ...mockData.consentRequestsPut.payload },
+      currentState: 'RequestIsValid'
+    }
+    expect(response.result).toEqual(expectedResp)
+  })
+
+  it('/consentRequests - error', async (): Promise<void> => {
+    const request = {
+      method: 'POST',
+      url: '/consentRequests',
+      payload: { ...mockData.consentRequestsPost.payload, toParticipantId: 'dfspa' }
+    }
+
+    const pubSub = new PubSub({} as RedisConnectionConfig)
+    // defer publication to notification channel
+    // if the validation fails the dfsp will respond with a
+    // PUT /consentRequests/{ID}/error where the inbound handler will publish the error
+    setTimeout(() => pubSub.publish(
+      PISPConsentRequestsModel.notificationChannel(
+        mockData.consentRequestsPost.payload.id
+      ),
+      mockData.consentRequestsPutError.payload as unknown as Message
+    ), 10)
+    const response = await server.inject(request)
+    expect(response.statusCode).toBe(500)
+    const expectedResp = {
+      ...mockData.consentRequestsPutError.payload,
+      currentState: 'errored'
+    }
+    expect(response.result).toEqual(expectedResp)
+  })
+
 })

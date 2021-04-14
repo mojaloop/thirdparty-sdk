@@ -51,7 +51,7 @@ export interface OutConfig {
   PORT: number
 }
 
-export interface InConfig extends OutConfig{
+export interface InConfig extends OutConfig {
   PISP_TRANSACTION_MODE: boolean
 }
 
@@ -103,7 +103,10 @@ export interface ServiceConfig {
     SDK_PARTIES_INFORMATION_URI: string
     SDK_NOTIFY_ABOUT_TRANSFER_URI: string
     DFSP_BACKEND_VALIDATE_OTP_PATH: string
+    DFSP_BACKEND_VALIDATE_CONS_REQ_PATH: string
     DFSP_BACKEND_GET_SCOPES_PATH: string
+    DFSP_BACKEND_SEND_OTP_REQ_PATH: string
+    DFSP_BACKEND_STORE_CONS_REQ_PATH: string
     JWS_SIGN: boolean
     JWS_SIGNING_KEY: PathLike | Buffer
     TLS: BaseRequestTLSConfig
@@ -300,6 +303,21 @@ export const ConvictConfig = Convict<ServiceConfig>({
       format: '*',
       default: 'accounts/{ID}'
     },
+    DFSP_BACKEND_VALIDATE_CONS_REQ_PATH: {
+      doc: 'path use by DFSPBackendRequests.validateConsentRequests',
+      format: '*',
+      default: 'validateConsentRequests'
+    },
+    DFSP_BACKEND_SEND_OTP_REQ_PATH: {
+      doc: 'path use by DFSPBackendRequests.sendOTP',
+      format: '*',
+      default: 'sendOTP'
+    },
+    DFSP_BACKEND_STORE_CONS_REQ_PATH: {
+      doc: 'path use by DFSPBackendRequests.storeConsentRequests',
+      format: '*',
+      default: 'store/consentRequests/{ID}'
+    },
     DFSP_BACKEND_VALIDATE_OTP_PATH: {
       doc: 'uri to sdk-scheme-adapter validateOTP endpoint',
       format: '*',
@@ -389,15 +407,15 @@ ConvictConfig.set('SHARED.JWS_SIGNING_KEY', getFileContent(ConvictConfig.get('SH
 // Note: Have not seen these be comma separated value strings. mimicking sdk-scheme-adapter for now
 ConvictConfig.set(
   'SHARED.TLS.creds.ca',
-  getFileListContent(<string> ConvictConfig.get('SHARED').TLS.creds.ca)
+  getFileListContent(<string>ConvictConfig.get('SHARED').TLS.creds.ca)
 )
 ConvictConfig.set(
   'SHARED.TLS.creds.cert',
-  getFileListContent(<string> ConvictConfig.get('SHARED').TLS.creds.cert)
+  getFileListContent(<string>ConvictConfig.get('SHARED').TLS.creds.cert)
 )
 ConvictConfig.set(
   'SHARED.TLS.creds.key',
-  getFileListContent(<string> ConvictConfig.get('SHARED').TLS.creds.key)
+  getFileListContent(<string>ConvictConfig.get('SHARED').TLS.creds.key)
 )
 
 // extract simplified config from Convict object

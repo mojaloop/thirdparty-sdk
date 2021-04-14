@@ -21,27 +21,44 @@
  * Gates Foundation
  - Name Surname <name.surname@gatesfoundation.com>
 
- - Paweł Marzec <pawel.marzec@modusbox.com>
  - Sridhar Voruganti <sridhar.voruganti@modusbox.com>
-
  --------------
  ******/
-import Authorizations from './authorizations'
-import ThirdpartyAuthorizations from './thirdpartyRequests/transactions/{ID}/authorizations'
-import ThirdpartyTransactionPartyLookup from './thirdpartyTransaction/partyLookup'
-import ThirdpartyTransactionIDInitiate from './thirdpartyTransaction/{ID}/initiate'
-import ThirdpartyTransactionIDApprove from './thirdpartyTransaction/{ID}/approve'
-import Accounts from './accounts/{fspId}/{userId}'
-import ConsentRequestsIDValidate from './consentRequests/{ID}/validate'
-import ConsentRequests from './consentRequests'
+import { Errors } from '@mojaloop/sdk-standard-components'
+import { HTTPResponseError } from '~/shared/http-response-error'
 
-export default {
-  OutboundAuthorizationsPost: Authorizations.post,
-  VerifyThirdPartyAuthorization: ThirdpartyAuthorizations.post,
-  ThirdpartyTransactionPartyLookup: ThirdpartyTransactionPartyLookup.post,
-  ThirdpartyTransactionIDInitiate: ThirdpartyTransactionIDInitiate.post,
-  ThirdpartyTransactionIDApprove: ThirdpartyTransactionIDApprove.post,
-  GetAccountsByUserId: Accounts.get,
-  OutboundConsentRequestsValidatePatch: ConsentRequestsIDValidate.patch,
-  OutboundConsentRequestsPost: ConsentRequests.post
+/**
+ * @function reformatError
+ * @description Helper function for formatting error details
+ * @param {Error} error object
+ * @returns {Promise<MojaloopApiErrorObject>}
+ */
+async function reformatError (err: Error): Promise<Errors.MojaloopApiErrorObject> {
+  if (err instanceof Errors.MojaloopFSPIOPError) {
+    return err.toApiErrorObject()
+  }
+
+  let mojaloopErrorCode = Errors.MojaloopApiErrorCodes.INTERNAL_SERVER_ERROR
+
+  if (err instanceof HTTPResponseError) {
+    const e = err.getData()
+    if (e.res && (e.res.body || e.res.data)) {
+      if (e.res.body) {
+        try {
+          const bodyObj = JSON.parse(e.res.body)
+          mojaloopErrorCode = Errors.MojaloopApiErrorCodeFromCode(`${bodyObj.statusCode}`)
+        } catch (ex) {
+          // do nothing
+        }
+      } else if (e.res.data) {
+        mojaloopErrorCode = Errors.MojaloopApiErrorCodeFromCode(`${e.res.data.statusCode}`)
+      }
+    }
+  }
+
+  return new Errors.MojaloopFSPIOPError(err, '', '', mojaloopErrorCode).toApiErrorObject()
+}
+
+export {
+  reformatError
 }

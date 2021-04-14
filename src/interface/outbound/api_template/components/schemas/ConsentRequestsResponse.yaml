@@ -1,0 +1,3 @@
+oneOf:
+  - $ref: './ConsentRequestsResponseError.yaml'
+  - $ref: './ConsentRequestsResponseSuccess.yaml'

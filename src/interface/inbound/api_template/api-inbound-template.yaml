@@ -23,6 +23,8 @@ paths:
     $ref: '../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/paths/authorizations.yaml'
   /authorizations/{ID}:
     $ref: '../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/paths/authorizations_ID.yaml'
+  /consentRequests:
+    $ref: '../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/paths/consentRequests.yaml'
   /consentRequests/{ID}:
     $ref: '../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/paths/consentRequests_ID.yaml'
   /consentRequests/{ID}/error:
