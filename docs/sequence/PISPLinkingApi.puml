@@ -163,34 +163,6 @@ PISP_TP_OUT --> PISP: 500 Internal Server Error ErrorInformationObject
 deactivate PISP_TP_OUT
 deactivate PISP
 
-== Pre-Linking - Cached ==
-autonumber 1 "<b>PRELINKING-#</b>"
-
-PISP -> PISP_TP_OUT: GET /linking/get-dfsps
-
-activate PISP
-activate PISP_TP_OUT
-
-rnote right of PISP_TP_OUT: We will need a uuid from the start of the model to link all steps
-PISP_TP_OUT -> PISP_TP_OUT: const uuid = uuidv4()
-PISP_TP_OUT -> PISP_TP_OUT: const model = await create()
-PISP_TP_OUT -> PISP_LM: model.getThirdpartyEnabledDFSPs()
-
-activate PISP_LM
-
-rnote right of PISP_LM: state: requestTPEnabledDFSPs
-PISP_LM -> PISP_LM: Check cache.\nDFSPs is stored in cache.
-PISP_LM -> PISP_LM: Retrieve from cache
-rnote right of PISP_LM: state: enabledDFSPLookupSuccess
-PISP_LM -> PISP_TP_OUT: return TPEnabledDFSPs
-
-deactivate PISP_LM
-
-PISP_TP_OUT --> PISP: 200 OK TPEnabledDFSPs
-
-deactivate PISP_TP_OUT
-deactivate PISP
-
 == Discovery ==
 autonumber 1 "<b>DISCOVERY-#</b>"
 rnote right of PISP
