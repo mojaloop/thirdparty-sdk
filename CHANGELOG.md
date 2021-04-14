@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+## [11.34.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.33.0...v11.34.0) (2021-04-14)
+
+
+### Features
+
+* implement consentRequests( post and put) endpoints ([#80](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/80)) ([a95d6d2](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/a95d6d2c74ebbfe4fbbb7b6f6d4e3acde503c753))
+
 ## [11.33.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.32.1...v11.33.0) (2021-04-06)
 
 
