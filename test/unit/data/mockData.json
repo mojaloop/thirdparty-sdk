@@ -229,6 +229,11 @@
       "isValid": false,
       "authChannels": []
     },
+    "responseErrorAuthChannel": {
+      "authChannels": [
+        "TEST"
+      ]
+    },
     "otpRequest": {
       "consentRequestId": "b51ec534-ee48-4575-b6a9-ead2955b8069",
       "username": "TBD",

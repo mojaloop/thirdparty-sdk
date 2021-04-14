@@ -480,6 +480,22 @@ describe('dfspConsentRequestsModel', () => {
       expect(modelConfig.dfspBackendRequests.storeConsentRequests).not.toHaveBeenCalled()
     })
 
+    it('storeReqAndSendOTP()-InvalidAuthChannel:  should transition from RequestIsValid to errored', async () => {
+      validateData = {
+        ...validateData,
+        response: mockData.consentRequestsPost.responseErrorAuthChannel,
+      }
+      const model = await create(validateData, modelConfig)
+
+      try {
+        // start request scopes step
+        await model.fsm.storeReqAndSendOTP()
+        shouldNotBeExecuted()
+      } catch (err) {
+        expect(err.message).toEqual('Invalid authChannel TEST')
+      }
+    })
+
     it('should handle exceptions', async () => {
       mocked(
         modelConfig.dfspBackendRequests.storeConsentRequests
