@@ -1,6 +1,6 @@
 @startuml
 
-title PISP Pre-linking
+title PISP Linking
 
 participant "PISP Backend" as PISP
 box "PISP tp-scheme-adapter"
@@ -329,18 +329,10 @@ PISP -> PISP_TP_OUT: POST /linking/request-consent
 rnote right of PISP #LightBlue
 POST /linking/request-consent
 {
-  scopes: [{
-    accountId: 'dfspa.username.1234',
-    actions: [
-      'accounts.getBalance',
-      'accounts.transfer'
-    ],
-    accountId: 'dfspa.username.5678',
-    actions: [
-      'accounts.getBalance',
-      'accounts.transfer'
-    ]
-  }],
+  "accounts": [
+    { accountNickname: "XXXXXXnt", id: "dfspa.username.1234", currency: "ZAR" },
+    { accountNickname: "SpeXXXXXXXXnt", id: "dfspa.username.5678", currency: "USD" }
+  ],
   callbackURI: 'pisp-app://callback'
 }
 end note
@@ -502,18 +494,10 @@ PISP -> PISP_TP_OUT: POST /linking/request-consent
 rnote right of PISP #LightBlue
 POST /linking/request-consent
 {
-  scopes: [{
-    accountId: 'dfspa.username.1234',
-    actions: [
-      'accounts.getBalance',
-      'accounts.transfer'
-    ],
-    accountId: 'dfspa.username.5678',
-    actions: [
-      'accounts.getBalance',
-      'accounts.transfer'
-    ]
-  }],
+  "accounts": [
+    { accountNickname: "XXXXXXnt", id: "dfspa.username.1234", currency: "ZAR" },
+    { accountNickname: "SpeXXXXXXXXnt", id: "dfspa.username.5678", currency: "USD" }
+  ],
   callbackURI: 'pisp-app://callback'
 }
 end note
