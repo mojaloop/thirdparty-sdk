@@ -81,6 +81,7 @@ note over PISP, Switch
 end note
 
 activate PISP_TP_IN
+activate Switch
 
 Switch --> PISP_TP_IN: PUT /services/THIRD_PARTY_DFSP/error
 rnote left of Switch #LightCoral
@@ -123,7 +124,7 @@ note over PISP, Switch
 end note
 
 activate PISP_TP_IN
-
+activate Switch
 Switch --> PISP_TP_IN: PUT /services/THIRD_PARTY_DFSP/error
 rnote left of Switch #LightCoral
 PUT /services/THIRD_PARTY_DFSP/error
@@ -190,10 +191,11 @@ PISP_TP_OUT --> PISP: 200 OK TPEnabledDFSPs
 deactivate PISP_TP_OUT
 deactivate PISP
 
-...PISP presents DFSPs to User. User selects their DFSP. This is a natural break point in the account linking flow due to needing end-user input...
-
 == Discovery ==
 autonumber 1 "<b>DISCOVERY-#</b>"
+rnote right of PISP
+PISP presents DFSPs to user. User selects a dfpsa and provides a generic ID to search for associated accounts
+end note
 PISP -> PISP_TP_OUT: GET /linking/accounts/dfspa/username1234
 
 activate PISP
@@ -275,6 +277,7 @@ PISP_LM -> PISP_TP_OUT: return Accounts
 deactivate PISP_LM
 PISP_TP_OUT --> PISP: 200 OK Accounts
 
+
 note over PISP, DFSP_LM
   ERROR_SCENARIO: Switch receives 7202 No accounts found for generic ID error.
 end note
@@ -319,6 +322,9 @@ deactivate PISP
 
 == Request Consent - Web ==
 autonumber 1 "<b>REQUEST-CONSENT-#</b>"
+rnote right of PISP
+PISP presents accounts to user. User selects one or more accounts to link.
+end note
 PISP -> PISP_TP_OUT: POST /linking/request-consent
 rnote right of PISP #LightBlue
 POST /linking/request-consent
@@ -383,13 +389,12 @@ deactivate Switch
 DFSP_TP_IN -> DFSP_TP_IN: const model = await loadFromKVS()
 activate DFSP_LM
 DFSP_TP_IN -> DFSP_LM: model.requestConsent()
-
+DFSP_LM -> DFSP_LM: DFSPBackendRequests.validateConsentRequest()
 activate DFSPAuthorizeSimulator
 DFSP_LM -> DFSPAuthorizeSimulator: ""POST /store/consentRequests/6789""
 DFSPAuthorizeSimulator -> DFSPAuthorizeSimulator: store consentRequest details
 DFSPAuthorizeSimulator -> DFSP_LM: 201 Created
 deactivate DFSPAuthorizeSimulator
-
 DFSP_TP_IN --> Switch: 202 Accepted
 deactivate DFSP_TP_IN
 
@@ -415,17 +420,84 @@ FSIOP-Destination: dfspa
 }
 end note
 Switch --> DFSP_LM: 202 ACCEPTED
-
+deactivate DFSP_LM
 activate PISP_TP_IN
 Switch ->  PISP_TP_IN: PUT /consentRequests/6789
-deactivate Switch
 PISP_TP_IN --> Switch: 200 OK
+deactivate Switch
+activate PISP_LM
 PISP_TP_IN --> PISP_LM: Consent Request response recieved
 rnote right of PISP_LM: state: webAuthenticationChannelResponseRecieved
 deactivate PISP_TP_IN
+PISP_LM -> PISP_TP_OUT: return Authentication Response
+deactivate PISP_LM
+PISP_TP_OUT --> PISP: 200 OK Autentication Response
+
+note over PISP, DFSP_LM
+  ERROR_SCENARIO:
+    FSP does not find scopes suitable |
+    FSP does not support any requested authentication channels |
+    FSP does not support any requested scope actions |
+    FSP does not trust PISP callback URI
+end note
+
+activate DFSP_TP_IN
+DFSP_TP_IN -> DFSP_TP_IN: const model = await loadFromKVS()
+activate DFSP_LM
+DFSP_TP_IN -> DFSP_LM: model.requestConsent()
+DFSP_LM -> DFSP_LM: DFSPBackendRequests.validateConsentRequest()
+
+DFSP_TP_IN --> Switch: 202 Accepted
+deactivate DFSP_TP_IN
+
+activate Switch
+DFSP_LM -> Switch: PUT /consentRequests/6789/error
+
+rnote left of DFSP_LM #LightCoral
+PUT /consentRequests/6789/error
+FSIOP-Source: dfspa
+FSIOP-Destination: pispa
+{
+  errorInformation: {
+    errorCode: '720x',
+    errorDescription: 'FSP does not find scopes suitable'
+  } OR
+  errorInformation: {
+    errorCode: '7203',
+    errorDescription: 'FSP does not support any requested authentication channels'
+  } OR
+  errorInformation: {
+    errorCode: '7204',
+    errorDescription: 'FSP does not support any requested scope actions'
+  } OR
+  errorInformation: {
+    errorCode: '720x',
+    errorDescription: 'FSP does not trust PISP callback URI'
+  }
+}
+end note
+Switch --> DFSP_LM: 200 OK
+deactivate DFSP_LM
+activate PISP_TP_IN
+deactivate DFSP_LM
+Switch ->  PISP_TP_IN: PUT /consentRequests/6789/error
+PISP_TP_IN --> Switch: 200 OK
+deactivate Switch
+activate PISP_LM
+PISP_TP_IN --> PISP_LM: MojaloopFSPIOPError response recieved
+rnote right of PISP_LM: state: errored
+deactivate PISP_TP_IN
+PISP_LM -> PISP_TP_OUT: return MojaloopFSPIOPError
+deactivate PISP_LM
+PISP_TP_OUT --> PISP: 500 Internal Server Error ErrorInformationObject
+deactivate PISP_TP_OUT
+deactivate PISP
 
 == Request Consent - OTP ==
 autonumber 1 "<b>REQUEST-CONSENT-#</b>"
+rnote right of PISP
+PISP presents accounts to user. User selects one or more accounts to link.
+end note
 PISP -> PISP_TP_OUT: POST /linking/request-consent
 rnote right of PISP #LightBlue
 POST /linking/request-consent
@@ -445,7 +517,6 @@ POST /linking/request-consent
   callbackURI: 'pisp-app://callback'
 }
 end note
-
 
 activate PISP
 activate PISP_TP_OUT
@@ -490,6 +561,7 @@ deactivate Switch
 DFSP_TP_IN -> DFSP_TP_IN: const model = await loadFromKVS()
 activate DFSP_LM
 DFSP_TP_IN -> DFSP_LM: model.requestConsent()
+DFSP_LM -> DFSP_LM: DFSPBackendRequests.validateConsentRequest()
 
 activate DFSPAuthorizeSimulator
 DFSP_LM -> DFSPAuthorizeSimulator: ""POST /store/consentRequests/6789""
@@ -522,12 +594,77 @@ FSIOP-Destination: dfspa
 }
 end note
 Switch --> DFSP_LM: 202 ACCEPTED
-
+deactivate DFSP_LM
 activate PISP_TP_IN
 Switch ->  PISP_TP_IN: PUT /consentRequests/6789
-deactivate Switch
 PISP_TP_IN --> Switch: 200 OK
+deactivate Switch
+activate PISP_LM
 PISP_TP_IN --> PISP_LM: Consent Request response recieved
 rnote right of PISP_LM: state: OTPAuthenticationChannelResponseRecieved
 deactivate PISP_TP_IN
+PISP_LM -> PISP_TP_OUT: return Authentication Response
+deactivate PISP_LM
+PISP_TP_OUT --> PISP: 200 OK Autentication Response
+
+note over PISP, DFSP_LM
+  ERROR_SCENARIO:
+    FSP does not find scopes suitable |
+    FSP does not support any requested authentication channels |
+    FSP does not support any requested scope actions |
+    FSP does not trust PISP callback URI
+end note
+
+activate DFSP_TP_IN
+DFSP_TP_IN -> DFSP_TP_IN: const model = await loadFromKVS()
+activate DFSP_LM
+DFSP_TP_IN -> DFSP_LM: model.requestConsent()
+DFSP_LM -> DFSP_LM: DFSPBackendRequests.validateConsentRequest()
+
+DFSP_TP_IN --> Switch: 202 Accepted
+deactivate DFSP_TP_IN
+
+activate Switch
+DFSP_LM -> Switch: PUT /consentRequests/6789/error
+
+rnote left of DFSP_LM #LightCoral
+PUT /consentRequests/6789/error
+FSIOP-Source: dfspa
+FSIOP-Destination: pispa
+{
+  errorInformation: {
+    errorCode: '720x',
+    errorDescription: 'FSP does not find scopes suitable'
+  } OR
+  errorInformation: {
+    errorCode: '7203',
+    errorDescription: 'FSP does not support any requested authentication channels'
+  } OR
+  errorInformation: {
+    errorCode: '7204',
+    errorDescription: 'FSP does not support any requested scope actions'
+  } OR
+  errorInformation: {
+    errorCode: '720x',
+    errorDescription: 'FSP does not trust PISP callback URI'
+  }
+}
+end note
+Switch --> DFSP_LM: 200 OK
+deactivate DFSP_LM
+activate PISP_TP_IN
+deactivate DFSP_LM
+Switch ->  PISP_TP_IN: PUT /consentRequests/6789/error
+PISP_TP_IN --> Switch: 200 OK
+deactivate Switch
+activate PISP_LM
+PISP_TP_IN --> PISP_LM: MojaloopFSPIOPError response recieved
+rnote right of PISP_LM: state: errored
+deactivate PISP_TP_IN
+PISP_LM -> PISP_TP_OUT: return MojaloopFSPIOPError
+deactivate PISP_LM
+PISP_TP_OUT --> PISP: 500 Internal Server Error ErrorInformationObject
+deactivate PISP_TP_OUT
+deactivate PISP
+
 @enduml
