@@ -1,4 +1,10 @@
 # PISP Discovery API
 Example PISP Discovery flow
 
+## Happy Path
+
 ![](../out/docs/sequence/PISPDiscoveryApi/PISP Discovery.svg)
+
+## Error Scenarios
+
+![](../out/docs/sequence/PISPDiscoveryApi/PISP Discovery Error Scenarios.svg)

@@ -28,7 +28,7 @@ activate PISP_TP_OUT
 
 PISP_TP_OUT -> PISP_TP_OUT: const model = await create()
 rnote right of PISP_TP_OUT: state: start
-PISP_TP_OUT -> PISP_DM: model.getAccounts()
+PISP_TP_OUT -> PISP_DM: model.getAccounts(dfspId, username)
 
 activate PISP_DM
 
@@ -96,48 +96,16 @@ deactivate PISP_TP_IN
 activate PISP_DM
 PISP_DM -> PISP_TP_OUT: return Accounts
 deactivate PISP_DM
-PISP_TP_OUT --> PISP: 200 OK Accounts
-
-
-note over PISP, DFSP_DM
-  ERROR_SCENARIO: Switch receives 7202 No accounts found for generic ID error.
-end note
-
-activate DFSP_DM
-DFSP_DM -> DFSP_DM: DFSPBackendRequests.getUserAccounts('username1234')
-DFSP_DM -> DFSP_DM: No accounts returned.
-DFSP_DM -> DFSP_DM: throw MojaloopFSPIOPError
-
-rnote left of DFSP_DM #LightCoral
-PUT /accounts/username1234/error
-FSIOP-Source: dfspa
-FSIOP-Destination: pispa
+rnote left of PISP_TP_OUT #LightBlue
 {
-  errorInformation: {
-    errorCode: '7202',
-    errorDescription: 'No accounts found for generic ID'
-  }
+  accounts: [
+    { accountNickname: "XXXXXXnt", id: "dfspa.username.1234", currency: "ZAR" },
+    { accountNickname: "SpeXXXXXXXXnt", id: "dfspa.username.5678", currency: "USD" }
+  ],
+  currentState="accountLookupSuccess"
 }
 end note
-
-DFSP_DM -> Switch: PUT /accounts/username1234/error
-activate Switch
-Switch --> DFSP_DM: 200 OK
-deactivate DFSP_DM
-
-Switch --> PISP_TP_IN: PUT /accounts/username1234/error
-activate PISP_TP_IN
-PISP_TP_IN --> Switch: 200 OK
-deactivate Switch
-
-PISP_TP_IN -> PISP_DM: MojaloopFSPIOPError response recieved
-deactivate PISP_TP_IN
-activate PISP_DM
-PISP_DM -> PISP_TP_OUT: return MojaloopFSPIOPError
-rnote right of PISP_DM: state: errored
-deactivate PISP_DM
-PISP_TP_OUT --> PISP: 500 Internal Server Error ErrorInformationObject
+PISP_TP_OUT --> PISP: 200 OK Accounts
 deactivate PISP_TP_OUT
 deactivate PISP
-
 @enduml
