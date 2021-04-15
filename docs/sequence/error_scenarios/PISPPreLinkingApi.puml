@@ -1,0 +1,123 @@
+@startuml
+
+title PISP Pre-Linking Error Scenarios
+
+participant "PISP Backend" as PISP
+box "PISP tp-scheme-adapter"
+  participant "outbound-server" as PISP_TP_OUT
+  participant "PISPrelinkingModel" as PISP_PLM
+  participant "inbound-server" as PISP_TP_IN
+end box
+box "Mojaloop"
+    participant Switch
+end box
+
+== Pre-Linking ==
+autonumber 1 "<b>PRELINKING-#</b>"
+
+PISP -> PISP_TP_OUT: GET /linking/providers
+
+activate PISP
+activate PISP_TP_OUT
+
+PISP_TP_OUT -> PISP_TP_OUT: const model = await create()
+rnote right of PISP_TP_OUT: state: start
+PISP_TP_OUT -> PISP_PLM: model.getThirdpartyEnabledDFSPs()
+
+activate PISP_PLM
+
+PISP_PLM -> PISP_PLM: ThirdpartyRequests.getServicesById()
+PISP_PLM -> Switch: GET /services/THIRD_PARTY_DFSP
+
+activate Switch
+Switch --> PISP_PLM: 202 Accepted
+deactivate PISP_PLM
+
+note over PISP, Switch
+  ERROR_SCENARIO: Switch receives 7201 error.
+end note
+
+activate PISP_TP_IN
+activate Switch
+
+Switch --> PISP_TP_IN: PUT /services/THIRD_PARTY_DFSP/error
+rnote left of Switch #LightCoral
+PUT /services/THIRD_PARTY_DFSP/error
+{
+  errorInformation: {
+    errorCode: '7201',
+    errorDescription: 'No thirdparty enabled FSP found'
+  }
+}
+end note
+PISP_TP_IN --> Switch: 200 OK
+
+deactivate Switch
+
+PISP_TP_IN -> PISP_PLM: ErrorInformationObject recieved
+
+deactivate PISP_TP_IN
+activate PISP_PLM
+
+PISP_PLM -> PISP_PLM: throw same error
+rnote right of PISP_PLM #LightCoral
+{
+  errorInformation: {
+    errorCode: '7201',
+    errorDescription: 'No thirdparty enabled FSP found'
+  }
+}
+end note
+rnote right of PISP_PLM: state: errored
+PISP_PLM -> PISP_TP_OUT: catch MojaloopFSPIOPError
+
+deactivate PISP_PLM
+
+PISP_TP_OUT --> PISP: 500 Internal Server Error ErrorInformationObject
+
+
+note over PISP, Switch
+  ERROR_SCENARIO: Switch sends back any other error.
+end note
+
+activate PISP_TP_IN
+activate Switch
+Switch --> PISP_TP_IN: PUT /services/THIRD_PARTY_DFSP/error
+rnote left of Switch #LightCoral
+PUT /services/THIRD_PARTY_DFSP/error
+{
+  errorInformation: {
+    errorCode: '2001',
+    errorDescription: 'Internal server error'
+  }
+}
+end note
+PISP_TP_IN --> Switch: 200 OK
+
+deactivate Switch
+
+PISP_TP_IN -> PISP_PLM: Services request recieved
+
+deactivate PISP_TP_IN
+activate PISP_PLM
+
+PISP_PLM -> PISP_PLM: throw account linking generic error
+rnote right of PISP_PLM #LightCoral
+{
+  errorInformation: {
+    errorCode: '7200',
+    errorDescription: 'Generic Thirdparty account linking error'
+  }
+}
+end note
+rnote right of PISP_PLM: state: errored
+PISP_PLM -> PISP_TP_OUT: catch MojaloopFSPIOPError
+
+deactivate PISP_PLM
+
+PISP_TP_OUT --> PISP: 404 Not Found ErrorInformationObject
+
+deactivate PISP_TP_OUT
+deactivate PISP
+
+@enduml
