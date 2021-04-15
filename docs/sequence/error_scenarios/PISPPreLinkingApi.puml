@@ -22,7 +22,7 @@ activate PISP_TP_OUT
 
 PISP_TP_OUT -> PISP_TP_OUT: const model = await create()
 rnote right of PISP_TP_OUT: state: start
-PISP_TP_OUT -> PISP_PLM: model.getThirdpartyEnabledDFSPs()
+PISP_TP_OUT -> PISP_PLM: model.getProviders()
 
 activate PISP_PLM
 
@@ -78,7 +78,7 @@ rnote left of PISP_TP_OUT #LightCoral
     errorCode: '7201',
     errorDescription: 'No thirdparty enabled FSP found'
   }
-  currentState="errored"
+  currentState: "errored"
 }
 end note
 PISP_TP_OUT --> PISP: 404 Not Found ErrorInformationObject
@@ -128,7 +128,7 @@ rnote left of PISP_TP_OUT #LightCoral
     errorCode: '7200',
     errorDescription: 'Generic Thirdparty account linking error'
   }
-  currentState="errored"
+  currentState: "errored"
 }
 end note
 PISP_TP_OUT --> PISP: 500 Internal Server Error ErrorInformationObject
