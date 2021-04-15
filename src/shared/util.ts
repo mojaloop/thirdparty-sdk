@@ -62,7 +62,7 @@ async function reformatError (err: Error): Promise<Errors.MojaloopApiErrorObject
 /**
  * @function throwMojaloopFSPIOPError
  * @description Helper function to throw MojaloopFSPIOPError
- * @param {MojaloopApiErrorCode} errorCode 
+ * @param {MojaloopApiErrorCode} errorCode
  */
 function throwMojaloopFSPIOPError (errorCode: Errors.MojaloopApiErrorCode): void {
   throw new Errors.MojaloopFSPIOPError('', '', '', errorCode)
