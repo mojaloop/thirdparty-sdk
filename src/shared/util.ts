@@ -59,6 +59,16 @@ async function reformatError (err: Error): Promise<Errors.MojaloopApiErrorObject
   return new Errors.MojaloopFSPIOPError(err, '', '', mojaloopErrorCode).toApiErrorObject()
 }
 
+/**
+ * @function throwMojaloopFSPIOPError
+ * @description Helper function to throw MojaloopFSPIOPError
+ * @param {MojaloopApiErrorCode} errorCode 
+ */
+function throwMojaloopFSPIOPError (errorCode: Errors.MojaloopApiErrorCode): void {
+  throw new Errors.MojaloopFSPIOPError('', '', '', errorCode)
+}
+
 export {
-  reformatError
+  reformatError,
+  throwMojaloopFSPIOPError
 }

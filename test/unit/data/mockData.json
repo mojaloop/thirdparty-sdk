@@ -214,25 +214,35 @@
     },
     "response": {
       "isValid": true,
-      "authChannels": [
-        "WEB"
-      ],
-      "authUri": "dfspa.com/authorize?consentRequestId=456"
+      "data": {
+        "authChannels": [
+          "WEB"
+        ],
+        "authUri": "dfspa.com/authorize?consentRequestId=456"
+      }
     },
     "responseOTP": {
       "isValid": true,
-      "authChannels": [
-        "OTP"
-      ]
+      "data": {
+        "authChannels": [
+          "OTP"
+        ]
+      }
     },
     "responseError": {
       "isValid": false,
-      "authChannels": []
+      "data": {},
+      "errorInformation": {
+        "errorCode": "7204",
+        "errorDescription": "FSP does not support any requested scope actions"
+      }
     },
     "responseErrorAuthChannel": {
-      "authChannels": [
-        "TEST"
-      ]
+      "data": {
+        "authChannels": [
+          "TEST"
+        ]
+      }
     },
     "otpRequest": {
       "consentRequestId": "b51ec534-ee48-4575-b6a9-ead2955b8069",

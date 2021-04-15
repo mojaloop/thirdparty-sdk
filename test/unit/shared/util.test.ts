@@ -24,11 +24,12 @@
  * Sridhar Voruganti <sridhar.voruganti@modusbox.com>
  --------------
  ******/
-import { reformatError } from '~/shared/util'
+import { reformatError, throwMojaloopFSPIOPError } from '~/shared/util'
 import { HTTPResponseError } from '~/shared/http-response-error'
 import { Errors } from '@mojaloop/sdk-standard-components'
-describe('shared/reformatError', (): void => {
+import shouldNotBeExecuted from 'test/unit/shouldNotBeExecuted'
 
+describe('shared/reformatError', (): void => {
   it('reformating of generic Error', async () => {
     const expected = {
       errorInformation: {
@@ -88,4 +89,16 @@ describe('shared/reformatError', (): void => {
     expect(result).toEqual(expected)
   })
 
+})
+describe('shared/throwMojaloopFSPIOPError', (): void => {
+  it('throwMojaloopFSPIOPError', () => {
+    try {
+      throwMojaloopFSPIOPError(Errors.MojaloopApiErrorCodeFromCode('7208'))
+      shouldNotBeExecuted()
+    } catch (err) {
+      console.log(JSON.stringify(err))
+      expect(err.apiErrorCode.code).toEqual('7208')
+      expect(err.apiErrorCode.message).toEqual('FSP failed to validate consent request')
+    }
+  })
 })
