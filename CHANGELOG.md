@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+### [11.34.1](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.34.0...v11.34.1) (2021-04-15)
+
+
+### Maintenance
+
+* update consentRequests simulator resp to support all error cases ([#86](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/86)) ([c81d681](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/c81d681dd490c2c15319ebe253fc3a4edfc977c2))
+
 ## [11.34.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.33.0...v11.34.0) (2021-04-14)
 
 
