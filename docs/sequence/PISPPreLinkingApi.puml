@@ -61,15 +61,14 @@ rnote right of PISP_PLM: state: enabledDFSPLookupSuccess
 PISP_PLM -> PISP_TP_OUT: return TPEnabledDFSPs
 
 deactivate PISP_PLM
-
-PISP_TP_OUT --> PISP: 200 OK TPEnabledDFSPs
 rnote left of PISP_TP_OUT #LightBlue
 {
     providers: [
        "dfspa", "dfspb"
     ],
-    currentState="COMPLETED"
+    currentState="enabledDFSPLookupSuccess"
 }
 end note
+PISP_TP_OUT --> PISP: 200 OK TPEnabledDFSPs
 
 @enduml

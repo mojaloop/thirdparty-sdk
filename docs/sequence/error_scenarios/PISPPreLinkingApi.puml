@@ -72,7 +72,15 @@ rnote right of PISP_PLM: state: errored
 PISP_PLM -> PISP_TP_OUT: catch MojaloopFSPIOPError
 
 deactivate PISP_PLM
-
+rnote left of PISP_TP_OUT #LightCoral
+{
+  errorInformation: {
+    errorCode: '7201',
+    errorDescription: 'No thirdparty enabled FSP found'
+  }
+  currentState="errored"
+}
+end note
 PISP_TP_OUT --> PISP: 404 Not Found ErrorInformationObject
 
 
@@ -114,7 +122,15 @@ rnote right of PISP_PLM: state: errored
 PISP_PLM -> PISP_TP_OUT: catch MojaloopFSPIOPError
 
 deactivate PISP_PLM
-
+rnote left of PISP_TP_OUT #LightCoral
+{
+  errorInformation: {
+    errorCode: '7200',
+    errorDescription: 'Generic Thirdparty account linking error'
+  }
+  currentState="errored"
+}
+end note
 PISP_TP_OUT --> PISP: 500 Internal Server Error ErrorInformationObject
 
 deactivate PISP_TP_OUT
