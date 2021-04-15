@@ -24,11 +24,11 @@
  * Sridhar Voruganti <sridhar.voruganti@modusbox.com>
  --------------
  ******/
-import { reformatError } from '~/shared/util'
+import { reformatError, mkMojaloopFSPIOPError } from '~/shared/util'
 import { HTTPResponseError } from '~/shared/http-response-error'
 import { Errors } from '@mojaloop/sdk-standard-components'
-describe('shared/reformatError', (): void => {
 
+describe('shared/reformatError', (): void => {
   it('reformating of generic Error', async () => {
     const expected = {
       errorInformation: {
@@ -88,4 +88,11 @@ describe('shared/reformatError', (): void => {
     expect(result).toEqual(expected)
   })
 
+})
+describe('shared/mkMojaloopFSPIOPError', (): void => {
+  it('mkMojaloopFSPIOPError', () => {
+    const errorObj = mkMojaloopFSPIOPError(Errors.MojaloopApiErrorCodeFromCode('7204'))
+    expect(errorObj.apiErrorCode.code).toEqual('7204')
+    expect(errorObj.apiErrorCode.message).toEqual('FSP does not support any requested scope actions')
+  })
 })

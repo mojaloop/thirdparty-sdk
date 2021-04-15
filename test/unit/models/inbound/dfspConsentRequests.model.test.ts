@@ -227,7 +227,7 @@ describe('dfspConsentRequestsModel', () => {
         await model.fsm.validateRequest()
         shouldNotBeExecuted()
       } catch (err) {
-        expect(err.apiErrorCode.code).toEqual('7207')
+        expect(err.apiErrorCode.code).toEqual('7208')
       }
 
       // check a PUT /consentsRequest/{ID}/error response was sent to source participant
@@ -235,8 +235,8 @@ describe('dfspConsentRequestsModel', () => {
         mockData.consentRequestsPutError.params.ID,
         {
           errorInformation: {
-            errorCode: '7207',
-            errorDescription: 'FSP failed retrieve scopes for consent request'
+            errorCode: '7208',
+            errorDescription: 'FSP failed to validate consent request'
           }
         },
         'pispa'
