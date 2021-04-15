@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+### [11.34.2](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.34.1...v11.34.2) (2021-04-15)
+
+
+### Documentation
+
+* add sequence digram for discovery flow ([#85](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/85)) ([e2fbfd0](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/e2fbfd0141583db750fc04bc9820766594151619))
+
 ### [11.34.1](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.34.0...v11.34.1) (2021-04-15)
 
 
