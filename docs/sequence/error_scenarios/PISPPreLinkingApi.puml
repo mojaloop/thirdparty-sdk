@@ -73,7 +73,7 @@ PISP_PLM -> PISP_TP_OUT: catch MojaloopFSPIOPError
 
 deactivate PISP_PLM
 
-PISP_TP_OUT --> PISP: 500 Internal Server Error ErrorInformationObject
+PISP_TP_OUT --> PISP: 404 Not Found ErrorInformationObject
 
 
 note over PISP, Switch
@@ -115,7 +115,7 @@ PISP_PLM -> PISP_TP_OUT: catch MojaloopFSPIOPError
 
 deactivate PISP_PLM
 
-PISP_TP_OUT --> PISP: 404 Not Found ErrorInformationObject
+PISP_TP_OUT --> PISP: 500 Internal Server Error ErrorInformationObject
 
 deactivate PISP_TP_OUT
 deactivate PISP
