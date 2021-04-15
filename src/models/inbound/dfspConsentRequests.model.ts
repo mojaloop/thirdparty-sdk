@@ -34,7 +34,7 @@ import {
   thirdparty as tpAPI
 } from '@mojaloop/api-snippets'
 import inspect from '~/shared/inspect'
-import { reformatError } from '~/shared/util'
+import { reformatError, mkMojaloopFSPIOPError } from '~/shared/util'
 import {
   DFSPConsentRequestsData,
   DFSPConsentRequestsStateMachine,
@@ -88,11 +88,11 @@ export class DFSPConsentRequestsModel
       const response = await this.dfspBackendRequests.validateConsentRequests(request)
 
       if (!response) {
-        throw new Errors.MojaloopFSPIOPError('', '', '', Errors.MojaloopApiErrorCodes.TP_FSP_CONSENT_SCOPES_ERROR)
+        throw mkMojaloopFSPIOPError(Errors.MojaloopApiErrorCodes.TP_CONSENT_REQ_VALIDATION_ERROR)
       }
 
       if (!response.isValid) {
-        throw new Errors.MojaloopFSPIOPError('', '', '', Errors.MojaloopApiErrorCodes.TP_NO_SUPPORTED_SCOPE_ACTIONS)
+        throw mkMojaloopFSPIOPError(Errors.MojaloopApiErrorCodeFromCode(`${response.errorInformation?.errorCode}`))
       }
 
       this.data.response = response
@@ -102,12 +102,11 @@ export class DFSPConsentRequestsModel
       const consentRequestResponse = {
         scopes: request.scopes,
         callbackUri: request.callbackUri,
-        authChannels: response.authChannels,
-        authUri: response.authUri,
+        authChannels: response.data.authChannels,
+        authUri: response.data.authUri,
         initiatorId: toParticipantId
       } as consentRequestResponseType
       await this.thirdpartyRequests.putConsentRequests(request.id, consentRequestResponse, toParticipantId)
-
 
     } catch (error) {
       const mojaloopError = await reformatError(error)
@@ -130,7 +129,7 @@ export class DFSPConsentRequestsModel
     const { request, response } = this.data
 
     try {
-      const channel = [...response!.authChannels].pop()
+      const channel = [...response!.data.authChannels].pop()
       switch (channel) {
         case 'WEB': {
           await this.dfspBackendRequests.storeConsentRequests(request)

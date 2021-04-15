@@ -59,6 +59,18 @@ async function reformatError (err: Error): Promise<Errors.MojaloopApiErrorObject
   return new Errors.MojaloopFSPIOPError(err, '', '', mojaloopErrorCode).toApiErrorObject()
 }
 
+/**
+ * @function mkMojaloopFSPIOPError
+ * @description Helper function to create MojaloopFSPIOPError
+ * @param {MojaloopApiErrorCode} errorCode
+ * @returns {MojaloopFSPIOPError}
+ */
+function mkMojaloopFSPIOPError (errorCode: Errors.MojaloopApiErrorCode): Errors.MojaloopFSPIOPError {
+  // TODO: investigate passing non empty strings for other args
+  return new Errors.MojaloopFSPIOPError('', '', '', errorCode)
+}
+
 export {
-  reformatError
+  reformatError,
+  mkMojaloopFSPIOPError
 }

@@ -32,6 +32,7 @@ import {
 import { Method } from 'javascript-state-machine'
 import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components';
 import {
+  v1_1 as fspiopAPI,
   thirdparty as tpAPI
 } from '@mojaloop/api-snippets'
 import { PubSub } from '~/shared/pub-sub'
@@ -40,8 +41,11 @@ import * as OutboundAPI from '~/interface/outbound/api_interfaces'
 
 export interface BackendValidateConsentRequestsResponse {
   isValid: boolean
-  authChannels: OutboundAPI.Schemas.AuthChannels
-  authUri?: string
+  data: {
+    authChannels: OutboundAPI.Schemas.AuthChannels
+    authUri?: string
+  }
+  errorInformation?: fspiopAPI.Schemas.ErrorInformation
 }
 
 export interface BackendSendOTPRequest {
