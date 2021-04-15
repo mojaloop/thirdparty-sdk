@@ -34,12 +34,11 @@ import {
   thirdparty as tpAPI
 } from '@mojaloop/api-snippets'
 import inspect from '~/shared/inspect'
-import { reformatError, throwMojaloopFSPIOPError } from '~/shared/util'
+import { reformatError, mkMojaloopFSPIOPError } from '~/shared/util'
 import {
   DFSPConsentRequestsData,
   DFSPConsentRequestsStateMachine,
-  DFSPConsentRequestsModelConfig,
-  BackendValidateConsentRequestsResponse
+  DFSPConsentRequestsModelConfig
 } from '~/models/inbound/dfspConsentRequests.interface'
 import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
 
@@ -86,15 +85,14 @@ export class DFSPConsentRequestsModel
     const { request, toParticipantId } = this.data
 
     try {
-      const response =
-        await this.dfspBackendRequests.validateConsentRequests(request) as BackendValidateConsentRequestsResponse
+      const response = await this.dfspBackendRequests.validateConsentRequests(request)
 
       if (!response) {
-        throwMojaloopFSPIOPError(Errors.MojaloopApiErrorCodes.TP_CONSENT_REQ_VALIDATION_ERROR)
+        throw mkMojaloopFSPIOPError(Errors.MojaloopApiErrorCodes.TP_CONSENT_REQ_VALIDATION_ERROR)
       }
 
       if (!response.isValid) {
-        throwMojaloopFSPIOPError(Errors.MojaloopApiErrorCodeFromCode(`${response.errorInformation?.errorCode}`))
+        throw mkMojaloopFSPIOPError(Errors.MojaloopApiErrorCodeFromCode(`${response.errorInformation?.errorCode}`))
       }
 
       this.data.response = response
@@ -109,7 +107,6 @@ export class DFSPConsentRequestsModel
         initiatorId: toParticipantId
       } as consentRequestResponseType
       await this.thirdpartyRequests.putConsentRequests(request.id, consentRequestResponse, toParticipantId)
-
 
     } catch (error) {
       const mojaloopError = await reformatError(error)

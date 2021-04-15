@@ -60,15 +60,17 @@ async function reformatError (err: Error): Promise<Errors.MojaloopApiErrorObject
 }
 
 /**
- * @function throwMojaloopFSPIOPError
- * @description Helper function to throw MojaloopFSPIOPError
+ * @function mkMojaloopFSPIOPError
+ * @description Helper function to create MojaloopFSPIOPError
  * @param {MojaloopApiErrorCode} errorCode
+ * @returns {MojaloopFSPIOPError}
  */
-function throwMojaloopFSPIOPError (errorCode: Errors.MojaloopApiErrorCode): void {
-  throw new Errors.MojaloopFSPIOPError('', '', '', errorCode)
+function mkMojaloopFSPIOPError (errorCode: Errors.MojaloopApiErrorCode): Errors.MojaloopFSPIOPError {
+  // TODO: investigate passing non empty strings for other args
+  return new Errors.MojaloopFSPIOPError('', '', '', errorCode)
 }
 
 export {
   reformatError,
-  throwMojaloopFSPIOPError
+  mkMojaloopFSPIOPError
 }

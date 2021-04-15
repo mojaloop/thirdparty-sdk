@@ -24,10 +24,9 @@
  * Sridhar Voruganti <sridhar.voruganti@modusbox.com>
  --------------
  ******/
-import { reformatError, throwMojaloopFSPIOPError } from '~/shared/util'
+import { reformatError, mkMojaloopFSPIOPError } from '~/shared/util'
 import { HTTPResponseError } from '~/shared/http-response-error'
 import { Errors } from '@mojaloop/sdk-standard-components'
-import shouldNotBeExecuted from 'test/unit/shouldNotBeExecuted'
 
 describe('shared/reformatError', (): void => {
   it('reformating of generic Error', async () => {
@@ -90,15 +89,10 @@ describe('shared/reformatError', (): void => {
   })
 
 })
-describe('shared/throwMojaloopFSPIOPError', (): void => {
-  it('throwMojaloopFSPIOPError', () => {
-    try {
-      throwMojaloopFSPIOPError(Errors.MojaloopApiErrorCodeFromCode('7208'))
-      shouldNotBeExecuted()
-    } catch (err) {
-      console.log(JSON.stringify(err))
-      expect(err.apiErrorCode.code).toEqual('7208')
-      expect(err.apiErrorCode.message).toEqual('FSP failed to validate consent request')
-    }
+describe('shared/mkMojaloopFSPIOPError', (): void => {
+  it('mkMojaloopFSPIOPError', () => {
+    const errorObj = mkMojaloopFSPIOPError(Errors.MojaloopApiErrorCodeFromCode('7204'))
+    expect(errorObj.apiErrorCode.code).toEqual('7204')
+    expect(errorObj.apiErrorCode.message).toEqual('FSP does not support any requested scope actions')
   })
 })
