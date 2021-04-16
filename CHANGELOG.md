@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+### [11.34.3](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.34.2...v11.34.3) (2021-04-16)
+
+
+### Documentation
+
+* add sequence diagram for pre-linking flow ([#84](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/84)) ([801e3f6](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/801e3f67a9c6df8d662e549e34e48df965de4ad7))
+
 ### [11.34.2](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.34.1...v11.34.2) (2021-04-15)
 
 
