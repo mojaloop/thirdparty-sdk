@@ -95,3 +95,4 @@ export interface PISPTransactionData extends StateData<PISPTransactionModelState
   transactionStatusPatch?: tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPatchResponse
   approveResponse?: OutboundAPI.Schemas.ThirdpartyTransactionIDApproveResponse
 }
+
