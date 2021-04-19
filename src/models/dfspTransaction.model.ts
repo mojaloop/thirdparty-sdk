@@ -41,7 +41,6 @@ import { InvalidDataError } from '~/shared/invalid-data-error'
 import { SDKOutgoingRequests } from '~/shared/sdk-outgoing-requests'
 import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
 import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
-import { OutboundAPI as SDKOutboundAPI } from '@mojaloop/sdk-scheme-adapter'
 
 export class DFSPTransactionModel
   extends PersistentModel<DFSPTransactionStateMachine, DFSPTransactionData> {
@@ -225,10 +224,10 @@ export class DFSPTransactionModel
 
     const resultAuthorization = await this.sdkOutgoingRequests.requestAuthorization(
       this.data.requestAuthorizationPostRequest
-    ) as SDKOutboundAPI.Schemas.authorizationsPostResponse
+    )
 
     if (!(resultAuthorization && resultAuthorization.currentState === 'COMPLETED')) {
-      // TODO: throw proper error when quotes
+      // TODO: throw proper error
       throw new Error('POST /authorizations failed')
     }
 
@@ -238,8 +237,18 @@ export class DFSPTransactionModel
   async onVerifyAuthorization (): Promise<void> {
     InvalidDataError.throwIfInvalidProperty(this.data, 'requestAuthorizationResponse')
 
-    // TODO: make verification of authorization data received in Approve phase from PISPTransactionModel
-    // TODO: handle error case when authorization data isn't valid
+    const result = await this.dfspBackendRequests.verifyAuthorization(
+      this.data.requestAuthorizationResponse!.authorizations
+    )
+
+    if (!(result && result.isValid)) {
+      // TODO: throw proper error
+      throw new Error('POST /verify-authorization failed')
+    }
+
+    // don't we want to store somewhere the transactionRequestState (now it is ACCEPTED)?
+    // TODO: add to state data transactionRequestState and properly update it
+
     // TODO: prepare this.data.transferRequest
     this.data.transferRequest = {}
   }

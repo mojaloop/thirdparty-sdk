@@ -75,7 +75,8 @@ describe('DFSPTransactionModel', () => {
         requestAuthorization: jest.fn(() => Promise.resolve(requestAuthorizationResponse))
       } as unknown as SDKOutgoingRequests,
       dfspBackendRequests: {
-        validateThirdpartyTransactionRequest: jest.fn(() => Promise.resolve({ isValid: true }))
+        validateThirdpartyTransactionRequest: jest.fn(() => Promise.resolve({ isValid: true })),
+        verifyAuthorization: jest.fn(() => Promise.resolve({ isValid: true }))
       } as unknown as DFSPBackendRequests
     }
     transactionRequestId = uuid()
@@ -328,6 +329,11 @@ describe('DFSPTransactionModel', () => {
       expect(model.data.requestAuthorizationResponse).toEqual(requestAuthorizationResponse)
 
       // onVerifyAuthorization
+      // check did we do proper call downstream
+      expect(model.dfspBackendRequests.verifyAuthorization).toHaveBeenCalledWith(
+        model.data.requestAuthorizationResponse!.authorizations
+      )
+
       // TODO: check properly transferRequest
       expect(model.data.transferRequest).toBeDefined()
 
@@ -428,6 +434,32 @@ describe('DFSPTransactionModel', () => {
       } catch (err) {
         // TODO: fix assert when proper error is thrown
         expect(err.message).toEqual('POST /authorizations failed')
+        done()
+      }
+    })
+
+    it('should throw if verifyAuthorization failed', async (done) => {
+      mocked(modelConfig.kvs.set).mockImplementationOnce(() => Promise.resolve(true))
+      mocked(modelConfig.dfspBackendRequests.verifyAuthorization).mockImplementationOnce(
+        () => Promise.resolve({ isValid: false })
+      )
+      const data: DFSPTransactionData = {
+        transactionRequestId,
+        participantId,
+        transactionRequestRequest,
+        transactionRequestPutUpdate,
+        requestQuoteRequest,
+        requestQuoteResponse,
+        requestAuthorizationResponse,
+        currentState: 'authorizationReceived'
+      }
+      const model = await create(data, modelConfig)
+      try {
+        await model.fsm.verifyAuthorization()
+        shouldNotBeExecuted()
+      } catch (err) {
+        // TODO: fix assert when proper error is thrown
+        expect(err.message).toEqual('POST /verify-authorization failed')
         done()
       }
     })

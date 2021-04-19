@@ -73,6 +73,8 @@ export interface DFSPTransactionModelConfig extends PersistentModelConfig {
 export interface DFSPTransactionData extends StateData<DFSPTransactionModelState> {
   transactionRequestId: string
 
+  // TODO: add to state data transactionRequestState and properly update it
+
   // id of participant (PISP) which sends ThirdpartyTransactionRequest to us
   // used as target dfspId param for calls to switch via thirdpartyRequests
   participantId: string
@@ -86,7 +88,6 @@ export interface DFSPTransactionData extends StateData<DFSPTransactionModelState
   requestQuoteResponse?: SDKOutboundAPI.Schemas.quotesPostResponse
 
   // used by requestAuthorization & verifyAuthorization
-  // TODO: proper type for requestAuthorizationPostRequest
   requestAuthorizationPostRequest?: SDKOutboundAPI.Schemas.authorizationsPostRequest
   requestAuthorizationResponse?: SDKOutboundAPI.Schemas.authorizationsPostResponse
 
