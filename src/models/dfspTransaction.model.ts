@@ -41,6 +41,7 @@ import { InvalidDataError } from '~/shared/invalid-data-error'
 import { SDKOutgoingRequests } from '~/shared/sdk-outgoing-requests'
 import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
 import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
+import { OutboundAPI as SDKOutboundAPI } from '@mojaloop/sdk-scheme-adapter'
 
 export class DFSPTransactionModel
   extends PersistentModel<DFSPTransactionStateMachine, DFSPTransactionData> {
@@ -159,8 +160,8 @@ export class DFSPTransactionModel
     // check result and throw if invalid
     if (!(updateResult && updateResult.statusCode === 200)) {
       // TODO: throw proper error when notification failed
-      // TODO: error should be transformed to call PUT /thirdpartyRequests/{ID}/transactions/error
-      throw new Error(`PUT /thirdpartyRequests/${this.data.transactionRequestId}/transactions failed`)
+      // TODO: error should be transformed to call PUT /thirdpartyRequests/transactions/{ID}/error
+      throw new Error(`PUT /thirdpartyRequests/transactions/${this.data.transactionRequestId} failed`)
     }
 
     // shortcut
@@ -197,7 +198,9 @@ export class DFSPTransactionModel
 
     // check result and throw if invalid
     if (!(resultQuote && resultQuote.currentState === 'COMPLETED')) {
-      // TODO: throw proper error when quotes
+      // TODO: throw proper error
+      // TODO: error should be transformed to call PUT /thirdpartyRequests/{ID}/transactions/error
+
       throw new Error('POST /quotes failed')
     }
 
@@ -208,15 +211,32 @@ export class DFSPTransactionModel
   async onRequestAuthorization (): Promise<void> {
     InvalidDataError.throwIfInvalidProperty(this.data, 'requestQuoteResponse')
 
-    // TODO: make a call to request authorization via SDKOutgoingRequests
-    // TODO: prepare this.data.requestAuthorizationPostRequest
-    this.data.requestAuthorizationPostRequest = {}
-    // TODO: store results from call
-    this.data.requestAuthorizationPostResponse = {}
+    this.data.requestAuthorizationPostRequest = {
+      fspId: this.data.participantId,
+      authorizationsPostRequest: {
+        authenticationType: 'U2F',
+        retriesLeft: '1',
+        amount: { ...this.data.transactionRequestRequest.amount },
+        quote: { ...this.data.requestQuoteResponse!.quotes },
+        transactionId: this.data.transactionRequestPutUpdate!.transactionId,
+        transactionRequestId: this.data.transactionRequestId
+      }
+    }
+
+    const resultAuthorization = await this.sdkOutgoingRequests.requestAuthorization(
+      this.data.requestAuthorizationPostRequest
+    ) as SDKOutboundAPI.Schemas.authorizationsPostResponse
+
+    if (!(resultAuthorization && resultAuthorization.currentState === 'COMPLETED')) {
+      // TODO: throw proper error when quotes
+      throw new Error('POST /authorizations failed')
+    }
+
+    this.data.requestAuthorizationResponse = resultAuthorization
   }
 
   async onVerifyAuthorization (): Promise<void> {
-    InvalidDataError.throwIfInvalidProperty(this.data, 'requestAuthorizationPostResponse')
+    InvalidDataError.throwIfInvalidProperty(this.data, 'requestAuthorizationResponse')
 
     // TODO: make verification of authorization data received in Approve phase from PISPTransactionModel
     // TODO: handle error case when authorization data isn't valid

@@ -87,9 +87,8 @@ export interface DFSPTransactionData extends StateData<DFSPTransactionModelState
 
   // used by requestAuthorization & verifyAuthorization
   // TODO: proper type for requestAuthorizationPostRequest
-  requestAuthorizationPostRequest?: unknown
-  // TODO: proper type for requestAuthorizationResponse
-  requestAuthorizationResponse?: unknown
+  requestAuthorizationPostRequest?: SDKOutboundAPI.Schemas.authorizationsPostRequest
+  requestAuthorizationResponse?: SDKOutboundAPI.Schemas.authorizationsPostResponse
 
   // used by requestTransfer
   // TODO: proper type for transferRequest

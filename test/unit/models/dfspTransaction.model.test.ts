@@ -59,7 +59,9 @@ describe('DFSPTransactionModel', () => {
   let transactionRequestRequest: tpAPI.Schemas.ThirdpartyRequestsTransactionsPostRequest
   let transactionRequestPutUpdate: tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPutResponse
   let requestQuoteRequest: SDKOutboundAPI.Schemas.quotesPostRequest
-  let quotesResponse: SDKOutboundAPI.Schemas.quotesPostResponse
+  let requestQuoteResponse: SDKOutboundAPI.Schemas.quotesPostResponse
+  let requestAuthorizationResponse: SDKOutboundAPI.Schemas.authorizationsPostResponse
+
   beforeEach(async () => {
     modelConfig = {
       key: 'cache-key',
@@ -69,7 +71,8 @@ describe('DFSPTransactionModel', () => {
         putThirdpartyRequestsTransactions: jest.fn(() => Promise.resolve({ statusCode: 200 }))
       } as unknown as ThirdpartyRequests,
       sdkOutgoingRequests: {
-        requestQuote: jest.fn(() => Promise.resolve(quotesResponse))
+        requestQuote: jest.fn(() => Promise.resolve(requestQuoteResponse)),
+        requestAuthorization: jest.fn(() => Promise.resolve(requestAuthorizationResponse))
       } as unknown as SDKOutgoingRequests,
       dfspBackendRequests: {
         validateThirdpartyTransactionRequest: jest.fn(() => Promise.resolve({ isValid: true }))
@@ -119,12 +122,25 @@ describe('DFSPTransactionModel', () => {
         transactionType: { ...transactionRequestRequest.transactionType }
       }
     }
-    quotesResponse = {
+    requestQuoteResponse = {
       quotes: {
         transferAmount: { ...transactionRequestRequest.amount },
         ilpPacket: 'abcd...',
         condition: 'xyz....',
         expiration: (new Date()).toISOString()
+      },
+      currentState: 'COMPLETED'
+    }
+    requestAuthorizationResponse = {
+      authorizations: {
+        authenticationInfo: {
+          authentication: 'U2F',
+          authenticationValue: {
+            pinValue: 'some-pin-value',
+            counter: '1'
+          } as string & Partial<{pinValue: string, counter: string}>
+        },
+        responseType: 'ENTERED'
       },
       currentState: 'COMPLETED'
     }
@@ -278,10 +294,38 @@ describe('DFSPTransactionModel', () => {
       expect(model.data.requestQuoteResponse!.quotes).toBeDefined()
       expect(model.data.requestQuoteResponse!.currentState).toEqual('COMPLETED')
 
+      expect(model.sdkOutgoingRequests.requestQuote).toHaveBeenCalledWith(model.data.requestQuoteRequest)
+
       // onRequestAuthorization
-      // TODO: check properly requestAuthorizationPostRequest & requestAuthorizationPostResponse
       expect(model.data.requestAuthorizationPostRequest).toBeDefined()
-      expect(model.data.requestAuthorizationPostResponse).toBeDefined()
+      expect(model.sdkOutgoingRequests.requestAuthorization).toBeCalledWith(model.data.requestAuthorizationPostRequest)
+
+      // shortcut
+      const rar = model.data.requestAuthorizationPostRequest!
+
+      // fspId should be set to PISP
+      expect(rar.fspId).toEqual(model.data.participantId)
+      expect(rar.authorizationsPostRequest).toBeDefined()
+
+      // only U2F with 1 retry
+      expect(rar.authorizationsPostRequest.authenticationType).toEqual('U2F')
+      expect(rar.authorizationsPostRequest.retriesLeft).toEqual('1')
+
+      // amount should be propagated from ThirdpartyRequestsRequest
+      expect(rar.authorizationsPostRequest.amount).toEqual(tr.amount)
+
+      // quotes must be propagated
+      expect(rar.authorizationsPostRequest.quote).toEqual(model.data.requestQuoteResponse!.quotes)
+
+      // transactionId must be propagated
+      expect(rar.authorizationsPostRequest.transactionId).toEqual(model.data.transactionRequestPutUpdate!.transactionId)
+      expect(rar.authorizationsPostRequest.transactionRequestId).toEqual(model.data.transactionRequestId)
+
+      // validate requestAuthorization response
+      expect(model.data.requestAuthorizationResponse).toBeDefined()
+
+      // authorizationsResponse is send by mock
+      expect(model.data.requestAuthorizationResponse).toEqual(requestAuthorizationResponse)
 
       // onVerifyAuthorization
       // TODO: check properly transferRequest
@@ -317,7 +361,7 @@ describe('DFSPTransactionModel', () => {
       }
     })
 
-    it('should throw if PUT /thirdpartyRequests/{ID}/transactions failed', async (done) => {
+    it('should throw if PUT /thirdpartyRequests/transactions/{ID} failed', async (done) => {
       mocked(modelConfig.kvs.set).mockImplementationOnce(() => Promise.resolve(true))
       mocked(modelConfig.thirdpartyRequests.putThirdpartyRequestsTransactions)
         .mockImplementationOnce(() => Promise.resolve({ statusCode: 400 } as GenericRequestResponse))
@@ -334,7 +378,7 @@ describe('DFSPTransactionModel', () => {
         shouldNotBeExecuted()
       } catch (err) {
         // TODO: fix assert when proper error is thrown
-        expect(err.message).toEqual(`PUT /thirdpartyRequests/${transactionRequestId}/transactions failed`)
+        expect(err.message).toEqual(`PUT /thirdpartyRequests/transactions/${transactionRequestId} failed`)
         done()
       }
     })
@@ -359,6 +403,31 @@ describe('DFSPTransactionModel', () => {
       } catch (err) {
         // TODO: fix assert when proper error is thrown
         expect(err.message).toEqual('POST /quotes failed')
+        done()
+      }
+    })
+
+    it('should throw if requestAuthorization failed', async (done) => {
+      mocked(modelConfig.kvs.set).mockImplementationOnce(() => Promise.resolve(true))
+      mocked(modelConfig.sdkOutgoingRequests.requestAuthorization).mockImplementationOnce(
+        () => Promise.resolve({ currentState: 'ERROR_OCCURRED' } as SDKOutboundAPI.Schemas.authorizationsPostResponse)
+      )
+      const data: DFSPTransactionData = {
+        transactionRequestId,
+        participantId,
+        transactionRequestRequest,
+        transactionRequestPutUpdate,
+        requestQuoteRequest,
+        requestQuoteResponse,
+        currentState: 'quoteReceived'
+      }
+      const model = await create(data, modelConfig)
+      try {
+        await model.fsm.requestAuthorization()
+        shouldNotBeExecuted()
+      } catch (err) {
+        // TODO: fix assert when proper error is thrown
+        expect(err.message).toEqual('POST /authorizations failed')
         done()
       }
     })
