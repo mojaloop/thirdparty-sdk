@@ -147,7 +147,7 @@ services:
       - "27017:27017"
 
   pisp-simulator:
-    image: mojaloop/mojaloop-simulator:v11.3.0.2-pisp
+    image: mojaloop/mojaloop-simulator:v11.3.0.3-pisp
 
     networks:
       - mojaloop-net
