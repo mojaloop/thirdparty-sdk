@@ -711,6 +711,33 @@ describe('DFSPTransactionModel', () => {
       }
     })
 
+    it('should throw if verifyAuthorization failed', async (done) => {
+      mocked(modelConfig.kvs.set).mockImplementationOnce(() => Promise.resolve(true))
+      mocked(modelConfig.dfspBackendRequests.verifyAuthorization).mockImplementationOnce(
+        () => Promise.resolve({ isValid: false })
+      )
+      const data: DFSPTransactionData = {
+        transactionRequestId,
+        participantId,
+        transactionRequestRequest,
+        transactionRequestPutUpdate,
+        requestQuoteRequest,
+        requestQuoteResponse,
+        requestAuthorizationResponse,
+        transactionRequestState: 'RECEIVED',
+        currentState: 'authorizationReceived'
+      }
+      const model = await create(data, modelConfig)
+      try {
+        await model.fsm.verifyAuthorization()
+        shouldNotBeExecuted()
+      } catch (err) {
+        // TODO: fix assert when proper error is thrown
+        expect(err.message).toEqual('POST /verify-authorization failed')
+        done()
+      }
+    })
+
     it('should handle errored state', async () => {
       mocked(modelConfig.kvs.set).mockImplementation(() => Promise.resolve(true))
       const data: DFSPTransactionData = {
