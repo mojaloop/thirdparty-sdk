@@ -26,7 +26,7 @@
  ******/
 
 import { HttpRequestsConfig, HttpRequests } from '~/shared/http-requests'
-import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
+import { thirdparty as tpAPI, v1_1 as fspiopAPI } from '@mojaloop/api-snippets'
 import { BackendValidateOTPResponse, BackendGetScopesResponse } from '../models/inbound/dfspOTPValidate.interface'
 
 export interface IsValidResponse {
@@ -91,10 +91,6 @@ export class DFSPBackendRequests extends HttpRequests {
   }
 
   // REQUESTS
-  /**
-   * TODO:
-   *  verifyAuthorization
-   */
 
   // request user's accounts details from DFSP Backend
   async getUserAccounts (userId: string): Promise<tpAPI.Schemas.AccountsIDPutResponse | void> {
@@ -126,5 +122,12 @@ export class DFSPBackendRequests extends HttpRequests {
     request: tpAPI.Schemas.ThirdpartyRequestsTransactionsPostRequest
   ): Promise<IsValidResponse | void> {
     return this.post(this.validateThirdpartyTransactionRequestPath, request)
+  }
+
+  // validate Authorization response received from PISP
+  async verifyAuthorization (
+    request: fspiopAPI.Schemas.AuthorizationsIDPutResponse
+  ): Promise<IsValidResponse | void> {
+    return this.post(this.verifyAuthorizationPath, request)
   }
 }

@@ -160,4 +160,29 @@ describe('backendRequests', () => {
       )
     })
   })
+
+  describe('verifyAuthorization', () => {
+    it('should propagate the call to post', async () => {
+      const response = { isValid: true }
+      const authorizationResponse: tpAPI.Schemas.AuthorizationsIDPutResponse = {
+        authenticationInfo: {
+          authentication: 'U2F',
+          authenticationValue: {
+            pinValue: 'some-pin-value',
+            counter: '1'
+          } as string & Partial<{pinValue: string, counter: string}>
+        },
+        responseType: 'ENTERED'
+      }
+      const postSpy = jest.spyOn(dfspBackendRequests, 'post').mockImplementationOnce(
+        () => Promise.resolve(response)
+      )
+      const result = await dfspBackendRequests.verifyAuthorization(authorizationResponse)
+      expect(result).toEqual(response)
+      expect(postSpy).toBeCalledWith(
+        dfspBackendRequests.verifyAuthorizationPath,
+        authorizationResponse
+      )
+    })
+  })
 })
