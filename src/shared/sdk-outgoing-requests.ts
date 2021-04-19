@@ -37,6 +37,7 @@ export interface SDKOutgoingRequestsConfig extends HttpRequestsConfig {
   requestPartiesInformationPath: string
   requestToPayTransferPath: string
   requestQuotePath: string
+  requestAuthorizationPath: string
 }
 
 /**
@@ -74,10 +75,14 @@ export class SDKOutgoingRequests extends HttpRequests {
     return this.config.requestQuotePath
   }
 
+  // requestAuthorization path getter
+  get requestAuthorizationPath (): string {
+    return this.config.requestAuthorizationPath
+  }
+
   // REQUESTS
   /**
    *  // synchronous calls to SDKOutgoing
-   *  requestAuthorization
    *  requestTransfer,
    *
    * */
@@ -125,6 +130,17 @@ export class SDKOutgoingRequests extends HttpRequests {
     request: OutboundAPI.Schemas.quotesPostRequest
   ): Promise<OutboundAPI.Schemas.quotesPostResponse | void> {
     return this.post(this.requestQuotePath, request)
+  }
+
+  /**
+   * @method requestAuthorization
+   * @param {OutboundAPI.Schemas.authorizationsPostRequest} request - authorization request
+   * @returns {Promise<OutboundAPI.Schemas.authorizationsPostResponse | void>}
+   */
+  async requestAuthorization (
+    request: OutboundAPI.Schemas.authorizationsPostRequest
+  ): Promise<OutboundAPI.Schemas.authorizationsPostResponse | void> {
+    return this.post(this.requestAuthorizationPath, request)
   }
 
   // TODO: drop it and replace by requestTransfer

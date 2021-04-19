@@ -16,6 +16,21 @@
       },
       {
         "method": "put",
+        "path": "/authorizations/{ID}",
+        "endpoint": "http://inbound-sdk-scheme-adapter:7000"
+      },
+      {
+        "method": "patch",
+        "path": "/thirdpartyRequests/transactions/{ID}",
+        "endpoint": "http://inbound-thirdparty-scheme-adapter:4005"
+      },
+      {
+        "method": "put",
+        "path": "/thirdpartyRequests/transactions/{ID}/error",
+        "endpoint": "http://inbound-thirdparty-scheme-adapter:4005"
+      },
+      {
+        "method": "put",
         "path": "/transfers/{ID}",
         "endpoint": "http://localhost:3000"
       }

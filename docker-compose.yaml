@@ -21,6 +21,8 @@ services:
       - "4005:4005"
     depends_on:
       - redis
+      - ml-testing-toolkit
+      - pisp-simulator
     extra_hosts:
       - "redis:172.17.0.1"
       - "ml-testing-toolkit:172.17.0.1"
@@ -47,6 +49,8 @@ services:
       - "4006:4006"
     depends_on:
       - redis
+      - ml-testing-toolkit
+      - pisp-simulator
     extra_hosts:
       - "redis:172.17.0.1"
       - "ml-testing-toolkit:172.17.0.1"
@@ -72,6 +76,7 @@ services:
       - mojaloop-net
     depends_on:
       - redis
+      - ml-testing-toolkit
     restart: always
     extra_hosts:
       - "central-ledger.local:172.17.0.1"
@@ -94,7 +99,6 @@ services:
       - "pisp-backend:172.17.0.1"
       - "ml-testing-toolkit:172.17.0.1"
 
-
   redis:
     container_name: redis
     image: "redis:6.0.10-alpine"
@@ -103,3 +107,55 @@ services:
     ports:
       - "6379:6379"
     restart: always
+  
+  ml-testing-toolkit:
+    image: mojaloop/ml-testing-toolkit:v12.0.1
+    container_name: ml-testing-toolkit
+    volumes:
+      - "./docker/contract/ml-testing-toolkit/spec_files:/opt/mojaloop-testing-toolkit/spec_files"
+      - "./docker/contract/ml-testing-toolkit/secrets:/opt/mojaloop-testing-toolkit/secrets"
+    ports:
+      - "15000:5000"
+      - "5050:5050"
+    command: npm start
+    networks:
+      - mojaloop-net
+    depends_on:
+      - mongo
+    extra_hosts:
+      - "inbound-thirdparty-scheme-adapter:172.17.0.1"
+      - "outbound-thirdparty-scheme-adapter:172.17.0.1"
+      - "inbound-sdk-scheme-adapter:172.17.0.1"
+      - "ml-testing-toolkit:172.17.0.1"
+
+  ml-testing-toolkit-ui:
+    image: mojaloop/ml-testing-toolkit-ui:v12.0.0
+    container_name: ml-testing-toolkit-ui
+    ports:
+      - "6060:6060"
+    command: nginx -g "daemon off;"
+    depends_on:
+      - ml-testing-toolkit
+      - mongo
+    networks:
+      - mojaloop-net
+
+  mongo:
+    image: mongo
+    container_name: 3p_mongo
+    ports:
+      - "27017:27017"
+
+  pisp-simulator:
+    image: mojaloop/mojaloop-simulator:v11.3.0.2-pisp
+
+    networks:
+      - mojaloop-net
+    container_name: pisp-simulator
+    env_file: ./docker/dfsp_backend.env
+    volumes:
+       - ./docker/dfsp_rules.json:/src/rules.json
+    ports:
+      - "9000:3000"
+      - "9002:3002"
+      - "9003:3003"    

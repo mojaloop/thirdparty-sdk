@@ -43,7 +43,8 @@ describe('SDKOutgoingRequests', () => {
     // requestAuthorizationPath: 'authorizations',
     requestPartiesInformationPath: 'parties/{Type}/{ID}/{SubId}',
     requestToPayTransferPath: 'request-to-pay-transfer',
-    requestQuotePath: 'request-quote'
+    requestQuotePath: 'request-quote',
+    requestAuthorizationPath: 'request-authorization'
   }
 
   const requestToPayTransfer: OutboundRequestToPayTransferPostRequest = {
@@ -161,6 +162,52 @@ describe('SDKOutgoingRequests', () => {
       const result = await sdkRequest.requestQuote(request)
       expect(result).toEqual(response)
       expect(postSpy).toHaveBeenCalledWith(sdkRequest.requestQuotePath, request)
+    })
+  })
+
+  describe('requestAuthorization', () => {
+    it('should propagate the call to post', async () => {
+      const request: OutboundAPI.Schemas.authorizationsPostRequest = {
+        fspId: uuid().substr(0, 32), // fspid has limited length
+        authorizationsPostRequest: {
+          transactionId: uuid(),
+          transactionRequestId: uuid(),
+          authenticationType: 'U2F',
+          retriesLeft: '1',
+          amount: {
+            currency: 'USD',
+            amount: '100'
+          },
+          quote: {
+            transferAmount: {
+              currency: 'USD',
+              amount: '100'
+            },
+            expiration: (new Date()).toISOString(),
+            ilpPacket: '...abc',
+            condition: 'xyz...'
+          }
+        }
+      }
+
+      const response: OutboundAPI.Schemas.authorizationsPostResponse = {
+        authenticationInfo: {
+          authentication: 'U2F',
+          authenticationValue: {
+            pinValue: 'abc...xyz',
+            counter: '1'
+          } as string & Partial<{pinValue: string, counter: string}>
+        },
+        responseType: 'ENTERED',
+        currentState: 'COMPLETED'
+      }
+
+      const postSpy = jest.spyOn(sdkRequest, 'post').mockImplementationOnce(
+        () => Promise.resolve(response)
+      )
+      const result = await sdkRequest.requestAuthorization(request)
+      expect(result).toEqual(response)
+      expect(postSpy).toHaveBeenCalledWith(sdkRequest.requestAuthorizationPath, request)
     })
   })
 

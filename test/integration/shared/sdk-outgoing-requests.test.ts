@@ -40,7 +40,8 @@ describe('SDKOutgoingRequests', () => {
     // requestAuthorizationPath: string
     requestPartiesInformationPath: config.SHARED.SDK_OUTGOING_PARTIES_INFORMATION_PATH,
     requestToPayTransferPath: config.SHARED.SDK_REQUEST_TO_PAY_TRANSFER_URI,
-    requestQuotePath: config.SHARED.SDK_OUTGOING_REQUEST_QUOTE_PATH
+    requestQuotePath: config.SHARED.SDK_OUTGOING_REQUEST_QUOTE_PATH,
+    requestAuthorizationPath: config.SHARED.SDK_OUTGOING_REQUEST_AUTHORIZATION_PATH
   }
   const sdkOutRequest = new SDKOutgoingRequests(sdkConfig)
 
@@ -51,7 +52,6 @@ describe('SDKOutgoingRequests', () => {
 
       // Assert
       expect(result).toBeDefined()
-
       // result could be void, so Typescript enforce code branching
       if (result) {
         expect(result.party).toBeDefined()
@@ -101,6 +101,51 @@ describe('SDKOutgoingRequests', () => {
       // result could be void, so Typescript enforce code branching
       if (result) {
         expect(result.quotes).toBeDefined()
+        expect(result.currentState).toEqual('COMPLETED')
+      }
+    })
+  })
+
+  describe('requestAuthorization', () => {
+    it('should return received authorization information', async () => {
+      const request: OutboundAPI.Schemas.authorizationsPostRequest = {
+        fspId: 'pisp',
+        authorizationsPostRequest: {
+          transactionId: uuid(),
+          transactionRequestId: uuid(),
+          authenticationType: 'U2F',
+          retriesLeft: '1',
+          amount: {
+            currency: 'USD',
+            amount: '100'
+          },
+          quote: {
+            transferAmount: {
+              currency: 'USD',
+              amount: '100'
+            },
+            expiration: (new Date()).toISOString(),
+            ilpPacket: 'abc',
+            condition: '0123456789012345678901234567890123456789012'
+          }
+        }
+      }
+
+      // Act
+      const result = await sdkOutRequest.requestAuthorization(request)
+
+      // Assert
+      expect(result).toBeDefined()
+      // result could be void, so Typescript enforce code branching
+      if (result) {
+        expect(result.authorizations.authenticationInfo).toEqual({
+          authentication: 'U2F',
+          authenticationValue: {
+            pinValue: expect.anything(),
+            counter: '1'
+          }
+        })
+        expect(result.authorizations.responseType).toBeDefined()
         expect(result.currentState).toEqual('COMPLETED')
       }
     })

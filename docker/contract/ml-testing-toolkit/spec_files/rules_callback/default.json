@@ -306,5 +306,55 @@
     },
     "type": "callback",
     "version": 1
+  },
+  {
+    "ruleId": 6,
+    "priority": 1,
+    "description": "post /authorizations",
+    "apiVersion": {
+      "minorVersion": 1,
+      "majorVersion": 0,
+      "type": "thirdparty_pisp",
+      "asynchronous": true
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/authorizations"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "post"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/authorizations/{ID}",
+      "params": {
+        "headers": {
+          "Content-Type": "application/vnd.interoperability.authorizations+json;version=1.0",
+          "Date": "2021-04-09T14:02:48.217Z",
+          "FSPIOP-Source": "dfspA"
+        },
+        "body": {
+          "authenticationInfo": {
+            "authentication": "U2F",
+            "authenticationValue": {
+              "pinValue": "some-pin-value",
+              "counter": "1"
+            }
+          },
+          "responseType": "ENTERED"
+        },
+        "scripts": {}
+      },
+      "type": "FIXED_CALLBACK"
+    },
+    "type": "callback",
+    "version": 1
   }
 ]

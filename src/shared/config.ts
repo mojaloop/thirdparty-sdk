@@ -101,6 +101,7 @@ export interface ServiceConfig {
     SDK_OUTGOING_URI: string
     SDK_OUTGOING_HTTP_SCHEME: string
     SDK_OUTGOING_REQUEST_QUOTE_PATH: string
+    SDK_OUTGOING_REQUEST_AUTHORIZATION_PATH: string
     SDK_REQUEST_TO_PAY_TRANSFER_URI: string
     SDK_OUTGOING_PARTIES_INFORMATION_PATH: string
     SDK_NOTIFY_ABOUT_TRANSFER_URI: string
@@ -335,12 +336,12 @@ export const ConvictConfig = Convict<ServiceConfig>({
     PISP_TRANSACTION_INITIATE_TIMEOUT_IN_SECONDS: {
       doc: 'Timeout for Transaction Initiate phase',
       format: 'nat',
-      default: 3
+      default: 30
     },
     PISP_TRANSACTION_APPROVE_TIMEOUT_IN_SECONDS: {
       doc: 'Timeout for Transaction Approve phase',
       format: 'nat',
-      default: 3
+      default: 30
     },
     SDK_OUTGOING_URI: {
       doc: 'host address of SDK scheme-adapter Outgoing service\'s ',
@@ -356,6 +357,11 @@ export const ConvictConfig = Convict<ServiceConfig>({
       doc: 'path to sdk outgoing quote sync interface',
       format: '*',
       default: 'quotes'
+    },
+    SDK_OUTGOING_REQUEST_AUTHORIZATION_PATH: {
+      doc: 'path to sdk outgoing authorization sync interface',
+      format: '*',
+      default: 'authorizations'
     },
     SDK_REQUEST_TO_PAY_TRANSFER_URI: {
       doc: 'uri to sdk-scheme-adapter requestToPayTransfer endpoint',
