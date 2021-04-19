@@ -191,14 +191,16 @@ describe('SDKOutgoingRequests', () => {
       }
 
       const response: OutboundAPI.Schemas.authorizationsPostResponse = {
-        authenticationInfo: {
-          authentication: 'U2F',
-          authenticationValue: {
-            pinValue: 'abc...xyz',
-            counter: '1'
-          } as string & Partial<{pinValue: string, counter: string}>
+        authorizations: {
+          authenticationInfo: {
+            authentication: 'U2F',
+            authenticationValue: {
+              pinValue: 'abc...xyz',
+              counter: '1'
+            } as string & Partial<{ pinValue: string, counter: string }>
+          },
+          responseType: 'ENTERED'
         },
-        responseType: 'ENTERED',
         currentState: 'COMPLETED'
       }
 
