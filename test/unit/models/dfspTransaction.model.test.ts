@@ -637,7 +637,7 @@ describe('DFSPTransactionModel', () => {
       }
     })
 
-    it('should throw if PUT /thirdpartyRequests/{ID}/transactions failed', async (done) => {
+    it('should throw if PUT /thirdpartyRequests/transactions/{ID} failed', async (done) => {
       mocked(modelConfig.kvs.set).mockImplementationOnce(() => Promise.resolve(true))
       mocked(modelConfig.thirdpartyRequests.putThirdpartyRequestsTransactions)
         .mockImplementationOnce(() => Promise.resolve({ statusCode: 400 } as GenericRequestResponse))
@@ -681,6 +681,32 @@ describe('DFSPTransactionModel', () => {
       } catch (err) {
         // TODO: fix assert when proper error is thrown
         expect(err.message).toEqual('POST /quotes failed')
+        done()
+      }
+    })
+
+    it('should throw if requestAuthorization failed', async (done) => {
+      mocked(modelConfig.kvs.set).mockImplementationOnce(() => Promise.resolve(true))
+      mocked(modelConfig.sdkOutgoingRequests.requestAuthorization).mockImplementationOnce(
+        () => Promise.resolve({ currentState: 'ERROR_OCCURRED' } as SDKOutboundAPI.Schemas.authorizationsPostResponse)
+      )
+      const data: DFSPTransactionData = {
+        transactionRequestId,
+        participantId,
+        transactionRequestRequest,
+        transactionRequestPutUpdate,
+        requestQuoteRequest,
+        requestQuoteResponse,
+        transactionRequestState: 'RECEIVED',
+        currentState: 'quoteReceived'
+      }
+      const model = await create(data, modelConfig)
+      try {
+        await model.fsm.requestAuthorization()
+        shouldNotBeExecuted()
+      } catch (err) {
+        // TODO: fix assert when proper error is thrown
+        expect(err.message).toEqual('POST /authorizations failed')
         done()
       }
     })
