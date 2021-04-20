@@ -621,9 +621,9 @@ describe('DFSPTransactionModel', () => {
 
       const data: DFSPTransactionData = {
         transactionRequestId,
+        transactionRequestState: 'RECEIVED',
         participantId,
         transactionRequestRequest,
-        transactionRequestState: 'RECEIVED',
         currentState: 'start'
       }
       const model = await create(data, modelConfig)
@@ -643,10 +643,10 @@ describe('DFSPTransactionModel', () => {
         .mockImplementationOnce(() => Promise.resolve({ statusCode: 400 } as GenericRequestResponse))
       const data: DFSPTransactionData = {
         transactionRequestId,
+        transactionRequestState: 'RECEIVED',
         participantId,
         transactionRequestRequest,
         transactionRequestPutUpdate,
-        transactionRequestState: 'RECEIVED',
         currentState: 'transactionRequestIsValid'
       }
       const model = await create(data, modelConfig)
@@ -667,11 +667,11 @@ describe('DFSPTransactionModel', () => {
       )
       const data: DFSPTransactionData = {
         transactionRequestId,
+        transactionRequestState: 'RECEIVED',
         participantId,
         transactionRequestRequest,
         transactionRequestPutUpdate,
         requestQuoteRequest,
-        transactionRequestState: 'RECEIVED',
         currentState: 'notifiedTransactionRequestIsValid'
       }
       const model = await create(data, modelConfig)
@@ -692,12 +692,12 @@ describe('DFSPTransactionModel', () => {
       )
       const data: DFSPTransactionData = {
         transactionRequestId,
+        transactionRequestState: 'RECEIVED',
         participantId,
         transactionRequestRequest,
         transactionRequestPutUpdate,
         requestQuoteRequest,
         requestQuoteResponse,
-        transactionRequestState: 'RECEIVED',
         currentState: 'quoteReceived'
       }
       const model = await create(data, modelConfig)
@@ -718,13 +718,13 @@ describe('DFSPTransactionModel', () => {
       )
       const data: DFSPTransactionData = {
         transactionRequestId,
+        transactionRequestState: 'RECEIVED',
         participantId,
         transactionRequestRequest,
         transactionRequestPutUpdate,
         requestQuoteRequest,
         requestQuoteResponse,
         requestAuthorizationResponse,
-        transactionRequestState: 'RECEIVED',
         currentState: 'authorizationReceived'
       }
       const model = await create(data, modelConfig)
@@ -734,6 +734,73 @@ describe('DFSPTransactionModel', () => {
       } catch (err) {
         // TODO: fix assert when proper error is thrown
         expect(err.message).toEqual('POST /verify-authorization failed')
+        done()
+      }
+    })
+
+    it('should throw if user REJECTED authorization/transfer', async (done) => {
+      mocked(modelConfig.kvs.set).mockImplementationOnce(() => Promise.resolve(true))
+      mocked(modelConfig.dfspBackendRequests.verifyAuthorization).mockImplementationOnce(
+        () => Promise.resolve({ isValid: false })
+      )
+      const data: DFSPTransactionData = {
+        transactionRequestId,
+        transactionRequestState: 'RECEIVED',
+        participantId,
+        transactionRequestRequest,
+        transactionRequestPutUpdate,
+        requestQuoteRequest,
+        requestQuoteResponse,
+        requestAuthorizationResponse: {
+          ...requestAuthorizationResponse,
+          authorizations: {
+            ...requestAuthorizationResponse.authorizations,
+            responseType: 'REJECTED'
+          }
+        },
+        currentState: 'authorizationReceived'
+      }
+      const model = await create(data, modelConfig)
+      try {
+        await model.fsm.verifyAuthorization()
+        shouldNotBeExecuted()
+      } catch (err) {
+        expect(model.data.transactionRequestState).toEqual('REJECTED')
+        // TODO: fix assert when proper error is thrown
+        expect(err.message).toEqual('Authorization/Transfer REJECTED')
+        done()
+      }
+    })
+
+    it('should throw if unexpected responseType received', async (done) => {
+      mocked(modelConfig.kvs.set).mockImplementationOnce(() => Promise.resolve(true))
+      mocked(modelConfig.dfspBackendRequests.verifyAuthorization).mockImplementationOnce(
+        () => Promise.resolve({ isValid: false })
+      )
+      const data: DFSPTransactionData = {
+        transactionRequestId,
+        transactionRequestState: 'RECEIVED',
+        participantId,
+        transactionRequestRequest,
+        transactionRequestPutUpdate,
+        requestQuoteRequest,
+        requestQuoteResponse,
+        requestAuthorizationResponse: {
+          ...requestAuthorizationResponse,
+          authorizations: {
+            ...requestAuthorizationResponse.authorizations,
+            responseType: 'RESEND'
+          }
+        },
+        currentState: 'authorizationReceived'
+      }
+      const model = await create(data, modelConfig)
+      try {
+        await model.fsm.verifyAuthorization()
+        shouldNotBeExecuted()
+      } catch (err) {
+        // TODO: fix assert when proper error is thrown
+        expect(err.message).toEqual('Unexpected authorization responseType: RESEND')
         done()
       }
     })
