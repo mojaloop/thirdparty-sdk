@@ -102,7 +102,6 @@ export interface ServiceConfig {
     SDK_OUTGOING_HTTP_SCHEME: string
     SDK_OUTGOING_REQUEST_QUOTE_PATH: string
     SDK_OUTGOING_REQUEST_AUTHORIZATION_PATH: string
-    SDK_OUTGOING_REQUEST_TRANSFER_PATH: string
     SDK_REQUEST_TO_PAY_TRANSFER_URI: string
     SDK_OUTGOING_PARTIES_INFORMATION_PATH: string
     SDK_NOTIFY_ABOUT_TRANSFER_URI: string
@@ -363,11 +362,6 @@ export const ConvictConfig = Convict<ServiceConfig>({
       doc: 'path to sdk outgoing authorization sync interface',
       format: '*',
       default: 'authorizations'
-    },
-    SDK_OUTGOING_REQUEST_TRANSFER_PATH: {
-      doc: 'path to sdk outgoing transfer sync interface',
-      format: '*',
-      default: 'simpleTransfers'
     },
     SDK_REQUEST_TO_PAY_TRANSFER_URI: {
       doc: 'uri to sdk-scheme-adapter requestToPayTransfer endpoint',

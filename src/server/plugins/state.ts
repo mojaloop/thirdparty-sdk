@@ -140,8 +140,7 @@ export const StatePlugin = {
       requestPartiesInformationPath: config.SHARED.SDK_OUTGOING_PARTIES_INFORMATION_PATH,
       requestToPayTransferPath: config.SHARED.SDK_REQUEST_TO_PAY_TRANSFER_URI,
       requestQuotePath: config.SHARED.SDK_OUTGOING_REQUEST_QUOTE_PATH,
-      requestAuthorizationPath: config.SHARED.SDK_OUTGOING_REQUEST_AUTHORIZATION_PATH,
-      requestTransferPath: config.SHARED.SDK_OUTGOING_REQUEST_TRANSFER_PATH
+      requestAuthorizationPath: config.SHARED.SDK_OUTGOING_REQUEST_AUTHORIZATION_PATH
     })
 
     try {

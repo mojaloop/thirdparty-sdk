@@ -33,11 +33,11 @@ import {
 } from '../models/thirdparty.transactions.interface'
 import { OutboundAPI } from '@mojaloop/sdk-scheme-adapter'
 export interface SDKOutgoingRequestsConfig extends HttpRequestsConfig {
+  // requestAuthorizationPath: string
   requestPartiesInformationPath: string
   requestToPayTransferPath: string
   requestQuotePath: string
   requestAuthorizationPath: string
-  requestTransferPath: string
 }
 
 /**
@@ -78,11 +78,6 @@ export class SDKOutgoingRequests extends HttpRequests {
   // requestAuthorization path getter
   get requestAuthorizationPath (): string {
     return this.config.requestAuthorizationPath
-  }
-
-  // requestTransfer path getter
-  get requestTransferPath (): string {
-    return this.config.requestTransferPath
   }
 
   // REQUESTS
@@ -146,17 +141,6 @@ export class SDKOutgoingRequests extends HttpRequests {
     request: OutboundAPI.Schemas.authorizationsPostRequest
   ): Promise<OutboundAPI.Schemas.authorizationsPostResponse | void> {
     return this.post(this.requestAuthorizationPath, request)
-  }
-
-  /**
-   * @method requestTransfer
-   * @param {OutboundAPI.Schemas.simpleTransfersPostRequest} request - transfer request
-   * @returns {Promise<OutboundAPI.Schemas.simpleTransfersPostResponse | void>}
-   */
-  async requestTransfer (
-    request: OutboundAPI.Schemas.simpleTransfersPostRequest
-  ): Promise<OutboundAPI.Schemas.simpleTransfersPostResponse | void> {
-    return this.post(this.requestTransferPath, request)
   }
 
   // TODO: drop it and replace by requestTransfer
