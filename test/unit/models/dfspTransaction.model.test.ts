@@ -343,12 +343,17 @@ describe('DFSPTransactionModel', () => {
       expect(model.data.transferRequest).toBeDefined()
 
       // onRequestTransfer
-      // TODO: check properly transferResponse & transactionRequestPatchUpdate
+      // TODO: SRIDHAR - check properly transferResponse & transactionRequestPatchUpdate
+      // TODO: SRIDHAR - check sdkOutgoingRequests.
       expect(model.data.transferResponse).toBeDefined()
       expect(model.data.transactionRequestPatchUpdate).toBeDefined()
 
       // onNotifyTransferIsDone
-      expect(model.thirdpartyRequests.patchConsentRequests).toHaveBeenCalledWith()
+      expect(model.thirdpartyRequests.patchThirdpartyRequestsTransactions).toHaveBeenCalledWith(
+        model.data.transactionRequestPatchUpdate,
+        model.data.transactionRequestId,
+        model.data.participantId
+      )
     })
 
     it('should throw if transactionRequestRequest is not valid', async (done) => {
