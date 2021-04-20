@@ -68,7 +68,8 @@ describe('DFSPTransactionModel', () => {
       kvs: new KVS(connectionConfig),
       logger: connectionConfig.logger,
       thirdpartyRequests: {
-        putThirdpartyRequestsTransactions: jest.fn(() => Promise.resolve({ statusCode: 200 }))
+        putThirdpartyRequestsTransactions: jest.fn(() => Promise.resolve({ statusCode: 200 })),
+        patchThirdpartyRequestsTransactions: jest.fn(() => Promise.resolve({ statusCode: 200 }))
       } as unknown as ThirdpartyRequests,
       sdkOutgoingRequests: {
         requestQuote: jest.fn(() => Promise.resolve(requestQuoteResponse)),
@@ -346,7 +347,8 @@ describe('DFSPTransactionModel', () => {
       expect(model.data.transferResponse).toBeDefined()
       expect(model.data.transactionRequestPatchUpdate).toBeDefined()
 
-      // onNotifyTransferIsDone - nothing to check
+      // onNotifyTransferIsDone
+      expect(model.thirdpartyRequests.patchConsentRequests).toHaveBeenCalledWith()
     })
 
     it('should throw if transactionRequestRequest is not valid', async (done) => {

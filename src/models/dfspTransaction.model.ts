@@ -289,14 +289,22 @@ export class DFSPTransactionModel
     // TODO: store results from call
     this.data.transferResponse = {}
 
-    // TODO: prepare this.data.transactionRequestPatchUpdate
-    this.data.transactionRequestPatchUpdate =
-      {} as unknown as tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPatchResponse
+    this.data.transactionRequestPatchUpdate = {
+      transactionId: this.data.transactionId!,
+      transactionRequestState: this.data.transactionRequestState,
+      // TODO: propagate transaction state from transferResponse when received
+      transactionState: 'COMPLETED'
+    }
   }
 
   async onNotifyTransferIsDone (): Promise<void> {
     InvalidDataError.throwIfInvalidProperty(this.data, 'transactionRequestPatchUpdate')
-    // TODO: make a notification call to PISP
+
+    await this.thirdpartyRequests.patchThirdpartyRequestsTransactions(
+      this.data.transactionRequestPatchUpdate!,
+      this.data.transactionRequestId,
+      this.data.participantId
+    )
   }
 
   // workflow
