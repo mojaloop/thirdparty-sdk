@@ -119,6 +119,7 @@ export class DFSPTransactionModel
   // transitions handlers
   async onValidateTransactionRequest (): Promise<void> {
     InvalidDataError.throwIfInvalidProperty(this.data, 'transactionRequestId')
+    InvalidDataError.throwIfInvalidProperty(this.data, 'transactionRequestState')
     InvalidDataError.throwIfInvalidProperty(this.data, 'participantId')
     InvalidDataError.throwIfInvalidProperty(this.data, 'transactionRequestRequest')
 
@@ -132,11 +133,13 @@ export class DFSPTransactionModel
       throw new Error('transactionRequestRequest is not valid')
     }
 
-    // happy path - transactionRequestRequest is valid,
+    // allocate new id
+    this.data.transactionId = uuid()
+
     // so let prepare notification payload to be send to PISPTransactionModel
     this.data.transactionRequestPutUpdate = {
-      transactionId: uuid(),
-      transactionRequestState: 'RECEIVED'
+      transactionId: this.data.transactionId,
+      transactionRequestState: this.data.transactionRequestState
     }
   }
 
@@ -148,7 +151,7 @@ export class DFSPTransactionModel
       this.data.transactionRequestRequest.payee.partyIdInfo, 'fspId'
     )
 
-    // this field will be present what is guaranted by InvalidDataError validation above
+    // this field will be present what is guaranteed by InvalidDataError validation above
     const update = this.data.transactionRequestPutUpdate as tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPutResponse
     const updateResult = await this.thirdpartyRequests.putThirdpartyRequestsTransactions(
       update,
@@ -157,7 +160,7 @@ export class DFSPTransactionModel
     )
 
     // check result and throw if invalid
-    if (!(updateResult && updateResult.statusCode === 200)) {
+    if (!(updateResult && updateResult.statusCode >= 200 && updateResult.statusCode < 300)) {
       // TODO: throw proper error when notification failed
       // TODO: error should be transformed to call PUT /thirdpartyRequests/transactions/{ID}/error
       throw new Error(`PUT /thirdpartyRequests/transactions/${this.data.transactionRequestId} failed`)
@@ -237,20 +240,46 @@ export class DFSPTransactionModel
   async onVerifyAuthorization (): Promise<void> {
     InvalidDataError.throwIfInvalidProperty(this.data, 'requestAuthorizationResponse')
 
-    const result = await this.dfspBackendRequests.verifyAuthorization(
-      this.data.requestAuthorizationResponse!.authorizations
-    )
+    // shortcut
+    const authorizationInfo = this.data.requestAuthorizationResponse!.authorizations
 
-    if (!(result && result.isValid)) {
-      // TODO: throw proper error
-      throw new Error('POST /verify-authorization failed')
+    // different actions on responseType
+    switch (authorizationInfo.responseType) {
+      case 'ENTERED': {
+        // user accepted quote & transfer details
+        // let verify entered signed challenge by DFSP backend
+        const result = await this.dfspBackendRequests.verifyAuthorization(authorizationInfo)
+
+        if (!(result && result.isValid)) {
+          // challenge is improperly signed
+          // TODO: throw proper error
+          throw new Error('POST /verify-authorization failed')
+        }
+
+        // user's challenge has been successfully verified
+        this.data.transactionRequestState = 'ACCEPTED'
+
+        // TODO: SRIDHAR prepare this.data.transferRequest
+        this.data.transferRequest = {}
+        break
+      }
+
+      case 'REJECTED': {
+        // user rejected authorization so transfer is declined, let abort workflow!
+        this.data.transactionRequestState = 'REJECTED'
+
+        // TODO: throw proper error;
+        // PUT /thirdpartyRequests/transactions/{ID}/error
+        // or  PATCH /thirdpartyRequests/transactions/{ID} ????
+        throw new Error('Authorization/Transfer REJECTED')
+      }
+
+      default: {
+        // should we setup ??? this.data.transactionRequestState = 'REJECTED'
+        // we received 'RESEND' or something else
+        throw new Error(`Unexpected authorization responseType: ${authorizationInfo.responseType}`)
+      }
     }
-
-    // don't we want to store somewhere the transactionRequestState (now it is ACCEPTED)?
-    // TODO: add to state data transactionRequestState and properly update it
-
-    // TODO: prepare this.data.transferRequest
-    this.data.transferRequest = {}
   }
 
   async onRequestTransfer (): Promise<void> {

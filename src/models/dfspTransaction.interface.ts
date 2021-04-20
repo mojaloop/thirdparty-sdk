@@ -71,12 +71,13 @@ export interface DFSPTransactionModelConfig extends PersistentModelConfig {
 }
 
 export interface DFSPTransactionData extends StateData<DFSPTransactionModelState> {
+  // transactionRequest
   transactionRequestId: string
+  transactionRequestState: tpAPI.Schemas.TransactionRequestState
+  transactionId?: string
 
-  // TODO: add to state data transactionRequestState and properly update it
-
-  // id of participant (PISP) which sends ThirdpartyTransactionRequest to us
-  // used as target dfspId param for calls to switch via thirdpartyRequests
+  // id of participant (PISP) which sends ThirdpartyTransactionRequest to DFSP
+  // used as target dfspId param for calls to PISP via switch
   participantId: string
 
   // used by validateTransactionRequest
