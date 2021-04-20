@@ -33,6 +33,7 @@ import {
 } from '../models/thirdparty.transactions.interface'
 import { OutboundAPI } from '@mojaloop/sdk-scheme-adapter'
 export interface SDKOutgoingRequestsConfig extends HttpRequestsConfig {
+  // requestAuthorizationPath: string
   requestPartiesInformationPath: string
   requestToPayTransferPath: string
   requestQuotePath: string

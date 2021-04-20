@@ -45,7 +45,7 @@ describe('SDKOutgoingRequests', () => {
     requestToPayTransferPath: 'request-to-pay-transfer',
     requestQuotePath: 'request-quote',
     requestAuthorizationPath: 'request-authorization',
-    requestTransferPath: 'request-transfer'
+    requestTransferPath: 'request-tranfer-path'
   }
 
   const requestToPayTransfer: OutboundRequestToPayTransferPostRequest = {
