@@ -44,7 +44,8 @@ describe('SDKOutgoingRequests', () => {
     requestPartiesInformationPath: 'parties/{Type}/{ID}/{SubId}',
     requestToPayTransferPath: 'request-to-pay-transfer',
     requestQuotePath: 'request-quote',
-    requestAuthorizationPath: 'request-authorization'
+    requestAuthorizationPath: 'request-authorization',
+    requestTransferPath: 'request-transfer'
   }
 
   const requestToPayTransfer: OutboundRequestToPayTransferPostRequest = {
@@ -210,6 +211,67 @@ describe('SDKOutgoingRequests', () => {
       const result = await sdkRequest.requestAuthorization(request)
       expect(result).toEqual(response)
       expect(postSpy).toHaveBeenCalledWith(sdkRequest.requestAuthorizationPath, request)
+    })
+  })
+
+  describe('requestTransfer', () => {
+    it('should propagate the call to post', async () => {
+      const transferId = uuid();
+      const request: OutboundAPI.Schemas.simpleTransfersPostRequest = {
+        fspId: 'dfspa',
+        transfersPostRequest: {
+          transferId,
+          payeeFsp: 'sim',
+          payerFsp: 'mojaloop-sdk',
+          amount: {
+            amount: '100',
+            currency: 'USD'
+          },
+          ilpPacket: 'AYIBgQAAAAAAAASwNGxldmVsb25lLmRmc3AxLm1lci45T2RTOF81MDdqUUZERmZlakgyOVc4bXFmNEpLMHlGTFGCAUBQU0svMS4wCk5vbmNlOiB1SXlweUYzY3pYSXBFdzVVc05TYWh3CkVuY3J5cHRpb246IG5vbmUKUGF5bWVudC1JZDogMTMyMzZhM2ItOGZhOC00MTYzLTg0NDctNGMzZWQzZGE5OGE3CgpDb250ZW50LUxlbmd0aDogMTM1CkNvbnRlbnQtVHlwZTogYXBwbGljYXRpb24vanNvbgpTZW5kZXItSWRlbnRpZmllcjogOTI4MDYzOTEKCiJ7XCJmZWVcIjowLFwidHJhbnNmZXJDb2RlXCI6XCJpbnZvaWNlXCIsXCJkZWJpdE5hbWVcIjpcImFsaWNlIGNvb3BlclwiLFwiY3JlZGl0TmFtZVwiOlwibWVyIGNoYW50XCIsXCJkZWJpdElkZW50aWZpZXJcIjpcIjkyODA2MzkxXCJ9IgA',
+          condition: 'f5sqb7tBTWPd5Y8BDFdMm9BJR_MNI4isf8p8n4D5pHA',
+          expiration: '2020-01-20T11:31:49.325Z',
+          extensionList: {
+            extension: [
+              {
+                key: 'qreqkey1',
+                value: 'qreqvalue1'
+              },
+              {
+                key: 'qreqkey2',
+                value: 'qreqvalue2'
+              }
+            ]
+          }
+        }
+      }
+
+      const response: OutboundAPI.Schemas.simpleTransfersPostResponse = {
+        transfer: {
+          fulfilment: 'fulfilment',
+          completedTimestamp: 'completedTimestamp',
+          transferState: 'RECEIVED',
+          extensionList: {
+            extension: [
+              {
+                key: 'qreqkey1',
+                value: 'qreqvalue1'
+              },
+              {
+                key: 'qreqkey2',
+                value: 'qreqvalue2'
+              }
+            ]
+          }
+        },
+        currentState: 'COMPLETED'
+      }
+
+      const postSpy = jest.spyOn(sdkRequest, 'post').mockImplementationOnce(
+        () => Promise.resolve(response)
+      )
+      const result = await sdkRequest.requestTransfer(request)
+      expect(result).toEqual(response)
+      expect(postSpy).toHaveBeenCalledWith(sdkRequest.requestTransferPath, request)
     })
   })
 
