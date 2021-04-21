@@ -63,7 +63,7 @@ services:
       interval: 30s
   
   sdk-scheme-adapter:
-    image: "mojaloop/sdk-scheme-adapter:v11.16.0"
+    image: "mojaloop/sdk-scheme-adapter:v11.16.2"
     container_name: sdk-scheme-adapter
     env_file: ./docker/sdk_scheme_adapter.env
     volumes:

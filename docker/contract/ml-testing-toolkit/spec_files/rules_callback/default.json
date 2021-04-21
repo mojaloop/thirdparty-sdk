@@ -356,5 +356,43 @@
     },
     "type": "callback",
     "version": 1
+  },
+  {
+    "ruleId": 7,
+    "priority": 1,
+    "description": "post /transfers",
+    "apiVersion": {
+      "minorVersion": 1,
+      "majorVersion": 1,
+      "type": "fspiop",
+      "asynchronous": true
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/transfers"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "post"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/transfers/{ID}",
+      "params": {
+        "body": {
+          "transferState": "COMMITTED"
+        }
+      },
+      "delay": 0,
+      "type": "MOCK_CALLBACK"
+    },
+    "type": "callback",
+    "version": 1
   }
 ]
