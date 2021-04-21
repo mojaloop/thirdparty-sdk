@@ -1,4 +1,4 @@
-# PISP Account linking API
-Example PISP Account linking
+# PISP Linking API
+Example PISP Linking
 
-![](../out/docs/sequence/PISPLinkingApi/PISP_Linking.svg)
+![](../out/docs/sequence/PISPLinkingApi/PISP Linking.svg)
