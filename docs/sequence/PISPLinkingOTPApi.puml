@@ -1,6 +1,6 @@
 @startuml
 
-title PISP Linking
+title PISP Linking OTP
 
 participant "PISP Backend" as PISP
 box "PISP tp-scheme-adapter"
@@ -18,135 +18,6 @@ box "DFSP tp-scheme-adapter"
   participant "DFSPLinkingModel" as DFSP_LM
 end box
 participant DFSPAuthorizeSimulator
-
-== Request Consent - Web ==
-autonumber 1 "<b>REQUEST-CONSENT-#</b>"
-rnote right of PISP
-PISP presents accounts to user. User selects one or more accounts to link.
-end note
-PISP -> PISP_TP_OUT: POST /linking/request-consent
-rnote right of PISP #LightBlue
-POST /linking/request-consent
-{
-  "accounts": [
-    { accountNickname: "XXXXXXnt", id: "dfspa.username.1234", currency: "ZAR" },
-    { accountNickname: "SpeXXXXXXXXnt", id: "dfspa.username.5678", currency: "USD" }
-  ],
-  callbackURI: 'pisp-app://callback'
-}
-end note
-
-
-activate PISP
-activate PISP_TP_OUT
-
-PISP_TP_OUT -> PISP_TP_OUT: const model = await create()
-rnote right of PISP_TP_OUT: state: start
-PISP_TP_OUT -> PISP_LM: model.requestConsent()
-
-activate PISP_LM
-
-PISP_LM -> PISP_LM: ThirdpartyRequests.postConsentRequests()
-PISP_LM -> Switch: POST /consentRequests
-rnote right of PISP_LM #LightBlue
-POST /consentRequests
-FSIOP-Source: pispa
-FSIOP-Destination: dfspa
-{
-  // consentRequestId will be the uuid created
-  // at the PRELINKING-2
-  consentRequestId: 6789
-  scopes: [{
-    accountId: 'dfspa.username.1234',
-    actions: ['accounts.getBalance', 'accounts.transfer'],
-    accountId: 'dfspa.username.5678',
-    actions: ['accounts.getBalance', 'accounts.transfer'],
-  }],
-  // model will add `authChannels`
-  authChannels: ["WEB", "OTP"],
-  callbackURI: 'pisp-app://callback...'
-}
-end note
-
-activate Switch
-Switch --> PISP_LM: 202 Accepted
-deactivate PISP_LM
-Switch -> DFSP_TP_IN: POST /consentRequests
-activate DFSP_TP_IN
-
-DFSP_TP_IN -> DFSP_TP_IN: const model = await create()
-activate DFSP_LM
-rnote right of DFSP_TP_IN: state: start
-DFSP_TP_IN -> DFSP_LM: model.requestConsent()
-DFSP_TP_IN --> Switch: 202 Accepted
-deactivate Switch
-deactivate DFSP_TP_IN
-DFSP_LM -> DFSP_LM: DFSPBackendRequests.validateConsentRequest()
-activate DFSPAuthorizeSimulator
-DFSP_LM -> DFSPAuthorizeSimulator: ""POST /store/consentRequests/6789""
-DFSPAuthorizeSimulator -> DFSPAuthorizeSimulator: store consentRequest details
-DFSPAuthorizeSimulator -> DFSP_LM: 201 Created
-rnote right of DFSP_LM: state: consentRequestValidatedAndStored
-deactivate DFSPAuthorizeSimulator
-
-activate Switch
-DFSP_LM -> Switch: PUT /consentRequests/6789
-
-rnote left of DFSP_LM #LightBlue
-PUT /consentRequests/6789
-FSIOP-Source: pispa
-FSIOP-Destination: dfspa
-{
-  consentRequestId: 6789
-  scopes: [{
-    accountId: 'dfspa.username.1234',
-    actions: ['accounts.getBalance', 'accounts.transfer'],
-    accountId: 'dfspa.username.5678',
-    actions: ['accounts.getBalance', 'accounts.transfer'],
-  }],
-  authChannels: ["WEB"],
-  callbackURI: 'pisp-app://callback...',
-  authURI: 'dfspa.com/authorize?consentRequestId=6789' // this is new
-}
-end note
-Switch --> DFSP_LM: 202 ACCEPTED
-deactivate DFSP_LM
-activate PISP_TP_IN
-Switch ->  PISP_TP_IN: PUT /consentRequests/6789
-PISP_TP_IN --> Switch: 200 OK
-deactivate Switch
-activate PISP_LM
-PISP_TP_IN --> PISP_LM: Consent Request response recieved
-rnote right of PISP_LM: state: webAuthenticationChannelResponseRecieved
-PISP_LM --> PISP_LM: this.saveToKVS()
-deactivate PISP_TP_IN
-PISP_LM -> PISP_TP_OUT: return Authentication Response
-deactivate PISP_LM
-PISP_TP_OUT --> PISP: 200 OK Autentication Response
-rnote left of PISP_TP_OUT #LightBlue
-{
-  channelResponse: {
-    consentRequestId: 6789
-    scopes: [{
-      accountId: 'dfspa.username.1234',
-      actions: ['accounts.getBalance', 'accounts.transfer'],
-      accountId: 'dfspa.username.5678',
-      actions: ['accounts.getBalance', 'accounts.transfer'],
-    }],
-    authChannels: ["WEB"],
-    callbackURI: 'pisp-app://callback...',
-    authURI: 'dfspa.com/authorize?consentRequestId=6789' // this is new
-  },
-  currentState="OTPAuthenticationChannelResponseRecieved"
-}
-end note
-deactivate PISP_TP_OUT
-deactivate PISP
-
-note over PISP, DFSPAuthorizeSimulator
-  The PISP is expected to redirect to the DFSP's `authUri` in their application to let the end user complete the web login flow.
-  Logging in successfully should provide the PISP with a secret to use in the next linking step.
-end note
 
 == Request Consent - OTP ==
 autonumber 1 "<b>REQUEST-CONSENT-#</b>"
@@ -283,9 +154,9 @@ autonumber 1 "<b>AUTHENTICATION-#</b>"
 rnote right of PISP
 PISP has obtained authToken from end-user(OTP) or through a callback(Web).
 end note
-PISP -> PISP_TP_OUT: POST /linking/authenticate
+PISP -> PISP_TP_OUT: POST /linking/request-consent/6789/authenticate
 rnote right of PISP #LightBlue
-PATCH /linking/authenticate/6789
+POST /linking/request-consent/6789/authenticate
 {
   authToken: '123456'
 }
@@ -334,22 +205,11 @@ validate both cases with one endpoint?
 POST /validateAuthToken
 {
   consentRequestId: '6789'
+  authChannel: model.data.authChannel,
   authToken: '124356'
 }
 end note
 rnote right of DFSP_LM: state: authTokenValidated
-
-DFSP_LM -> DFSP_LM: model.getScopes()
-DFSP_LM -> DFSP_LM: Get scopes.
-rnote right of DFSP_LM #LightBlue
-Do we need to get scopes from
-- DFSPAuthorizeSimulator?
-- Using DFSPBackendRequests?
-- Can't we store the consentRequest in the Consent Request stage
-  in the model data and pull it from there instead of having to
-  make a request?
-end note
-rnote right of DFSP_LM: state: scopesRetrieved
 
 DFSP_LM -> DFSP_LM: const consentId = uuid()
 DFSP_LM -> DFSP_LM: model.grantConsent()
@@ -373,12 +233,7 @@ FSIOP-Destination: pispa
 {
   consentId: 1a2b3c4d
   consentRequestId: 6789
-  scopes: [{
-    accountId: 'dfspa.username.1234',
-    actions: ['accounts.getBalance', 'accounts.transfer'],
-    accountId: 'dfspa.username.5678',
-    actions: ['accounts.getBalance', 'accounts.transfer'],
-  }]
+  scopes: model.data.scopes
 }
 end note
 Switch --> DFSP_LM: 202 ACCEPTED
@@ -466,6 +321,7 @@ FSIOP-Destination: central-auth
 }
 end note
 Switch --> DFSP_LM: 202 Accepted
+DFSP_LM -> DFSP_LM: this.saveToKVS()
 deactivate DFSP_LM
 
 Switch -> AUTH: POST /consents/1a2b3c4d
@@ -494,7 +350,6 @@ FSIOP-Destination: dfspa
 end note
 
 Switch --> AUTH: 200 OK
-deactivate AUTH
 activate DFSP_TP_IN
 Switch -> DFSP_TP_IN: PUT /consents/1a2b3c4d
 DFSP_TP_IN -> DFSP_TP_IN: const model = await loadFromKVS({key: 1a2b3c4d})
@@ -506,7 +361,6 @@ DFSP_TP_IN --> Switch: 200 OK
 deactivate Switch
 deactivate DFSP_TP_IN
 
-activate AUTH
 AUTH -> ALS: POST /participants/CONSENTS/1a2b3c4d
 activate ALS
 ALS --> AUTH: 202 Accepted
