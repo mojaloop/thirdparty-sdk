@@ -533,6 +533,7 @@
         },
         "scripts": {}
       },
+      "delay": 0,
       "type": "MOCK_CALLBACK"
     },
     "type": "callback",
