@@ -259,8 +259,32 @@ export class DFSPTransactionModel
         // user's challenge has been successfully verified
         this.data.transactionRequestState = 'ACCEPTED'
 
-        // TODO: SRIDHAR prepare this.data.transferRequest
-        this.data.transferRequest = {}
+        // TODO: to have or not to have transferId - what has been passed to quote - investigate!!!
+        this.data.transferId = uuid()
+
+        const tr = this.data.transactionRequestRequest
+        const quote = this.data.requestQuoteResponse!.quotes
+        // prepare transfer request
+        this.data.transferRequest = {
+          // TODO: payer.fspId is optional it should be mandatory
+          fspId: tr.payer.fspId!,
+          transfersPostRequest: {
+            transferId: this.data.transferId!,
+
+            // payee & payer data from /thirdpartyRequests/transaction
+            payeeFsp: tr.payee.partyIdInfo.fspId!,
+            payerFsp: tr.payer.fspId!,
+
+            // transfer data from quote response
+            amount: { ...quote.transferAmount },
+            ilpPacket: quote.ilpPacket,
+            condition: quote.condition,
+
+            // TODO: investigate recalculation of expiry...
+            expiration: tr.expiration
+          }
+
+        }
         break
       }
 
@@ -285,14 +309,26 @@ export class DFSPTransactionModel
   async onRequestTransfer (): Promise<void> {
     InvalidDataError.throwIfInvalidProperty(this.data, 'transferRequest')
 
-    // TODO: make a call to request simple transfer via SDKOutgoingRequests
-    // TODO: store results from call
-    this.data.transferResponse = {}
+    // make a call to switch via sync sdk api
+    const transferResult = await this.sdkOutgoingRequests.requestTransfer(
+      this.data.transferRequest!
+    )
+
+    // check result
+    if (
+      !(transferResult &&
+        transferResult.currentState === 'COMPLETED' &&
+        transferResult.transfer.transferState === 'COMMITTED'
+      )
+    ) {
+      // TODO: throw proper error
+      throw new Error('POST /simpleTransfer failed')
+    }
+    this.data.transferResponse = transferResult
 
     this.data.transactionRequestPatchUpdate = {
       transactionId: this.data.transactionId!,
       transactionRequestState: this.data.transactionRequestState,
-      // TODO: propagate transaction state from transferResponse when received
       transactionState: 'COMPLETED'
     }
   }

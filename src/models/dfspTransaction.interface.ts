@@ -75,6 +75,7 @@ export interface DFSPTransactionData extends StateData<DFSPTransactionModelState
   transactionRequestId: string
   transactionRequestState: tpAPI.Schemas.TransactionRequestState
   transactionId?: string
+  transferId?: string
 
   // id of participant (PISP) which sends ThirdpartyTransactionRequest to DFSP
   // used as target dfspId param for calls to PISP via switch
@@ -94,8 +95,7 @@ export interface DFSPTransactionData extends StateData<DFSPTransactionModelState
 
   // used by requestTransfer
   // TODO: proper type for transferRequest
-  transferRequest?: unknown
-  // TODO: proper type for transferResponse
-  transferResponse?: unknown
+  transferRequest?: SDKOutboundAPI.Schemas.simpleTransfersPostRequest
+  transferResponse?: SDKOutboundAPI.Schemas.simpleTransfersPostResponse
   transactionRequestPatchUpdate?: tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPatchResponse
 }

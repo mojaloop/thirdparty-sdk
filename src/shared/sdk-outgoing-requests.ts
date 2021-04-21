@@ -85,12 +85,7 @@ export class SDKOutgoingRequests extends HttpRequests {
     return this.config.requestTransferPath
   }
 
-  // REQUESTS
-  /**
-   *  // synchronous calls to SDKOutgoing
-   *  requestTransfer,
-   *
-   * */
+  // REQUESTS - synchronous calls to SDKOutgoing
 
   /**
    * @method requestPartiesInformation

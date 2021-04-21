@@ -61,6 +61,7 @@ describe('DFSPTransactionModel', () => {
   let requestQuoteRequest: SDKOutboundAPI.Schemas.quotesPostRequest
   let requestQuoteResponse: SDKOutboundAPI.Schemas.quotesPostResponse
   let requestAuthorizationResponse: SDKOutboundAPI.Schemas.authorizationsPostResponse
+  let requestTransferResponse: SDKOutboundAPI.Schemas.simpleTransfersPostResponse
 
   beforeEach(async () => {
     modelConfig = {
@@ -73,7 +74,8 @@ describe('DFSPTransactionModel', () => {
       } as unknown as ThirdpartyRequests,
       sdkOutgoingRequests: {
         requestQuote: jest.fn(() => Promise.resolve(requestQuoteResponse)),
-        requestAuthorization: jest.fn(() => Promise.resolve(requestAuthorizationResponse))
+        requestAuthorization: jest.fn(() => Promise.resolve(requestAuthorizationResponse)),
+        requestTransfer: jest.fn(() => Promise.resolve(requestTransferResponse))
       } as unknown as SDKOutgoingRequests,
       dfspBackendRequests: {
         validateThirdpartyTransactionRequest: jest.fn(() => Promise.resolve({ isValid: true })),
@@ -143,6 +145,15 @@ describe('DFSPTransactionModel', () => {
           } as string & Partial<{pinValue: string, counter: string}>
         },
         responseType: 'ENTERED'
+      },
+      currentState: 'COMPLETED'
+    }
+
+    requestTransferResponse = {
+      transfer: {
+        fulfilment: 'some-fulfilment',
+        completedTimestamp: new Date().toISOString(),
+        transferState: 'COMMITTED'
       },
       currentState: 'COMPLETED'
     }
@@ -339,14 +350,33 @@ describe('DFSPTransactionModel', () => {
         model.data.requestAuthorizationResponse!.authorizations
       )
 
-      // TODO: SRIDHAR - check properly transferRequest
+      // check the setup of transferRequest
       expect(model.data.transferRequest).toBeDefined()
+      const rtr = model.data.transferRequest!
+      const quote = model.data.requestQuoteResponse!.quotes
+      expect(rtr.fspId).toEqual(tr.payer.fspId)
+      expect(rtr.transfersPostRequest).toEqual({
+        transferId: model.data.transferId!,
+        payeeFsp: tr.payee.partyIdInfo.fspId!,
+        payerFsp: tr.payer.fspId!,
+        amount: { ...quote.transferAmount },
+        ilpPacket: quote.ilpPacket,
+        condition: quote.condition,
+        expiration: tr.expiration
+      })
 
       // onRequestTransfer
-      // TODO: SRIDHAR - check properly transferResponse & transactionRequestPatchUpdate
-      // TODO: SRIDHAR - check sdkOutgoingRequests.
+      expect(model.sdkOutgoingRequests.requestTransfer).toBeCalledWith(model.data.transferRequest)
+
       expect(model.data.transferResponse).toBeDefined()
+      expect(model.data.transferResponse).toEqual(requestTransferResponse)
+
       expect(model.data.transactionRequestPatchUpdate).toBeDefined()
+      expect(model.data.transactionRequestPatchUpdate).toEqual({
+        transactionId: model.data.transactionId!,
+        transactionRequestState: model.data.transactionRequestState,
+        transactionState: 'COMPLETED'
+      })
 
       // onNotifyTransferIsDone
       expect(model.thirdpartyRequests.patchThirdpartyRequestsTransactions).toHaveBeenCalledWith(
