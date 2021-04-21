@@ -45,7 +45,10 @@ describe('backendRequests', () => {
     getUserAccountsPath: 'accounts/{ID}',
     validateOTPPath: 'validateOTP',
     getScopesPath: 'scopes/{ID}',
-    validateThirdpartyTransactionRequestPath: 'validate-third-party-transaction-request'
+    validateThirdpartyTransactionRequestPath: 'validate-third-party-transaction-request',
+    validateConsentRequestsPath: 'validateConsentRequests',
+    sendOTPPath: 'sendOTP',
+    storeConsentRequestsPath: 'store/consentRequests/{ID}'
   }
 
   beforeEach(() => {
@@ -65,6 +68,9 @@ describe('backendRequests', () => {
     expect(typeof dfspBackendRequests.put).toEqual('function')
     expect(typeof dfspBackendRequests.getUserAccounts).toEqual('function')
     expect(typeof dfspBackendRequests.validateThirdpartyTransactionRequest).toEqual('function')
+    expect(typeof dfspBackendRequests.validateConsentRequests).toEqual('function')
+    expect(typeof dfspBackendRequests.sendOTP).toEqual('function')
+    expect(typeof dfspBackendRequests.storeConsentRequests).toEqual('function')
 
     /**
      * TODO: check for methods
@@ -183,6 +189,47 @@ describe('backendRequests', () => {
         dfspBackendRequests.verifyAuthorizationPath,
         authorizationResponse
       )
+    })
+  })
+  describe('validateConsentRequests', () => {
+    it('should propagate call to post', async () => {
+      const mockData = JSON.parse(JSON.stringify(TestData))
+      const request = mockData.consentRequestsPost.payload
+      const response = mockData.consentRequestsPost.response
+      const getSpy = jest.spyOn(dfspBackendRequests, 'post').mockImplementationOnce(
+        () => Promise.resolve(response)
+      )
+      const result = await dfspBackendRequests.validateConsentRequests(request)
+      expect(result).toEqual(response)
+      expect(getSpy).toBeCalledWith('validateConsentRequests', request)
+    })
+  })
+
+  describe('sendOTP', () => {
+    it('should propagate call to post', async () => {
+      const mockData = JSON.parse(JSON.stringify(TestData))
+      const request = mockData.consentRequestsPost.payload
+      const otpRequest = mockData.consentRequestsPost.otpRequest
+      const response = mockData.consentRequestsPost.otpResponse
+      const getSpy = jest.spyOn(dfspBackendRequests, 'post').mockImplementationOnce(
+        () => Promise.resolve(response)
+      )
+      const result = await dfspBackendRequests.sendOTP(request)
+      expect(result).toEqual(response)
+      expect(getSpy).toBeCalledWith('sendOTP', otpRequest)
+    })
+  })
+
+  describe('storeConsentRequests', () => {
+    it('should propagate call to post', async () => {
+      const mockData = JSON.parse(JSON.stringify(TestData))
+      const request = mockData.consentRequestsPost.payload
+      const getSpy = jest.spyOn(dfspBackendRequests, 'post').mockImplementationOnce(
+        () => Promise.resolve()
+      )
+      const result = await dfspBackendRequests.storeConsentRequests(request)
+      expect(result).toBeUndefined()
+      expect(getSpy).toBeCalledWith(`store/consentRequests/${request.id}`, { scopes: request.scopes })
     })
   })
 })

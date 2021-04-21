@@ -27,7 +27,16 @@
 
 import { HttpRequestsConfig, HttpRequests } from '~/shared/http-requests'
 import { thirdparty as tpAPI, v1_1 as fspiopAPI } from '@mojaloop/api-snippets'
-import { BackendValidateOTPResponse, BackendGetScopesResponse } from '../models/inbound/dfspOTPValidate.interface'
+import {
+  BackendValidateOTPResponse,
+  BackendGetScopesResponse
+} from '../models/inbound/dfspOTPValidate.interface'
+import {
+  BackendValidateConsentRequestsResponse,
+  BackendSendOTPRequest,
+  BackendSendOTPResponse,
+  BackendStoreScopesRequest
+} from '~/models/inbound/dfspConsentRequests.interface'
 
 export interface IsValidResponse {
   isValid: boolean
@@ -39,6 +48,9 @@ export interface DFSPBackendConfig extends HttpRequestsConfig {
   validateOTPPath: string
   getScopesPath: string
   validateThirdpartyTransactionRequestPath: string
+  validateConsentRequestsPath: string
+  sendOTPPath: string
+  storeConsentRequestsPath: string
 }
 
 /**
@@ -90,12 +102,55 @@ export class DFSPBackendRequests extends HttpRequests {
     return this.config.validateThirdpartyTransactionRequestPath
   }
 
+  // validate ConsentRequests path getter
+  get validateConsentRequestsPath (): string {
+    return this.config.validateConsentRequestsPath
+  }
+
+  // validate ConsentRequests path getter
+  get sendOTPPath (): string {
+    return this.config.sendOTPPath
+  }
+
+  // validate ConsentRequests path getter
+  get storeConsentRequestsPath (): string {
+    return this.config.storeConsentRequestsPath
+  }
+
   // REQUESTS
 
   // request user's accounts details from DFSP Backend
   async getUserAccounts (userId: string): Promise<tpAPI.Schemas.AccountsIDPutResponse | void> {
     const accountsPath = this.getUserAccountsPath.replace('{ID}', userId)
     return this.get<tpAPI.Schemas.AccountsIDPutResponse>(accountsPath)
+  }
+
+  async validateConsentRequests (
+    request: tpAPI.Schemas.ConsentRequestsPostRequest
+  ): Promise<BackendValidateConsentRequestsResponse | void> {
+    const path = this.validateConsentRequestsPath
+    return this.post<tpAPI.Schemas.ConsentRequestsPostRequest, BackendValidateConsentRequestsResponse>(path, request)
+  }
+
+  async sendOTP (
+    request: tpAPI.Schemas.ConsentRequestsPostRequest
+  ): Promise<BackendSendOTPResponse | void> {
+    const otpRequest: BackendSendOTPRequest = {
+      consentRequestId: request.id,
+      username: 'TBD',
+      message: 'TBD'
+    }
+    return this.post<BackendSendOTPRequest, BackendSendOTPResponse>(this.sendOTPPath, otpRequest)
+  }
+
+  async storeConsentRequests (
+    request: tpAPI.Schemas.ConsentRequestsPostRequest
+  ): Promise<void> {
+    const path = this.storeConsentRequestsPath.replace('{ID}', request.id)
+    const scopesReq: BackendStoreScopesRequest = {
+      scopes: request.scopes
+    }
+    return this.post<BackendStoreScopesRequest, Promise<void>>(path, scopesReq)
   }
 
   // POST the consent request ID and authToken for a DFSP to validate.

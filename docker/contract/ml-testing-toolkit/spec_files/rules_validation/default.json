@@ -1,1 +1,55 @@
-[]
+[
+  {
+    "ruleId": 1,
+    "priority": 1,
+    "description": "post /consentRequests -error",
+    "apiVersion": {
+      "minorVersion": 1,
+      "majorVersion": 0,
+      "type": "thirdparty_pisp",
+      "asynchronous": true
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "body",
+          "operator": "equal",
+          "value": "d51ec534-ee48-4575-b6a9-ead2955b8069",
+          "path": "id"
+        },
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/consentRequests"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "post"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/consentRequests/{ID}/error",
+      "params": {
+        "headers": {
+          "Accept": "application/vnd.interoperability.thirdparty+json;version=1.0",
+          "Content-Type": "application/vnd.interoperability.thirdparty+json;version=1.0",
+          "Date": "Wed, 27 May 2020 11:13:34 GMT",
+          "FSPIOP-Source": "DFSPA"
+        },
+        "body": {
+          "errorInformation": {
+            "errorCode": "7204",
+            "errorDescription": "FSP does not support any requested scope actions"
+          }
+        },
+        "scripts": {}
+      },
+      "type": "FIXED_ERROR_CALLBACK"
+    },
+    "type": "validation",
+    "version": 1
+  }
+]

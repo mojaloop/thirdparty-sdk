@@ -224,6 +224,70 @@ paths:
           $ref: '#/components/responses/501'
         '503':
           $ref: '#/components/responses/503'
+  /consentRequests:
+    post:
+      tags:
+        - consentRequests
+        - sampled
+      operationId: CreateConsentRequest
+      summary: CreateConsentRequest
+      description: >
+        A request from a PISP to a DFSP to start the process of delegating
+        consent
+      parameters:
+        - $ref: '#/components/parameters/Accept'
+        - $ref: '#/components/parameters/Content-Length'
+        - $ref: '#/components/parameters/Content-Type'
+        - $ref: '#/components/parameters/Date'
+        - $ref: '#/components/parameters/X-Forwarded-For'
+        - $ref: '#/components/parameters/FSPIOP-Source'
+        - $ref: '#/components/parameters/FSPIOP-Destination'
+        - $ref: '#/components/parameters/FSPIOP-Encryption'
+        - $ref: '#/components/parameters/FSPIOP-Signature'
+        - $ref: '#/components/parameters/FSPIOP-URI'
+        - $ref: '#/components/parameters/FSPIOP-HTTP-Method'
+      requestBody:
+        description: The consentRequest to create
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsentRequestsPostRequest'
+            example:
+              id: '456'
+              initiatorId: pispA
+              authChannels:
+                - WEB
+                - OTP
+              scopes:
+                - accountId: dfspa.username.1234
+                  actions:
+                    - accounts.transfer
+                    - accounts.getBalance
+                - accountId: dfspa.username.5678
+                  actions:
+                    - accounts.transfer
+                    - accounts.getBalance
+              callbackUri: 'pisp-app://callback.com'
+      responses:
+        '202':
+          $ref: '#/components/responses/202'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '405':
+          $ref: '#/components/responses/405'
+        '406':
+          $ref: '#/components/responses/406'
+        '501':
+          $ref: '#/components/responses/501'
+        '503':
+          $ref: '#/components/responses/503'
   '/consentRequests/{ID}':
     parameters:
       - $ref: '#/components/parameters/ID'
@@ -525,8 +589,8 @@ paths:
       operationId: CreateThirdpartyTransactionRequests
       summary: CreateThirdpartyTransactionRequests
       description: >-
-        The HTTP request POST `/thirdpartyRequests/transactions` is used to
-        create a transaction.
+        The HTTP request POST `/thirdpartyRequests/transactions` is used by a
+        PISP to initiate a 3rd party Transaction request with a DFSP
       tags:
         - thirdpartyRequests
         - sampled
@@ -658,7 +722,7 @@ paths:
         The HTTP request `GET /thirdpartyRequests/transactions/{ID}` is used to
         request the 
 
-        retrieval of a third party transaction.
+        retrieval of a third party transaction request.
       responses:
         '202':
           $ref: '#/components/responses/202'
@@ -685,10 +749,10 @@ paths:
       operationId: UpdateThirdPartyTransactionRequests
       summary: UpdateThirdPartyTransactionRequests
       description: >
-        The HTTP request `PUT /thirdpartyRequests/transactions/{ID}` is used to
-        inform the client about
+        The HTTP request `PUT /thirdpartyRequests/transactions/{ID}` is used by
+        the DFSP to inform the client about
 
-        status of a previously requested thirdparty transaction.
+        the status of a previously requested thirdparty transaction request.
 
 
         Switch(Thirdparty API Adapter) -> PISP
@@ -701,6 +765,9 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ThirdpartyRequestsTransactionsIDPutResponse'
+            example:
+              transactionId: 11111111-0000-0000-0000-000000000000
+              transactionRequestState: RECEIVED
       responses:
         '200':
           $ref: '#/components/responses/200'
@@ -741,7 +808,12 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ThirdpartyRequestsTransactionsIDPutResponse'
+              $ref: >-
+                #/components/schemas/ThirdpartyRequestsTransactionsIDPatchResponse
+            example:
+              transactionId: 11111111-0000-0000-0000-000000000000
+              transactionRequestState: ACCEPTED
+              transactionState: COMMITTED
       responses:
         '200':
           $ref: '#/components/responses/200'
@@ -776,7 +848,9 @@ paths:
         used.
 
         The `{ID}` in the URI should contain the `transactionRequestId` that was
-        used for the creation of the transaction request.
+        used for the creation of 
+
+        the thirdparty transaction request.
       parameters:
         - $ref: '#/components/parameters/ID'
         - $ref: '#/components/parameters/Content-Length'
@@ -1645,6 +1719,47 @@ components:
       required:
         - accountId
         - actions
+    ConsentRequestChannelType:
+      title: ConsentRequestChannelType
+      type: string
+      enum:
+        - WEB
+        - OTP
+      description: |
+        The auth channel being used for the consentRequest.
+        - "WEB" - The Web auth channel.
+        - "OTP" - The OTP auth channel.
+    ConsentRequestsPostRequest:
+      title: ConsentRequestsPostRequest
+      type: object
+      description: The object sent in a `POST /consentRequests` request.
+      properties:
+        id:
+          $ref: '#/components/schemas/CorrelationId'
+        initiatorId:
+          type: string
+          description: >-
+            The id of the PISP who will initiate transactions on a user's
+            behalf.
+        scopes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Scope'
+        authChannels:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConsentRequestChannelType'
+        callbackUri:
+          type: string
+          description: >-
+            The callback uri that the user will be redirected to after
+            completing the WEB auth channel.
+      required:
+        - id
+        - initiatorId
+        - scopes
+        - authChannels
+        - callbackUri
     ConsentRequestChannelTypeWeb:
       title: ConsentRequestChannelTypeWeb
       type: string
@@ -2473,3 +2588,35 @@ components:
       required:
         - transactionId
         - transactionRequestState
+    TransactionState:
+      title: TransactionState
+      type: string
+      enum:
+        - RECEIVED
+        - PENDING
+        - COMPLETED
+        - REJECTED
+      description: |-
+        Below are the allowed values for the enumeration.
+        - RECEIVED - Payee FSP has received the transaction from the Payer FSP.
+        - PENDING - Payee FSP has validated the transaction.
+        - COMPLETED - Payee FSP has successfully performed the transaction.
+        - REJECTED - Payee FSP has failed to perform the transaction.
+      example: RECEIVED
+    ThirdpartyRequestsTransactionsIDPatchResponse:
+      title: ThirdpartyRequestsTransactionsIDPatchResponse
+      type: object
+      description: >-
+        The object sent in the PATCH /thirdpartyRequests/transactions/{ID}
+        callback.
+      properties:
+        transactionId:
+          $ref: '#/components/schemas/CorrelationId'
+        transactionRequestState:
+          $ref: '#/components/schemas/TransactionRequestState'
+        transactionState:
+          $ref: '#/components/schemas/TransactionState'
+      required:
+        - transactionId
+        - transactionRequestState
+        - transactionState

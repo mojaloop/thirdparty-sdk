@@ -49,6 +49,9 @@ export interface paths {
   '/authorizations/{ID}': {
     put: operations['InboundAuthorizationsIDPutResponse'];
   };
+  '/consentRequests': {
+    post: operations['CreateConsentRequest'];
+  };
   '/consentRequests/{ID}': {
     put: operations['UpdateConsentRequest'];
     patch: operations['PatchConsentRequest'];
@@ -250,6 +253,38 @@ export interface operations {
       503: components['responses']['503'];
     };
   };
+  /** A request from a PISP to a DFSP to start the process of delegating consent */
+  CreateConsentRequest: {
+    parameters: {
+      header: {
+        Accept: components['parameters']['Accept'];
+        'Content-Length'?: components['parameters']['Content-Length'];
+        'Content-Type': components['parameters']['Content-Type'];
+        Date: components['parameters']['Date'];
+        'X-Forwarded-For'?: components['parameters']['X-Forwarded-For'];
+        'FSPIOP-Source': components['parameters']['FSPIOP-Source'];
+        'FSPIOP-Destination'?: components['parameters']['FSPIOP-Destination'];
+        'FSPIOP-Encryption'?: components['parameters']['FSPIOP-Encryption'];
+        'FSPIOP-Signature'?: components['parameters']['FSPIOP-Signature'];
+        'FSPIOP-URI'?: components['parameters']['FSPIOP-URI'];
+        'FSPIOP-HTTP-Method'?: components['parameters']['FSPIOP-HTTP-Method'];
+      };
+    };
+    requestBody: {
+      'application/json': components['schemas']['ConsentRequestsPostRequest'];
+    };
+    responses: {
+      202: components['responses']['202'];
+      400: components['responses']['400'];
+      401: components['responses']['401'];
+      403: components['responses']['403'];
+      404: components['responses']['404'];
+      405: components['responses']['405'];
+      406: components['responses']['406'];
+      501: components['responses']['501'];
+      503: components['responses']['503'];
+    };
+  };
   /**
    * DFSP updates auth channels and/or auth uri in response to consentRequest.
    *
@@ -387,7 +422,7 @@ export interface operations {
       503: components['responses']['503'];
     };
   };
-  /** The HTTP request POST `/thirdpartyRequests/transactions` is used to create a transaction. */
+  /** The HTTP request POST `/thirdpartyRequests/transactions` is used by a PISP to initiate a 3rd party Transaction request with a DFSP */
   CreateThirdpartyTransactionRequests: {
     requestBody: {
       'application/json': components['schemas']['ThirdpartyRequestsTransactionsPostRequest'];
@@ -448,7 +483,7 @@ export interface operations {
   };
   /**
    * The HTTP request `GET /thirdpartyRequests/transactions/{ID}` is used to request the
-   * retrieval of a third party transaction.
+   * retrieval of a third party transaction request.
    */
   GetThirdpartyTransactionRequests: {
     responses: {
@@ -464,8 +499,8 @@ export interface operations {
     };
   };
   /**
-   * The HTTP request `PUT /thirdpartyRequests/transactions/{ID}` is used to inform the client about
-   * status of a previously requested thirdparty transaction.
+   * The HTTP request `PUT /thirdpartyRequests/transactions/{ID}` is used by the DFSP to inform the client about
+   * the status of a previously requested thirdparty transaction request.
    *
    * Switch(Thirdparty API Adapter) -> PISP
    */
@@ -505,7 +540,7 @@ export interface operations {
       };
     };
     requestBody: {
-      'application/json': components['schemas']['ThirdpartyRequestsTransactionsIDPutResponse'];
+      'application/json': components['schemas']['ThirdpartyRequestsTransactionsIDPatchResponse'];
     };
     responses: {
       200: components['responses']['200'];
@@ -522,7 +557,8 @@ export interface operations {
   /**
    * If the server is unable to find the transaction request, or another processing error occurs,
    * the error callback `PUT /thirdpartyRequests/transactions/{ID}/error` is used.
-   * The `{ID}` in the URI should contain the `transactionRequestId` that was used for the creation of the transaction request.
+   * The `{ID}` in the URI should contain the `transactionRequestId` that was used for the creation of
+   * the thirdparty transaction request.
    */
   ThirdpartyTransactionRequestsError: {
     parameters: {
@@ -901,6 +937,22 @@ export interface components {
       accountId: components['schemas']['AccountAddress'];
       actions: components['schemas']['ConsentScopeType'][];
     };
+    /**
+     * The auth channel being used for the consentRequest.
+     * - "WEB" - The Web auth channel.
+     * - "OTP" - The OTP auth channel.
+     */
+    ConsentRequestChannelType: 'WEB' | 'OTP';
+    /** The object sent in a `POST /consentRequests` request. */
+    ConsentRequestsPostRequest: {
+      id: components['schemas']['CorrelationId'];
+      /** The id of the PISP who will initiate transactions on a user's behalf. */
+      initiatorId: string;
+      scopes: components['schemas']['Scope'][];
+      authChannels: components['schemas']['ConsentRequestChannelType'][];
+      /** The callback uri that the user will be redirected to after completing the WEB auth channel. */
+      callbackUri: string;
+    };
     /** The web auth channel being used for PUT consentRequest/{ID} request. */
     ConsentRequestChannelTypeWeb: 'WEB';
     /**
@@ -1233,6 +1285,20 @@ export interface components {
     ThirdpartyRequestsTransactionsIDPutResponse: {
       transactionId: components['schemas']['CorrelationId'];
       transactionRequestState: components['schemas']['TransactionRequestState'];
+    };
+    /**
+     * Below are the allowed values for the enumeration.
+     * - RECEIVED - Payee FSP has received the transaction from the Payer FSP.
+     * - PENDING - Payee FSP has validated the transaction.
+     * - COMPLETED - Payee FSP has successfully performed the transaction.
+     * - REJECTED - Payee FSP has failed to perform the transaction.
+     */
+    TransactionState: 'RECEIVED' | 'PENDING' | 'COMPLETED' | 'REJECTED';
+    /** The object sent in the PATCH /thirdpartyRequests/transactions/{ID} callback. */
+    ThirdpartyRequestsTransactionsIDPatchResponse: {
+      transactionId: components['schemas']['CorrelationId'];
+      transactionRequestState: components['schemas']['TransactionRequestState'];
+      transactionState: components['schemas']['TransactionState'];
     };
   };
   responses: {

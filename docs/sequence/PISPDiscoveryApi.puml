@@ -1,0 +1,111 @@
+@startuml
+
+title PISP Discovery
+
+participant "PISP Backend" as PISP
+box "PISP tp-scheme-adapter"
+  participant "outbound-server" as PISP_TP_OUT
+  participant "PISPDiscoveryModel" as PISP_DM
+  participant "inbound-server" as PISP_TP_IN
+end box
+box "Mojaloop"
+    participant Switch
+end box
+box "DFSP tp-scheme-adapter"
+  participant "inbound-server" as DFSP_TP_IN
+  participant "DFSPDiscoveryModel" as DFSP_DM
+end box
+
+== Discovery ==
+autonumber 1 "<b>DISCOVERY-#</b>"
+rnote right of PISP
+PISP presents thirdparty enabled DFSPs to user. User selects a dfpsa and provides a generic ID to search for associated accounts
+end note
+PISP -> PISP_TP_OUT: GET /linking/accounts/dfspa/username1234
+
+activate PISP
+activate PISP_TP_OUT
+
+PISP_TP_OUT -> PISP_TP_OUT: const model = await create()
+rnote right of PISP_TP_OUT: state: start
+PISP_TP_OUT -> PISP_DM: model.getAccounts(dfspId, username)
+
+activate PISP_DM
+
+
+PISP_DM -> PISP_DM: ThirdpartyRequests.getAccounts()
+PISP_DM -> Switch: GET /accounts/username1234
+rnote right of PISP_DM #LightBlue
+GET /accounts/username1234
+FSIOP-Source: pispa
+FSIOP-Destination: dfspa
+end note
+
+activate Switch
+Switch --> PISP_DM: 202 Accepted
+deactivate PISP_DM
+
+Switch -> DFSP_TP_IN: GET /accounts/username1234
+activate DFSP_TP_IN
+DFSP_TP_IN --> Switch: 202 Accepted
+deactivate Switch
+
+DFSP_TP_IN -> DFSP_TP_IN: const model = await create()
+rnote right of DFSP_TP_IN: state: start
+DFSP_TP_IN -> DFSP_DM: model.retrieveAccounts()
+deactivate DFSP_TP_IN
+
+note over PISP, DFSP_DM
+  HAPPY_SCENARIO: DFSP returns list of accounts.
+end note
+
+activate DFSP_DM
+DFSP_DM -> DFSP_DM: DFSPBackendRequests.getUserAccounts('username1234')
+DFSP_DM -> DFSP_DM: Accounts returned.
+rnote right of DFSP_DM: state: accountsRetrieved
+
+rnote left of DFSP_DM #LightBlue
+NOTE: This deviates from the original design document.
+      Which has the response as a top-level array which
+      is a security and expandability risk.
+      Fixing that here.
+PUT /accounts/username1234
+FSIOP-Source: dfspa
+FSIOP-Destination: pispa
+{
+  "accounts": [
+    { accountNickname: "XXXXXXnt", id: "dfspa.username.1234", currency: "ZAR" },
+    { accountNickname: "SpeXXXXXXXXnt", id: "dfspa.username.5678", currency: "USD" }
+  ]
+}
+end note
+
+DFSP_DM -> Switch: PUT /accounts/username1234
+activate Switch
+Switch --> DFSP_DM: 200 OK
+deactivate DFSP_DM
+
+Switch --> PISP_TP_IN: PUT /accounts/username1234
+activate PISP_TP_IN
+PISP_TP_IN --> Switch: 200 OK
+deactivate Switch
+
+PISP_TP_IN -> PISP_DM: Accounts response recieved
+rnote right of PISP_DM: state: accountLookupSuccess
+deactivate PISP_TP_IN
+activate PISP_DM
+PISP_DM -> PISP_TP_OUT: return Accounts
+deactivate PISP_DM
+rnote left of PISP_TP_OUT #LightBlue
+{
+  accounts: [
+    { accountNickname: "XXXXXXnt", id: "dfspa.username.1234", currency: "ZAR" },
+    { accountNickname: "SpeXXXXXXXXnt", id: "dfspa.username.5678", currency: "USD" }
+  ],
+  currentState="accountLookupSuccess"
+}
+end note
+PISP_TP_OUT --> PISP: 200 OK Accounts
+deactivate PISP_TP_OUT
+deactivate PISP
+@enduml

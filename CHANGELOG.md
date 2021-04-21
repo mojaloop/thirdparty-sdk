@@ -1,4 +1,32 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+### [11.34.3](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.34.2...v11.34.3) (2021-04-16)
+
+
+### Documentation
+
+* add sequence diagram for pre-linking flow ([#84](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/84)) ([801e3f6](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/801e3f67a9c6df8d662e549e34e48df965de4ad7))
+
+### [11.34.2](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.34.1...v11.34.2) (2021-04-15)
+
+
+### Documentation
+
+* add sequence digram for discovery flow ([#85](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/85)) ([e2fbfd0](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/e2fbfd0141583db750fc04bc9820766594151619))
+
+### [11.34.1](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.34.0...v11.34.1) (2021-04-15)
+
+
+### Maintenance
+
+* update consentRequests simulator resp to support all error cases ([#86](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/86)) ([c81d681](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/c81d681dd490c2c15319ebe253fc3a4edfc977c2))
+
+## [11.34.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.33.0...v11.34.0) (2021-04-14)
+
+
+### Features
+
+* implement consentRequests( post and put) endpoints ([#80](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/80)) ([a95d6d2](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/a95d6d2c74ebbfe4fbbb7b6f6d4e3acde503c753))
+
 ## [11.33.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.32.1...v11.33.0) (2021-04-06)
 
 

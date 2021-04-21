@@ -25,7 +25,12 @@
 
  --------------
  ******/
-import SDK from '@mojaloop/sdk-standard-components'
+import {
+  WSO2Auth,
+  MojaloopRequests,
+  ThirdpartyRequests,
+  Logger as SDKLogger
+} from '@mojaloop/sdk-standard-components'
 import { KVS } from '~/shared/kvs'
 import { PubSub } from '~/shared/pub-sub'
 import { ResponseToolkit, Server } from '@hapi/hapi'
@@ -41,10 +46,10 @@ import { Scheme } from '~/shared/http-scheme'
 export interface StateResponseToolkit extends ResponseToolkit {
   getKVS: () => KVS
   getPubSub: () => PubSub
-  getLogger: () => SDK.Logger.Logger
-  getMojaloopRequests: () => SDK.MojaloopRequests
-  getThirdpartyRequests: () => SDK.ThirdpartyRequests
-  getWSO2Auth: () => SDK.WSO2Auth
+  getLogger: () => SDKLogger.Logger
+  getMojaloopRequests: () => MojaloopRequests
+  getThirdpartyRequests: () => ThirdpartyRequests
+  getWSO2Auth: () => WSO2Auth
   getPISPBackendRequests: () => PISPBackendRequests
   getDFSPBackendRequests: () => DFSPBackendRequests
   getSDKOutgoingRequests: () => SDKOutgoingRequests
@@ -75,7 +80,7 @@ export const StatePlugin = {
       key: string
     }
     // prepare WSO2Auth
-    const wso2Auth = new SDK.WSO2Auth({
+    const wso2Auth = new WSO2Auth({
       ...config.WSO2_AUTH,
       logger,
       tlsCreds: config.SHARED.TLS.mutualTLS.enabled
@@ -84,7 +89,7 @@ export const StatePlugin = {
     })
 
     // prepare Requests instances
-    const mojaloopRequests = new SDK.MojaloopRequests({
+    const mojaloopRequests = new MojaloopRequests({
       logger,
       peerEndpoint: config.SHARED.PEER_ENDPOINT,
       alsEndpoint: config.SHARED.ALS_ENDPOINT,
@@ -96,10 +101,10 @@ export const StatePlugin = {
       dfspId: config.SHARED.DFSP_ID,
       tls: config.SHARED.TLS,
       jwsSign: config.SHARED.JWS_SIGN,
-      jwsSigningKey: <Buffer> config.SHARED.JWS_SIGNING_KEY
+      jwsSigningKey: <Buffer>config.SHARED.JWS_SIGNING_KEY
     })
 
-    const thirdpartyRequest = new SDK.ThirdpartyRequests({
+    const thirdpartyRequest = new ThirdpartyRequests({
       logger,
       peerEndpoint: config.SHARED.PEER_ENDPOINT,
       alsEndpoint: config.SHARED.ALS_ENDPOINT,
@@ -111,7 +116,7 @@ export const StatePlugin = {
       dfspId: config.SHARED.DFSP_ID,
       tls: config.SHARED.TLS,
       jwsSign: config.SHARED.JWS_SIGN,
-      jwsSigningKey: <Buffer> config.SHARED.JWS_SIGNING_KEY
+      jwsSigningKey: <Buffer>config.SHARED.JWS_SIGNING_KEY
     })
 
     const pispBackendRequests = new PISPBackendRequests({
@@ -130,7 +135,10 @@ export const StatePlugin = {
       getUserAccountsPath: config.SHARED.DFSP_BACKEND_GET_USER_ACCOUNTS_PATH,
       validateOTPPath: config.SHARED.DFSP_BACKEND_VALIDATE_OTP_PATH,
       getScopesPath: config.SHARED.DFSP_BACKEND_GET_SCOPES_PATH,
-      validateThirdpartyTransactionRequestPath: config.SHARED.DFSP_BACKEND_VALIDATE_THIRDPARTY_TRANSACTION_REQUEST
+      validateThirdpartyTransactionRequestPath: config.SHARED.DFSP_BACKEND_VALIDATE_THIRDPARTY_TRANSACTION_REQUEST,
+      validateConsentRequestsPath: config.SHARED.DFSP_BACKEND_VALIDATE_CONS_REQ_PATH,
+      sendOTPPath: config.SHARED.DFSP_BACKEND_SEND_OTP_REQ_PATH,
+      storeConsentRequestsPath: config.SHARED.DFSP_BACKEND_STORE_CONS_REQ_PATH
     })
 
     const sdkOutgoingRequests = new SDKOutgoingRequests({
@@ -152,10 +160,10 @@ export const StatePlugin = {
       // prepare toolkit accessors
       server.decorate('toolkit', 'getKVS', (): KVS => kvs)
       server.decorate('toolkit', 'getPubSub', (): PubSub => pubSub)
-      server.decorate('toolkit', 'getLogger', (): SDK.Logger.Logger => logger)
-      server.decorate('toolkit', 'getMojaloopRequests', (): SDK.MojaloopRequests => mojaloopRequests)
-      server.decorate('toolkit', 'getThirdpartyRequests', (): SDK.ThirdpartyRequests => thirdpartyRequest)
-      server.decorate('toolkit', 'getWSO2Auth', (): SDK.WSO2Auth => wso2Auth)
+      server.decorate('toolkit', 'getLogger', (): SDKLogger.Logger => logger)
+      server.decorate('toolkit', 'getMojaloopRequests', (): MojaloopRequests => mojaloopRequests)
+      server.decorate('toolkit', 'getThirdpartyRequests', (): ThirdpartyRequests => thirdpartyRequest)
+      server.decorate('toolkit', 'getWSO2Auth', (): WSO2Auth => wso2Auth)
       server.decorate('toolkit', 'getPISPBackendRequests', (): PISPBackendRequests => pispBackendRequests)
       server.decorate('toolkit', 'getDFSPBackendRequests', (): DFSPBackendRequests => dfspBackendRequests)
       server.decorate('toolkit', 'getSDKOutgoingRequests', (): SDKOutgoingRequests => sdkOutgoingRequests)

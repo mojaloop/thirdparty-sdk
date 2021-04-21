@@ -1,0 +1,74 @@
+@startuml
+
+title PISP Pre-Linking
+
+participant "PISP Backend" as PISP
+box "PISP tp-scheme-adapter"
+  participant "outbound-server" as PISP_TP_OUT
+  participant "PISPrelinkingModel" as PISP_PLM
+  participant "inbound-server" as PISP_TP_IN
+end box
+box "Mojaloop"
+    participant Switch
+end box
+
+== Pre-Linking ==
+autonumber 1 "<b>PRELINKING-#</b>"
+
+PISP -> PISP_TP_OUT: GET /linking/providers
+
+activate PISP
+activate PISP_TP_OUT
+
+PISP_TP_OUT -> PISP_TP_OUT: const model = await create()
+rnote right of PISP_TP_OUT: state: start
+PISP_TP_OUT -> PISP_PLM: model.getProviders()
+
+activate PISP_PLM
+
+PISP_PLM -> PISP_PLM: ThirdpartyRequests.getServicesById()
+PISP_PLM -> Switch: GET /services/THIRD_PARTY_DFSP
+
+activate Switch
+Switch --> PISP_PLM: 202 Accepted
+deactivate PISP_PLM
+
+note over PISP, Switch
+  HAPPY_SCENARIO: Switch returns a non-empty list
+end note
+
+activate PISP_TP_IN
+
+Switch --> PISP_TP_IN: PUT /services/THIRD_PARTY_DFSP
+rnote left of Switch #LightBlue
+PUT /services/THIRD_PARTY_DFSP
+{
+  providers: [
+    "dfspa", "dfspb"
+  ]
+}
+end note
+PISP_TP_IN --> Switch: 200 OK
+
+deactivate Switch
+
+PISP_TP_IN -> PISP_PLM: Services request recieved
+
+deactivate PISP_TP_IN
+activate PISP_PLM
+
+rnote right of PISP_PLM: state: providersLookupSuccess
+PISP_PLM -> PISP_TP_OUT: return providers
+
+deactivate PISP_PLM
+rnote left of PISP_TP_OUT #LightBlue
+{
+    providers: [
+       "dfspa", "dfspb"
+    ],
+    currentState: "providersLookupSuccess"
+}
+end note
+PISP_TP_OUT --> PISP: 200 OK Providers
+
+@enduml

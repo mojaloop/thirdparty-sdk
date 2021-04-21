@@ -46,11 +46,16 @@ import {
 import {
   OutboundAccountsModel
 } from '~/models/outbound/accounts.model'
+import {
+  PISPConsentRequestsModel
+} from '~/models/outbound/pispConsentRequests.model'
 import { PISPTransactionPhase } from '~/models/pispTransaction.interface'
 import { PISPOTPValidateModel } from '~/models/outbound/pispOTPValidate.model'
 import ThirdpartyAuthorizations from '~/handlers/inbound/thirdpartyRequests/transactions/{ID}/authorizations'
 import ConsentsHandler from '~/handlers/inbound/consents'
+import ConsentRequestsHandler from '~/handlers/inbound/consentRequests'
 import ConsentRequestsIdHandler from '~/handlers/inbound/consentRequests/{ID}'
+import ConsentRequestsIdErrorHandler from '~/handlers/inbound/consentRequests/{ID}/error'
 import { Server, Request } from '@hapi/hapi'
 import { StateResponseToolkit } from '~/server/plugins/state'
 import { buildPayeeQuoteRequestFromTptRequest } from '~/domain/thirdpartyRequests/transactions'
@@ -700,6 +705,151 @@ describe('Inbound API routes', (): void => {
       }
       const response = await server.inject(request)
       expect(response.statusCode).toBe(202)
+    })
+  })
+
+  describe('POST /consentRequests', () => {
+    it('handler && pubSub invocation', async (): Promise<void> => {
+      const request = {
+        payload: mockData.consentRequestsPost.payload,
+        headers: {
+          'Content-Type': 'application/json',
+          'FSPIOP-Source': 'switch',
+          Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
+          'FSPIOP-Destination': 'dfspA'
+        }
+      }
+      const pubSubMock = {
+        publish: jest.fn()
+      }
+      const toolkit = {
+        getPubSub: jest.fn(() => pubSubMock),
+        response: jest.fn(() => ({
+          code: jest.fn((code: number) => ({
+            statusCode: code
+          }))
+        })),
+        getLogger: jest.fn(() => logger),
+        getDFSPBackendRequests: jest.fn(() => ({
+          validateConsentRequests: jest.fn(() => Promise.resolve(mockData.consentRequestsPost.response)),
+          storeConsentRequests: jest.fn(() => Promise.resolve()),
+          sendOTP: jest.fn(() => Promise.resolve(mockData.consentRequestsPost.otpResponse)),
+        })),
+        getThirdpartyRequests: jest.fn(() => ({
+          putConsentRequests: jest.fn(),
+          putConsentRequestsError: jest.fn()
+        })),
+        getKVS: jest.fn(() => ({
+          set: jest.fn()
+        }))
+      }
+
+      const result = await ConsentRequestsHandler.post(
+        {},
+        request as unknown as Request,
+        toolkit as unknown as StateResponseToolkit
+      )
+
+      expect(result.statusCode).toEqual(202)
+    })
+
+    it('input validation', async (): Promise<void> => {
+      const request = {
+        method: 'POST',
+        url: '/consentRequests',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'FSPIOP-Source': 'switch',
+          Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
+          'FSPIOP-Destination': 'dfspA'
+        },
+        payload: mockData.consentRequestsPost.payload
+      }
+      const response = await server.inject(request)
+      expect(response.statusCode).toBe(202)
+    })
+  })
+
+  describe('PUT /consentRequests/{ID}', () => {
+    jest.useFakeTimers()
+    const request: Request = mockData.consentRequestsPut
+    const errorRequest: Request = mockData.consentRequestsPutError
+    it('PUT handler && pubSub invocation', async (): Promise<void> => {
+      const pubSubMock = {
+        publish: jest.fn()
+      }
+      const toolkit = {
+        getPubSub: jest.fn(() => pubSubMock),
+        getLogger: jest.fn(() => logger),
+        getDFSPBackendRequests: jest.fn(),
+        getThirdpartyRequests: jest.fn(),
+        response: jest.fn(() => ({
+          code: jest.fn((code: number) => ({
+            statusCode: code
+          }))
+        }))
+      }
+
+      const result = await ConsentRequestsIdHandler.put(
+        {},
+        request,
+        toolkit as unknown as StateResponseToolkit
+      )
+
+      expect(result.statusCode).toEqual(200)
+      jest.runAllImmediates()
+      expect(toolkit.getPubSub).toBeCalledTimes(1)
+
+      const channel = PISPConsentRequestsModel.notificationChannel(request.params.ID)
+      expect(pubSubMock.publish).toBeCalledWith(channel, request.payload)
+    })
+
+    it('input validation', async (): Promise<void> => {
+      const inRequest = {
+        method: 'PUT',
+        url: '/consentRequests/b51ec534-ee48-4575-b6a9-ead2955b8069',
+        headers: {
+          'Content-Type': 'application/json',
+          'FSPIOP-Source': 'switch',
+          Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
+          'FSPIOP-Destination': 'dfspA'
+        },
+        payload: request.payload
+      }
+      const response = await server.inject(inRequest)
+      expect(response.statusCode).toBe(200)
+    })
+
+    it('PUT error handler && pubSub invocation', async (): Promise<void> => {
+      const pubSubMock = {
+        publish: jest.fn()
+      }
+      const toolkit = {
+        getPubSub: jest.fn(() => pubSubMock),
+        getLogger: jest.fn(() => logger),
+        getDFSPBackendRequests: jest.fn(),
+        getThirdpartyRequests: jest.fn(),
+        response: jest.fn(() => ({
+          code: jest.fn((code: number) => ({
+            statusCode: code
+          }))
+        }))
+      }
+      const result = await ConsentRequestsIdErrorHandler.put(
+        {},
+        errorRequest,
+        toolkit as unknown as StateResponseToolkit
+      )
+
+      expect(result.statusCode).toEqual(200)
+      jest.runAllImmediates()
+      expect(toolkit.getPubSub).toBeCalledTimes(1)
+
+      const otpChannel = PISPOTPValidateModel.notificationChannel(errorRequest.params.ID)
+      expect(pubSubMock.publish).toBeCalledWith(otpChannel, errorRequest.payload)
+      const channel = PISPConsentRequestsModel.notificationChannel(errorRequest.params.ID)
+      expect(pubSubMock.publish).toBeCalledWith(channel, errorRequest.payload)
     })
   })
 
