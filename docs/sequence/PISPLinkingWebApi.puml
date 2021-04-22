@@ -186,12 +186,11 @@ Switch --> PISP_LM: 202 Accepted
 deactivate PISP_LM
 Switch -> DFSP_TP_IN: PATCH /consentRequests/6789
 activate DFSP_TP_IN
-
+DFSP_TP_IN --> Switch: 202 Accepted
 DFSP_TP_IN -> DFSP_TP_IN: const model = await loadFromKVS({key: 6789})
-activate DFSP_LM
 rnote right of DFSP_TP_IN: state: consentRequestValidatedAndStored
 DFSP_TP_IN -> DFSP_LM: model.validateAuthToken()
-DFSP_TP_IN --> Switch: 202 Accepted
+activate DFSP_LM
 deactivate Switch
 deactivate DFSP_TP_IN
 
