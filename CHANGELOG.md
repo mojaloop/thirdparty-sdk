@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+## [11.35.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.34.3...v11.35.0) (2021-04-22)
+
+
+### Features
+
+* 2108 dfsp transaction model ([#79](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/79)) ([272314f](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/272314f97d55f77e3d1a9d2f52a0bc5c35342ae0))
+
 ### [11.34.3](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.34.2...v11.34.3) (2021-04-16)
 
 
