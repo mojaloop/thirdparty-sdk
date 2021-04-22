@@ -151,7 +151,7 @@ export class DFSPTransactionModel
       this.data.transactionRequestRequest.payee.partyIdInfo, 'fspId'
     )
 
-    // this field will be present what is guaranteed by InvalidDataError validation above
+    // this field will be present which is guaranteed by InvalidDataError validation above
     const update = this.data.transactionRequestPutUpdate as tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPutResponse
     const updateResult = await this.thirdpartyRequests.putThirdpartyRequestsTransactions(
       update,
