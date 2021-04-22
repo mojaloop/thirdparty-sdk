@@ -31,12 +31,6 @@
   "API_DEFINITIONS": [
     {
       "type": "fspiop",
-      "version": "1.0",
-      "folderPath": "fspiop_1.0",
-      "asynchronous": true
-    },
-    {
-      "type": "fspiop",
       "version": "1.1",
       "folderPath": "fspiop_1.1",
       "asynchronous": true

@@ -91,6 +91,7 @@ export interface ServiceConfig {
     DFSP_BACKEND_HTTP_SCHEME: string
     DFSP_BACKEND_VERIFY_AUTHORIZATION_PATH: string
     DFSP_BACKEND_VERIFY_CONSENT_PATH: string
+    DFSP_BACKEND_VALIDATE_THIRDPARTY_TRANSACTION_REQUEST: string
     DFSP_BACKEND_GET_USER_ACCOUNTS_PATH: string
     PISP_BACKEND_URI: string
     PISP_BACKEND_HTTP_SCHEME: string
@@ -99,8 +100,11 @@ export interface ServiceConfig {
     PISP_TRANSACTION_APPROVE_TIMEOUT_IN_SECONDS: number
     SDK_OUTGOING_URI: string
     SDK_OUTGOING_HTTP_SCHEME: string
+    SDK_OUTGOING_REQUEST_QUOTE_PATH: string
+    SDK_OUTGOING_REQUEST_AUTHORIZATION_PATH: string
+    SDK_OUTGOING_REQUEST_TRANSFER_PATH: string
     SDK_REQUEST_TO_PAY_TRANSFER_URI: string
-    SDK_PARTIES_INFORMATION_URI: string
+    SDK_OUTGOING_PARTIES_INFORMATION_PATH: string
     SDK_NOTIFY_ABOUT_TRANSFER_URI: string
     DFSP_BACKEND_VALIDATE_OTP_PATH: string
     DFSP_BACKEND_VALIDATE_CONS_REQ_PATH: string
@@ -328,6 +332,11 @@ export const ConvictConfig = Convict<ServiceConfig>({
       format: '*',
       default: 'scopes/{ID}'
     },
+    DFSP_BACKEND_VALIDATE_THIRDPARTY_TRANSACTION_REQUEST: {
+      doc: 'path used by DFSPBackendRequests.validateThirdpartyTransactionRequest',
+      format: '*',
+      default: 'validate-thirdparty-transaction-request'
+    },
     PISP_BACKEND_URI: {
       doc: 'host address of DFSP\'s ',
       format: '*',
@@ -346,12 +355,12 @@ export const ConvictConfig = Convict<ServiceConfig>({
     PISP_TRANSACTION_INITIATE_TIMEOUT_IN_SECONDS: {
       doc: 'Timeout for Transaction Initiate phase',
       format: 'nat',
-      default: 3
+      default: 30
     },
     PISP_TRANSACTION_APPROVE_TIMEOUT_IN_SECONDS: {
       doc: 'Timeout for Transaction Approve phase',
       format: 'nat',
-      default: 3
+      default: 30
     },
     SDK_OUTGOING_URI: {
       doc: 'host address of SDK scheme-adapter Outgoing service\'s ',
@@ -363,12 +372,27 @@ export const ConvictConfig = Convict<ServiceConfig>({
       format: ['http', 'https'],
       default: 'http'
     },
+    SDK_OUTGOING_REQUEST_QUOTE_PATH: {
+      doc: 'path to sdk outgoing quote sync interface',
+      format: '*',
+      default: 'quotes'
+    },
+    SDK_OUTGOING_REQUEST_AUTHORIZATION_PATH: {
+      doc: 'path to sdk outgoing authorization sync interface',
+      format: '*',
+      default: 'authorizations'
+    },
+    SDK_OUTGOING_REQUEST_TRANSFER_PATH: {
+      doc: 'path to sdk outgoing transfer sync interface',
+      format: '*',
+      default: 'simpleTransfers'
+    },
     SDK_REQUEST_TO_PAY_TRANSFER_URI: {
       doc: 'uri to sdk-scheme-adapter requestToPayTransfer endpoint',
       format: '*',
       default: 'localhost:9000/requestToPayTransfer'
     },
-    SDK_PARTIES_INFORMATION_URI: {
+    SDK_OUTGOING_PARTIES_INFORMATION_PATH: {
       doc: 'uri to sdk-scheme-adapter requestToPayTransfer endpoint',
       format: '*',
       default: 'localhost:7002/parties/{Type}/{ID}/{SubId}'

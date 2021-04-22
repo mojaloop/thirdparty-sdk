@@ -36,7 +36,7 @@ async function patch (_context: any, request: Request, h: StateResponseToolkit):
   const payload = request.payload as tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPatchResponse
   const pubSub = h.getPubSub()
 
-  h.getLogger().push({ payload }).info('PATCH /thirdpartyRequests/{ID}/transactions/ pushing to channel')
+  h.getLogger().push({ payload }).info('PATCH /thirdpartyRequests/transactions/{ID} pushing to channel')
 
   // don't await on promise to resolve, let finish publish in background
   PISPTransactionModel.triggerWorkflow(
@@ -54,7 +54,7 @@ async function put (_context: any, request: Request, h: StateResponseToolkit): P
   const payload = request.payload as tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPutResponse
   const pubSub = h.getPubSub()
 
-  h.getLogger().push({ payload }).info('PUT /thirdpartyRequests/{ID}/transactions/ pushing to channel')
+  h.getLogger().push({ payload }).info('PUT /thirdpartyRequests/transactions/{ID} pushing to channel')
 
   // don't await on promise to resolve, let finish publish in background
   PISPTransactionModel.triggerWorkflow(

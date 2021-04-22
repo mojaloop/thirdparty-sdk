@@ -183,7 +183,7 @@
             "const curDate = (new Date()).toUTCString();",
             "const reqBody = JSON.parse(pm.request.body);",
             "const transactionRequestId = reqBody.transactionRequestId",
-            "const puthThirdpartyRequestIDTransactionReq = {",
+            "const putThirdpartyRequestIDTransactionReq = {",
             "  url: userConfig.CALLBACK_ENDPOINT + '/thirdpartyRequests/transactions/' + transactionRequestId,",
             "  method: 'PUT',",
             "  header: {",
@@ -201,8 +201,8 @@
             "  }",
             "}",
             "  ",
-            "pm.sendRequest(puthThirdpartyRequestIDTransactionReq, function (err, resp) {",
-            "  console.error('PUT /thridpartyRequests/{ID}/transaction response', resp.json(), err)",
+            "pm.sendRequest(putThirdpartyRequestIDTransactionReq, function (err, resp) {",
+            "  console.error('PUT /thirdpartyRequests/{ID}/transaction response', resp.json(), err)",
             "})"
           ]
         }
@@ -275,6 +275,41 @@
   {
     "ruleId": 5,
     "priority": 1,
+    "description": "post /quotes",
+    "apiVersion": {
+      "minorVersion": 1,
+      "majorVersion": 1,
+      "type": "fspiop",
+      "asynchronous": true
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/quotes"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "post"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/quotes/{ID}",
+      "params": {
+        "scripts": {}
+      },
+      "type": "MOCK_CALLBACK"
+    },
+    "type": "callback",
+    "version": 1
+  },
+  {
+    "ruleId": 6,
+    "priority": 1,
     "description": "post /consentRequests -WEB",
     "apiVersion": {
       "minorVersion": 1,
@@ -338,14 +373,13 @@
         },
         "scripts": {}
       },
-      "delay": 0,
       "type": "FIXED_CALLBACK"
     },
     "type": "callback",
     "version": 1
   },
   {
-    "ruleId": 6,
+    "ruleId": 7,
     "priority": 1,
     "description": "post /consentRequests -OTP",
     "apiVersion": {
@@ -357,6 +391,12 @@
     "conditions": {
       "all": [
         {
+          "fact": "body",
+          "operator": "equal",
+          "value": "c51ec534-ee48-4575-b6a9-ead2955b8069",
+          "path": "id"
+        },
+        {
           "fact": "operationPath",
           "operator": "equal",
           "value": "/consentRequests"
@@ -365,12 +405,6 @@
           "fact": "method",
           "operator": "equal",
           "value": "post"
-        },
-        {
-          "fact": "body",
-          "operator": "equal",
-          "value": "c51ec534-ee48-4575-b6a9-ead2955b8069",
-          "path": "id"
         }
       ]
     },
@@ -406,10 +440,100 @@
             }
           ],
           "callbackUri": "pisp-app://callback.com"
-        }
+        },
+        "scripts": {}
       },
       "delay": 0,
       "type": "FIXED_CALLBACK"
+    },
+    "type": "callback",
+    "version": 1
+  },
+  {
+    "ruleId": 8,
+    "priority": 1,
+    "description": "post /authorizations",
+    "apiVersion": {
+      "minorVersion": 1,
+      "majorVersion": 0,
+      "type": "thirdparty_pisp",
+      "asynchronous": true
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/authorizations"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "post"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/authorizations/{ID}",
+      "params": {
+        "headers": {
+          "Content-Type": "application/vnd.interoperability.authorizations+json;version=1.0",
+          "Date": "2021-04-09T14:02:48.217Z",
+          "FSPIOP-Source": "dfspA"
+        },
+        "body": {
+          "authenticationInfo": {
+            "authentication": "U2F",
+            "authenticationValue": {
+              "pinValue": "some-pin-value",
+              "counter": "1"
+            }
+          },
+          "responseType": "ENTERED"
+        },
+        "scripts": {}
+      },
+      "delay": 0,
+      "type": "FIXED_CALLBACK"
+    },
+    "type": "callback",
+    "version": 1
+  },
+  {
+    "ruleId": 9,
+    "priority": 1,
+    "description": "post /transfers",
+    "apiVersion": {
+      "minorVersion": 1,
+      "majorVersion": 1,
+      "type": "fspiop",
+      "asynchronous": true
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/transfers"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "post"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/transfers/{ID}",
+      "params": {
+        "body": {
+          "transferState": "COMMITTED"
+        },
+        "scripts": {}
+      },
+      "type": "MOCK_CALLBACK"
     },
     "type": "callback",
     "version": 1

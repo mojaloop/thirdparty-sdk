@@ -32,26 +32,6 @@ module.exports = {
           method: 'ncat'
         },
         {
-          description: 'Inbound API A',
-          uri: 'localhost:4055',
-          method: 'ncat'
-        },
-        {
-          description: 'Outbound API A',
-          uri: 'localhost:4056',
-          method: 'ncat'
-        },
-        {
-          description: 'Inbound API B',
-          uri: 'localhost:4057',
-          method: 'ncat'
-        },
-        {
-          description: 'Outbound API B',
-          uri: 'localhost:4058',
-          method: 'ncat'
-        },
-        {
           description: 'PISP Simulator',
           uri: 'localhost:9000',
           method: 'ncat'

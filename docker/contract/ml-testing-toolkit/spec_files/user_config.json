@@ -7,17 +7,32 @@
       {
         "method": "put",
         "path": "/parties/{Type}/{ID}",
-        "endpoint": "http://172.17.0.1:7000"
+        "endpoint": "http://inbound-sdk-scheme-adapter:7000"
       },
       {
         "method": "put",
         "path": "/quotes/{ID}",
-        "endpoint": "http://localhost:3002"
+        "endpoint": "http://inbound-sdk-scheme-adapter:7000"
+      },
+      {
+        "method": "put",
+        "path": "/authorizations/{ID}",
+        "endpoint": "http://inbound-sdk-scheme-adapter:7000"
+      },
+      {
+        "method": "patch",
+        "path": "/thirdpartyRequests/transactions/{ID}",
+        "endpoint": "http://inbound-thirdparty-scheme-adapter:4005"
+      },
+      {
+        "method": "put",
+        "path": "/thirdpartyRequests/transactions/{ID}/error",
+        "endpoint": "http://inbound-thirdparty-scheme-adapter:4005"
       },
       {
         "method": "put",
         "path": "/transfers/{ID}",
-        "endpoint": "http://localhost:3000"
+        "endpoint": "http://inbound-sdk-scheme-adapter:7000"
       }
     ]
   },
@@ -28,9 +43,9 @@
   "SEND_CALLBACK_ENABLE": true,
   "FSPID": "pispA",
   "DEFAULT_USER_FSPID": "userdfsp",
-  "TRANSFERS_VALIDATION_WITH_PREVIOUS_QUOTES": true,
-  "TRANSFERS_VALIDATION_ILP_PACKET": true,
-  "TRANSFERS_VALIDATION_CONDITION": true,
+  "TRANSFERS_VALIDATION_WITH_PREVIOUS_QUOTES": false,
+  "TRANSFERS_VALIDATION_ILP_PACKET": false,
+  "TRANSFERS_VALIDATION_CONDITION": false,
   "ILP_SECRET": "secret",
   "VERSIONING_SUPPORT_ENABLE": true,
   "OVERRIDE_WITH_ENV": true,

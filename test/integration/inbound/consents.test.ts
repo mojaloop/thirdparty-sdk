@@ -57,33 +57,33 @@ describe('POST /consents', (): void => {
       headers: {
         'Content-Type': 'application/json',
         'FSPIOP-Source': 'switch',
-        'Accept': 'application/json',
+        Accept: 'application/json',
         Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
         'FSPIOP-Destination': 'pispA'
       }
     }
 
-    it('should propagate message via Redis PUB/SUB', async (): Promise<void> => {
-      // eslint-disable-next-line no-async-promise-executor
-      return new Promise(async (resolve) => {
-        const pubSub = new PubSub(config)
-        await pubSub.connect()
-        expect(pubSub.isConnected).toBeTruthy()
+    it('should propagate message via Redis PUB/SUB', async (done): Promise<void> => {
+      const pubSub = new PubSub(config)
+      await pubSub.connect()
+      expect(pubSub.isConnected).toBeTruthy()
 
-        pubSub.subscribe('PISPOTPValidate-997c89f4-053c-4283-bfec-45a1a0a28fba', async (channel: string, message: Message, _id: number) => {
+      pubSub.subscribe('PISPOTPValidate-997c89f4-053c-4283-bfec-45a1a0a28fba',
+        async (channel: string, message: Message) => {
           expect(channel).toEqual('PISPOTPValidate-997c89f4-053c-4283-bfec-45a1a0a28fba')
           expect(message).toEqual(payload)
           await pubSub.disconnect()
           expect(pubSub.isConnected).toBeFalsy()
 
-          resolve()
-        })
-        // Act
-        const response = await axios.post(scenarioUri, payload, axiosConfig)
+          done()
+        }
+      )
 
-        // Assert
-        expect(response.status).toEqual(202)
-      })
+      // Act
+      const response = await axios.post(scenarioUri, payload, axiosConfig)
+
+      // Assert
+      expect(response.status).toEqual(202)
     })
   })
 })

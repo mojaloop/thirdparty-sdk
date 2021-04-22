@@ -29,6 +29,9 @@ import { DFSPBackendConfig, DFSPBackendRequests } from '~/shared/dfsp-backend-re
 import { Scheme } from '~/shared/http-scheme'
 import mockLogger from '../mockLogger'
 import TestData from 'test/unit/data/mockData.json'
+import { uuid } from 'uuidv4'
+import { BackendGetScopesResponse } from '~/models/inbound/dfspOTPValidate.interface'
+import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
 
 describe('backendRequests', () => {
   let dfspBackendRequests: DFSPBackendRequests
@@ -42,6 +45,7 @@ describe('backendRequests', () => {
     getUserAccountsPath: 'accounts/{ID}',
     validateOTPPath: 'validateOTP',
     getScopesPath: 'scopes/{ID}',
+    validateThirdpartyTransactionRequestPath: 'validate-third-party-transaction-request',
     validateConsentRequestsPath: 'validateConsentRequests',
     sendOTPPath: 'sendOTP',
     storeConsentRequestsPath: 'store/consentRequests/{ID}'
@@ -63,6 +67,7 @@ describe('backendRequests', () => {
     expect(typeof dfspBackendRequests.post).toEqual('function')
     expect(typeof dfspBackendRequests.put).toEqual('function')
     expect(typeof dfspBackendRequests.getUserAccounts).toEqual('function')
+    expect(typeof dfspBackendRequests.validateThirdpartyTransactionRequest).toEqual('function')
     expect(typeof dfspBackendRequests.validateConsentRequests).toEqual('function')
     expect(typeof dfspBackendRequests.sendOTP).toEqual('function')
     expect(typeof dfspBackendRequests.storeConsentRequests).toEqual('function')
@@ -70,7 +75,6 @@ describe('backendRequests', () => {
     /**
      * TODO: check for methods
      *  - verifyAuthorization
-     *  - verifyConsent
      */
   })
 
@@ -88,6 +92,105 @@ describe('backendRequests', () => {
     })
   })
 
+  describe('validateOTPSecret', () => {
+    it('should propagate the call to post', async () => {
+      const response = { isValid: true }
+      const postSpy = jest.spyOn(dfspBackendRequests, 'post').mockImplementationOnce(
+        () => Promise.resolve(response)
+      )
+      const consentRequestId = uuid()
+      const authToken = uuid()
+      const result = await dfspBackendRequests.validateOTPSecret(consentRequestId, authToken)
+      expect(result).toEqual(response)
+      expect(postSpy).toBeCalledWith(dfspBackendRequests.validateOTPPath, { authToken, consentRequestId })
+    })
+  })
+
+  describe('getScopes', () => {
+    it('should propagate the call to get', async () => {
+      const consentRequestId = uuid()
+      const response: BackendGetScopesResponse = {
+        scopes: [
+          {
+            accountId: uuid(),
+            actions: ['accounts.getBalance']
+          }
+        ]
+      }
+      const getSpy = jest.spyOn(dfspBackendRequests, 'get').mockImplementationOnce(
+        () => Promise.resolve(response)
+      )
+
+      const result = await dfspBackendRequests.getScopes(consentRequestId)
+      expect(result).toEqual(response)
+      expect(getSpy).toBeCalledWith(dfspBackendRequests.getScopesPath.replace('{ID}', consentRequestId))
+    })
+  })
+
+  describe('validateThirdpartyTransactionRequest', () => {
+    it('should propagate the call to post', async () => {
+      const response = { isValid: true }
+      const transactionRequestId = uuid()
+      const transactionRequestRequest: tpAPI.Schemas.ThirdpartyRequestsTransactionsPostRequest = {
+        transactionRequestId,
+        payee: {
+          partyIdInfo: {
+            partyIdType: 'MSISDN',
+            partyIdentifier: '+44 1234 5678'
+          }
+        },
+        payer: {
+          partyIdType: 'THIRD_PARTY_LINK',
+          partyIdentifier: 'qwerty-1234'
+        },
+        amountType: 'SEND',
+        amount: {
+          currency: 'USD',
+          amount: '100'
+        },
+        transactionType: {
+          scenario: 'TRANSFER',
+          initiator: 'PAYER',
+          initiatorType: 'CONSUMER'
+        },
+        expiration: (new Date()).toISOString()
+      }
+      const postSpy = jest.spyOn(dfspBackendRequests, 'post').mockImplementationOnce(
+        () => Promise.resolve(response)
+      )
+      const result = await dfspBackendRequests.validateThirdpartyTransactionRequest(transactionRequestRequest)
+      expect(result).toEqual(response)
+      expect(postSpy).toBeCalledWith(
+        dfspBackendRequests.validateThirdpartyTransactionRequestPath,
+        transactionRequestRequest
+      )
+    })
+  })
+
+  describe('verifyAuthorization', () => {
+    it('should propagate the call to post', async () => {
+      const response = { isValid: true }
+      const authorizationResponse: tpAPI.Schemas.AuthorizationsIDPutResponse = {
+        authenticationInfo: {
+          authentication: 'U2F',
+          authenticationValue: {
+            pinValue: 'some-pin-value',
+            counter: '1'
+          } as string & Partial<{pinValue: string, counter: string}>
+        },
+        responseType: 'ENTERED'
+      }
+      const postSpy = jest.spyOn(dfspBackendRequests, 'post').mockImplementationOnce(
+        () => Promise.resolve(response)
+      )
+      const result = await dfspBackendRequests.verifyAuthorization(authorizationResponse)
+      expect(result).toEqual(response)
+      expect(postSpy).toBeCalledWith(
+        dfspBackendRequests.verifyAuthorizationPath,
+        authorizationResponse
+      )
+    })
+  })
   describe('validateConsentRequests', () => {
     it('should propagate call to post', async () => {
       const mockData = JSON.parse(JSON.stringify(TestData))
@@ -125,9 +228,8 @@ describe('backendRequests', () => {
         () => Promise.resolve()
       )
       const result = await dfspBackendRequests.storeConsentRequests(request)
-      expect(result).toBeNull
+      expect(result).toBeUndefined()
       expect(getSpy).toBeCalledWith(`store/consentRequests/${request.id}`, { scopes: request.scopes })
     })
   })
-
 })

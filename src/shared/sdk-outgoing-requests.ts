@@ -33,9 +33,11 @@ import {
 } from '../models/thirdparty.transactions.interface'
 import { OutboundAPI } from '@mojaloop/sdk-scheme-adapter'
 export interface SDKOutgoingRequestsConfig extends HttpRequestsConfig {
-  // requestAuthorizationPath: string
   requestPartiesInformationPath: string
   requestToPayTransferPath: string
+  requestQuotePath: string
+  requestAuthorizationPath: string
+  requestTransferPath: string
 }
 
 /**
@@ -68,20 +70,22 @@ export class SDKOutgoingRequests extends HttpRequests {
     return this.config.requestToPayTransferPath
   }
 
-  // REQUESTS
-  /**
-   * TODO: these requests will be used by DFSPTransactionModel/PISPTransactionModel
-   *  // these two will be done by calling ThirdpartyRequests interface, so not implemented here
-   *  notifyThirdpartyAboutRejectedAuthorization
-   *  notifyThirdpartyAboutTransfer
-   *  // synchronous calls to SDKOutgoing
-   *  requestAuthorization
-   *  requestQuote,
-   *  requestThirdpartyTransaction
-   *  requestTransfer,
-   *  requestVerifyAuthorization
-   *
-   * */
+  // requestQuote path getter
+  get requestQuotePath (): string {
+    return this.config.requestQuotePath
+  }
+
+  // requestAuthorization path getter
+  get requestAuthorizationPath (): string {
+    return this.config.requestAuthorizationPath
+  }
+
+  // requestTransfer path getter
+  get requestTransferPath (): string {
+    return this.config.requestTransferPath
+  }
+
+  // REQUESTS - synchronous calls to SDKOutgoing
 
   /**
    * @method requestPartiesInformation
@@ -96,7 +100,7 @@ export class SDKOutgoingRequests extends HttpRequests {
   ): Promise<OutboundAPI.Schemas.partiesByIdResponse | void> {
     // generate uri from template
     const uri = this.fullUri(
-      // config.SHARED.SDK_PARTIES_INFORMATION_URI
+      // config.SHARED.SDK_OUTGOING_PARTIES_INFORMATION_PATH
       this.requestPartiesInformationPath
         .replace('{Type}', type)
         .replace('{ID}', id)
@@ -115,6 +119,39 @@ export class SDKOutgoingRequests extends HttpRequests {
       headers: this.headers,
       agent: this.agent
     })
+  }
+
+  /**
+   * @method requestQuote
+   * @param {OutboundAPI.Schemas.quotesPostRequest} request - quotes request
+   * @returns {Promise<<OutboundAPI.Schemas.quotesPostResponse|void>} - quotes response
+   */
+  async requestQuote (
+    request: OutboundAPI.Schemas.quotesPostRequest
+  ): Promise<OutboundAPI.Schemas.quotesPostResponse | void> {
+    return this.post(this.requestQuotePath, request)
+  }
+
+  /**
+   * @method requestAuthorization
+   * @param {OutboundAPI.Schemas.authorizationsPostRequest} request - authorization request
+   * @returns {Promise<OutboundAPI.Schemas.authorizationsPostResponse | void>}
+   */
+  async requestAuthorization (
+    request: OutboundAPI.Schemas.authorizationsPostRequest
+  ): Promise<OutboundAPI.Schemas.authorizationsPostResponse | void> {
+    return this.post(this.requestAuthorizationPath, request)
+  }
+
+  /**
+   * @method requestTransfer
+   * @param {OutboundAPI.Schemas.simpleTransfersPostRequest} request - transfer request
+   * @returns {Promise<OutboundAPI.Schemas.simpleTransfersPostResponse | void>}
+   */
+  async requestTransfer (
+    request: OutboundAPI.Schemas.simpleTransfersPostRequest
+  ): Promise<OutboundAPI.Schemas.simpleTransfersPostResponse | void> {
+    return this.post(this.requestTransferPath, request)
   }
 
   // TODO: drop it and replace by requestTransfer
