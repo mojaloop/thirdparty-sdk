@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+### [11.35.1](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.35.0...v11.35.1) (2021-04-22)
+
+
+### Documentation
+
+* add happy path for PISPLinkingModel sequence diagram ([#87](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/87)) ([c2818b9](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/c2818b95769be333aa779f2169f50b75c4ea8655))
+
 ## [11.35.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.34.3...v11.35.0) (2021-04-22)
 
 
