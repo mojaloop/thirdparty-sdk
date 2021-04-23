@@ -30,6 +30,10 @@ import inspect from '~/shared/inspect'
 
 export interface ResponseErrorData {
   msg: string
+  res?: {
+    body?: string
+    data?: {[key:string]: unknown }
+  }
 }
 
 export class HTTPResponseError<ErrorData extends ResponseErrorData> extends Error {

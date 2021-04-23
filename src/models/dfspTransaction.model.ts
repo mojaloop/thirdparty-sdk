@@ -40,8 +40,7 @@ import {
 import { InvalidDataError } from '~/shared/invalid-data-error'
 import { SDKOutgoingRequests } from '~/shared/sdk-outgoing-requests'
 import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
-import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
-
+import { ThirdpartyRequests, Errors } from '@mojaloop/sdk-standard-components'
 export class DFSPTransactionModel
   extends PersistentModel<DFSPTransactionStateMachine, DFSPTransactionData> {
   protected config: DFSPTransactionModelConfig
@@ -130,6 +129,7 @@ export class DFSPTransactionModel
     if (!(validationResult && validationResult.isValid)) {
       // TODO: throw proper error when transactionRequestRequest is not valid
       // TODO: error should be transformed to call PUT /thirdpartyRequests/{ID}/transactions/error
+      // TP_FSP_TRANSACTION_REQUEST_NOT_VALID
       throw new Error('transactionRequestRequest is not valid')
     }
 
@@ -163,6 +163,7 @@ export class DFSPTransactionModel
     if (!(updateResult && updateResult.statusCode >= 200 && updateResult.statusCode < 300)) {
       // TODO: throw proper error when notification failed
       // TODO: error should be transformed to call PUT /thirdpartyRequests/transactions/{ID}/error
+      // TP_FSP_TRANSACTION_PUT_UPDATE_FAILED
       throw new Error(`PUT /thirdpartyRequests/transactions/${this.data.transactionRequestId} failed`)
     }
 
@@ -202,6 +203,7 @@ export class DFSPTransactionModel
     if (!(resultQuote && resultQuote.currentState === 'COMPLETED')) {
       // TODO: throw proper error
       // TODO: error should be transformed to call PUT /thirdpartyRequests/{ID}/transactions/error
+      // TP_FSP_TRANSACTION_REQUEST_QUOTE_FAILED
 
       throw new Error('POST /quotes failed')
     }
@@ -231,6 +233,7 @@ export class DFSPTransactionModel
 
     if (!(resultAuthorization && resultAuthorization.currentState === 'COMPLETED')) {
       // TODO: throw proper error
+      // TP_FSP_TRANSACTION_REQUEST_AUTHORIZATION_FAILED
       throw new Error('POST /authorizations failed')
     }
 
@@ -253,6 +256,7 @@ export class DFSPTransactionModel
         if (!(result && result.isValid)) {
           // challenge is improperly signed
           // TODO: throw proper error
+          // TP_FSP_TRANSACTION_AUTHORIZATION_NOT_VALID
           throw new Error('POST /verify-authorization failed')
         }
 
@@ -295,12 +299,14 @@ export class DFSPTransactionModel
         // TODO: throw proper error;
         // PUT /thirdpartyRequests/transactions/{ID}/error
         // or  PATCH /thirdpartyRequests/transactions/{ID} ????
+        // TP_FSP_TRANSACTION_AUTHORIZATION_REJECTED_BY_USER
         throw new Error('Authorization/Transfer REJECTED')
       }
 
       default: {
         // should we setup ??? this.data.transactionRequestState = 'REJECTED'
         // we received 'RESEND' or something else
+        // TP_FSP_TRANSACTION_AUTHORIZATION_UNEXPECTED
         throw new Error(`Unexpected authorization responseType: ${authorizationInfo.responseType}`)
       }
     }
@@ -322,6 +328,7 @@ export class DFSPTransactionModel
       )
     ) {
       // TODO: throw proper error
+      // TP_FSP_TRANSACTION_TRANSFER_FAILED
       throw new Error('POST /simpleTransfer failed')
     }
     this.data.transferResponse = transferResult
@@ -336,11 +343,15 @@ export class DFSPTransactionModel
   async onNotifyTransferIsDone (): Promise<void> {
     InvalidDataError.throwIfInvalidProperty(this.data, 'transactionRequestPatchUpdate')
 
-    await this.thirdpartyRequests.patchThirdpartyRequestsTransactions(
+    const result = await this.thirdpartyRequests.patchThirdpartyRequestsTransactions(
       this.data.transactionRequestPatchUpdate!,
       this.data.transactionRequestId,
       this.data.participantId
     )
+    if (!result) {
+      // TP_FSP_TRANSACTION_NOTIFICATION_FAILED
+      throw new Error('PATCH /thirdpartyRequests/transactions/{ID} failed')
+    }
   }
 
   // workflow
