@@ -40,7 +40,7 @@ import {
 import { InvalidDataError } from '~/shared/invalid-data-error'
 import { SDKOutgoingRequests } from '~/shared/sdk-outgoing-requests'
 import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
-import { ThirdpartyRequests, Errors } from '@mojaloop/sdk-standard-components'
+import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
 export class DFSPTransactionModel
   extends PersistentModel<DFSPTransactionStateMachine, DFSPTransactionData> {
   protected config: DFSPTransactionModelConfig
