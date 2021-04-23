@@ -26,7 +26,7 @@
  ******/
 
 import { RequestResponse } from '@mojaloop/sdk-standard-components'
-import { HTTPResponseError } from './http-response-error'
+import { HTTPResponseError, ResponseErrorData } from './http-response-error'
 
 export function throwOrExtractData<Data> (res: RequestResponse<Data>): Data | void {
   // TODO: will a 503 or 500 with content-length zero generate an error?
@@ -43,7 +43,7 @@ export function throwOrExtractData<Data> (res: RequestResponse<Data>): Data | vo
     throw new HTTPResponseError({
       msg: `Request returned non-success status code ${res.statusCode}`,
       res
-    })
+    } as unknown as ResponseErrorData)
   }
 
   return res.data
