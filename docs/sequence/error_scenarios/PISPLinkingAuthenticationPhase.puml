@@ -77,19 +77,43 @@ POST /validateAuthToken
   authToken: '124356'
 }
 end note
-rnote right of DFSP_LM: state: authTokenValidated
+rnote right of DFSP_LM: state: errored
+DFSP_LM -> Switch: PUT /consentRequests/6789/error
+activate Switch
 
-DFSP_LM -> DFSP_LM: const consentId = uuid()
-DFSP_LM -> DFSP_LM: model.grantConsent()
-DFSP_LM -> DFSP_LM: ThirdpartyRequests.postConsents()
-rnote right of DFSP_LM: state: consentGranted
-rnote right of DFSP_LM #LightBlue
-It's important to save the model with the consentId from this point onwards!
-Requests will not contain a consentRequestId in the upcoming requests.
-This may require changing `PersistentModel` to have a secondary key it can
-store the model with.
+rnote left of DFSP_LM #LightCoral
+PUT /consentRequests/6789/error
+FSIOP-Source: dfspa
+FSIOP-Destination: pispa
+{
+  errorInformation: {
+    errorCode: '7200',
+    errorDescription: 'Generic Thirdparty account linking error'
+  } OR
+  errorInformation: {
+    errorCode: '7205',
+    errorDescription: 'OTP failed validation'
+  } OR
+  errorInformation: {
+    errorCode: '7206',
+    errorDescription: 'FSP failed to validate OTP'
+  }
+}
 end note
-DFSP_LM -> DFSP_LM: this.saveToKVS({key: '1a2b3c4d'})
+Switch --> DFSP_LM: 200 OK
+deactivate DFSP_LM
+Switch ->  PISP_TP_IN: PUT /consentRequests/6789/error
+activate PISP_TP_IN
+PISP_TP_IN --> Switch: 200 OK
+deactivate Switch
+PISP_TP_IN --> PISP_LM: MojaloopFSPIOPError response recieved
+deactivate PISP_TP_IN
+activate PISP_LM
+rnote right of PISP_LM: state: errored
+PISP_LM -> PISP_TP_OUT: return MojaloopFSPIOPError
+deactivate PISP_LM
+PISP_TP_OUT --> PISP: 500 Internal Server Error ErrorInformationObject
+deactivate PISP_TP_OUT
+deactivate PISP
 
-DFSP_LM -> Switch: POST /consents
 @enduml
