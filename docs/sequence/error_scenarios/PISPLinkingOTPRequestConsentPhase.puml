@@ -1,6 +1,6 @@
 @startuml
 
-title PISP Linking OTP Error Scenarios (Request Consent Phase)
+title PISP Linking OTP Error Scenarios Request Consent Phase
 
 participant "PISP Backend" as PISP
 box "PISP tp-scheme-adapter"
@@ -73,12 +73,12 @@ deactivate PISP_LM
 Switch -> DFSP_TP_IN: POST /consentRequests
 activate DFSP_TP_IN
 DFSP_TP_IN --> Switch: 202 Accepted
+deactivate Switch
 DFSP_TP_IN -> DFSP_TP_IN: const model = await create()
 rnote right of DFSP_TP_IN: state: start
 DFSP_TP_IN -> DFSP_LM: model.requestConsent()
-activate DFSP_LM
-deactivate Switch
 deactivate DFSP_TP_IN
+activate DFSP_LM
 DFSP_LM -> DFSP_LM: DFSPBackendRequests.validateConsentRequest()
 rnote right of DFSP_LM: state: errored
 DFSP_LM -> Switch: PUT /consentRequests/6789/error
@@ -117,15 +117,14 @@ FSIOP-Destination: pispa
 end note
 Switch --> DFSP_LM: 200 OK
 deactivate DFSP_LM
-activate PISP_TP_IN
-deactivate DFSP_LM
 Switch ->  PISP_TP_IN: PUT /consentRequests/6789/error
+activate PISP_TP_IN
 PISP_TP_IN --> Switch: 200 OK
 deactivate Switch
-activate PISP_LM
 PISP_TP_IN --> PISP_LM: MojaloopFSPIOPError response recieved
-rnote right of PISP_LM: state: errored
 deactivate PISP_TP_IN
+activate PISP_LM
+rnote right of PISP_LM: state: errored
 PISP_LM -> PISP_TP_OUT: return MojaloopFSPIOPError
 deactivate PISP_LM
 PISP_TP_OUT --> PISP: 500 Internal Server Error ErrorInformationObject

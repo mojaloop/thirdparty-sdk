@@ -43,7 +43,6 @@ activate PISP_TP_OUT
 PISP_TP_OUT -> PISP_TP_OUT: const model = await create()
 rnote right of PISP_TP_OUT: state: start
 PISP_TP_OUT -> PISP_LM: model.requestConsent()
-
 activate PISP_LM
 
 PISP_LM -> PISP_LM: ThirdpartyRequests.postConsentRequests()
@@ -74,15 +73,15 @@ deactivate PISP_LM
 Switch -> DFSP_TP_IN: POST /consentRequests
 activate DFSP_TP_IN
 DFSP_TP_IN --> Switch: 202 Accepted
+deactivate Switch
 DFSP_TP_IN -> DFSP_TP_IN: const model = await create()
 rnote right of DFSP_TP_IN: state: start
 DFSP_TP_IN -> DFSP_LM: model.requestConsent()
-activate DFSP_LM
-deactivate Switch
 deactivate DFSP_TP_IN
+activate DFSP_LM
 DFSP_LM -> DFSP_LM: DFSPBackendRequests.validateConsentRequest()
-activate DFSPAuthorizeSimulator
 DFSP_LM -> DFSPAuthorizeSimulator: POST /sendOTP
+activate DFSPAuthorizeSimulator
 rnote right of DFSP_LM #LightBlue
 POST /sendOTP
 {
@@ -97,9 +96,8 @@ rnote right of DFSP_LM: state: consentRequestValidatedAndStored
 deactivate DFSPAuthorizeSimulator
 deactivate DFSP_TP_IN
 
-
-activate Switch
 DFSP_LM -> Switch: PUT /consentRequests/6789
+activate Switch
 
 rnote left of DFSP_LM #LightBlue
 PUT /consentRequests/6789
@@ -120,15 +118,16 @@ FSIOP-Destination: dfspa
 end note
 Switch --> DFSP_LM: 202 ACCEPTED
 deactivate DFSP_LM
-activate PISP_TP_IN
+
 Switch ->  PISP_TP_IN: PUT /consentRequests/6789
+activate PISP_TP_IN
 PISP_TP_IN --> Switch: 200 OK
 deactivate Switch
 activate PISP_LM
 PISP_TP_IN --> PISP_LM: Consent Request response recieved
+deactivate PISP_TP_IN
 rnote right of PISP_LM: state: OTPAuthenticationChannelResponseRecieved
 PISP_LM --> PISP_LM: this.saveToKVS()
-deactivate PISP_TP_IN
 PISP_LM -> PISP_TP_OUT: return Authentication Response
 deactivate PISP_LM
 PISP_TP_OUT --> PISP: 200 OK Autentication Response
@@ -196,13 +195,12 @@ deactivate PISP_LM
 Switch -> DFSP_TP_IN: PATCH /consentRequests/6789
 activate DFSP_TP_IN
 DFSP_TP_IN --> Switch: 202 Accepted
+deactivate Switch
 DFSP_TP_IN -> DFSP_TP_IN: const model = await loadFromKVS({key: 6789})
 rnote right of DFSP_TP_IN: state: consentRequestValidatedAndStored
 DFSP_TP_IN -> DFSP_LM: model.validateAuthToken()
-activate DFSP_LM
-
-deactivate Switch
 deactivate DFSP_TP_IN
+activate DFSP_LM
 
 DFSP_LM -> DFSP_LM: DFSPBackendRequests.validateAuthToken()
 rnote right of DFSP_LM #LightBlue
@@ -231,8 +229,8 @@ store the model with.
 end note
 DFSP_LM -> DFSP_LM: this.saveToKVS({key: '1a2b3c4d'})
 
-activate Switch
 DFSP_LM -> Switch: POST /consents
+activate Switch
 
 rnote left of DFSP_LM #LightBlue
 POST /consents
@@ -246,11 +244,11 @@ FSIOP-Destination: pispa
 end note
 Switch --> DFSP_LM: 202 ACCEPTED
 deactivate DFSP_LM
-activate PISP_TP_IN
 Switch ->  PISP_TP_IN: POST /consents
+activate PISP_TP_IN
 PISP_TP_IN -> PISP_TP_IN: const model = await loadFromKVS({key: 6789})
-activate PISP_LM
 PISP_TP_IN -> PISP_LM: model.registerCredential()
+activate PISP_LM
 PISP_TP_IN --> Switch: 202 Accepted
 deactivate PISP_TP_IN
 deactivate Switch
@@ -266,8 +264,8 @@ PISP_LM --> PISP_LM: this.saveToKVS({key: '1a2b3c4d'})
 
 PISP_LM -> PISP_LM: ThirdpartyRequests.putConsents()
 rnote right of PISP_LM: state: signedConsentSent
-activate Switch
 PISP_LM -> Switch: PUT /consents/1a2b3c4d
+activate Switch
 
 rnote right of PISP_LM #LightBlue
 PUT /consents/1a2b3c4d
@@ -294,9 +292,9 @@ Switch -> DFSP_TP_IN: PUT /consents/1a2b3c4d
 activate DFSP_TP_IN
 
 DFSP_TP_IN -> DFSP_TP_IN: const model = await loadFromKVS({key: 1a2b3c4d})
-activate DFSP_LM
 rnote right of DFSP_TP_IN: state: signedConsentRecieved
 DFSP_TP_IN -> DFSP_LM: model.validateSignedConsent()
+activate DFSP_LM
 rnote right of DFSP_TP_IN: state: pendingRegistrationAndValidation
 DFSP_TP_IN --> Switch: 202 Accepted
 deactivate Switch
@@ -307,8 +305,8 @@ Does this need a backend request or can the scheme adapter check the consent.
 end note
 rnote right of DFSP_LM: state: signedConsentChecked
 DFSP_LM-> DFSP_LM: model.validateWithAuthService()
-activate Switch
 DFSP_LM -> Switch: POST /consents/1a2b3c4d
+activate Switch
 
 rnote left of DFSP_LM #LightBlue
 POST /consents/1a2b3c4d
@@ -358,8 +356,8 @@ FSIOP-Destination: dfspa
 end note
 
 Switch --> AUTH: 200 OK
-activate DFSP_TP_IN
 Switch -> DFSP_TP_IN: PUT /consents/1a2b3c4d
+activate DFSP_TP_IN
 DFSP_TP_IN -> DFSP_TP_IN: const model = await loadFromKVS({key: 1a2b3c4d})
 DFSP_TP_IN -> DFSP_TP_IN: consentResponseRecieved()
 rnote right of DFSP_TP_IN: state: consentResponseRecieved
@@ -419,8 +417,8 @@ Switch -> PISP_TP_IN: PATCH /consents/1a2b3c4d
 activate PISP_TP_IN
 PISP_TP_IN -> PISP_TP_IN: const model = await loadFromKVS({key: 1a2b3c4d})
 
-activate PISP_LM
 PISP_TP_IN -> PISP_LM: Verified Response recieved
+activate PISP_LM
 PISP_TP_IN --> Switch: 200 OK
 deactivate PISP_TP_IN
 deactivate Switch
