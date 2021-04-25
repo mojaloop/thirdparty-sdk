@@ -28,10 +28,11 @@ PISP -> PISP_TP_OUT: POST /linking/request-consent
 rnote right of PISP #LightBlue
 POST /linking/request-consent
 {
-  "accounts": [
+  accounts: [
     { accountNickname: "XXXXXXnt", id: "dfspa.username.1234", currency: "ZAR" },
     { accountNickname: "SpeXXXXXXXXnt", id: "dfspa.username.5678", currency: "USD" }
   ],
+  userId: "username1234", // so the dfsp can associate this request with GET /accounts
   callbackURI: 'pisp-app://callback'
 }
 end note
@@ -46,15 +47,15 @@ PISP_TP_OUT -> PISP_LM: model.requestConsent()
 activate PISP_LM
 
 PISP_LM -> PISP_LM: ThirdpartyRequests.postConsentRequests()
+PISP_LM -> PISP_LM: const consentRequestId = uuid()
 PISP_LM -> Switch: POST /consentRequests
 rnote right of PISP_LM #LightBlue
 POST /consentRequests
 FSIOP-Source: pispa
 FSIOP-Destination: dfspa
 {
-  // consentRequestId will be the uuid created
-  // at the PRELINKING-2
   consentRequestId: 6789
+  userId: "username1234"
   scopes: [{
     accountId: 'dfspa.username.1234',
     actions: ['accounts.getBalance', 'accounts.transfer'],
@@ -62,7 +63,7 @@ FSIOP-Destination: dfspa
     actions: ['accounts.getBalance', 'accounts.transfer'],
   }],
   // model will add `authChannels`
-  authChannels: ["OTP"],
+  authChannels: ["WEB", "OTP"],
   callbackURI: 'pisp-app://callback...'
 }
 end note
@@ -81,9 +82,17 @@ deactivate Switch
 deactivate DFSP_TP_IN
 DFSP_LM -> DFSP_LM: DFSPBackendRequests.validateConsentRequest()
 activate DFSPAuthorizeSimulator
-DFSP_LM -> DFSPAuthorizeSimulator: ""POST /store/consentRequests/6789""
-DFSPAuthorizeSimulator -> DFSPAuthorizeSimulator: store consentRequest details
-DFSPAuthorizeSimulator -> DFSP_LM: 201 Created
+DFSP_LM -> DFSPAuthorizeSimulator: POST /sendOTP
+rnote right of DFSP_LM #LightBlue
+POST /sendOTP
+{
+  consentRequestId: 6789,
+  username: "username.1234",
+  message: "0987"
+}
+end note
+DFSPAuthorizeSimulator -> DFSPAuthorizeSimulator: take action on TTK for defined rule for username
+DFSPAuthorizeSimulator -> DFSP_LM: 200 OK
 rnote right of DFSP_LM: state: consentRequestValidatedAndStored
 deactivate DFSPAuthorizeSimulator
 deactivate DFSP_TP_IN
@@ -104,9 +113,9 @@ FSIOP-Destination: dfspa
     accountId: 'dfspa.username.5678',
     actions: ['accounts.getBalance', 'accounts.transfer'],
   }],
-  authChannels: ["OTP"],
+  authChannels: ["OTP"], // updated with the channel in use
   callbackURI: 'pisp-app://callback...',
-  authURI: 'dfspa.com/authorize?consentRequestId=6789' // this is new
+  // note: no authURI for OTP flow
 }
 end note
 Switch --> DFSP_LM: 202 ACCEPTED

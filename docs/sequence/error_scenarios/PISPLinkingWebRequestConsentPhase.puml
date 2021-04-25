@@ -1,0 +1,130 @@
+@startuml
+
+title PISP Linking Web Error Scenarios (Request Consent Phase)
+
+participant "PISP Backend" as PISP
+box "PISP tp-scheme-adapter"
+  participant "outbound-server" as PISP_TP_OUT
+  participant "PISPLinkingModel" as PISP_LM
+  participant "inbound-server" as PISP_TP_IN
+end box
+box "Mojaloop"
+    participant Switch
+    participant "Auth Service" as AUTH
+    participant "Account Lookup Service" as ALS
+end box
+box "DFSP tp-scheme-adapter"
+  participant "inbound-server" as DFSP_TP_IN
+  participant "DFSPLinkingModel" as DFSP_LM
+end box
+
+== Request Consent - Web ==
+autonumber 1 "<b>REQUEST-CONSENT-#</b>"
+rnote right of PISP
+PISP presents accounts to user. User selects one or more accounts to link.
+end note
+PISP -> PISP_TP_OUT: POST /linking/request-consent
+rnote right of PISP #LightBlue
+POST /linking/request-consent
+{
+  accounts: [
+    { accountNickname: "XXXXXXnt", id: "dfspa.username.1234", currency: "ZAR" },
+    { accountNickname: "SpeXXXXXXXXnt", id: "dfspa.username.5678", currency: "USD" }
+  ],
+  callbackURI: 'pisp-app://callback'
+}
+end note
+
+
+activate PISP
+activate PISP_TP_OUT
+
+PISP_TP_OUT -> PISP_TP_OUT: const model = await create()
+rnote right of PISP_TP_OUT: state: start
+PISP_TP_OUT -> PISP_LM: model.requestConsent()
+
+activate PISP_LM
+
+PISP_LM -> PISP_LM: ThirdpartyRequests.postConsentRequests()
+PISP_LM -> PISP_LM: const consentRequestId = uuid()
+PISP_LM -> Switch: POST /consentRequests
+rnote right of PISP_LM #LightBlue
+POST /consentRequests
+FSIOP-Source: pispa
+FSIOP-Destination: dfspa
+{
+  consentRequestId: 6789
+  scopes: [{
+    accountId: 'dfspa.username.1234',
+    actions: ['accounts.getBalance', 'accounts.transfer'],
+    accountId: 'dfspa.username.5678',
+    actions: ['accounts.getBalance', 'accounts.transfer'],
+  }],
+  // model will add `authChannels`
+  authChannels: ["WEB", "OTP"],
+  callbackURI: 'pisp-app://callback...'
+}
+end note
+
+Switch --> PISP_LM: 202 Accepted
+activate Switch
+Switch -> DFSP_TP_IN: POST /consentRequests
+activate DFSP_TP_IN
+
+DFSP_TP_IN --> Switch: 202 Accepted
+DFSP_TP_IN -> DFSP_TP_IN: const model = await create()
+rnote right of DFSP_TP_IN: state: start
+DFSP_TP_IN -> DFSP_LM: model.requestConsent()
+activate DFSP_LM
+deactivate Switch
+deactivate DFSP_TP_IN
+DFSP_LM -> DFSP_LM: DFSPBackendRequests.validateConsentRequest()
+rnote right of DFSP_LM: state: errored
+DFSP_LM -> Switch: PUT /consentRequests/6789/error
+activate Switch
+
+rnote left of DFSP_LM #LightCoral
+PUT /consentRequests/6789/error
+FSIOP-Source: dfspa
+FSIOP-Destination: pispa
+{
+  errorInformation: {
+    errorCode: '7200',
+    errorDescription: 'Generic Thirdparty account linking error'
+  } OR
+  errorInformation: {
+    errorCode: '7203',
+    errorDescription: 'FSP does not support any requested authentication channels'
+  } OR
+  errorInformation: {
+    errorCode: '7204',
+    errorDescription: 'FSP does not support any requested scope actions'
+  } OR
+  errorInformation: {
+    errorCode: '7209',
+    errorDescription: 'FSP does not find scopes suitable'
+  } OR
+  errorInformation: {
+    errorCode: '7210',
+    errorDescription: 'FSP does not trust PISP callback URI'
+  }
+}
+end note
+Switch --> DFSP_LM: 200 OK
+deactivate DFSP_LM
+activate PISP_TP_IN
+deactivate DFSP_LM
+Switch ->  PISP_TP_IN: PUT /consentRequests/6789/error
+PISP_TP_IN --> Switch: 200 OK
+deactivate Switch
+activate PISP_LM
+PISP_TP_IN --> PISP_LM: MojaloopFSPIOPError response recieved
+rnote right of PISP_LM: state: errored
+deactivate PISP_TP_IN
+PISP_LM -> PISP_TP_OUT: return MojaloopFSPIOPError
+deactivate PISP_LM
+PISP_TP_OUT --> PISP: 500 Internal Server Error ErrorInformationObject
+deactivate PISP_TP_OUT
+deactivate PISP
+
+@enduml

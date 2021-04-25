@@ -28,7 +28,7 @@ PISP -> PISP_TP_OUT: POST /linking/request-consent
 rnote right of PISP #LightBlue
 POST /linking/request-consent
 {
-  "accounts": [
+  accounts: [
     { accountNickname: "XXXXXXnt", id: "dfspa.username.1234", currency: "ZAR" },
     { accountNickname: "SpeXXXXXXXXnt", id: "dfspa.username.5678", currency: "USD" }
   ],
@@ -47,14 +47,13 @@ PISP_TP_OUT -> PISP_LM: model.requestConsent()
 activate PISP_LM
 
 PISP_LM -> PISP_LM: ThirdpartyRequests.postConsentRequests()
+PISP_LM -> PISP_LM: const consentRequestId = uuid()
 PISP_LM -> Switch: POST /consentRequests
 rnote right of PISP_LM #LightBlue
 POST /consentRequests
 FSIOP-Source: pispa
 FSIOP-Destination: dfspa
 {
-  // consentRequestId will be the uuid created
-  // at the PRELINKING-2
   consentRequestId: 6789
   scopes: [{
     accountId: 'dfspa.username.1234',
@@ -103,7 +102,7 @@ FSIOP-Destination: dfspa
     accountId: 'dfspa.username.5678',
     actions: ['accounts.getBalance', 'accounts.transfer'],
   }],
-  authChannels: ["WEB"],
+  authChannels: ["WEB"], // updated with the channel in use
   callbackURI: 'pisp-app://callback...',
   authURI: 'dfspa.com/authorize?consentRequestId=6789' // this is new
 }
