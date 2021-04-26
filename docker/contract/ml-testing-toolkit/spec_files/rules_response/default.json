@@ -207,7 +207,8 @@
             "  console.error(err)",
             "})"
           ]
-        }
+        },
+        "delay": 0
       },
       "type": "FIXED_RESPONSE"
     },
