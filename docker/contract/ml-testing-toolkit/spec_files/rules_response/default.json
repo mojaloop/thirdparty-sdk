@@ -196,7 +196,7 @@
             "    raw: JSON.stringify({",
             "    \"transactionId\": \"c51ec534-ee48-4575-b6a9-ead2955b8069\",",
             "    \"transactionRequestState\": \"ACCEPTED\",",
-            "    \"tranactionState\": \"COMPLETED\"",
+            "    \"transactionState\": \"COMPLETED\"",
             "    })",
             "  }",
             "}",

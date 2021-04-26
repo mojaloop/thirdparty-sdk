@@ -5,7 +5,7 @@ import { RedisConnectionConfig } from '~/shared/redis-connection'
 import Config from '~/shared/config'
 import mockLogger from '../../unit/mockLogger'
 
-describe.skip('PISP Transaction', (): void => {
+describe('PISP Transaction', (): void => {
   const config: RedisConnectionConfig = {
     host: Config.REDIS.HOST,
     port: Config.REDIS.PORT,
