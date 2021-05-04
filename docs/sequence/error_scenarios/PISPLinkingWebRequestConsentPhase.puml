@@ -31,6 +31,7 @@ POST /linking/request-consent
     { accountNickname: "XXXXXXnt", id: "dfspa.username.1234", currency: "ZAR" },
     { accountNickname: "SpeXXXXXXXXnt", id: "dfspa.username.5678", currency: "USD" }
   ],
+  userId: "username1234", // so the dfsp can associate this request with GET /accounts
   callbackURI: 'pisp-app://callback'
 }
 end note
@@ -54,6 +55,7 @@ FSIOP-Source: pispa
 FSIOP-Destination: dfspa
 {
   consentRequestId: 6789
+  userId: "username1234",
   scopes: [{
     accountId: 'dfspa.username.1234',
     actions: ['accounts.getBalance', 'accounts.transfer'],
