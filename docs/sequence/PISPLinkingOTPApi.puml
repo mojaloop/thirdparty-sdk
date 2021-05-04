@@ -130,7 +130,7 @@ rnote right of PISP_LM: state: OTPAuthenticationChannelResponseRecieved
 PISP_LM --> PISP_LM: this.saveToKVS()
 PISP_LM -> PISP_TP_OUT: return Authentication Response
 deactivate PISP_LM
-PISP_TP_OUT --> PISP: 200 OK Autentication Response
+PISP_TP_OUT --> PISP: 200 OK Authentication Response
 rnote left of PISP_TP_OUT #LightBlue
 {
   channelResponse: {
@@ -214,6 +214,9 @@ POST /validateAuthToken
   authChannel: model.data.authChannel,
   authToken: '124356'
 }
+
+For now we will just use one endpoint.
+The DFSP should be able to infer the method based on the consentRequestId.
 end note
 rnote right of DFSP_LM: state: authTokenValidated
 
@@ -292,7 +295,7 @@ Switch -> DFSP_TP_IN: PUT /consents/1a2b3c4d
 activate DFSP_TP_IN
 
 DFSP_TP_IN -> DFSP_TP_IN: const model = await loadFromKVS({key: 1a2b3c4d})
-rnote right of DFSP_TP_IN: state: signedConsentRecieved
+rnote right of DFSP_TP_IN: state: signedConsentReceived
 DFSP_TP_IN -> DFSP_LM: model.validateSignedConsent()
 activate DFSP_LM
 rnote right of DFSP_TP_IN: state: pendingRegistrationAndValidation
@@ -302,6 +305,11 @@ deactivate DFSP_TP_IN
 DFSP_LM -> DFSP_LM: Check signed consent.
 rnote right of DFSP_LM #LightBlue
 Does this need a backend request or can the scheme adapter check the consent.
+
+Yes and No. We're keeping it as this for now (default to just talking to the
+auth service), but ideally we would open up a config option that would allow a
+DFSP to specify whether or not the DFSP Backend should receive a callback
+asking them to validate the credential before proceeding.
 end note
 rnote right of DFSP_LM: state: signedConsentChecked
 DFSP_LM-> DFSP_LM: model.validateWithAuthService()
