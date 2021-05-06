@@ -112,16 +112,18 @@ activate PISP_TP_IN
 PISP_TP_IN -> PISP_TP_IN: const model = await loadFromKVS({key: 6789})
 PISP_TP_IN -> PISP_LM: model.consentReceivedAwaitCredential()
 activate PISP_LM
+PISP_LM --> PISP_LM: const challenge = deriveChallenge(consentRequest)
 PISP_TP_IN --> Switch: 202 Accepted
 deactivate PISP_TP_IN
 deactivate Switch
 rnote right of PISP_LM: state: consentReceivedAwaitingCredential
-PISP_LM -> PISP_TP_OUT: return Model state
+PISP_LM -> PISP_TP_OUT: return Model state and challenge
 deactivate PISP_LM
-PISP_TP_OUT -> PISP: 200 OK Model State
+PISP_TP_OUT -> PISP: 200 OK Model State and challenge
 rnote left of PISP_TP_OUT #LightBlue
 {
   currentState: "consentReceivedAwaitingCredential"
+  challenge: challenge
 }
 end note
 
@@ -141,7 +143,6 @@ PISP_TP_OUT -> PISP_TP_OUT: const model = await loadFromKVS({key: 6789})
 PISP_TP_OUT -> PISP_LM: model.registerCredential()
 activate PISP_LM
 
-PISP_LM --> PISP_LM: const challenge = deriveChallenge(consentRequest)
 PISP_LM -> PISP_LM: ThirdpartyRequests.putConsents()
 rnote right of PISP_LM: state: signedConsentSent
 rnote right of PISP_LM #LightBlue
