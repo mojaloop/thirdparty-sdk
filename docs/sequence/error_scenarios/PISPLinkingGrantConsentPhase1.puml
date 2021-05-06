@@ -143,7 +143,7 @@ activate PISP_LM
 
 PISP_LM --> PISP_LM: const challenge = deriveChallenge(consentRequest)
 PISP_LM -> PISP_LM: ThirdpartyRequests.putConsents()
-rnote right of PISP_LM: state: credentialResponseSent
+rnote right of PISP_LM: state: signedConsentSent
 rnote right of PISP_LM #LightBlue
 It's important to save the model with the consentId from this point onwards!
 Requests will not contain a consentRequestId in the upcoming requests.
