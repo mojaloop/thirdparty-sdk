@@ -27,7 +27,7 @@ export function reformatError (
         mojaloopErrorCode = Errors.MojaloopApiErrorCodeFromCode(`${e.res.data?.statusCode}`)
       }
     }
-  // check are we having valid MojaloopApiErrorCodes object thrown itself
+  // check are we having valid MojaloopApiErrorCodes object thrown
   } else {
     // error is valid when it is defined on the common list
     const code = (err as MojaloopApiErrorCode).code

@@ -42,6 +42,7 @@ import shouldNotBeExecuted from 'test/unit/shouldNotBeExecuted'
 import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
 import { GenericRequestResponse, ThirdpartyRequests, Errors } from '@mojaloop/sdk-standard-components'
 import { OutboundAPI as SDKOutboundAPI } from '@mojaloop/sdk-scheme-adapter'
+import { reformatError } from '~/shared/api-error'
 
 // mock KVS default exported class
 jest.mock('~/shared/kvs')
@@ -72,7 +73,8 @@ describe('DFSPTransactionModel', () => {
       logger: connectionConfig.logger,
       thirdpartyRequests: {
         putThirdpartyRequestsTransactions: jest.fn(() => Promise.resolve({ statusCode: 200 })),
-        patchThirdpartyRequestsTransactions: jest.fn(() => Promise.resolve({ statusCode: 200 }))
+        patchThirdpartyRequestsTransactions: jest.fn(() => Promise.resolve({ statusCode: 200 })),
+        putThirdpartyRequestsTransactionsError: jest.fn(() => Promise.resolve({ statusCode: 200 }))
       } as unknown as ThirdpartyRequests,
       sdkOutgoingRequests: {
         requestQuote: jest.fn(() => Promise.resolve(requestQuoteResponse)),
@@ -710,6 +712,40 @@ describe('DFSPTransactionModel', () => {
       // state data shouldn't be modified
       expect(model.data).toEqual(data)
     })
+  })
+
+  it('should propagate error to callback', async () => {
+    mocked(modelConfig.kvs.set).mockImplementation(() => Promise.resolve(true))
+    mocked(modelConfig.dfspBackendRequests.validateThirdpartyTransactionRequest)
+      .mockImplementationOnce(() => Promise.resolve({ isValid: false }))
+
+    const data: DFSPTransactionData = {
+      transactionRequestId,
+      transactionRequestState: 'RECEIVED',
+      participantId,
+      transactionRequestRequest,
+      currentState: 'start'
+    }
+    const model = await create(data, modelConfig)
+    checkDTMLayout(model, data)
+
+    // execute workflow
+    await model.run()
+
+    // the state shouldn't be changed
+    expect(model.data.currentState).toEqual('errored')
+
+    // errored state should be saved
+    expect(mocked(modelConfig.kvs.set)).toBeCalledTimes(1)
+
+    // the error callback should be called
+    expect(mocked(modelConfig.thirdpartyRequests.putThirdpartyRequestsTransactionsError)).toBeCalledWith(
+      reformatError(
+        Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_REQUEST_NOT_VALID, model.logger
+      ),
+      model.data.transactionRequestId,
+      model.data.participantId
+    )
   })
 
   describe('loadFromKVS', () => {

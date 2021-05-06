@@ -29,7 +29,7 @@
 
 import { StateMachineConfig } from 'javascript-state-machine'
 import { uuid } from 'uuidv4'
-import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
+import { thirdparty as tpAPI, v1_1 as fspiopAPI } from '@mojaloop/api-snippets'
 
 import { PersistentModel } from './persistent.model'
 import {
@@ -41,6 +41,7 @@ import { InvalidDataError } from '~/shared/invalid-data-error'
 import { SDKOutgoingRequests } from '~/shared/sdk-outgoing-requests'
 import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
 import { ThirdpartyRequests, Errors } from '@mojaloop/sdk-standard-components'
+import { reformatError } from '~/shared/api-error'
 export class DFSPTransactionModel
   extends PersistentModel<DFSPTransactionStateMachine, DFSPTransactionData> {
   protected config: DFSPTransactionModelConfig
@@ -332,43 +333,55 @@ export class DFSPTransactionModel
 
   // workflow
   async run (): Promise<void> {
-    switch (this.data.currentState) {
-      case 'start':
-        await this.fsm.validateTransactionRequest()
-        await this.saveToKVS()
+    try {
+      switch (this.data.currentState) {
+        case 'start':
+          await this.fsm.validateTransactionRequest()
+          await this.saveToKVS()
 
-      case 'transactionRequestIsValid':
-        await this.fsm.notifyTransactionRequestIsValid()
-        await this.saveToKVS()
+        case 'transactionRequestIsValid':
+          await this.fsm.notifyTransactionRequestIsValid()
+          await this.saveToKVS()
 
-      case 'notifiedTransactionRequestIsValid':
-        await this.fsm.requestQuote()
-        await this.saveToKVS()
+        case 'notifiedTransactionRequestIsValid':
+          await this.fsm.requestQuote()
+          await this.saveToKVS()
 
-      case 'quoteReceived':
-        await this.fsm.requestAuthorization()
-        await this.saveToKVS()
+        case 'quoteReceived':
+          await this.fsm.requestAuthorization()
+          await this.saveToKVS()
 
-      case 'authorizationReceived':
-        await this.fsm.verifyAuthorization()
-        await this.saveToKVS()
+        case 'authorizationReceived':
+          await this.fsm.verifyAuthorization()
+          await this.saveToKVS()
 
-      case 'authorizationReceivedIsValid':
-        await this.fsm.requestTransfer()
-        await this.saveToKVS()
+        case 'authorizationReceivedIsValid':
+          await this.fsm.requestTransfer()
+          await this.saveToKVS()
 
-      case 'transferIsDone':
-        await this.fsm.notifyTransferIsDone()
-        await this.saveToKVS()
+        case 'transferIsDone':
+          await this.fsm.notifyTransferIsDone()
+          await this.saveToKVS()
 
-      case 'transactionRequestIsDone':
-        return
+        case 'transactionRequestIsDone':
+          return
 
-      case 'errored':
-      default:
-        await this.saveToKVS()
-        // stopped in errored state
-        this.logger.info('State machine in errored state')
+        case 'errored':
+        default:
+          await this.saveToKVS()
+          // stopped in errored state
+          this.logger.info('State machine in errored state')
+      }
+    } catch (error) {
+      const mojaloopError = reformatError(error, this.logger)
+      this.logger.push({ mojaloopError }).info(`Sending error response to ${this.data.participantId}`)
+      this.data.currentState = 'errored'
+      await this.saveToKVS()
+      await this.thirdpartyRequests.putThirdpartyRequestsTransactionsError(
+        mojaloopError as unknown as fspiopAPI.Schemas.ErrorInformationObject,
+        this.data.transactionRequestId,
+        this.data.participantId
+      )
     }
   }
 }
