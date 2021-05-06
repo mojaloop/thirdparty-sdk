@@ -104,6 +104,14 @@
       "decision": "ignore",
       "madeAt": 1619372585387,
       "expiresAt": 1621964580306
+    },
+    "1662|@mojaloop/sdk-scheme-adapter>redis": {
+      "decision": "fix",
+      "madeAt": 1620261819311
+    },
+    "1662|redis": {
+      "decision": "fix",
+      "madeAt": 1620261819311
     }
   },
   "rules": {},
