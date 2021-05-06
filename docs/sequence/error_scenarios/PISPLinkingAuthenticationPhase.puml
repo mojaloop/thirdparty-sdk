@@ -35,7 +35,7 @@ activate PISP
 activate PISP_TP_OUT
 
 PISP_TP_OUT -> PISP_TP_OUT: const model = await loadFromKVS({key: 6789})
-rnote right of PISP_TP_OUT: state: webAuthenticationChannelResponseRecieved or OTPAuthenticationChannelResponseRecieved
+rnote right of PISP_TP_OUT: state: webAuthenticationChannelResponseReceived or OTPAuthenticationChannelResponseReceived
 PISP_TP_OUT -> PISP_LM: model.authenticate()
 
 activate PISP_LM
@@ -106,7 +106,7 @@ Switch ->  PISP_TP_IN: PUT /consentRequests/6789/error
 activate PISP_TP_IN
 PISP_TP_IN --> Switch: 200 OK
 deactivate Switch
-PISP_TP_IN --> PISP_LM: MojaloopFSPIOPError response recieved
+PISP_TP_IN --> PISP_LM: MojaloopFSPIOPError response received
 deactivate PISP_TP_IN
 activate PISP_LM
 rnote right of PISP_LM: state: errored

@@ -87,7 +87,7 @@ activate PISP_TP_IN
 PISP_TP_IN --> Switch: 200 OK
 deactivate Switch
 
-PISP_TP_IN -> PISP_DM: MojaloopFSPIOPError response recieved
+PISP_TP_IN -> PISP_DM: MojaloopFSPIOPError response received
 deactivate PISP_TP_IN
 activate PISP_DM
 PISP_DM -> PISP_TP_OUT: return MojaloopFSPIOPError
@@ -136,7 +136,7 @@ activate PISP_TP_IN
 PISP_TP_IN --> Switch: 200 OK
 deactivate Switch
 
-PISP_TP_IN -> PISP_DM: MojaloopFSPIOPError response recieved
+PISP_TP_IN -> PISP_DM: MojaloopFSPIOPError response received
 deactivate PISP_TP_IN
 activate PISP_DM
 PISP_DM -> PISP_TP_OUT: return MojaloopFSPIOPError

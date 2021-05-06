@@ -36,7 +36,7 @@ activate PISP
 activate PISP_TP_OUT
 
 PISP_TP_OUT -> PISP_TP_OUT: const model = await loadFromKVS({key: 6789})
-rnote right of PISP_TP_OUT: state: webAuthenticationChannelResponseRecieved or OTPAuthenticationChannelResponseRecieved
+rnote right of PISP_TP_OUT: state: webAuthenticationChannelResponseReceived or OTPAuthenticationChannelResponseReceived
 PISP_TP_OUT -> PISP_LM: model.authenticate()
 
 activate PISP_LM
@@ -110,23 +110,47 @@ deactivate DFSP_LM
 Switch ->  PISP_TP_IN: POST /consents
 activate PISP_TP_IN
 PISP_TP_IN -> PISP_TP_IN: const model = await loadFromKVS({key: 6789})
-PISP_TP_IN -> PISP_LM: model.registerCredential()
+PISP_TP_IN -> PISP_LM: model.consentReceivedAwaitCredential()
 activate PISP_LM
 PISP_TP_IN --> Switch: 202 Accepted
 deactivate PISP_TP_IN
 deactivate Switch
-rnote right of PISP_LM: state: consentRecieved
+rnote right of PISP_LM: state: consentReceivedAwaitingCredential
+PISP_LM -> PISP_TP_OUT: return Model state
+deactivate PISP_LM
+PISP_TP_OUT -> PISP: 200 OK Model State
+rnote left of PISP_TP_OUT #LightBlue
+{
+  currentState: "consentReceivedAwaitingCredential"
+}
+end note
+
+rnote right of PISP
+PISP has obtained credential from the end-user
+end note
+PISP -> PISP_TP_OUT: POST /linking/request-consent/6789/authenticate
+rnote right of PISP #LightBlue
+POST /linking/request-consent/6789/pass-credential
+{
+  credential: {
+    payload: PublicKeyCredential
+  }
+}
+end note
+PISP_TP_OUT -> PISP_TP_OUT: const model = await loadFromKVS({key: 6789})
+PISP_TP_OUT -> PISP_LM: model.registerCredential()
+activate PISP_LM
+
+PISP_LM --> PISP_LM: const challenge = deriveChallenge(consentRequest)
+PISP_LM -> PISP_LM: ThirdpartyRequests.putConsents()
+rnote right of PISP_LM: state: credentialResponseSent
 rnote right of PISP_LM #LightBlue
 It's important to save the model with the consentId from this point onwards!
 Requests will not contain a consentRequestId in the upcoming requests.
 This may require changing `PersistentModel` to have a secondary key it can
 store the model with.
 end note
-PISP_LM --> PISP_LM: const challenge = deriveChallenge(consentRequest)
 PISP_LM --> PISP_LM: this.saveToKVS({key: '1a2b3c4d'})
-
-PISP_LM -> PISP_LM: ThirdpartyRequests.putConsents()
-rnote right of PISP_LM: state: signedConsentSent
 PISP_LM -> Switch: PUT /consents/1a2b3c4d
 activate Switch
 
@@ -198,7 +222,7 @@ Switch ->  PISP_TP_IN: PUT /consents/1a2b3c4d/error
 activate PISP_TP_IN
 PISP_TP_IN --> Switch: 200 OK
 deactivate Switch
-PISP_TP_IN --> PISP_LM: MojaloopFSPIOPError response recieved
+PISP_TP_IN --> PISP_LM: MojaloopFSPIOPError response received
 deactivate PISP_TP_IN
 activate PISP_LM
 rnote right of PISP_LM: state: errored

@@ -5,7 +5,7 @@ title PISPOTPValidateModel
 
 [*] --> outboundServer: ""PATCH /consentRequests/{ID}/validate""
 outboundServer --> start: creation of state machine
-start --> OTPIsValid:\ncall ""PATCH /consentRequests/{ID}/""\nrecieved ""POST /CONSENTS""
-start --> errored:\ncall ""PATCH /consentRequests/{ID}/""\nrecieved ""PUT /consentRequests/{ID}/error""
+start --> OTPIsValid:\ncall ""PATCH /consentRequests/{ID}/""\nreceived ""POST /CONSENTS""
+start --> errored:\ncall ""PATCH /consentRequests/{ID}/""\nreceived ""PUT /consentRequests/{ID}/error""
 
 @enduml
