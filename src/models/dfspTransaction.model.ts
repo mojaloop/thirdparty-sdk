@@ -40,7 +40,7 @@ import {
 import { InvalidDataError } from '~/shared/invalid-data-error'
 import { SDKOutgoingRequests } from '~/shared/sdk-outgoing-requests'
 import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
-import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
+import { ThirdpartyRequests, Errors } from '@mojaloop/sdk-standard-components'
 export class DFSPTransactionModel
   extends PersistentModel<DFSPTransactionStateMachine, DFSPTransactionData> {
   protected config: DFSPTransactionModelConfig
@@ -127,10 +127,7 @@ export class DFSPTransactionModel
       this.data.transactionRequestRequest
     )
     if (!(validationResult && validationResult.isValid)) {
-      // TODO: throw proper error when transactionRequestRequest is not valid
-      // TODO: error should be transformed to call PUT /thirdpartyRequests/{ID}/transactions/error
-      // TP_FSP_TRANSACTION_REQUEST_NOT_VALID
-      throw new Error('transactionRequestRequest is not valid')
+      throw Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_REQUEST_NOT_VALID
     }
 
     // allocate new id
@@ -161,10 +158,7 @@ export class DFSPTransactionModel
 
     // check result and throw if invalid
     if (!(updateResult && updateResult.statusCode >= 200 && updateResult.statusCode < 300)) {
-      // TODO: throw proper error when notification failed
-      // TODO: error should be transformed to call PUT /thirdpartyRequests/transactions/{ID}/error
-      // TP_FSP_TRANSACTION_PUT_UPDATE_FAILED
-      throw new Error(`PUT /thirdpartyRequests/transactions/${this.data.transactionRequestId} failed`)
+      throw Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_UPDATE_FAILED
     }
 
     // shortcut
@@ -201,11 +195,7 @@ export class DFSPTransactionModel
 
     // check result and throw if invalid
     if (!(resultQuote && resultQuote.currentState === 'COMPLETED')) {
-      // TODO: throw proper error
-      // TODO: error should be transformed to call PUT /thirdpartyRequests/{ID}/transactions/error
-      // TP_FSP_TRANSACTION_REQUEST_QUOTE_FAILED
-
-      throw new Error('POST /quotes failed')
+      throw Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_REQUEST_QUOTE_FAILED
     }
 
     // store result in state
@@ -232,9 +222,7 @@ export class DFSPTransactionModel
     )
 
     if (!(resultAuthorization && resultAuthorization.currentState === 'COMPLETED')) {
-      // TODO: throw proper error
-      // TP_FSP_TRANSACTION_REQUEST_AUTHORIZATION_FAILED
-      throw new Error('POST /authorizations failed')
+      throw Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_REQUEST_AUTHORIZATION_FAILED
     }
 
     this.data.requestAuthorizationResponse = resultAuthorization
@@ -254,10 +242,7 @@ export class DFSPTransactionModel
         const result = await this.dfspBackendRequests.verifyAuthorization(authorizationInfo)
 
         if (!(result && result.isValid)) {
-          // challenge is improperly signed
-          // TODO: throw proper error
-          // TP_FSP_TRANSACTION_AUTHORIZATION_NOT_VALID
-          throw new Error('POST /verify-authorization failed')
+          throw Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_AUTHORIZATION_NOT_VALID
         }
 
         // user's challenge has been successfully verified
@@ -295,19 +280,13 @@ export class DFSPTransactionModel
       case 'REJECTED': {
         // user rejected authorization so transfer is declined, let abort workflow!
         this.data.transactionRequestState = 'REJECTED'
-
-        // TODO: throw proper error;
-        // PUT /thirdpartyRequests/transactions/{ID}/error
-        // or  PATCH /thirdpartyRequests/transactions/{ID} ????
-        // TP_FSP_TRANSACTION_AUTHORIZATION_REJECTED_BY_USER
-        throw new Error('Authorization/Transfer REJECTED')
+        throw Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_AUTHORIZATION_REJECTED_BY_USER
       }
 
       default: {
         // should we setup ??? this.data.transactionRequestState = 'REJECTED'
-        // we received 'RESEND' or something else
-        // TP_FSP_TRANSACTION_AUTHORIZATION_UNEXPECTED
-        throw new Error(`Unexpected authorization responseType: ${authorizationInfo.responseType}`)
+        // we received 'RESEND' or something else...
+        throw Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_AUTHORIZATION_UNEXPECTED
       }
     }
   }
@@ -327,12 +306,10 @@ export class DFSPTransactionModel
         transferResult.transfer.transferState === 'COMMITTED'
       )
     ) {
-      // TODO: throw proper error
-      // TP_FSP_TRANSACTION_TRANSFER_FAILED
-      throw new Error('POST /simpleTransfer failed')
+      throw Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_TRANSFER_FAILED
     }
-    this.data.transferResponse = transferResult
 
+    this.data.transferResponse = transferResult
     this.data.transactionRequestPatchUpdate = {
       transactionId: this.data.transactionId!,
       transactionRequestState: this.data.transactionRequestState,
@@ -349,8 +326,7 @@ export class DFSPTransactionModel
       this.data.participantId
     )
     if (!result) {
-      // TP_FSP_TRANSACTION_NOTIFICATION_FAILED
-      throw new Error('PATCH /thirdpartyRequests/transactions/{ID} failed')
+      throw Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_NOTIFICATION_FAILED
     }
   }
 

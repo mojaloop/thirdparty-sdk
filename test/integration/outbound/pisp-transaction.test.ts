@@ -69,7 +69,7 @@ describe('PISP Transaction', (): void => {
         expiration: '2020-07-15T22:17:28.985-01:00'
       }
 
-      // TTK allows to setup only one callback by standardsimulate
+      // TTK allows to setup only one callback by standard simulate
       // initiate - receive authorization to sign
       const initiateresponse = await axios.post(initiateURI, initiateRequest)
       expect(initiateresponse.status).toEqual(200)
