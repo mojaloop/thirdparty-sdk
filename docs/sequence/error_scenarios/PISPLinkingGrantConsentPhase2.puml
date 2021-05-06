@@ -1,0 +1,257 @@
+@startuml
+
+title PISP Linking Error Scenarios Grant Consent Phase - 2
+
+participant "PISP Backend" as PISP
+box "PISP tp-scheme-adapter"
+  participant "outbound-server" as PISP_TP_OUT
+  participant "PISPLinkingModel" as PISP_LM
+  participant "inbound-server" as PISP_TP_IN
+end box
+box "Mojaloop"
+    participant Switch
+    participant "Auth Service" as AUTH
+    participant "Account Lookup Service" as ALS
+end box
+box "DFSP tp-scheme-adapter"
+  participant "inbound-server" as DFSP_TP_IN
+  participant "DFSPLinkingModel" as DFSP_LM
+end box
+participant DFSPAuthorizeSimulator
+
+== Authentication+Grant Consent ==
+autonumber 1 "<b>AUTHENTICATION-#</b>"
+rnote right of PISP
+PISP has obtained authToken from end-user(OTP) or through a callback(Web).
+end note
+PISP -> PISP_TP_OUT: POST /linking/request-consent/6789/authenticate
+rnote right of PISP #LightBlue
+POST /linking/request-consent/6789/authenticate
+{
+  authToken: '123456'
+}
+end note
+
+activate PISP
+activate PISP_TP_OUT
+
+PISP_TP_OUT -> PISP_TP_OUT: const model = await loadFromKVS({key: 6789})
+rnote right of PISP_TP_OUT: state: webAuthenticationChannelResponseRecieved or OTPAuthenticationChannelResponseRecieved
+PISP_TP_OUT -> PISP_LM: model.authenticate()
+
+activate PISP_LM
+
+PISP_LM -> PISP_LM: ThirdpartyRequests.patchConsentRequests()
+PISP_LM -> Switch: PATCH /consentRequests/6789
+rnote right of PISP_LM #LightBlue
+PATCH /consentRequests/6789
+FSIOP-Source: pispa
+FSIOP-Destination: dfspa
+{
+  authToken: '124356'
+}
+end note
+
+activate Switch
+Switch --> PISP_LM: 202 Accepted
+deactivate PISP_LM
+Switch -> DFSP_TP_IN: PATCH /consentRequests/6789
+activate DFSP_TP_IN
+DFSP_TP_IN --> Switch: 202 Accepted
+deactivate Switch
+DFSP_TP_IN -> DFSP_TP_IN: const model = await loadFromKVS({key: 6789})
+rnote right of DFSP_TP_IN: state: consentRequestValidatedAndStored
+DFSP_TP_IN -> DFSP_LM: model.validateAuthToken()
+deactivate DFSP_TP_IN
+activate DFSP_LM
+
+DFSP_LM -> DFSP_LM: DFSPBackendRequests.validateAuthToken()
+rnote right of DFSP_LM #LightBlue
+Do we need two backend endpoints for validating
+web authTokens and OTP authTokens? Or is a DFSP expected to
+validate both cases with one endpoint?
+
+POST /validateAuthToken
+{
+  consentRequestId: '6789'
+  authChannel: model.data.authChannel,
+  authToken: '124356'
+}
+end note
+rnote right of DFSP_LM: state: authTokenValidated
+
+DFSP_LM -> DFSP_LM: const consentId = uuid()
+DFSP_LM -> DFSP_LM: model.grantConsent()
+DFSP_LM -> DFSP_LM: ThirdpartyRequests.postConsents()
+rnote right of DFSP_LM: state: consentGranted
+rnote right of DFSP_LM #LightBlue
+It's important to save the model with the consentId from this point onwards!
+Requests will not contain a consentRequestId in the upcoming requests.
+This may require changing `PersistentModel` to have a secondary key it can
+store the model with.
+end note
+DFSP_LM -> DFSP_LM: this.saveToKVS({key: '1a2b3c4d'})
+
+DFSP_LM -> Switch: POST /consents
+activate Switch
+
+rnote left of DFSP_LM #LightBlue
+POST /consents
+FSIOP-Source: dfspa
+FSIOP-Destination: pispa
+{
+  consentId: 1a2b3c4d
+  consentRequestId: 6789
+  scopes: model.data.scopes
+}
+end note
+Switch --> DFSP_LM: 202 ACCEPTED
+deactivate DFSP_LM
+Switch ->  PISP_TP_IN: POST /consents
+activate PISP_TP_IN
+PISP_TP_IN -> PISP_TP_IN: const model = await loadFromKVS({key: 6789})
+PISP_TP_IN -> PISP_LM: model.registerCredential()
+activate PISP_LM
+PISP_TP_IN --> Switch: 202 Accepted
+deactivate PISP_TP_IN
+deactivate Switch
+rnote right of PISP_LM: state: consentRecieved
+rnote right of PISP_LM #LightBlue
+It's important to save the model with the consentId from this point onwards!
+Requests will not contain a consentRequestId in the upcoming requests.
+This may require changing `PersistentModel` to have a secondary key it can
+store the model with.
+end note
+PISP_LM --> PISP_LM: const challenge = deriveChallenge(consentRequest)
+PISP_LM --> PISP_LM: this.saveToKVS({key: '1a2b3c4d'})
+
+PISP_LM -> PISP_LM: ThirdpartyRequests.putConsents()
+rnote right of PISP_LM: state: signedConsentSent
+PISP_LM -> Switch: PUT /consents/1a2b3c4d
+activate Switch
+
+rnote right of PISP_LM #LightBlue
+PUT /consents/1a2b3c4d
+FSIOP-Source: pispa
+FSIOP-Destination: dfspa
+{
+  scopes: [{
+    accountId: 'dfspa.username.1234',
+    actions: ['accounts.getBalance', 'accounts.transfer'],
+    accountId: 'dfspa.username.5678',
+    actions: ['accounts.getBalance', 'accounts.transfer'],
+  }],
+  credential: {
+    credentialType: "FIDO",
+    status: "PENDING",
+    payload: PublicKeyCredential
+  }
+}
+end note
+
+Switch --> PISP_LM: 202 Accepted
+deactivate PISP_LM
+Switch -> DFSP_TP_IN: PUT /consents/1a2b3c4d
+activate DFSP_TP_IN
+
+DFSP_TP_IN -> DFSP_TP_IN: const model = await loadFromKVS({key: 1a2b3c4d})
+rnote right of DFSP_TP_IN: state: signedConsentReceived
+DFSP_TP_IN -> DFSP_LM: model.validateSignedConsent()
+activate DFSP_LM
+rnote right of DFSP_TP_IN: state: pendingRegistrationAndValidation
+DFSP_TP_IN --> Switch: 202 Accepted
+deactivate Switch
+deactivate DFSP_TP_IN
+DFSP_LM -> DFSP_LM: Check signed consent.
+rnote right of DFSP_LM #LightBlue
+Does this need a backend request or can the scheme adapter check the consent.
+end note
+rnote right of DFSP_LM: state: signedConsentChecked
+DFSP_LM-> DFSP_LM: model.validateWithAuthService()
+DFSP_LM -> Switch: POST /consents/1a2b3c4d
+activate Switch
+
+rnote left of DFSP_LM #LightBlue
+POST /consents/1a2b3c4d
+FSIOP-Source: dfspa
+FSIOP-Destination: central-auth
+{
+  scopes: [{
+    accountId: 'dfspa.username.1234',
+    actions: ['accounts.getBalance', 'accounts.transfer'],
+    accountId: 'dfspa.username.5678',
+    actions: ['accounts.getBalance', 'accounts.transfer'],
+  }],
+  credential: {
+    credentialType: "FIDO",
+    status: "PENDING",
+    payload: PublicKeyCredential
+  }
+}
+end note
+Switch --> DFSP_LM: 202 Accepted
+DFSP_LM -> DFSP_LM: this.saveToKVS()
+deactivate DFSP_LM
+
+Switch -> AUTH: POST /consents/1a2b3c4d
+activate AUTH
+AUTH --> Switch: 202 Accepted
+AUTH -> AUTH: Check consent.
+rnote right of AUTH: Auth Service determines consent is invalid.
+AUTH -> Switch: PUT /consents/1a2b3c4d/error
+
+rnote left of AUTH #LightCoral
+PUT /consents/1a2b3c4d/error
+FSIOP-Source: central-auth
+FSIOP-Destination: dfspa
+{
+  errorInformation: {
+    errorCode: '7213',
+    errorDescription: 'Consent is invalid'
+  }
+}
+end note
+
+Switch --> AUTH: 200 OK
+Switch -> DFSP_TP_IN: PUT /consents/1a2b3c4d/error
+activate DFSP_TP_IN
+DFSP_TP_IN -> DFSP_TP_IN: const model = await loadFromKVS({key: 1a2b3c4d})
+DFSP_TP_IN -> DFSP_TP_IN: consentResponseRecieved()
+rnote right of DFSP_TP_IN: state: consentResponseRecieved
+DFSP_TP_IN -> DFSP_LM: Auth Service response recieved
+activate DFSP_LM
+DFSP_TP_IN --> Switch: 200 OK
+deactivate Switch
+deactivate DFSP_TP_IN
+rnote right of DFSP_LM: state: errored
+DFSP_LM -> Switch: PUT /consents/1a2b3c4d/error
+activate Switch
+
+rnote left of DFSP_LM #LightCoral
+PUT /consents/1a2b3c4d/error
+FSIOP-Source: dfspa
+FSIOP-Destination: pispa
+{
+  errorInformation: {
+    errorCode: '7213',
+    errorDescription: 'Consent is invalid'
+  }
+}
+end note
+Switch --> DFSP_LM: 200 OK
+deactivate DFSP_LM
+Switch ->  PISP_TP_IN: PUT /consents/1a2b3c4d/error
+activate PISP_TP_IN
+PISP_TP_IN --> Switch: 200 OK
+deactivate Switch
+PISP_TP_IN --> PISP_LM: MojaloopFSPIOPError response recieved
+deactivate PISP_TP_IN
+activate PISP_LM
+rnote right of PISP_LM: state: errored
+PISP_LM -> PISP_TP_OUT: return MojaloopFSPIOPError
+deactivate PISP_LM
+PISP_TP_OUT --> PISP: 500 Internal Server Error ErrorInformationObject
+deactivate PISP_TP_OUT
+deactivate PISP
+
+@enduml

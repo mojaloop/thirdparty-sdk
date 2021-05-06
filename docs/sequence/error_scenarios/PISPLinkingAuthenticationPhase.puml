@@ -1,0 +1,119 @@
+@startuml
+
+title PISP Linking Error Scenarios Authentication Phase
+
+participant "PISP Backend" as PISP
+box "PISP tp-scheme-adapter"
+  participant "outbound-server" as PISP_TP_OUT
+  participant "PISPLinkingModel" as PISP_LM
+  participant "inbound-server" as PISP_TP_IN
+end box
+box "Mojaloop"
+    participant Switch
+    participant "Auth Service" as AUTH
+    participant "Account Lookup Service" as ALS
+end box
+box "DFSP tp-scheme-adapter"
+  participant "inbound-server" as DFSP_TP_IN
+  participant "DFSPLinkingModel" as DFSP_LM
+end box
+
+== Authentication ==
+autonumber 1 "<b>AUTHENTICATION-#</b>"
+rnote right of PISP
+PISP has obtained authToken from end-user(OTP) or through a callback(Web).
+end note
+PISP -> PISP_TP_OUT: POST /linking/request-consent/6789/authenticate
+rnote right of PISP #LightBlue
+POST /linking/request-consent/6789/authenticate
+{
+  authToken: '123456'
+}
+end note
+
+activate PISP
+activate PISP_TP_OUT
+
+PISP_TP_OUT -> PISP_TP_OUT: const model = await loadFromKVS({key: 6789})
+rnote right of PISP_TP_OUT: state: webAuthenticationChannelResponseRecieved or OTPAuthenticationChannelResponseRecieved
+PISP_TP_OUT -> PISP_LM: model.authenticate()
+
+activate PISP_LM
+
+PISP_LM -> PISP_LM: ThirdpartyRequests.patchConsentRequests()
+PISP_LM -> Switch: PATCH /consentRequests/6789
+rnote right of PISP_LM #LightBlue
+PATCH /consentRequests/6789
+FSIOP-Source: pispa
+FSIOP-Destination: dfspa
+{
+  authToken: '124356'
+}
+end note
+
+activate Switch
+Switch --> PISP_LM: 202 Accepted
+deactivate PISP_LM
+Switch -> DFSP_TP_IN: PATCH /consentRequests/6789
+activate DFSP_TP_IN
+DFSP_TP_IN --> Switch: 202 Accepted
+deactivate Switch
+DFSP_TP_IN -> DFSP_TP_IN: const model = await loadFromKVS({key: 6789})
+rnote right of DFSP_TP_IN: state: consentRequestValidatedAndStored
+DFSP_TP_IN -> DFSP_LM: model.validateAuthToken()
+deactivate DFSP_TP_IN
+activate DFSP_LM
+
+DFSP_LM -> DFSP_LM: DFSPBackendRequests.validateAuthToken()
+rnote right of DFSP_LM #LightBlue
+Do we need two backend endpoints for validating
+web authTokens and OTP authTokens? Or is a DFSP expected to
+validate both cases with one endpoint?
+
+POST /validateAuthToken
+{
+  consentRequestId: '6789'
+  authChannel: model.data.authChannel,
+  authToken: '124356'
+}
+end note
+rnote right of DFSP_LM: state: errored
+DFSP_LM -> Switch: PUT /consentRequests/6789/error
+activate Switch
+
+rnote left of DFSP_LM #LightCoral
+PUT /consentRequests/6789/error
+FSIOP-Source: dfspa
+FSIOP-Destination: pispa
+{
+  errorInformation: {
+    errorCode: '7200',
+    errorDescription: 'Generic Thirdparty account linking error'
+  } OR
+  errorInformation: {
+    errorCode: '7205',
+    errorDescription: 'OTP failed validation'
+  } OR
+  errorInformation: {
+    errorCode: '7206',
+    errorDescription: 'FSP failed to validate OTP'
+  }
+}
+end note
+Switch --> DFSP_LM: 200 OK
+deactivate DFSP_LM
+Switch ->  PISP_TP_IN: PUT /consentRequests/6789/error
+activate PISP_TP_IN
+PISP_TP_IN --> Switch: 200 OK
+deactivate Switch
+PISP_TP_IN --> PISP_LM: MojaloopFSPIOPError response recieved
+deactivate PISP_TP_IN
+activate PISP_LM
+rnote right of PISP_LM: state: errored
+PISP_LM -> PISP_TP_OUT: return MojaloopFSPIOPError
+deactivate PISP_LM
+PISP_TP_OUT --> PISP: 500 Internal Server Error ErrorInformationObject
+deactivate PISP_TP_OUT
+deactivate PISP
+
+@enduml
