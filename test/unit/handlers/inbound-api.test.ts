@@ -733,7 +733,7 @@ describe('Inbound API routes', (): void => {
         getDFSPBackendRequests: jest.fn(() => ({
           validateConsentRequests: jest.fn(() => Promise.resolve(mockData.consentRequestsPost.response)),
           storeConsentRequests: jest.fn(() => Promise.resolve()),
-          sendOTP: jest.fn(() => Promise.resolve(mockData.consentRequestsPost.otpResponse)),
+          sendOTP: jest.fn(() => Promise.resolve(mockData.consentRequestsPost.otpResponse))
         })),
         getThirdpartyRequests: jest.fn(() => ({
           putConsentRequests: jest.fn(),
@@ -759,7 +759,7 @@ describe('Inbound API routes', (): void => {
         url: '/consentRequests',
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json',
+          Accept: 'application/json',
           'FSPIOP-Source': 'switch',
           Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
           'FSPIOP-Destination': 'dfspA'

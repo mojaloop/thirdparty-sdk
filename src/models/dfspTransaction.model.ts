@@ -374,7 +374,7 @@ export class DFSPTransactionModel
       }
     } catch (error) {
       const mojaloopError = reformatError(error, this.logger)
-      this.logger.push({ mojaloopError }).info(`Sending error response to ${this.data.participantId}`)
+      this.logger.push({ error, mojaloopError }).info(`Sending error response to ${this.data.participantId}`)
       this.data.currentState = 'errored'
       await this.saveToKVS()
       await this.thirdpartyRequests.putThirdpartyRequestsTransactionsError(
