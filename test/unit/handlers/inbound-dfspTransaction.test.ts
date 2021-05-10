@@ -103,6 +103,7 @@ describe('Inbound DFSP Transaction handler', () => {
       requestTransfer: jest.fn(() => Promise.resolve(requestTransferResponse))
     } as unknown as SDKOutgoingRequests
     toolkit = {
+      getDFSPId: jest.fn(() => 'pisp'),
       getLogger: jest.fn(() => mockLogger()),
       getKVS: jest.fn(() => kvsMock),
       getThirdpartyRequests: jest.fn(() => thirdpartyRequestsMock),

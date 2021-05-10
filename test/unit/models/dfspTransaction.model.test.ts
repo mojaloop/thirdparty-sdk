@@ -40,7 +40,7 @@ import mockLogger from 'test/unit/mockLogger'
 import sortedArray from 'test/unit/sortedArray'
 import shouldNotBeExecuted from 'test/unit/shouldNotBeExecuted'
 import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
-import { GenericRequestResponse, ThirdpartyRequests, Errors } from '@mojaloop/sdk-standard-components'
+import { ThirdpartyRequests, Errors } from '@mojaloop/sdk-standard-components'
 import { OutboundAPI as SDKOutboundAPI } from '@mojaloop/sdk-scheme-adapter'
 import { reformatError } from '~/shared/api-error'
 
@@ -68,6 +68,7 @@ describe('DFSPTransactionModel', () => {
 
   beforeEach(async () => {
     modelConfig = {
+      dfspId: 'dfsp_a',
       key: 'cache-key',
       kvs: new KVS(connectionConfig),
       logger: connectionConfig.logger,
@@ -411,11 +412,11 @@ describe('DFSPTransactionModel', () => {
       expect(model.data.transferRequest).toBeDefined()
       const rtr = model.data.transferRequest!
       const quote = model.data.requestQuoteResponse!.quotes
-      expect(rtr.fspId).toEqual(tr.payer.fspId)
+      expect(rtr.fspId).toEqual('dfsp_a')
       expect(rtr.transfersPostRequest).toEqual({
         transferId: model.data.transferId!,
         payeeFsp: tr.payee.partyIdInfo.fspId!,
-        payerFsp: tr.payer.fspId!,
+        payerFsp: 'dfsp_a',
         amount: { ...quote.transferAmount },
         ilpPacket: quote.ilpPacket,
         condition: quote.condition,
@@ -467,7 +468,8 @@ describe('DFSPTransactionModel', () => {
     it('should throw if PUT /thirdpartyRequests/transactions/{ID} failed', async (done) => {
       mocked(modelConfig.kvs.set).mockImplementationOnce(() => Promise.resolve(true))
       mocked(modelConfig.thirdpartyRequests.putThirdpartyRequestsTransactions)
-        .mockImplementationOnce(() => Promise.resolve({ statusCode: 400 } as GenericRequestResponse))
+        // eslint-disable-next-line prefer-promise-reject-errors
+        .mockImplementationOnce(() => Promise.reject({ statusCode: 400 }))
       const data: DFSPTransactionData = {
         transactionRequestId,
         transactionRequestState: 'RECEIVED',

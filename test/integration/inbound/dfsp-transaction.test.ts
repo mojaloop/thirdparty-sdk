@@ -54,7 +54,7 @@ describe('DFSP Transaction', (): void => {
       const axiosConfig = {
         headers: {
           'Content-Type': 'application/json',
-          'FSPIOP-Source': 'switch',
+          'FSPIOP-Source': 'pisp',
           Date: (new Date()).toISOString(),
           'FSPIOP-Destination': 'dfspA'
         }

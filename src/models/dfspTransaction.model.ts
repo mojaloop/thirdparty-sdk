@@ -219,6 +219,8 @@ export class DFSPTransactionModel
       }
     }
 
+    console.log('this.data.requestAuthorizationPostRequest', this.data.requestAuthorizationPostRequest)
+
     const resultAuthorization = await this.sdkOutgoingRequests.requestAuthorization(
       this.data.requestAuthorizationPostRequest
     )
@@ -257,14 +259,13 @@ export class DFSPTransactionModel
         const quote = this.data.requestQuoteResponse!.quotes
         // prepare transfer request
         this.data.transferRequest = {
-          // TODO: payer.fspId is optional it should be mandatory
-          fspId: tr.payer.fspId!,
+          fspId: this.config.dfspId,
           transfersPostRequest: {
             transferId: this.data.transferId!,
 
             // payee & payer data from /thirdpartyRequests/transaction
             payeeFsp: tr.payee.partyIdInfo.fspId!,
-            payerFsp: tr.payer.fspId!,
+            payerFsp: this.config.dfspId,
 
             // transfer data from quote response
             amount: { ...quote.transferAmount },
