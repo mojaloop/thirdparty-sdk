@@ -121,7 +121,7 @@ Switch ->  PISP_TP_IN: PUT /consentRequests/6789/error
 activate PISP_TP_IN
 PISP_TP_IN --> Switch: 200 OK
 deactivate Switch
-PISP_TP_IN --> PISP_LM: MojaloopFSPIOPError response recieved
+PISP_TP_IN --> PISP_LM: MojaloopFSPIOPError response received
 deactivate PISP_TP_IN
 activate PISP_LM
 rnote right of PISP_LM: state: errored

@@ -54,7 +54,7 @@ PISP_TP_IN --> Switch: 200 OK
 
 deactivate Switch
 
-PISP_TP_IN -> PISP_PLM: ErrorInformationObject recieved
+PISP_TP_IN -> PISP_PLM: ErrorInformationObject received
 
 deactivate PISP_TP_IN
 activate PISP_PLM
@@ -104,7 +104,7 @@ PISP_TP_IN --> Switch: 200 OK
 
 deactivate Switch
 
-PISP_TP_IN -> PISP_PLM: Services request recieved
+PISP_TP_IN -> PISP_PLM: Services request received
 
 deactivate PISP_TP_IN
 activate PISP_PLM
