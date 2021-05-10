@@ -151,14 +151,15 @@ export class DFSPTransactionModel
 
     // this field will be present which is guaranteed by InvalidDataError validation above
     const update = this.data.transactionRequestPutUpdate as tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPutResponse
-    const updateResult = await this.thirdpartyRequests.putThirdpartyRequestsTransactions(
-      update,
-      this.data.transactionRequestId,
-      this.data.participantId
-    )
-
-    // check result and throw if invalid
-    if (!(updateResult && updateResult.statusCode >= 200 && updateResult.statusCode < 300)) {
+    try {
+      await this.thirdpartyRequests.putThirdpartyRequestsTransactions(
+        update,
+        this.data.transactionRequestId,
+        this.data.participantId
+      )
+    } catch (err) {
+      this.logger.push({ err }).log('putThirdpartyRequestsTransactions failed')
+      // throw proper error
       throw Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_UPDATE_FAILED
     }
 
