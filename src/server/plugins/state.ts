@@ -53,6 +53,7 @@ export interface StateResponseToolkit extends ResponseToolkit {
   getPISPBackendRequests: () => PISPBackendRequests
   getDFSPBackendRequests: () => DFSPBackendRequests
   getSDKOutgoingRequests: () => SDKOutgoingRequests
+  getDFSPId: () => string
 }
 
 export const StatePlugin = {
@@ -167,7 +168,7 @@ export const StatePlugin = {
       server.decorate('toolkit', 'getPISPBackendRequests', (): PISPBackendRequests => pispBackendRequests)
       server.decorate('toolkit', 'getDFSPBackendRequests', (): DFSPBackendRequests => dfspBackendRequests)
       server.decorate('toolkit', 'getSDKOutgoingRequests', (): SDKOutgoingRequests => sdkOutgoingRequests)
-
+      server.decorate('toolkit', 'getDFSPId', (): string => config.SHARED.DFSP_ID)
       // disconnect from redis when server is stopped
       server.events.on('stop', async () => {
         await Promise.allSettled([kvs.disconnect(), pubSub.disconnect()])
