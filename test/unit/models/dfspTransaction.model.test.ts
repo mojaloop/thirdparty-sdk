@@ -657,7 +657,7 @@ describe('DFSPTransactionModel', () => {
     it('should throw if notify transfer patch failed', async (done) => {
       mocked(modelConfig.kvs.set).mockImplementationOnce(() => Promise.resolve(true))
       mocked(modelConfig.thirdpartyRequests.patchThirdpartyRequestsTransactions).mockImplementationOnce(
-        () => Promise.resolve(undefined)
+        () => Promise.reject(new Error('error from patch'))
       )
       const data: DFSPTransactionData = {
         transactionRequestId,

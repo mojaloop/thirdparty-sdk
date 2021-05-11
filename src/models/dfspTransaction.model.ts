@@ -219,8 +219,6 @@ export class DFSPTransactionModel
       }
     }
 
-    console.log('this.data.requestAuthorizationPostRequest', this.data.requestAuthorizationPostRequest)
-
     const resultAuthorization = await this.sdkOutgoingRequests.requestAuthorization(
       this.data.requestAuthorizationPostRequest
     )
@@ -323,12 +321,14 @@ export class DFSPTransactionModel
   async onNotifyTransferIsDone (): Promise<void> {
     InvalidDataError.throwIfInvalidProperty(this.data, 'transactionRequestPatchUpdate')
 
-    const result = await this.thirdpartyRequests.patchThirdpartyRequestsTransactions(
-      this.data.transactionRequestPatchUpdate!,
-      this.data.transactionRequestId,
-      this.data.participantId
-    )
-    if (!result) {
+    try {
+      await this.thirdpartyRequests.patchThirdpartyRequestsTransactions(
+        this.data.transactionRequestPatchUpdate!,
+        this.data.transactionRequestId,
+        this.data.participantId
+      )
+    } catch (err) {
+      this.logger.push({ err }).log('patchThirdpartyRequestsTransactions failed')
       throw Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_NOTIFICATION_FAILED
     }
   }
