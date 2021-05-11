@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+## [11.36.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.35.3...v11.36.0) (2021-05-11)
+
+
+### Features
+
+* **dfspTransaction:** workflow, errors, unit & integration tests ([#88](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/88)) ([80bca46](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/80bca46f0543e965abe9a8c86419a4bc02bb4aee))
+
 ### [11.35.3](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.35.2...v11.35.3) (2021-05-10)
 
 
