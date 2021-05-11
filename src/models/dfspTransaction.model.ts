@@ -328,7 +328,7 @@ export class DFSPTransactionModel
         this.data.participantId
       )
     } catch (err) {
-      this.logger.push({ err }).log('patchThirdpartyRequestsTransactions failed')
+      this.logger.push({ err }).log('patchThirdpartyRequestsTransactions')
       throw Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_NOTIFICATION_FAILED
     }
   }
