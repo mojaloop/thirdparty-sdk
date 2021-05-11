@@ -43,11 +43,11 @@ import { mocked } from 'ts-jest/utils'
 
 import mockLogger from 'test/unit/mockLogger'
 import sortedArray from 'test/unit/sortedArray'
-import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests';
+import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
 import {
   DFSPConsentRequestsModelConfig,
   DFSPConsentRequestsData
-} from '~/models/inbound/dfspConsentRequests.interface';
+} from '~/models/inbound/dfspConsentRequests.interface'
 import {
   thirdparty as tpAPI
 } from '@mojaloop/api-snippets'
@@ -87,7 +87,7 @@ describe('dfspConsentRequestsModel', () => {
         validateConsentRequests: jest.fn(() => Promise.resolve(mockData.consentRequestsPost.response)),
         storeConsentRequests: jest.fn(() => Promise.resolve()),
         sendOTP: jest.fn(() => Promise.resolve(mockData.consentRequestsPost.otpResponse))
-      } as unknown as DFSPBackendRequests,
+      } as unknown as DFSPBackendRequests
     }
     mocked(modelConfig.pubSub.subscribe).mockImplementationOnce(
       (_channel: string, cb: NotificationCallback) => {
@@ -108,7 +108,9 @@ describe('dfspConsentRequestsModel', () => {
     await modelConfig.pubSub.disconnect()
   })
 
-  function checkDFSPConsentRequestsModelLayout (dfspConsentRequestsModel: DFSPConsentRequestsModel, consentRequestsData?: DFSPConsentRequestsData) {
+  function checkDFSPConsentRequestsModelLayout (
+    dfspConsentRequestsModel: DFSPConsentRequestsModel, consentRequestsData?: DFSPConsentRequestsData
+  ) {
     expect(dfspConsentRequestsModel).toBeTruthy()
     expect(dfspConsentRequestsModel.data).toBeDefined()
     expect(dfspConsentRequestsModel.fsm.state).toEqual(consentRequestsData?.currentState || 'start')
@@ -132,7 +134,7 @@ describe('dfspConsentRequestsModel', () => {
       'errored',
       'none',
       'start',
-      'success',
+      'success'
     ])
     expect(sortedArray(dfspConsentRequestsModel.fsm.allTransitions())).toEqual([
       'error',
@@ -176,13 +178,15 @@ describe('dfspConsentRequestsModel', () => {
       expect(model.data.currentState).toEqual('RequestIsValid')
 
       // check we made a call to dfspBackendRequests.validateConsentRequests
-      expect(modelConfig.dfspBackendRequests.validateConsentRequests).toBeCalledWith(mockData.consentRequestsPost.payload)
+      expect(modelConfig.dfspBackendRequests.validateConsentRequests)
+        .toBeCalledWith(mockData.consentRequestsPost.payload)
     })
 
     it('validateRequest():OTP should transition start  to RequestIsValid when successful', async () => {
       const model = await create(validateData, modelConfig)
 
-      mocked(modelConfig.dfspBackendRequests.validateConsentRequests).mockImplementationOnce(() => Promise.resolve(mockData.consentRequestsPost.responseOTP))
+      mocked(modelConfig.dfspBackendRequests.validateConsentRequests)
+        .mockImplementationOnce(() => Promise.resolve(mockData.consentRequestsPost.responseOTP))
 
       // start validation step
       await model.fsm.validateRequest()
@@ -191,7 +195,8 @@ describe('dfspConsentRequestsModel', () => {
       expect(model.data.currentState).toEqual('RequestIsValid')
 
       // check we made a call to dfspBackendRequests.validateConsentRequests
-      expect(modelConfig.dfspBackendRequests.validateConsentRequests).toBeCalledWith(mockData.consentRequestsPost.payload)
+      expect(modelConfig.dfspBackendRequests.validateConsentRequests)
+        .toBeCalledWith(mockData.consentRequestsPost.payload)
     })
 
     it('should handle failed backend validation and send PUT /consentsRequest/{ID}/error response', async () => {
@@ -388,7 +393,7 @@ describe('dfspConsentRequestsModel', () => {
         )
         mocked(modelConfig.logger.info).mockReset()
         expect(model.data.currentState).toEqual('success')
-        const result = await existsInKVS(modelConfig);
+        const result = await existsInKVS(modelConfig)
         expect(result).toBeUndefined()
       })
 
@@ -426,7 +431,6 @@ describe('dfspConsentRequestsModel', () => {
         expect(model.run()).rejects.toEqual(error)
       })
     })
-
   })
 
   describe('StoreReqAndSendOTP Backend Phase', () => {
@@ -464,13 +468,17 @@ describe('dfspConsentRequestsModel', () => {
     it('storeReqAndSendOTP()-OTP:  should transition from RequestIsValid to success when successful', async () => {
       validateData = {
         ...validateData,
-        response: mockData.consentRequestsPost.responseOTP,
+        response: mockData.consentRequestsPost.responseOTP
       }
       const model = await create(validateData, modelConfig)
 
-      mocked(modelConfig.dfspBackendRequests.sendOTP).mockImplementationOnce(() => Promise.resolve(mockData.consentRequestsPost.otpResponse)),
-        // start request scopes step
-        await model.fsm.storeReqAndSendOTP()
+      mocked(modelConfig.dfspBackendRequests.sendOTP)
+        .mockImplementationOnce(
+          () => Promise.resolve(mockData.consentRequestsPost.otpResponse)
+        )
+
+      // start request scopes step
+      await model.fsm.storeReqAndSendOTP()
 
       // check that the fsm was able to transition properly
       expect(model.data.currentState).toEqual('success')
@@ -483,7 +491,7 @@ describe('dfspConsentRequestsModel', () => {
     it('storeReqAndSendOTP()-InvalidAuthChannel:  should transition from RequestIsValid to errored', async () => {
       validateData = {
         ...validateData,
-        response: mockData.consentRequestsPost.responseErrorAuthChannel,
+        response: mockData.consentRequestsPost.responseErrorAuthChannel
       }
       const model = await create(validateData, modelConfig)
 
@@ -519,12 +527,11 @@ describe('dfspConsentRequestsModel', () => {
 
   describe('loadFromKVS', () => {
     it('should properly call `KVS.get`, get expected data in `context.data` and setup state of machine', async () => {
-
       const dataFromCache = {
         toParticipantId: 'pispa',
         request: mockData.consentRequestsPost.payload,
         currentState: 'success',
-        response: mockData.consentRequestsPost.response,
+        response: mockData.consentRequestsPost.response
       }
       mocked(modelConfig.kvs.get).mockImplementationOnce(async () => dataFromCache)
       const am = await loadFromKVS(modelConfig)

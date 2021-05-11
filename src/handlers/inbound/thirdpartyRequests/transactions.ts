@@ -26,53 +26,43 @@
  --------------
  ******/
 
-import {
-  // forwardPostQuoteRequestToPayee,
-  verifyConsentId,
-  verifyPispId,
-  verifySourceAccountId,
-  validateGrantedConsent
-} from '~/domain/thirdpartyRequests/transactions'
 import { Context } from 'openapi-backend'
-import { Enums } from '@mojaloop/central-services-error-handling'
 import { Enum } from '@mojaloop/central-services-shared'
 import { Request, ResponseObject } from '@hapi/hapi'
 import { StateResponseToolkit } from '~/server/plugins/state'
-import {
-  InboundThridpartyTransactionsModelConfig,
-  InboundThridpartyTransactionsModel
-} from '~/models/inbound/thirdparty.transactions.model'
-import { InboundThirdpartyTransactionPostRequest } from '~/models/thirdparty.transactions.interface'
+import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
+import { DFSPTransactionModel, create } from '~/models/dfspTransaction.model'
+import { DFSPTransactionModelConfig, DFSPTransactionData } from '~/models/dfspTransaction.interface'
 /**
  * Handles a DFSP inbound POST /thirdpartyRequests/transaction request
  */
-async function post (_context: Context, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
-  const transactionRequest = request.payload as InboundThirdpartyTransactionPostRequest
-  const pispId = request.headers['FSPIOP-Source']
-  // input validation - mocked
-  if (!(await verifyConsentId(transactionRequest.consentId)) ||
-      !(await verifyPispId(request.headers['FSPIOP-Source'])) ||
-      !(await verifySourceAccountId(transactionRequest.sourceAccountId)) ||
-      !(await validateGrantedConsent(transactionRequest.consentId))) {
-    // todo: change to a thirdparty specific error code here
-    return h.response(Enums.FSPIOPErrorCodes.CLIENT_ERROR).code(Enum.Http.ReturnCodes.BADREQUEST.CODE)
-  }
+async function post (
+  _context: Context, request: Request, h: StateResponseToolkit
+): Promise<ResponseObject> {
+  const transactionRequest = request.payload as tpAPI.Schemas.ThirdpartyRequestsTransactionsPostRequest
+  const participantId = request.headers['fspiop-source']
 
-  const modelConfig: InboundThridpartyTransactionsModelConfig = {
-    logger: h.getLogger(),
+  const config: DFSPTransactionModelConfig = {
+    dfspId: h.getDFSPId(),
+    thirdpartyRequests: h.getThirdpartyRequests(),
     sdkOutgoingRequests: h.getSDKOutgoingRequests(),
-    mojaloopRequests: h.getMojaloopRequests(),
-    thirdpartyRequests: h.getThirdpartyRequests()
+    dfspBackendRequests: h.getDFSPBackendRequests(),
+    logger: h.getLogger(),
+    kvs: h.getKVS(),
+    key: `dfspTransaction-${transactionRequest.transactionRequestId}`
   }
-  const model = new InboundThridpartyTransactionsModel(modelConfig)
-  // don't await on promise to be resolved
+
   setImmediate(async () => {
-    const result = await model.requestToPayTransfer(transactionRequest, pispId)
-    modelConfig.logger.push({ result }).info('requestToPayTransfer done')
-
-    // TODO: should we process result somewhere ? PUT ?
+    const data: DFSPTransactionData = {
+      transactionRequestId: transactionRequest.transactionRequestId,
+      transactionRequestState: 'RECEIVED',
+      participantId,
+      currentState: 'start',
+      transactionRequestRequest: transactionRequest
+    }
+    const model: DFSPTransactionModel = await create(data, config)
+    await model.run()
   })
-
   return h.response({}).code(Enum.Http.ReturnCodes.ACCEPTED.CODE)
 }
 

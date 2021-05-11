@@ -157,7 +157,7 @@ describe('InboundAccountsModel', () => {
           throw new HTTPResponseError({
             msg: 'mocked-error',
             res: {
-              body: { statusCode: '2002' }
+              body: '['
             }
           })
         }

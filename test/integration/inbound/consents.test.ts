@@ -42,7 +42,7 @@ describe('POST /consents', (): void => {
     }
     const payload = {
       consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
-      consentRequestId: '997c89f4-053c-4283-bfec-45a1a0a28fba',
+      consentRequestId: '997c89f4-053c-4283-bfec-45a1a0a28fbb',
       scopes: [{
         accountId: 'some-id',
         actions: [
@@ -68,9 +68,9 @@ describe('POST /consents', (): void => {
       await pubSub.connect()
       expect(pubSub.isConnected).toBeTruthy()
 
-      pubSub.subscribe('PISPOTPValidate-997c89f4-053c-4283-bfec-45a1a0a28fba',
+      pubSub.subscribe('PISPOTPValidate-997c89f4-053c-4283-bfec-45a1a0a28fbb',
         async (channel: string, message: Message) => {
-          expect(channel).toEqual('PISPOTPValidate-997c89f4-053c-4283-bfec-45a1a0a28fba')
+          expect(channel).toEqual('PISPOTPValidate-997c89f4-053c-4283-bfec-45a1a0a28fbb')
           expect(message).toEqual(payload)
           await pubSub.disconnect()
           expect(pubSub.isConnected).toBeFalsy()

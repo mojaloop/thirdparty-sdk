@@ -57,7 +57,7 @@ async function post (_context: unknown, request: Request, h: StateResponseToolki
     kvs: h.getKVS(),
     pubSub: h.getPubSub(),
     // TODO refactor api-snippets to have this field mandatory!
-    key: payload.transactionRequestId as string,
+    key: payload.transactionRequestId,
     logger: h.getLogger(),
     thirdpartyRequests: h.getThirdpartyRequests(),
     mojaloopRequests: h.getMojaloopRequests(),
