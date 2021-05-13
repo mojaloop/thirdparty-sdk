@@ -34,6 +34,9 @@ export interface paths {
   '/consentRequests': {
     post: operations['OutboundConsentRequestsPost'];
   };
+  '/linking/providers': {
+    get: operations['GetProviders'];
+  };
 }
 
 export interface operations {
@@ -214,6 +217,20 @@ export interface operations {
     };
     responses: {
       200: components['responses']['ConsentRequestsResponse'];
+      400: components['responses']['400'];
+      401: components['responses']['401'];
+      403: components['responses']['403'];
+      404: components['responses']['404'];
+      405: components['responses']['405'];
+      406: components['responses']['406'];
+      501: components['responses']['501'];
+      503: components['responses']['503'];
+    };
+  };
+  /** The HTTP request `GET /linking/providers` is used to retrieve a list of thirdparty enabled DFSP identifiers. */
+  GetProviders: {
+    responses: {
+      200: components['responses']['LinkingProvidersResponse'];
       400: components['responses']['400'];
       401: components['responses']['401'];
       403: components['responses']['403'];
@@ -987,6 +1004,23 @@ export interface components {
     ConsentRequestsResponse:
     | components['schemas']['ConsentRequestsResponseError']
     | components['schemas']['ConsentRequestsResponseSuccess'];
+    /** State of GET /linking/providers request */
+    LinkingProvidersState: 'start' | 'errored' | 'providersLookupSuccess';
+    LinkingProvidersResponseError: {
+      errorInformation: components['schemas']['ErrorInformation'];
+      currentState: components['schemas']['LinkingProvidersState'];
+    };
+    /** The object sent in a `PUT /services/{ServiceType}` request. */
+    ServicesServiceTypePutResponse: {
+      providers: components['schemas']['FspId'][];
+    };
+    LinkingProvidersResponseSuccess: {
+      providers: components['schemas']['ServicesServiceTypePutResponse'];
+      currentState: components['schemas']['LinkingProvidersState'];
+    };
+    LinkingProvidersResponse:
+    | components['schemas']['LinkingProvidersResponseError']
+    | components['schemas']['LinkingProvidersResponseSuccess'];
   };
   responses: {
     /** OK */
@@ -1130,6 +1164,12 @@ export interface components {
     ConsentRequestsResponse: {
       content: {
         'application/json': components['schemas']['ConsentRequestsResponse'];
+      };
+    };
+    /** Response body of GET /linking/providers */
+    LinkingProvidersResponse: {
+      content: {
+        'application/json': components['schemas']['LinkingProvidersResponse'];
       };
     };
   };

@@ -1,0 +1,6 @@
+description: |
+  Response body of GET /linking/providers
+content:
+  application/json:
+    schema:
+      $ref: '../schemas/LinkingProvidersResponse.yaml'

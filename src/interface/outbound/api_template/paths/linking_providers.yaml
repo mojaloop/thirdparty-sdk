@@ -8,20 +8,20 @@ get:
     - linking
   responses:
     '200':
-      $ref: '#/components/responses/LinkingProvidersResponse'
+      $ref: '../components/responses/LinkingProvidersResponse.yaml'
     '400':
-      $ref: '#/components/responses/400'
+      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/400.yaml'
     '401':
-      $ref: '#/components/responses/401'
+      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/401.yaml'
     '403':
-      $ref: '#/components/responses/403'
+      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/403.yaml'
     '404':
-      $ref: '#/components/responses/404'
+      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/404.yaml'
     '405':
-      $ref: '#/components/responses/405'
+      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/405.yaml'
     '406':
-      $ref: '#/components/responses/406'
+      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/406.yaml'
     '501':
-      $ref: '#/components/responses/501'
+      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/501.yaml'
     '503':
-      $ref: '#/components/responses/503'
+      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/503.yaml'
