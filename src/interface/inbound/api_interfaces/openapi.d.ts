@@ -4,149 +4,188 @@
  */
 
 export interface paths {
-  '/accounts/{ID}': {
-    get: operations['GetAccountsByUserId'];
-    put: operations['UpdateAccountsByUserId'];
+  "/accounts/{ID}": {
+    get: operations["GetAccountsByUserId"];
+    put: operations["UpdateAccountsByUserId"];
     parameters: {
       path: {
-        ID: components['parameters']['ID'];
+        ID: components["parameters"]["ID"];
       };
       header: {
-        Date: components['parameters']['Date'];
-        'X-Forwarded-For'?: components['parameters']['X-Forwarded-For'];
-        'FSPIOP-Source': components['parameters']['FSPIOP-Source'];
-        'FSPIOP-Destination'?: components['parameters']['FSPIOP-Destination'];
-        'FSPIOP-Encryption'?: components['parameters']['FSPIOP-Encryption'];
-        'FSPIOP-Signature'?: components['parameters']['FSPIOP-Signature'];
-        'FSPIOP-URI'?: components['parameters']['FSPIOP-URI'];
-        'FSPIOP-HTTP-Method'?: components['parameters']['FSPIOP-HTTP-Method'];
+        Date: components["parameters"]["Date"];
+        "X-Forwarded-For"?: components["parameters"]["X-Forwarded-For"];
+        "FSPIOP-Source": components["parameters"]["FSPIOP-Source"];
+        "FSPIOP-Destination"?: components["parameters"]["FSPIOP-Destination"];
+        "FSPIOP-Encryption"?: components["parameters"]["FSPIOP-Encryption"];
+        "FSPIOP-Signature"?: components["parameters"]["FSPIOP-Signature"];
+        "FSPIOP-URI"?: components["parameters"]["FSPIOP-URI"];
+        "FSPIOP-HTTP-Method"?: components["parameters"]["FSPIOP-HTTP-Method"];
       };
     };
   };
-  '/accounts/{ID}/error': {
-    put: operations['UpdateAccountsByUserIdError'];
+  "/accounts/{ID}/error": {
+    put: operations["UpdateAccountsByUserIdError"];
     parameters: {
       path: {
-        ID: components['parameters']['ID'];
+        ID: components["parameters"]["ID"];
       };
       header: {
-        'Content-Length'?: components['parameters']['Content-Length'];
-        'Content-Type': components['parameters']['Content-Type'];
-        Date: components['parameters']['Date'];
-        'X-Forwarded-For'?: components['parameters']['X-Forwarded-For'];
-        'FSPIOP-Source': components['parameters']['FSPIOP-Source'];
-        'FSPIOP-Destination'?: components['parameters']['FSPIOP-Destination'];
-        'FSPIOP-Encryption'?: components['parameters']['FSPIOP-Encryption'];
-        'FSPIOP-Signature'?: components['parameters']['FSPIOP-Signature'];
-        'FSPIOP-URI'?: components['parameters']['FSPIOP-URI'];
-        'FSPIOP-HTTP-Method'?: components['parameters']['FSPIOP-HTTP-Method'];
+        "Content-Length"?: components["parameters"]["Content-Length"];
+        "Content-Type": components["parameters"]["Content-Type"];
+        Date: components["parameters"]["Date"];
+        "X-Forwarded-For"?: components["parameters"]["X-Forwarded-For"];
+        "FSPIOP-Source": components["parameters"]["FSPIOP-Source"];
+        "FSPIOP-Destination"?: components["parameters"]["FSPIOP-Destination"];
+        "FSPIOP-Encryption"?: components["parameters"]["FSPIOP-Encryption"];
+        "FSPIOP-Signature"?: components["parameters"]["FSPIOP-Signature"];
+        "FSPIOP-URI"?: components["parameters"]["FSPIOP-URI"];
+        "FSPIOP-HTTP-Method"?: components["parameters"]["FSPIOP-HTTP-Method"];
       };
     };
   };
-  '/authorizations': {
-    post: operations['AuthorizationsPostRequest'];
+  "/authorizations": {
+    post: operations["AuthorizationsPostRequest"];
   };
-  '/authorizations/{ID}': {
-    put: operations['InboundAuthorizationsIDPutResponse'];
+  "/authorizations/{ID}": {
+    put: operations["InboundAuthorizationsIDPutResponse"];
   };
-  '/consentRequests': {
-    post: operations['CreateConsentRequest'];
+  "/consentRequests": {
+    post: operations["CreateConsentRequest"];
   };
-  '/consentRequests/{ID}': {
-    put: operations['UpdateConsentRequest'];
-    patch: operations['PatchConsentRequest'];
+  "/consentRequests/{ID}": {
+    put: operations["UpdateConsentRequest"];
+    patch: operations["PatchConsentRequest"];
     parameters: {
       path: {
-        ID: components['parameters']['ID'];
+        ID: components["parameters"]["ID"];
       };
       header: {
-        'Content-Length'?: components['parameters']['Content-Length'];
-        'Content-Type': components['parameters']['Content-Type'];
-        Date: components['parameters']['Date'];
-        'X-Forwarded-For'?: components['parameters']['X-Forwarded-For'];
-        'FSPIOP-Source': components['parameters']['FSPIOP-Source'];
-        'FSPIOP-Destination'?: components['parameters']['FSPIOP-Destination'];
-        'FSPIOP-Encryption'?: components['parameters']['FSPIOP-Encryption'];
-        'FSPIOP-Signature'?: components['parameters']['FSPIOP-Signature'];
-        'FSPIOP-URI'?: components['parameters']['FSPIOP-URI'];
-        'FSPIOP-HTTP-Method'?: components['parameters']['FSPIOP-HTTP-Method'];
+        "Content-Length"?: components["parameters"]["Content-Length"];
+        "Content-Type": components["parameters"]["Content-Type"];
+        Date: components["parameters"]["Date"];
+        "X-Forwarded-For"?: components["parameters"]["X-Forwarded-For"];
+        "FSPIOP-Source": components["parameters"]["FSPIOP-Source"];
+        "FSPIOP-Destination"?: components["parameters"]["FSPIOP-Destination"];
+        "FSPIOP-Encryption"?: components["parameters"]["FSPIOP-Encryption"];
+        "FSPIOP-Signature"?: components["parameters"]["FSPIOP-Signature"];
+        "FSPIOP-URI"?: components["parameters"]["FSPIOP-URI"];
+        "FSPIOP-HTTP-Method"?: components["parameters"]["FSPIOP-HTTP-Method"];
       };
     };
   };
-  '/consentRequests/{ID}/error': {
-    put: operations['NotifyErrorConsentRequests'];
+  "/consentRequests/{ID}/error": {
+    put: operations["NotifyErrorConsentRequests"];
   };
-  '/consents': {
-    post: operations['PostConsents'];
+  "/consents": {
+    post: operations["PostConsents"];
   };
-  '/health': {
-    get: operations['HealthGet'];
+  "/health": {
+    get: operations["HealthGet"];
   };
-  '/metrics': {
-    get: operations['MetricsGet'];
+  "/metrics": {
+    get: operations["MetricsGet"];
   };
-  '/thirdpartyRequests/transactions': {
-    post: operations['CreateThirdpartyTransactionRequests'];
+  "/thirdpartyRequests/transactions": {
+    post: operations["CreateThirdpartyTransactionRequests"];
     parameters: {
       header: {
-        Accept: components['parameters']['Accept'];
-        'Content-Length'?: components['parameters']['Content-Length'];
-        'Content-Type': components['parameters']['Content-Type'];
-        Date: components['parameters']['Date'];
-        'X-Forwarded-For'?: components['parameters']['X-Forwarded-For'];
-        'FSPIOP-Source': components['parameters']['FSPIOP-Source'];
-        'FSPIOP-Destination'?: components['parameters']['FSPIOP-Destination'];
-        'FSPIOP-Encryption'?: components['parameters']['FSPIOP-Encryption'];
-        'FSPIOP-Signature'?: components['parameters']['FSPIOP-Signature'];
-        'FSPIOP-URI'?: components['parameters']['FSPIOP-URI'];
-        'FSPIOP-HTTP-Method'?: components['parameters']['FSPIOP-HTTP-Method'];
+        Accept: components["parameters"]["Accept"];
+        "Content-Length"?: components["parameters"]["Content-Length"];
+        "Content-Type": components["parameters"]["Content-Type"];
+        Date: components["parameters"]["Date"];
+        "X-Forwarded-For"?: components["parameters"]["X-Forwarded-For"];
+        "FSPIOP-Source": components["parameters"]["FSPIOP-Source"];
+        "FSPIOP-Destination"?: components["parameters"]["FSPIOP-Destination"];
+        "FSPIOP-Encryption"?: components["parameters"]["FSPIOP-Encryption"];
+        "FSPIOP-Signature"?: components["parameters"]["FSPIOP-Signature"];
+        "FSPIOP-URI"?: components["parameters"]["FSPIOP-URI"];
+        "FSPIOP-HTTP-Method"?: components["parameters"]["FSPIOP-HTTP-Method"];
       };
     };
   };
-  '/thirdpartyRequests/transactions/{ID}/authorizations': {
-    post: operations['VerifyThirdPartyAuthorization'];
-    put: operations['UpdateThirdpartyAuthorization'];
-    parameters: {
-      path: {
-        ID: components['parameters']['ID'];
-      };
-      header: {
-        'Content-Length'?: components['parameters']['Content-Length'];
-        'Content-Type': components['parameters']['Content-Type'];
-        Date: components['parameters']['Date'];
-        'X-Forwarded-For'?: components['parameters']['X-Forwarded-For'];
-        'FSPIOP-Source': components['parameters']['FSPIOP-Source'];
-        'FSPIOP-Destination'?: components['parameters']['FSPIOP-Destination'];
-        'FSPIOP-Encryption'?: components['parameters']['FSPIOP-Encryption'];
-        'FSPIOP-Signature'?: components['parameters']['FSPIOP-Signature'];
-        'FSPIOP-URI'?: components['parameters']['FSPIOP-URI'];
-        'FSPIOP-HTTP-Method'?: components['parameters']['FSPIOP-HTTP-Method'];
-      };
-    };
-  };
-  '/thirdpartyRequests/transactions/{ID}': {
-    get: operations['GetThirdpartyTransactionRequests'];
-    put: operations['UpdateThirdPartyTransactionRequests'];
-    patch: operations['NotifyThirdpartyTransactionRequests'];
+  "/thirdpartyRequests/transactions/{ID}/authorizations": {
+    post: operations["VerifyThirdPartyAuthorization"];
+    put: operations["UpdateThirdpartyAuthorization"];
     parameters: {
       path: {
-        ID: components['parameters']['ID'];
+        ID: components["parameters"]["ID"];
       };
       header: {
-        Accept: components['parameters']['Accept'];
-        Date: components['parameters']['Date'];
-        'X-Forwarded-For'?: components['parameters']['X-Forwarded-For'];
-        'FSPIOP-Source': components['parameters']['FSPIOP-Source'];
-        'FSPIOP-Destination'?: components['parameters']['FSPIOP-Destination'];
-        'FSPIOP-Encryption'?: components['parameters']['FSPIOP-Encryption'];
-        'FSPIOP-Signature'?: components['parameters']['FSPIOP-Signature'];
-        'FSPIOP-URI'?: components['parameters']['FSPIOP-URI'];
-        'FSPIOP-HTTP-Method'?: components['parameters']['FSPIOP-HTTP-Method'];
+        "Content-Length"?: components["parameters"]["Content-Length"];
+        "Content-Type": components["parameters"]["Content-Type"];
+        Date: components["parameters"]["Date"];
+        "X-Forwarded-For"?: components["parameters"]["X-Forwarded-For"];
+        "FSPIOP-Source": components["parameters"]["FSPIOP-Source"];
+        "FSPIOP-Destination"?: components["parameters"]["FSPIOP-Destination"];
+        "FSPIOP-Encryption"?: components["parameters"]["FSPIOP-Encryption"];
+        "FSPIOP-Signature"?: components["parameters"]["FSPIOP-Signature"];
+        "FSPIOP-URI"?: components["parameters"]["FSPIOP-URI"];
+        "FSPIOP-HTTP-Method"?: components["parameters"]["FSPIOP-HTTP-Method"];
       };
     };
   };
-  '/thirdpartyRequests/transactions/{ID}/error': {
-    put: operations['ThirdpartyTransactionRequestsError'];
+  "/thirdpartyRequests/transactions/{ID}": {
+    get: operations["GetThirdpartyTransactionRequests"];
+    put: operations["UpdateThirdPartyTransactionRequests"];
+    patch: operations["NotifyThirdpartyTransactionRequests"];
+    parameters: {
+      path: {
+        ID: components["parameters"]["ID"];
+      };
+      header: {
+        Accept: components["parameters"]["Accept"];
+        Date: components["parameters"]["Date"];
+        "X-Forwarded-For"?: components["parameters"]["X-Forwarded-For"];
+        "FSPIOP-Source": components["parameters"]["FSPIOP-Source"];
+        "FSPIOP-Destination"?: components["parameters"]["FSPIOP-Destination"];
+        "FSPIOP-Encryption"?: components["parameters"]["FSPIOP-Encryption"];
+        "FSPIOP-Signature"?: components["parameters"]["FSPIOP-Signature"];
+        "FSPIOP-URI"?: components["parameters"]["FSPIOP-URI"];
+        "FSPIOP-HTTP-Method"?: components["parameters"]["FSPIOP-HTTP-Method"];
+      };
+    };
+  };
+  "/thirdpartyRequests/transactions/{ID}/error": {
+    put: operations["ThirdpartyTransactionRequestsError"];
+  };
+  "/services/{ServiceType}": {
+    get: operations["GetServicesByServiceType"];
+    put: operations["PutServicesByServiceType"];
+    parameters: {
+      path: {
+        ServiceType: components["parameters"]["ServiceType"];
+      };
+      header: {
+        Date: components["parameters"]["Date"];
+        "X-Forwarded-For"?: components["parameters"]["X-Forwarded-For"];
+        "FSPIOP-Source": components["parameters"]["FSPIOP-Source"];
+        "FSPIOP-Destination"?: components["parameters"]["FSPIOP-Destination"];
+        "FSPIOP-Encryption"?: components["parameters"]["FSPIOP-Encryption"];
+        "FSPIOP-Signature"?: components["parameters"]["FSPIOP-Signature"];
+        "FSPIOP-URI"?: components["parameters"]["FSPIOP-URI"];
+        "FSPIOP-HTTP-Method"?: components["parameters"]["FSPIOP-HTTP-Method"];
+      };
+    };
+  };
+  "/services/{ServiceType}/error": {
+    put: operations["PutServicesByServiceTypeAndError"];
+    parameters: {
+      path: {
+        ServiceType: components["parameters"]["ServiceType"];
+      };
+      header: {
+        "Content-Length"?: components["parameters"]["Content-Length"];
+        "Content-Type": components["parameters"]["Content-Type"];
+        Date: components["parameters"]["Date"];
+        "X-Forwarded-For"?: components["parameters"]["X-Forwarded-For"];
+        "FSPIOP-Source": components["parameters"]["FSPIOP-Source"];
+        "FSPIOP-Destination"?: components["parameters"]["FSPIOP-Destination"];
+        "FSPIOP-Encryption"?: components["parameters"]["FSPIOP-Encryption"];
+        "FSPIOP-Signature"?: components["parameters"]["FSPIOP-Signature"];
+        "FSPIOP-URI"?: components["parameters"]["FSPIOP-URI"];
+        "FSPIOP-HTTP-Method"?: components["parameters"]["FSPIOP-HTTP-Method"];
+      };
+    };
   };
 }
 
@@ -155,76 +194,76 @@ export interface operations {
   GetAccountsByUserId: {
     parameters: {
       header: {
-        Accept: components['parameters']['Accept'];
+        Accept: components["parameters"]["Accept"];
       };
     };
     responses: {
-      202: components['responses']['202'];
-      400: components['responses']['400'];
-      401: components['responses']['401'];
-      403: components['responses']['403'];
-      404: components['responses']['404'];
-      405: components['responses']['405'];
-      406: components['responses']['406'];
-      501: components['responses']['501'];
-      503: components['responses']['503'];
+      202: components["responses"]["202"];
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      405: components["responses"]["405"];
+      406: components["responses"]["406"];
+      501: components["responses"]["501"];
+      503: components["responses"]["503"];
     };
   };
   /** The HTTP request `PUT /accounts/{ID}` is used to return the list of potential accounts available for linking */
   UpdateAccountsByUserId: {
     parameters: {
       header: {
-        'Content-Length'?: components['parameters']['Content-Length'];
-        'Content-Type': components['parameters']['Content-Type'];
+        "Content-Length"?: components["parameters"]["Content-Length"];
+        "Content-Type": components["parameters"]["Content-Type"];
       };
     };
     requestBody: {
-      'application/json': components['schemas']['AccountsIDPutResponse'];
+      "application/json": components["schemas"]["AccountsIDPutResponse"];
     };
     responses: {
-      200: components['responses']['200'];
-      400: components['responses']['400'];
-      401: components['responses']['401'];
-      403: components['responses']['403'];
-      404: components['responses']['404'];
-      405: components['responses']['405'];
-      406: components['responses']['406'];
-      501: components['responses']['501'];
-      503: components['responses']['503'];
+      200: components["responses"]["200"];
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      405: components["responses"]["405"];
+      406: components["responses"]["406"];
+      501: components["responses"]["501"];
+      503: components["responses"]["503"];
     };
   };
   /** The HTTP request `PUT /accounts/{ID}/error` is used to return error information */
   UpdateAccountsByUserIdError: {
     requestBody: {
-      'application/json': components['schemas']['ErrorInformationObject'];
+      "application/json": components["schemas"]["ErrorInformationObject"];
     };
     responses: {
-      200: components['responses']['200'];
-      400: components['responses']['400'];
-      401: components['responses']['401'];
-      403: components['responses']['403'];
-      404: components['responses']['404'];
-      405: components['responses']['405'];
-      406: components['responses']['406'];
-      501: components['responses']['501'];
-      503: components['responses']['503'];
+      200: components["responses"]["200"];
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      405: components["responses"]["405"];
+      406: components["responses"]["406"];
+      501: components["responses"]["501"];
+      503: components["responses"]["503"];
     };
   };
   /** The HTTP request `POST /authorizations` is used to request the Payer to enter the applicable credentials in the PISP system. */
   AuthorizationsPostRequest: {
     requestBody: {
-      'application/json': components['schemas']['AuthorizationsPostRequest'];
+      "application/json": components["schemas"]["AuthorizationsPostRequest"];
     };
     responses: {
-      202: components['responses']['202'];
-      400: components['responses']['400'];
-      401: components['responses']['401'];
-      403: components['responses']['403'];
-      404: components['responses']['404'];
-      405: components['responses']['405'];
-      406: components['responses']['406'];
-      501: components['responses']['501'];
-      503: components['responses']['503'];
+      202: components["responses"]["202"];
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      405: components["responses"]["405"];
+      406: components["responses"]["406"];
+      501: components["responses"]["501"];
+      503: components["responses"]["503"];
     };
   };
   /**
@@ -241,48 +280,48 @@ export interface operations {
     responses: {
       /** information about result of required (via POST) /authorization */
       200: {
-        'application/json': components['schemas']['AuthorizationsIDPutResponse'];
+        "application/json": components["schemas"]["AuthorizationsIDPutResponse"];
       };
-      400: components['responses']['400'];
-      401: components['responses']['401'];
-      403: components['responses']['403'];
-      404: components['responses']['404'];
-      405: components['responses']['405'];
-      406: components['responses']['406'];
-      501: components['responses']['501'];
-      503: components['responses']['503'];
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      405: components["responses"]["405"];
+      406: components["responses"]["406"];
+      501: components["responses"]["501"];
+      503: components["responses"]["503"];
     };
   };
   /** A request from a PISP to a DFSP to start the process of delegating consent */
   CreateConsentRequest: {
     parameters: {
       header: {
-        Accept: components['parameters']['Accept'];
-        'Content-Length'?: components['parameters']['Content-Length'];
-        'Content-Type': components['parameters']['Content-Type'];
-        Date: components['parameters']['Date'];
-        'X-Forwarded-For'?: components['parameters']['X-Forwarded-For'];
-        'FSPIOP-Source': components['parameters']['FSPIOP-Source'];
-        'FSPIOP-Destination'?: components['parameters']['FSPIOP-Destination'];
-        'FSPIOP-Encryption'?: components['parameters']['FSPIOP-Encryption'];
-        'FSPIOP-Signature'?: components['parameters']['FSPIOP-Signature'];
-        'FSPIOP-URI'?: components['parameters']['FSPIOP-URI'];
-        'FSPIOP-HTTP-Method'?: components['parameters']['FSPIOP-HTTP-Method'];
+        Accept: components["parameters"]["Accept"];
+        "Content-Length"?: components["parameters"]["Content-Length"];
+        "Content-Type": components["parameters"]["Content-Type"];
+        Date: components["parameters"]["Date"];
+        "X-Forwarded-For"?: components["parameters"]["X-Forwarded-For"];
+        "FSPIOP-Source": components["parameters"]["FSPIOP-Source"];
+        "FSPIOP-Destination"?: components["parameters"]["FSPIOP-Destination"];
+        "FSPIOP-Encryption"?: components["parameters"]["FSPIOP-Encryption"];
+        "FSPIOP-Signature"?: components["parameters"]["FSPIOP-Signature"];
+        "FSPIOP-URI"?: components["parameters"]["FSPIOP-URI"];
+        "FSPIOP-HTTP-Method"?: components["parameters"]["FSPIOP-HTTP-Method"];
       };
     };
     requestBody: {
-      'application/json': components['schemas']['ConsentRequestsPostRequest'];
+      "application/json": components["schemas"]["ConsentRequestsPostRequest"];
     };
     responses: {
-      202: components['responses']['202'];
-      400: components['responses']['400'];
-      401: components['responses']['401'];
-      403: components['responses']['403'];
-      404: components['responses']['404'];
-      405: components['responses']['405'];
-      406: components['responses']['406'];
-      501: components['responses']['501'];
-      503: components['responses']['503'];
+      202: components["responses"]["202"];
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      405: components["responses"]["405"];
+      406: components["responses"]["406"];
+      501: components["responses"]["501"];
+      503: components["responses"]["503"];
     };
   };
   /**
@@ -293,172 +332,172 @@ export interface operations {
    */
   UpdateConsentRequest: {
     requestBody: {
-      'application/json':
-      | components['schemas']['ConsentRequestsIDPutResponseWeb']
-      | components['schemas']['ConsentRequestsIDPutResponseWebAuth']
-      | components['schemas']['ConsentRequestsIDPutResponseOTP']
-      | components['schemas']['ConsentRequestsIDPutResponseOTPAuth'];
+      "application/json":
+        | components["schemas"]["ConsentRequestsIDPutResponseWeb"]
+        | components["schemas"]["ConsentRequestsIDPutResponseWebAuth"]
+        | components["schemas"]["ConsentRequestsIDPutResponseOTP"]
+        | components["schemas"]["ConsentRequestsIDPutResponseOTPAuth"];
     };
     responses: {
-      202: components['responses']['202'];
-      400: components['responses']['400'];
-      401: components['responses']['401'];
-      403: components['responses']['403'];
-      404: components['responses']['404'];
-      405: components['responses']['405'];
-      406: components['responses']['406'];
-      501: components['responses']['501'];
-      503: components['responses']['503'];
+      202: components["responses"]["202"];
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      405: components["responses"]["405"];
+      406: components["responses"]["406"];
+      501: components["responses"]["501"];
+      503: components["responses"]["503"];
     };
   };
   /** PISP sends user's OTP token to a DFSP to verify user trusts aforementioned PISP */
   PatchConsentRequest: {
     requestBody: {
-      'application/json': components['schemas']['ConsentRequestsIDPatchRequest'];
+      "application/json": components["schemas"]["ConsentRequestsIDPatchRequest"];
     };
     responses: {
-      202: components['responses']['202'];
-      400: components['responses']['400'];
-      401: components['responses']['401'];
-      403: components['responses']['403'];
-      404: components['responses']['404'];
-      405: components['responses']['405'];
-      406: components['responses']['406'];
-      501: components['responses']['501'];
-      503: components['responses']['503'];
+      202: components["responses"]["202"];
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      405: components["responses"]["405"];
+      406: components["responses"]["406"];
+      501: components["responses"]["501"];
+      503: components["responses"]["503"];
     };
   };
   /** DFSP responds to the PISP if something went wrong with validating an OTP or secret. */
   NotifyErrorConsentRequests: {
     parameters: {
       path: {
-        ID: components['parameters']['ID'];
+        ID: components["parameters"]["ID"];
       };
       header: {
-        'Content-Length'?: components['parameters']['Content-Length'];
-        'Content-Type': components['parameters']['Content-Type'];
-        Date: components['parameters']['Date'];
-        'X-Forwarded-For'?: components['parameters']['X-Forwarded-For'];
-        'FSPIOP-Source': components['parameters']['FSPIOP-Source'];
-        'FSPIOP-Destination'?: components['parameters']['FSPIOP-Destination'];
-        'FSPIOP-Encryption'?: components['parameters']['FSPIOP-Encryption'];
-        'FSPIOP-Signature'?: components['parameters']['FSPIOP-Signature'];
-        'FSPIOP-URI'?: components['parameters']['FSPIOP-URI'];
-        'FSPIOP-HTTP-Method'?: components['parameters']['FSPIOP-HTTP-Method'];
+        "Content-Length"?: components["parameters"]["Content-Length"];
+        "Content-Type": components["parameters"]["Content-Type"];
+        Date: components["parameters"]["Date"];
+        "X-Forwarded-For"?: components["parameters"]["X-Forwarded-For"];
+        "FSPIOP-Source": components["parameters"]["FSPIOP-Source"];
+        "FSPIOP-Destination"?: components["parameters"]["FSPIOP-Destination"];
+        "FSPIOP-Encryption"?: components["parameters"]["FSPIOP-Encryption"];
+        "FSPIOP-Signature"?: components["parameters"]["FSPIOP-Signature"];
+        "FSPIOP-URI"?: components["parameters"]["FSPIOP-URI"];
+        "FSPIOP-HTTP-Method"?: components["parameters"]["FSPIOP-HTTP-Method"];
       };
     };
     requestBody: {
-      'application/json': components['schemas']['ErrorInformationObject'];
+      "application/json": components["schemas"]["ErrorInformationObject"];
     };
     responses: {
-      200: components['responses']['200'];
-      400: components['responses']['400'];
-      401: components['responses']['401'];
-      403: components['responses']['403'];
-      404: components['responses']['404'];
-      405: components['responses']['405'];
-      406: components['responses']['406'];
-      501: components['responses']['501'];
-      503: components['responses']['503'];
+      200: components["responses"]["200"];
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      405: components["responses"]["405"];
+      406: components["responses"]["406"];
+      501: components["responses"]["501"];
+      503: components["responses"]["503"];
     };
   };
   /** DFSP sends this request to the PISP after granting consent. */
   PostConsents: {
     parameters: {
       header: {
-        Accept: components['parameters']['Accept'];
-        'Content-Length'?: components['parameters']['Content-Length'];
-        'Content-Type': components['parameters']['Content-Type'];
-        Date: components['parameters']['Date'];
-        'X-Forwarded-For'?: components['parameters']['X-Forwarded-For'];
-        'FSPIOP-Source': components['parameters']['FSPIOP-Source'];
-        'FSPIOP-Destination'?: components['parameters']['FSPIOP-Destination'];
-        'FSPIOP-Encryption'?: components['parameters']['FSPIOP-Encryption'];
-        'FSPIOP-Signature'?: components['parameters']['FSPIOP-Signature'];
-        'FSPIOP-URI'?: components['parameters']['FSPIOP-URI'];
-        'FSPIOP-HTTP-Method'?: components['parameters']['FSPIOP-HTTP-Method'];
+        Accept: components["parameters"]["Accept"];
+        "Content-Length"?: components["parameters"]["Content-Length"];
+        "Content-Type": components["parameters"]["Content-Type"];
+        Date: components["parameters"]["Date"];
+        "X-Forwarded-For"?: components["parameters"]["X-Forwarded-For"];
+        "FSPIOP-Source": components["parameters"]["FSPIOP-Source"];
+        "FSPIOP-Destination"?: components["parameters"]["FSPIOP-Destination"];
+        "FSPIOP-Encryption"?: components["parameters"]["FSPIOP-Encryption"];
+        "FSPIOP-Signature"?: components["parameters"]["FSPIOP-Signature"];
+        "FSPIOP-URI"?: components["parameters"]["FSPIOP-URI"];
+        "FSPIOP-HTTP-Method"?: components["parameters"]["FSPIOP-HTTP-Method"];
       };
     };
     requestBody: {
-      'application/json': components['schemas']['ConsentsPostRequest'];
+      "application/json": components["schemas"]["ConsentsPostRequest"];
     };
     responses: {
-      202: components['responses']['202'];
-      400: components['responses']['400'];
-      401: components['responses']['401'];
-      403: components['responses']['403'];
-      404: components['responses']['404'];
-      405: components['responses']['405'];
-      406: components['responses']['406'];
-      501: components['responses']['501'];
-      503: components['responses']['503'];
+      202: components["responses"]["202"];
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      405: components["responses"]["405"];
+      406: components["responses"]["406"];
+      501: components["responses"]["501"];
+      503: components["responses"]["503"];
     };
   };
   /** The HTTP request GET /health is used to return the current status of the API. */
   HealthGet: {
     responses: {
-      200: components['responses']['200'];
-      400: components['responses']['400'];
-      401: components['responses']['401'];
-      403: components['responses']['403'];
-      404: components['responses']['404'];
-      405: components['responses']['405'];
-      406: components['responses']['406'];
-      501: components['responses']['501'];
-      503: components['responses']['503'];
+      200: components["responses"]["200"];
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      405: components["responses"]["405"];
+      406: components["responses"]["406"];
+      501: components["responses"]["501"];
+      503: components["responses"]["503"];
     };
   };
   /** The HTTP request GET /metrics is used to return metrics for the API. */
   MetricsGet: {
     responses: {
-      200: components['responses']['200'];
-      400: components['responses']['400'];
-      401: components['responses']['401'];
-      403: components['responses']['403'];
-      404: components['responses']['404'];
-      405: components['responses']['405'];
-      406: components['responses']['406'];
-      501: components['responses']['501'];
-      503: components['responses']['503'];
+      200: components["responses"]["200"];
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      405: components["responses"]["405"];
+      406: components["responses"]["406"];
+      501: components["responses"]["501"];
+      503: components["responses"]["503"];
     };
   };
   /** The HTTP request POST `/thirdpartyRequests/transactions` is used by a PISP to initiate a 3rd party Transaction request with a DFSP */
   CreateThirdpartyTransactionRequests: {
     requestBody: {
-      'application/json': components['schemas']['ThirdpartyRequestsTransactionsPostRequest'];
+      "application/json": components["schemas"]["ThirdpartyRequestsTransactionsPostRequest"];
     };
     responses: {
-      202: components['responses']['202'];
-      400: components['responses']['400'];
-      401: components['responses']['401'];
-      403: components['responses']['403'];
-      404: components['responses']['404'];
-      405: components['responses']['405'];
-      406: components['responses']['406'];
-      501: components['responses']['501'];
-      503: components['responses']['503'];
+      202: components["responses"]["202"];
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      405: components["responses"]["405"];
+      406: components["responses"]["406"];
+      501: components["responses"]["501"];
+      503: components["responses"]["503"];
     };
   };
   /** The HTTP request `POST /thirdpartyRequests/transactions/{id}/authorizations` is used by the DFSP to verify a third party authorization. */
   VerifyThirdPartyAuthorization: {
     parameters: {
       header: {
-        Accept: components['parameters']['Accept'];
+        Accept: components["parameters"]["Accept"];
       };
     };
     requestBody: {
-      'application/json': components['schemas']['ThirdpartyRequestsTransactionsIDAuthorizationsPostRequest'];
+      "application/json": components["schemas"]["ThirdpartyRequestsTransactionsIDAuthorizationsPostRequest"];
     };
     responses: {
-      202: components['responses']['202'];
-      400: components['responses']['400'];
-      401: components['responses']['401'];
-      403: components['responses']['403'];
-      404: components['responses']['404'];
-      405: components['responses']['405'];
-      406: components['responses']['406'];
-      501: components['responses']['501'];
-      503: components['responses']['503'];
+      202: components["responses"]["202"];
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      405: components["responses"]["405"];
+      406: components["responses"]["406"];
+      501: components["responses"]["501"];
+      503: components["responses"]["503"];
     };
   };
   /**
@@ -467,18 +506,18 @@ export interface operations {
    */
   UpdateThirdpartyAuthorization: {
     requestBody: {
-      'application/json': components['schemas']['ThirdpartyRequestsTransactionsIDAuthorizationsPutResponse'];
+      "application/json": components["schemas"]["ThirdpartyRequestsTransactionsIDAuthorizationsPutResponse"];
     };
     responses: {
-      200: components['responses']['200'];
-      400: components['responses']['400'];
-      401: components['responses']['401'];
-      403: components['responses']['403'];
-      404: components['responses']['404'];
-      405: components['responses']['405'];
-      406: components['responses']['406'];
-      501: components['responses']['501'];
-      503: components['responses']['503'];
+      200: components["responses"]["200"];
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      405: components["responses"]["405"];
+      406: components["responses"]["406"];
+      501: components["responses"]["501"];
+      503: components["responses"]["503"];
     };
   };
   /**
@@ -487,15 +526,15 @@ export interface operations {
    */
   GetThirdpartyTransactionRequests: {
     responses: {
-      202: components['responses']['202'];
-      400: components['responses']['400'];
-      401: components['responses']['401'];
-      403: components['responses']['403'];
-      404: components['responses']['404'];
-      405: components['responses']['405'];
-      406: components['responses']['406'];
-      501: components['responses']['501'];
-      503: components['responses']['503'];
+      202: components["responses"]["202"];
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      405: components["responses"]["405"];
+      406: components["responses"]["406"];
+      501: components["responses"]["501"];
+      503: components["responses"]["503"];
     };
   };
   /**
@@ -507,23 +546,23 @@ export interface operations {
   UpdateThirdPartyTransactionRequests: {
     parameters: {
       header: {
-        'Content-Length'?: components['parameters']['Content-Length'];
-        'Content-Type': components['parameters']['Content-Type'];
+        "Content-Length"?: components["parameters"]["Content-Length"];
+        "Content-Type": components["parameters"]["Content-Type"];
       };
     };
     requestBody: {
-      'application/json': components['schemas']['ThirdpartyRequestsTransactionsIDPutResponse'];
+      "application/json": components["schemas"]["ThirdpartyRequestsTransactionsIDPutResponse"];
     };
     responses: {
-      200: components['responses']['200'];
-      400: components['responses']['400'];
-      401: components['responses']['401'];
-      403: components['responses']['403'];
-      404: components['responses']['404'];
-      405: components['responses']['405'];
-      406: components['responses']['406'];
-      501: components['responses']['501'];
-      503: components['responses']['503'];
+      200: components["responses"]["200"];
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      405: components["responses"]["405"];
+      406: components["responses"]["406"];
+      501: components["responses"]["501"];
+      503: components["responses"]["503"];
     };
   };
   /**
@@ -535,23 +574,23 @@ export interface operations {
   NotifyThirdpartyTransactionRequests: {
     parameters: {
       header: {
-        'Content-Length'?: components['parameters']['Content-Length'];
-        'Content-Type': components['parameters']['Content-Type'];
+        "Content-Length"?: components["parameters"]["Content-Length"];
+        "Content-Type": components["parameters"]["Content-Type"];
       };
     };
     requestBody: {
-      'application/json': components['schemas']['ThirdpartyRequestsTransactionsIDPatchResponse'];
+      "application/json": components["schemas"]["ThirdpartyRequestsTransactionsIDPatchResponse"];
     };
     responses: {
-      200: components['responses']['200'];
-      400: components['responses']['400'];
-      401: components['responses']['401'];
-      403: components['responses']['403'];
-      404: components['responses']['404'];
-      405: components['responses']['405'];
-      406: components['responses']['406'];
-      501: components['responses']['501'];
-      503: components['responses']['503'];
+      200: components["responses"]["200"];
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      405: components["responses"]["405"];
+      406: components["responses"]["406"];
+      501: components["responses"]["501"];
+      503: components["responses"]["503"];
     };
   };
   /**
@@ -563,34 +602,99 @@ export interface operations {
   ThirdpartyTransactionRequestsError: {
     parameters: {
       path: {
-        ID: components['parameters']['ID'];
+        ID: components["parameters"]["ID"];
       };
       header: {
-        'Content-Length'?: components['parameters']['Content-Length'];
-        'Content-Type': components['parameters']['Content-Type'];
-        Date: components['parameters']['Date'];
-        'X-Forwarded-For'?: components['parameters']['X-Forwarded-For'];
-        'FSPIOP-Source': components['parameters']['FSPIOP-Source'];
-        'FSPIOP-Destination'?: components['parameters']['FSPIOP-Destination'];
-        'FSPIOP-Encryption'?: components['parameters']['FSPIOP-Encryption'];
-        'FSPIOP-Signature'?: components['parameters']['FSPIOP-Signature'];
-        'FSPIOP-URI'?: components['parameters']['FSPIOP-URI'];
-        'FSPIOP-HTTP-Method'?: components['parameters']['FSPIOP-HTTP-Method'];
+        "Content-Length"?: components["parameters"]["Content-Length"];
+        "Content-Type": components["parameters"]["Content-Type"];
+        Date: components["parameters"]["Date"];
+        "X-Forwarded-For"?: components["parameters"]["X-Forwarded-For"];
+        "FSPIOP-Source": components["parameters"]["FSPIOP-Source"];
+        "FSPIOP-Destination"?: components["parameters"]["FSPIOP-Destination"];
+        "FSPIOP-Encryption"?: components["parameters"]["FSPIOP-Encryption"];
+        "FSPIOP-Signature"?: components["parameters"]["FSPIOP-Signature"];
+        "FSPIOP-URI"?: components["parameters"]["FSPIOP-URI"];
+        "FSPIOP-HTTP-Method"?: components["parameters"]["FSPIOP-HTTP-Method"];
       };
     };
     requestBody: {
-      'application/json': components['schemas']['ErrorInformationObject'];
+      "application/json": components["schemas"]["ErrorInformationObject"];
     };
     responses: {
-      200: components['responses']['200'];
-      400: components['responses']['400'];
-      401: components['responses']['401'];
-      403: components['responses']['403'];
-      404: components['responses']['404'];
-      405: components['responses']['405'];
-      406: components['responses']['406'];
-      501: components['responses']['501'];
-      503: components['responses']['503'];
+      200: components["responses"]["200"];
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      405: components["responses"]["405"];
+      406: components["responses"]["406"];
+      501: components["responses"]["501"];
+      503: components["responses"]["503"];
+    };
+  };
+  /**
+   * The HTTP request `GET /services/{ServiceType}` is used to retrieve the list of participants
+   * that support a specified service.
+   */
+  GetServicesByServiceType: {
+    parameters: {
+      header: {
+        Accept: components["parameters"]["Accept"];
+      };
+    };
+    responses: {
+      202: components["responses"]["202"];
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      405: components["responses"]["405"];
+      406: components["responses"]["406"];
+      501: components["responses"]["501"];
+      503: components["responses"]["503"];
+    };
+  };
+  /**
+   * The HTTP request `PUT /services/{ServiceType}` is used to return list of participants
+   * that support a specified service.
+   */
+  PutServicesByServiceType: {
+    parameters: {
+      header: {
+        "Content-Length"?: components["parameters"]["Content-Length"];
+        "Content-Type": components["parameters"]["Content-Type"];
+      };
+    };
+    requestBody: {
+      "application/json": components["schemas"]["ServicesServiceTypePutResponse"];
+    };
+    responses: {
+      200: components["responses"]["200"];
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      405: components["responses"]["405"];
+      406: components["responses"]["406"];
+      501: components["responses"]["501"];
+      503: components["responses"]["503"];
+    };
+  };
+  /** The HTTP request `PUT /services/{ServiceType}/error` is used to return error information */
+  PutServicesByServiceTypeAndError: {
+    requestBody: {
+      "application/json": components["schemas"]["ErrorInformationObject"];
+    };
+    responses: {
+      200: components["responses"]["200"];
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      405: components["responses"]["405"];
+      406: components["responses"]["406"];
+      501: components["responses"]["501"];
+      503: components["responses"]["503"];
     };
   };
 }
@@ -606,19 +710,19 @@ export interface components {
      *
      * **Note:** An alternative to `X-Forwarded-For` is defined in [RFC 7239](https://tools.ietf.org/html/rfc7239). However, to this point RFC 7239 is less-used and supported than `X-Forwarded-For`.
      */
-    'X-Forwarded-For': string;
+    "X-Forwarded-For": string;
     /** The `FSPIOP-Source` header field is a non-HTTP standard field used by the API for identifying the sender of the HTTP request. The field should be set by the original sender of the request. Required for routing and signature verification (see header field `FSPIOP-Signature`). */
-    'FSPIOP-Source': string;
+    "FSPIOP-Source": string;
     /** The `FSPIOP-Destination` header field is a non-HTTP standard field used by the API for HTTP header based routing of requests and responses to the destination. The field must be set by the original sender of the request if the destination is known (valid for all services except GET /parties) so that any entities between the client and the server do not need to parse the payload for routing purposes. If the destination is not known (valid for service GET /parties), the field should be left empty. */
-    'FSPIOP-Destination': string;
+    "FSPIOP-Destination": string;
     /** The `FSPIOP-Encryption` header field is a non-HTTP standard field used by the API for applying end-to-end encryption of the request. */
-    'FSPIOP-Encryption': string;
+    "FSPIOP-Encryption": string;
     /** The `FSPIOP-Signature` header field is a non-HTTP standard field used by the API for applying an end-to-end request signature. */
-    'FSPIOP-Signature': string;
+    "FSPIOP-Signature": string;
     /** The `FSPIOP-URI` header field is a non-HTTP standard field used by the API for signature verification, should contain the service URI. Required if signature verification is used, for more information, see [the API Signature document](https://github.com/mojaloop/docs/tree/master/Specification%20Document%20Set). */
-    'FSPIOP-URI': string;
+    "FSPIOP-URI": string;
     /** The `FSPIOP-HTTP-Method` header field is a non-HTTP standard field used by the API for signature verification, should contain the service HTTP method. Required if signature verification is used, for more information, see [the API Signature document](https://github.com/mojaloop/docs/tree/master/Specification%20Document%20Set). */
-    'FSPIOP-HTTP-Method': string;
+    "FSPIOP-HTTP-Method": string;
     /** The `Accept` header field indicates the version of the API the client would like the server to use. */
     Accept: string;
     /**
@@ -626,9 +730,11 @@ export interface components {
      *
      * **Note:** The API supports a maximum size of 5242880 bytes (5 Megabytes).
      */
-    'Content-Length': number;
+    "Content-Length": number;
     /** The `Content-Type` header indicates the specific version of the API used to send the payload body. */
-    'Content-Type': string;
+    "Content-Type": string;
+    /** The type of the service identifier. For example, `THIRD_PARTY_DFSP` */
+    ServiceType: string;
   };
   schemas: {
     /** The API data type ErrorCode is a JSON String of four characters, consisting of digits only. Negative numbers are not allowed. A leading zero is not allowed. Each error code in the API is a four-digit number, for example, 1234, where the first number (1 in the example) represents the high-level error category, the second number (2 in the example) represents the low-level error category, and the last two numbers (34 in the example) represent the specific error. */
@@ -641,23 +747,23 @@ export interface components {
     ExtensionValue: string;
     /** Data model for the complex type Extension. */
     Extension: {
-      key: components['schemas']['ExtensionKey'];
-      value: components['schemas']['ExtensionValue'];
+      key: components["schemas"]["ExtensionKey"];
+      value: components["schemas"]["ExtensionValue"];
     };
     /** Data model for the complex type ExtensionList. An optional list of extensions, specific to deployment. */
     ExtensionList: {
       /** Number of Extension elements. */
-      extension: components['schemas']['Extension'][];
+      extension: components["schemas"]["Extension"][];
     };
     /** Data model for the complex type ErrorInformation. */
     ErrorInformation: {
-      errorCode: components['schemas']['ErrorCode'];
-      errorDescription: components['schemas']['ErrorDescription'];
-      extensionList?: components['schemas']['ExtensionList'];
+      errorCode: components["schemas"]["ErrorCode"];
+      errorDescription: components["schemas"]["ErrorDescription"];
+      extensionList?: components["schemas"]["ExtensionList"];
     };
     /** Data model for the complex type object that contains an optional element ErrorInformation used along with 4xx and 5xx responses. */
     ErrorInformationResponse: {
-      errorInformation?: components['schemas']['ErrorInformation'];
+      errorInformation?: components["schemas"]["ErrorInformation"];
     };
     /**
      * A long-lived unique account identifier provided by the DFSP. This MUST NOT
@@ -667,176 +773,176 @@ export interface components {
     AccountAddress: string;
     /** The currency codes defined in [ISO 4217](https://www.iso.org/iso-4217-currency-codes.html) as three-letter alphabetic codes are used as the standard naming representation for currencies. */
     Currency:
-    | 'AED'
-    | 'AFN'
-    | 'ALL'
-    | 'AMD'
-    | 'ANG'
-    | 'AOA'
-    | 'ARS'
-    | 'AUD'
-    | 'AWG'
-    | 'AZN'
-    | 'BAM'
-    | 'BBD'
-    | 'BDT'
-    | 'BGN'
-    | 'BHD'
-    | 'BIF'
-    | 'BMD'
-    | 'BND'
-    | 'BOB'
-    | 'BRL'
-    | 'BSD'
-    | 'BTN'
-    | 'BWP'
-    | 'BYN'
-    | 'BZD'
-    | 'CAD'
-    | 'CDF'
-    | 'CHF'
-    | 'CLP'
-    | 'CNY'
-    | 'COP'
-    | 'CRC'
-    | 'CUC'
-    | 'CUP'
-    | 'CVE'
-    | 'CZK'
-    | 'DJF'
-    | 'DKK'
-    | 'DOP'
-    | 'DZD'
-    | 'EGP'
-    | 'ERN'
-    | 'ETB'
-    | 'EUR'
-    | 'FJD'
-    | 'FKP'
-    | 'GBP'
-    | 'GEL'
-    | 'GGP'
-    | 'GHS'
-    | 'GIP'
-    | 'GMD'
-    | 'GNF'
-    | 'GTQ'
-    | 'GYD'
-    | 'HKD'
-    | 'HNL'
-    | 'HRK'
-    | 'HTG'
-    | 'HUF'
-    | 'IDR'
-    | 'ILS'
-    | 'IMP'
-    | 'INR'
-    | 'IQD'
-    | 'IRR'
-    | 'ISK'
-    | 'JEP'
-    | 'JMD'
-    | 'JOD'
-    | 'JPY'
-    | 'KES'
-    | 'KGS'
-    | 'KHR'
-    | 'KMF'
-    | 'KPW'
-    | 'KRW'
-    | 'KWD'
-    | 'KYD'
-    | 'KZT'
-    | 'LAK'
-    | 'LBP'
-    | 'LKR'
-    | 'LRD'
-    | 'LSL'
-    | 'LYD'
-    | 'MAD'
-    | 'MDL'
-    | 'MGA'
-    | 'MKD'
-    | 'MMK'
-    | 'MNT'
-    | 'MOP'
-    | 'MRO'
-    | 'MUR'
-    | 'MVR'
-    | 'MWK'
-    | 'MXN'
-    | 'MYR'
-    | 'MZN'
-    | 'NAD'
-    | 'NGN'
-    | 'NIO'
-    | 'NOK'
-    | 'NPR'
-    | 'NZD'
-    | 'OMR'
-    | 'PAB'
-    | 'PEN'
-    | 'PGK'
-    | 'PHP'
-    | 'PKR'
-    | 'PLN'
-    | 'PYG'
-    | 'QAR'
-    | 'RON'
-    | 'RSD'
-    | 'RUB'
-    | 'RWF'
-    | 'SAR'
-    | 'SBD'
-    | 'SCR'
-    | 'SDG'
-    | 'SEK'
-    | 'SGD'
-    | 'SHP'
-    | 'SLL'
-    | 'SOS'
-    | 'SPL'
-    | 'SRD'
-    | 'STD'
-    | 'SVC'
-    | 'SYP'
-    | 'SZL'
-    | 'THB'
-    | 'TJS'
-    | 'TMT'
-    | 'TND'
-    | 'TOP'
-    | 'TRY'
-    | 'TTD'
-    | 'TVD'
-    | 'TWD'
-    | 'TZS'
-    | 'UAH'
-    | 'UGX'
-    | 'USD'
-    | 'UYU'
-    | 'UZS'
-    | 'VEF'
-    | 'VND'
-    | 'VUV'
-    | 'WST'
-    | 'XAF'
-    | 'XCD'
-    | 'XDR'
-    | 'XOF'
-    | 'XPF'
-    | 'YER'
-    | 'ZAR'
-    | 'ZMW'
-    | 'ZWD';
+      | "AED"
+      | "AFN"
+      | "ALL"
+      | "AMD"
+      | "ANG"
+      | "AOA"
+      | "ARS"
+      | "AUD"
+      | "AWG"
+      | "AZN"
+      | "BAM"
+      | "BBD"
+      | "BDT"
+      | "BGN"
+      | "BHD"
+      | "BIF"
+      | "BMD"
+      | "BND"
+      | "BOB"
+      | "BRL"
+      | "BSD"
+      | "BTN"
+      | "BWP"
+      | "BYN"
+      | "BZD"
+      | "CAD"
+      | "CDF"
+      | "CHF"
+      | "CLP"
+      | "CNY"
+      | "COP"
+      | "CRC"
+      | "CUC"
+      | "CUP"
+      | "CVE"
+      | "CZK"
+      | "DJF"
+      | "DKK"
+      | "DOP"
+      | "DZD"
+      | "EGP"
+      | "ERN"
+      | "ETB"
+      | "EUR"
+      | "FJD"
+      | "FKP"
+      | "GBP"
+      | "GEL"
+      | "GGP"
+      | "GHS"
+      | "GIP"
+      | "GMD"
+      | "GNF"
+      | "GTQ"
+      | "GYD"
+      | "HKD"
+      | "HNL"
+      | "HRK"
+      | "HTG"
+      | "HUF"
+      | "IDR"
+      | "ILS"
+      | "IMP"
+      | "INR"
+      | "IQD"
+      | "IRR"
+      | "ISK"
+      | "JEP"
+      | "JMD"
+      | "JOD"
+      | "JPY"
+      | "KES"
+      | "KGS"
+      | "KHR"
+      | "KMF"
+      | "KPW"
+      | "KRW"
+      | "KWD"
+      | "KYD"
+      | "KZT"
+      | "LAK"
+      | "LBP"
+      | "LKR"
+      | "LRD"
+      | "LSL"
+      | "LYD"
+      | "MAD"
+      | "MDL"
+      | "MGA"
+      | "MKD"
+      | "MMK"
+      | "MNT"
+      | "MOP"
+      | "MRO"
+      | "MUR"
+      | "MVR"
+      | "MWK"
+      | "MXN"
+      | "MYR"
+      | "MZN"
+      | "NAD"
+      | "NGN"
+      | "NIO"
+      | "NOK"
+      | "NPR"
+      | "NZD"
+      | "OMR"
+      | "PAB"
+      | "PEN"
+      | "PGK"
+      | "PHP"
+      | "PKR"
+      | "PLN"
+      | "PYG"
+      | "QAR"
+      | "RON"
+      | "RSD"
+      | "RUB"
+      | "RWF"
+      | "SAR"
+      | "SBD"
+      | "SCR"
+      | "SDG"
+      | "SEK"
+      | "SGD"
+      | "SHP"
+      | "SLL"
+      | "SOS"
+      | "SPL"
+      | "SRD"
+      | "STD"
+      | "SVC"
+      | "SYP"
+      | "SZL"
+      | "THB"
+      | "TJS"
+      | "TMT"
+      | "TND"
+      | "TOP"
+      | "TRY"
+      | "TTD"
+      | "TVD"
+      | "TWD"
+      | "TZS"
+      | "UAH"
+      | "UGX"
+      | "USD"
+      | "UYU"
+      | "UZS"
+      | "VEF"
+      | "VND"
+      | "VUV"
+      | "WST"
+      | "XAF"
+      | "XCD"
+      | "XDR"
+      | "XOF"
+      | "XPF"
+      | "YER"
+      | "ZAR"
+      | "ZMW"
+      | "ZWD";
     AccountsIDPutResponse: {
-      accountNickname: components['schemas']['AccountAddress'];
-      id: components['schemas']['AccountAddress'];
-      currency: components['schemas']['Currency'];
+      accountNickname: components["schemas"]["AccountAddress"];
+      id: components["schemas"]["AccountAddress"];
+      currency: components["schemas"]["Currency"];
     }[];
     /** Data model for the complex type object that contains ErrorInformation. */
     ErrorInformationObject: {
-      errorInformation: components['schemas']['ErrorInformation'];
+      errorInformation: components["schemas"]["ErrorInformation"];
     };
     /**
      * Below are the allowed values for the enumeration AuthenticationType.
@@ -844,15 +950,15 @@ export interface components {
      * - QRCODE - QR code used as One Time Password.
      * - U2F - U2F is a new addition isolated to Thirdparty stream.
      */
-    AuthenticationType: 'OTP' | 'QRCODE' | 'U2F';
+    AuthenticationType: "OTP" | "QRCODE" | "U2F";
     /** The API data type Integer is a JSON String consisting of digits only. Negative numbers and leading zeroes are not allowed. The data type is always limited to a specific number of digits. */
     Integer: string;
     /** The API data type Amount is a JSON String in a canonical format that is restricted by a regular expression for interoperability reasons. This pattern does not allow any trailing zeroes at all, but allows an amount without a minor currency unit. It also only allows four digits in the minor currency unit; a negative value is not allowed. Using more than 18 digits in the major currency unit is not allowed. */
     Amount: string;
     /** Data model for the complex type Money. */
     Money: {
-      currency: components['schemas']['Currency'];
-      amount: components['schemas']['Amount'];
+      currency: components["schemas"]["Currency"];
+      amount: components["schemas"]["Amount"];
     };
     /** Identifier that correlates all messages of the same sequence. The API data type UUID (Universally Unique Identifier) is a JSON String in canonical format, conforming to [RFC 4122](https://tools.ietf.org/html/rfc4122), that is restricted by a regular expression for interoperability reasons. A UUID is always 36 characters long, 32 hexadecimal symbols and 4 dashes (‘-‘). */
     CorrelationId: string;
@@ -864,8 +970,8 @@ export interface components {
     Longitude: string;
     /** Data model for the complex type GeoCode. Indicates the geographic location from where the transaction was initiated. */
     GeoCode: {
-      latitude: components['schemas']['Latitude'];
-      longitude: components['schemas']['Longitude'];
+      latitude: components["schemas"]["Latitude"];
+      longitude: components["schemas"]["Longitude"];
     };
     /** Information for recipient (transport layer information). */
     IlpPacket: string;
@@ -873,24 +979,24 @@ export interface components {
     IlpCondition: string;
     /** The object sent in the PUT /quotes/{ID} callback. */
     QuotesIDPutResponse: {
-      transferAmount: components['schemas']['Money'];
-      payeeReceiveAmount?: components['schemas']['Money'];
-      payeeFspFee?: components['schemas']['Money'];
-      payeeFspCommission?: components['schemas']['Money'];
-      expiration: components['schemas']['DateTime'];
-      geoCode?: components['schemas']['GeoCode'];
-      ilpPacket: components['schemas']['IlpPacket'];
-      condition: components['schemas']['IlpCondition'];
-      extensionList?: components['schemas']['ExtensionList'];
+      transferAmount: components["schemas"]["Money"];
+      payeeReceiveAmount?: components["schemas"]["Money"];
+      payeeFspFee?: components["schemas"]["Money"];
+      payeeFspCommission?: components["schemas"]["Money"];
+      expiration: components["schemas"]["DateTime"];
+      geoCode?: components["schemas"]["GeoCode"];
+      ilpPacket: components["schemas"]["IlpPacket"];
+      condition: components["schemas"]["IlpCondition"];
+      extensionList?: components["schemas"]["ExtensionList"];
     };
     /** POST /authorizations request object. */
     AuthorizationsPostRequest: {
-      authenticationType: components['schemas']['AuthenticationType'];
-      retriesLeft: components['schemas']['Integer'];
-      amount: components['schemas']['Money'];
-      transactionId: components['schemas']['CorrelationId'];
-      transactionRequestId: components['schemas']['CorrelationId'];
-      quote: components['schemas']['QuotesIDPutResponse'];
+      authenticationType: components["schemas"]["AuthenticationType"];
+      retriesLeft: components["schemas"]["Integer"];
+      amount: components["schemas"]["Money"];
+      transactionId: components["schemas"]["CorrelationId"];
+      transactionRequestId: components["schemas"]["CorrelationId"];
+      quote: components["schemas"]["QuotesIDPutResponse"];
     };
     /** The API data type OtpValue is a JSON String of 3 to 10 characters, consisting of digits only. Negative numbers are not allowed. One or more leading zeros are allowed. */
     OtpValue: string;
@@ -901,18 +1007,18 @@ export interface components {
     /** U2F challenge-response, where payer FSP verifies if the response provided by end-user device matches the previously registered key. */
     U2FPinValue: {
       /** U2F challenge-response. */
-      pinValue: components['schemas']['U2FPIN'];
+      pinValue: components["schemas"]["U2FPIN"];
       /** Sequential counter used for cloning detection. Present only for U2F authentication. */
-      counter: components['schemas']['Integer'];
+      counter: components["schemas"]["Integer"];
     };
     /** Contains the authentication value. The format depends on the authentication type used in the AuthenticationInfo complex type. */
-    AuthenticationValue: Partial<components['schemas']['OtpValue']> &
-    Partial<components['schemas']['QRCODE']> &
-    Partial<components['schemas']['U2FPinValue']>;
+    AuthenticationValue: Partial<components["schemas"]["OtpValue"]> &
+      Partial<components["schemas"]["QRCODE"]> &
+      Partial<components["schemas"]["U2FPinValue"]>;
     /** Data model for the complex type AuthenticationInfo. */
     AuthenticationInfo: {
-      authentication: components['schemas']['AuthenticationType'];
-      authenticationValue: components['schemas']['AuthenticationValue'];
+      authentication: components["schemas"]["AuthenticationType"];
+      authenticationValue: components["schemas"]["AuthenticationValue"];
     };
     /**
      * Below are the allowed values for the enumeration.
@@ -920,41 +1026,41 @@ export interface components {
      * - REJECTED - Consumer rejected the transaction.
      * - RESEND - Consumer requested to resend the authentication value.
      */
-    AuthorizationResponse: 'ENTERED' | 'REJECTED' | 'RESEND';
+    AuthorizationResponse: "ENTERED" | "REJECTED" | "RESEND";
     /** The object sent in the PUT /authorizations/{ID} callback. */
     AuthorizationsIDPutResponse: {
-      authenticationInfo?: components['schemas']['AuthenticationInfo'];
-      responseType: components['schemas']['AuthorizationResponse'];
+      authenticationInfo?: components["schemas"]["AuthenticationInfo"];
+      responseType: components["schemas"]["AuthorizationResponse"];
     };
     /**
      * The scopes requested for a ConsentRequest.
      * - "accounts.getBalance" - Get the balance of a given account.
      * - "accounts.transfer" - Initiate a transfer from an account.
      */
-    ConsentScopeType: 'accounts.getBalance' | 'accounts.transfer';
+    ConsentScopeType: "accounts.getBalance" | "accounts.transfer";
     /** Scope + Account Identifier mapping for a Consent. */
     Scope: {
-      accountId: components['schemas']['AccountAddress'];
-      actions: components['schemas']['ConsentScopeType'][];
+      accountId: components["schemas"]["AccountAddress"];
+      actions: components["schemas"]["ConsentScopeType"][];
     };
     /**
      * The auth channel being used for the consentRequest.
      * - "WEB" - The Web auth channel.
      * - "OTP" - The OTP auth channel.
      */
-    ConsentRequestChannelType: 'WEB' | 'OTP';
+    ConsentRequestChannelType: "WEB" | "OTP";
     /** The object sent in a `POST /consentRequests` request. */
     ConsentRequestsPostRequest: {
-      id: components['schemas']['CorrelationId'];
+      id: components["schemas"]["CorrelationId"];
       /** The id of the PISP who will initiate transactions on a user's behalf. */
       initiatorId: string;
-      scopes: components['schemas']['Scope'][];
-      authChannels: components['schemas']['ConsentRequestChannelType'][];
+      scopes: components["schemas"]["Scope"][];
+      authChannels: components["schemas"]["ConsentRequestChannelType"][];
       /** The callback uri that the user will be redirected to after completing the WEB auth channel. */
       callbackUri: string;
     };
     /** The web auth channel being used for PUT consentRequest/{ID} request. */
-    ConsentRequestChannelTypeWeb: 'WEB';
+    ConsentRequestChannelTypeWeb: "WEB";
     /**
      * The object sent in a `PUT /consentRequests/{ID}` request.
      *
@@ -966,8 +1072,8 @@ export interface components {
     ConsentRequestsIDPutResponseWeb: {
       /** The id of the PISP who will initiate transactions on a user's behalf. */
       initiatorId: string;
-      scopes: components['schemas']['Scope'][];
-      authChannels: components['schemas']['ConsentRequestChannelTypeWeb'][];
+      scopes: components["schemas"]["Scope"][];
+      authChannels: components["schemas"]["ConsentRequestChannelTypeWeb"][];
       /** The callback uri that the user will be redirected to after completing the WEB auth channel. */
       callbackUri: string;
       /** The callback uri that the pisp app redirects to for user to complete their login. */
@@ -983,8 +1089,8 @@ export interface components {
     ConsentRequestsIDPutResponseWebAuth: {
       /** The id of the PISP who will initiate transactions on a user's behalf. */
       initiatorId: string;
-      scopes: components['schemas']['Scope'][];
-      authChannels: components['schemas']['ConsentRequestChannelTypeWeb'][];
+      scopes: components["schemas"]["Scope"][];
+      authChannels: components["schemas"]["ConsentRequestChannelTypeWeb"][];
       /** The callback uri that the user will be redirected to after completing the WEB auth channel. */
       callbackUri: string;
       /** The callback uri that the pisp app redirects to for user to complete their login. */
@@ -993,7 +1099,7 @@ export interface components {
       authToken: string;
     };
     /** The OTP auth channel being used for PUT consentRequest/{ID} request. */
-    ConsentRequestChannelTypeOTP: 'OTP';
+    ConsentRequestChannelTypeOTP: "OTP";
     /**
      * The object sent in a `PUT /consentRequests/{ID}` request.
      *
@@ -1002,8 +1108,8 @@ export interface components {
     ConsentRequestsIDPutResponseOTP: {
       /** The id of the PISP who will initiate transactions on a user's behalf. */
       initiatorId: string;
-      scopes: components['schemas']['Scope'][];
-      authChannels: components['schemas']['ConsentRequestChannelTypeOTP'][];
+      scopes: components["schemas"]["Scope"][];
+      authChannels: components["schemas"]["ConsentRequestChannelTypeOTP"][];
       /** The callback uri that the user will be redirected to after completing the WEB auth channel. */
       callbackUri: string;
     };
@@ -1017,8 +1123,8 @@ export interface components {
     ConsentRequestsIDPutResponseOTPAuth: {
       /** The id of the PISP who will initiate transactions on a user's behalf. */
       initiatorId: string;
-      scopes: components['schemas']['Scope'][];
-      authChannels: components['schemas']['ConsentRequestChannelTypeOTP'][];
+      scopes: components["schemas"]["Scope"][];
+      authChannels: components["schemas"]["ConsentRequestChannelTypeOTP"][];
       /** The callback uri that the user will be redirected to after completing the WEB auth channel. */
       callbackUri: string;
       /** The Auth token from the OTP or redirect to pisp app. */
@@ -1026,7 +1132,7 @@ export interface components {
     };
     /** The object sent in a `PATCH /consentRequests/{ID}` request. */
     ConsentRequestsIDPatchRequest: {
-      authToken: components['schemas']['OtpValue'];
+      authToken: components["schemas"]["OtpValue"];
     };
     /** The object sent in a `POST /consents` request. */
     ConsentsPostRequest: {
@@ -1035,13 +1141,13 @@ export interface components {
        * decided by the DFSP who creates the Consent
        * This field is REQUIRED for POST /consent.
        */
-      consentId: components['schemas']['CorrelationId'];
+      consentId: components["schemas"]["CorrelationId"];
       /**
        * The id of the ConsentRequest that was used to initiate the
        * creation of this Consent.
        */
-      consentRequestId: components['schemas']['CorrelationId'];
-      scopes: components['schemas']['Scope'][];
+      consentRequestId: components["schemas"]["CorrelationId"];
+      scopes: components["schemas"]["Scope"][];
     };
     /**
      * The API data type Name is a JSON String, restricted by a regular expression to avoid characters which are generally not used in a name.
@@ -1053,14 +1159,14 @@ export interface components {
     Name: string;
     /** Data model for the complex type Account. */
     Account: {
-      address?: components['schemas']['AccountAddress'];
-      currency: components['schemas']['Currency'];
-      description?: components['schemas']['Name'];
+      address?: components["schemas"]["AccountAddress"];
+      currency: components["schemas"]["Currency"];
+      description?: components["schemas"]["Name"];
     };
     /** Data model for the complex type AccountList. */
     AccountList: {
       /** Accounts associated with the Party. */
-      account: components['schemas']['Account'][];
+      account: components["schemas"]["Account"][];
     };
     /**
      * This is a variant based on FSPIOP `PartyIdType` specification.
@@ -1105,16 +1211,16 @@ export interface components {
      * - THIRD_PARTY_LINK - TBD
      */
     PartyIdType:
-    | 'MSISDN'
-    | 'EMAIL'
-    | 'PERSONAL_ID'
-    | 'BUSINESS'
-    | 'DEVICE'
-    | 'ACCOUNT_ID'
-    | 'IBAN'
-    | 'ALIAS'
-    | 'CONSENT'
-    | 'THIRD_PARTY_LINK';
+      | "MSISDN"
+      | "EMAIL"
+      | "PERSONAL_ID"
+      | "BUSINESS"
+      | "DEVICE"
+      | "ACCOUNT_ID"
+      | "IBAN"
+      | "ALIAS"
+      | "CONSENT"
+      | "THIRD_PARTY_LINK";
     /** Identifier of the Party. */
     PartyIdentifier: string;
     /** Either a sub-identifier of a PartyIdentifier, or a sub-type of the PartyIdType, normally a PersonalIdentifierType. */
@@ -1123,11 +1229,11 @@ export interface components {
     FspId: string;
     /** Data model for the complex type PartyIdInfo. */
     PartyIdInfo: {
-      partyIdType: components['schemas']['PartyIdType'];
-      partyIdentifier: components['schemas']['PartyIdentifier'];
-      partySubIdOrType?: components['schemas']['PartySubIdOrType'];
-      fspId?: components['schemas']['FspId'];
-      extensionList?: components['schemas']['ExtensionList'];
+      partyIdType: components["schemas"]["PartyIdType"];
+      partyIdentifier: components["schemas"]["PartyIdentifier"];
+      partySubIdOrType?: components["schemas"]["PartySubIdOrType"];
+      fspId?: components["schemas"]["FspId"];
+      extensionList?: components["schemas"]["ExtensionList"];
     };
     /** A limited set of pre-defined numbers. This list would be a limited set of numbers identifying a set of popular merchant types like School Fees, Pubs and Restaurants, Groceries, etc. */
     MerchantClassificationCode: string;
@@ -1141,45 +1247,45 @@ export interface components {
     LastName: string;
     /** Data model for the complex type PartyComplexName. */
     PartyComplexName: {
-      firstName?: components['schemas']['FirstName'];
-      middleName?: components['schemas']['MiddleName'];
-      lastName?: components['schemas']['LastName'];
+      firstName?: components["schemas"]["FirstName"];
+      middleName?: components["schemas"]["MiddleName"];
+      lastName?: components["schemas"]["LastName"];
     };
     /** Date of Birth of the Party. */
     DateOfBirth: string;
     /** Data model for the complex type PartyPersonalInfo. */
     PartyPersonalInfo: {
-      complexName?: components['schemas']['PartyComplexName'];
-      dateOfBirth?: components['schemas']['DateOfBirth'];
+      complexName?: components["schemas"]["PartyComplexName"];
+      dateOfBirth?: components["schemas"]["DateOfBirth"];
     };
     /** Data model for the complex type Party. */
     Party: {
-      accounts?: components['schemas']['AccountList'];
-      partyIdInfo: components['schemas']['PartyIdInfo'];
-      merchantClassificationCode?: components['schemas']['MerchantClassificationCode'];
-      name?: components['schemas']['PartyName'];
-      personalInfo?: components['schemas']['PartyPersonalInfo'];
+      accounts?: components["schemas"]["AccountList"];
+      partyIdInfo: components["schemas"]["PartyIdInfo"];
+      merchantClassificationCode?: components["schemas"]["MerchantClassificationCode"];
+      name?: components["schemas"]["PartyName"];
+      personalInfo?: components["schemas"]["PartyPersonalInfo"];
     };
     /**
      * This is a variant based on FSPIOP `PartyIdType` specification.
      * This validation interface should be use by `POST /thirdpartyRequests/transactions`
      * - THIRD_PARTY_LINK - is the DFSP's internal reference which allows DFSP to find out the corresponding consent
      */
-    PartyIdTypeTPLink: 'THIRD_PARTY_LINK';
+    PartyIdTypeTPLink: "THIRD_PARTY_LINK";
     /** Data model for the complex type PartyIdInfo. */
     PartyIdInfoTPLink: {
-      partyIdType: components['schemas']['PartyIdTypeTPLink'];
-      partyIdentifier: components['schemas']['PartyIdentifier'];
-      partySubIdOrType?: components['schemas']['PartySubIdOrType'];
-      fspId?: components['schemas']['FspId'];
-      extensionList?: components['schemas']['ExtensionList'];
+      partyIdType: components["schemas"]["PartyIdTypeTPLink"];
+      partyIdentifier: components["schemas"]["PartyIdentifier"];
+      partySubIdOrType?: components["schemas"]["PartySubIdOrType"];
+      fspId?: components["schemas"]["FspId"];
+      extensionList?: components["schemas"]["ExtensionList"];
     };
     /**
      * Below are the allowed values for the enumeration AmountType.
      * - SEND - Amount the Payer would like to send, that is, the amount that should be withdrawn from the Payer account including any fees.
      * - RECEIVE - Amount the Payer would like the Payee to receive, that is, the amount that should be sent to the receiver exclusive of any fees.
      */
-    AmountType: 'SEND' | 'RECEIVE';
+    AmountType: "SEND" | "RECEIVE";
     /**
      * Below are the allowed values for the enumeration.
      * - DEPOSIT - Used for performing a Cash-In (deposit) transaction. In a normal scenario, electronic funds are transferred from a Business account to a Consumer account, and physical cash is given from the Consumer to the Business User.
@@ -1189,11 +1295,11 @@ export interface components {
      * - REFUND - Used for performing a refund of transaction.
      */
     TransactionScenario:
-    | 'DEPOSIT'
-    | 'WITHDRAWAL'
-    | 'TRANSFER'
-    | 'PAYMENT'
-    | 'REFUND';
+      | "DEPOSIT"
+      | "WITHDRAWAL"
+      | "TRANSFER"
+      | "PAYMENT"
+      | "REFUND";
     /** Possible sub-scenario, defined locally within the scheme (UndefinedEnum Type). */
     TransactionSubScenario: string;
     /**
@@ -1201,7 +1307,7 @@ export interface components {
      * - PAYER - Sender of funds is initiating the transaction. The account to send from is either owned by the Payer or is connected to the Payer in some way.
      * - PAYEE - Recipient of the funds is initiating the transaction by sending a transaction request. The Payer must approve the transaction, either automatically by a pre-generated OTP or by pre-approval of the Payee, or by manually approving in his or her own Device.
      */
-    TransactionInitiator: 'PAYER' | 'PAYEE';
+    TransactionInitiator: "PAYER" | "PAYEE";
     /**
      * Below are the allowed values for the enumeration.
      * - CONSUMER - Consumer is the initiator of the transaction.
@@ -1209,39 +1315,39 @@ export interface components {
      * - BUSINESS - Business is the initiator of the transaction.
      * - DEVICE - Device is the initiator of the transaction.
      */
-    TransactionInitiatorType: 'CONSUMER' | 'AGENT' | 'BUSINESS' | 'DEVICE';
+    TransactionInitiatorType: "CONSUMER" | "AGENT" | "BUSINESS" | "DEVICE";
     /** Reason for the refund. */
     RefundReason: string;
     /** Data model for the complex type Refund. */
     Refund: {
-      originalTransactionId: components['schemas']['CorrelationId'];
-      refundReason?: components['schemas']['RefundReason'];
+      originalTransactionId: components["schemas"]["CorrelationId"];
+      refundReason?: components["schemas"]["RefundReason"];
     };
     /** (BopCode) The API data type [BopCode](https://www.imf.org/external/np/sta/bopcode/) is a JSON String of 3 characters, consisting of digits only. Negative numbers are not allowed. A leading zero is not allowed. */
     BalanceOfPayments: string;
     /** Data model for the complex type TransactionType. */
     TransactionType: {
-      scenario: components['schemas']['TransactionScenario'];
-      subScenario?: components['schemas']['TransactionSubScenario'];
-      initiator: components['schemas']['TransactionInitiator'];
-      initiatorType: components['schemas']['TransactionInitiatorType'];
-      refundInfo?: components['schemas']['Refund'];
-      balanceOfPayments?: components['schemas']['BalanceOfPayments'];
+      scenario: components["schemas"]["TransactionScenario"];
+      subScenario?: components["schemas"]["TransactionSubScenario"];
+      initiator: components["schemas"]["TransactionInitiator"];
+      initiatorType: components["schemas"]["TransactionInitiatorType"];
+      refundInfo?: components["schemas"]["Refund"];
+      balanceOfPayments?: components["schemas"]["BalanceOfPayments"];
     };
     /** The object sent in the POST /thirdpartyRequests/transactions request. */
     ThirdpartyRequestsTransactionsPostRequest: {
       /** Common ID between the FSPs for the transaction request object. The ID should be reused for resends of the same transaction request. A new ID should be generated for each new transaction request. */
-      transactionRequestId: components['schemas']['CorrelationId'];
+      transactionRequestId: components["schemas"]["CorrelationId"];
       /** Information about the Payee in the proposed financial transaction. */
-      payee: components['schemas']['Party'];
+      payee: components["schemas"]["Party"];
       /** Information about the Payer in the proposed financial transaction. */
-      payer: components['schemas']['PartyIdInfoTPLink'];
+      payer: components["schemas"]["PartyIdInfoTPLink"];
       /** SEND for sendAmount, RECEIVE for receiveAmount. */
-      amountType: components['schemas']['AmountType'];
+      amountType: components["schemas"]["AmountType"];
       /** Requested amount to be transferred from the Payer to Payee. */
-      amount: components['schemas']['Money'];
+      amount: components["schemas"]["Money"];
       /** Type of transaction. */
-      transactionType: components['schemas']['TransactionType'];
+      transactionType: components["schemas"]["TransactionType"];
       /** Date and time until when the transaction request is valid. It can be set to get a quick failure in case the peer FSP takes too long to respond. */
       expiration: string;
     };
@@ -1252,26 +1358,26 @@ export interface components {
       /** Base64 encoded binary string - the original challenge. */
       challenge: string;
       /** Base64 encoded binary string - the signed challenge. */
-      value: components['schemas']['BinaryString'];
+      value: components["schemas"]["BinaryString"];
       /** Common ID between the PISP and FSP for the Consent object This tells DFSP and auth-service which consent allows the PISP to initiate transaction. */
-      consentId: components['schemas']['CorrelationId'];
+      consentId: components["schemas"]["CorrelationId"];
       /** DFSP specific account identifiers, e.g. `dfspa.alice.1234` */
-      sourceAccountId: components['schemas']['AccountAddress'];
+      sourceAccountId: components["schemas"]["AccountAddress"];
       /** The status of the authorization. This value must be `VERIFIED` for a PUT request. */
-      status: 'VERIFIED';
+      status: "VERIFIED";
     };
     /** The object sent in the POST /thirdpartyRequests/transactions/{id}/authorizations request. */
     ThirdpartyRequestsTransactionsIDAuthorizationsPostRequest: {
       /** Base64 encoded binary string - the original challenge. */
       challenge: string;
       /** Base64 encoded binary string - the signed challenge */
-      value: components['schemas']['BinaryString'];
+      value: components["schemas"]["BinaryString"];
       /** Common ID between the PISP and FSP for the Consent object This tells DFSP and auth-service which constent allows the PISP to initiate transaction. */
-      consentId: components['schemas']['CorrelationId'];
+      consentId: components["schemas"]["CorrelationId"];
       /** DFSP specific account identifiers, e.g. `dfspa.alice.1234` */
-      sourceAccountId: components['schemas']['AccountAddress'];
+      sourceAccountId: components["schemas"]["AccountAddress"];
       /** The status of the authorization. This MUST be PENDING for a POST request */
-      status: 'PENDING';
+      status: "PENDING";
     };
     /**
      * Below are the allowed values for the enumeration.
@@ -1280,11 +1386,11 @@ export interface components {
      * - ACCEPTED - Payer has approved the transaction.
      * - REJECTED - Payer has rejected the transaction.
      */
-    TransactionRequestState: 'RECEIVED' | 'PENDING' | 'ACCEPTED' | 'REJECTED';
+    TransactionRequestState: "RECEIVED" | "PENDING" | "ACCEPTED" | "REJECTED";
     /** The object sent in the PUT /thirdPartyRequests/transactions/{ID} request. */
     ThirdpartyRequestsTransactionsIDPutResponse: {
-      transactionId: components['schemas']['CorrelationId'];
-      transactionRequestState: components['schemas']['TransactionRequestState'];
+      transactionId: components["schemas"]["CorrelationId"];
+      transactionRequestState: components["schemas"]["TransactionRequestState"];
     };
     /**
      * Below are the allowed values for the enumeration.
@@ -1293,97 +1399,101 @@ export interface components {
      * - COMPLETED - Payee FSP has successfully performed the transaction.
      * - REJECTED - Payee FSP has failed to perform the transaction.
      */
-    TransactionState: 'RECEIVED' | 'PENDING' | 'COMPLETED' | 'REJECTED';
+    TransactionState: "RECEIVED" | "PENDING" | "COMPLETED" | "REJECTED";
     /** The object sent in the PATCH /thirdpartyRequests/transactions/{ID} callback. */
     ThirdpartyRequestsTransactionsIDPatchResponse: {
-      transactionId: components['schemas']['CorrelationId'];
-      transactionRequestState: components['schemas']['TransactionRequestState'];
-      transactionState: components['schemas']['TransactionState'];
+      transactionId: components["schemas"]["CorrelationId"];
+      transactionRequestState: components["schemas"]["TransactionRequestState"];
+      transactionState: components["schemas"]["TransactionState"];
+    };
+    /** The object sent in a `PUT /services/{ServiceType}` request. */
+    ServicesServiceTypePutResponse: {
+      providers: components["schemas"]["FspId"][];
     };
   };
   responses: {
     /** OK */
-    '200': {};
+    "200": {};
     /** Accepted */
-    '202': {};
+    "202": {};
     /** Bad Request */
-    '400': {
+    "400": {
       content: {
-        'application/json': components['schemas']['ErrorInformationResponse'];
+        "application/json": components["schemas"]["ErrorInformationResponse"];
       };
       headers: {
-        'Content-Length': components['headers']['Content-Length'];
-        'Content-Type': components['headers']['Content-Type'];
+        "Content-Length": components["headers"]["Content-Length"];
+        "Content-Type": components["headers"]["Content-Type"];
       };
     };
     /** Unauthorized */
-    '401': {
+    "401": {
       content: {
-        'application/json': components['schemas']['ErrorInformationResponse'];
+        "application/json": components["schemas"]["ErrorInformationResponse"];
       };
       headers: {
-        'Content-Length': components['headers']['Content-Length'];
-        'Content-Type': components['headers']['Content-Type'];
+        "Content-Length": components["headers"]["Content-Length"];
+        "Content-Type": components["headers"]["Content-Type"];
       };
     };
     /** Forbidden */
-    '403': {
+    "403": {
       content: {
-        'application/json': components['schemas']['ErrorInformationResponse'];
+        "application/json": components["schemas"]["ErrorInformationResponse"];
       };
       headers: {
-        'Content-Length': components['headers']['Content-Length'];
-        'Content-Type': components['headers']['Content-Type'];
+        "Content-Length": components["headers"]["Content-Length"];
+        "Content-Type": components["headers"]["Content-Type"];
       };
     };
     /** Not Found */
-    '404': {
+    "404": {
       content: {
-        'application/json': components['schemas']['ErrorInformationResponse'];
+        "application/json": components["schemas"]["ErrorInformationResponse"];
       };
       headers: {
-        'Content-Length': components['headers']['Content-Length'];
-        'Content-Type': components['headers']['Content-Type'];
+        "Content-Length": components["headers"]["Content-Length"];
+        "Content-Type": components["headers"]["Content-Type"];
       };
     };
     /** Method Not Allowed */
-    '405': {
+    "405": {
       content: {
-        'application/json': components['schemas']['ErrorInformationResponse'];
+        "application/json": components["schemas"]["ErrorInformationResponse"];
       };
       headers: {
-        'Content-Length': components['headers']['Content-Length'];
-        'Content-Type': components['headers']['Content-Type'];
+        "Content-Length": components["headers"]["Content-Length"];
+        "Content-Type": components["headers"]["Content-Type"];
       };
     };
     /** Not Acceptable */
-    '406': {
+    "406": {
       content: {
-        'application/json': components['schemas']['ErrorInformationResponse'];
+        "application/json": components["schemas"]["ErrorInformationResponse"];
       };
       headers: {
-        'Content-Length': components['headers']['Content-Length'];
-        'Content-Type': components['headers']['Content-Type'];
+        "Content-Length": components["headers"]["Content-Length"];
+        "Content-Type": components["headers"]["Content-Type"];
       };
     };
     /** Not Implemented */
-    '501': {
+    "501": {
       content: {
-        'application/json': components['schemas']['ErrorInformationResponse'];
+        "application/json": components["schemas"]["ErrorInformationResponse"];
       };
       headers: {
-        'Content-Length': components['headers']['Content-Length'];
-        'Content-Type': components['headers']['Content-Type'];
+        "Content-Length": components["headers"]["Content-Length"];
+        "Content-Type": components["headers"]["Content-Type"];
       };
     };
     /** Service Unavailable */
-    '503': {
+    "503": {
       content: {
-        'application/json': components['schemas']['ErrorInformationResponse'];
+        "application/json": components["schemas"]["ErrorInformationResponse"];
       };
       headers: {
-        'Content-Length': components['headers']['Content-Length'];
-        'Content-Type': components['headers']['Content-Type'];
+        "Content-Length": components["headers"]["Content-Length"];
+        "Content-Type": components["headers"]["Content-Type"];
       };
     };
   };

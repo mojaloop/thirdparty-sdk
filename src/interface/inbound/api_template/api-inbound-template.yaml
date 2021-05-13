@@ -43,3 +43,7 @@ paths:
     $ref: '../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/paths/thirdpartyRequests_transactions_ID.yaml'
   /thirdpartyRequests/transactions/{ID}/error:
     $ref: '../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/paths/thirdpartyRequests_transactions_ID_error.yaml'
+  /services/{ServiceType}:
+    $ref: '../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/paths/services_ServiceType.yaml'
+  /services/{ServiceType}/error:
+    $ref: '../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/paths/services_ServiceType_error.yaml'

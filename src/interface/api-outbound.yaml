@@ -574,8 +574,8 @@ components:
             error:
               value:
                 errorInformation:
-                  errorCode: '3200'
-                  errorDescription: Generic ID not found
+                  errorCode: '7204'
+                  errorDescription: FSP does not support any requested scope actions
   headers:
     Content-Length:
       required: false
