@@ -2110,6 +2110,7 @@ components:
         - ACCOUNT_ID
         - IBAN
         - ALIAS
+        - THIRD_PARTY_LINK  # there is a need to update quotes endpoint def to accept this value
       description: >-
         Below are the allowed values for the enumeration.
 

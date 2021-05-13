@@ -90,7 +90,7 @@ activate PISP_TP_IN
 PISP_TP_IN --> Switch: 200 OK
 deactivate Switch
 
-PISP_TP_IN -> PISP_DM: Accounts response recieved
+PISP_TP_IN -> PISP_DM: Accounts response received
 rnote right of PISP_DM: state: accountLookupSuccess
 deactivate PISP_TP_IN
 activate PISP_DM

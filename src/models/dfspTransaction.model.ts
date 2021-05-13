@@ -29,7 +29,7 @@
 
 import { StateMachineConfig } from 'javascript-state-machine'
 import { uuid } from 'uuidv4'
-import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
+import { thirdparty as tpAPI, v1_1 as fspiopAPI } from '@mojaloop/api-snippets'
 
 import { PersistentModel } from './persistent.model'
 import {
@@ -40,8 +40,8 @@ import {
 import { InvalidDataError } from '~/shared/invalid-data-error'
 import { SDKOutgoingRequests } from '~/shared/sdk-outgoing-requests'
 import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
-import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
-
+import { ThirdpartyRequests, Errors } from '@mojaloop/sdk-standard-components'
+import { reformatError } from '~/shared/api-error'
 export class DFSPTransactionModel
   extends PersistentModel<DFSPTransactionStateMachine, DFSPTransactionData> {
   protected config: DFSPTransactionModelConfig
@@ -128,9 +128,7 @@ export class DFSPTransactionModel
       this.data.transactionRequestRequest
     )
     if (!(validationResult && validationResult.isValid)) {
-      // TODO: throw proper error when transactionRequestRequest is not valid
-      // TODO: error should be transformed to call PUT /thirdpartyRequests/{ID}/transactions/error
-      throw new Error('transactionRequestRequest is not valid')
+      throw Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_REQUEST_NOT_VALID
     }
 
     // allocate new id
@@ -153,17 +151,16 @@ export class DFSPTransactionModel
 
     // this field will be present which is guaranteed by InvalidDataError validation above
     const update = this.data.transactionRequestPutUpdate as tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPutResponse
-    const updateResult = await this.thirdpartyRequests.putThirdpartyRequestsTransactions(
-      update,
-      this.data.transactionRequestId,
-      this.data.participantId
-    )
-
-    // check result and throw if invalid
-    if (!(updateResult && updateResult.statusCode >= 200 && updateResult.statusCode < 300)) {
-      // TODO: throw proper error when notification failed
-      // TODO: error should be transformed to call PUT /thirdpartyRequests/transactions/{ID}/error
-      throw new Error(`PUT /thirdpartyRequests/transactions/${this.data.transactionRequestId} failed`)
+    try {
+      await this.thirdpartyRequests.putThirdpartyRequestsTransactions(
+        update,
+        this.data.transactionRequestId,
+        this.data.participantId
+      )
+    } catch (err) {
+      this.logger.push({ err }).log('putThirdpartyRequestsTransactions failed')
+      // throw proper error
+      throw Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_UPDATE_FAILED
     }
 
     // shortcut
@@ -200,10 +197,7 @@ export class DFSPTransactionModel
 
     // check result and throw if invalid
     if (!(resultQuote && resultQuote.currentState === 'COMPLETED')) {
-      // TODO: throw proper error
-      // TODO: error should be transformed to call PUT /thirdpartyRequests/{ID}/transactions/error
-
-      throw new Error('POST /quotes failed')
+      throw Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_REQUEST_QUOTE_FAILED
     }
 
     // store result in state
@@ -230,8 +224,7 @@ export class DFSPTransactionModel
     )
 
     if (!(resultAuthorization && resultAuthorization.currentState === 'COMPLETED')) {
-      // TODO: throw proper error
-      throw new Error('POST /authorizations failed')
+      throw Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_REQUEST_AUTHORIZATION_FAILED
     }
 
     this.data.requestAuthorizationResponse = resultAuthorization
@@ -251,9 +244,7 @@ export class DFSPTransactionModel
         const result = await this.dfspBackendRequests.verifyAuthorization(authorizationInfo)
 
         if (!(result && result.isValid)) {
-          // challenge is improperly signed
-          // TODO: throw proper error
-          throw new Error('POST /verify-authorization failed')
+          throw Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_AUTHORIZATION_NOT_VALID
         }
 
         // user's challenge has been successfully verified
@@ -266,14 +257,13 @@ export class DFSPTransactionModel
         const quote = this.data.requestQuoteResponse!.quotes
         // prepare transfer request
         this.data.transferRequest = {
-          // TODO: payer.fspId is optional it should be mandatory
-          fspId: tr.payer.fspId!,
+          fspId: this.config.dfspId,
           transfersPostRequest: {
             transferId: this.data.transferId!,
 
             // payee & payer data from /thirdpartyRequests/transaction
             payeeFsp: tr.payee.partyIdInfo.fspId!,
-            payerFsp: tr.payer.fspId!,
+            payerFsp: this.config.dfspId,
 
             // transfer data from quote response
             amount: { ...quote.transferAmount },
@@ -291,17 +281,13 @@ export class DFSPTransactionModel
       case 'REJECTED': {
         // user rejected authorization so transfer is declined, let abort workflow!
         this.data.transactionRequestState = 'REJECTED'
-
-        // TODO: throw proper error;
-        // PUT /thirdpartyRequests/transactions/{ID}/error
-        // or  PATCH /thirdpartyRequests/transactions/{ID} ????
-        throw new Error('Authorization/Transfer REJECTED')
+        throw Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_AUTHORIZATION_REJECTED_BY_USER
       }
 
       default: {
         // should we setup ??? this.data.transactionRequestState = 'REJECTED'
-        // we received 'RESEND' or something else
-        throw new Error(`Unexpected authorization responseType: ${authorizationInfo.responseType}`)
+        // we received 'RESEND' or something else...
+        throw Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_AUTHORIZATION_UNEXPECTED
       }
     }
   }
@@ -321,11 +307,10 @@ export class DFSPTransactionModel
         transferResult.transfer.transferState === 'COMMITTED'
       )
     ) {
-      // TODO: throw proper error
-      throw new Error('POST /simpleTransfer failed')
+      throw Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_TRANSFER_FAILED
     }
-    this.data.transferResponse = transferResult
 
+    this.data.transferResponse = transferResult
     this.data.transactionRequestPatchUpdate = {
       transactionId: this.data.transactionId!,
       transactionRequestState: this.data.transactionRequestState,
@@ -336,52 +321,69 @@ export class DFSPTransactionModel
   async onNotifyTransferIsDone (): Promise<void> {
     InvalidDataError.throwIfInvalidProperty(this.data, 'transactionRequestPatchUpdate')
 
-    await this.thirdpartyRequests.patchThirdpartyRequestsTransactions(
-      this.data.transactionRequestPatchUpdate!,
-      this.data.transactionRequestId,
-      this.data.participantId
-    )
+    try {
+      await this.thirdpartyRequests.patchThirdpartyRequestsTransactions(
+        this.data.transactionRequestPatchUpdate!,
+        this.data.transactionRequestId,
+        this.data.participantId
+      )
+    } catch (err) {
+      this.logger.push({ err }).log('patchThirdpartyRequestsTransactions')
+      throw Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_NOTIFICATION_FAILED
+    }
   }
 
   // workflow
   async run (): Promise<void> {
-    switch (this.data.currentState) {
-      case 'start':
-        await this.fsm.validateTransactionRequest()
-        await this.saveToKVS()
+    try {
+      switch (this.data.currentState) {
+        case 'start':
+          await this.fsm.validateTransactionRequest()
+          await this.saveToKVS()
 
-      case 'transactionRequestIsValid':
-        await this.fsm.notifyTransactionRequestIsValid()
-        await this.saveToKVS()
+        case 'transactionRequestIsValid':
+          await this.fsm.notifyTransactionRequestIsValid()
+          await this.saveToKVS()
 
-      case 'notifiedTransactionRequestIsValid':
-        await this.fsm.requestQuote()
-        await this.saveToKVS()
+        case 'notifiedTransactionRequestIsValid':
+          await this.fsm.requestQuote()
+          await this.saveToKVS()
 
-      case 'quoteReceived':
-        await this.fsm.requestAuthorization()
-        await this.saveToKVS()
+        case 'quoteReceived':
+          await this.fsm.requestAuthorization()
+          await this.saveToKVS()
 
-      case 'authorizationReceived':
-        await this.fsm.verifyAuthorization()
-        await this.saveToKVS()
+        case 'authorizationReceived':
+          await this.fsm.verifyAuthorization()
+          await this.saveToKVS()
 
-      case 'authorizationReceivedIsValid':
-        await this.fsm.requestTransfer()
-        await this.saveToKVS()
+        case 'authorizationReceivedIsValid':
+          await this.fsm.requestTransfer()
+          await this.saveToKVS()
 
-      case 'transferIsDone':
-        await this.fsm.notifyTransferIsDone()
-        await this.saveToKVS()
+        case 'transferIsDone':
+          await this.fsm.notifyTransferIsDone()
+          await this.saveToKVS()
 
-      case 'transactionRequestIsDone':
-        return
+        case 'transactionRequestIsDone':
+          return
 
-      case 'errored':
-      default:
-        await this.saveToKVS()
-        // stopped in errored state
-        this.logger.info('State machine in errored state')
+        case 'errored':
+        default:
+          await this.saveToKVS()
+          // stopped in errored state
+          this.logger.info('State machine in errored state')
+      }
+    } catch (error) {
+      const mojaloopError = reformatError(error, this.logger)
+      this.logger.push({ error, mojaloopError }).info(`Sending error response to ${this.data.participantId}`)
+      this.data.currentState = 'errored'
+      await this.saveToKVS()
+      await this.thirdpartyRequests.putThirdpartyRequestsTransactionsError(
+        mojaloopError as unknown as fspiopAPI.Schemas.ErrorInformationObject,
+        this.data.transactionRequestId,
+        this.data.participantId
+      )
     }
   }
 }

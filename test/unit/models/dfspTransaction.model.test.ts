@@ -40,8 +40,9 @@ import mockLogger from 'test/unit/mockLogger'
 import sortedArray from 'test/unit/sortedArray'
 import shouldNotBeExecuted from 'test/unit/shouldNotBeExecuted'
 import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
-import { GenericRequestResponse, ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
+import { ThirdpartyRequests, Errors } from '@mojaloop/sdk-standard-components'
 import { OutboundAPI as SDKOutboundAPI } from '@mojaloop/sdk-scheme-adapter'
+import { reformatError } from '~/shared/api-error'
 
 // mock KVS default exported class
 jest.mock('~/shared/kvs')
@@ -62,15 +63,19 @@ describe('DFSPTransactionModel', () => {
   let requestQuoteResponse: SDKOutboundAPI.Schemas.quotesPostResponse
   let requestAuthorizationResponse: SDKOutboundAPI.Schemas.authorizationsPostResponse
   let requestTransferResponse: SDKOutboundAPI.Schemas.simpleTransfersPostResponse
+  let transferRequest: SDKOutboundAPI.Schemas.simpleTransfersPostRequest
+  let transferId: string
 
   beforeEach(async () => {
     modelConfig = {
+      dfspId: 'dfsp_a',
       key: 'cache-key',
       kvs: new KVS(connectionConfig),
       logger: connectionConfig.logger,
       thirdpartyRequests: {
         putThirdpartyRequestsTransactions: jest.fn(() => Promise.resolve({ statusCode: 200 })),
-        patchThirdpartyRequestsTransactions: jest.fn(() => Promise.resolve({ statusCode: 200 }))
+        patchThirdpartyRequestsTransactions: jest.fn(() => Promise.resolve({ statusCode: 200 })),
+        putThirdpartyRequestsTransactionsError: jest.fn(() => Promise.resolve({ statusCode: 200 }))
       } as unknown as ThirdpartyRequests,
       sdkOutgoingRequests: {
         requestQuote: jest.fn(() => Promise.resolve(requestQuoteResponse)),
@@ -84,6 +89,7 @@ describe('DFSPTransactionModel', () => {
     }
     transactionRequestId = uuid()
     participantId = uuid()
+    transferId = uuid()
     transactionRequestRequest = {
       transactionRequestId,
       payee: {
@@ -126,6 +132,7 @@ describe('DFSPTransactionModel', () => {
         transactionType: { ...transactionRequestRequest.transactionType }
       }
     }
+
     requestQuoteResponse = {
       quotes: {
         transferAmount: { ...transactionRequestRequest.amount },
@@ -135,6 +142,7 @@ describe('DFSPTransactionModel', () => {
       },
       currentState: 'COMPLETED'
     }
+
     requestAuthorizationResponse = {
       authorizations: {
         authenticationInfo: {
@@ -147,6 +155,19 @@ describe('DFSPTransactionModel', () => {
         responseType: 'ENTERED'
       },
       currentState: 'COMPLETED'
+    }
+
+    transferRequest = {
+      fspId: transactionRequestRequest.payer.fspId!,
+      transfersPostRequest: {
+        transferId,
+        payeeFsp: transactionRequestRequest.payee.partyIdInfo.fspId!,
+        payerFsp: transactionRequestRequest.payer.fspId!,
+        amount: { ...requestQuoteResponse.quotes.transferAmount },
+        ilpPacket: 'abcd...',
+        condition: 'xyz....',
+        expiration: (new Date()).toISOString()
+      }
     }
 
     requestTransferResponse = {
@@ -269,6 +290,14 @@ describe('DFSPTransactionModel', () => {
 
       // check properly requestQuoteRequest
       expect(model.data.requestQuoteRequest).toBeDefined()
+      expect(modelConfig.thirdpartyRequests.putThirdpartyRequestsTransactions)
+        .toBeCalledWith(
+          model.data.transactionRequestPutUpdate,
+          model.data.transactionRequestId,
+          model.data.participantId
+        )
+      // check properly requestQuoteRequest
+      expect(model.data.requestQuoteRequest).toBeDefined()
 
       // shortcuts
       const rq = model.data.requestQuoteRequest!
@@ -282,6 +311,35 @@ describe('DFSPTransactionModel', () => {
 
       // shortcut
       const rqr = rq.quotesPostRequest
+
+      // transactionId should be the same as sent to PISP
+      expect(rqr.transactionId)
+        .toEqual(model.data.transactionRequestPutUpdate!.transactionId)
+
+      // transactionRequestId should be the same as received
+      expect(rqr.transactionRequestId)
+        .toEqual(tr.transactionRequestId)
+
+      // payee should be the same as received
+      expect(rqr.payee).toEqual(tr.payee)
+
+      // payer should be build from received payer.partyIdInfo
+      expect(rqr.payer).toEqual({ partyIdInfo: { ...tr.payer } })
+
+      // amountType should be the same as received
+      expect(rqr.amountType).toEqual(tr.amountType)
+
+      // amount should be the same as received
+      expect(rqr.amount).toEqual(tr.amount)
+
+      // transactionType should be the same as received
+      expect(rqr.transactionType).toEqual(tr.transactionType)
+
+      // payee's DFSP should be asked for quote
+      expect(rq.fspId).toEqual(tr.payee.partyIdInfo.fspId)
+
+      // quote id should be allocated
+      expect(rq.quotesPostRequest.quoteId).toBeDefined()
 
       // transactionId should be the same as sent to PISP
       expect(rqr.transactionId)
@@ -354,11 +412,11 @@ describe('DFSPTransactionModel', () => {
       expect(model.data.transferRequest).toBeDefined()
       const rtr = model.data.transferRequest!
       const quote = model.data.requestQuoteResponse!.quotes
-      expect(rtr.fspId).toEqual(tr.payer.fspId)
+      expect(rtr.fspId).toEqual('dfsp_a')
       expect(rtr.transfersPostRequest).toEqual({
         transferId: model.data.transferId!,
         payeeFsp: tr.payee.partyIdInfo.fspId!,
-        payerFsp: tr.payer.fspId!,
+        payerFsp: 'dfsp_a',
         amount: { ...quote.transferAmount },
         ilpPacket: quote.ilpPacket,
         condition: quote.condition,
@@ -401,10 +459,8 @@ describe('DFSPTransactionModel', () => {
       const model = await create(data, modelConfig)
       try {
         await model.fsm.validateTransactionRequest()
-        shouldNotBeExecuted()
       } catch (err) {
-        // TODO: fix assert when proper error is thrown
-        expect(err.message).toEqual('transactionRequestRequest is not valid')
+        expect(err).toEqual(Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_REQUEST_NOT_VALID)
         done()
       }
     })
@@ -412,7 +468,8 @@ describe('DFSPTransactionModel', () => {
     it('should throw if PUT /thirdpartyRequests/transactions/{ID} failed', async (done) => {
       mocked(modelConfig.kvs.set).mockImplementationOnce(() => Promise.resolve(true))
       mocked(modelConfig.thirdpartyRequests.putThirdpartyRequestsTransactions)
-        .mockImplementationOnce(() => Promise.resolve({ statusCode: 400 } as GenericRequestResponse))
+        // eslint-disable-next-line prefer-promise-reject-errors
+        .mockImplementationOnce(() => Promise.reject({ statusCode: 400 }))
       const data: DFSPTransactionData = {
         transactionRequestId,
         transactionRequestState: 'RECEIVED',
@@ -424,10 +481,8 @@ describe('DFSPTransactionModel', () => {
       const model = await create(data, modelConfig)
       try {
         await model.fsm.notifyTransactionRequestIsValid()
-        shouldNotBeExecuted()
       } catch (err) {
-        // TODO: fix assert when proper error is thrown
-        expect(err.message).toEqual(`PUT /thirdpartyRequests/transactions/${transactionRequestId} failed`)
+        expect(err).toEqual(Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_UPDATE_FAILED)
         done()
       }
     })
@@ -449,10 +504,8 @@ describe('DFSPTransactionModel', () => {
       const model = await create(data, modelConfig)
       try {
         await model.fsm.requestQuote()
-        shouldNotBeExecuted()
       } catch (err) {
-        // TODO: fix assert when proper error is thrown
-        expect(err.message).toEqual('POST /quotes failed')
+        expect(err).toEqual(Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_REQUEST_QUOTE_FAILED)
         done()
       }
     })
@@ -475,10 +528,8 @@ describe('DFSPTransactionModel', () => {
       const model = await create(data, modelConfig)
       try {
         await model.fsm.requestAuthorization()
-        shouldNotBeExecuted()
       } catch (err) {
-        // TODO: fix assert when proper error is thrown
-        expect(err.message).toEqual('POST /authorizations failed')
+        expect(err).toEqual(Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_REQUEST_AUTHORIZATION_FAILED)
         done()
       }
     })
@@ -502,10 +553,8 @@ describe('DFSPTransactionModel', () => {
       const model = await create(data, modelConfig)
       try {
         await model.fsm.verifyAuthorization()
-        shouldNotBeExecuted()
       } catch (err) {
-        // TODO: fix assert when proper error is thrown
-        expect(err.message).toEqual('POST /verify-authorization failed')
+        expect(err).toEqual(Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_AUTHORIZATION_NOT_VALID)
         done()
       }
     })
@@ -535,11 +584,9 @@ describe('DFSPTransactionModel', () => {
       const model = await create(data, modelConfig)
       try {
         await model.fsm.verifyAuthorization()
-        shouldNotBeExecuted()
       } catch (err) {
         expect(model.data.transactionRequestState).toEqual('REJECTED')
-        // TODO: fix assert when proper error is thrown
-        expect(err.message).toEqual('Authorization/Transfer REJECTED')
+        expect(err).toEqual(Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_AUTHORIZATION_REJECTED_BY_USER)
         done()
       }
     })
@@ -569,14 +616,80 @@ describe('DFSPTransactionModel', () => {
       const model = await create(data, modelConfig)
       try {
         await model.fsm.verifyAuthorization()
-        shouldNotBeExecuted()
       } catch (err) {
-        // TODO: fix assert when proper error is thrown
-        expect(err.message).toEqual('Unexpected authorization responseType: RESEND')
+        expect(err).toEqual(Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_AUTHORIZATION_UNEXPECTED)
         done()
       }
     })
 
+    it('should throw if transfer failed', async (done) => {
+      mocked(modelConfig.kvs.set).mockImplementationOnce(() => Promise.resolve(true))
+      mocked(modelConfig.sdkOutgoingRequests.requestTransfer).mockImplementationOnce(
+        () => Promise.resolve(
+          { currentState: 'ERROR_OCCURRED' } as SDKOutboundAPI.Schemas.simpleTransfersPostResponse)
+      )
+      const data: DFSPTransactionData = {
+        transactionRequestId,
+        transactionRequestState: 'ACCEPTED',
+        participantId,
+        transactionRequestRequest,
+        transactionRequestPutUpdate,
+        requestQuoteRequest,
+        requestQuoteResponse,
+        requestAuthorizationResponse: {
+          ...requestAuthorizationResponse,
+          authorizations: {
+            ...requestAuthorizationResponse.authorizations,
+            responseType: 'RESEND'
+          }
+        },
+        transferRequest,
+        currentState: 'authorizationReceivedIsValid'
+      }
+      const model = await create(data, modelConfig)
+      try {
+        await model.fsm.onRequestTransfer()
+      } catch (err) {
+        expect(err).toEqual(Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_TRANSFER_FAILED)
+        done()
+      }
+    })
+    it('should throw if notify transfer patch failed', async (done) => {
+      mocked(modelConfig.kvs.set).mockImplementationOnce(() => Promise.resolve(true))
+      mocked(modelConfig.thirdpartyRequests.patchThirdpartyRequestsTransactions).mockImplementationOnce(
+        () => Promise.reject(new Error('error from patch'))
+      )
+      const data: DFSPTransactionData = {
+        transactionRequestId,
+        transactionRequestState: 'ACCEPTED',
+        participantId,
+        transactionRequestRequest,
+        transactionRequestPutUpdate,
+        requestQuoteRequest,
+        requestQuoteResponse,
+        requestAuthorizationResponse: {
+          ...requestAuthorizationResponse,
+          authorizations: {
+            ...requestAuthorizationResponse.authorizations,
+            responseType: 'RESEND'
+          }
+        },
+        transferRequest,
+        transactionRequestPatchUpdate: {
+          transactionId: transactionRequestPutUpdate.transactionId,
+          transactionRequestState: 'ACCEPTED',
+          transactionState: 'COMPLETED'
+        },
+        currentState: 'transferIsDone'
+      }
+      const model = await create(data, modelConfig)
+      try {
+        await model.fsm.onNotifyTransferIsDone()
+      } catch (err) {
+        expect(err).toEqual(Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_NOTIFICATION_FAILED)
+        done()
+      }
+    })
     it('should handle errored state', async () => {
       mocked(modelConfig.kvs.set).mockImplementation(() => Promise.resolve(true))
       const data: DFSPTransactionData = {
@@ -601,6 +714,40 @@ describe('DFSPTransactionModel', () => {
       // state data shouldn't be modified
       expect(model.data).toEqual(data)
     })
+  })
+
+  it('should propagate error to callback', async () => {
+    mocked(modelConfig.kvs.set).mockImplementation(() => Promise.resolve(true))
+    mocked(modelConfig.dfspBackendRequests.validateThirdpartyTransactionRequest)
+      .mockImplementationOnce(() => Promise.resolve({ isValid: false }))
+
+    const data: DFSPTransactionData = {
+      transactionRequestId,
+      transactionRequestState: 'RECEIVED',
+      participantId,
+      transactionRequestRequest,
+      currentState: 'start'
+    }
+    const model = await create(data, modelConfig)
+    checkDTMLayout(model, data)
+
+    // execute workflow
+    await model.run()
+
+    // the state shouldn't be changed
+    expect(model.data.currentState).toEqual('errored')
+
+    // errored state should be saved
+    expect(mocked(modelConfig.kvs.set)).toBeCalledTimes(1)
+
+    // the error callback should be called
+    expect(mocked(modelConfig.thirdpartyRequests.putThirdpartyRequestsTransactionsError)).toBeCalledWith(
+      reformatError(
+        Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_REQUEST_NOT_VALID, model.logger
+      ),
+      model.data.transactionRequestId,
+      model.data.participantId
+    )
   })
 
   describe('loadFromKVS', () => {

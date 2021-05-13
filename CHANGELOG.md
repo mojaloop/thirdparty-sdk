@@ -1,4 +1,24 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+## [11.36.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.35.3...v11.36.0) (2021-05-11)
+
+
+### Features
+
+* **dfspTransaction:** workflow, errors, unit & integration tests ([#88](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/88)) ([80bca46](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/80bca46f0543e965abe9a8c86419a4bc02bb4aee))
+
+### [11.35.3](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.35.2...v11.35.3) (2021-05-10)
+
+
+### Documentation
+
+* add endpoint to handle passing of credential and fix typos ([#91](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/91)) ([02ef1b1](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/02ef1b1b977aa4698cb7b8d4f1b251dc09328ea3))
+* add more account linking error scenarios and doc fixes ([#89](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/89)) ([fd8510e](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/fd8510eea261c0704600b931dde8f67513dcf46b))
+
+
+### Maintenance
+
+* resolve vulnerabilties ([#92](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/92)) ([30b7b95](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/30b7b9592a312df52cebd2a981b0e9b0825955ef))
+
 ### [11.35.2](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.35.1...v11.35.2) (2021-04-26)
 
 

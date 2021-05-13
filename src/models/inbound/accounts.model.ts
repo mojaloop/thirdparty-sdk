@@ -101,7 +101,7 @@ export class InboundAccountsModel {
     }
     return new Errors.MojaloopFSPIOPError(
       err,
-      'Error1 in getUserAccounts @ Inbound' as unknown as string,
+      'Error1 in getUserAccounts @ Inbound',
       null as unknown as string,
       mojaloopErrorCode
     ).toApiErrorObject()

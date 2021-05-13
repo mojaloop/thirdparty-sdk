@@ -58,6 +58,49 @@ paths:
           $ref: '#/components/responses/501'
         '503':
           $ref: '#/components/responses/503'
+    put:
+      tags:
+        - thirdpartyRequests
+        - sampled
+      operationId: UpdateThirdPartyTransactionRequests
+      summary: UpdateThirdPartyTransactionRequests
+      description: >
+        The HTTP request `PUT /thirdpartyRequests/transactions/{ID}` is used to
+        inform the client about
+
+        status of a previously requested thirdparty transaction.
+
+
+        Switch(Thirdparty API Adapter) -> PISP
+      parameters:
+        - $ref: '#/components/parameters/ID'
+        - $ref: '#/components/parameters/Content-Length'
+        - $ref: '#/components/parameters/Content-Type'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ThirdpartyRequestsTransactionsIDPutResponse'
+      responses:
+        '200':
+          $ref: '#/components/responses/200'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '405':
+          $ref: '#/components/responses/405'
+        '406':
+          $ref: '#/components/responses/406'
+        '501':
+          $ref: '#/components/responses/501'
+        '503':
+          $ref: '#/components/responses/503'
   /thirdpartyRequests/transactions:
     post:
       tags:
@@ -1006,38 +1049,20 @@ components:
         - ACCEPTED - Payer has approved the transaction.
         - REJECTED - Payer has rejected the transaction.
       example: RECEIVED
-    TransactionState:
-      title: TransactionState
-      type: string
-      enum:
-        - RECEIVED
-        - PENDING
-        - COMPLETED
-        - REJECTED
-      description: |-
-        Below are the allowed values for the enumeration.
-        - RECEIVED - Payee FSP has received the transaction from the Payer FSP.
-        - PENDING - Payee FSP has validated the transaction.
-        - COMPLETED - Payee FSP has successfully performed the transaction.
-        - REJECTED - Payee FSP has failed to perform the transaction.
-      example: RECEIVED
-    ThirdpartyRequestsTransactionsIDPatchResponse:
-      title: ThirdpartyRequestsTransactionsIDPatchResponse
+    ThirdpartyRequestsTransactionsIDPutResponse:
+      title: ThirdpartyRequestsTransactionsIDPutResponse
       type: object
       description: >-
-        The object sent in the PATCH /thirdpartyRequests/transactions/{ID}
-        callback.
+        The object sent in the PUT /thirdPartyRequests/transactions/{ID}
+        request.
       properties:
         transactionId:
           $ref: '#/components/schemas/CorrelationId'
         transactionRequestState:
           $ref: '#/components/schemas/TransactionRequestState'
-        transactionState:
-          $ref: '#/components/schemas/TransactionState'
       required:
         - transactionId
         - transactionRequestState
-        - transactionState
     ErrorCode:
       title: ErrorCode
       type: string
@@ -1120,6 +1145,38 @@ components:
       properties:
         errorInformation:
           $ref: '#/components/schemas/ErrorInformation'
+    TransactionState:
+      title: TransactionState
+      type: string
+      enum:
+        - RECEIVED
+        - PENDING
+        - COMPLETED
+        - REJECTED
+      description: |-
+        Below are the allowed values for the enumeration.
+        - RECEIVED - Payee FSP has received the transaction from the Payer FSP.
+        - PENDING - Payee FSP has validated the transaction.
+        - COMPLETED - Payee FSP has successfully performed the transaction.
+        - REJECTED - Payee FSP has failed to perform the transaction.
+      example: RECEIVED
+    ThirdpartyRequestsTransactionsIDPatchResponse:
+      title: ThirdpartyRequestsTransactionsIDPatchResponse
+      type: object
+      description: >-
+        The object sent in the PATCH /thirdpartyRequests/transactions/{ID}
+        callback.
+      properties:
+        transactionId:
+          $ref: '#/components/schemas/CorrelationId'
+        transactionRequestState:
+          $ref: '#/components/schemas/TransactionRequestState'
+        transactionState:
+          $ref: '#/components/schemas/TransactionState'
+      required:
+        - transactionId
+        - transactionRequestState
+        - transactionState
     AccountAddress:
       title: AccountAddress
       type: string

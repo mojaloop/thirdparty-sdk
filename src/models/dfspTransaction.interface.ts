@@ -65,6 +65,7 @@ export interface DFSPTransactionStateMachine extends ControlledStateMachine {
 }
 
 export interface DFSPTransactionModelConfig extends PersistentModelConfig {
+  dfspId: string
   thirdpartyRequests: ThirdpartyRequests
   sdkOutgoingRequests: SDKOutgoingRequests
   dfspBackendRequests: DFSPBackendRequests
