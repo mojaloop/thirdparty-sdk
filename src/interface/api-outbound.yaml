@@ -386,6 +386,34 @@ paths:
           $ref: '#/components/responses/501'
         '503':
           $ref: '#/components/responses/503'
+  /linking/providers:
+    get:
+      operationId: GetProviders
+      summary: GetProviders
+      description: >
+        The HTTP request `GET /linking/providers` is used to retrieve a list of
+        thirdparty enabled DFSP identifiers.
+      tags:
+        - linking
+      responses:
+        '200':
+          $ref: '#/components/responses/LinkingProvidersResponse'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '405':
+          $ref: '#/components/responses/405'
+        '406':
+          $ref: '#/components/responses/406'
+        '501':
+          $ref: '#/components/responses/501'
+        '503':
+          $ref: '#/components/responses/503'
 components:
   responses:
     '200':
@@ -574,8 +602,15 @@ components:
             error:
               value:
                 errorInformation:
-                  errorCode: '3200'
-                  errorDescription: Generic ID not found
+                  errorCode: '7204'
+                  errorDescription: FSP does not support any requested scope actions
+    LinkingProvidersResponse:
+      description: |
+        Response body of GET /linking/providers
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/LinkingProvidersResponse'
   headers:
     Content-Length:
       required: false
@@ -2263,6 +2298,51 @@ components:
       oneOf:
         - $ref: '#/components/schemas/ConsentRequestsResponseError'
         - $ref: '#/components/schemas/ConsentRequestsResponseSuccess'
+    LinkingProvidersState:
+      title: LinkingProvidersState
+      description: State of GET /linking/providers request
+      type: string
+      enum:
+        - start
+        - errored
+        - providersLookupSuccess
+    LinkingProvidersResponseError:
+      title: LinkingProvidersResponseError
+      type: object
+      properties:
+        errorInformation:
+          $ref: '#/components/schemas/ErrorInformation'
+        currentState:
+          $ref: '#/components/schemas/LinkingProvidersState'
+      required:
+        - errorInformation
+        - currentState
+    ServicesServiceTypePutResponse:
+      title: ServicesServiceTypePutResponse
+      type: object
+      description: 'The object sent in a `PUT /services/{ServiceType}` request.'
+      properties:
+        providers:
+          type: array
+          items:
+            $ref: '#/components/schemas/FspId'
+      required:
+        - providers
+    LinkingProvidersResponseSuccess:
+      title: LinkingProvidersResponseSuccess
+      type: object
+      properties:
+        providers:
+          $ref: '#/components/schemas/ServicesServiceTypePutResponse'
+        currentState:
+          $ref: '#/components/schemas/LinkingProvidersState'
+      required:
+        - providers
+        - currentState
+    LinkingProvidersResponse:
+      oneOf:
+        - $ref: '#/components/schemas/LinkingProvidersResponseError'
+        - $ref: '#/components/schemas/LinkingProvidersResponseSuccess'
   parameters:
     ID:
       name: ID

@@ -1,0 +1,7 @@
+title: LinkingProvidersState
+description: State of GET /linking/providers request
+type: string
+enum:
+  - start
+  - errored
+  - providersLookupSuccess

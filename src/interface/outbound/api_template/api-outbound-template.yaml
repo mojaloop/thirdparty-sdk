@@ -29,7 +29,7 @@ paths:
     $ref: paths/thirdpartyTransaction_ID_initiate.yaml
   /thirdpartyTransaction/{ID}/approve:
     $ref: paths/thirdpartyTransaction_ID_approve.yaml
-    
+
   /thirdpartyRequests/transactions/{ID}/authorizations:
     $ref: paths/thirdpartyRequests_transactions_ID_authorizations.yaml
   /accounts/{fspId}/{userId}:
@@ -38,3 +38,5 @@ paths:
     $ref: paths/consentRequests_ID_validate.yaml
   /consentRequests:
     $ref: paths/consentRequests.yaml
+  /linking/providers:
+    $ref:  paths/linking_providers.yaml

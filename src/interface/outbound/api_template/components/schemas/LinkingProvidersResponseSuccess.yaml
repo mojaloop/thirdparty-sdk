@@ -1,0 +1,10 @@
+title: LinkingProvidersResponseSuccess
+type: object
+properties:
+  providers:
+    $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/ServicesServiceTypePutResponse.yaml'
+  currentState:
+    $ref: '../../components/schemas/LinkingProvidersState.yaml'
+required:
+  - providers
+  - currentState
