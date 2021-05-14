@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+### [11.36.1](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.36.0...v11.36.1) (2021-05-14)
+
+
+### Maintenance
+
+* add inbound/outbound interfaces for pre-linking and bump dependencies ([#94](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/94)) ([b5f8f0c](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/b5f8f0c3e925caac3f0c1aa6861a4fa09a4fb745))
+
 ## [11.36.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.35.3...v11.36.0) (2021-05-11)
 
 
