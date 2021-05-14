@@ -98,7 +98,7 @@ paths:
           $ref: ../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/501.yaml
         503:
           $ref: ../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/503.yaml
- 
+
   /thirdpartyRequests/transactions:
     post:
       tags:
@@ -943,6 +943,11 @@ paths:
           $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/501.yaml'
         503:
           $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/503.yaml'
+  /services/{ServiceType}:
+    $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/paths/services_ServiceType.yaml'
+  /services/{ServiceType}/error:
+    $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/paths/services_ServiceType_error.yaml'
+
 components:
   schemas:
     OutboundAuthorizationsPostRequest:

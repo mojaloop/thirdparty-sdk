@@ -152,7 +152,7 @@ export class PISPPrelinkingModel
           this.logger.info(
             `getProviders requested for ${data.serviceType},  currentState: ${data.currentState}`
           )
-
+          console.log('hello')
           await this.fsm.getProviders()
           await this.checkModelDataForErrorInformation()
           return this.getResponse()

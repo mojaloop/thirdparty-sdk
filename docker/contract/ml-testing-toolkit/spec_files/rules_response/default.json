@@ -256,5 +256,65 @@
     },
     "type": "response",
     "version": 1
+  },
+  {
+    "ruleId": 6,
+    "priority": 1,
+    "description": "get /services/THIRD_PARTY_DFSP",
+    "apiVersion": {
+      "minorVersion": 1,
+      "majorVersion": 0,
+      "type": "thirdparty_pisp",
+      "asynchronous": true
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/services/THIRD_PARTY_DFSP"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "get"
+        }
+      ]
+    },
+    "event": {
+      "method": null,
+      "path": null,
+      "params": {
+        "scripts": {
+          "exec": [
+            "const userConfig = JSON.parse(pm.globals.get('userConfig'))",
+            "const curDate = (new Date()).toUTCString()",
+            "const servicesRequest = {",
+            "  url: userConfig.CALLBACK_ENDPOINT + '/services/THIRD_PARTY_DFSP',",
+            "  method: 'put',",
+            "  header: {",
+            "    'FSPIOP-Source': 'switch',",
+            "    'Accept': 'application/vnd.interoperability.services+json;version=1.0',",
+            "    'Content-Type': 'application/vnd.interoperability.services+json;version=1.0',",
+            "    'Date': curDate",
+            "  },",
+            "  body: {",
+            "    mode: 'raw',",
+            "    raw: JSON.stringify({",
+            "      \"providers\": [\"dfspA\", \"dfspB\"]",
+            "    })",
+            "  }",
+            "}",
+            "pm.sendRequest(servicesRequest, function (err, response) {",
+            "console.log('consent response : '+JSON.stringify(response.json()))",
+            "});"
+          ]
+        },
+        "statusCode": "200"
+      },
+      "type": "MOCK_RESPONSE"
+    },
+    "type": "response",
+    "version": 1
   }
 ]

@@ -162,7 +162,7 @@ describe('pispPrelinkingModel', () => {
       // check that the fsm was able to transition properly
       expect(model.data.currentState).toEqual('providersLookupSuccess')
 
-      // check we made a call to thirdpartyRequests.patchConsentRequests
+      // check we made a call to thirdpartyRequests.getServices
       expect(modelConfig.thirdpartyRequests.getServices).toBeCalledWith(
         'THIRD_PARTY_DFSP'
       )
