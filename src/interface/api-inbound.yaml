@@ -720,7 +720,7 @@ paths:
       summary: GetThirdpartyTransactionRequests
       description: >
         The HTTP request `GET /thirdpartyRequests/transactions/{ID}` is used to
-        request the
+        request the 
 
         retrieval of a third party transaction request.
       responses:
@@ -848,7 +848,7 @@ paths:
         used.
 
         The `{ID}` in the URI should contain the `transactionRequestId` that was
-        used for the creation of
+        used for the creation of 
 
         the thirdparty transaction request.
       parameters:
