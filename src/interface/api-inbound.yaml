@@ -720,7 +720,7 @@ paths:
       summary: GetThirdpartyTransactionRequests
       description: >
         The HTTP request `GET /thirdpartyRequests/transactions/{ID}` is used to
-        request the 
+        request the
 
         retrieval of a third party transaction request.
       responses:
@@ -848,7 +848,7 @@ paths:
         used.
 
         The `{ID}` in the URI should contain the `transactionRequestId` that was
-        used for the creation of 
+        used for the creation of
 
         the thirdparty transaction request.
       parameters:
@@ -1787,7 +1787,6 @@ components:
         - $ref: '#/components/schemas/OtpValue'
         - $ref: '#/components/schemas/QRCODE'
         - $ref: '#/components/schemas/U2FPinValue'
-      pattern: '^\d{3,10}$|^\S{1,64}$'
       description: >-
         Contains the authentication value. The format depends on the
         authentication type used in the AuthenticationInfo complex type.

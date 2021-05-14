@@ -508,7 +508,7 @@ components:
           $ref: '#/components/headers/Content-Type'
     AuthorizationsResponse:
       description: >
-        response body of POST/authorizations 
+        response body of POST/authorizations
 
         derived from AuthorizationsIDPutResponse by Inbound Service via Pub/Sub
         channel
@@ -554,7 +554,7 @@ components:
               #/components/schemas/ThirdpartyRequestsTransactionsIDAuthorizationsPutResponse
     AccountsByUserIdResponse:
       description: >
-        response body of GET /accounts/{ID} 
+        response body of GET /accounts/{ID}
 
         derived from UpdateAccountsByUserId by Inbound Service via Pub/Sub
         channel
@@ -1109,7 +1109,6 @@ components:
         - $ref: '#/components/schemas/OtpValue'
         - $ref: '#/components/schemas/QRCODE'
         - $ref: '#/components/schemas/U2FPinValue'
-      pattern: '^\d{3,10}$|^\S{1,64}$'
       description: >-
         Contains the authentication value. The format depends on the
         authentication type used in the AuthenticationInfo complex type.
@@ -2317,23 +2316,14 @@ components:
       required:
         - errorInformation
         - currentState
-    ServicesServiceTypePutResponse:
-      title: ServicesServiceTypePutResponse
-      type: object
-      description: 'The object sent in a `PUT /services/{ServiceType}` request.'
-      properties:
-        providers:
-          type: array
-          items:
-            $ref: '#/components/schemas/FspId'
-      required:
-        - providers
     LinkingProvidersResponseSuccess:
       title: LinkingProvidersResponseSuccess
       type: object
       properties:
         providers:
-          $ref: '#/components/schemas/ServicesServiceTypePutResponse'
+          type: array
+          items:
+            $ref: '#/components/schemas/FspId'
         currentState:
           $ref: '#/components/schemas/LinkingProvidersState'
       required:

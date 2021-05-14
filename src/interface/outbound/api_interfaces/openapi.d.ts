@@ -1010,12 +1010,8 @@ export interface components {
       errorInformation: components['schemas']['ErrorInformation'];
       currentState: components['schemas']['LinkingProvidersState'];
     };
-    /** The object sent in a `PUT /services/{ServiceType}` request. */
-    ServicesServiceTypePutResponse: {
-      providers: components['schemas']['FspId'][];
-    };
     LinkingProvidersResponseSuccess: {
-      providers: components['schemas']['ServicesServiceTypePutResponse'];
+      providers: components['schemas']['FspId'][];
       currentState: components['schemas']['LinkingProvidersState'];
     };
     LinkingProvidersResponse:

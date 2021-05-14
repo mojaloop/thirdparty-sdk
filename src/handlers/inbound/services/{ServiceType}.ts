@@ -21,29 +21,34 @@
  * Gates Foundation
  - Name Surname <name.surname@gatesfoundation.com>
 
- - Paweł Marzec <pawel.marzec@modusbox.com>
- - Sridhar Voruganti <sridhar.voruganti@modusbox.com>
+ - Kevin Leyow <kevin.leyow@modusbox.com>
 
  --------------
  ******/
-import Authorizations from './authorizations'
-import ThirdpartyAuthorizations from './thirdpartyRequests/transactions/{ID}/authorizations'
-import ThirdpartyTransactionPartyLookup from './thirdpartyTransaction/partyLookup'
-import ThirdpartyTransactionIDInitiate from './thirdpartyTransaction/{ID}/initiate'
-import ThirdpartyTransactionIDApprove from './thirdpartyTransaction/{ID}/approve'
-import Accounts from './accounts/{fspId}/{userId}'
-import ConsentRequestsIDValidate from './consentRequests/{ID}/validate'
-import ConsentRequests from './consentRequests'
-import LinkingProviders from './linking/providers'
+import { Request, ResponseObject } from '@hapi/hapi'
+import { StateResponseToolkit } from '~/server/plugins/state'
+import { PISPPrelinkingModel } from '~/models/outbound/pispPrelinking.model';
+import { Message } from '~/shared/pub-sub'
+import { Enum } from '@mojaloop/central-services-shared';
+
+/**
+ * Handles an inbound `PUT /services/{ServiceType}` request
+ */
+async function put (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+  const serviceType = request.params.ServiceType
+
+  const channel = PISPPrelinkingModel.notificationChannel(serviceType)
+  const pubSub = h.getPubSub()
+
+  // don't await on promise to resolve, let finish publish in background
+  setImmediate(async () => {
+    pubSub.publish(channel, request.payload as unknown as Message)
+    h.getLogger().info(`Inbound received PUT /services/{ServiceType} response and published to channel : ${channel}`)
+  })
+
+  return h.response().code(Enum.Http.ReturnCodes.OK.CODE)
+}
 
 export default {
-  OutboundAuthorizationsPost: Authorizations.post,
-  VerifyThirdPartyAuthorization: ThirdpartyAuthorizations.post,
-  ThirdpartyTransactionPartyLookup: ThirdpartyTransactionPartyLookup.post,
-  ThirdpartyTransactionIDInitiate: ThirdpartyTransactionIDInitiate.post,
-  ThirdpartyTransactionIDApprove: ThirdpartyTransactionIDApprove.post,
-  GetAccountsByUserId: Accounts.get,
-  OutboundConsentRequestsValidatePatch: ConsentRequestsIDValidate.patch,
-  OutboundConsentRequestsPost: ConsentRequests.post,
-  GetProviders: LinkingProviders.get
+  put
 }
