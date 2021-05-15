@@ -30,6 +30,8 @@ import { StateResponseToolkit } from '~/server/plugins/state'
 import { PISPPrelinkingModel } from '~/models/outbound/pispPrelinking.model';
 import { Message } from '~/shared/pub-sub'
 import { Enum } from '@mojaloop/central-services-shared';
+import { ServiceType } from '~/models/outbound/pispPrelinking.interface';
+
 
 /**
  * Handles an inbound `PUT /services/{ServiceType}` request
@@ -37,14 +39,16 @@ import { Enum } from '@mojaloop/central-services-shared';
 async function put (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const serviceType = request.params.ServiceType
 
-  const channel = PISPPrelinkingModel.notificationChannel(serviceType)
-  const pubSub = h.getPubSub()
+  if (serviceType == ServiceType.THIRD_PARTY_DFSP) {
+    const channel = PISPPrelinkingModel.notificationChannel(serviceType)
+    const pubSub = h.getPubSub()
 
-  // don't await on promise to resolve, let finish publish in background
-  setImmediate(async () => {
-    pubSub.publish(channel, request.payload as unknown as Message)
-    h.getLogger().info(`Inbound received PUT /services/{ServiceType} response and published to channel : ${channel}`)
-  })
+    // don't await on promise to resolve, let finish publish in background
+    setImmediate(async () => {
+      pubSub.publish(channel, request.payload as unknown as Message)
+      h.getLogger().info(`Inbound received PUT /services/{ServiceType} response and published to channel : ${channel}`)
+    })
+  }
 
   return h.response().code(Enum.Http.ReturnCodes.OK.CODE)
 }
