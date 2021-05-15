@@ -36,6 +36,9 @@ import {
 import { PubSub } from '~/shared/pub-sub'
 import * as OutboundAPI from '~/interface/outbound/api_interfaces'
 
+export enum ServiceType {
+  THIRD_PARTY_DFSP = 'THIRD_PARTY_DFSP'
+}
 export interface PISPPrelinkingStateMachine extends ControlledStateMachine {
   getProviders: Method
   onGetProviders: Method
