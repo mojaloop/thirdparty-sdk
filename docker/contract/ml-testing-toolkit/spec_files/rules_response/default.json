@@ -270,9 +270,10 @@
     "conditions": {
       "all": [
         {
-          "fact": "operationPath",
+          "fact": "pathParams",
           "operator": "equal",
-          "value": "/services/THIRD_PARTY_DFSP"
+          "value": "THIRD_PARTY_DFSP",
+          "path": "ServiceType"
         },
         {
           "fact": "method",
@@ -309,8 +310,7 @@
             "console.log('consent response : '+JSON.stringify(response.json()))",
             "});"
           ]
-        },
-        "statusCode": "200"
+        }
       },
       "type": "MOCK_RESPONSE"
     },

@@ -57,7 +57,6 @@ describe('PISP Pre-Linking', (): void => {
         currentState: 'providersLookupSuccess'
       }
       const linkingProvidersResponse = await axios.get(linkingProvidersURI)
-      console.log(linkingProvidersResponse)
       expect(linkingProvidersResponse.status).toEqual(200)
       expect(linkingProvidersResponse.data.currentState).toEqual('providersLookupSuccess')
       expect(linkingProvidersResponse.data).toEqual(expectedResponse)
