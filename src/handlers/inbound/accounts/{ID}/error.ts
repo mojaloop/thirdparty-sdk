@@ -26,7 +26,7 @@ import { Message } from '~/shared/pub-sub'
 import { StateResponseToolkit } from '~/server/plugins/state'
 import {
   OutboundAccountsModel
-} from '~/models/outbound/accounts.model'
+} from '~/models/outbound/pispDiscovery.model'
 
 /**
  * Handles an inbound PUT /accounts/{ID}/error request

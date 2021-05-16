@@ -38,30 +38,30 @@ import {
 } from '@mojaloop/api-snippets'
 import { PubSub } from '~/shared/pub-sub'
 
-export enum OutboundAccountsModelState {
+export enum PISPDiscoveryModelState {
   start = 'WAITING_FOR_ACCOUNTS_REQUEST',
   succeeded = 'COMPLETED',
   errored = 'ERROR_OCCURRED'
 }
 
-export interface OutboundAccountsGetResponse {
-  accounts: tpAPI.Schemas.AccountsIDPutResponse
+export interface PISPDiscoveryGetResponse {
+  accounts: tpAPI.Schemas.Account[]
   errorInformation?: fspiopAPI.Schemas.ErrorInformation
-  currentState: OutboundAccountsModelState
+  currentState: PISPDiscoveryModelState
 }
 
-export interface OutboundAccountsStateMachine extends ControlledStateMachine {
+export interface PISPDiscoveryStateMachine extends ControlledStateMachine {
   requestAccounts: Method
   onRequestAccounts: Method
 }
 
-export interface OutboundAccountsModelConfig extends PersistentModelConfig {
+export interface PISPDiscoveryModelConfig extends PersistentModelConfig {
   pubSub: PubSub
   thirdpartyRequests: ThirdpartyRequests
 }
 
-export interface OutboundAccountsData extends StateData {
+export interface PISPDiscoveryData extends StateData {
   toParticipantId: string
   userId: string
-  response?: OutboundAccountsGetResponse
+  response?: PISPDiscoveryGetResponse
 }

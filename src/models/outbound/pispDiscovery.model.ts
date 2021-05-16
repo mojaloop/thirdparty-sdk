@@ -25,12 +25,12 @@
  --------------
  ******/
 import {
-  OutboundAccountsGetResponse,
-  OutboundAccountsModelConfig,
-  OutboundAccountsModelState,
-  OutboundAccountsData,
-  OutboundAccountsStateMachine
-} from '~/models/accounts.interface'
+  PISPDiscoveryGetResponse,
+  PISPDiscoveryModelConfig,
+  PISPDiscoveryModelState,
+  PISPDiscoveryData,
+  PISPDiscoveryStateMachine
+} from '~/models/outbound/pispDiscovery.interface'
 import {
   v1_1 as fspiopAPI,
   thirdparty as tpAPI
@@ -42,13 +42,13 @@ import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
 
 import inspect from '~/shared/inspect'
 
-export class OutboundAccountsModel
-  extends PersistentModel<OutboundAccountsStateMachine, OutboundAccountsData> {
-  protected config: OutboundAccountsModelConfig
+export class PISPDiscoveryModel
+  extends PersistentModel<PISPDiscoveryStateMachine, PISPDiscoveryData> {
+  protected config: PISPDiscoveryModelConfig
 
   constructor (
-    data: OutboundAccountsData,
-    config: OutboundAccountsModelConfig
+    data: PISPDiscoveryData,
+    config: PISPDiscoveryModelConfig
   ) {
     const spec: StateMachineConfig = {
       init: 'start',
@@ -76,7 +76,7 @@ export class OutboundAccountsModel
   // generate the name of notification channel dedicated for accounts requests
   static notificationChannel (id: string): string {
     if (!(id && id.toString().length > 0)) {
-      throw new Error('OutboundAccountsModel.notificationChannel: \'id\' parameter is required')
+      throw new Error('PISPDiscoveryModel.notificationChannel: \'id\' parameter is required')
     }
     // channel name
     return `accounts_${id}`
@@ -90,7 +90,7 @@ export class OutboundAccountsModel
    * from the PubSub that the requestAccounts has been resolved
    */
   async onRequestAccounts (): Promise<void> {
-    const channel = OutboundAccountsModel.notificationChannel(this.data.userId)
+    const channel = PISPDiscoveryModel.notificationChannel(this.data.userId)
     const pubSub: PubSub = this.pubSub
 
     // eslint-disable-next-line no-async-promise-executor
@@ -108,9 +108,9 @@ export class OutboundAccountsModel
 
           // store response which will be returned by 'getResponse' method in workflow 'run'
           this.data.response = {
-            accounts: putResponse.errorInformation ? [] : [...putResponse],
-            currentState: OutboundAccountsModelState[
-              this.data.currentState as keyof typeof OutboundAccountsModelState
+            accounts: putResponse.errorInformation ? [] : putResponse.accounts,
+            currentState: PISPDiscoveryModelState[
+              this.data.currentState as keyof typeof PISPDiscoveryModelState
             ]
           }
 
@@ -136,14 +136,14 @@ export class OutboundAccountsModel
    *
    * @returns {object} - Response representing the result of the onRequestAccounts process
    */
-  getResponse (): OutboundAccountsGetResponse | void {
+  getResponse (): PISPDiscoveryGetResponse | void {
     return this.data.response
   }
 
   /**
    * runs the workflow
    */
-  async run (): Promise<OutboundAccountsGetResponse | void> {
+  async run (): Promise<PISPDiscoveryGetResponse | void> {
     const data = this.data
     try {
       // run transitions based on incoming state
@@ -165,7 +165,7 @@ export class OutboundAccountsModel
           return
       }
     } catch (err) {
-      this.logger.info(`Error running OutboundAccountsModel : ${inspect(err)}`)
+      this.logger.info(`Error running PISPDiscoveryModel : ${inspect(err)}`)
 
       // as this function is recursive, we don't want to error the state machine multiple times
       if (data.currentState !== 'errored') {
@@ -185,32 +185,13 @@ export class OutboundAccountsModel
 }
 
 export async function create (
-  data: OutboundAccountsData,
-  config: OutboundAccountsModelConfig
-): Promise<OutboundAccountsModel> {
+  data: PISPDiscoveryData,
+  config: PISPDiscoveryModelConfig
+): Promise<PISPDiscoveryModel> {
   // create a new model
-  const model = new OutboundAccountsModel(data, config)
+  const model = new PISPDiscoveryModel(data, config)
 
   // enforce to finish any transition to state specified by data.currentState or spec.init
   await model.fsm.state
   return model
-}
-
-// loads PersistentModel from KVS storage using given `config` and `spec`
-export async function loadFromKVS (
-  config: OutboundAccountsModelConfig
-): Promise<OutboundAccountsModel> {
-  try {
-    const data = await config.kvs.get<OutboundAccountsData>(config.key)
-    if (!data) {
-      throw new Error(`No data found in KVS for: ${config.key}`)
-    }
-    config.logger.push({ data })
-    config.logger.info('data loaded from KVS')
-    return new OutboundAccountsModel(data, config)
-  } catch (err) {
-    config.logger.push({ err })
-    config.logger.info(`Error loading data from KVS for key: ${config.key}`)
-    throw err
-  }
 }

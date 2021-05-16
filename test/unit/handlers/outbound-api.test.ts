@@ -30,7 +30,7 @@
 import { OutboundAuthorizationsModelState } from '~/models/authorizations.interface'
 import { OutboundAuthorizationsModel } from '~/models/outbound/authorizations.model'
 import { OutboundThirdpartyAuthorizationsModel } from '~/models/outbound/thirdparty.authorizations.model'
-import { OutboundAccountsModel } from '~/models/outbound/accounts.model'
+import { PISPDiscoveryModel } from '~/models/outbound/pispDiscovery.model'
 import { PISPOTPValidateModel } from '~/models/outbound/pispOTPValidate.model'
 import { PISPConsentRequestsModel } from '~/models/outbound/pispConsentRequests.model'
 import {
@@ -48,7 +48,7 @@ import {
   , PISPTransactionPhase
 } from '~/models/pispTransaction.interface'
 import PTM, { PISPTransactionModel } from '~/models/pispTransaction.model'
-import { OutboundAccountsModelState } from '~/models/accounts.interface'
+import { PISPDiscoveryModelState } from '~/models/outbound/pispDiscovery.interface'
 
 import { RedisConnectionConfig } from '~/shared/redis-connection'
 import { Server } from '@hapi/hapi'
@@ -497,16 +497,16 @@ describe('Outbound API routes', (): void => {
     })
   })
 
-  it('/accounts/{fspId}/{userId} -success', async (): Promise<void> => {
+  it('linking/accounts/{fspId}/{userId} -success', async (): Promise<void> => {
     const userId = 'username1234'
     const request = {
       method: 'GET',
-      url: `/accounts/dfspa/${userId}`
+      url: `linking/accounts/dfspa/${userId}`
     }
     const pubSub = new PubSub({} as RedisConnectionConfig)
     // defer publication to notification channel
     setTimeout(() => pubSub.publish(
-      OutboundAccountsModel.notificationChannel(userId),
+      PISPDiscoveryModel.notificationChannel(userId),
       mockData.accountsRequest.payload as unknown as Message
     ), 10)
     const response = await server.inject(request)
@@ -524,16 +524,16 @@ describe('Outbound API routes', (): void => {
           currency: 'USD'
         }
       ],
-      currentState: OutboundAccountsModelState.succeeded
+      currentState: PISPDiscoveryModelState.succeeded
     }
     expect(response.result).toEqual(expectedResp)
   })
 
-  it('/accounts/{fspId}/{userId} -fail', async (): Promise<void> => {
+  it('linking/accounts/{fspId}/{userId} -fail', async (): Promise<void> => {
     const userId = 'test'
     const request = {
       method: 'GET',
-      url: `/accounts/dfspa/${userId}`
+      url: `linking/accounts/dfspa/${userId}`
     }
     const errorResp = {
       errorInformation: {
@@ -544,14 +544,14 @@ describe('Outbound API routes', (): void => {
     const pubSub = new PubSub({} as RedisConnectionConfig)
     // defer publication to notification channel
     setTimeout(() => pubSub.publish(
-      OutboundAccountsModel.notificationChannel(userId),
+      PISPDiscoveryModel.notificationChannel(userId),
       errorResp as unknown as Message
     ), 10)
     const response = await server.inject(request)
     expect(response.statusCode).toBe(500)
     const expectedResp = {
       accounts: [],
-      currentState: OutboundAccountsModelState.succeeded,
+      currentState: PISPDiscoveryModelState.succeeded,
       errorInformation: errorResp.errorInformation
     }
     expect((response.result)).toEqual(expectedResp)

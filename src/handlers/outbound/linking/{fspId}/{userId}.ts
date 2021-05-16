@@ -25,14 +25,14 @@
 import { StateResponseToolkit } from '~/server/plugins/state'
 import { Request, ResponseObject } from '@hapi/hapi'
 import {
-  OutboundAccountsData,
-  OutboundAccountsModelConfig,
-  OutboundAccountsGetResponse
-} from '~/models/accounts.interface'
+  PISPDiscoveryData,
+  PISPDiscoveryModelConfig,
+  PISPDiscoveryGetResponse
+} from '~/models/outbound/pispDiscovery.interface'
 import {
-  OutboundAccountsModel,
+  PISPDiscoveryModel,
   create
-} from '~/models/outbound/accounts.model'
+} from '~/models/outbound/pispDiscovery.model'
 
 /**
  * Handles outbound GET /linking/accounts/{fspId}/{userId} request
@@ -41,12 +41,12 @@ import {
 async function get (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const userId: string = request.params.userId
   // prepare config
-  const data: OutboundAccountsData = {
+  const data: PISPDiscoveryData = {
     toParticipantId: request.params.fspId,
     userId: userId,
     currentState: 'start'
   }
-  const config: OutboundAccountsModelConfig = {
+  const config: PISPDiscoveryModelConfig = {
     key: userId,
     kvs: h.getKVS(),
     logger: h.getLogger(),
@@ -54,8 +54,8 @@ async function get (_context: any, request: Request, h: StateResponseToolkit): P
     thirdpartyRequests: h.getThirdpartyRequests()
   }
 
-  const model: OutboundAccountsModel = await create(data, config)
-  const result = (await model.run()) as OutboundAccountsGetResponse
+  const model: PISPDiscoveryModel = await create(data, config)
+  const result = (await model.run()) as PISPDiscoveryGetResponse
   const statusCode = (result.errorInformation) ? 500 : 200
 
   return h.response(result).code(statusCode)

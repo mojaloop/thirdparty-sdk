@@ -36,7 +36,7 @@ import {
 } from '~/models/inbound/accounts.model'
 import {
   OutboundAccountsModel
-} from '~/models/outbound/accounts.model'
+} from '~/models/outbound/pispDiscovery.model'
 import { Request, ResponseObject } from '@hapi/hapi'
 import { StateResponseToolkit } from '~/server/plugins/state'
 

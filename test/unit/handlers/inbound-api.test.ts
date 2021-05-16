@@ -45,7 +45,7 @@ import {
 } from '~/models/pispTransaction.model'
 import {
   OutboundAccountsModel
-} from '~/models/outbound/accounts.model'
+} from '~/models/outbound/pispDiscovery.model'
 import {
   PISPConsentRequestsModel
 } from '~/models/outbound/pispConsentRequests.model'

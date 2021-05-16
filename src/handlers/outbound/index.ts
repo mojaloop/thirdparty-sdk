@@ -31,7 +31,7 @@ import ThirdpartyAuthorizations from './thirdpartyRequests/transactions/{ID}/aut
 import ThirdpartyTransactionPartyLookup from './thirdpartyTransaction/partyLookup'
 import ThirdpartyTransactionIDInitiate from './thirdpartyTransaction/{ID}/initiate'
 import ThirdpartyTransactionIDApprove from './thirdpartyTransaction/{ID}/approve'
-import Accounts from './accounts/{fspId}/{userId}'
+import Accounts from './linking/{fspId}/{userId}'
 import ConsentRequestsIDValidate from './consentRequests/{ID}/validate'
 import ConsentRequests from './consentRequests'
 

@@ -40,7 +40,7 @@ import {
   OutboundAccountsModel,
   create,
   loadFromKVS
-} from '~/models/outbound/accounts.model'
+} from '~/models/outbound/pispDiscovery.model'
 
 import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
 import { RedisConnectionConfig } from '~/shared/redis-connection'
