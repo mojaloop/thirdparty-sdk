@@ -253,45 +253,6 @@ paths:
           $ref: '#/components/responses/501'
         '503':
           $ref: '#/components/responses/503'
-  '/accounts/{fspId}/{userId}':
-    get:
-      operationId: GetAccountsByUserId
-      summary: GetAccountsByUserId
-      description: >
-        The HTTP request `GET /accounts/{fspId}/{userId}` is used to retrieve
-        the list of potential accounts available for linking.
-      tags:
-        - accounts
-      parameters:
-        - name: fspId
-          in: path
-          required: true
-          schema:
-            $ref: '#/components/schemas/FspId'
-        - name: userId
-          in: path
-          required: true
-          schema:
-            $ref: '#/components/schemas/AccountAddress'
-      responses:
-        '200':
-          $ref: '#/components/responses/AccountsByUserIdResponse'
-        '400':
-          $ref: '#/components/responses/400'
-        '401':
-          $ref: '#/components/responses/401'
-        '403':
-          $ref: '#/components/responses/403'
-        '404':
-          $ref: '#/components/responses/404'
-        '405':
-          $ref: '#/components/responses/405'
-        '406':
-          $ref: '#/components/responses/406'
-        '501':
-          $ref: '#/components/responses/501'
-        '503':
-          $ref: '#/components/responses/503'
   '/consentRequests/{ID}/validate':
     patch:
       operationId: OutboundConsentRequestsValidatePatch
@@ -398,6 +359,45 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/LinkingProvidersResponse'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '405':
+          $ref: '#/components/responses/405'
+        '406':
+          $ref: '#/components/responses/406'
+        '501':
+          $ref: '#/components/responses/501'
+        '503':
+          $ref: '#/components/responses/503'
+  '/linking/accounts/{fspId}/{userId}':
+    get:
+      operationId: GetAccountsByUserId
+      summary: GetAccountsByUserId
+      description: >
+        The HTTP request `GET /linking/accounts/{fspId}/{userId}` is used to
+        retrieve the list of potential accounts available for linking.
+      tags:
+        - accounts
+      parameters:
+        - name: fspId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/FspId'
+        - name: userId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/AccountAddress'
+      responses:
+        '200':
+          $ref: '#/components/responses/AccountsByUserIdResponse'
         '400':
           $ref: '#/components/responses/400'
         '401':
@@ -552,23 +552,6 @@ components:
           schema:
             $ref: >-
               #/components/schemas/ThirdpartyRequestsTransactionsIDAuthorizationsPutResponse
-    AccountsByUserIdResponse:
-      description: >
-        response body of GET /accounts/{ID} 
-
-        derived from UpdateAccountsByUserId by Inbound Service via Pub/Sub
-        channel
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/AccountsIDPutResponse'
-          example:
-            - accountNickname: dfspa.user.nickname1
-              id: dfspa.username.1234
-              currency: ZAR
-            - accountNickname: dfspa.user.nickname2
-              id: dfspa.username.5678
-              currency: USD
     ConsentRequestsValidateResponse:
       description: Consent requests validate response
       content:
@@ -611,6 +594,23 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/LinkingProvidersResponse'
+    AccountsByUserIdResponse:
+      description: >
+        response body of GET /accounts/{ID} 
+
+        derived from UpdateAccountsByUserId by Inbound Service via Pub/Sub
+        channel
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AccountsIDPutResponse'
+          example:
+            - accountNickname: dfspa.user.nickname1
+              id: dfspa.username.1234
+              currency: ZAR
+            - accountNickname: dfspa.user.nickname2
+              id: dfspa.username.5678
+              currency: USD
   headers:
     Content-Length:
       required: false
@@ -1909,30 +1909,6 @@ components:
         - consentId
         - sourceAccountId
         - status
-    AccountsIDPutResponse:
-      title: AccountsIDPutResponse
-      type: object
-      description: 'The object sent in a `PUT /accounts/{ID}` request.'
-      properties:
-        accounts:
-          type: array
-          items:
-            type: object
-            description: |
-              The object sent in a `PUT /accounts/{ID}` request.
-            properties:
-              accountNickname:
-                $ref: '#/components/schemas/AccountAddress'
-              id:
-                $ref: '#/components/schemas/AccountAddress'
-              currency:
-                $ref: '#/components/schemas/Currency'
-            required:
-              - accountNickname
-              - id
-              - currency
-      required:
-        - accounts
     ConsentRequestsValidateRequest:
       title: ConsentRequestsValidateRequest
       description: 'POST /consentRequests/{ID}/validate Request object'
@@ -2348,6 +2324,30 @@ components:
       oneOf:
         - $ref: '#/components/schemas/LinkingProvidersResponseError'
         - $ref: '#/components/schemas/LinkingProvidersResponseSuccess'
+    AccountsIDPutResponse:
+      title: AccountsIDPutResponse
+      type: object
+      description: 'The object sent in a `PUT /accounts/{ID}` request.'
+      properties:
+        accounts:
+          type: array
+          items:
+            type: object
+            description: |
+              The object sent in a `PUT /accounts/{ID}` request.
+            properties:
+              accountNickname:
+                $ref: '#/components/schemas/AccountAddress'
+              id:
+                $ref: '#/components/schemas/AccountAddress'
+              currency:
+                $ref: '#/components/schemas/Currency'
+            required:
+              - accountNickname
+              - id
+              - currency
+      required:
+        - accounts
   parameters:
     ID:
       name: ID

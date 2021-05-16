@@ -35,7 +35,7 @@ import {
 } from '~/models/outbound/accounts.model'
 
 /**
- * Handles outbound GET /accounts/{fspId}/{userId} request
+ * Handles outbound GET /linking/accounts/{fspId}/{userId} request
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function get (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {

@@ -2,7 +2,7 @@ get:
   operationId: GetAccountsByUserId
   summary: GetAccountsByUserId
   description: |
-    The HTTP request `GET /accounts/{fspId}/{userId}` is used to retrieve the list of potential accounts available for linking.
+    The HTTP request `GET /linking/accounts/{fspId}/{userId}` is used to retrieve the list of potential accounts available for linking.
   tags:
     - accounts
   parameters:
