@@ -935,11 +935,14 @@ export interface components {
       | "ZAR"
       | "ZMW"
       | "ZWD";
+    /** The object sent in a `PUT /accounts/{ID}` request. */
     AccountsIDPutResponse: {
-      accountNickname: components["schemas"]["AccountAddress"];
-      id: components["schemas"]["AccountAddress"];
-      currency: components["schemas"]["Currency"];
-    }[];
+      accounts: {
+        accountNickname: components["schemas"]["AccountAddress"];
+        id: components["schemas"]["AccountAddress"];
+        currency: components["schemas"]["Currency"];
+      }[];
+    };
     /** Data model for the complex type object that contains ErrorInformation. */
     ErrorInformationObject: {
       errorInformation: components["schemas"]["ErrorInformation"];

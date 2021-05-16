@@ -1109,7 +1109,6 @@ components:
         - $ref: '#/components/schemas/OtpValue'
         - $ref: '#/components/schemas/QRCODE'
         - $ref: '#/components/schemas/U2FPinValue'
-      pattern: '^\d{3,10}$|^\S{1,64}$'
       description: >-
         Contains the authentication value. The format depends on the
         authentication type used in the AuthenticationInfo complex type.
@@ -1912,22 +1911,28 @@ components:
         - status
     AccountsIDPutResponse:
       title: AccountsIDPutResponse
-      type: array
-      items:
-        type: object
-        description: |
-          The object sent in a `PUT /accounts/{ID}` request.
-        properties:
-          accountNickname:
-            $ref: '#/components/schemas/AccountAddress'
-          id:
-            $ref: '#/components/schemas/AccountAddress'
-          currency:
-            $ref: '#/components/schemas/Currency'
-        required:
-          - accountNickname
-          - id
-          - currency
+      type: object
+      description: 'The object sent in a `PUT /accounts/{ID}` request.'
+      properties:
+        accounts:
+          type: array
+          items:
+            type: object
+            description: |
+              The object sent in a `PUT /accounts/{ID}` request.
+            properties:
+              accountNickname:
+                $ref: '#/components/schemas/AccountAddress'
+              id:
+                $ref: '#/components/schemas/AccountAddress'
+              currency:
+                $ref: '#/components/schemas/Currency'
+            required:
+              - accountNickname
+              - id
+              - currency
+      required:
+        - accounts
     ConsentRequestsValidateRequest:
       title: ConsentRequestsValidateRequest
       description: 'POST /consentRequests/{ID}/validate Request object'

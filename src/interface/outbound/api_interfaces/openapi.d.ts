@@ -846,11 +846,14 @@ export interface components {
       /** The status of the authorization. This value must be `VERIFIED` for a PUT request. */
       status: 'VERIFIED';
     };
+    /** The object sent in a `PUT /accounts/{ID}` request. */
     AccountsIDPutResponse: {
-      accountNickname: components['schemas']['AccountAddress'];
-      id: components['schemas']['AccountAddress'];
-      currency: components['schemas']['Currency'];
-    }[];
+      accounts: {
+        accountNickname: components['schemas']['AccountAddress'];
+        id: components['schemas']['AccountAddress'];
+        currency: components['schemas']['Currency'];
+      }[];
+    };
     /** POST /consentRequests/{ID}/validate Request object */
     ConsentRequestsValidateRequest: {
       toParticipantId: string;
