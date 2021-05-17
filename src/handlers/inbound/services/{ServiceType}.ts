@@ -28,25 +28,29 @@
 import { Request, ResponseObject } from '@hapi/hapi'
 import { StateResponseToolkit } from '~/server/plugins/state'
 import { PISPPrelinkingModel } from '~/models/outbound/pispPrelinking.model';
-import { Message } from '~/shared/pub-sub'
 import { Enum } from '@mojaloop/central-services-shared';
 import { ServiceType } from '~/models/outbound/pispPrelinking.interface';
+import { thirdparty as tpAPI } from '@mojaloop/api-snippets';
 
 
 /**
  * Handles an inbound `PUT /services/{ServiceType}` request
  */
 async function put (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+  const payload = request.payload as tpAPI.Schemas.ServicesServiceTypePutResponse
   const serviceType = request.params.ServiceType
 
   if (serviceType == ServiceType.THIRD_PARTY_DFSP) {
-    const channel = PISPPrelinkingModel.notificationChannel(serviceType)
     const pubSub = h.getPubSub()
 
     // don't await on promise to resolve, let finish publish in background
     setImmediate(async () => {
-      pubSub.publish(channel, request.payload as unknown as Message)
-      h.getLogger().info(`Inbound received PUT /services/{ServiceType} response and published to channel : ${channel}`)
+      await PISPPrelinkingModel.triggerWorkflow(
+        serviceType,
+        pubSub,
+        payload
+      )
+      h.getLogger().info(`Inbound received PUT /services/{ServiceType} response`)
     })
   }
 

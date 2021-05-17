@@ -29,26 +29,32 @@ import { Request, ResponseObject } from '@hapi/hapi'
 import {
   v1_1 as fspiopAPI
 } from '@mojaloop/api-snippets'
-import { Message } from '~/shared/pub-sub'
 import { StateResponseToolkit } from '~/server/plugins/state'
 import { PISPPrelinkingModel } from '~/models/outbound/pispPrelinking.model';
 import { Enum } from '@mojaloop/central-services-shared';
+import { ServiceType } from '~/models/outbound/pispPrelinking.interface';
+
 
 /**
 * Handles a inbound PUT /services/{ServiceType}/error request
 */
 async function put (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const payload = request.payload as fspiopAPI.Schemas.ErrorInformation
-  const channel = PISPPrelinkingModel.notificationChannel(
-    request.params.ServiceType
-  )
-  const pubSub = h.getPubSub()
+  const serviceType = request.params.ServiceType
 
-  // don't await on promise to resolve, let finish publish in background
-  setImmediate(async () => {
-    pubSub.publish(channel, payload as unknown as Message)
-    h.getLogger().info(`Inbound received PUT /services/{ServiceType}/error response and published to channel : ${channel}`)
-  })
+  if (serviceType == ServiceType.THIRD_PARTY_DFSP) {
+    const pubSub = h.getPubSub()
+    // don't await on promise to resolve, let finish publish in background
+    setImmediate(async () => {
+      await PISPPrelinkingModel.triggerWorkflow(
+        serviceType,
+        pubSub,
+        payload
+      )
+      h.getLogger().info(`Inbound received PUT /services/{ServiceType}/error response`)
+    })
+  }
+
   return h.response({}).code(Enum.Http.ReturnCodes.OK.CODE)
 }
 

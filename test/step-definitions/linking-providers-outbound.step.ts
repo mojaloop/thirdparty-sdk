@@ -115,7 +115,7 @@ defineFeature(feature, (test): void => {
     jest.resetAllMocks()
     jest.resetModules()
     server.events.on('stop', done)
-    server.stop()
+    server.stop({ timeout:0 })
   })
 
   test('GetProviders', ({ given, when, then }): void => {

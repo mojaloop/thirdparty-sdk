@@ -75,6 +75,15 @@ export class PISPPrelinkingModel
     return `PISPPrelinking-${serviceType}`
   }
 
+  static async triggerWorkflow (
+    serviceType: string,
+    pubSub: PubSub,
+    message: Message
+  ): Promise<void> {
+    const channel = PISPPrelinkingModel.notificationChannel(serviceType)
+    return deferredJob(pubSub, channel).trigger(message)
+  }
+
   async onGetProviders (): Promise<void> {
     const { serviceType } = this.data
 
@@ -152,7 +161,6 @@ export class PISPPrelinkingModel
           this.logger.info(
             `getProviders requested for ${data.serviceType},  currentState: ${data.currentState}`
           )
-          console.log('hello')
           await this.fsm.getProviders()
           await this.checkModelDataForErrorInformation()
           return this.getResponse()
