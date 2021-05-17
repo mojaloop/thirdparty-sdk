@@ -497,11 +497,11 @@ describe('Outbound API routes', (): void => {
     })
   })
 
-  it('linking/accounts/{fspId}/{userId} -success', async (): Promise<void> => {
+  it('/linking/accounts/{fspId}/{userId} - success', async (): Promise<void> => {
     const userId = 'username1234'
     const request = {
       method: 'GET',
-      url: `linking/accounts/dfspa/${userId}`
+      url: `/linking/accounts/dfspa/${userId}`
     }
     const pubSub = new PubSub({} as RedisConnectionConfig)
     // defer publication to notification channel
@@ -529,11 +529,11 @@ describe('Outbound API routes', (): void => {
     expect(response.result).toEqual(expectedResp)
   })
 
-  it('linking/accounts/{fspId}/{userId} -fail', async (): Promise<void> => {
+  it('/linking/accounts/{fspId}/{userId} - fail', async (): Promise<void> => {
     const userId = 'test'
     const request = {
       method: 'GET',
-      url: `linking/accounts/dfspa/${userId}`
+      url: `/linking/accounts/dfspa/${userId}`
     }
     const errorResp = {
       errorInformation: {

@@ -35,7 +35,7 @@ import {
   InboundAccountsModelConfig
 } from '~/models/inbound/accounts.model'
 import {
-  OutboundAccountsModel
+  PISPDiscoveryModel
 } from '~/models/outbound/pispDiscovery.model'
 import { Request, ResponseObject } from '@hapi/hapi'
 import { StateResponseToolkit } from '~/server/plugins/state'
@@ -47,7 +47,7 @@ import { StateResponseToolkit } from '~/server/plugins/state'
 async function put (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const payload = request.payload as unknown as tpAPI.Schemas.AccountsIDPutResponse
   const userId: string = request.params.ID
-  const channel = OutboundAccountsModel.notificationChannel(userId)
+  const channel = PISPDiscoveryModel.notificationChannel(userId)
   const pubSub = h.getPubSub()
   // don't await on promise to resolve, let finish publish in background
   pubSub.publish(channel, payload as unknown as Message)

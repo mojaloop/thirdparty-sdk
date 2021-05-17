@@ -44,7 +44,7 @@ import {
   PISPTransactionModel
 } from '~/models/pispTransaction.model'
 import {
-  OutboundAccountsModel
+  PISPDiscoveryModel
 } from '~/models/outbound/pispDiscovery.model'
 import {
   PISPConsentRequestsModel
@@ -581,7 +581,7 @@ describe('Inbound API routes', (): void => {
       expect(result.statusCode).toEqual(200)
       expect(toolkit.getPubSub).toBeCalledTimes(1)
 
-      const channel = OutboundAccountsModel.notificationChannel(request.params.ID)
+      const channel = PISPDiscoveryModel.notificationChannel(request.params.ID)
       expect(pubSubMock.publish).toBeCalledWith(channel, request.payload)
     })
 
@@ -652,7 +652,7 @@ describe('Inbound API routes', (): void => {
       expect(result.statusCode).toEqual(200)
       expect(toolkit.getPubSub).toBeCalledTimes(1)
 
-      const channel = OutboundAccountsModel.notificationChannel(errorRequest.params.ID)
+      const channel = PISPDiscoveryModel.notificationChannel(errorRequest.params.ID)
       expect(pubSubMock.publish).toBeCalledWith(channel, errorRequest.payload)
     })
   })
