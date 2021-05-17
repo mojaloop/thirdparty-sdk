@@ -94,7 +94,7 @@ describe('pispPrelinkingModel', () => {
     await modelConfig.pubSub.disconnect()
   })
 
-  function checkPISPOTPModelLayout (pispOTPmodel: PISPPrelinkingModel, optData?: PISPPrelinkingData) {
+  function checkPISPPrelinkingModelLayout (pispOTPmodel: PISPPrelinkingModel, optData?: PISPPrelinkingData) {
     expect(pispOTPmodel).toBeTruthy()
     expect(pispOTPmodel.data).toBeDefined()
     expect(pispOTPmodel.fsm.state).toEqual(optData?.currentState || 'start')
@@ -147,7 +147,7 @@ describe('pispPrelinkingModel', () => {
 
     it('should be well constructed', async () => {
       const model = await create(prelinkingData, modelConfig)
-      checkPISPOTPModelLayout(model, prelinkingData)
+      checkPISPPrelinkingModelLayout(model, prelinkingData)
     })
 
     it('getProviders() should transition start to providersLookupSuccess state when successful', async () => {
