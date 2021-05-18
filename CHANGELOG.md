@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+## [11.37.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.36.1...v11.37.0) (2021-05-18)
+
+
+### Features
+
+* implement pisp prelinking flow ([#95](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/95)) ([244fc74](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/244fc74657711a1602a4d6ed2499157963b87950))
+
 ### [11.36.1](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.36.0...v11.36.1) (2021-05-14)
 
 
