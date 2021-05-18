@@ -94,18 +94,20 @@
     "params": {
       "ID": "username1234"
     },
-    "payload": [
-      {
-        "accountNickname": "dfspa.user.nickname1",
-        "id": "dfspa.username.1234",
-        "currency": "ZAR"
-      },
-      {
-        "accountNickname": "dfspa.user.nickname2",
-        "id": "dfspa.username.5678",
-        "currency": "USD"
-      }
-    ]
+    "payload": {
+      "accounts": [
+        {
+          "accountNickname": "dfspa.user.nickname1",
+          "id": "dfspa.username.1234",
+          "currency": "ZAR"
+        },
+        {
+          "accountNickname": "dfspa.user.nickname2",
+          "id": "dfspa.username.5678",
+          "currency": "USD"
+        }
+      ]
+    }
   },
   "accountsRequestError": {
     "headers": {

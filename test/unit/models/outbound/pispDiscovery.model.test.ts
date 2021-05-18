@@ -28,19 +28,18 @@ import { KVS } from '~/shared/kvs'
 import { Message, NotificationCallback, PubSub } from '~/shared/pub-sub'
 
 import {
-  OutboundAccountsData,
-  OutboundAccountsModelConfig,
-  OutboundAccountsModelState
-} from '~/models/accounts.interface'
+  PISPDiscoveryData,
+  PISPDiscoveryModelConfig,
+  PISPDiscoveryModelState
+} from '~/models/outbound/pispDiscovery.interface'
 import {
   v1_1 as fspiopAPI,
   thirdparty as tpAPI
 } from '@mojaloop/api-snippets'
 import {
-  OutboundAccountsModel,
-  create,
-  loadFromKVS
-} from '~/models/outbound/accounts.model'
+  PISPDiscoveryModel,
+  create
+} from '~/models/outbound/pispDiscovery.model'
 
 import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
 import { RedisConnectionConfig } from '~/shared/redis-connection'
@@ -57,13 +56,13 @@ jest.mock('~/shared/kvs')
 // mock PubSub default exported class
 jest.mock('~/shared/pub-sub')
 
-describe('OutboundAccountsModel', () => {
+describe('PISPDiscoveryModel', () => {
   const connectionConfig: RedisConnectionConfig = {
     port: 6789,
     host: 'localhost',
     logger: mockLogger()
   }
-  let modelConfig: OutboundAccountsModelConfig
+  let modelConfig: PISPDiscoveryModelConfig
   const expectedResp = {
     accounts: [
       {
@@ -77,7 +76,7 @@ describe('OutboundAccountsModel', () => {
         currency: 'USD'
       }
     ],
-    currentState: OutboundAccountsModelState.succeeded
+    currentState: PISPDiscoveryModelState.succeeded
   }
   const idNotFoundResp = {
     accounts: [],
@@ -107,7 +106,7 @@ describe('OutboundAccountsModel', () => {
     await modelConfig.pubSub.disconnect()
   })
 
-  function checkOAMLayout (am: OutboundAccountsModel, optData?: OutboundAccountsData) {
+  function checkPISPDiscoveryModelLayout (am: PISPDiscoveryModel, optData?: PISPDiscoveryData) {
     expect(am).toBeTruthy()
     expect(am.data).toBeDefined()
     expect(am.fsm.state).toEqual(optData?.currentState || 'start')
@@ -128,20 +127,19 @@ describe('OutboundAccountsModel', () => {
   }
 
   it('module layout', () => {
-    expect(typeof OutboundAccountsModel).toEqual('function')
-    expect(typeof loadFromKVS).toEqual('function')
+    expect(typeof PISPDiscoveryModel).toEqual('function')
     expect(typeof create).toEqual('function')
   })
 
   describe('notificationChannel', () => {
     it('should generate proper channel name', () => {
       const id = '123'
-      expect(OutboundAccountsModel.notificationChannel(id)).toEqual('accounts_123')
+      expect(PISPDiscoveryModel.notificationChannel(id)).toEqual('accounts_123')
     })
 
     it('input validation', () => {
       expect(
-        () => OutboundAccountsModel.notificationChannel(null as unknown as string)
+        () => PISPDiscoveryModel.notificationChannel(null as unknown as string)
       ).toThrow()
     })
   })
@@ -150,7 +148,7 @@ describe('OutboundAccountsModel', () => {
     let subId = 0
     let channel: string
     let handler: NotificationCallback
-    let data: OutboundAccountsData
+    let data: PISPDiscoveryData
     type PutResponseOrError = tpAPI.Schemas.AccountsIDPutResponse & fspiopAPI.Schemas.ErrorInformationObject
     let putResponse: PutResponseOrError
 
@@ -173,9 +171,14 @@ describe('OutboundAccountsModel', () => {
         currentState: 'start'
       }
 
-      channel = OutboundAccountsModel.notificationChannel(data.userId)
+      channel = PISPDiscoveryModel.notificationChannel(data.userId)
 
       putResponse = mockData.accountsRequest.payload
+    })
+
+    it('should be well constructed', async () => {
+      const model = await create(data, modelConfig)
+      checkPISPDiscoveryModelLayout(model, data)
     })
 
     it('should give response properly populated from notification channel - success', async () => {
@@ -308,73 +311,6 @@ describe('OutboundAccountsModel', () => {
 
         expect(model.run()).rejects.toEqual(error)
       })
-    })
-  })
-
-  describe('loadFromKVS', () => {
-    it('should properly call `KVS.get`, get expected data in `context.data` and setup state of machine', async () => {
-      const dataFromCache: OutboundAccountsData = {
-        toParticipantId: '123',
-        userId: 'username1234',
-        currentState: 'succeeded'
-      }
-      mocked(modelConfig.kvs.get).mockImplementationOnce(async () => dataFromCache)
-      const am = await loadFromKVS(modelConfig)
-      checkOAMLayout(am, dataFromCache)
-
-      // to get value from cache proper key should be used
-      expect(mocked(modelConfig.kvs.get)).toHaveBeenCalledWith(modelConfig.key)
-
-      // check what has been stored in `data`
-      expect(am.data).toEqual(dataFromCache)
-    })
-
-    it('should throw when received invalid data from `KVS.get`', async () => {
-      mocked(modelConfig.kvs.get).mockImplementationOnce(async () => null)
-      try {
-        await loadFromKVS(modelConfig)
-        shouldNotBeExecuted()
-      } catch (error) {
-        expect(error.message).toEqual(`No data found in KVS for: ${modelConfig.key}`)
-      }
-    })
-
-    it('should propagate error received from `KVS.get`', async () => {
-      mocked(modelConfig.kvs.get).mockImplementationOnce(jest.fn(async () => { throw new Error('error from KVS.get') }))
-      expect(() => loadFromKVS(modelConfig))
-        .rejects.toEqual(new Error('error from KVS.get'))
-    })
-  })
-
-  describe('saveToKVS', () => {
-    it('should store using KVS.set', async () => {
-      mocked(modelConfig.kvs.set).mockImplementationOnce(() => Promise.resolve(true))
-      const data: OutboundAccountsData = {
-        toParticipantId: '123',
-        userId: 'username1234',
-        currentState: 'succeeded'
-      }
-      const model = await create(data, modelConfig)
-      checkOAMLayout(model, data)
-
-      // transition `init` should encounter exception when saving `context.data`
-      await model.saveToKVS()
-      expect(mocked(modelConfig.kvs.set)).toBeCalledWith(model.key, model.data)
-    })
-
-    it('should propagate error from KVS.set', async () => {
-      mocked(modelConfig.kvs.set).mockImplementationOnce(() => { throw new Error('error from KVS.set') })
-      const data: OutboundAccountsData = {
-        toParticipantId: '123',
-        userId: 'username1234',
-        currentState: 'succeeded'
-      }
-      const am = await create(data, modelConfig)
-      checkOAMLayout(am, data)
-
-      // transition `init` should encounter exception when saving `context.data`
-      expect(() => am.saveToKVS()).rejects.toEqual(new Error('error from KVS.set'))
-      expect(mocked(modelConfig.kvs.set)).toBeCalledWith(am.key, am.data)
     })
   })
 })

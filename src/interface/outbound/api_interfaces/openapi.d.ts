@@ -25,9 +25,6 @@ export interface paths {
   '/thirdpartyRequests/transactions/{ID}/authorizations': {
     post: operations['VerifyThirdPartyAuthorization'];
   };
-  '/accounts/{fspId}/{userId}': {
-    get: operations['GetAccountsByUserId'];
-  };
   '/consentRequests/{ID}/validate': {
     patch: operations['OutboundConsentRequestsValidatePatch'];
   };
@@ -36,6 +33,9 @@ export interface paths {
   };
   '/linking/providers': {
     get: operations['GetProviders'];
+  };
+  '/linking/accounts/{fspId}/{userId}': {
+    get: operations['GetAccountsByUserId'];
   };
 }
 
@@ -168,26 +168,6 @@ export interface operations {
       503: components['responses']['503'];
     };
   };
-  /** The HTTP request `GET /accounts/{fspId}/{userId}` is used to retrieve the list of potential accounts available for linking. */
-  GetAccountsByUserId: {
-    parameters: {
-      path: {
-        fspId: components['schemas']['FspId'];
-        userId: components['schemas']['AccountAddress'];
-      };
-    };
-    responses: {
-      200: components['responses']['AccountsByUserIdResponse'];
-      400: components['responses']['400'];
-      401: components['responses']['401'];
-      403: components['responses']['403'];
-      404: components['responses']['404'];
-      405: components['responses']['405'];
-      406: components['responses']['406'];
-      501: components['responses']['501'];
-      503: components['responses']['503'];
-    };
-  };
   /** Used in the authentication phase of account linking. Used by the PISP to pass an OTP on behalf of the user to the DFSP to establish a chain of trust. */
   OutboundConsentRequestsValidatePatch: {
     parameters: {
@@ -231,6 +211,26 @@ export interface operations {
   GetProviders: {
     responses: {
       200: components['responses']['LinkingProvidersResponse'];
+      400: components['responses']['400'];
+      401: components['responses']['401'];
+      403: components['responses']['403'];
+      404: components['responses']['404'];
+      405: components['responses']['405'];
+      406: components['responses']['406'];
+      501: components['responses']['501'];
+      503: components['responses']['503'];
+    };
+  };
+  /** The HTTP request `GET /linking/accounts/{fspId}/{userId}` is used to retrieve the list of potential accounts available for linking. */
+  GetAccountsByUserId: {
+    parameters: {
+      path: {
+        fspId: components['schemas']['FspId'];
+        userId: components['schemas']['AccountAddress'];
+      };
+    };
+    responses: {
+      200: components['responses']['AccountsByUserIdResponse'];
       400: components['responses']['400'];
       401: components['responses']['401'];
       403: components['responses']['403'];
@@ -846,11 +846,6 @@ export interface components {
       /** The status of the authorization. This value must be `VERIFIED` for a PUT request. */
       status: 'VERIFIED';
     };
-    AccountsIDPutResponse: {
-      accountNickname: components['schemas']['AccountAddress'];
-      id: components['schemas']['AccountAddress'];
-      currency: components['schemas']['Currency'];
-    }[];
     /** POST /consentRequests/{ID}/validate Request object */
     ConsentRequestsValidateRequest: {
       toParticipantId: string;
@@ -1017,6 +1012,14 @@ export interface components {
     LinkingProvidersResponse:
     | components['schemas']['LinkingProvidersResponseError']
     | components['schemas']['LinkingProvidersResponseSuccess'];
+    /** The object sent in a `PUT /accounts/{ID}` request. */
+    AccountsIDPutResponse: {
+      accounts: {
+        accountNickname: components['schemas']['AccountAddress'];
+        id: components['schemas']['AccountAddress'];
+        currency: components['schemas']['Currency'];
+      }[];
+    };
   };
   responses: {
     /** OK */
@@ -1138,15 +1141,6 @@ export interface components {
         'application/json': components['schemas']['ThirdpartyRequestsTransactionsIDAuthorizationsPutResponse'];
       };
     };
-    /**
-     * response body of GET /accounts/{ID}
-     * derived from UpdateAccountsByUserId by Inbound Service via Pub/Sub channel
-     */
-    AccountsByUserIdResponse: {
-      content: {
-        'application/json': components['schemas']['AccountsIDPutResponse'];
-      };
-    };
     /** Consent requests validate response */
     ConsentRequestsValidateResponse: {
       content: {
@@ -1166,6 +1160,15 @@ export interface components {
     LinkingProvidersResponse: {
       content: {
         'application/json': components['schemas']['LinkingProvidersResponse'];
+      };
+    };
+    /**
+     * response body of GET /accounts/{ID}
+     * derived from UpdateAccountsByUserId by Inbound Service via Pub/Sub channel
+     */
+    AccountsByUserIdResponse: {
+      content: {
+        'application/json': components['schemas']['AccountsIDPutResponse'];
       };
     };
   };

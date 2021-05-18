@@ -36,6 +36,8 @@ import {
 } from '@mojaloop/api-snippets'
 import { HTTPResponseError } from '~/shared/http-response-error'
 
+// todo: refactor this into dfspDiscoveryModel. this solution will suffice for
+//       now.
 export interface InboundAccountsModelConfig {
   logger: SDKLogger.Logger
   dfspBackendRequests: DFSPBackendRequests
