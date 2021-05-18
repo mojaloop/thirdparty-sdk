@@ -21,29 +21,37 @@
  * Gates Foundation
  - Name Surname <name.surname@gatesfoundation.com>
 
- - Paweł Marzec <pawel.marzec@modusbox.com>
- - Sridhar Voruganti <sridhar.voruganti@modusbox.com>
-
+ - Kevin Leyow - kevin.leyow@modusbox.com
  --------------
  ******/
-import Authorizations from './authorizations'
-import ThirdpartyAuthorizations from './thirdpartyRequests/transactions/{ID}/authorizations'
-import ThirdpartyTransactionPartyLookup from './thirdpartyTransaction/partyLookup'
-import ThirdpartyTransactionIDInitiate from './thirdpartyTransaction/{ID}/initiate'
-import ThirdpartyTransactionIDApprove from './thirdpartyTransaction/{ID}/approve'
-import Accounts from './accounts/{fspId}/{userId}'
-import ConsentRequestsIDValidate from './consentRequests/{ID}/validate'
-import ConsentRequests from './consentRequests'
-import LinkingProviders from './linking/providers'
+ import {
+  ControlledStateMachine,
+  PersistentModelConfig, StateData
+} from '~/models/persistent.model'
+import { Method } from 'javascript-state-machine'
+import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components';
+import {
+  thirdparty as tpAPI
+} from '@mojaloop/api-snippets'
+import { PubSub } from '~/shared/pub-sub'
+import * as OutboundAPI from '~/interface/outbound/api_interfaces'
 
-export default {
-  OutboundAuthorizationsPost: Authorizations.post,
-  VerifyThirdPartyAuthorization: ThirdpartyAuthorizations.post,
-  ThirdpartyTransactionPartyLookup: ThirdpartyTransactionPartyLookup.post,
-  ThirdpartyTransactionIDInitiate: ThirdpartyTransactionIDInitiate.post,
-  ThirdpartyTransactionIDApprove: ThirdpartyTransactionIDApprove.post,
-  GetAccountsByUserId: Accounts.get,
-  OutboundConsentRequestsValidatePatch: ConsentRequestsIDValidate.patch,
-  OutboundConsentRequestsPost: ConsentRequests.post,
-  GetProviders: LinkingProviders.get
+export enum ServiceType {
+  THIRD_PARTY_DFSP = 'THIRD_PARTY_DFSP'
+}
+export interface PISPPrelinkingStateMachine extends ControlledStateMachine {
+  getProviders: Method
+  onGetProviders: Method
+}
+
+export interface PISPPrelinkingModelConfig extends PersistentModelConfig {
+  pubSub: PubSub
+  thirdpartyRequests: ThirdpartyRequests
+  requestProcessingTimeoutSeconds: number
+}
+
+export interface PISPPrelinkingData extends StateData<OutboundAPI.Schemas.LinkingProvidersState> {
+  serviceType: string
+  providers?: string[]
+  errorInformation?: tpAPI.Schemas.ErrorInformation
 }

@@ -94,4 +94,6 @@ export namespace Schemas {
   export type AuthChannels = components['schemas']['ConsentRequestChannelType'][]
   export type ConsentRequestsState = components['schemas']['ConsentRequestsState']
   export type ConsentRequestsResponse = components['schemas']['ConsentRequestsResponse']
+  export type LinkingProvidersState = components['schemas']['LinkingProvidersState']
+  export type LinkingProvidersResponse = components['schemas']['LinkingProvidersResponse']
 }

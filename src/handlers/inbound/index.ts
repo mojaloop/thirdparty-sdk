@@ -37,6 +37,8 @@ import NotifyThirdpartyTransactionRequests from './thirdpartyRequests/transactio
 import ThirdpartyTransactionRequestsError from './thirdpartyRequests/transactions/{ID}/error'
 import InboundAccounts from './accounts/{ID}'
 import InboundAccountsError from './accounts/{ID}/error'
+import InboundServices from './services/{ServiceType}'
+import InboundServicesError from './services/{ServiceType}/error'
 
 export default {
   CreateThirdpartyTransactionRequests: ThirdpartyRequestsTransactions.post,
@@ -53,5 +55,7 @@ export default {
   PatchConsentRequest: InboundConsentRequestsId.patch,
   UpdateConsentRequest: InboundConsentRequestsId.put,
   NotifyErrorConsentRequests: InboundConsentRequestsIdError.put,
-  PostConsents: InboundConsents.post
+  PostConsents: InboundConsents.post,
+  PutServicesByServiceType: InboundServices.put,
+  PutServicesByServiceTypeAndError: InboundServicesError.put
 }
