@@ -2823,22 +2823,28 @@ components:
         - type
     AccountsIDPutResponse:
       title: AccountsIDPutResponse
-      type: array
-      items:
-        type: object
-        description: |
-          The object sent in a `PUT /accounts/{ID}` request.
-        properties:
-          accountNickname:
-            $ref: '#/components/schemas/AccountAddress'
-          id:
-            $ref: '#/components/schemas/AccountAddress'
-          currency:
-            $ref: '#/components/schemas/Currency'
-        required:
-          - accountNickname
-          - id
-          - currency
+      type: object
+      description: 'The object sent in a `PUT /accounts/{ID}` request.'
+      properties:
+        accounts:
+          type: array
+          items:
+            type: object
+            description: |
+              The object sent in a `PUT /accounts/{ID}` request.
+            properties:
+              accountNickname:
+                $ref: '#/components/schemas/AccountAddress'
+              id:
+                $ref: '#/components/schemas/AccountAddress'
+              currency:
+                $ref: '#/components/schemas/Currency'
+            required:
+              - accountNickname
+              - id
+              - currency
+      required:
+        - accounts
     ServicesServiceTypePutResponse:
       title: ServicesServiceTypePutResponse
       type: object
