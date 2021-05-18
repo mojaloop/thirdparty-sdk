@@ -2298,23 +2298,14 @@ components:
       required:
         - errorInformation
         - currentState
-    ServicesServiceTypePutResponse:
-      title: ServicesServiceTypePutResponse
-      type: object
-      description: 'The object sent in a `PUT /services/{ServiceType}` request.'
-      properties:
-        providers:
-          type: array
-          items:
-            $ref: '#/components/schemas/FspId'
-      required:
-        - providers
     LinkingProvidersResponseSuccess:
       title: LinkingProvidersResponseSuccess
       type: object
       properties:
         providers:
-          $ref: '#/components/schemas/ServicesServiceTypePutResponse'
+          type: array
+          items:
+            $ref: '#/components/schemas/FspId'
         currentState:
           $ref: '#/components/schemas/LinkingProvidersState'
       required:

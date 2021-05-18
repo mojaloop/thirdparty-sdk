@@ -21,29 +21,42 @@
  * Gates Foundation
  - Name Surname <name.surname@gatesfoundation.com>
 
- - Paweł Marzec <pawel.marzec@modusbox.com>
- - Sridhar Voruganti <sridhar.voruganti@modusbox.com>
+ - Kevin Leyow <kevin.leyow@modusbox.com>
 
  --------------
  ******/
-import Authorizations from './authorizations'
-import ThirdpartyAuthorizations from './thirdpartyRequests/transactions/{ID}/authorizations'
-import ThirdpartyTransactionPartyLookup from './thirdpartyTransaction/partyLookup'
-import ThirdpartyTransactionIDInitiate from './thirdpartyTransaction/{ID}/initiate'
-import ThirdpartyTransactionIDApprove from './thirdpartyTransaction/{ID}/approve'
-import LinkingAccounts from './linking/{fspId}/{userId}'
-import ConsentRequestsIDValidate from './consentRequests/{ID}/validate'
-import ConsentRequests from './consentRequests'
-import LinkingProviders from './linking/providers'
+import { Request, ResponseObject } from '@hapi/hapi'
+import { StateResponseToolkit } from '~/server/plugins/state'
+import { PISPPrelinkingModel } from '~/models/outbound/pispPrelinking.model';
+import { Enum } from '@mojaloop/central-services-shared';
+import { ServiceType } from '~/models/outbound/pispPrelinking.interface';
+import { thirdparty as tpAPI } from '@mojaloop/api-snippets';
+
+
+/**
+ * Handles an inbound `PUT /services/{ServiceType}` request
+ */
+async function put (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+  const payload = request.payload as tpAPI.Schemas.ServicesServiceTypePutResponse
+  const serviceType = request.params.ServiceType
+
+  if (serviceType == ServiceType.THIRD_PARTY_DFSP) {
+    const pubSub = h.getPubSub()
+
+    // don't await on promise to resolve, let finish publish in background
+    setImmediate(async () => {
+      await PISPPrelinkingModel.triggerWorkflow(
+        serviceType,
+        pubSub,
+        payload
+      )
+      h.getLogger().info(`Inbound received PUT /services/{ServiceType} response`)
+    })
+  }
+
+  return h.response().code(Enum.Http.ReturnCodes.OK.CODE)
+}
 
 export default {
-  OutboundAuthorizationsPost: Authorizations.post,
-  VerifyThirdPartyAuthorization: ThirdpartyAuthorizations.post,
-  ThirdpartyTransactionPartyLookup: ThirdpartyTransactionPartyLookup.post,
-  ThirdpartyTransactionIDInitiate: ThirdpartyTransactionIDInitiate.post,
-  ThirdpartyTransactionIDApprove: ThirdpartyTransactionIDApprove.post,
-  GetAccountsByUserId: LinkingAccounts.get,
-  OutboundConsentRequestsValidatePatch: ConsentRequestsIDValidate.patch,
-  OutboundConsentRequestsPost: ConsentRequests.post,
-  GetProviders: LinkingProviders.get
+  put
 }

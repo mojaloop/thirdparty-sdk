@@ -995,6 +995,136 @@ paths:
           $ref: '#/components/responses/501'
         '503':
           $ref: '#/components/responses/503'
+  '/services/{ServiceType}':
+    parameters:
+      - $ref: '#/components/parameters/ServiceType'
+      - $ref: '#/components/parameters/Date'
+      - $ref: '#/components/parameters/X-Forwarded-For'
+      - $ref: '#/components/parameters/FSPIOP-Source'
+      - $ref: '#/components/parameters/FSPIOP-Destination'
+      - $ref: '#/components/parameters/FSPIOP-Encryption'
+      - $ref: '#/components/parameters/FSPIOP-Signature'
+      - $ref: '#/components/parameters/FSPIOP-URI'
+      - $ref: '#/components/parameters/FSPIOP-HTTP-Method'
+    get:
+      operationId: GetServicesByServiceType
+      summary: GetServicesByServiceType
+      description: >
+        The HTTP request `GET /services/{ServiceType}` is used to retrieve the
+        list of participants
+
+        that support a specified service.
+      parameters:
+        - $ref: '#/components/parameters/Accept'
+      tags:
+        - services
+        - sampled
+      responses:
+        '202':
+          $ref: '#/components/responses/202'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '405':
+          $ref: '#/components/responses/405'
+        '406':
+          $ref: '#/components/responses/406'
+        '501':
+          $ref: '#/components/responses/501'
+        '503':
+          $ref: '#/components/responses/503'
+    put:
+      description: >
+        The HTTP request `PUT /services/{ServiceType}` is used to return list of
+        participants
+
+        that support a specified service.
+      operationId: PutServicesByServiceType
+      summary: PutServicesByServiceType
+      tags:
+        - services
+        - sampled
+      parameters:
+        - $ref: '#/components/parameters/Content-Length'
+        - $ref: '#/components/parameters/Content-Type'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServicesServiceTypePutResponse'
+      responses:
+        '200':
+          $ref: '#/components/responses/200'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '405':
+          $ref: '#/components/responses/405'
+        '406':
+          $ref: '#/components/responses/406'
+        '501':
+          $ref: '#/components/responses/501'
+        '503':
+          $ref: '#/components/responses/503'
+  '/services/{ServiceType}/error':
+    parameters:
+      - $ref: '#/components/parameters/ServiceType'
+      - $ref: '#/components/parameters/Content-Length'
+      - $ref: '#/components/parameters/Content-Type'
+      - $ref: '#/components/parameters/Date'
+      - $ref: '#/components/parameters/X-Forwarded-For'
+      - $ref: '#/components/parameters/FSPIOP-Source'
+      - $ref: '#/components/parameters/FSPIOP-Destination'
+      - $ref: '#/components/parameters/FSPIOP-Encryption'
+      - $ref: '#/components/parameters/FSPIOP-Signature'
+      - $ref: '#/components/parameters/FSPIOP-URI'
+      - $ref: '#/components/parameters/FSPIOP-HTTP-Method'
+    put:
+      description: >
+        The HTTP request `PUT /services/{ServiceType}/error` is used to return
+        error information
+      operationId: PutServicesByServiceTypeAndError
+      summary: PutServicesByServiceTypeAndError
+      tags:
+        - services
+        - sampled
+      requestBody:
+        description: Details of the error returned.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ErrorInformationObject'
+      responses:
+        '200':
+          $ref: '#/components/responses/200'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '405':
+          $ref: '#/components/responses/405'
+        '406':
+          $ref: '#/components/responses/406'
+        '501':
+          $ref: '#/components/responses/501'
+        '503':
+          $ref: '#/components/responses/503'
 components:
   schemas:
     OutboundAuthorizationsPostRequest:
@@ -2693,28 +2823,33 @@ components:
         - type
     AccountsIDPutResponse:
       title: AccountsIDPutResponse
+      type: array
+      items:
+        type: object
+        description: |
+          The object sent in a `PUT /accounts/{ID}` request.
+        properties:
+          accountNickname:
+            $ref: '#/components/schemas/AccountAddress'
+          id:
+            $ref: '#/components/schemas/AccountAddress'
+          currency:
+            $ref: '#/components/schemas/Currency'
+        required:
+          - accountNickname
+          - id
+          - currency
+    ServicesServiceTypePutResponse:
+      title: ServicesServiceTypePutResponse
       type: object
-      description: 'The object sent in a `PUT /accounts/{ID}` request.'
+      description: 'The object sent in a `PUT /services/{ServiceType}` request.'
       properties:
-        accounts:
+        providers:
           type: array
           items:
-            type: object
-            description: |
-              The object sent in a `PUT /accounts/{ID}` request.
-            properties:
-              accountNickname:
-                $ref: '#/components/schemas/AccountAddress'
-              id:
-                $ref: '#/components/schemas/AccountAddress'
-              currency:
-                $ref: '#/components/schemas/Currency'
-            required:
-              - accountNickname
-              - id
-              - currency
+            $ref: '#/components/schemas/FspId'
       required:
-        - accounts
+        - providers
   parameters:
     ID:
       name: ID
@@ -2846,6 +2981,13 @@ components:
         method. Required if signature verification is used, for more
         information, see [the API Signature
         document](https://github.com/mojaloop/docs/tree/master/Specification%20Document%20Set).
+    ServiceType:
+      name: ServiceType
+      in: path
+      required: true
+      schema:
+        type: string
+      description: 'The type of the service identifier. For example, `THIRD_PARTY_DFSP`'
   responses:
     '200':
       description: OK

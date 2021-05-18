@@ -328,5 +328,53 @@
         "errorDescription": "FSP does not support any requested scope actions"
       }
     }
+  },
+  "getServicesByServiceTypeRequest": {
+    "headers": {
+      "fspiop-source": "pispA",
+      "fspiop-destination": "switch"
+    },
+    "params": {
+      "ServiceType": "THIRD_PARTY_DFSP"
+    },
+    "payload": {}
+  },
+  "putServicesByServiceTypeRequest": {
+    "headers": {
+      "fspiop-source": "switch",
+      "fspiop-destination": "pispA"
+    },
+    "params": {
+      "ServiceType": "THIRD_PARTY_DFSP"
+    },
+    "payload": {
+      "providers": [
+        "dfspA",
+        "dfspB"
+      ]
+    }
+  },
+  "putServicesByServiceTypeRequestError": {
+    "headers": {
+      "fspiop-source": "switch",
+      "fspiop-destination": "pispA"
+    },
+    "params": {
+      "ServiceType": "THIRD_PARTY_DFSP"
+    },
+    "payload": {
+      "errorInformation": {
+        "errorCode": "7201",
+        "errorDescription": "No thirdparty enabled FSP found",
+        "extensionList": {
+          "extension": [
+            {
+              "key": "test",
+              "value": "test"
+            }
+          ]
+        }
+      }
+    }
   }
 }

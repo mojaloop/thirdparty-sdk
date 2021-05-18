@@ -56,6 +56,8 @@ import ConsentsHandler from '~/handlers/inbound/consents'
 import ConsentRequestsHandler from '~/handlers/inbound/consentRequests'
 import ConsentRequestsIdHandler from '~/handlers/inbound/consentRequests/{ID}'
 import ConsentRequestsIdErrorHandler from '~/handlers/inbound/consentRequests/{ID}/error'
+import ServicesServiceTypeHandler from '~/handlers/inbound/services/{ServiceType}'
+import ServicesServiceTypeErrorHandler from '~/handlers/inbound/services/{ServiceType}/error'
 import { Server, Request } from '@hapi/hapi'
 import { StateResponseToolkit } from '~/server/plugins/state'
 import { buildPayeeQuoteRequestFromTptRequest } from '~/domain/thirdpartyRequests/transactions'
@@ -970,6 +972,120 @@ describe('Inbound API routes', (): void => {
           'FSPIOP-Destination': 'dfspA'
         },
         payload: putThirdpartyAuthResponse
+      }
+      const response = await server.inject(request)
+      expect(response.statusCode).toBe(200)
+    })
+  })
+
+  describe('PUT /services/{ServiceType}', () => {
+    it('handler && pubSub invocation', async (): Promise<void> => {
+      const putServicesByServiceTypeRequest: Request = mockData.putServicesByServiceTypeRequest
+      const request = {
+        payload: putServicesByServiceTypeRequest,
+        params: {
+          ServiceType: 'THIRD_PARTY_DFSP'
+        },
+        headers: {
+          'Content-Type': 'application/json',
+          'FSPIOP-Source': 'switch',
+          Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
+          'FSPIOP-Destination': 'pispA'
+        }
+      }
+      const pubSubMock = {
+        publish: jest.fn()
+      }
+      const toolkit = {
+        getPubSub: jest.fn(() => pubSubMock),
+        response: jest.fn(() => ({
+          code: jest.fn((code: number) => ({
+            statusCode: code
+          }))
+        })),
+        getLogger: jest.fn(() => logger),
+        getKVS: jest.fn(() => ({
+          set: jest.fn()
+        }))
+      }
+
+      const result = await ServicesServiceTypeHandler.put(
+        {},
+        request as unknown as Request,
+        toolkit as unknown as StateResponseToolkit
+      )
+
+      expect(result.statusCode).toEqual(200)
+    })
+
+    it('input validation', async (): Promise<void> => {
+      const request = {
+        method: 'PUT',
+        url: '/services/THIRD_PARTY_DFSP',
+        headers: {
+          'Content-Type': 'application/json',
+          'FSPIOP-Source': 'switch',
+          Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
+          'FSPIOP-Destination': 'pispA'
+        },
+        payload: mockData.putServicesByServiceTypeRequest.payload
+      }
+      const response = await server.inject(request)
+      expect(response.statusCode).toBe(200)
+    })
+  })
+
+  describe('PUT /services/{ServiceType}/error', () => {
+    it('handler && pubSub invocation', async (): Promise<void> => {
+      const errorRequest: Request = mockData.putServicesByServiceTypeRequestError
+      const request = {
+        payload: errorRequest,
+        params: {
+          ServiceType: 'THIRD_PARTY_DFSP'
+        },
+        headers: {
+          'Content-Type': 'application/json',
+          'FSPIOP-Source': 'switch',
+          Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
+          'FSPIOP-Destination': 'pispA'
+        }
+      }
+      const pubSubMock = {
+        publish: jest.fn()
+      }
+      const toolkit = {
+        getPubSub: jest.fn(() => pubSubMock),
+        response: jest.fn(() => ({
+          code: jest.fn((code: number) => ({
+            statusCode: code
+          }))
+        })),
+        getLogger: jest.fn(() => logger),
+        getKVS: jest.fn(() => ({
+          set: jest.fn()
+        }))
+      }
+
+      const result = await ServicesServiceTypeErrorHandler.put(
+        {},
+        request as unknown as Request,
+        toolkit as unknown as StateResponseToolkit
+      )
+
+      expect(result.statusCode).toEqual(200)
+    })
+
+    it('input validation', async (): Promise<void> => {
+      const request = {
+        method: 'PUT',
+        url: '/services/THIRD_PARTY_DFSP/error',
+        headers: {
+          'Content-Type': 'application/json',
+          'FSPIOP-Source': 'switch',
+          Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
+          'FSPIOP-Destination': 'pispA'
+        },
+        payload: mockData.putServicesByServiceTypeRequestError.payload
       }
       const response = await server.inject(request)
       expect(response.statusCode).toBe(200)

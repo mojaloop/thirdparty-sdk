@@ -33,6 +33,7 @@ import { OutboundThirdpartyAuthorizationsModel } from '~/models/outbound/thirdpa
 import { PISPDiscoveryModel } from '~/models/outbound/pispDiscovery.model'
 import { PISPOTPValidateModel } from '~/models/outbound/pispOTPValidate.model'
 import { PISPConsentRequestsModel } from '~/models/outbound/pispConsentRequests.model'
+import { PISPPrelinkingModel } from '~/models/outbound/pispPrelinking.model';
 import {
   v1_1 as fspiopAPI,
   thirdparty as tpAPI
@@ -136,7 +137,8 @@ jest.mock('@mojaloop/sdk-standard-components', () => {
       postThirdpartyRequestsTransactions: jest.fn(() => Promise.resolve(initiateResponse)),
       getAccounts: jest.fn(() => Promise.resolve(mockData.accountsRequest.payload)),
       patchConsentRequests: jest.fn(() => Promise.resolve(mockData.inboundConsentsPostRequest)),
-      postConsentRequests: jest.fn(() => Promise.resolve(mockData.consentRequestsPut.payload))
+      postConsentRequests: jest.fn(() => Promise.resolve(mockData.consentRequestsPut.payload)),
+      getServices: jest.fn(() => Promise.resolve(mockData.putServicesByServiceTypeRequest.payload))
     })),
     WSO2Auth: jest.fn(),
     Logger: {
@@ -690,4 +692,55 @@ describe('Outbound API routes', (): void => {
     expect(response.result).toEqual(expectedResp)
   })
 
+  it('/linking/providers - success', async (): Promise<void> => {
+    const request = {
+      method: 'GET',
+      url: `/linking/providers`,
+    }
+    const pubSub = new PubSub({} as RedisConnectionConfig)
+
+    setTimeout(() => pubSub.publish(
+      PISPPrelinkingModel.notificationChannel(
+        'THIRD_PARTY_DFSP'
+      ),
+      mockData.putServicesByServiceTypeRequest.payload as unknown as Message
+    ), 10)
+    const response = await server.inject(request)
+    expect(response.statusCode).toBe(200)
+    const expectedResp = {
+      providers: ['dfspA', 'dfspB'],
+      currentState: 'providersLookupSuccess'
+    }
+    expect(response.result).toEqual(expectedResp)
+  })
+
+  it('/linking/providers - error', async (): Promise<void> => {
+    const request = {
+      method: 'GET',
+      url: `/linking/providers`,
+    }
+
+    const errorResponse = {
+      errorInformation: {
+        errorCode: '7000',
+        errorDescription: 'Generic thirdparty error'
+      }
+    }
+
+    const pubSub = new PubSub({} as RedisConnectionConfig)
+
+    setTimeout(() => pubSub.publish(
+      PISPPrelinkingModel.notificationChannel(
+        'THIRD_PARTY_DFSP'
+      ),
+      errorResponse as unknown as Message
+    ), 10)
+    const response = await server.inject(request)
+    expect(response.statusCode).toBe(500)
+    const expectedResp = {
+      currentState: 'errored',
+      errorInformation: errorResponse.errorInformation
+    }
+    expect(response.result).toEqual(expectedResp)
+  })
 })
