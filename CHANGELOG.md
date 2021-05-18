@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+### [11.37.1](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.37.0...v11.37.1) (2021-05-18)
+
+
+### Code Refactor
+
+* PISP and DFSP Discovery flow, formally the Accounts flow ([#96](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/96)) ([3eaa937](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/3eaa937966659e8d6a01442c21b98ce3e13fe645))
+
 ## [11.37.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.36.1...v11.37.0) (2021-05-18)
 
 
