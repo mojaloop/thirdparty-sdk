@@ -84,6 +84,7 @@ export interface ServiceConfig {
     QUOTES_ENDPOINT?: string
     TRANSFERS_ENDPOINT?: string
     BULK_TRANSFERS_ENDPOINT?: string
+    SERVICES_ENDPOINT?: string
     THIRDPARTY_REQUESTS_ENDPOINT?: string
     TRANSACTION_REQUEST_ENDPOINT?: string
     DFSP_ID: string
@@ -263,6 +264,12 @@ export const ConvictConfig = Convict<ServiceConfig>({
       doc: 'Bulk Transfers endpoint',
       format: '*',
       env: 'BULK_TRANSFERS_ENDPOINT',
+      default: undefined
+    },
+    SERVICES_ENDPOINT: {
+      doc: 'Service provider request endpoint',
+      format: '*',
+      env: 'SERVICES_ENDPOINT',
       default: undefined
     },
     THIRDPARTY_REQUESTS_ENDPOINT: {
