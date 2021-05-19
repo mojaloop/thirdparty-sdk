@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+### [11.37.2](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.37.1...v11.37.2) (2021-05-19)
+
+
+### Maintenance
+
+* add config setup for services endpoint ([#97](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/97)) ([d6cb511](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/d6cb511fe8a40df90e2ccf3d7c8656db974c8807))
+
 ### [11.37.1](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.37.0...v11.37.1) (2021-05-18)
 
 
