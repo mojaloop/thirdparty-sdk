@@ -84,9 +84,9 @@ async function patch (_context: unknown, request: Request, h: StateResponseToolk
  * Handles an inbound `PUT /consentRequests/{ID}` request
  */
 async function put (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
-  const consentRequesttId = request.params.ID
+  const consentRequestId = request.params.ID
 
-  const channel = PISPConsentRequestsModel.notificationChannel(consentRequesttId)
+  const channel = PISPConsentRequestsModel.notificationChannel(consentRequestId)
   const pubSub = h.getPubSub()
   // don't await on promise to resolve, let finish publish in background
   setImmediate(async () => {
