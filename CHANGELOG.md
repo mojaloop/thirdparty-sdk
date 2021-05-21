@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+### [11.37.3](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.37.2...v11.37.3) (2021-05-21)
+
+
+### Maintenance
+
+* **deps:** bump hosted-git-info from 2.8.8 to 2.8.9 ([#93](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/93)) ([fbe4c7d](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/fbe4c7d947746ae6d8220a9465d6b8e4d324c41c))
+
 ### [11.37.2](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.37.1...v11.37.2) (2021-05-19)
 
 
