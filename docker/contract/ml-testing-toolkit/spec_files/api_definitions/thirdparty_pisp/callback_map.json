@@ -113,7 +113,7 @@
       "successCallback": {
         "method": "put",
         "path": "/consentRequests/{ID}",
-        "pathPattern": "/consentRequests/{$request.body.id}",
+        "pathPattern": "/consentRequests/{$request.body.consentRequestId}",
         "headerOverride": {
           "FSPIOP-Source": "{$config.FSPID}",
           "FSPIOP-Destination": "{$request.headers.fspiop-source}",
@@ -124,7 +124,7 @@
       "errorCallback": {
         "method": "put",
         "path": "/consentRequests/{ID}/error",
-        "pathPattern": "/consentRequests/{$request.body.id}/error",
+        "pathPattern": "/consentRequests/{$request.body.consentRequestId}/error",
         "headerOverride": {
           "FSPIOP-Source": "{$config.FSPID}",
           "FSPIOP-Destination": "{$request.headers.fspiop-source}",

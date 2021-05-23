@@ -154,10 +154,10 @@ describe('PUT /consentRequests/{ID}', (): void => {
       await pubSub.connect()
       expect(pubSub.isConnected).toBeTruthy()
       pubSub.subscribe(
-        'PISPConsentRequests_997c89f4-053c-4283-bfec-45a1a0a28fbb',
+        'PISPLinking_997c89f4-053c-4283-bfec-45a1a0a28fbb',
         async (channel: string, message: Message, _id: number
         ) => {
-          expect(channel).toEqual('PISPConsentRequests_997c89f4-053c-4283-bfec-45a1a0a28fbb')
+          expect(channel).toEqual('PISPLinking_997c89f4-053c-4283-bfec-45a1a0a28fbb')
           expect(message).toEqual(mockData.consentRequestsPut.payload)
           await pubSub.disconnect()
           expect(pubSub.isConnected).toBeFalsy()

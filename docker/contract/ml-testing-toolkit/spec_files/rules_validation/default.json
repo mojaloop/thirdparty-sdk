@@ -15,7 +15,7 @@
           "fact": "body",
           "operator": "equal",
           "value": "d51ec534-ee48-4575-b6a9-ead2955b8069",
-          "path": "id"
+          "path": "consentRequestId"
         },
         {
           "fact": "operationPath",
