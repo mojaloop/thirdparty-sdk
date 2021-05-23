@@ -35,14 +35,14 @@ import { RedisConnectionConfig } from '~/shared/redis-connection'
 import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
 
 const apiPath = path.resolve(__dirname, '../../src/interface/api-outbound.yaml')
-const featurePath = path.resolve(__dirname, '../features/linking-providers-outbound.feature')
+const featurePath = path.resolve(__dirname, '../features/linking-discovery-outbound.feature')
 const feature = loadFeature(featurePath)
 
 jest.mock('@mojaloop/sdk-standard-components', () => {
   return {
-  MojaloopRequests: jest.fn(),
+    MojaloopRequests: jest.fn(),
     ThirdpartyRequests: jest.fn(() => ({
-      getServices: jest.fn(() => Promise.resolve())
+      getAccounts: jest.fn(() => Promise.resolve())
     })),
     WSO2Auth: jest.fn(),
     Logger: {
@@ -118,21 +118,32 @@ defineFeature(feature, (test): void => {
     server.stop({ timeout:0 })
   })
 
-  test('GetLinkingProviders', ({ given, when, then }): void => {
-    const servicesServiceTypePutResponse: tpAPI.Schemas.ServicesServiceTypePutResponse = {
-      providers: ['dfspA', 'dfspB']
+  test('GetLinkingAccountsByUserId', ({ given, when, then }): void => {
+    const accountsIDPutResponse: tpAPI.Schemas.AccountsIDPutResponse = {
+      "accounts": [
+        {
+          "accountNickname": "dfspa.user.nickname1",
+          "id": "dfspa.username.1234",
+          "currency": "ZAR"
+        },
+        {
+          "accountNickname": "dfspa.user.nickname2",
+          "id": "dfspa.username.5678",
+          "currency": "USD"
+        }
+      ]
     }
 
     given('Outbound API server', async (): Promise<void> => {
       server = await prepareOutboundAPIServer()
     })
 
-    when('I send a \'GetLinkingProviders\' request', async (): Promise<ServerInjectResponse> => {
+    when('I send a \'GetLinkingAccountsByUserId\' request', async (): Promise<ServerInjectResponse> => {
       jest.mock('~/shared/kvs')
       jest.mock('~/shared/pub-sub')
       const request = {
         method: 'GET',
-        url: '/linking/providers',
+        url: '/linking/accounts/dfspA/username1234',
         headers: {
           'Content-Type': 'application/json',
           'FSPIOP-Source': 'pispA',
@@ -144,7 +155,7 @@ defineFeature(feature, (test): void => {
       // defer publication to notification channel
       setTimeout(() => pubSub.publish(
         'some-channel',
-        servicesServiceTypePutResponse as unknown as Message
+        accountsIDPutResponse as unknown as Message
       ), 10)
       response = await server.inject(request)
       return response

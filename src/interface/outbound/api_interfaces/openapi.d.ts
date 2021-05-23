@@ -29,10 +29,10 @@ export interface paths {
     patch: operations['OutboundConsentRequestsValidatePatch'];
   };
   '/linking/providers': {
-    get: operations['GetProviders'];
+    get: operations['GetLinkingProviders'];
   };
   '/linking/accounts/{fspId}/{userId}': {
-    get: operations['GetAccountsByUserId'];
+    get: operations['GetLinkingAccountsByUserId'];
   };
   '/linking/request-consent': {
     post: operations['PostLinkingRequestConsent'];
@@ -191,7 +191,7 @@ export interface operations {
     };
   };
   /** The HTTP request `GET /linking/providers` is used to retrieve a list of thirdparty enabled DFSP identifiers. */
-  GetProviders: {
+  GetLinkingProviders: {
     responses: {
       200: components['responses']['LinkingProvidersResponse'];
       400: components['responses']['400'];
@@ -205,7 +205,7 @@ export interface operations {
     };
   };
   /** The HTTP request `GET /linking/accounts/{fspId}/{userId}` is used to retrieve the list of potential accounts available for linking. */
-  GetAccountsByUserId: {
+  GetLinkingAccountsByUserId: {
     parameters: {
       path: {
         fspId: components['schemas']['FspId'];

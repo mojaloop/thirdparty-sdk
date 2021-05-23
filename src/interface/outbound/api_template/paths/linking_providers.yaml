@@ -1,6 +1,6 @@
 get:
-  operationId: GetProviders
-  summary: GetProviders
+  operationId: GetLinkingProviders
+  summary: GetLinkingProviders
   description: >
     The HTTP request `GET /linking/providers` is used to retrieve
     a list of thirdparty enabled DFSP identifiers.

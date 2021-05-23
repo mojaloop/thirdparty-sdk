@@ -43,8 +43,8 @@ export default {
   ThirdpartyTransactionPartyLookup: ThirdpartyTransactionPartyLookup.post,
   ThirdpartyTransactionIDInitiate: ThirdpartyTransactionIDInitiate.post,
   ThirdpartyTransactionIDApprove: ThirdpartyTransactionIDApprove.post,
-  GetAccountsByUserId: LinkingAccounts.get,
   OutboundConsentRequestsValidatePatch: ConsentRequestsIDValidate.patch,
-  PostLinkingRequestConsent: LinkingRequestConsent.post,
-  GetProviders: LinkingProviders.get
+  GetLinkingProviders: LinkingProviders.get,
+  GetLinkingAccountsByUserId: LinkingAccounts.get,
+  PostLinkingRequestConsent: LinkingRequestConsent.post
 }

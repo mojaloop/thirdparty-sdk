@@ -297,8 +297,8 @@ paths:
           $ref: '#/components/responses/503'
   /linking/providers:
     get:
-      operationId: GetProviders
-      summary: GetProviders
+      operationId: GetLinkingProviders
+      summary: GetLinkingProviders
       description: >
         The HTTP request `GET /linking/providers` is used to retrieve a list of
         thirdparty enabled DFSP identifiers.
@@ -325,8 +325,8 @@ paths:
           $ref: '#/components/responses/503'
   '/linking/accounts/{fspId}/{userId}':
     get:
-      operationId: GetAccountsByUserId
-      summary: GetAccountsByUserId
+      operationId: GetLinkingAccountsByUserId
+      summary: GetLinkingAccountsByUserId
       description: >
         The HTTP request `GET /linking/accounts/{fspId}/{userId}` is used to
         retrieve the list of potential accounts available for linking.
