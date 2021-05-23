@@ -229,7 +229,7 @@ describe('backendRequests', () => {
       )
       const result = await dfspBackendRequests.storeConsentRequests(request)
       expect(result).toBeUndefined()
-      expect(getSpy).toBeCalledWith(`store/consentRequests/${request.id}`, { scopes: request.scopes })
+      expect(getSpy).toBeCalledWith(`store/consentRequests/${request.consentRequestId}`, { scopes: request.scopes })
     })
   })
 })
