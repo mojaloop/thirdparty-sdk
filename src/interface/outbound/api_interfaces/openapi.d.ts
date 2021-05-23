@@ -28,14 +28,14 @@ export interface paths {
   '/consentRequests/{ID}/validate': {
     patch: operations['OutboundConsentRequestsValidatePatch'];
   };
-  '/consentRequests': {
-    post: operations['OutboundConsentRequestsPost'];
-  };
   '/linking/providers': {
     get: operations['GetProviders'];
   };
   '/linking/accounts/{fspId}/{userId}': {
     get: operations['GetAccountsByUserId'];
+  };
+  '/linking/request-consent': {
+    post: operations['PostLinkingRequestConsent'];
   };
 }
 
@@ -190,23 +190,6 @@ export interface operations {
       503: components['responses']['503'];
     };
   };
-  /** A request from a PISP to a DFSP to start the process of delegating consent */
-  OutboundConsentRequestsPost: {
-    requestBody: {
-      'application/json': components['schemas']['ConsentRequestsPostRequest'];
-    };
-    responses: {
-      200: components['responses']['ConsentRequestsResponse'];
-      400: components['responses']['400'];
-      401: components['responses']['401'];
-      403: components['responses']['403'];
-      404: components['responses']['404'];
-      405: components['responses']['405'];
-      406: components['responses']['406'];
-      501: components['responses']['501'];
-      503: components['responses']['503'];
-    };
-  };
   /** The HTTP request `GET /linking/providers` is used to retrieve a list of thirdparty enabled DFSP identifiers. */
   GetProviders: {
     responses: {
@@ -226,11 +209,35 @@ export interface operations {
     parameters: {
       path: {
         fspId: components['schemas']['FspId'];
-        userId: components['schemas']['AccountAddress'];
+        userId: components['schemas']['AccountId'];
       };
     };
     responses: {
       200: components['responses']['AccountsByUserIdResponse'];
+      400: components['responses']['400'];
+      401: components['responses']['401'];
+      403: components['responses']['403'];
+      404: components['responses']['404'];
+      405: components['responses']['405'];
+      406: components['responses']['406'];
+      501: components['responses']['501'];
+      503: components['responses']['503'];
+    };
+  };
+  /**
+   * The HTTP request `POST /linking/request-consent` is used to by a PISP to ask
+   * a specific DFSP to start the process of establishing consent between three parties.
+   *
+   * - The PISP
+   * - The DFSP
+   * - A user presumed to be a customer of 'The DFSP'
+   */
+  PostLinkingRequestConsent: {
+    requestBody: {
+      'application/json': components['schemas']['LinkingRequestConsentPostRequest'];
+    };
+    responses: {
+      200: components['responses']['LinkingRequestConsentResponse'];
       400: components['responses']['400'];
       401: components['responses']['401'];
       403: components['responses']['403'];
@@ -636,12 +643,6 @@ export interface components {
       dateOfBirth?: components['schemas']['DateOfBirth'];
     };
     /**
-     * A long-lived unique account identifier provided by the DFSP. This MUST NOT
-     * be Bank Account Number or anything that may expose a User's private bank
-     * account information.
-     */
-    AccountAddress: string;
-    /**
      * The API data type Name is a JSON String, restricted by a regular expression to avoid characters which are generally not used in a name.
      *
      * Regular Expression - The regular expression for restricting the Name type is "^(?!\s*$)[\w .,'-]{1,128}$". The restriction does not allow a string consisting of whitespace only, all Unicode characters are allowed, as well as the period (.) (apostrophe (‘), dash (-), comma (,) and space characters ( ).
@@ -649,11 +650,17 @@ export interface components {
      * **Note:** In some programming languages, Unicode support must be specifically enabled. For example, if Java is used, the flag UNICODE_CHARACTER_CLASS must be enabled to allow Unicode characters.
      */
     Name: string;
+    /**
+     * A long-lived unique account identifier provided by the DFSP. This MUST NOT
+     * be Bank Account Number or anything that may expose a User's private bank
+     * account information.
+     */
+    AccountId: string;
     /** Data model for the complex type Account. */
     Account: {
-      address?: components['schemas']['AccountAddress'];
+      accountNickname?: components['schemas']['Name'];
+      id?: components['schemas']['AccountId'];
       currency: components['schemas']['Currency'];
-      description?: components['schemas']['Name'];
     };
     /** Data model for the complex type AccountList. */
     AccountList: {
@@ -829,7 +836,7 @@ export interface components {
       /** Common ID between the PISP and FSP for the Consent object This tells DFSP and auth-service which constent allows the PISP to initiate transaction. */
       consentId: components['schemas']['CorrelationId'];
       /** DFSP specific account identifiers, e.g. `dfspa.alice.1234` */
-      sourceAccountId: components['schemas']['AccountAddress'];
+      sourceAccountId: components['schemas']['AccountId'];
       /** The status of the authorization. This MUST be PENDING for a POST request */
       status: 'PENDING';
     };
@@ -842,7 +849,7 @@ export interface components {
       /** Common ID between the PISP and FSP for the Consent object This tells DFSP and auth-service which consent allows the PISP to initiate transaction. */
       consentId: components['schemas']['CorrelationId'];
       /** DFSP specific account identifiers, e.g. `dfspa.alice.1234` */
-      sourceAccountId: components['schemas']['AccountAddress'];
+      sourceAccountId: components['schemas']['AccountId'];
       /** The status of the authorization. This value must be `VERIFIED` for a PUT request. */
       status: 'VERIFIED';
     };
@@ -869,7 +876,7 @@ export interface components {
     ConsentScopeType: 'accounts.getBalance' | 'accounts.transfer';
     /** Scope + Account Identifier mapping for a Consent. */
     Scope: {
-      accountId: components['schemas']['AccountAddress'];
+      accountId: components['schemas']['AccountId'];
       actions: components['schemas']['ConsentScopeType'][];
     };
     /** The object sent in a `POST /consents` request. */
@@ -894,111 +901,6 @@ export interface components {
     ConsentRequestsValidateResponse:
     | components['schemas']['ConsentRequestsValidateResponseError']
     | components['schemas']['ConsentRequestsValidateResponseSuccess'];
-    /**
-     * The auth channel being used for the consentRequest.
-     * - "WEB" - The Web auth channel.
-     * - "OTP" - The OTP auth channel.
-     */
-    ConsentRequestChannelType: 'WEB' | 'OTP';
-    /** The object sent in a `POST /consentRequests` request. */
-    ConsentRequestsPostRequest: {
-      toParticipantId: string;
-      id: components['schemas']['CorrelationId'];
-      /** The id of the PISP who will initiate transactions on a user's behalf. */
-      initiatorId: string;
-      scopes: components['schemas']['Scope'][];
-      authChannels: components['schemas']['ConsentRequestChannelType'][];
-      /** The callback uri that the user will be redirected to after completing the WEB auth channel. */
-      callbackUri: string;
-    };
-    /** State of POST consent requests */
-    ConsentRequestsState: 'start' | 'errored' | 'success' | 'RequestIsValid';
-    ConsentRequestsResponseError: {
-      errorInformation: components['schemas']['ErrorInformation'];
-      currentState: components['schemas']['ConsentRequestsState'];
-    };
-    /** The web auth channel being used for PUT consentRequest/{ID} request. */
-    ConsentRequestChannelTypeWeb: 'WEB';
-    /**
-     * The object sent in a `PUT /consentRequests/{ID}` request.
-     *
-     * Schema used in the request consent phase of the account linking web flow,
-     * the result is the PISP being instructed on a specific URL where this
-     * supposed user should be redirected. This URL should be a place where
-     * the user can prove their identity (e.g., by logging in).
-     */
-    ConsentRequestsIDPutResponseWeb: {
-      /** The id of the PISP who will initiate transactions on a user's behalf. */
-      initiatorId: string;
-      scopes: components['schemas']['Scope'][];
-      authChannels: components['schemas']['ConsentRequestChannelTypeWeb'][];
-      /** The callback uri that the user will be redirected to after completing the WEB auth channel. */
-      callbackUri: string;
-      /** The callback uri that the pisp app redirects to for user to complete their login. */
-      authUri: string;
-    };
-    /**
-     * The object sent in a `PUT /consentRequests/{ID}` request.
-     *
-     * Schema used in the authentication phase of the account linking flow,
-     * the user is expected to prove their identity to the DFSP by passing a OTP
-     * or secret to the PISP.
-     */
-    ConsentRequestsIDPutResponseWebAuth: {
-      /** The id of the PISP who will initiate transactions on a user's behalf. */
-      initiatorId: string;
-      scopes: components['schemas']['Scope'][];
-      authChannels: components['schemas']['ConsentRequestChannelTypeWeb'][];
-      /** The callback uri that the user will be redirected to after completing the WEB auth channel. */
-      callbackUri: string;
-      /** The callback uri that the pisp app redirects to for user to complete their login. */
-      authUri: string;
-      /** The Auth token from the OTP or redirect to pisp app. */
-      authToken: string;
-    };
-    /** The OTP auth channel being used for PUT consentRequest/{ID} request. */
-    ConsentRequestChannelTypeOTP: 'OTP';
-    /**
-     * The object sent in a `PUT /consentRequests/{ID}` request.
-     *
-     * Schema used in the request consent phase of the account linking OTP/SMS flow.
-     */
-    ConsentRequestsIDPutResponseOTP: {
-      /** The id of the PISP who will initiate transactions on a user's behalf. */
-      initiatorId: string;
-      scopes: components['schemas']['Scope'][];
-      authChannels: components['schemas']['ConsentRequestChannelTypeOTP'][];
-      /** The callback uri that the user will be redirected to after completing the WEB auth channel. */
-      callbackUri: string;
-    };
-    /**
-     * The object sent in a `PUT /consentRequests/{ID}` request.
-     *
-     * Schema used in the authentication phase of the account linking flow,
-     * the user is expected to prove their identity to the DFSP by passing a OTP
-     * or secret to the PISP.
-     */
-    ConsentRequestsIDPutResponseOTPAuth: {
-      /** The id of the PISP who will initiate transactions on a user's behalf. */
-      initiatorId: string;
-      scopes: components['schemas']['Scope'][];
-      authChannels: components['schemas']['ConsentRequestChannelTypeOTP'][];
-      /** The callback uri that the user will be redirected to after completing the WEB auth channel. */
-      callbackUri: string;
-      /** The Auth token from the OTP or redirect to pisp app. */
-      authToken: string;
-    };
-    ConsentRequestsResponseSuccess: {
-      consentRequests:
-      | components['schemas']['ConsentRequestsIDPutResponseWeb']
-      | components['schemas']['ConsentRequestsIDPutResponseWebAuth']
-      | components['schemas']['ConsentRequestsIDPutResponseOTP']
-      | components['schemas']['ConsentRequestsIDPutResponseOTPAuth'];
-      currentState: components['schemas']['ConsentRequestsState'];
-    };
-    ConsentRequestsResponse:
-    | components['schemas']['ConsentRequestsResponseError']
-    | components['schemas']['ConsentRequestsResponseSuccess'];
     /** State of GET /linking/providers request */
     LinkingProvidersState: 'start' | 'errored' | 'providersLookupSuccess';
     LinkingProvidersResponseError: {
@@ -1015,11 +917,78 @@ export interface components {
     /** The object sent in a `PUT /accounts/{ID}` request. */
     AccountsIDPutResponse: {
       accounts: {
-        accountNickname: components['schemas']['AccountAddress'];
-        id: components['schemas']['AccountAddress'];
+        accountNickname: components['schemas']['Name'];
+        id: components['schemas']['AccountId'];
         currency: components['schemas']['Currency'];
       }[];
     };
+    /** The object sent in a `POST /linking/request-consent` request. */
+    LinkingRequestConsentPostRequest: {
+      toParticipantId: string;
+      consentRequestId: components['schemas']['CorrelationId'];
+      accounts: {
+        accountNickname: components['schemas']['Name'];
+        id: components['schemas']['AccountId'];
+        currency: components['schemas']['Currency'];
+      }[];
+      /** ID used to associate request with GET /accounts request. */
+      userId: string;
+      /** The callback uri that the user will be redirected to after completing the WEB auth channel. */
+      callbackUri: string;
+    };
+    /** State of `POST /linking/request-consent` request */
+    LinkingRequestConsentState:
+    | 'start'
+    | 'errored'
+    | 'success'
+    | 'OTPAuthenticationChannelResponseRecieved'
+    | 'WebAuthenticationChannelResponseRecieved';
+    LinkingRequestConsentResponseError: {
+      errorInformation: components['schemas']['ErrorInformation'];
+      currentState: components['schemas']['LinkingRequestConsentState'];
+    };
+    /** The web auth channel being used for PUT consentRequest/{ID} request. */
+    ConsentRequestChannelTypeWeb: 'WEB';
+    /**
+     * The object sent in a `PUT /consentRequests/{ID}` request.
+     *
+     * Schema used in the request consent phase of the account linking web flow,
+     * the result is the PISP being instructed on a specific URL where this
+     * supposed user should be redirected. This URL should be a place where
+     * the user can prove their identity (e.g., by logging in).
+     */
+    ConsentRequestsIDPutResponseWeb: {
+      consentRequestId: components['schemas']['CorrelationId'];
+      scopes: components['schemas']['Scope'][];
+      authChannels: components['schemas']['ConsentRequestChannelTypeWeb'][];
+      /** The callback uri that the user will be redirected to after completing the WEB auth channel. */
+      callbackUri: string;
+      /** The callback uri that the pisp app redirects to for user to complete their login. */
+      authUri: string;
+    };
+    /** The OTP auth channel being used for PUT consentRequest/{ID} request. */
+    ConsentRequestChannelTypeOTP: 'OTP';
+    /**
+     * The object sent in a `PUT /consentRequests/{ID}` request.
+     *
+     * Schema used in the request consent phase of the account linking OTP/SMS flow.
+     */
+    ConsentRequestsIDPutResponseOTP: {
+      consentRequestId: components['schemas']['CorrelationId'];
+      scopes: components['schemas']['Scope'][];
+      authChannels: components['schemas']['ConsentRequestChannelTypeOTP'][];
+      /** The callback uri that the user will be redirected to after completing the WEB auth channel. */
+      callbackUri: string;
+    };
+    LinkingRequestConsentResponseSuccess: {
+      channelResponse:
+      | components['schemas']['ConsentRequestsIDPutResponseWeb']
+      | components['schemas']['ConsentRequestsIDPutResponseOTP'];
+      currentState: components['schemas']['LinkingRequestConsentState'];
+    };
+    LinkingRequestConsentResponse:
+    | components['schemas']['LinkingRequestConsentResponseError']
+    | components['schemas']['LinkingRequestConsentResponseSuccess'];
   };
   responses: {
     /** OK */
@@ -1147,15 +1116,6 @@ export interface components {
         'application/json': components['schemas']['ConsentRequestsValidateResponse'];
       };
     };
-    /**
-     * response body of POST /consentRequests
-     * derived from PostConsentRequest by Inbound Service via Pub/Sub channel
-     */
-    ConsentRequestsResponse: {
-      content: {
-        'application/json': components['schemas']['ConsentRequestsResponse'];
-      };
-    };
     /** Response body of GET /linking/providers */
     LinkingProvidersResponse: {
       content: {
@@ -1169,6 +1129,12 @@ export interface components {
     AccountsByUserIdResponse: {
       content: {
         'application/json': components['schemas']['AccountsIDPutResponse'];
+      };
+    };
+    /** Response body of POST /linking/request-consent. */
+    LinkingRequestConsentResponse: {
+      content: {
+        'application/json': components['schemas']['LinkingRequestConsentResponse'];
       };
     };
   };

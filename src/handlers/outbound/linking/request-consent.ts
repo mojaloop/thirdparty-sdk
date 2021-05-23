@@ -20,45 +20,47 @@
  optionally within square brackets <email>.
  * Gates Foundation
  - Name Surname <name.surname@gatesfoundation.com>
+
  - Sridhar Voruganti <sridhar.voruganti@modusbox.com>
  --------------
  ******/
 
 import { StateResponseToolkit } from '~/server/plugins/state'
 import { Request, ResponseObject } from '@hapi/hapi'
-import { PISPConsentRequestsModel, create } from '~/models/outbound/pispConsentRequests.model';
+import { PISPLinkingModel, create } from '~/models/outbound/pispLinking.model';
 import {
-  PISPConsentRequestsData,
-  PISPConsentRequestsModelConfig
-} from '~/models/outbound/pispConsentRequests.interface'
+  PISPLinkingData,
+  PISPLinkingModelConfig
+} from '~/models/outbound/pispLinking.interface'
 import * as OutboundAPI from '~/interface/outbound/api_interfaces'
 import config from '~/shared/config';
 
 /**
- * Handles outbound POST /consentRequests request
+ * Handles outbound POST /linking/request-consent request
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function post (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
-  const payload = request.payload as OutboundAPI.Schemas.ConsentRequestsPostRequest
+  const payload = request.payload as OutboundAPI.Schemas.LinkingRequestConsentPostRequest
   // prepare config
-  const data: PISPConsentRequestsData = {
+  const data: PISPLinkingData = {
     currentState: 'start',
-    request: payload
+    consentRequestId: payload.consentRequestId,
+    linkingRequestConsentPostRequest: payload
   }
 
-  const modelConfig: PISPConsentRequestsModelConfig = {
+  const modelConfig: PISPLinkingModelConfig = {
     kvs: h.getKVS(),
     pubSub: h.getPubSub(),
-    key: payload.id,
+    key: payload.consentRequestId,
     logger: h.getLogger(),
     thirdpartyRequests: h.getThirdpartyRequests(),
     requestProcessingTimeoutSeconds: config.REQUEST_PROCESSING_TIMEOUT_SECONDS
   }
-  const model: PISPConsentRequestsModel = await create(data, modelConfig)
+  const model: PISPLinkingModel = await create(data, modelConfig)
 
   const result = await model.run()
   if (!result) {
-    h.getLogger().error('outbound POST /consentRequests unexpected result from workflow')
+    h.getLogger().error('outbound POST /linking/request-consent unexpected result from workflow')
     return h.response({}).code(500)
   }
 

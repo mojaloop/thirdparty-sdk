@@ -38,7 +38,7 @@ import {
   DFSPOTPValidateModelConfig
 } from '~/models/inbound/dfspOTPValidate.interface'
 import inspect from '~/shared/inspect';
-import { PISPConsentRequestsModel } from '~/models/outbound/pispConsentRequests.model';
+import { PISPLinkingModel } from '~/models/outbound/pispLinking.model';
 import { Message } from '~/shared/pub-sub'
 
 async function patch (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
@@ -86,7 +86,7 @@ async function patch (_context: unknown, request: Request, h: StateResponseToolk
 async function put (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const consentRequestId = request.params.ID
 
-  const channel = PISPConsentRequestsModel.notificationChannel(consentRequestId)
+  const channel = PISPLinkingModel.notificationChannel(consentRequestId)
   const pubSub = h.getPubSub()
   // don't await on promise to resolve, let finish publish in background
   setImmediate(async () => {

@@ -1,35 +1,25 @@
 post:
-  operationId: OutboundConsentRequestsPost
-  summary: Outbound Consent Requests endpoint
+  operationId: PostLinkingRequestConsent
+  summary: PostLinkingRequestConsent
   description: |
-    A request from a PISP to a DFSP to start the process of delegating consent
+    The HTTP request `POST /linking/request-consent` is used to by a PISP to ask
+    a specific DFSP to start the process of establishing consent between three parties.
+
+    - The PISP
+    - The DFSP
+    - A user presumed to be a customer of 'The DFSP'
   tags:
-    - consentRequests
+    - linking
   requestBody:
-    description: The consentRequest body
+    description: Consent requests validate request details
     required: true
     content:
       application/json:
         schema:
-          $ref: '../components/schemas/ConsentRequestsPostRequest.yaml'
-        example:
-          toParticipantId: 'dfspA'
-          id: '456'
-          initiatorId: 'pispA'
-          authChannels: ['WEB', 'OTP']
-          scopes:
-            - accountId: dfspa.username.1234
-              actions:
-                - accounts.transfer
-                - accounts.getBalance
-            - accountId: dfspa.username.5678
-              actions:
-                - accounts.transfer
-                - accounts.getBalance
-          callbackUri: 'pisp-app://callback.com'
+          $ref: '../components/schemas/LinkingRequestConsentPostRequest.yaml'
   responses:
     '200':
-      $ref: '../components/responses/ConsentRequestsResponse.yaml'
+      $ref: '../components/responses/LinkingRequestConsentResponse.yaml'
     '400':
       $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/400.yaml'
     '401':

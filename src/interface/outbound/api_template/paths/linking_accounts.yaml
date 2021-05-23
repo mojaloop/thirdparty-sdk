@@ -15,7 +15,7 @@ get:
       in: path
       required: true
       schema:
-        $ref: '../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/AccountAddress.yaml'
+        $ref: '../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/AccountId.yaml'
   responses:
     '200':
       $ref: '../components/responses/AccountsByUserIdResponse.yaml'

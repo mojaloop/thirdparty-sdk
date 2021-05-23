@@ -26,7 +26,7 @@
 
 import { Request } from '@hapi/hapi'
 import { StateResponseToolkit } from '~/server/plugins/state'
-import ConsentRequests from '~/handlers/outbound/consentRequests'
+import LinkingRequestConsent from '~/handlers/outbound/linking/request-consent'
 import mockLogger from '../mockLogger'
 import TestData from 'test/unit/data/mockData.json'
 
@@ -37,8 +37,8 @@ jest.mock('~/shared/kvs')
 // mock PubSub default exported class
 jest.mock('~/shared/pub-sub')
 
-jest.mock('~/models/outbound/pispConsentRequests.model', () => ({
-  PISPConsentRequestsModel: {
+jest.mock('~/models/outbound/pispLinking.model', () => ({
+  PISPLinkingModel: {
     notificationChannel: jest.fn(() => 'the-mocked-channel')
   },
   create: jest.fn(async () => ({
@@ -67,17 +67,17 @@ describe('Outbound Consent request handler', () => {
     }))
   }
 
-  it('/consentRequests should report error when result from \'run\' is undefined', async () => {
+  it('/linking/request-consents should report error when result from \'run\' is undefined', async () => {
     const request = {
       method: 'POST',
-      url: '/consentRequests',
+      url: '/linking/request-consents',
       headers: {
         'Content-Type': 'application/json'
       },
       payload: { ...mockData.consentRequestsPost.payload, toParticipantId: 'dfspa' }
     }
 
-    const result = await ConsentRequests.post(
+    const result = await LinkingRequestConsent.post(
       {},
       request as unknown as Request,
       toolkit as unknown as StateResponseToolkit

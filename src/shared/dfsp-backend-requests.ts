@@ -36,7 +36,7 @@ import {
   BackendSendOTPRequest,
   BackendSendOTPResponse,
   BackendStoreScopesRequest
-} from '~/models/inbound/dfspConsentRequests.interface'
+} from '~/models/inbound/dfspLinking.interface'
 
 export interface IsValidResponse {
   isValid: boolean
@@ -136,7 +136,7 @@ export class DFSPBackendRequests extends HttpRequests {
     request: tpAPI.Schemas.ConsentRequestsPostRequest
   ): Promise<BackendSendOTPResponse | void> {
     const otpRequest: BackendSendOTPRequest = {
-      consentRequestId: request.id,
+      consentRequestId: request.consentRequestId,
       username: 'TBD',
       message: 'TBD'
     }
@@ -146,7 +146,7 @@ export class DFSPBackendRequests extends HttpRequests {
   async storeConsentRequests (
     request: tpAPI.Schemas.ConsentRequestsPostRequest
   ): Promise<void> {
-    const path = this.storeConsentRequestsPath.replace('{ID}', request.id)
+    const path = this.storeConsentRequestsPath.replace('{ID}', request.consentRequestId)
     const scopesReq: BackendStoreScopesRequest = {
       scopes: request.scopes
     }

@@ -29,7 +29,7 @@ import { Message } from '~/shared/pub-sub'
 import { StateResponseToolkit } from '~/server/plugins/state'
 import { PISPOTPValidateModel } from '~/models/outbound/pispOTPValidate.model';
 import { Enum } from '@mojaloop/central-services-shared';
-import { PISPConsentRequestsModel } from '~/models/outbound/pispConsentRequests.model'
+import { PISPLinkingModel } from '~/models/outbound/pispLinking.model'
 
 /**
  * Handles a inbound PUT /consentRequests/{ID}/error request
@@ -44,7 +44,7 @@ async function put (_context: any, request: Request, h: StateResponseToolkit): P
   )
   const pubSub = h.getPubSub()
 
-  const consentReqChannel = PISPConsentRequestsModel.notificationChannel(
+  const consentReqChannel = PISPLinkingModel.notificationChannel(
     request.params.ID
   )
   // don't await on promise to resolve, let finish publish in background

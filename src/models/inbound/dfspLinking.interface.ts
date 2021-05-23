@@ -26,34 +26,56 @@
  ******/
 import {
   ControlledStateMachine,
-  PersistentModelConfig, StateData
+  PersistentModelConfig,
+  StateData
 } from '~/models/persistent.model'
 import { Method } from 'javascript-state-machine'
 import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components';
 import {
+  v1_1 as fspiopAPI,
   thirdparty as tpAPI
 } from '@mojaloop/api-snippets'
 import { PubSub } from '~/shared/pub-sub'
-import * as OutboundAPI from '~/interface/outbound/api_interfaces'
+import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests';
 
-export interface PISPConsentRequestsStateMachine extends ControlledStateMachine {
+export interface BackendValidateConsentRequestsResponse {
+  isValid: boolean
+  data: {
+    authChannels: tpAPI.Schemas.ConsentRequestChannelType[]
+    authUri?: string
+  }
+  errorInformation?: fspiopAPI.Schemas.ErrorInformation
+}
+
+export interface BackendSendOTPRequest {
+  consentRequestId: string
+  username: string
+  message: string
+}
+
+export interface BackendSendOTPResponse {
+  otp: string
+}
+
+export interface BackendStoreScopesRequest {
+  scopes: tpAPI.Schemas.Scope[]
+}
+
+export interface DFSPLinkingStateMachine extends ControlledStateMachine {
   validateRequest: Method
   onValidateRequest: Method
+  storeReqAndSendOTP: Method
+  onStoreReqAndSendOTP: Method
 }
 
-export interface PISPConsentRequestsModelConfig extends PersistentModelConfig {
+export interface DFSPLinkingModelConfig extends PersistentModelConfig {
   pubSub: PubSub
   thirdpartyRequests: ThirdpartyRequests
-  requestProcessingTimeoutSeconds: number
+  dfspBackendRequests: DFSPBackendRequests
 }
 
-export interface PISPConsentRequestsData extends StateData<OutboundAPI.Schemas.ConsentRequestsState> {
-  request: OutboundAPI.Schemas.ConsentRequestsPostRequest
-  response?: OutboundAPI.Schemas.ConsentRequestsResponse
-  consentRequests?:
-  tpAPI.Schemas.ConsentRequestsIDPutResponseWeb |
-  tpAPI.Schemas.ConsentRequestsIDPutResponseWebAuth |
-  tpAPI.Schemas.ConsentRequestsIDPutResponseOTP |
-  tpAPI.Schemas.ConsentRequestsIDPutResponseOTPAuth
-  errorInformation?: tpAPI.Schemas.ErrorInformation
+export interface DFSPLinkingData extends StateData {
+  toParticipantId: string
+  consentRequestsPostRequest: tpAPI.Schemas.ConsentRequestsPostRequest
+  backendValidateConsentRequestsResponse?: BackendValidateConsentRequestsResponse
 }

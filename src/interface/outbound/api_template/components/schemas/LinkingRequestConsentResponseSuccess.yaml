@@ -1,0 +1,13 @@
+
+title: LinkingRequestConsentResponseSuccess
+type: object
+properties:
+  channelResponse:
+    oneOf:
+      - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/ConsentRequestsIDPutResponseWeb.yaml'
+      - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/ConsentRequestsIDPutResponseOTP.yaml'
+  currentState:
+    $ref: '../../components/schemas/LinkingRequestConsentState.yaml'
+required:
+  - channelResponse
+  - currentState

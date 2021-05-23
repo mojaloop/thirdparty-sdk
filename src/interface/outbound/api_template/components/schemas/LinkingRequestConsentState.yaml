@@ -1,0 +1,9 @@
+title: LinkingRequestConsentState
+description: State of `POST /linking/request-consent` request
+type: string
+enum:
+  - start
+  - errored
+  - success
+  - OTPAuthenticationChannelResponseRecieved
+  - WebAuthenticationChannelResponseRecieved

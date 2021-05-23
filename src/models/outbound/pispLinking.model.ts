@@ -32,30 +32,32 @@ import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components';
 import { thirdparty as tpAPI, v1_1 as fspiopAPI } from '@mojaloop/api-snippets';
 import inspect from '~/shared/inspect'
 import {
-  PISPConsentRequestsData,
-  PISPConsentRequestsStateMachine,
-  PISPConsentRequestsModelConfig
-} from '~/models/outbound/pispConsentRequests.interface';
+  PISPLinkingData,
+  PISPLinkingStateMachine,
+  PISPLinkingModelConfig
+} from '~/models/outbound/pispLinking.interface';
 import { Message } from '~/shared/pub-sub';
 import deferredJob from '~/shared/deferred-job';
 import * as OutboundAPI from '~/interface/outbound/api_interfaces'
 
-export class PISPConsentRequestsModel
-  extends PersistentModel<PISPConsentRequestsStateMachine, PISPConsentRequestsData> {
-  protected config: PISPConsentRequestsModelConfig
+export class PISPLinkingModel
+  extends PersistentModel<PISPLinkingStateMachine, PISPLinkingData> {
+  protected config: PISPLinkingModelConfig
 
   constructor (
-    data: PISPConsentRequestsData,
-    config: PISPConsentRequestsModelConfig
+    data: PISPLinkingData,
+    config: PISPLinkingModelConfig
   ) {
     const spec: StateMachineConfig = {
       init: 'start',
       transitions: [
-        { name: 'validateRequest', from: 'start', to: 'RequestIsValid' }
+        { name: 'requestConsent', from: 'start', to: 'channelResponseReceived' },
+        { name: 'changeToOTPAuthentication', from: 'channelResponseReceived', to: 'OTPAuthenticationChannelResponseRecieved' },
+        { name: 'changeToWebAuthentication', from: 'channelResponseReceived', to: 'WebAuthenticationChannelResponseRecieved' }
       ],
       methods: {
         // specific transitions handlers methods
-        onValidateRequest: () => this.onValidateRequest(),
+        onRequestConsent: () => this.onRequestConsent(),
       }
     }
     super(data, config, spec)
@@ -73,22 +75,45 @@ export class PISPConsentRequestsModel
 
   static notificationChannel (consentRequestId: string): string {
     if (!consentRequestId) {
-      throw new Error('PISPConsentRequestsModel.notificationChannel: \'consentRequestId\' parameter is required')
+      throw new Error('PISPLinkingModel.notificationChannel: \'consentRequestId\' parameter is required')
     }
     // channel name
-    return `PISPConsentRequests_${consentRequestId}`
+    return `PISPLinking_${consentRequestId}`
   }
 
-  async onValidateRequest (): Promise<void> {
-    const { request } = this.data
-    const channel = PISPConsentRequestsModel.notificationChannel(request.id)
-    this.logger.push({ channel }).info('onValidateRequest - subscribe to channel')
+  linkingRequestConsentPostRequestToConsentRequestsPostRequest(): tpAPI.Schemas.ConsentRequestsPostRequest {
+    const { linkingRequestConsentPostRequest, consentRequestId } = this.data
+
+    const scopes: tpAPI.Schemas.Scope[] = []
+    for (const account of linkingRequestConsentPostRequest.accounts as unknown as tpAPI.Schemas.Account[]) {
+      scopes.push({
+        accountId: account.id!,
+        actions: ['accounts.getBalance', 'accounts.transfer']
+      })
+    }
+
+    const postConsentRequest: tpAPI.Schemas.ConsentRequestsPostRequest = {
+      consentRequestId,
+      scopes,
+      userId: linkingRequestConsentPostRequest.userId,
+      authChannels: ["OTP", "WEB"],
+      callbackUri: linkingRequestConsentPostRequest.callbackUri
+    }
+    return postConsentRequest
+  }
+
+  async onRequestConsent (): Promise<void> {
+    const { linkingRequestConsentPostRequest, consentRequestId } = this.data
+    const channel = PISPLinkingModel.notificationChannel(consentRequestId)
+    this.logger.push({ channel }).info('onRequestConsent - subscribe to channel')
+
+    const postConsentRequest = this.linkingRequestConsentPostRequestToConsentRequestsPostRequest()
 
     return deferredJob(this.pubSub, channel)
       .init(async (channel) => {
         const res = await this.thirdpartyRequests.postConsentRequests(
-          request,
-          request.toParticipantId
+          postConsentRequest,
+          linkingRequestConsentPostRequest.toParticipantId
         )
 
         this.logger.push({ res, channel })
@@ -98,17 +123,15 @@ export class PISPConsentRequestsModel
         try {
           type PutResponse =
             tpAPI.Schemas.ConsentRequestsIDPutResponseWeb |
-            tpAPI.Schemas.ConsentRequestsIDPutResponseWebAuth |
-            tpAPI.Schemas.ConsentRequestsIDPutResponseOTP |
-            tpAPI.Schemas.ConsentRequestsIDPutResponseOTPAuth
+            tpAPI.Schemas.ConsentRequestsIDPutResponseOTP
           type PutResponseOrError = PutResponse & fspiopAPI.Schemas.ErrorInformationObject
           const putResponse = message as unknown as PutResponseOrError
+
           if (putResponse.errorInformation) {
             this.data.errorInformation = putResponse.errorInformation
           } else {
-            this.data.consentRequests = { ...message as unknown as PutResponse }
+            this.data.linkingRequestConsentInboundChannelResponse = { ...message as unknown as PutResponse }
           }
-
         } catch (error) {
           this.logger.push(error).error('ThirdpartyRequests.postConsentRequests request error')
           return Promise.reject(error)
@@ -117,18 +140,23 @@ export class PISPConsentRequestsModel
       .wait(this.config.requestProcessingTimeoutSeconds * 1000)
   }
 
-  getResponse (): OutboundAPI.Schemas.ConsentRequestsResponse | void {
+  getResponse (): OutboundAPI.Schemas.LinkingRequestConsentResponse | void {
     switch (this.data.currentState) {
-      case 'RequestIsValid':
+      case 'OTPAuthenticationChannelResponseRecieved':
         return {
-          consentRequests: this.data.consentRequests,
+          channelResponse: this.data.linkingRequestConsentInboundChannelResponse,
           currentState: this.data.currentState
-        } as OutboundAPI.Schemas.ConsentRequestsResponse
+        } as OutboundAPI.Schemas.LinkingRequestConsentResponse
+      case 'WebAuthenticationChannelResponseRecieved':
+        return {
+          channelResponse: this.data.linkingRequestConsentInboundChannelResponse,
+          currentState: this.data.currentState
+        } as OutboundAPI.Schemas.LinkingRequestConsentResponse
       case 'errored':
         return {
           errorInformation: this.data.errorInformation,
           currentState: this.data.currentState
-        } as OutboundAPI.Schemas.ConsentRequestsResponse
+        } as OutboundAPI.Schemas.LinkingRequestConsentResponse
       default:
     }
   }
@@ -141,10 +169,24 @@ export class PISPConsentRequestsModel
     }
   }
 
+  async checkModelDataChannelResponse (): Promise<void> {
+    if (!this.data.linkingRequestConsentInboundChannelResponse) {
+      return
+    }
+
+    if (this.data.linkingRequestConsentInboundChannelResponse.authChannels[0] == "WEB") {
+      await this.fsm.changeToWebAuthentication()
+    } else if (this.data.linkingRequestConsentInboundChannelResponse.authChannels[0] == "OTP"){
+      await this.fsm.changeToOTPAuthentication()
+    } else {
+      await this.fsm.error()
+    }
+  }
+
   /**
    * runs the workflow
    */
-  async run (): Promise<OutboundAPI.Schemas.ConsentRequestsResponse | void> {
+  async run (): Promise<OutboundAPI.Schemas.LinkingRequestConsentResponse | void> {
     const data = this.data
     try {
       // run transitions based on incoming state
@@ -154,9 +196,10 @@ export class PISPConsentRequestsModel
           this.logger.info(
             `validateRequest for ${data.consentRequestId},  currentState: ${data.currentState}`
           )
-          await this.fsm.validateRequest()
-          await this.saveToKVS()
+          await this.fsm.requestConsent()
           await this.checkModelDataForErrorInformation()
+          await this.checkModelDataChannelResponse()
+          await this.saveToKVS()
           return this.getResponse()
 
         default:
@@ -164,7 +207,7 @@ export class PISPConsentRequestsModel
           return
       }
     } catch (err) {
-      this.logger.info(`Error running PISPConsentRequestsModel : ${inspect(err)}`)
+      this.logger.info(`Error running PISPLinkingModel : ${inspect(err)}`)
 
       // as this function is recursive, we don't want to error the state machine multiple times
       if (data.currentState !== 'errored') {
@@ -184,11 +227,11 @@ export class PISPConsentRequestsModel
 }
 
 export async function create (
-  data: PISPConsentRequestsData,
-  config: PISPConsentRequestsModelConfig
-): Promise<PISPConsentRequestsModel> {
+  data: PISPLinkingData,
+  config: PISPLinkingModelConfig
+): Promise<PISPLinkingModel> {
   // create a new model
-  const model = new PISPConsentRequestsModel(data, config)
+  const model = new PISPLinkingModel(data, config)
 
   // enforce to finish any transition to state specified by data.currentState or spec.init
   await model.fsm.state
@@ -196,6 +239,6 @@ export async function create (
 }
 
 export default {
-  PISPConsentRequestsModel,
+  PISPLinkingModel,
   create,
 }

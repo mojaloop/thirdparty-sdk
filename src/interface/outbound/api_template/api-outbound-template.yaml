@@ -34,9 +34,10 @@ paths:
     $ref: paths/thirdpartyRequests_transactions_ID_authorizations.yaml
   /consentRequests/{ID}/validate:
     $ref: paths/consentRequests_ID_validate.yaml
-  /consentRequests:
-    $ref: paths/consentRequests.yaml
+
   /linking/providers:
     $ref:  paths/linking_providers.yaml
   /linking/accounts/{fspId}/{userId}:
     $ref: paths/linking_accounts.yaml
+  /linking/request-consent:
+    $ref: paths/linking_request_consent.yaml

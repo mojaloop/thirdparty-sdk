@@ -32,7 +32,7 @@ import { OutboundAuthorizationsModel } from '~/models/outbound/authorizations.mo
 import { OutboundThirdpartyAuthorizationsModel } from '~/models/outbound/thirdparty.authorizations.model'
 import { PISPDiscoveryModel } from '~/models/outbound/pispDiscovery.model'
 import { PISPOTPValidateModel } from '~/models/outbound/pispOTPValidate.model'
-import { PISPConsentRequestsModel } from '~/models/outbound/pispConsentRequests.model'
+import { PISPLinkingModel } from '~/models/outbound/pispLinking.model'
 import { PISPPrelinkingModel } from '~/models/outbound/pispPrelinking.model';
 import {
   v1_1 as fspiopAPI,
@@ -638,21 +638,21 @@ describe('Outbound API routes', (): void => {
     expect(response.result).toEqual(expectedResp)
   })
 
-  it('/consentRequests - success', async (): Promise<void> => {
+  it('/linking/request-consent - success', async (): Promise<void> => {
     // const consentRequestId = '6988c34f-055b-4ed5-b223-b10c8a2e2329'
     const request = {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      url: '/consentRequests',
-      payload: { ...mockData.consentRequestsPost.payload, toParticipantId: 'dfspa' }
+      url: '/linking/request-consent',
+      payload: { ...mockData.linkingRequestConsentPostRequest.payload }
     }
 
     const pubSub = new PubSub({} as RedisConnectionConfig)
     // defer publication to notification channel
     setTimeout(() => pubSub.publish(
-      PISPConsentRequestsModel.notificationChannel(mockData.consentRequestsPost.payload.id),
+      PISPLinkingModel.notificationChannel(mockData.linkingRequestConsentPostRequest.payload.consentRequestId),
       mockData.consentRequestsPut.payload as unknown as Message
     ), 10)
 
@@ -660,17 +660,17 @@ describe('Outbound API routes', (): void => {
 
     expect(response.statusCode).toBe(200)
     const expectedResp = {
-      consentRequests: { ...mockData.consentRequestsPut.payload },
-      currentState: 'RequestIsValid'
+      channelResponse: { ...mockData.consentRequestsPut.payload },
+      currentState: 'WebAuthenticationChannelResponseRecieved'
     }
     expect(response.result).toEqual(expectedResp)
   })
 
-  it('/consentRequests - error', async (): Promise<void> => {
+  it('/linking/request-consent - error', async (): Promise<void> => {
     const request = {
       method: 'POST',
-      url: '/consentRequests',
-      payload: { ...mockData.consentRequestsPost.payload, toParticipantId: 'dfspa' }
+      url: '/linking/request-consent',
+      payload: { ...mockData.linkingRequestConsentPostRequest.payload }
     }
 
     const pubSub = new PubSub({} as RedisConnectionConfig)
@@ -678,8 +678,8 @@ describe('Outbound API routes', (): void => {
     // if the validation fails the dfsp will respond with a
     // PUT /consentRequests/{ID}/error where the inbound handler will publish the error
     setTimeout(() => pubSub.publish(
-      PISPConsentRequestsModel.notificationChannel(
-        mockData.consentRequestsPost.payload.id
+      PISPLinkingModel.notificationChannel(
+        mockData.linkingRequestConsentPostRequest.payload.consentRequestId
       ),
       mockData.consentRequestsPutError.payload as unknown as Message
     ), 10)

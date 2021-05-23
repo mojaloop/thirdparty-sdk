@@ -1,0 +1,6 @@
+description: |
+  Response body of POST /linking/request-consent.
+content:
+  application/json:
+    schema:
+      $ref: '../schemas/LinkingRequestConsentResponse.yaml'

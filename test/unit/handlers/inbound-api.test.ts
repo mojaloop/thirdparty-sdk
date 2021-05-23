@@ -47,8 +47,8 @@ import {
   PISPDiscoveryModel
 } from '~/models/outbound/pispDiscovery.model'
 import {
-  PISPConsentRequestsModel
-} from '~/models/outbound/pispConsentRequests.model'
+  PISPLinkingModel
+} from '~/models/outbound/pispLinking.model'
 import { PISPTransactionPhase } from '~/models/pispTransaction.interface'
 import { PISPOTPValidateModel } from '~/models/outbound/pispOTPValidate.model'
 import ThirdpartyAuthorizations from '~/handlers/inbound/thirdpartyRequests/transactions/{ID}/authorizations'
@@ -803,7 +803,7 @@ describe('Inbound API routes', (): void => {
       jest.runAllImmediates()
       expect(toolkit.getPubSub).toBeCalledTimes(1)
 
-      const channel = PISPConsentRequestsModel.notificationChannel(request.params.ID)
+      const channel = PISPLinkingModel.notificationChannel(request.params.ID)
       expect(pubSubMock.publish).toBeCalledWith(channel, request.payload)
     })
 
@@ -850,7 +850,7 @@ describe('Inbound API routes', (): void => {
 
       const otpChannel = PISPOTPValidateModel.notificationChannel(errorRequest.params.ID)
       expect(pubSubMock.publish).toBeCalledWith(otpChannel, errorRequest.payload)
-      const channel = PISPConsentRequestsModel.notificationChannel(errorRequest.params.ID)
+      const channel = PISPLinkingModel.notificationChannel(errorRequest.params.ID)
       expect(pubSubMock.publish).toBeCalledWith(channel, errorRequest.payload)
     })
   })

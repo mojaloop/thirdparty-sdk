@@ -28,17 +28,17 @@ import { KVS } from '~/shared/kvs'
 import { Message, NotificationCallback, PubSub } from '~/shared/pub-sub'
 
 import {
-  PISPConsentRequestsData,
-  PISPConsentRequestsModelConfig,
-} from '~/models/outbound/pispConsentRequests.interface'
+  PISPLinkingData,
+  PISPLinkingModelConfig,
+} from '~/models/outbound/pispLinking.interface'
 import {
   v1_1 as fspiopAPI,
   thirdparty as tpAPI
 } from '@mojaloop/api-snippets'
 import {
-  PISPConsentRequestsModel,
+  PISPLinkingModel,
   create
-} from '~/models/outbound/pispConsentRequests.model'
+} from '~/models/outbound/pispLinking.model'
 
 import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
 import { RedisConnectionConfig } from '~/shared/redis-connection'
@@ -56,16 +56,16 @@ jest.mock('~/shared/kvs')
 jest.mock('~/shared/pub-sub')
 const mockData = JSON.parse(JSON.stringify(TestData))
 
-describe('PISPConsentRequestsModel', () => {
+describe('PISPLinkingModel', () => {
   const connectionConfig: RedisConnectionConfig = {
     port: 6789,
     host: 'localhost',
     logger: mockLogger()
   }
-  let modelConfig: PISPConsentRequestsModelConfig
+  let modelConfig: PISPLinkingModelConfig
   const expectedResp = {
-    consentRequests: { ...mockData.consentRequestsPut.payload },
-    currentState: 'RequestIsValid'
+    channelResponse: { ...mockData.consentRequestsPut.payload },
+    currentState: 'WebAuthenticationChannelResponseRecieved'
   }
 
   const expectedErrorResp = {
@@ -93,7 +93,7 @@ describe('PISPConsentRequestsModel', () => {
     await modelConfig.pubSub.disconnect()
   })
 
-  function checkPISPConsentRequestsModelLayout (am: PISPConsentRequestsModel, optData?: PISPConsentRequestsData) {
+  function checkPISPLinkingModelLayout (am: PISPLinkingModel, optData?: PISPLinkingData) {
     expect(am).toBeTruthy()
     expect(am.data).toBeDefined()
     expect(am.fsm.state).toEqual(optData?.currentState || 'start')
@@ -104,17 +104,30 @@ describe('PISPConsentRequestsModel', () => {
 
     // check is fsm correctly constructed
     expect(typeof am.fsm.init).toEqual('function')
-    expect(typeof am.fsm.validateRequest).toEqual('function')
+    expect(typeof am.fsm.onRequestConsent).toEqual('function')
 
     // check fsm notification handler
-    expect(typeof am.onValidateRequest).toEqual('function')
+    expect(typeof am.onRequestConsent).toEqual('function')
 
-    expect(sortedArray(am.fsm.allStates())).toEqual(['RequestIsValid', 'errored', 'none', 'start'])
-    expect(sortedArray(am.fsm.allTransitions())).toEqual(['error', 'init', 'validateRequest'])
+    expect(sortedArray(am.fsm.allStates())).toEqual([
+      'OTPAuthenticationChannelResponseRecieved',
+      'WebAuthenticationChannelResponseRecieved',
+      'channelResponseReceived',
+      'errored',
+      'none',
+      'start'
+    ])
+    expect(sortedArray(am.fsm.allTransitions())).toEqual([
+      'changeToOTPAuthentication',
+      'changeToWebAuthentication',
+      'error',
+      'init',
+      'requestConsent'
+    ])
   }
 
   it('module layout', () => {
-    expect(typeof PISPConsentRequestsModel).toEqual('function')
+    expect(typeof PISPLinkingModel).toEqual('function')
     expect(typeof create).toEqual('function')
   })
 
@@ -123,12 +136,12 @@ describe('PISPConsentRequestsModel', () => {
   describe('notificationChannel', () => {
     it('should generate proper channel name', () => {
       const id = '123'
-      expect(PISPConsentRequestsModel.notificationChannel(id)).toEqual('PISPConsentRequests_123')
+      expect(PISPLinkingModel.notificationChannel(id)).toEqual('PISPLinking_123')
     })
 
     it('input validation', () => {
       expect(
-        () => PISPConsentRequestsModel.notificationChannel(null as unknown as string)
+        () => PISPLinkingModel.notificationChannel(null as unknown as string)
       ).toThrow()
     })
   })
@@ -137,12 +150,10 @@ describe('PISPConsentRequestsModel', () => {
     let subId = 0
     let channel: string
     let handler: NotificationCallback
-    let data: PISPConsentRequestsData
+    let data: PISPLinkingData
     type PutResponse =
       tpAPI.Schemas.ConsentRequestsIDPutResponseWeb |
-      tpAPI.Schemas.ConsentRequestsIDPutResponseWebAuth |
-      tpAPI.Schemas.ConsentRequestsIDPutResponseOTP |
-      tpAPI.Schemas.ConsentRequestsIDPutResponseOTPAuth
+      tpAPI.Schemas.ConsentRequestsIDPutResponseOTP
     type PutResponseOrError = PutResponse & fspiopAPI.Schemas.ErrorInformationObject
     let putResponse: PutResponseOrError
 
@@ -160,18 +171,19 @@ describe('PISPConsentRequestsModel', () => {
 
       data = {
         toParticipantId: 'dfspA',
-        request: mockData.consentRequestsPost.payload,
+        consentRequestId: mockData.linkingRequestConsentPostRequest.payload.consentRequestId,
+        linkingRequestConsentPostRequest: mockData.linkingRequestConsentPostRequest.payload,
         currentState: 'start'
       }
 
-      channel = PISPConsentRequestsModel.notificationChannel(data.request.id)
+      channel = PISPLinkingModel.notificationChannel(data.consentRequestId)
 
       putResponse = mockData.consentRequestsPut.payload
     })
 
     it('should be well constructed', async () => {
       const model = await create(data, modelConfig)
-      checkPISPConsentRequestsModelLayout(model, data)
+      checkPISPLinkingModelLayout(model, data)
     })
 
     it('should give response properly populated from notification channel - success', async () => {
@@ -185,7 +197,8 @@ describe('PISPConsentRequestsModel', () => {
       // Assertions
       expect(result).toEqual(expectedResp)
       expect(mocked(modelConfig.thirdpartyRequests.postConsentRequests)).toHaveBeenCalledWith(
-        model.data.request, model.data.toParticipantId
+        model.linkingRequestConsentPostRequestToConsentRequestsPostRequest(),
+        model.data.toParticipantId
       )
       expect(mocked(modelConfig.pubSub.subscribe)).toBeCalledTimes(1)
       expect(mocked(modelConfig.pubSub.unsubscribe)).toBeCalledWith(channel, subId)
@@ -194,7 +207,8 @@ describe('PISPConsentRequestsModel', () => {
     it('should give response properly populated from notification channel - error response', async () => {
       data = {
         toParticipantId: 'dfspA',
-        request: mockData.consentRequestsPost.payload,
+        consentRequestId: mockData.linkingRequestConsentPostRequest.payload.consentRequestId,
+        linkingRequestConsentPostRequest: mockData.linkingRequestConsentPostRequest.payload,
         currentState: 'start'
       }
       putResponse = mockData.consentRequestsPutError.payload
@@ -208,7 +222,8 @@ describe('PISPConsentRequestsModel', () => {
       // Assertions
       expect(result).toEqual(expectedErrorResp)
       expect(mocked(modelConfig.thirdpartyRequests.postConsentRequests)).toHaveBeenCalledWith(
-        model.data.request, model.data.toParticipantId
+        model.linkingRequestConsentPostRequestToConsentRequestsPostRequest(),
+        model.data.toParticipantId
       )
       expect(mocked(modelConfig.pubSub.subscribe)).toBeCalledTimes(1)
       expect(mocked(modelConfig.pubSub.unsubscribe)).toBeCalledWith(channel, subId)
@@ -244,13 +259,14 @@ describe('PISPConsentRequestsModel', () => {
 
         expect(result).toEqual(expectedResp)
         expect(mocked(modelConfig.thirdpartyRequests.postConsentRequests)).toHaveBeenCalledWith(
-          model.data.request, model.data.toParticipantId
+          model.linkingRequestConsentPostRequestToConsentRequestsPostRequest(),
+          model.data.toParticipantId
         )
         expect(mocked(modelConfig.pubSub.subscribe)).toBeCalledTimes(1)
         expect(mocked(modelConfig.pubSub.unsubscribe)).toBeCalledWith(channel, subId)
         expect(mocked(modelConfig.pubSub.publish)).toBeCalledWith(channel, putResponse)
         mocked(modelConfig.logger.info).mockReset()
-        expect(model.data.currentState).toEqual('RequestIsValid')
+        expect(model.data.currentState).toEqual('WebAuthenticationChannelResponseRecieved')
       })
 
       it('errored', async () => {

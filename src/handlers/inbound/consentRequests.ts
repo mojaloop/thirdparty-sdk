@@ -33,10 +33,10 @@ import { Request, ResponseObject } from '@hapi/hapi'
 import { StateResponseToolkit } from '~/server/plugins/state'
 import { Enum } from '@mojaloop/central-services-shared'
 import {
-  DFSPConsentRequestsData,
-  DFSPConsentRequestsModelConfig
-} from '~/models/inbound/dfspConsentRequests.interface'
-import { DFSPConsentRequestsModel } from '~/models/inbound/dfspConsentRequests.model';
+  DFSPLinkingData,
+  DFSPLinkingModelConfig
+} from '~/models/inbound/dfspLinking.interface'
+import { DFSPLinkingModel } from '~/models/inbound/dfspLinking.model';
 import inspect from '~/shared/inspect';
 
 /**
@@ -48,28 +48,28 @@ async function post (_context: unknown, request: Request, h: StateResponseToolki
   // pull the PISP's ID to send back the PUT /consentRequests/{ID}
   const sourceFspId = request.headers['fspiop-source']
 
-  const data: DFSPConsentRequestsData = {
+  const data: DFSPLinkingData = {
     currentState: 'start',
     toParticipantId: sourceFspId,
-    request: payload
+    consentRequestsPostRequest: payload
   }
   // if the request is valid then DFSP returns response via PUT /consentRequests/{ID} call.
-  const modelConfig: DFSPConsentRequestsModelConfig = {
+  const modelConfig: DFSPLinkingModelConfig = {
     kvs: h.getKVS(),
     pubSub: h.getPubSub(),
-    key: payload.id,
+    key: payload.consentRequestId,
     logger: h.getLogger(),
     dfspBackendRequests: h.getDFSPBackendRequests(),
     thirdpartyRequests: h.getThirdpartyRequests(),
   }
-  const model = new DFSPConsentRequestsModel(data, modelConfig)
+  const model = new DFSPLinkingModel(data, modelConfig)
 
   // don't await on promise to be resolved
   setImmediate(async () => {
     try {
       await model.run()
     } catch (error) {
-      h.getLogger().info(`Error running DFSPConsentRequestsModel : ${inspect(error)}`)
+      h.getLogger().info(`Error running DFSPLinkingModel : ${inspect(error)}`)
     }
   })
 

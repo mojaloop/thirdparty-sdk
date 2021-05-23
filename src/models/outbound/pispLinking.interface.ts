@@ -26,57 +26,36 @@
  ******/
 import {
   ControlledStateMachine,
-  PersistentModelConfig,
-  StateData
+  PersistentModelConfig, StateData
 } from '~/models/persistent.model'
 import { Method } from 'javascript-state-machine'
 import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components';
 import {
-  v1_1 as fspiopAPI,
   thirdparty as tpAPI
 } from '@mojaloop/api-snippets'
 import { PubSub } from '~/shared/pub-sub'
-import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests';
 import * as OutboundAPI from '~/interface/outbound/api_interfaces'
 
-export interface BackendValidateConsentRequestsResponse {
-  isValid: boolean
-  data: {
-    authChannels: OutboundAPI.Schemas.AuthChannels
-    authUri?: string
-  }
-  errorInformation?: fspiopAPI.Schemas.ErrorInformation
+
+export interface PISPLinkingStateMachine extends ControlledStateMachine {
+  requestConsent: Method
+  onRequestConsent: Method
+  changeToWebAuthentication: Method
+  changeToOTPAuthentication: Method
 }
 
-export interface BackendSendOTPRequest {
-  consentRequestId: string
-  username: string
-  message: string
-}
-
-export interface BackendSendOTPResponse {
-  otp: string
-}
-
-export interface BackendStoreScopesRequest {
-  scopes: tpAPI.Schemas.Scope[]
-}
-
-export interface DFSPConsentRequestsStateMachine extends ControlledStateMachine {
-  validateRequest: Method
-  onValidateRequest: Method
-  storeReqAndSendOTP: Method
-  onStoreReqAndSendOTP: Method
-}
-
-export interface DFSPConsentRequestsModelConfig extends PersistentModelConfig {
+export interface PISPLinkingModelConfig extends PersistentModelConfig {
   pubSub: PubSub
   thirdpartyRequests: ThirdpartyRequests
-  dfspBackendRequests: DFSPBackendRequests
+  requestProcessingTimeoutSeconds: number
 }
 
-export interface DFSPConsentRequestsData extends StateData {
-  toParticipantId: string
-  request: tpAPI.Schemas.ConsentRequestsPostRequest
-  response?: BackendValidateConsentRequestsResponse
+export interface PISPLinkingData extends StateData<OutboundAPI.Schemas.LinkingRequestConsentState> {
+  consentRequestId: string
+  linkingRequestConsentPostRequest: OutboundAPI.Schemas.LinkingRequestConsentPostRequest
+  linkingRequestConsentInboundChannelResponse?:
+    tpAPI.Schemas.ConsentRequestsIDPutResponseWeb |
+    tpAPI.Schemas.ConsentRequestsIDPutResponseOTP
+  linkingRequestConsentPostResponse?: OutboundAPI.Schemas.LinkingRequestConsentResponse
+  errorInformation?: tpAPI.Schemas.ErrorInformation
 }

@@ -295,58 +295,6 @@ paths:
           $ref: '#/components/responses/501'
         '503':
           $ref: '#/components/responses/503'
-  /consentRequests:
-    post:
-      operationId: OutboundConsentRequestsPost
-      summary: Outbound Consent Requests endpoint
-      description: >
-        A request from a PISP to a DFSP to start the process of delegating
-        consent
-      tags:
-        - consentRequests
-      requestBody:
-        description: The consentRequest body
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ConsentRequestsPostRequest'
-            example:
-              toParticipantId: dfspA
-              id: '456'
-              initiatorId: pispA
-              authChannels:
-                - WEB
-                - OTP
-              scopes:
-                - accountId: dfspa.username.1234
-                  actions:
-                    - accounts.transfer
-                    - accounts.getBalance
-                - accountId: dfspa.username.5678
-                  actions:
-                    - accounts.transfer
-                    - accounts.getBalance
-              callbackUri: 'pisp-app://callback.com'
-      responses:
-        '200':
-          $ref: '#/components/responses/ConsentRequestsResponse'
-        '400':
-          $ref: '#/components/responses/400'
-        '401':
-          $ref: '#/components/responses/401'
-        '403':
-          $ref: '#/components/responses/403'
-        '404':
-          $ref: '#/components/responses/404'
-        '405':
-          $ref: '#/components/responses/405'
-        '406':
-          $ref: '#/components/responses/406'
-        '501':
-          $ref: '#/components/responses/501'
-        '503':
-          $ref: '#/components/responses/503'
   /linking/providers:
     get:
       operationId: GetProviders
@@ -394,10 +342,55 @@ paths:
           in: path
           required: true
           schema:
-            $ref: '#/components/schemas/AccountAddress'
+            $ref: '#/components/schemas/AccountId'
       responses:
         '200':
           $ref: '#/components/responses/AccountsByUserIdResponse'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '405':
+          $ref: '#/components/responses/405'
+        '406':
+          $ref: '#/components/responses/406'
+        '501':
+          $ref: '#/components/responses/501'
+        '503':
+          $ref: '#/components/responses/503'
+  /linking/request-consent:
+    post:
+      operationId: PostLinkingRequestConsent
+      summary: PostLinkingRequestConsent
+      description: >
+        The HTTP request `POST /linking/request-consent` is used to by a PISP to
+        ask
+
+        a specific DFSP to start the process of establishing consent between
+        three parties.
+
+
+        - The PISP
+
+        - The DFSP
+
+        - A user presumed to be a customer of 'The DFSP'
+      tags:
+        - linking
+      requestBody:
+        description: Consent requests validate request details
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LinkingRequestConsentPostRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/LinkingRequestConsentResponse'
         '400':
           $ref: '#/components/responses/400'
         '401':
@@ -558,35 +551,6 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ConsentRequestsValidateResponse'
-    ConsentRequestsResponse:
-      description: |
-        response body of POST /consentRequests
-        derived from PostConsentRequest by Inbound Service via Pub/Sub channel
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ConsentRequestsResponse'
-          examples:
-            success:
-              value:
-                authChannels:
-                  - WEB
-                scopes:
-                  - accountId: dfspa.username.1234
-                    actions:
-                      - accounts.transfer
-                      - accounts.getBalance
-                  - accountId: dfspa.username.5678
-                    actions:
-                      - accounts.transfer
-                      - accounts.getBalance
-                callbackUri: 'pisp-app://callback.com'
-                authUri: dfspa.com/authorize?consentRequestId=456
-            error:
-              value:
-                errorInformation:
-                  errorCode: '7204'
-                  errorDescription: FSP does not support any requested scope actions
     LinkingProvidersResponse:
       description: |
         Response body of GET /linking/providers
@@ -611,6 +575,13 @@ components:
             - accountNickname: dfspa.user.nickname2
               id: dfspa.username.5678
               currency: USD
+    LinkingRequestConsentResponse:
+      description: |
+        Response body of POST /linking/request-consent.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/LinkingRequestConsentResponse'
   headers:
     Content-Length:
       required: false
@@ -1391,19 +1362,6 @@ components:
           $ref: '#/components/schemas/PartyComplexName'
         dateOfBirth:
           $ref: '#/components/schemas/DateOfBirth'
-    AccountAddress:
-      title: AccountAddress
-      type: string
-      description: >
-        A long-lived unique account identifier provided by the DFSP. This MUST
-        NOT
-
-        be Bank Account Number or anything that may expose a User's private bank
-
-        account information.
-      pattern: '^([0-9A-Za-z_~\-\.]+[0-9A-Za-z_~\-])$'
-      minLength: 1
-      maxLength: 1023
     Name:
       title: Name
       type: string
@@ -1423,17 +1381,30 @@ components:
         **Note:** In some programming languages, Unicode support must be
         specifically enabled. For example, if Java is used, the flag
         UNICODE_CHARACTER_CLASS must be enabled to allow Unicode characters.
+    AccountId:
+      title: AccountId
+      type: string
+      description: >
+        A long-lived unique account identifier provided by the DFSP. This MUST
+        NOT
+
+        be Bank Account Number or anything that may expose a User's private bank
+
+        account information.
+      pattern: '^([0-9A-Za-z_~\-\.]+[0-9A-Za-z_~\-])$'
+      minLength: 1
+      maxLength: 1023
     Account:
       title: Account
       type: object
       description: Data model for the complex type Account.
       properties:
-        address:
-          $ref: '#/components/schemas/AccountAddress'
+        accountNickname:
+          $ref: '#/components/schemas/Name'
+        id:
+          $ref: '#/components/schemas/AccountId'
         currency:
           $ref: '#/components/schemas/Currency'
-        description:
-          $ref: '#/components/schemas/Name'
       required:
         - currency
     AccountList:
@@ -1856,7 +1827,7 @@ components:
             transaction.
         sourceAccountId:
           allOf:
-            - $ref: '#/components/schemas/AccountAddress'
+            - $ref: '#/components/schemas/AccountId'
           description: 'DFSP specific account identifiers, e.g. `dfspa.alice.1234`'
         status:
           type: string
@@ -1894,7 +1865,7 @@ components:
             transaction.
         sourceAccountId:
           allOf:
-            - $ref: '#/components/schemas/AccountAddress'
+            - $ref: '#/components/schemas/AccountId'
           description: 'DFSP specific account identifiers, e.g. `dfspa.alice.1234`'
         status:
           type: string
@@ -1963,7 +1934,7 @@ components:
         }
       properties:
         accountId:
-          $ref: '#/components/schemas/AccountAddress'
+          $ref: '#/components/schemas/AccountId'
         actions:
           type: array
           items:
@@ -2012,273 +1983,6 @@ components:
       oneOf:
         - $ref: '#/components/schemas/ConsentRequestsValidateResponseError'
         - $ref: '#/components/schemas/ConsentRequestsValidateResponseSuccess'
-    ConsentRequestChannelType:
-      title: ConsentRequestChannelType
-      type: string
-      enum:
-        - WEB
-        - OTP
-      description: |
-        The auth channel being used for the consentRequest.
-        - "WEB" - The Web auth channel.
-        - "OTP" - The OTP auth channel.
-    ConsentRequestsPostRequest:
-      title: ConsentRequestsPostRequest
-      type: object
-      description: The object sent in a `POST /consentRequests` request.
-      properties:
-        toParticipantId:
-          type: string
-        id:
-          $ref: '#/components/schemas/CorrelationId'
-        initiatorId:
-          type: string
-          description: >-
-            The id of the PISP who will initiate transactions on a user's
-            behalf.
-        scopes:
-          type: array
-          items:
-            $ref: '#/components/schemas/Scope'
-        authChannels:
-          type: array
-          items:
-            $ref: '#/components/schemas/ConsentRequestChannelType'
-        callbackUri:
-          type: string
-          description: >-
-            The callback uri that the user will be redirected to after
-            completing the WEB auth channel.
-      required:
-        - toParticipantId
-        - id
-        - initiatorId
-        - scopes
-        - authChannels
-        - callbackUri
-    ConsentRequestsState:
-      title: ConsentRequestsState
-      description: State of POST consent requests
-      type: string
-      enum:
-        - start
-        - errored
-        - success
-        - RequestIsValid
-    ConsentRequestsResponseError:
-      title: ConsentRequestsResponseError
-      type: object
-      properties:
-        errorInformation:
-          $ref: '#/components/schemas/ErrorInformation'
-        currentState:
-          $ref: '#/components/schemas/ConsentRequestsState'
-      required:
-        - errorInformation
-        - currentState
-    ConsentRequestChannelTypeWeb:
-      title: ConsentRequestChannelTypeWeb
-      type: string
-      enum:
-        - WEB
-      description: |
-        The web auth channel being used for PUT consentRequest/{ID} request.
-    ConsentRequestsIDPutResponseWeb:
-      title: ConsentRequestsIDPutResponseWeb
-      type: object
-      description: >
-        The object sent in a `PUT /consentRequests/{ID}` request.
-
-
-        Schema used in the request consent phase of the account linking web
-        flow,
-
-        the result is the PISP being instructed on a specific URL where this
-
-        supposed user should be redirected. This URL should be a place where
-
-        the user can prove their identity (e.g., by logging in).
-      properties:
-        initiatorId:
-          type: string
-          description: >-
-            The id of the PISP who will initiate transactions on a user's
-            behalf.
-        scopes:
-          type: array
-          items:
-            $ref: '#/components/schemas/Scope'
-        authChannels:
-          type: array
-          items:
-            $ref: '#/components/schemas/ConsentRequestChannelTypeWeb'
-        callbackUri:
-          type: string
-          description: >-
-            The callback uri that the user will be redirected to after
-            completing the WEB auth channel.
-        authUri:
-          type: string
-          description: >-
-            The callback uri that the pisp app redirects to for user to complete
-            their login.
-      required:
-        - initiatorId
-        - scopes
-        - authChannels
-        - callbackUri
-        - authUri
-      additionalProperties: false
-    ConsentRequestsIDPutResponseWebAuth:
-      title: ConsentRequestsIDPutResponseWebAuth
-      type: object
-      description: >
-        The object sent in a `PUT /consentRequests/{ID}` request.
-
-
-        Schema used in the authentication phase of the account linking flow,
-
-        the user is expected to prove their identity to the DFSP by passing a
-        OTP
-
-        or secret to the PISP.
-      properties:
-        initiatorId:
-          type: string
-          description: >-
-            The id of the PISP who will initiate transactions on a user's
-            behalf.
-        scopes:
-          type: array
-          items:
-            $ref: '#/components/schemas/Scope'
-        authChannels:
-          type: array
-          items:
-            $ref: '#/components/schemas/ConsentRequestChannelTypeWeb'
-        callbackUri:
-          type: string
-          description: >-
-            The callback uri that the user will be redirected to after
-            completing the WEB auth channel.
-        authUri:
-          type: string
-          description: >-
-            The callback uri that the pisp app redirects to for user to complete
-            their login.
-        authToken:
-          type: string
-          description: The Auth token from the OTP or redirect to pisp app.
-      required:
-        - initiatorId
-        - scopes
-        - authChannels
-        - callbackUri
-        - authUri
-        - authToken
-      additionalProperties: false
-    ConsentRequestChannelTypeOTP:
-      title: ConsentRequestChannelTypeOTP
-      type: string
-      enum:
-        - OTP
-      description: |
-        The OTP auth channel being used for PUT consentRequest/{ID} request.
-    ConsentRequestsIDPutResponseOTP:
-      title: ConsentRequestsIDPutResponseOTP
-      type: object
-      description: >
-        The object sent in a `PUT /consentRequests/{ID}` request.
-
-
-        Schema used in the request consent phase of the account linking OTP/SMS
-        flow.
-      properties:
-        initiatorId:
-          type: string
-          description: >-
-            The id of the PISP who will initiate transactions on a user's
-            behalf.
-        scopes:
-          type: array
-          items:
-            $ref: '#/components/schemas/Scope'
-        authChannels:
-          type: array
-          items:
-            $ref: '#/components/schemas/ConsentRequestChannelTypeOTP'
-        callbackUri:
-          type: string
-          description: >-
-            The callback uri that the user will be redirected to after
-            completing the WEB auth channel.
-      required:
-        - initiatorId
-        - scopes
-        - authChannels
-        - callbackUri
-      additionalProperties: false
-    ConsentRequestsIDPutResponseOTPAuth:
-      title: ConsentRequestsIDPutResponseOTPAuth
-      type: object
-      description: >
-        The object sent in a `PUT /consentRequests/{ID}` request.
-
-
-        Schema used in the authentication phase of the account linking flow,
-
-        the user is expected to prove their identity to the DFSP by passing a
-        OTP
-
-        or secret to the PISP.
-      properties:
-        initiatorId:
-          type: string
-          description: >-
-            The id of the PISP who will initiate transactions on a user's
-            behalf.
-        scopes:
-          type: array
-          items:
-            $ref: '#/components/schemas/Scope'
-        authChannels:
-          type: array
-          items:
-            $ref: '#/components/schemas/ConsentRequestChannelTypeOTP'
-        callbackUri:
-          type: string
-          description: >-
-            The callback uri that the user will be redirected to after
-            completing the WEB auth channel.
-        authToken:
-          type: string
-          description: The Auth token from the OTP or redirect to pisp app.
-      required:
-        - initiatorId
-        - scopes
-        - authChannels
-        - callbackUri
-        - authToken
-      additionalProperties: false
-    ConsentRequestsResponseSuccess:
-      title: ConsentRequestsResponse
-      type: object
-      properties:
-        consentRequests:
-          oneOf:
-            - $ref: '#/components/schemas/ConsentRequestsIDPutResponseWeb'
-            - $ref: '#/components/schemas/ConsentRequestsIDPutResponseWebAuth'
-            - $ref: '#/components/schemas/ConsentRequestsIDPutResponseOTP'
-            - $ref: '#/components/schemas/ConsentRequestsIDPutResponseOTPAuth'
-        currentState:
-          $ref: '#/components/schemas/ConsentRequestsState'
-      required:
-        - consentRequests
-        - currentState
-    ConsentRequestsResponse:
-      oneOf:
-        - $ref: '#/components/schemas/ConsentRequestsResponseError'
-        - $ref: '#/components/schemas/ConsentRequestsResponseSuccess'
     LinkingProvidersState:
       title: LinkingProvidersState
       description: State of GET /linking/providers request
@@ -2328,9 +2032,9 @@ components:
               The object sent in a `PUT /accounts/{ID}` request.
             properties:
               accountNickname:
-                $ref: '#/components/schemas/AccountAddress'
+                $ref: '#/components/schemas/Name'
               id:
-                $ref: '#/components/schemas/AccountAddress'
+                $ref: '#/components/schemas/AccountId'
               currency:
                 $ref: '#/components/schemas/Currency'
             required:
@@ -2339,6 +2043,172 @@ components:
               - currency
       required:
         - accounts
+    LinkingRequestConsentPostRequest:
+      title: LinkingRequestConsentPostRequest
+      type: object
+      description: The object sent in a `POST /linking/request-consent` request.
+      properties:
+        toParticipantId:
+          type: string
+        consentRequestId:
+          $ref: '#/components/schemas/CorrelationId'
+        accounts:
+          type: array
+          items:
+            type: object
+            description: |
+              The object sent in a `PUT /accounts/{ID}` request.
+            properties:
+              accountNickname:
+                $ref: '#/components/schemas/Name'
+              id:
+                $ref: '#/components/schemas/AccountId'
+              currency:
+                $ref: '#/components/schemas/Currency'
+            required:
+              - accountNickname
+              - id
+              - currency
+        userId:
+          type: string
+          description: ID used to associate request with GET /accounts request.
+        callbackUri:
+          type: string
+          description: >-
+            The callback uri that the user will be redirected to after
+            completing the WEB auth channel.
+      required:
+        - toParticipantId
+        - consentRequestId
+        - accounts
+        - userId
+        - callbackUri
+    LinkingRequestConsentState:
+      title: LinkingRequestConsentState
+      description: State of `POST /linking/request-consent` request
+      type: string
+      enum:
+        - start
+        - errored
+        - success
+        - OTPAuthenticationChannelResponseRecieved
+        - WebAuthenticationChannelResponseRecieved
+    LinkingRequestConsentResponseError:
+      title: LinkingRequestConsentResponseError
+      type: object
+      properties:
+        errorInformation:
+          $ref: '#/components/schemas/ErrorInformation'
+        currentState:
+          $ref: '#/components/schemas/LinkingRequestConsentState'
+      required:
+        - errorInformation
+        - currentState
+    ConsentRequestChannelTypeWeb:
+      title: ConsentRequestChannelTypeWeb
+      type: string
+      enum:
+        - WEB
+      description: |
+        The web auth channel being used for PUT consentRequest/{ID} request.
+    ConsentRequestsIDPutResponseWeb:
+      title: ConsentRequestsIDPutResponseWeb
+      type: object
+      description: >
+        The object sent in a `PUT /consentRequests/{ID}` request.
+
+
+        Schema used in the request consent phase of the account linking web
+        flow,
+
+        the result is the PISP being instructed on a specific URL where this
+
+        supposed user should be redirected. This URL should be a place where
+
+        the user can prove their identity (e.g., by logging in).
+      properties:
+        consentRequestId:
+          $ref: '#/components/schemas/CorrelationId'
+        scopes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Scope'
+        authChannels:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConsentRequestChannelTypeWeb'
+        callbackUri:
+          type: string
+          description: >-
+            The callback uri that the user will be redirected to after
+            completing the WEB auth channel.
+        authUri:
+          type: string
+          description: >-
+            The callback uri that the pisp app redirects to for user to complete
+            their login.
+      required:
+        - consentRequestId
+        - scopes
+        - authChannels
+        - callbackUri
+        - authUri
+      additionalProperties: false
+    ConsentRequestChannelTypeOTP:
+      title: ConsentRequestChannelTypeOTP
+      type: string
+      enum:
+        - OTP
+      description: |
+        The OTP auth channel being used for PUT consentRequest/{ID} request.
+    ConsentRequestsIDPutResponseOTP:
+      title: ConsentRequestsIDPutResponseOTP
+      type: object
+      description: >
+        The object sent in a `PUT /consentRequests/{ID}` request.
+
+
+        Schema used in the request consent phase of the account linking OTP/SMS
+        flow.
+      properties:
+        consentRequestId:
+          $ref: '#/components/schemas/CorrelationId'
+        scopes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Scope'
+        authChannels:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConsentRequestChannelTypeOTP'
+        callbackUri:
+          type: string
+          description: >-
+            The callback uri that the user will be redirected to after
+            completing the WEB auth channel.
+      required:
+        - consentRequestId
+        - scopes
+        - authChannels
+        - callbackUri
+      additionalProperties: false
+    LinkingRequestConsentResponseSuccess:
+      title: LinkingRequestConsentResponseSuccess
+      type: object
+      properties:
+        channelResponse:
+          oneOf:
+            - $ref: '#/components/schemas/ConsentRequestsIDPutResponseWeb'
+            - $ref: '#/components/schemas/ConsentRequestsIDPutResponseOTP'
+        currentState:
+          $ref: '#/components/schemas/LinkingRequestConsentState'
+      required:
+        - channelResponse
+        - currentState
+    LinkingRequestConsentResponse:
+      oneOf:
+        - $ref: '#/components/schemas/LinkingRequestConsentResponseError'
+        - $ref: '#/components/schemas/LinkingRequestConsentResponseSuccess'
   parameters:
     ID:
       name: ID

@@ -189,13 +189,8 @@
     "headers": {},
     "params": {},
     "payload": {
-      "toParticipantId": "dfspA",
-      "id": "b51ec534-ee48-4575-b6a9-ead2955b8069",
-      "initiatorId": "pispA",
-      "authChannels": [
-        "WEB",
-        "OTP"
-      ],
+      "consentRequestId": "b51ec534-ee48-4575-b6a9-ead2955b8069",
+      "userId": "dfspa.username",
       "scopes": [
         {
           "accountId": "dfspa.username.1234",
@@ -211,6 +206,10 @@
             "accounts.getBalance"
           ]
         }
+      ],
+      "authChannels": [
+        "WEB",
+        "OTP"
       ],
       "callbackUri": "pisp-app://callback.com"
     },
@@ -261,6 +260,7 @@
       "ID": "b51ec534-ee48-4575-b6a9-ead2955b8069"
     },
     "payload": {
+      "consentRequestId": "b51ec534-ee48-4575-b6a9-ead2955b8069",
       "scopes": [
         {
           "accountId": "dfspa.username.1234",
@@ -281,8 +281,7 @@
       "authUri": "dfspa.com/authorize?consentRequestId=456",
       "authChannels": [
         "WEB"
-      ],
-      "initiatorId": "pisp"
+      ]
     }
   },
   "consentRequestsPutOTP": {
@@ -291,6 +290,7 @@
       "ID": "b51ec534-ee48-4575-b6a9-ead2955b8069"
     },
     "payload": {
+      "consentRequestId": "b51ec534-ee48-4575-b6a9-ead2955b8069",
       "scopes": [
         {
           "accountId": "dfspa.username.1234",
@@ -310,8 +310,7 @@
       "callbackUri": "pisp-app://callback.com",
       "authChannels": [
         "OTP"
-      ],
-      "initiatorId": "pisp"
+      ]
     }
   },
   "consentRequestsPutError": {
@@ -375,6 +374,20 @@
           ]
         }
       }
+    }
+  },
+  "linkingRequestConsentPostRequest": {
+    "headers": {},
+    "params": {},
+    "payload": {
+      "consentRequestId": "bbce3ce8-c247-4153-aab1-f89768c93b18",
+      "toParticipantId": "dfspA",
+      "accounts": [
+        { "accountNickname": "XXXXXXnt", "id": "dfspa.username.1234", "currency": "ZAR" },
+        { "accountNickname": "SpeXXXXXXXXnt", "id": "dfspa.username.5678", "currency": "USD" }
+      ],
+      "userId": "username1234",
+      "callbackUri": "pisp-app://callback.com"
     }
   }
 }

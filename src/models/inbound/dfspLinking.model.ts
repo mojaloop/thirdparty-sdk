@@ -36,27 +36,27 @@ import {
 import inspect from '~/shared/inspect'
 import { reformatError, mkMojaloopFSPIOPError } from '~/shared/util'
 import {
-  DFSPConsentRequestsData,
-  DFSPConsentRequestsStateMachine,
-  DFSPConsentRequestsModelConfig
-} from '~/models/inbound/dfspConsentRequests.interface'
+  DFSPLinkingData,
+  DFSPLinkingStateMachine,
+  DFSPLinkingModelConfig
+} from '~/models/inbound/dfspLinking.interface'
 import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
 
-// DFSPConsentRequestsModel is the passive inbound handler for inbound
+// DFSPLinkingModel is the passive inbound handler for inbound
 // POST /consentRequests requests and no response is generated from `model.run()`
-export class DFSPConsentRequestsModel
-  extends PersistentModel<DFSPConsentRequestsStateMachine, DFSPConsentRequestsData> {
-  protected config: DFSPConsentRequestsModelConfig
+export class DFSPLinkingModel
+  extends PersistentModel<DFSPLinkingStateMachine, DFSPLinkingData> {
+  protected config: DFSPLinkingModelConfig
 
   constructor (
-    data: DFSPConsentRequestsData,
-    config: DFSPConsentRequestsModelConfig
+    data: DFSPLinkingData,
+    config: DFSPLinkingModelConfig
   ) {
     const spec: StateMachineConfig = {
       init: 'start',
       transitions: [
-        { name: 'validateRequest', from: 'start', to: 'RequestIsValid' },
-        { name: 'storeReqAndSendOTP', from: 'RequestIsValid', to: 'success' }
+        { name: 'validateRequest', from: 'start', to: 'requestIsValid' },
+        { name: 'storeReqAndSendOTP', from: 'requestIsValid', to: 'consentRequestValidatedAndStored' }
       ],
       methods: {
         // specific transitions handlers methods
@@ -82,10 +82,10 @@ export class DFSPConsentRequestsModel
   }
 
   async onValidateRequest (): Promise<void> {
-    const { request, toParticipantId } = this.data
+    const { consentRequestsPostRequest, toParticipantId } = this.data
 
     try {
-      const response = await this.dfspBackendRequests.validateConsentRequests(request)
+      const response = await this.dfspBackendRequests.validateConsentRequests(consentRequestsPostRequest)
 
       if (!response) {
         throw mkMojaloopFSPIOPError(Errors.MojaloopApiErrorCodes.TP_CONSENT_REQ_VALIDATION_ERROR)
@@ -95,27 +95,29 @@ export class DFSPConsentRequestsModel
         throw mkMojaloopFSPIOPError(Errors.MojaloopApiErrorCodeFromCode(`${response.errorInformation?.errorCode}`))
       }
 
-      this.data.response = response
+      this.data.backendValidateConsentRequestsResponse = response
 
       type consentRequestResponseType = tpAPI.Schemas.ConsentRequestsIDPutResponseOTP &
         tpAPI.Schemas.ConsentRequestsIDPutResponseWeb
+
       const consentRequestResponse = {
-        scopes: request.scopes,
-        callbackUri: request.callbackUri,
+        consentRequestId: consentRequestsPostRequest.consentRequestId,
+        scopes: consentRequestsPostRequest.scopes,
+        callbackUri: consentRequestsPostRequest.callbackUri,
         authChannels: response.data.authChannels,
         authUri: response.data.authUri,
-        initiatorId: toParticipantId
       } as consentRequestResponseType
-      await this.thirdpartyRequests.putConsentRequests(request.id, consentRequestResponse, toParticipantId)
+
+      await this.thirdpartyRequests.putConsentRequests(consentRequestsPostRequest.consentRequestId, consentRequestResponse, toParticipantId)
 
     } catch (error) {
       const mojaloopError = await reformatError(error)
 
-      this.logger.push({ error }).error('start -> RequestIsValid')
+      this.logger.push({ error }).error('start -> requestIsValid')
       this.logger.push({ mojaloopError }).info(`Sending error response to ${toParticipantId}`)
 
       await this.thirdpartyRequests.putConsentRequestsError(
-        request.id,
+        consentRequestsPostRequest.consentRequestId,
         mojaloopError as unknown as fspiopAPI.Schemas.ErrorInformationObject,
         toParticipantId
       )
@@ -126,17 +128,17 @@ export class DFSPConsentRequestsModel
   }
 
   async onStoreReqAndSendOTP (): Promise<void> {
-    const { request, response } = this.data
+    const { consentRequestsPostRequest, backendValidateConsentRequestsResponse } = this.data
 
     try {
-      const channel = [...response!.data.authChannels].pop()
+      const channel = [...backendValidateConsentRequestsResponse!.data.authChannels].pop()
       switch (channel) {
         case 'WEB': {
-          await this.dfspBackendRequests.storeConsentRequests(request)
+          await this.dfspBackendRequests.storeConsentRequests(consentRequestsPostRequest)
           break
         }
         case 'OTP': {
-          await this.dfspBackendRequests.sendOTP(request)
+          await this.dfspBackendRequests.sendOTP(consentRequestsPostRequest)
           break
         }
         default: {
@@ -146,7 +148,7 @@ export class DFSPConsentRequestsModel
       }
 
     } catch (error) {
-      this.logger.push({ error }).error('RequestIsValid -> success')
+      this.logger.push({ error }).error('requestIsValid -> success')
       // throw error to stop state machine
       throw error
     }
@@ -163,15 +165,15 @@ export class DFSPConsentRequestsModel
         case 'start':
           await this.saveToKVS()
           this.logger.info(
-            `validateRequest requested for ${data.request.id},  currentState: ${data.currentState}`
+            `validateRequest requested for ${data.consentRequestsPostRequest.consentRequestId},  currentState: ${data.currentState}`
           )
           await this.fsm.validateRequest()
           await this.saveToKVS()
           return this.run();
 
-        case 'RequestIsValid':
+        case 'requestIsValid':
           this.logger.info(
-            `storeReqAndSendOTP requested for ${data.request.id},  currentState: ${data.currentState}`
+            `storeReqAndSendOTP requested for ${data.consentRequestsPostRequest.consentRequestId},  currentState: ${data.currentState}`
           )
           await this.fsm.storeReqAndSendOTP()
           await this.saveToKVS()
@@ -182,7 +184,7 @@ export class DFSPConsentRequestsModel
           return
       }
     } catch (err) {
-      this.logger.info(`Error running DFSPConsentRequestsModel : ${inspect(err)}`)
+      this.logger.info(`Error running DFSPLinkingModel : ${inspect(err)}`)
 
       // as this function is recursive, we don't want to error the state machine multiple times
       if (data.currentState !== 'errored') {
@@ -201,16 +203,16 @@ export class DFSPConsentRequestsModel
   }
 }
 
-export async function existsInKVS (config: DFSPConsentRequestsModelConfig): Promise<boolean> {
+export async function existsInKVS (config: DFSPLinkingModelConfig): Promise<boolean> {
   return config.kvs.exists(config.key)
 }
 
 export async function create (
-  data: DFSPConsentRequestsData,
-  config: DFSPConsentRequestsModelConfig
-): Promise<DFSPConsentRequestsModel> {
+  data: DFSPLinkingData,
+  config: DFSPLinkingModelConfig
+): Promise<DFSPLinkingModel> {
   // create a new model
-  const model = new DFSPConsentRequestsModel(data, config)
+  const model = new DFSPLinkingModel(data, config)
 
   // enforce to finish any transition to state specified by data.currentState or spec.init
   await model.fsm.state
@@ -219,10 +221,10 @@ export async function create (
 
 // loads PersistentModel from KVS storage using given `config` and `spec`
 export async function loadFromKVS (
-  config: DFSPConsentRequestsModelConfig
-): Promise<DFSPConsentRequestsModel> {
+  config: DFSPLinkingModelConfig
+): Promise<DFSPLinkingModel> {
   try {
-    const data = await config.kvs.get<DFSPConsentRequestsData>(config.key)
+    const data = await config.kvs.get<DFSPLinkingData>(config.key)
     if (!data) {
       throw new Error(`No data found in KVS for: ${config.key}`)
     }
@@ -235,7 +237,7 @@ export async function loadFromKVS (
 }
 
 export default {
-  DFSPConsentRequestsModel,
+  DFSPLinkingModel,
   existsInKVS,
   create,
   loadFromKVS
