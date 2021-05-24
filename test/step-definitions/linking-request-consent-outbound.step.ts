@@ -176,7 +176,6 @@ defineFeature(feature, (test): void => {
         consentRequestsIDPutResponseWeb as unknown as Message
       ), 10)
       response = await server.inject(request)
-      console.log(response)
       return response
     })
 

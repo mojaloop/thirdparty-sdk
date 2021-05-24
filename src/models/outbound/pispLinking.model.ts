@@ -25,20 +25,21 @@
  --------------
  ******/
 
-import { PubSub } from '~/shared/pub-sub'
-import { PersistentModel } from '~/models/persistent.model'
-import { StateMachineConfig } from 'javascript-state-machine'
-import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components';
 import { thirdparty as tpAPI, v1_1 as fspiopAPI } from '@mojaloop/api-snippets';
-import inspect from '~/shared/inspect'
+import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components';
+import { StateMachineConfig } from 'javascript-state-machine';
+import { canonicalize } from 'json-canonicalize';
+import sha256 from 'crypto-js/sha256';
+import * as OutboundAPI from '~/interface/outbound/api_interfaces';
 import {
   PISPLinkingData,
-  PISPLinkingStateMachine,
-  PISPLinkingModelConfig
+  PISPLinkingModelConfig,
+  PISPLinkingStateMachine
 } from '~/models/outbound/pispLinking.interface';
-import { Message } from '~/shared/pub-sub';
+import { PersistentModel } from '~/models/persistent.model';
 import deferredJob from '~/shared/deferred-job';
-import * as OutboundAPI from '~/interface/outbound/api_interfaces'
+import inspect from '~/shared/inspect';
+import { Message, PubSub } from '~/shared/pub-sub';
 import { PISPLinkingPhase } from './pispLinking.interface';
 
 export class PISPLinkingModel
@@ -115,6 +116,20 @@ export class PISPLinkingModel
       callbackUri: linkingRequestConsentPostRequest.callbackUri
     }
     return postConsentRequest
+  }
+
+  static deriveChallenge(consentsPostRequest: tpAPI.Schemas.ConsentsPostRequest): string {
+    if (!consentsPostRequest) {
+      throw new Error('PISPLinkingModel.deriveChallenge: \'consentRequestsPostRequest\' parameter is required')
+    }
+
+    const rawChallenge = {
+      consentId: consentsPostRequest.consentId,
+      scopes: consentsPostRequest.scopes
+    }
+
+    const RFC8785String = canonicalize(rawChallenge)
+    return sha256(RFC8785String).toString()
   }
 
   async onRequestConsent (): Promise<void> {
@@ -222,7 +237,7 @@ export class PISPLinkingModel
       case 'consentReceivedAwaitingCredential':
         return {
           consent: this.data.linkingRequestConsentIDValidateInboundConsentResponse,
-          challenge: 'hello',
+          challenge: PISPLinkingModel.deriveChallenge(this.data.linkingRequestConsentIDValidateInboundConsentResponse!),
           currentState: this.data.currentState
         } as OutboundAPI.Schemas.LinkingRequestConsentIDValidateResponse
       case 'errored':

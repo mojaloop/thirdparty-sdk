@@ -53,54 +53,156 @@ describe('PISP requests DFSP to validate user consentRequests for linking', (): 
     await kvs.disconnect()
   })
 
-  it('WEB: validateRequest should be success', async (): Promise<void> => {
-    // ttk returns WEB response for id 'b51ec534-ee48-4575-b6a9-ead2955b8069'
-    const linkingRequestConsentRequest = {
-      ...mockData.linkingRequestConsentPostRequest.payload,
-      consentRequestId: 'b51ec534-ee48-4575-b6a9-ead2955b8069',
-      toParticipantId: 'dfspa'
-    }
-    const expectedResponse = {
-      channelResponse: { ...mockData.consentRequestsPut.payload },
-      currentState: 'WebAuthenticationChannelResponseRecieved'
-    }
-    const consentRequestsResponse = await axios.post(linkingRequestConsentURI, linkingRequestConsentRequest)
-    expect(consentRequestsResponse.status).toEqual(200)
-    expect(consentRequestsResponse.data).toEqual(expectedResponse)
+  describe('PISP Linking flow Web', (): void => {
+    it('WEB: request consent should be success', async (): Promise<void> => {
+      // ttk returns WEB response for id 'b51ec534-ee48-4575-b6a9-ead2955b8069'
+      const linkingRequestConsentRequest = {
+        ...mockData.linkingRequestConsentPostRequest.payload,
+        consentRequestId: 'b51ec534-ee48-4575-b6a9-ead2955b8069',
+        toParticipantId: 'dfspa'
+      }
+      const expectedResponse = {
+        channelResponse: { ...mockData.consentRequestsPut.payload },
+        currentState: 'WebAuthenticationChannelResponseRecieved'
+      }
+      const consentRequestsResponse = await axios.post(linkingRequestConsentURI, linkingRequestConsentRequest)
+      expect(consentRequestsResponse.status).toEqual(200)
+      expect(consentRequestsResponse.data).toEqual(expectedResponse)
+    })
+
+    it('WEB: request consent validate should be success', async (): Promise<void> => {
+      const consentRequestId = 'b51ec534-ee48-4575-b6a9-ead2955b8069'
+      const linkingRequestConsentValidateURI = `${env.outbound.baseUri}/linking/request-consent/${consentRequestId}/validate`
+
+      // ttk uses an authToken of 123456 to return a valid response
+      const linkingRequestConsentValidateRequest = {
+        authToken: '123456'
+      }
+      const expectedResponse = {
+        consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
+        consentRequestId: consentRequestId,
+        scopes: [{
+          accountId: 'some-id',
+          actions: [
+            'accounts.getBalance',
+            'accounts.transfer'
+          ]
+        }
+        ]
+      }
+      const consentRequestsResponse = await axios.patch(linkingRequestConsentValidateURI, linkingRequestConsentValidateRequest)
+      expect(consentRequestsResponse.status).toEqual(200)
+      expect(consentRequestsResponse.data.currentState).toEqual('consentReceivedAwaitingCredential')
+      expect(consentRequestsResponse.data.consent).toEqual(expectedResponse)
+    })
   })
 
-  it('OTP: validateRequest should be success', async (): Promise<void> => {
-    // ttk returns OTP response for id 'c51ec534-ee48-4575-b6a9-ead2955b8069'
-    const linkingRequestConsentRequest = {
-      ...mockData.linkingRequestConsentPostRequest.payload,
-      consentRequestId: 'c51ec534-ee48-4575-b6a9-ead2955b8069',
-      toParticipantId: 'dfspa'
-    }
-    const expectedResponse = {
-      channelResponse: { ...mockData.consentRequestsPutOTP.payload },
-      currentState: 'OTPAuthenticationChannelResponseRecieved'
-    }
-    const consentRequestsResponse = await axios.post(linkingRequestConsentURI, linkingRequestConsentRequest)
-    expect(consentRequestsResponse.status).toEqual(200)
-    expect(consentRequestsResponse.data).toEqual(expectedResponse)
+  describe('PISP Linking flow OTP', (): void => {
+    it('OTP: request consent should be success', async (): Promise<void> => {
+      // ttk returns OTP response for id 'c51ec534-ee48-4575-b6a9-ead2955b8069'
+      const linkingRequestConsentRequest = {
+        ...mockData.linkingRequestConsentPostRequest.payload,
+        consentRequestId: 'c51ec534-ee48-4575-b6a9-ead2955b8069',
+        toParticipantId: 'dfspa'
+      }
+      const expectedResponse = {
+        channelResponse: { ...mockData.consentRequestsPutOTP.payload },
+        currentState: 'OTPAuthenticationChannelResponseRecieved'
+      }
+      const consentRequestsResponse = await axios.post(linkingRequestConsentURI, linkingRequestConsentRequest)
+      expect(consentRequestsResponse.status).toEqual(200)
+      expect(consentRequestsResponse.data).toEqual(expectedResponse)
+    })
+
+    it('OTP: request consent validate should be success', async (): Promise<void> => {
+      const consentRequestId = 'c51ec534-ee48-4575-b6a9-ead2955b8069'
+      const linkingRequestConsentValidateURI = `${env.outbound.baseUri}/linking/request-consent/${consentRequestId}/validate`
+
+      // ttk uses an authToken of 123456 to return a valid response
+      const linkingRequestConsentValidateRequest = {
+        authToken: '123456'
+      }
+      const expectedResponse = {
+        consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
+        consentRequestId: consentRequestId,
+        scopes: [{
+          accountId: 'some-id',
+          actions: [
+            'accounts.getBalance',
+            'accounts.transfer'
+          ]
+        }
+        ]
+      }
+      const consentRequestsResponse = await axios.patch(linkingRequestConsentValidateURI, linkingRequestConsentValidateRequest)
+      expect(consentRequestsResponse.status).toEqual(200)
+      expect(consentRequestsResponse.data.currentState).toEqual('consentReceivedAwaitingCredential')
+      expect(consentRequestsResponse.data.consent).toEqual(expectedResponse)
+    })
   })
 
-  it('validateRequest should be errored', async (done): Promise<void> => {
-    // ttk returns Error reponse for id 'd51ec534-ee48-4575-b6a9-ead2955b8069'
-    const linkingRequestConsentRequest = {
-      ...mockData.linkingRequestConsentPostRequest.payload,
-      consentRequestId: 'd51ec534-ee48-4575-b6a9-ead2955b8069',
-      toParticipantId: 'dfspa'
-    }
-    const expectedResponse = {
-      ...mockData.consentRequestsPutError.payload,
-      currentState: 'errored'
-    }
-    await axios.post(linkingRequestConsentURI, linkingRequestConsentRequest)
+
+  describe('PISP Linking flow OTP - Error @ consent request stage', (): void => {
+    it('validateRequest should be errored', async (done): Promise<void> => {
+      // ttk returns Error reponse for id 'd51ec534-ee48-4575-b6a9-ead2955b8069'
+      const linkingRequestConsentRequest = {
+        ...mockData.linkingRequestConsentPostRequest.payload,
+        consentRequestId: 'd51ec534-ee48-4575-b6a9-ead2955b8069',
+        toParticipantId: 'dfspa'
+      }
+      const expectedResponse = {
+        ...mockData.consentRequestsPutError.payload,
+        currentState: 'errored'
+      }
+      await axios.post(linkingRequestConsentURI, linkingRequestConsentRequest)
+        .catch(error => {
+          expect(error.response.status).toEqual(500)
+          expect(error.response.data).toEqual(expectedResponse)
+          done()
+        })
+    })
+  })
+
+
+  describe('PISP Linking flow WEB - Error @ consent request validate stage', (): void => {
+    it('WEB: request consent should be success', async (): Promise<void> => {
+      // ttk returns WEB response for id 'b51ec534-ee48-4575-b6a9-ead2955b8069'
+      const linkingRequestConsentRequest = {
+        ...mockData.linkingRequestConsentPostRequest.payload,
+        consentRequestId: 'b51ec534-ee48-4575-b6a9-ead2955b8069',
+        toParticipantId: 'dfspa'
+      }
+      const expectedResponse = {
+        channelResponse: { ...mockData.consentRequestsPut.payload },
+        currentState: 'WebAuthenticationChannelResponseRecieved'
+      }
+      const consentRequestsResponse = await axios.post(linkingRequestConsentURI, linkingRequestConsentRequest)
+      expect(consentRequestsResponse.status).toEqual(200)
+      expect(consentRequestsResponse.data).toEqual(expectedResponse)
+    })
+
+    it('WEB: request consent validate should be errored', async (): Promise<void> => {
+      const consentRequestId = 'b51ec534-ee48-4575-b6a9-ead2955b8069'
+      const linkingRequestConsentValidateURI = `${env.outbound.baseUri}/linking/request-consent/${consentRequestId}/validate`
+
+      // ttk uses an authToken of 123456 to return a valid response
+      const linkingRequestConsentValidateRequest = {
+        authToken: '654321'
+      }
+      const expectedResponse = {
+        errorInformation: {
+          errorCode: "7000",
+          errorDescription: "Generic thirdparty error"
+        },
+        currentState: 'errored'
+      }
+
+      await axios.patch(linkingRequestConsentValidateURI, linkingRequestConsentValidateRequest)
       .catch(error => {
         expect(error.response.status).toEqual(500)
+        expect(error.response.data.currentState).toEqual('errored')
         expect(error.response.data).toEqual(expectedResponse)
-        done()
       })
+    })
   })
 })

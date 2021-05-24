@@ -36,14 +36,15 @@ import { RedisConnectionConfig } from '~/shared/redis-connection'
 import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
 
 const apiPath = path.resolve(__dirname, '../../src/interface/api-outbound.yaml')
-const featurePath = path.resolve(__dirname, '../features/consent-requests-validate-outbound.feature')
+const featurePath = path.resolve(__dirname, '../features/linking-request-consent-validate-outbound.feature')
 const feature = loadFeature(featurePath)
 
 jest.mock('@mojaloop/sdk-standard-components', () => {
   return {
     MojaloopRequests: jest.fn(),
     ThirdpartyRequests: jest.fn(() => ({
-      patchConsentRequests: jest.fn(() => Promise.resolve())
+      patchConsentRequests: jest.fn(() => Promise.resolve()),
+      postConsentRequests: jest.fn(() => Promise.resolve())
     })),
     WSO2Auth: jest.fn(),
     Logger: {
@@ -119,7 +120,7 @@ defineFeature(feature, (test): void => {
     server.stop()
   })
 
-  test('OutboundConsentRequestsValidatePatch', ({ given, when, then }): void => {
+  test('PatchLinkingRequestConsentIDValidate', ({ given, when, then }): void => {
     const postConsentsIDPatchResponse: tpAPI.Schemas.ConsentsPostRequest = {
       consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
       consentRequestId: '997c89f4-053c-4283-bfec-45a1a0a28fba',
@@ -137,24 +138,77 @@ defineFeature(feature, (test): void => {
       server = await prepareOutboundAPIServer()
     })
 
-    when('I send a \'OutboundConsentRequestsValidatePatch\' request', async (): Promise<ServerInjectResponse> => {
+    when('I send a \'PatchLinkingRequestConsentIDValidate\' request', async (): Promise<ServerInjectResponse> => {
       jest.mock('~/shared/kvs')
       jest.mock('~/shared/pub-sub')
-      const request = {
-        method: 'PATCH',
-        url: '/consentRequests/a6ab19f7-d07e-43dc-9af5-768f30dd45e7/validate',
+      const pubSub = new PubSub({} as RedisConnectionConfig)
+
+      // linking flow requires a sequence of outgoing requests
+      // we initiate the flow with POST /linking/request-consent
+      const consentRequestsIDPutResponseWeb: tpAPI.Schemas.ConsentRequestsIDPutResponseWeb = {
+        "consentRequestId": "b51ec534-ee48-4575-b6a9-ead2955b8069",
+        "scopes": [
+          {
+            "accountId": "dfspa.username.1234",
+            "actions": [
+              "accounts.transfer",
+              "accounts.getBalance"
+            ]
+          },
+          {
+            "accountId": "dfspa.username.5678",
+            "actions": [
+              "accounts.transfer",
+              "accounts.getBalance"
+            ]
+          }
+        ],
+        "callbackUri": "pisp-app://callback.com",
+        "authUri": "dfspa.com/authorize?consentRequestId=456",
+        "authChannels": [
+          "WEB"
+        ]
+      }
+
+      const postRequest = {
+        method: 'POST',
+        url: '/linking/request-consent',
         headers: {
           'Content-Type': 'application/json',
-          'FSPIOP-Source': 'switch',
           Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
-          'FSPIOP-Destination': 'dfspA'
         },
         payload: {
-          toParticipantId: 'dfspa',
+          consentRequestId: "bbce3ce8-c247-4153-aab1-f89768c93b18",
+          toParticipantId: "dfspA",
+          accounts: [
+            { "accountNickname": "XXXXXXnt", "id": "dfspa.username.1234", "currency": "ZAR" },
+            { "accountNickname": "SpeXXXXXXXXnt", "id": "dfspa.username.5678", "currency": "USD" }
+          ],
+          userId: "username1234",
+          callbackUri: "pisp-app://callback.com"
+        }
+      }
+
+      // defer publication to notification channel
+      setTimeout(() => pubSub.publish(
+        'some-channel',
+        consentRequestsIDPutResponseWeb as unknown as Message
+      ), 10)
+      await server.inject(postRequest)
+
+      // test linking-request-consent-validate-outbound now that the model has
+      // been saved to KVS
+      const request = {
+        method: 'PATCH',
+        url: '/linking/request-consent/bbce3ce8-c247-4153-aab1-f89768c93b18/validate',
+        headers: {
+          'Content-Type': 'application/json',
+          Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
+        },
+        payload: {
           authToken: '123456'
         }
       }
-      const pubSub = new PubSub({} as RedisConnectionConfig)
       // defer publication to notification channel
       setTimeout(() => pubSub.publish(
         'some-channel',

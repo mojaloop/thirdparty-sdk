@@ -368,22 +368,21 @@ describe('PISPLinkingModel', () => {
           { authToken: '123456' },
           'dfspA'
         )
-
-        expect(result).toEqual({
-          challenge: 'hello',
-          consent: {
-            consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
-            consentRequestId: consentRequestId,
-            scopes: [
-              {
-                accountId: 'some-id',
-                actions: [
-                  'accounts.getBalance',
-                  'accounts.transfer'
-                ]
-              }
+        const expectedConsent: tpAPI.Schemas.ConsentsPostRequest = {
+          consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
+          consentRequestId,
+          scopes: [{
+            accountId: 'some-id',
+            actions: [
+              'accounts.getBalance',
+              'accounts.transfer'
             ]
-          },
+          }
+          ]
+        }
+        expect(result).toEqual({
+          challenge: PISPLinkingModel.deriveChallenge(expectedConsent),
+          consent: expectedConsent,
           currentState: 'consentReceivedAwaitingCredential'
         })
       })

@@ -34,141 +34,197 @@ import TestData from 'test/unit/data/mockData.json'
 
 const mockData = JSON.parse(JSON.stringify(TestData))
 
-describe('PUT /consentRequests/{ID}/error', (): void => {
-  const scenarioUri = `${env.inbound.baseUri}/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fba/error`
-  describe('Inbound API', (): void => {
-    const config: RedisConnectionConfig = {
-      host: Config.REDIS.HOST,
-      port: Config.REDIS.PORT,
-      logger: mockLogger(),
-      timeout: Config.REDIS.TIMEOUT
-    }
-    const payload = {
-      errorInformation: {
-        errorCode: '5100',
-        errorDescription: 'This is an error description.',
-        extensionList: {
-          extension: [
-            {
-              key: 'sample error key',
-              value: 'sample error value'
-            }
-          ]
+describe('PISP Inbound', (): void => {
+  // these must be run in sequence since am inbound POST /consentRequests
+  // initializes a recurringly used DFSPLinkingModel object.
+  describe('POST /consentRequests', (): void => {
+    const scenarioUri = `${env.inbound.baseUri}/consentRequests`
+    describe('Inbound API', (): void => {
+      const payload = {
+        "consentRequestId": "997c89f4-053c-4283-bfec-45a1a0a28fba",
+        "userId": "dfspa.username",
+        "scopes": [
+          {
+            "accountId": "dfspa.username.1234",
+            "actions": [
+              "accounts.transfer",
+              "accounts.getBalance"
+            ]
+          },
+          {
+            "accountId": "dfspa.username.5678",
+            "actions": [
+              "accounts.transfer",
+              "accounts.getBalance"
+            ]
+          }
+        ],
+        "authChannels": [
+          "WEB",
+          "OTP"
+        ],
+        "callbackUri": "pisp-app://callback.com"
+      }
+
+      const axiosConfig = {
+        headers: {
+          'Content-Type': 'application/json',
+          'FSPIOP-Source': 'switch',
+          Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
+          'FSPIOP-Destination': 'dfspA'
         }
       }
-    }
 
-    const axiosConfig = {
-      headers: {
-        'Content-Type': 'application/json',
-        'FSPIOP-Source': 'switch',
-        Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
-        'FSPIOP-Destination': 'pispA'
+      it('should return 202', async (): Promise<void> => {
+        // Act
+        const response = await axios.post(scenarioUri, payload, axiosConfig)
+
+        // Assert
+        expect(response.status).toEqual(202)
+      })
+    })
+  })
+
+  describe('PATCH /consentRequests/{ID}', (): void => {
+    const scenarioUri = `${env.inbound.baseUri}/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fba`
+    describe('Inbound API', (): void => {
+      const payload = {
+        authToken: '123456'
       }
-    }
 
-    it('should propagate message via Redis PUB/SUB', async (): Promise<void> => {
-      // eslint-disable-next-line no-async-promise-executor
-      return new Promise(async (resolve) => {
+      const axiosConfig = {
+        headers: {
+          'Content-Type': 'application/json',
+          'FSPIOP-Source': 'switch',
+          Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
+          'FSPIOP-Destination': 'dfspA'
+        }
+      }
+
+      it('should return 202', async (): Promise<void> => {
+        // Act
+        const response = await axios.patch(scenarioUri, payload, axiosConfig)
+
+        // Assert
+        expect(response.status).toEqual(202)
+      })
+    })
+  })
+})
+
+
+describe('PISP Inbound', (): void => {
+  describe('PUT /consentRequests/{ID}/error', (): void => {
+    const scenarioUri = `${env.inbound.baseUri}/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fba/error`
+    describe('Inbound API', (): void => {
+      const config: RedisConnectionConfig = {
+        host: Config.REDIS.HOST,
+        port: Config.REDIS.PORT,
+        logger: mockLogger(),
+        timeout: Config.REDIS.TIMEOUT
+      }
+      const payload = {
+        errorInformation: {
+          errorCode: '5100',
+          errorDescription: 'This is an error description.',
+          extensionList: {
+            extension: [
+              {
+                key: 'sample error key',
+                value: 'sample error value'
+              }
+            ]
+          }
+        }
+      }
+
+      const axiosConfig = {
+        headers: {
+          'Content-Type': 'application/json',
+          'FSPIOP-Source': 'switch',
+          Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
+          'FSPIOP-Destination': 'pispA'
+        }
+      }
+
+      it('should propagate message via Redis PUB/SUB', async (): Promise<void> => {
+        // eslint-disable-next-line no-async-promise-executor
+        return new Promise(async (resolve) => {
+          const pubSub = new PubSub(config)
+          await pubSub.connect()
+          expect(pubSub.isConnected).toBeTruthy()
+
+          pubSub.subscribe('PISPLinking_requestConsent_997c89f4-053c-4283-bfec-45a1a0a28fba',
+            async (channel: string, message: Message, _id: number) => {
+              expect(channel).toEqual('PISPLinking_requestConsent_997c89f4-053c-4283-bfec-45a1a0a28fba')
+              expect(message).toEqual(payload)
+              await pubSub.disconnect()
+              expect(pubSub.isConnected).toBeFalsy()
+
+              resolve()
+            }
+          )
+
+          pubSub.subscribe('PISPConsentRequests_requestConsentAuthenticate_997c89f4-053c-4283-bfec-45a1a0a28fba',
+            async (channel: string, message: Message, _id: number) => {
+              expect(channel).toEqual('PISPConsentRequests_requestConsentAuthenticate_997c89f4-053c-4283-bfec-45a1a0a28fba')
+              expect(message).toEqual(payload)
+              await pubSub.disconnect()
+              expect(pubSub.isConnected).toBeFalsy()
+
+              resolve()
+            }
+          )
+          // Act
+          const response = await axios.put(scenarioUri, payload, axiosConfig)
+
+          // Assert
+          expect(response.status).toEqual(200)
+        })
+      })
+    })
+  })
+
+  describe('PUT /consentRequests/{ID}', (): void => {
+    const scenarioUri = `${env.inbound.baseUri}/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fbb`
+    describe('Inbound API', (): void => {
+      const config: RedisConnectionConfig = {
+        host: Config.REDIS.HOST,
+        port: Config.REDIS.PORT,
+        logger: mockLogger(),
+        timeout: Config.REDIS.TIMEOUT
+      }
+      const axiosConfig = {
+        headers: {
+          'Content-Type': 'application/json',
+          'FSPIOP-Source': 'switch',
+          Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
+          'FSPIOP-Destination': 'dfspA'
+        }
+      }
+
+      it('should propagate message via Redis PUB/SUB', async (done): Promise<void> => {
         const pubSub = new PubSub(config)
         await pubSub.connect()
         expect(pubSub.isConnected).toBeTruthy()
-
-        pubSub.subscribe('PISPOTPValidate-997c89f4-053c-4283-bfec-45a1a0a28fba',
-          async (channel: string, message: Message, _id: number) => {
-            expect(channel).toEqual('PISPOTPValidate-997c89f4-053c-4283-bfec-45a1a0a28fba')
-            expect(message).toEqual(payload)
+        pubSub.subscribe(
+          'PISPLinking_requestConsent_997c89f4-053c-4283-bfec-45a1a0a28fbb',
+          async (channel: string, message: Message, _id: number
+          ) => {
+            expect(channel).toEqual('PISPLinking_requestConsent_997c89f4-053c-4283-bfec-45a1a0a28fbb')
+            expect(message).toEqual(mockData.consentRequestsPut.payload)
             await pubSub.disconnect()
             expect(pubSub.isConnected).toBeFalsy()
 
-            resolve()
-          }
-        )
-
-        pubSub.subscribe('PISPConsentRequests_997c89f4-053c-4283-bfec-45a1a0a28fba',
-          async (channel: string, message: Message, _id: number) => {
-            expect(channel).toEqual('PISPConsentRequests_997c89f4-053c-4283-bfec-45a1a0a28fba')
-            expect(message).toEqual(payload)
-            await pubSub.disconnect()
-            expect(pubSub.isConnected).toBeFalsy()
-
-            resolve()
-          }
-        )
+            done()
+          })
         // Act
-        const response = await axios.put(scenarioUri, payload, axiosConfig)
+        const response = await axios.put(scenarioUri, mockData.consentRequestsPut.payload, axiosConfig)
 
         // Assert
         expect(response.status).toEqual(200)
       })
     })
   })
-})
 
-describe('PATCH /consentRequests/{ID}', (): void => {
-  const scenarioUri = `${env.inbound.baseUri}/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fba`
-  describe('Inbound API', (): void => {
-    const payload = {
-      authToken: '123456'
-    }
-
-    const axiosConfig = {
-      headers: {
-        'Content-Type': 'application/json',
-        'FSPIOP-Source': 'switch',
-        Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
-        'FSPIOP-Destination': 'dfspA'
-      }
-    }
-
-    it('should return 202', async (): Promise<void> => {
-      // Act
-      const response = await axios.patch(scenarioUri, payload, axiosConfig)
-
-      // Assert
-      expect(response.status).toEqual(202)
-    })
-  })
-})
-
-describe('PUT /consentRequests/{ID}', (): void => {
-  const scenarioUri = `${env.inbound.baseUri}/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fbb`
-  describe('Inbound API', (): void => {
-    const config: RedisConnectionConfig = {
-      host: Config.REDIS.HOST,
-      port: Config.REDIS.PORT,
-      logger: mockLogger(),
-      timeout: Config.REDIS.TIMEOUT
-    }
-    const axiosConfig = {
-      headers: {
-        'Content-Type': 'application/json',
-        'FSPIOP-Source': 'switch',
-        Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
-        'FSPIOP-Destination': 'dfspA'
-      }
-    }
-
-    it('should propagate message via Redis PUB/SUB', async (done): Promise<void> => {
-      const pubSub = new PubSub(config)
-      await pubSub.connect()
-      expect(pubSub.isConnected).toBeTruthy()
-      pubSub.subscribe(
-        'PISPLinking_997c89f4-053c-4283-bfec-45a1a0a28fbb',
-        async (channel: string, message: Message, _id: number
-        ) => {
-          expect(channel).toEqual('PISPLinking_997c89f4-053c-4283-bfec-45a1a0a28fbb')
-          expect(message).toEqual(mockData.consentRequestsPut.payload)
-          await pubSub.disconnect()
-          expect(pubSub.isConnected).toBeFalsy()
-
-          done()
-        })
-      // Act
-      const response = await axios.put(scenarioUri, mockData.consentRequestsPut.payload, axiosConfig)
-
-      // Assert
-      expect(response.status).toEqual(200)
-    })
-  })
 })

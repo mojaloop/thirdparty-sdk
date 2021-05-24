@@ -663,22 +663,22 @@ describe('Outbound API routes', (): void => {
       mockData.inboundConsentsPostRequest.payload as unknown as Message
     ), 10)
     const response = await server.inject(request)
-
+    const expectedConsent: tpAPI.Schemas.ConsentsPostRequest = {
+      consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
+      consentRequestId,
+      scopes: [{
+        accountId: 'some-id',
+        actions: [
+          'accounts.getBalance',
+          'accounts.transfer'
+        ]
+      }
+      ]
+    }
     expect(response.statusCode).toBe(200)
     const expectedResp = {
-      consent: {
-        consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
-        consentRequestId,
-        scopes: [{
-          accountId: 'some-id',
-          actions: [
-            'accounts.getBalance',
-            'accounts.transfer'
-          ]
-        }
-        ]
-      },
-      challenge: "hello",
+      consent: expectedConsent,
+      challenge: PISPLinkingModel.deriveChallenge(expectedConsent),
       currentState: 'consentReceivedAwaitingCredential'
     }
     expect(response.result).toEqual(expectedResp)

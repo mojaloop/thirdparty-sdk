@@ -43,7 +43,6 @@ describe('backendRequests', () => {
     verifyConsentPath: 'verify-consent',
     getUserAccountsPath: 'accounts/{ID}',
     validateOTPPath: 'validateOTP',
-    getScopesPath: 'scopes/{ID}',
     validateThirdpartyTransactionRequestPath: 'validate-third-party-transaction-request',
     validateConsentRequestsPath: 'validateConsentRequests',
     sendOTPPath: 'sendOTP',
