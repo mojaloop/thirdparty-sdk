@@ -32,8 +32,7 @@ import {
   BackendSendOTPRequest,
   BackendSendOTPResponse,
   BackendStoreScopesRequest,
-  BackendValidateOTPResponse,
-  BackendGetScopesResponse
+  BackendValidateOTPResponse
 } from '~/models/inbound/dfspLinking.interface'
 
 export interface IsValidResponse {
@@ -44,7 +43,6 @@ export interface DFSPBackendConfig extends HttpRequestsConfig {
   verifyConsentPath: string
   getUserAccountsPath: string
   validateOTPPath: string
-  getScopesPath: string
   validateThirdpartyTransactionRequestPath: string
   validateConsentRequestsPath: string
   sendOTPPath: string
@@ -88,11 +86,6 @@ export class DFSPBackendRequests extends HttpRequests {
   // validate OTP path getter
   get validateOTPPath (): string {
     return this.config.validateOTPPath
-  }
-
-  // get scopes path getter
-  get getScopesPath (): string {
-    return this.config.getScopesPath
   }
 
   // get path for validation of ThirdpartyTransactionRequest
@@ -161,13 +154,6 @@ export class DFSPBackendRequests extends HttpRequests {
     }
 
     return this.post(this.validateOTPPath, validateRequest)
-  }
-
-  // retrieve the scopes that PISP is granted on a user's behalf
-  async getScopes (consentRequestId: string): Promise<BackendGetScopesResponse | void> {
-    const uri = this.getScopesPath.replace('{ID}', consentRequestId)
-
-    return this.get(uri)
   }
 
   // validate ThirdpartyTransactionRequest

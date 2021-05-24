@@ -957,7 +957,6 @@ export interface components {
     | components['schemas']['LinkingRequestConsentResponseSuccess'];
     /** PATCH /linking/request-consent/{ID}/validate Request object */
     LinkingRequestConsentIDValidateRequest: {
-      toParticipantId: string;
       authToken: string;
     };
     /** State of PATCH linking request consent validate */

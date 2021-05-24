@@ -128,8 +128,8 @@
     "headers": {},
     "params": {},
     "payload": {
-      "consentRequestId": "3356cdc5-ee8f-4fcf-b7b6-aee68ac56a42",
-      "authToken": "12345"
+      "consentRequestId": "b51ec534-ee48-4575-b6a9-ead2955b8069",
+      "authToken": "123456"
     }
   },
   "backendValidateOTPResponseValid": {
@@ -144,28 +144,6 @@
     "params": {},
     "payload": {
       "isValid": false
-    }
-  },
-  "backendGetScopesRequest": {
-    "headers": {},
-    "params": {
-      "ID": "079ede98-e587-4af8-98a5-6eb0b9b45cad"
-    },
-    "payload": {}
-  },
-  "backendGetScopesResponse": {
-    "headers": {},
-    "params": {},
-    "payload": {
-      "scopes": [
-        {
-          "accountId": "some-id",
-          "actions": [
-            "accounts.getBalance",
-            "accounts.transfer"
-          ]
-        }
-      ]
     }
   },
   "inboundConsentsPostRequest": {
@@ -396,7 +374,6 @@
       "ID": "b51ec534-ee48-4575-b6a9-ead2955b8069"
     },
     "payload": {
-      "consentRequestId": "b51ec534-ee48-4575-b6a9-ead2955b8069",
       "authToken": "123456"
     }
   },
@@ -406,7 +383,6 @@
       "ID": "b51ec534-ee48-4575-b6a9-ead2955b8069"
     },
     "payload": {
-      "toParticipantId": "dfspA",
       "authToken": "123456"
     }
   }

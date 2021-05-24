@@ -40,6 +40,7 @@ import * as OutboundAPI from '~/interface/outbound/api_interfaces'
 export enum PISPLinkingPhase {
   requestConsent = 'requestConsent',
   requestConsentAuthenticate = 'requestConsentAuthenticate',
+  passCredential = 'passCredential'
 }
 
 export type PISPLinkingModelState =
@@ -63,6 +64,10 @@ export interface PISPLinkingModelConfig extends PersistentModelConfig {
 
 export interface PISPLinkingData extends StateData<PISPLinkingModelState> {
   consentRequestId: string
+  // all subsequent outbound requests will use `model.data.toParticipantId`
+  // taken from `linkingRequestConsentPostRequest.toParticipantId` vs. specifying
+  // `toParticipantId` in each outbound request
+  toParticipantId?: string
 
   // request consent phase
   linkingRequestConsentPostRequest: OutboundAPI.Schemas.LinkingRequestConsentPostRequest

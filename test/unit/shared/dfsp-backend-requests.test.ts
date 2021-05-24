@@ -30,7 +30,6 @@ import { Scheme } from '~/shared/http-scheme'
 import mockLogger from '../mockLogger'
 import TestData from 'test/unit/data/mockData.json'
 import { uuid } from 'uuidv4'
-import { BackendGetScopesResponse } from '~/models/inbound/dfspOTPValidate.interface'
 import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
 
 describe('backendRequests', () => {
@@ -103,27 +102,6 @@ describe('backendRequests', () => {
       const result = await dfspBackendRequests.validateOTPSecret(consentRequestId, authToken)
       expect(result).toEqual(response)
       expect(postSpy).toBeCalledWith(dfspBackendRequests.validateOTPPath, { authToken, consentRequestId })
-    })
-  })
-
-  describe('getScopes', () => {
-    it('should propagate the call to get', async () => {
-      const consentRequestId = uuid()
-      const response: BackendGetScopesResponse = {
-        scopes: [
-          {
-            accountId: uuid(),
-            actions: ['accounts.getBalance']
-          }
-        ]
-      }
-      const getSpy = jest.spyOn(dfspBackendRequests, 'get').mockImplementationOnce(
-        () => Promise.resolve(response)
-      )
-
-      const result = await dfspBackendRequests.getScopes(consentRequestId)
-      expect(result).toEqual(response)
-      expect(getSpy).toBeCalledWith(dfspBackendRequests.getScopesPath.replace('{ID}', consentRequestId))
     })
   })
 

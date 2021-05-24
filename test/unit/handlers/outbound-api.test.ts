@@ -648,7 +648,6 @@ describe('Outbound API routes', (): void => {
       method: 'PATCH',
       url: `/linking/request-consent/${consentRequestId}/validate`,
       payload: {
-        toParticipantId: 'dfpsa',
         authToken: '123456'
       }
     }

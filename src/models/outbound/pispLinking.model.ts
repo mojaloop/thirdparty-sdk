@@ -123,6 +123,10 @@ export class PISPLinkingModel
       PISPLinkingPhase.requestConsent,
       consentRequestId
     )
+
+    // store `toParticipantId` for subsequent outgoing requests
+    this.data.toParticipantId = linkingRequestConsentPostRequest.toParticipantId
+
     this.logger.push({ channel }).info('onRequestConsent - subscribe to channel')
 
     const postConsentRequest = this.linkingRequestConsentPostRequestToConsentRequestsPostRequest()
@@ -131,7 +135,7 @@ export class PISPLinkingModel
       .init(async (channel) => {
         const res = await this.thirdpartyRequests.postConsentRequests(
           postConsentRequest,
-          linkingRequestConsentPostRequest.toParticipantId
+          this.data.toParticipantId!
         )
 
         this.logger.push({ res, channel })
@@ -173,7 +177,7 @@ export class PISPLinkingModel
       const res = await this.thirdpartyRequests.patchConsentRequests(
         consentRequestId,
         { authToken: linkingRequestConsentIDValidatePatchRequest!.authToken },
-        linkingRequestConsentIDValidatePatchRequest!.toParticipantId
+        this.data.toParticipantId!
       )
 
       this.logger.push({ res, channel })

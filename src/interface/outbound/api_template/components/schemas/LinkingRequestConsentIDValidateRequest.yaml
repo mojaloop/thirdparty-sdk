@@ -2,11 +2,8 @@ title: LinkingRequestConsentIDValidateRequest
 description: PATCH /linking/request-consent/{ID}/validate Request object
 type: object
 properties:
-  toParticipantId:
-    type: string
   authToken:
     type: string
 required:
-  - toParticipantId
   - authToken
 additionalProperties: false

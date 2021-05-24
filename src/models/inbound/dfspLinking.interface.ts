@@ -93,6 +93,9 @@ export interface DFSPLinkingModelConfig extends PersistentModelConfig {
 export interface DFSPLinkingData extends StateData {
   toParticipantId: string
   consentRequestId?: string
+  // scopes from the initial `consentRequestsPostRequest` will be stored
+  // for later reference to save the DFSP from having to retrieve them from
+  // their backend
   scopes?: tpAPI.Schemas.Scope[]
 
   // request consent phase
