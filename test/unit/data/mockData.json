@@ -399,5 +399,15 @@
       "consentRequestId": "b51ec534-ee48-4575-b6a9-ead2955b8069",
       "authToken": "123456"
     }
+  },
+  "linkingRequestConsentIDValidatePatchRequest": {
+    "headers": {},
+    "params": {
+      "ID": "b51ec534-ee48-4575-b6a9-ead2955b8069"
+    },
+    "payload": {
+      "toParticipantId": "dfspA",
+      "authToken": "123456"
+    }
   }
 }

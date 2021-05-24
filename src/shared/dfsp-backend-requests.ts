@@ -28,14 +28,12 @@
 import { HttpRequestsConfig, HttpRequests } from '~/shared/http-requests'
 import { thirdparty as tpAPI, v1_1 as fspiopAPI } from '@mojaloop/api-snippets'
 import {
-  BackendValidateOTPResponse,
-  BackendGetScopesResponse
-} from '../models/inbound/dfspOTPValidate.interface'
-import {
   BackendValidateConsentRequestsResponse,
   BackendSendOTPRequest,
   BackendSendOTPResponse,
-  BackendStoreScopesRequest
+  BackendStoreScopesRequest,
+  BackendValidateOTPResponse,
+  BackendGetScopesResponse
 } from '~/models/inbound/dfspLinking.interface'
 
 export interface IsValidResponse {

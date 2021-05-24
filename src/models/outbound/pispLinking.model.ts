@@ -183,7 +183,7 @@ export class PISPLinkingModel
       try {
         type PutResponseOrError = tpAPI.Schemas.ConsentsPostRequest & fspiopAPI.Schemas.ErrorInformationObject
         const putResponse = message as unknown as PutResponseOrError
-        console.log(putResponse)
+
         if (putResponse.errorInformation) {
           this.data.errorInformation = putResponse.errorInformation
         } else {
