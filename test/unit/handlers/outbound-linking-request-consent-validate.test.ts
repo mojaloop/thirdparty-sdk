@@ -26,7 +26,7 @@
 
 import { Request } from '@hapi/hapi'
 import { StateResponseToolkit } from '~/server/plugins/state'
-import ConsentRequestsIDValidate from '~/handlers/outbound/consentRequests/{ID}/validate'
+import ConsentRequestsIDValidate from '~/handlers/outbound/linking/request-consent/{ID}/validate'
 import mockLogger from '../mockLogger'
 
 // mock KVS default exported class
@@ -35,8 +35,8 @@ jest.mock('~/shared/kvs')
 // mock PubSub default exported class
 jest.mock('~/shared/pub-sub')
 
-jest.mock('~/models/outbound/pispOTPValidate.model', () => ({
-  PISPOTPValidateModel: {
+jest.mock('~/models/outbound/pispLinking.model', () => ({
+  PISPLinkingModel: {
     notificationChannel: jest.fn(() => 'the-mocked-channel')
   },
   create: jest.fn(async () => ({
@@ -50,7 +50,7 @@ jest.mock('~/models/outbound/pispOTPValidate.model', () => ({
   existsInKVS: jest.fn(() => Promise.resolve(false))
 }))
 
-describe('Outbound Consent request otp validate handlers', () => {
+describe('Outbound linking request consent ID validate handlers', () => {
   const toolkit = {
     getKVS: jest.fn(),
     getPubSub: jest.fn(),
@@ -69,10 +69,10 @@ describe('Outbound Consent request otp validate handlers', () => {
     toParticipantId: 'dfspa'
   }
 
-  it('/consentRequests/{ID}/validate should report error when result from \'run\' is undefined', async () => {
+  it('/linking/request-consent/{ID}/validate should report error when result from \'run\' is undefined', async () => {
     const request = {
       method: 'PATCH',
-      url: '/consentRequests/{ID}/validate',
+      url: '/linking/request-consent/{ID}/validate',
       headers: {
         'Content-Type': 'application/json'
       },

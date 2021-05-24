@@ -1,5 +1,0 @@
-description: Consent requests validate response
-content:
-  application/json:
-    schema:
-      $ref: '../schemas/ConsentRequestsValidateResponse.yaml'

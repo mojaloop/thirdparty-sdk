@@ -41,6 +41,9 @@ import {
   DFSPLinkingModelConfig
 } from '~/models/inbound/dfspLinking.interface'
 import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
+import { BackendValidateOTPResponse } from './dfspLinking.interface';
+import { HTTPResponseError } from '../../shared/http-response-error';
+import { uuid } from 'uuidv4';
 
 // DFSPLinkingModel is the passive inbound handler for inbound
 // POST /consentRequests requests and no response is generated from `model.run()`
@@ -56,12 +59,16 @@ export class DFSPLinkingModel
       init: 'start',
       transitions: [
         { name: 'validateRequest', from: 'start', to: 'requestIsValid' },
-        { name: 'storeReqAndSendOTP', from: 'requestIsValid', to: 'consentRequestValidatedAndStored' }
+        { name: 'storeReqAndSendOTP', from: 'requestIsValid', to: 'consentRequestValidatedAndStored' },
+        { name: 'validateAuthToken', from: 'consentRequestValidatedAndStored', to: 'authTokenValidated' },
+        { name: 'grantConsent', from: 'authTokenValidated', to: 'consentGranted' }
       ],
       methods: {
         // specific transitions handlers methods
         onValidateRequest: () => this.onValidateRequest(),
-        onStoreReqAndSendOTP: () => this.onStoreReqAndSendOTP()
+        onStoreReqAndSendOTP: () => this.onStoreReqAndSendOTP(),
+        onValidateAuthToken: () => this.onValidateAuthToken(),
+        onGrantConsent: () => this.onGrantConsent()
       }
     }
     super(data, config, spec)
@@ -81,8 +88,21 @@ export class DFSPLinkingModel
     return this.config.thirdpartyRequests
   }
 
+  /*
+  static notificationChannel (phase: DFSPLinkingPhase, consentRequestId: string): string {
+    if (!consentRequestId) {
+      throw new Error('DFSPLinkingModel.notificationChannel: \'consentRequestId\' parameter is required')
+    }
+    // channel name
+    return `DFSPLinking_${phase}_${consentRequestId}`
+  }
+  */
+
   async onValidateRequest (): Promise<void> {
     const { consentRequestsPostRequest, toParticipantId } = this.data
+
+    // store consentRequestId since this will be referenced often
+    this.data.consentRequestId = consentRequestsPostRequest.consentRequestId
 
     try {
       const response = await this.dfspBackendRequests.validateConsentRequests(consentRequestsPostRequest)
@@ -130,6 +150,9 @@ export class DFSPLinkingModel
   async onStoreReqAndSendOTP (): Promise<void> {
     const { consentRequestsPostRequest, backendValidateConsentRequestsResponse } = this.data
 
+    // store scopes in model for future requests
+    this.data.scopes = consentRequestsPostRequest.scopes
+
     try {
       const channel = [...backendValidateConsentRequestsResponse!.data.authChannels].pop()
       switch (channel) {
@@ -148,7 +171,81 @@ export class DFSPLinkingModel
       }
 
     } catch (error) {
-      this.logger.push({ error }).error('requestIsValid -> success')
+      this.logger.push({ error }).error('requestIsValid -> consentRequestValidatedAndStored')
+      // throw error to stop state machine
+      throw error
+    }
+  }
+
+  async onValidateAuthToken (): Promise<void> {
+    const { consentRequestId, consentRequestsIDPatchRequest, toParticipantId } = this.data
+
+    try {
+      const isValidOTP = await this.dfspBackendRequests.validateOTPSecret(
+        consentRequestId,
+        consentRequestsIDPatchRequest!.authToken
+      ) as BackendValidateOTPResponse
+
+      if (!isValidOTP) {
+        throw new Errors.MojaloopFSPIOPError(
+          null as unknown as string,
+          null as unknown as string,
+          null as unknown as string,
+          Errors.MojaloopApiErrorCodes.TP_FSP_OTP_VALIDATION_ERROR
+        )
+      }
+
+      if (!isValidOTP.isValid) {
+        throw new Errors.MojaloopFSPIOPError(
+          null as unknown as string,
+          null as unknown as string,
+          null as unknown as string,
+          Errors.MojaloopApiErrorCodes.TP_OTP_VALIDATION_ERROR
+        )
+      }
+    } catch (error) {
+      const mojaloopError = this.reformatError(error)
+
+      this.logger.push({ error }).error('consentRequestValidatedAndStored -> authTokenValidated')
+      this.logger.push({ mojaloopError }).info(`Sending error response to ${toParticipantId}`)
+
+      await this.thirdpartyRequests.putConsentRequestsError(
+        consentRequestId,
+        mojaloopError as unknown as fspiopAPI.Schemas.ErrorInformationObject,
+        toParticipantId
+      )
+      // throw error to stop state machine
+      throw error
+    }
+  }
+
+
+  async onGrantConsent (): Promise<void> {
+    const { consentRequestId, toParticipantId, scopes } = this.data
+
+    const postConsentRequestsPayload: tpAPI.Schemas.ConsentsPostRequest = {
+      consentId: uuid(),
+      consentRequestId: consentRequestId,
+      scopes: scopes || []
+    }
+
+    try {
+      await this.thirdpartyRequests.postConsents(
+        postConsentRequestsPayload,
+        toParticipantId
+      )
+    } catch (error) {
+      const mojaloopError = this.reformatError(error)
+
+      this.logger.push({ error }).error('authTokenValidated -> consentGranted')
+      this.logger.push(error).error('ThirdpartyRequests.postConsents request error')
+
+      // note: if the POST /consents fails at the DFSP we report that back to the pisp
+      await this.thirdpartyRequests.putConsentRequestsError(
+        consentRequestId,
+        mojaloopError as unknown as fspiopAPI.Schemas.ErrorInformationObject,
+        toParticipantId
+      )
       // throw error to stop state machine
       throw error
     }
@@ -177,7 +274,25 @@ export class DFSPLinkingModel
           )
           await this.fsm.storeReqAndSendOTP()
           await this.saveToKVS()
-          return this.run()
+          // POST /consentRequest handled wait for PATCH /consentRequest{ID}
+          return
+
+        case 'consentRequestValidatedAndStored':
+          this.logger.info(
+            `validateAuthToken requested for ${data.consentRequestId},  currentState: ${data.currentState}`
+          )
+          await this.fsm.validateAuthToken()
+          await this.saveToKVS()
+          return this.run();
+
+        case 'authTokenValidated':
+          this.logger.info(
+            `grantConsent requested for ${data.consentRequestId},  currentState: ${data.currentState}`
+          )
+          await this.fsm.grantConsent()
+          await this.saveToKVS()
+          // PATCH /consentRequest{ID} handled
+          return
 
         default:
           this.logger.info('State machine in errored state')
@@ -200,6 +315,38 @@ export class DFSPLinkingModel
       }
       throw err
     }
+  }
+
+  reformatError (err: Error): Errors.MojaloopApiErrorObject {
+    if (err instanceof Errors.MojaloopFSPIOPError) {
+      return err.toApiErrorObject()
+    }
+
+    let mojaloopErrorCode = Errors.MojaloopApiErrorCodes.INTERNAL_SERVER_ERROR
+
+    if (err instanceof HTTPResponseError) {
+      const e = err.getData()
+      if (e.res && (e.res.body || e.res.data)) {
+        if (e.res.body) {
+          try {
+            const bodyObj = JSON.parse(e.res.body)
+            mojaloopErrorCode = Errors.MojaloopApiErrorCodeFromCode(`${bodyObj.statusCode}`)
+          } catch (ex) {
+            // do nothing
+            this.logger.push({ ex }).error('Error parsing error message body as JSON')
+          }
+        } else if (e.res.data) {
+          mojaloopErrorCode = Errors.MojaloopApiErrorCodeFromCode(`${e.res.data.statusCode}`)
+        }
+      }
+    }
+
+    return new Errors.MojaloopFSPIOPError(
+      err,
+      null as unknown as string,
+      null as unknown as string,
+      mojaloopErrorCode
+    ).toApiErrorObject()
   }
 }
 

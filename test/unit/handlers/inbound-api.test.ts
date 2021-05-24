@@ -50,7 +50,6 @@ import {
   PISPLinkingModel
 } from '~/models/outbound/pispLinking.model'
 import { PISPTransactionPhase } from '~/models/pispTransaction.interface'
-import { PISPOTPValidateModel } from '~/models/outbound/pispOTPValidate.model'
 import ThirdpartyAuthorizations from '~/handlers/inbound/thirdpartyRequests/transactions/{ID}/authorizations'
 import ConsentsHandler from '~/handlers/inbound/consents'
 import ConsentRequestsHandler from '~/handlers/inbound/consentRequests'
@@ -69,6 +68,7 @@ import index from '~/index'
 import path from 'path'
 import config from '~/shared/config'
 import { logger } from '~/shared/logger'
+import { PISPLinkingPhase } from '~/models/outbound/pispLinking.interface'
 
 const mockData = JSON.parse(JSON.stringify(TestData))
 const postThirdpartyRequestsTransactionRequest = mockData.postThirdpartyRequestsTransactionRequest
@@ -136,10 +136,15 @@ jest.mock('~/models/inbound/authorizations.model', () => ({
   }))
 }))
 
-jest.mock('~/models/inbound/dfspOTPValidate.model', () => ({
-  DFSPOTPValidateModel: jest.fn(() => {
+jest.mock('~/models/inbound/dfspLinking.model', () => ({
+  DFSPLinkingModel: jest.fn(() => {
     return {
-      run: jest.fn()
+      run: jest.fn(),
+    }
+  }),
+  loadFromKVS: jest.fn(() => {
+    return {
+      data: {}
     }
   })
 }))
@@ -176,7 +181,7 @@ const postConsentRequest: tpAPI.Schemas.ConsentsPostRequest = {
 }
 
 const patchConsentRequestsRequest: tpAPI.Schemas.ConsentRequestsIDPatchRequest = {
-  authToken: '123455'
+  authToken: '123455',
 }
 
 describe('Inbound API routes', (): void => {
@@ -686,9 +691,12 @@ describe('Inbound API routes', (): void => {
       )
 
       expect(result.statusCode).toEqual(202)
-      expect(toolkit.getPubSub).toBeCalledTimes(1)
 
-      const channel = PISPOTPValidateModel.notificationChannel(postConsentRequest.consentRequestId)
+      const channel = PISPLinkingModel.notificationChannel(
+        PISPLinkingPhase.requestConsentAuthenticate,
+        postConsentRequest.consentRequestId
+      )
+      expect(toolkit.getPubSub).toBeCalledTimes(1)
       expect(pubSubMock.publish).toBeCalledWith(channel, postConsentRequest)
     })
 
@@ -803,7 +811,10 @@ describe('Inbound API routes', (): void => {
       jest.runAllImmediates()
       expect(toolkit.getPubSub).toBeCalledTimes(1)
 
-      const channel = PISPLinkingModel.notificationChannel(request.params.ID)
+      const channel = PISPLinkingModel.notificationChannel(
+        PISPLinkingPhase.requestConsent,
+        request.params.ID
+      )
       expect(pubSubMock.publish).toBeCalledWith(channel, request.payload)
     })
 
@@ -846,12 +857,19 @@ describe('Inbound API routes', (): void => {
 
       expect(result.statusCode).toEqual(200)
       jest.runAllImmediates()
-      expect(toolkit.getPubSub).toBeCalledTimes(1)
+      expect(toolkit.getPubSub).toBeCalledTimes(2)
 
-      const otpChannel = PISPOTPValidateModel.notificationChannel(errorRequest.params.ID)
-      expect(pubSubMock.publish).toBeCalledWith(otpChannel, errorRequest.payload)
-      const channel = PISPLinkingModel.notificationChannel(errorRequest.params.ID)
+      const channel = PISPLinkingModel.notificationChannel(
+        PISPLinkingPhase.requestConsent,
+        errorRequest.params.ID
+      )
       expect(pubSubMock.publish).toBeCalledWith(channel, errorRequest.payload)
+
+      const authTokenChannel = PISPLinkingModel.notificationChannel(
+        PISPLinkingPhase.requestConsentAuthenticate,
+        errorRequest.params.ID
+      )
+      expect(pubSubMock.publish).toBeCalledWith(authTokenChannel, errorRequest.payload)
     })
   })
 
@@ -883,15 +901,6 @@ describe('Inbound API routes', (): void => {
         getDFSPBackendRequests: jest.fn(() => ({
           validateOTPSecret: jest.fn(() => Promise.resolve({
             isValid: true
-          })),
-          getScopes: jest.fn(() => Promise.resolve({
-            scopes: [{
-              accountId: 'some-id',
-              actions: [
-                'accounts.getBalance',
-                'accounts.transfer'
-              ]
-            }]
           }))
         })),
         getThirdpartyRequests: jest.fn(() => ({

@@ -37,11 +37,22 @@ import { PubSub } from '~/shared/pub-sub'
 import * as OutboundAPI from '~/interface/outbound/api_interfaces'
 
 
+export enum PISPLinkingPhase {
+  requestConsent = 'requestConsent',
+  requestConsentAuthenticate = 'requestConsentAuthenticate',
+}
+
+export type PISPLinkingModelState =
+  OutboundAPI.Schemas.LinkingRequestConsentState
+  | OutboundAPI.Schemas.LinkingRequestConsentIDValidateState
+
 export interface PISPLinkingStateMachine extends ControlledStateMachine {
   requestConsent: Method
   onRequestConsent: Method
   changeToWebAuthentication: Method
   changeToOTPAuthentication: Method
+  authenticate: Method
+  onAuthenticate: Method
 }
 
 export interface PISPLinkingModelConfig extends PersistentModelConfig {
@@ -50,12 +61,20 @@ export interface PISPLinkingModelConfig extends PersistentModelConfig {
   requestProcessingTimeoutSeconds: number
 }
 
-export interface PISPLinkingData extends StateData<OutboundAPI.Schemas.LinkingRequestConsentState> {
+export interface PISPLinkingData extends StateData<PISPLinkingModelState> {
   consentRequestId: string
+
+  // request consent phase
   linkingRequestConsentPostRequest: OutboundAPI.Schemas.LinkingRequestConsentPostRequest
   linkingRequestConsentInboundChannelResponse?:
     tpAPI.Schemas.ConsentRequestsIDPutResponseWeb |
     tpAPI.Schemas.ConsentRequestsIDPutResponseOTP
   linkingRequestConsentPostResponse?: OutboundAPI.Schemas.LinkingRequestConsentResponse
+
+  // authentication phase
+  linkingRequestConsentIDValidatePatchRequest?: OutboundAPI.Schemas.LinkingRequestConsentIDValidateRequest
+  linkingRequestConsentIDValidateInboundConsentResponse?: tpAPI.Schemas.ConsentsPostRequest
+  linkingRequestConsentIDValidateResponse?: OutboundAPI.Schemas.LinkingRequestConsentIDValidateResponse
+
   errorInformation?: tpAPI.Schemas.ErrorInformation
 }

@@ -253,48 +253,6 @@ paths:
           $ref: '#/components/responses/501'
         '503':
           $ref: '#/components/responses/503'
-  '/consentRequests/{ID}/validate':
-    patch:
-      operationId: OutboundConsentRequestsValidatePatch
-      summary: Outbound consent requests validate endpoint
-      description: >
-        Used in the authentication phase of account linking. Used by the PISP to
-        pass an OTP on behalf of the user to the DFSP to establish a chain of
-        trust.
-      tags:
-        - consentRequests
-      parameters:
-        - name: ID
-          in: path
-          required: true
-          schema:
-            $ref: '#/components/schemas/CorrelationId'
-      requestBody:
-        description: Consent requests validate request details
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ConsentRequestsValidateRequest'
-      responses:
-        '200':
-          $ref: '#/components/responses/ConsentRequestsValidateResponse'
-        '400':
-          $ref: '#/components/responses/400'
-        '401':
-          $ref: '#/components/responses/401'
-        '403':
-          $ref: '#/components/responses/403'
-        '404':
-          $ref: '#/components/responses/404'
-        '405':
-          $ref: '#/components/responses/405'
-        '406':
-          $ref: '#/components/responses/406'
-        '501':
-          $ref: '#/components/responses/501'
-        '503':
-          $ref: '#/components/responses/503'
   /linking/providers:
     get:
       operationId: GetLinkingProviders
@@ -331,7 +289,7 @@ paths:
         The HTTP request `GET /linking/accounts/{fspId}/{userId}` is used to
         retrieve the list of potential accounts available for linking.
       tags:
-        - accounts
+        - linking
       parameters:
         - name: fspId
           in: path
@@ -391,6 +349,49 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/LinkingRequestConsentResponse'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '405':
+          $ref: '#/components/responses/405'
+        '406':
+          $ref: '#/components/responses/406'
+        '501':
+          $ref: '#/components/responses/501'
+        '503':
+          $ref: '#/components/responses/503'
+  '/linking/request-consent/{ID}/validate':
+    patch:
+      operationId: PatchLinkingRequestConsentIDValidate
+      summary: 'Outbound PATCH /linking/request-consent/{ID}/authenticate endpoint'
+      description: >
+        Used in the authentication phase of account linking.
+
+        Used by the PISP to pass an Auth token on behalf of the user to the DFSP
+        to establish a chain of trust.
+      tags:
+        - linking
+      parameters:
+        - name: ID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/CorrelationId'
+      requestBody:
+        description: Linking request consent validate request details
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LinkingRequestConsentIDValidateRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/LinkingRequestConsentIDValidateResponse'
         '400':
           $ref: '#/components/responses/400'
         '401':
@@ -545,12 +546,6 @@ components:
           schema:
             $ref: >-
               #/components/schemas/ThirdpartyRequestsTransactionsIDAuthorizationsPutResponse
-    ConsentRequestsValidateResponse:
-      description: Consent requests validate response
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ConsentRequestsValidateResponse'
     LinkingProvidersResponse:
       description: |
         Response body of GET /linking/providers
@@ -582,6 +577,12 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/LinkingRequestConsentResponse'
+    LinkingRequestConsentIDValidateResponse:
+      description: Linking request consent validate response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/LinkingRequestConsentIDValidateResponse'
   headers:
     Content-Length:
       required: false
@@ -1880,109 +1881,6 @@ components:
         - consentId
         - sourceAccountId
         - status
-    ConsentRequestsValidateRequest:
-      title: ConsentRequestsValidateRequest
-      description: 'POST /consentRequests/{ID}/validate Request object'
-      type: object
-      properties:
-        toParticipantId:
-          type: string
-        authToken:
-          type: string
-      required:
-        - toParticipantId
-        - authToken
-      additionalProperties: false
-    ConsentRequestsValidateState:
-      title: ConsentRequestsValidateState
-      description: State of POST consent requests validate
-      type: string
-      enum:
-        - start
-        - errored
-        - success
-        - OTPIsValid
-    ConsentRequestsValidateResponseError:
-      title: ConsentRequestsValidateResponseError
-      type: object
-      properties:
-        errorInformation:
-          $ref: '#/components/schemas/ErrorInformation'
-        currentState:
-          $ref: '#/components/schemas/ConsentRequestsValidateState'
-      required:
-        - errorInformation
-        - currentState
-    ConsentScopeType:
-      title: ConsentScopeType
-      type: string
-      enum:
-        - accounts.getBalance
-        - accounts.transfer
-      description: |
-        The scopes requested for a ConsentRequest.
-        - "accounts.getBalance" - Get the balance of a given account.
-        - "accounts.transfer" - Initiate a transfer from an account.
-    Scope:
-      title: Scope
-      type: object
-      description: Scope + Account Identifier mapping for a Consent.
-      example: |
-        {
-          accountId: "dfsp.username.5678",
-          actions: [ "accounts.transfer", "accounts.getBalance" ]
-        }
-      properties:
-        accountId:
-          $ref: '#/components/schemas/AccountId'
-        actions:
-          type: array
-          items:
-            $ref: '#/components/schemas/ConsentScopeType'
-      required:
-        - accountId
-        - actions
-    ConsentsPostRequest:
-      title: ConsentPostRequest
-      type: object
-      description: The object sent in a `POST /consents` request.
-      properties:
-        consentId:
-          allOf:
-            - $ref: '#/components/schemas/CorrelationId'
-          description: |
-            Common ID between the PISP and FSP for the Consent object
-            decided by the DFSP who creates the Consent
-            This field is REQUIRED for POST /consent.
-        consentRequestId:
-          allOf:
-            - $ref: '#/components/schemas/CorrelationId'
-          description: |
-            The id of the ConsentRequest that was used to initiate the
-            creation of this Consent.
-        scopes:
-          type: array
-          items:
-            $ref: '#/components/schemas/Scope'
-      required:
-        - consentId
-        - consentRequestId
-        - scopes
-    ConsentRequestsValidateResponseSuccess:
-      title: ConsentRequestsValidateResponse
-      type: object
-      properties:
-        consent:
-          $ref: '#/components/schemas/ConsentsPostRequest'
-        currentState:
-          $ref: '#/components/schemas/ConsentRequestsValidateState'
-      required:
-        - consent
-        - currentState
-    ConsentRequestsValidateResponse:
-      oneOf:
-        - $ref: '#/components/schemas/ConsentRequestsValidateResponseError'
-        - $ref: '#/components/schemas/ConsentRequestsValidateResponseSuccess'
     LinkingProvidersState:
       title: LinkingProvidersState
       description: State of GET /linking/providers request
@@ -2104,6 +2002,35 @@ components:
       required:
         - errorInformation
         - currentState
+    ConsentScopeType:
+      title: ConsentScopeType
+      type: string
+      enum:
+        - accounts.getBalance
+        - accounts.transfer
+      description: |
+        The scopes requested for a ConsentRequest.
+        - "accounts.getBalance" - Get the balance of a given account.
+        - "accounts.transfer" - Initiate a transfer from an account.
+    Scope:
+      title: Scope
+      type: object
+      description: Scope + Account Identifier mapping for a Consent.
+      example: |
+        {
+          accountId: "dfsp.username.5678",
+          actions: [ "accounts.transfer", "accounts.getBalance" ]
+        }
+      properties:
+        accountId:
+          $ref: '#/components/schemas/AccountId'
+        actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConsentScopeType'
+      required:
+        - accountId
+        - actions
     ConsentRequestChannelTypeWeb:
       title: ConsentRequestChannelTypeWeb
       type: string
@@ -2209,6 +2136,80 @@ components:
       oneOf:
         - $ref: '#/components/schemas/LinkingRequestConsentResponseError'
         - $ref: '#/components/schemas/LinkingRequestConsentResponseSuccess'
+    LinkingRequestConsentIDValidateRequest:
+      title: LinkingRequestConsentIDValidateRequest
+      description: 'PATCH /linking/request-consent/{ID}/validate Request object'
+      type: object
+      properties:
+        toParticipantId:
+          type: string
+        authToken:
+          type: string
+      required:
+        - toParticipantId
+        - authToken
+      additionalProperties: false
+    LinkingRequestConsentIDValidateState:
+      title: LinkingRequestConsentIDValidateState
+      description: State of PATCH linking request consent validate
+      type: string
+      enum:
+        - errored
+        - consentReceivedAwaitingCredential
+    LinkingRequestConsentIDValidateResponseError:
+      title: LinkingRequestConsentIDValidateResponseError
+      type: object
+      properties:
+        errorInformation:
+          $ref: '#/components/schemas/ErrorInformation'
+        currentState:
+          $ref: '#/components/schemas/LinkingRequestConsentIDValidateState'
+      required:
+        - errorInformation
+        - currentState
+    ConsentsPostRequest:
+      title: ConsentPostRequest
+      type: object
+      description: The object sent in a `POST /consents` request.
+      properties:
+        consentId:
+          allOf:
+            - $ref: '#/components/schemas/CorrelationId'
+          description: |
+            Common ID between the PISP and FSP for the Consent object
+            decided by the DFSP who creates the Consent
+            This field is REQUIRED for POST /consent.
+        consentRequestId:
+          allOf:
+            - $ref: '#/components/schemas/CorrelationId'
+          description: |
+            The id of the ConsentRequest that was used to initiate the
+            creation of this Consent.
+        scopes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Scope'
+      required:
+        - consentId
+        - consentRequestId
+        - scopes
+    LinkingRequestConsentIDValidateResponseSuccess:
+      title: LinkingRequestConsentIDValidateResponse
+      type: object
+      properties:
+        consent:
+          $ref: '#/components/schemas/ConsentsPostRequest'
+        challenge:
+          type: string
+        currentState:
+          $ref: '#/components/schemas/LinkingRequestConsentIDValidateState'
+      required:
+        - consent
+        - currentState
+    LinkingRequestConsentIDValidateResponse:
+      oneOf:
+        - $ref: '#/components/schemas/LinkingRequestConsentIDValidateResponseError'
+        - $ref: '#/components/schemas/LinkingRequestConsentIDValidateResponseSuccess'
   parameters:
     ID:
       name: ID

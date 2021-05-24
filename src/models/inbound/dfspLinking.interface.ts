@@ -38,6 +38,20 @@ import {
 import { PubSub } from '~/shared/pub-sub'
 import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests';
 
+
+export enum DFSPLinkingPhase {
+  requestConsent = 'requestConsent',
+  requestConsentAuthenticate = 'requestConsentAuthenticate',
+}
+
+export enum DFSPLinkingModelState {
+  start = 'start',
+  requestIsValid = 'requestIsValid',
+  consentRequestValidatedAndStored = 'consentRequestValidatedAndStored',
+  authTokenValidated = 'authTokenValidated',
+  consentGranted = 'consentGranted',
+  errored = 'errored'
+}
 export interface BackendValidateConsentRequestsResponse {
   isValid: boolean
   data: {
@@ -61,11 +75,23 @@ export interface BackendStoreScopesRequest {
   scopes: tpAPI.Schemas.Scope[]
 }
 
+export interface BackendValidateOTPResponse {
+  isValid: boolean
+}
+
+export interface BackendGetScopesResponse {
+  scopes: tpAPI.Schemas.Scope[]
+}
+
 export interface DFSPLinkingStateMachine extends ControlledStateMachine {
   validateRequest: Method
   onValidateRequest: Method
   storeReqAndSendOTP: Method
   onStoreReqAndSendOTP: Method
+  validateAuthToken: Method
+  onValidateAuthToken: Method
+  grantConsent: Method
+  onGrantConsent: Method
 }
 
 export interface DFSPLinkingModelConfig extends PersistentModelConfig {
@@ -73,9 +99,16 @@ export interface DFSPLinkingModelConfig extends PersistentModelConfig {
   thirdpartyRequests: ThirdpartyRequests
   dfspBackendRequests: DFSPBackendRequests
 }
-
-export interface DFSPLinkingData extends StateData {
+export interface DFSPLinkingData extends StateData<DFSPLinkingModelState> {
   toParticipantId: string
+  consentRequestId: string
+  scopes?: tpAPI.Schemas.Scope[]
+
+  // request consent phase
   consentRequestsPostRequest: tpAPI.Schemas.ConsentRequestsPostRequest
   backendValidateConsentRequestsResponse?: BackendValidateConsentRequestsResponse
+
+  // authenticate phase
+  consentRequestsIDPatchRequest?: tpAPI.Schemas.ConsentRequestsIDPatchRequest
+  consentRequestPostRequest?: tpAPI.Schemas.ConsentsPostRequest
 }

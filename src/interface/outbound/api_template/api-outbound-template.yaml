@@ -32,8 +32,6 @@ paths:
 
   /thirdpartyRequests/transactions/{ID}/authorizations:
     $ref: paths/thirdpartyRequests_transactions_ID_authorizations.yaml
-  /consentRequests/{ID}/validate:
-    $ref: paths/consentRequests_ID_validate.yaml
 
   /linking/providers:
     $ref:  paths/linking_providers.yaml
@@ -41,3 +39,5 @@ paths:
     $ref: paths/linking_accounts.yaml
   /linking/request-consent:
     $ref: paths/linking_request_consent.yaml
+  /linking/request-consent/{ID}/validate:
+    $ref: paths/linking_request_consent_ID_validate.yaml

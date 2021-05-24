@@ -33,23 +33,22 @@ import { Message } from '~/shared/pub-sub'
 import { Request, ResponseObject } from '@hapi/hapi'
 import { StateResponseToolkit } from '~/server/plugins/state'
 import { Enum } from '@mojaloop/central-services-shared'
-import { PISPOTPValidateModel } from '~/models/outbound/pispOTPValidate.model'
+import { PISPLinkingModel } from '~/models/outbound/pispLinking.model'
+import { PISPLinkingPhase } from '~/models/outbound/pispLinking.interface'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function post (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const payload = request.payload as tpAPI.Schemas.ConsentsPostRequest
-  const logger = h.getLogger()
 
   // POST /consents is a follow-up request to PATCH /consentRequests
   // so we publish the request on the PISPConsentRequestModel
-  const channel = PISPOTPValidateModel.notificationChannel(
-    payload.consentRequestId
+  PISPLinkingModel.triggerWorkflow(
+    PISPLinkingPhase.requestConsentAuthenticate,
+    payload.consentRequestId,
+    h.getPubSub(),
+    payload as unknown as Message
   )
-  const pubSub = h.getPubSub()
-  // don't await on promise to resolve
-  // let finish publish in background
-  pubSub.publish(channel, payload as unknown as Message)
-  logger.info('PISPConsentRequestModel handled POST /consents request')
+  h.getLogger().info('PISPConsentRequestModel handled POST /consents request')
 
   // Note that we will have passed request validation, JWS etc... by this point
   // so it is safe to return 202

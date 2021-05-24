@@ -26,55 +26,46 @@
 
 import { StateResponseToolkit } from '~/server/plugins/state'
 import { Request, ResponseObject } from '@hapi/hapi'
-import { PISPOTPValidateModel, create } from '~/models/outbound/pispOTPValidate.model';
+import { PISPLinkingModel, loadFromKVS } from '~/models/outbound/pispLinking.model';
 import {
-  PISPOTPValidateData,
-  PISPOTPValidateModelConfig,
-  OutboundOTPValidateData
-} from '~/models/outbound/pispOTPValidate.interface'
+  PISPLinkingModelConfig,
+} from '~/models/outbound/pispLinking.interface'
 import config from '~/shared/config';
 import inspect from '~/shared/inspect';
+import * as OutboundAPI from '~/interface/outbound/api_interfaces'
+
 
 /**
- * Handles outbound PATCH /consentRequests/{ID} request
+ * Handles outbound PATCH /linking/request-consent/{ID}/authenticate request
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function patch (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
-  const payload = request.payload as OutboundOTPValidateData
-  const consentRequestsRequestId = request.params.ID
-  const authToken = payload.authToken
-  const toParticipantId = payload.toParticipantId
+  const payload = request.payload as OutboundAPI.Schemas.LinkingRequestConsentIDValidateRequest
+  const consentRequestId = request.params.ID
 
-  // prepare config
-  const data: PISPOTPValidateData = {
-    currentState: 'start',
-    consentRequestsRequestId,
-    authToken,
-    toParticipantId
-  }
-
-  const modelConfig: PISPOTPValidateModelConfig = {
+  const modelConfig: PISPLinkingModelConfig = {
     kvs: h.getKVS(),
     pubSub: h.getPubSub(),
-    key: consentRequestsRequestId,
+    key: consentRequestId,
     logger: h.getLogger(),
     thirdpartyRequests: h.getThirdpartyRequests(),
     requestProcessingTimeoutSeconds: config.REQUEST_PROCESSING_TIMEOUT_SECONDS
   }
 
   try {
-    const model: PISPOTPValidateModel = await create(data, modelConfig)
+    const model: PISPLinkingModel = await loadFromKVS(modelConfig)
+    model.data.linkingRequestConsentIDValidatePatchRequest = payload
 
     const result = await model.run()
     if (!result) {
-      h.getLogger().error('outbound PATCH /consentRequests/{ID}/validate unexpected result from workflow')
+      h.getLogger().error('outbound PATCH /linking/request-consent/{ID}/authenticate unexpected result from workflow')
       return h.response({}).code(500)
     }
 
     const statusCode = (result.currentState == 'errored') ? 500 : 200
     return h.response(result).code(statusCode)
   } catch(error) {
-    h.getLogger().info(`Error running PISPOTPValidateModel : ${inspect(error)}`)
+    h.getLogger().info(`Error running PISPLinkingModel : ${inspect(error)}`)
     return h.response({}).code(500)
   }
 }

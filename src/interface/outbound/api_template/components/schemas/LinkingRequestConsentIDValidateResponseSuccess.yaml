@@ -1,11 +1,13 @@
 
-title: ConsentRequestsValidateResponse
+title: LinkingRequestConsentIDValidateResponse
 type: object
 properties:
   consent:
     $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/ConsentsPostRequest.yaml'
+  challenge:
+    type: string
   currentState:
-    $ref: '../../components/schemas/ConsentRequestsValidateState.yaml'
+    $ref: '../../components/schemas/LinkingRequestConsentIDValidateState.yaml'
 required:
   - consent
   - currentState

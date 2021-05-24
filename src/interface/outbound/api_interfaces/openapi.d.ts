@@ -25,9 +25,6 @@ export interface paths {
   '/thirdpartyRequests/transactions/{ID}/authorizations': {
     post: operations['VerifyThirdPartyAuthorization'];
   };
-  '/consentRequests/{ID}/validate': {
-    patch: operations['OutboundConsentRequestsValidatePatch'];
-  };
   '/linking/providers': {
     get: operations['GetLinkingProviders'];
   };
@@ -36,6 +33,9 @@ export interface paths {
   };
   '/linking/request-consent': {
     post: operations['PostLinkingRequestConsent'];
+  };
+  '/linking/request-consent/{ID}/validate': {
+    patch: operations['PatchLinkingRequestConsentIDValidate'];
   };
 }
 
@@ -168,28 +168,6 @@ export interface operations {
       503: components['responses']['503'];
     };
   };
-  /** Used in the authentication phase of account linking. Used by the PISP to pass an OTP on behalf of the user to the DFSP to establish a chain of trust. */
-  OutboundConsentRequestsValidatePatch: {
-    parameters: {
-      path: {
-        ID: components['schemas']['CorrelationId'];
-      };
-    };
-    requestBody: {
-      'application/json': components['schemas']['ConsentRequestsValidateRequest'];
-    };
-    responses: {
-      200: components['responses']['ConsentRequestsValidateResponse'];
-      400: components['responses']['400'];
-      401: components['responses']['401'];
-      403: components['responses']['403'];
-      404: components['responses']['404'];
-      405: components['responses']['405'];
-      406: components['responses']['406'];
-      501: components['responses']['501'];
-      503: components['responses']['503'];
-    };
-  };
   /** The HTTP request `GET /linking/providers` is used to retrieve a list of thirdparty enabled DFSP identifiers. */
   GetLinkingProviders: {
     responses: {
@@ -238,6 +216,31 @@ export interface operations {
     };
     responses: {
       200: components['responses']['LinkingRequestConsentResponse'];
+      400: components['responses']['400'];
+      401: components['responses']['401'];
+      403: components['responses']['403'];
+      404: components['responses']['404'];
+      405: components['responses']['405'];
+      406: components['responses']['406'];
+      501: components['responses']['501'];
+      503: components['responses']['503'];
+    };
+  };
+  /**
+   * Used in the authentication phase of account linking.
+   * Used by the PISP to pass an Auth token on behalf of the user to the DFSP to establish a chain of trust.
+   */
+  PatchLinkingRequestConsentIDValidate: {
+    parameters: {
+      path: {
+        ID: components['schemas']['CorrelationId'];
+      };
+    };
+    requestBody: {
+      'application/json': components['schemas']['LinkingRequestConsentIDValidateRequest'];
+    };
+    responses: {
+      200: components['responses']['LinkingRequestConsentIDValidateResponse'];
       400: components['responses']['400'];
       401: components['responses']['401'];
       403: components['responses']['403'];
@@ -853,54 +856,6 @@ export interface components {
       /** The status of the authorization. This value must be `VERIFIED` for a PUT request. */
       status: 'VERIFIED';
     };
-    /** POST /consentRequests/{ID}/validate Request object */
-    ConsentRequestsValidateRequest: {
-      toParticipantId: string;
-      authToken: string;
-    };
-    /** State of POST consent requests validate */
-    ConsentRequestsValidateState:
-    | 'start'
-    | 'errored'
-    | 'success'
-    | 'OTPIsValid';
-    ConsentRequestsValidateResponseError: {
-      errorInformation: components['schemas']['ErrorInformation'];
-      currentState: components['schemas']['ConsentRequestsValidateState'];
-    };
-    /**
-     * The scopes requested for a ConsentRequest.
-     * - "accounts.getBalance" - Get the balance of a given account.
-     * - "accounts.transfer" - Initiate a transfer from an account.
-     */
-    ConsentScopeType: 'accounts.getBalance' | 'accounts.transfer';
-    /** Scope + Account Identifier mapping for a Consent. */
-    Scope: {
-      accountId: components['schemas']['AccountId'];
-      actions: components['schemas']['ConsentScopeType'][];
-    };
-    /** The object sent in a `POST /consents` request. */
-    ConsentsPostRequest: {
-      /**
-       * Common ID between the PISP and FSP for the Consent object
-       * decided by the DFSP who creates the Consent
-       * This field is REQUIRED for POST /consent.
-       */
-      consentId: components['schemas']['CorrelationId'];
-      /**
-       * The id of the ConsentRequest that was used to initiate the
-       * creation of this Consent.
-       */
-      consentRequestId: components['schemas']['CorrelationId'];
-      scopes: components['schemas']['Scope'][];
-    };
-    ConsentRequestsValidateResponseSuccess: {
-      consent: components['schemas']['ConsentsPostRequest'];
-      currentState: components['schemas']['ConsentRequestsValidateState'];
-    };
-    ConsentRequestsValidateResponse:
-    | components['schemas']['ConsentRequestsValidateResponseError']
-    | components['schemas']['ConsentRequestsValidateResponseSuccess'];
     /** State of GET /linking/providers request */
     LinkingProvidersState: 'start' | 'errored' | 'providersLookupSuccess';
     LinkingProvidersResponseError: {
@@ -947,6 +902,17 @@ export interface components {
       errorInformation: components['schemas']['ErrorInformation'];
       currentState: components['schemas']['LinkingRequestConsentState'];
     };
+    /**
+     * The scopes requested for a ConsentRequest.
+     * - "accounts.getBalance" - Get the balance of a given account.
+     * - "accounts.transfer" - Initiate a transfer from an account.
+     */
+    ConsentScopeType: 'accounts.getBalance' | 'accounts.transfer';
+    /** Scope + Account Identifier mapping for a Consent. */
+    Scope: {
+      accountId: components['schemas']['AccountId'];
+      actions: components['schemas']['ConsentScopeType'][];
+    };
     /** The web auth channel being used for PUT consentRequest/{ID} request. */
     ConsentRequestChannelTypeWeb: 'WEB';
     /**
@@ -989,6 +955,42 @@ export interface components {
     LinkingRequestConsentResponse:
     | components['schemas']['LinkingRequestConsentResponseError']
     | components['schemas']['LinkingRequestConsentResponseSuccess'];
+    /** PATCH /linking/request-consent/{ID}/validate Request object */
+    LinkingRequestConsentIDValidateRequest: {
+      toParticipantId: string;
+      authToken: string;
+    };
+    /** State of PATCH linking request consent validate */
+    LinkingRequestConsentIDValidateState:
+    | 'errored'
+    | 'consentReceivedAwaitingCredential';
+    LinkingRequestConsentIDValidateResponseError: {
+      errorInformation: components['schemas']['ErrorInformation'];
+      currentState: components['schemas']['LinkingRequestConsentIDValidateState'];
+    };
+    /** The object sent in a `POST /consents` request. */
+    ConsentsPostRequest: {
+      /**
+       * Common ID between the PISP and FSP for the Consent object
+       * decided by the DFSP who creates the Consent
+       * This field is REQUIRED for POST /consent.
+       */
+      consentId: components['schemas']['CorrelationId'];
+      /**
+       * The id of the ConsentRequest that was used to initiate the
+       * creation of this Consent.
+       */
+      consentRequestId: components['schemas']['CorrelationId'];
+      scopes: components['schemas']['Scope'][];
+    };
+    LinkingRequestConsentIDValidateResponseSuccess: {
+      consent: components['schemas']['ConsentsPostRequest'];
+      challenge?: string;
+      currentState: components['schemas']['LinkingRequestConsentIDValidateState'];
+    };
+    LinkingRequestConsentIDValidateResponse:
+    | components['schemas']['LinkingRequestConsentIDValidateResponseError']
+    | components['schemas']['LinkingRequestConsentIDValidateResponseSuccess'];
   };
   responses: {
     /** OK */
@@ -1110,12 +1112,6 @@ export interface components {
         'application/json': components['schemas']['ThirdpartyRequestsTransactionsIDAuthorizationsPutResponse'];
       };
     };
-    /** Consent requests validate response */
-    ConsentRequestsValidateResponse: {
-      content: {
-        'application/json': components['schemas']['ConsentRequestsValidateResponse'];
-      };
-    };
     /** Response body of GET /linking/providers */
     LinkingProvidersResponse: {
       content: {
@@ -1135,6 +1131,12 @@ export interface components {
     LinkingRequestConsentResponse: {
       content: {
         'application/json': components['schemas']['LinkingRequestConsentResponse'];
+      };
+    };
+    /** Linking request consent validate response */
+    LinkingRequestConsentIDValidateResponse: {
+      content: {
+        'application/json': components['schemas']['LinkingRequestConsentIDValidateResponse'];
       };
     };
   };

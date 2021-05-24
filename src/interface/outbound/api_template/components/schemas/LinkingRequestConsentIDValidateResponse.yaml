@@ -1,0 +1,3 @@
+oneOf:
+  - $ref: './LinkingRequestConsentIDValidateResponseError.yaml'
+  - $ref: './LinkingRequestConsentIDValidateResponseSuccess.yaml'

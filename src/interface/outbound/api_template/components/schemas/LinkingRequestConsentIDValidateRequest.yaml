@@ -1,5 +1,5 @@
-title: ConsentRequestsValidateRequest
-description: POST /consentRequests/{ID}/validate Request object
+title: LinkingRequestConsentIDValidateRequest
+description: PATCH /linking/request-consent/{ID}/validate Request object
 type: object
 properties:
   toParticipantId:

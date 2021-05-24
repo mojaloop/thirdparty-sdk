@@ -1,10 +1,11 @@
 patch:
-  operationId: OutboundConsentRequestsValidatePatch
-  summary: Outbound consent requests validate endpoint
+  operationId: PatchLinkingRequestConsentIDValidate
+  summary: Outbound PATCH /linking/request-consent/{ID}/authenticate endpoint
   description: |
-    Used in the authentication phase of account linking. Used by the PISP to pass an OTP on behalf of the user to the DFSP to establish a chain of trust.
+    Used in the authentication phase of account linking.
+    Used by the PISP to pass an Auth token on behalf of the user to the DFSP to establish a chain of trust.
   tags:
-    - consentRequests
+    - linking
   parameters:
     - name: ID
       in: path
@@ -12,15 +13,15 @@ patch:
       schema:
         $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/schemas/CorrelationId.yaml'
   requestBody:
-    description: Consent requests validate request details
+    description: Linking request consent validate request details
     required: true
     content:
       application/json:
         schema:
-          $ref: '../components/schemas/ConsentRequestsValidateRequest.yaml'
+          $ref: '../components/schemas/LinkingRequestConsentIDValidateRequest.yaml'
   responses:
     '200':
-      $ref: '../components/responses/ConsentRequestsValidateResponse.yaml'
+      $ref: '../components/responses/LinkingRequestConsentIDValidateResponse.yaml'
     '400':
       $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/400.yaml'
     '401':

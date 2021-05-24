@@ -4,7 +4,7 @@ get:
   description: |
     The HTTP request `GET /linking/accounts/{fspId}/{userId}` is used to retrieve the list of potential accounts available for linking.
   tags:
-    - accounts
+    - linking
   parameters:
     - name: fspId
       in: path

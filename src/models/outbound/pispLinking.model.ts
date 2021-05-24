@@ -39,6 +39,7 @@ import {
 import { Message } from '~/shared/pub-sub';
 import deferredJob from '~/shared/deferred-job';
 import * as OutboundAPI from '~/interface/outbound/api_interfaces'
+import { PISPLinkingPhase } from './pispLinking.interface';
 
 export class PISPLinkingModel
   extends PersistentModel<PISPLinkingStateMachine, PISPLinkingData> {
@@ -53,11 +54,14 @@ export class PISPLinkingModel
       transitions: [
         { name: 'requestConsent', from: 'start', to: 'channelResponseReceived' },
         { name: 'changeToOTPAuthentication', from: 'channelResponseReceived', to: 'OTPAuthenticationChannelResponseRecieved' },
-        { name: 'changeToWebAuthentication', from: 'channelResponseReceived', to: 'WebAuthenticationChannelResponseRecieved' }
+        { name: 'changeToWebAuthentication', from: 'channelResponseReceived', to: 'WebAuthenticationChannelResponseRecieved' },
+        { name: 'authenticate', from: 'OTPAuthenticationChannelResponseRecieved', to: 'consentReceivedAwaitingCredential' },
+        { name: 'authenticate', from: 'WebAuthenticationChannelResponseRecieved', to: 'consentReceivedAwaitingCredential' }
       ],
       methods: {
         // specific transitions handlers methods
         onRequestConsent: () => this.onRequestConsent(),
+        onAuthenticate: () => this.onAuthenticate()
       }
     }
     super(data, config, spec)
@@ -73,13 +77,24 @@ export class PISPLinkingModel
     return this.config.thirdpartyRequests
   }
 
-  static notificationChannel (consentRequestId: string): string {
+  static notificationChannel (phase: PISPLinkingPhase, consentRequestId: string): string {
     if (!consentRequestId) {
       throw new Error('PISPLinkingModel.notificationChannel: \'consentRequestId\' parameter is required')
     }
     // channel name
-    return `PISPLinking_${consentRequestId}`
+    return `PISPLinking_${phase}_${consentRequestId}`
   }
+
+  static async triggerWorkflow (
+    phase: PISPLinkingPhase,
+    consentRequestId: string,
+    pubSub: PubSub,
+    message: Message
+  ): Promise<void> {
+    const channel = PISPLinkingModel.notificationChannel(phase, consentRequestId)
+    return deferredJob(pubSub, channel).trigger(message)
+  }
+
 
   linkingRequestConsentPostRequestToConsentRequestsPostRequest(): tpAPI.Schemas.ConsentRequestsPostRequest {
     const { linkingRequestConsentPostRequest, consentRequestId } = this.data
@@ -104,7 +119,10 @@ export class PISPLinkingModel
 
   async onRequestConsent (): Promise<void> {
     const { linkingRequestConsentPostRequest, consentRequestId } = this.data
-    const channel = PISPLinkingModel.notificationChannel(consentRequestId)
+    const channel = PISPLinkingModel.notificationChannel(
+      PISPLinkingPhase.requestConsent,
+      consentRequestId
+    )
     this.logger.push({ channel }).info('onRequestConsent - subscribe to channel')
 
     const postConsentRequest = this.linkingRequestConsentPostRequestToConsentRequestsPostRequest()
@@ -140,7 +158,52 @@ export class PISPLinkingModel
       .wait(this.config.requestProcessingTimeoutSeconds * 1000)
   }
 
-  getResponse (): OutboundAPI.Schemas.LinkingRequestConsentResponse | void {
+  async onAuthenticate (): Promise<void> {
+    const { consentRequestId, linkingRequestConsentIDValidatePatchRequest } = this.data
+
+    const channel = PISPLinkingModel.notificationChannel(
+      PISPLinkingPhase.requestConsentAuthenticate,
+      consentRequestId
+    )
+
+    this.logger.push({ channel }).info('onValidateOTP - subscribe to channel')
+
+    return deferredJob(this.pubSub, channel)
+    .init(async (channel) => {
+      const res = await this.thirdpartyRequests.patchConsentRequests(
+        consentRequestId,
+        { authToken: linkingRequestConsentIDValidatePatchRequest!.authToken },
+        linkingRequestConsentIDValidatePatchRequest!.toParticipantId
+      )
+
+      this.logger.push({ res, channel })
+        .log('ThirdpartyRequests.patchConsentRequests request call sent to peer, listening on response')
+    })
+    .job(async (message: Message): Promise<void> => {
+      try {
+        type PutResponseOrError = tpAPI.Schemas.ConsentsPostRequest & fspiopAPI.Schemas.ErrorInformationObject
+        const putResponse = message as unknown as PutResponseOrError
+        console.log(putResponse)
+        if (putResponse.errorInformation) {
+          this.data.errorInformation = putResponse.errorInformation
+        } else {
+          this.data.linkingRequestConsentIDValidateInboundConsentResponse = {
+            ...message as unknown as tpAPI.Schemas.ConsentsPostRequest
+          }
+        }
+
+      } catch (error) {
+        this.logger.push(error).error('ThirdpartyRequests.patchConsentRequests request error')
+        return Promise.reject(error)
+      }
+    })
+    .wait(this.config.requestProcessingTimeoutSeconds * 1000)
+  }
+
+  getResponse ():
+    OutboundAPI.Schemas.LinkingRequestConsentResponse |
+    OutboundAPI.Schemas.LinkingRequestConsentIDValidateResponse |
+    void {
     switch (this.data.currentState) {
       case 'OTPAuthenticationChannelResponseRecieved':
         return {
@@ -152,6 +215,12 @@ export class PISPLinkingModel
           channelResponse: this.data.linkingRequestConsentInboundChannelResponse,
           currentState: this.data.currentState
         } as OutboundAPI.Schemas.LinkingRequestConsentResponse
+      case 'consentReceivedAwaitingCredential':
+        return {
+          consent: this.data.linkingRequestConsentIDValidateInboundConsentResponse,
+          challenge: 'hello',
+          currentState: this.data.currentState
+        } as OutboundAPI.Schemas.LinkingRequestConsentIDValidateResponse
       case 'errored':
         return {
           errorInformation: this.data.errorInformation,
@@ -186,7 +255,10 @@ export class PISPLinkingModel
   /**
    * runs the workflow
    */
-  async run (): Promise<OutboundAPI.Schemas.LinkingRequestConsentResponse | void> {
+  async run (): Promise<
+    OutboundAPI.Schemas.LinkingRequestConsentResponse |
+    OutboundAPI.Schemas.LinkingRequestConsentIDValidateResponse |
+    void> {
     const data = this.data
     try {
       // run transitions based on incoming state
@@ -199,6 +271,24 @@ export class PISPLinkingModel
           await this.fsm.requestConsent()
           await this.checkModelDataForErrorInformation()
           await this.checkModelDataChannelResponse()
+          await this.saveToKVS()
+          return this.getResponse()
+
+        case 'OTPAuthenticationChannelResponseRecieved':
+          this.logger.info(
+            `validateRequest for ${data.consentRequestId},  currentState: ${data.currentState}`
+          )
+          await this.fsm.authenticate()
+          await this.checkModelDataForErrorInformation()
+          await this.saveToKVS()
+          return this.getResponse()
+
+        case 'WebAuthenticationChannelResponseRecieved':
+          this.logger.info(
+            `validateRequest for ${data.consentRequestId},  currentState: ${data.currentState}`
+          )
+          await this.fsm.authenticate()
+          await this.checkModelDataForErrorInformation()
           await this.saveToKVS()
           return this.getResponse()
 
@@ -223,6 +313,23 @@ export class PISPLinkingModel
       }
       throw err
     }
+  }
+}
+
+// loads PersistentModel from KVS storage using given `config` and `spec`
+export async function loadFromKVS (
+  config: PISPLinkingModelConfig
+): Promise<PISPLinkingModel> {
+  try {
+    const data = await config.kvs.get<PISPLinkingData>(config.key)
+    if (!data) {
+      throw new Error(`No data found in KVS for: ${config.key}`)
+    }
+    config.logger.push({ data }).info('data loaded from KVS')
+    return create(data, config)
+  } catch (err) {
+    config.logger.push({ err }).info(`Error loading data from KVS for key: ${config.key}`)
+    throw err
   }
 }
 
