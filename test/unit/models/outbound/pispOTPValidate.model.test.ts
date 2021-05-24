@@ -23,7 +23,7 @@ optionally within square brackets <email>.
 
 - Kevin Leyow - kevin.leyow@modusbox.com
 --------------
-******/
+
 
 import {
   v1_1 as fspiopAPI,
@@ -53,7 +53,7 @@ jest.mock('~/shared/kvs')
 // mock PubSub default exported class
 jest.mock('~/shared/pub-sub')
 
-describe('pispOTPValidateModel', () => {
+describe.skip('pispOTPValidateModel', () => {
   const connectionConfig: RedisConnectionConfig = {
     port: 6789,
     host: 'localhost',
@@ -217,3 +217,4 @@ describe('pispOTPValidateModel', () => {
     })
   })
 })
+******/

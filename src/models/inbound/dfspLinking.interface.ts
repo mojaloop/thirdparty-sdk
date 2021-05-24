@@ -43,15 +43,6 @@ export enum DFSPLinkingPhase {
   requestConsent = 'requestConsent',
   requestConsentAuthenticate = 'requestConsentAuthenticate',
 }
-
-export enum DFSPLinkingModelState {
-  start = 'start',
-  requestIsValid = 'requestIsValid',
-  consentRequestValidatedAndStored = 'consentRequestValidatedAndStored',
-  authTokenValidated = 'authTokenValidated',
-  consentGranted = 'consentGranted',
-  errored = 'errored'
-}
 export interface BackendValidateConsentRequestsResponse {
   isValid: boolean
   data: {
@@ -99,9 +90,9 @@ export interface DFSPLinkingModelConfig extends PersistentModelConfig {
   thirdpartyRequests: ThirdpartyRequests
   dfspBackendRequests: DFSPBackendRequests
 }
-export interface DFSPLinkingData extends StateData<DFSPLinkingModelState> {
+export interface DFSPLinkingData extends StateData {
   toParticipantId: string
-  consentRequestId: string
+  consentRequestId?: string
   scopes?: tpAPI.Schemas.Scope[]
 
   // request consent phase

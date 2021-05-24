@@ -81,12 +81,16 @@ describe('dfspLinkingModel', () => {
       logger: connectionConfig.logger,
       thirdpartyRequests: {
         putConsentRequests: jest.fn(() => Promise.resolve({ statusCode: 202 })),
-        putConsentRequestsError: jest.fn(() => Promise.resolve({ statusCode: 202 }))
+        putConsentRequestsError: jest.fn(() => Promise.resolve({ statusCode: 202 })),
+        postConsents: jest.fn(() => Promise.resolve({ statusCode: 202 })),
       } as unknown as ThirdpartyRequests,
       dfspBackendRequests: {
         validateConsentRequests: jest.fn(() => Promise.resolve(mockData.consentRequestsPost.response)),
         storeConsentRequests: jest.fn(() => Promise.resolve()),
-        sendOTP: jest.fn(() => Promise.resolve(mockData.consentRequestsPost.otpResponse))
+        sendOTP: jest.fn(() => Promise.resolve(mockData.consentRequestsPost.otpResponse)),
+        validateOTPSecret: jest.fn(() => Promise.resolve({
+          isValid: true
+        }))
       } as unknown as DFSPBackendRequests
     }
     mocked(modelConfig.pubSub.subscribe).mockImplementationOnce(
@@ -130,6 +134,8 @@ describe('dfspLinkingModel', () => {
     expect(typeof dfspLinkingModel.onStoreReqAndSendOTP).toEqual('function')
 
     expect(sortedArray(dfspLinkingModel.fsm.allStates())).toEqual([
+      'authTokenValidated',
+      'consentGranted',
       'consentRequestValidatedAndStored',
       'errored',
       'none',
@@ -138,9 +144,12 @@ describe('dfspLinkingModel', () => {
     ])
     expect(sortedArray(dfspLinkingModel.fsm.allTransitions())).toEqual([
       'error',
+      'grantConsent',
       'init',
       'storeReqAndSendOTP',
-      'validateRequest'
+      'validateAuthToken',
+      'validateRequest',
+
     ])
   }
 
@@ -525,6 +534,215 @@ describe('dfspLinkingModel', () => {
     })
   })
 
+  describe('Validate AuthToken with Backend Phase', () => {
+    let validateData: DFSPLinkingData
+
+    beforeEach(async () => {
+      validateData = {
+        toParticipantId: 'pispa',
+        currentState: 'consentRequestValidatedAndStored',
+        consentRequestId: 'b51ec534-ee48-4575-b6a9-ead2955b8069',
+        consentRequestsPostRequest: mockData.consentRequestsPost.payload,
+        backendValidateConsentRequestsResponse: mockData.consentRequestsPost.response,
+        consentRequestsIDPatchRequest: mockData.consentRequestsIDPatchRequest.payload
+      }
+    })
+
+    it('should be well constructed', async () => {
+      const model = await create(validateData, modelConfig)
+      checkDFSPLinkingModelLayout(model, validateData)
+    })
+
+    it('validateAuthToken() should transition start to authTokenValidated state when successful', async () => {
+      const model = await create(validateData, modelConfig)
+      mocked(modelConfig.dfspBackendRequests.validateOTPSecret).mockImplementationOnce(() => Promise.resolve({
+        isValid: true
+      }))
+
+      // start validation step
+      await model.fsm.validateAuthToken()
+
+      // check that the fsm was able to transition properly
+      expect(model.data.currentState).toEqual('authTokenValidated')
+
+      // check we made a call to dfspBackendRequests.validateOTPSecret
+      expect(modelConfig.dfspBackendRequests.validateOTPSecret).toBeCalledWith(
+        'b51ec534-ee48-4575-b6a9-ead2955b8069', '123456'
+      )
+    })
+
+    it('should handle failed OTP backend validation and send PUT /consentsRequest/{ID}/error response', async () => {
+      mocked(
+        modelConfig.dfspBackendRequests.validateOTPSecret
+      ).mockImplementationOnce(() => Promise.resolve({
+        isValid: false
+      }))
+
+      const model = await create(validateData, modelConfig)
+      try {
+        // start validation step
+        await model.fsm.validateAuthToken()
+        shouldNotBeExecuted()
+      } catch (err) {
+        expect(err.apiErrorCode.code).toEqual('7205')
+      }
+
+      // check a PUT /consentsRequest/{ID}/error response was sent to source participant
+      // todo: better and more descriptive error handling
+      expect(modelConfig.thirdpartyRequests.putConsentRequestsError).toBeCalledWith(
+        'b51ec534-ee48-4575-b6a9-ead2955b8069',
+        {
+          errorInformation: {
+            errorCode: '7205',
+            errorDescription: 'OTP failed validation'
+          }
+        },
+        'pispa'
+      )
+    })
+
+    it('should handle empty OTP validation response and send PUT /consentsRequest/{ID}/error response', async () => {
+      mocked(
+        modelConfig.dfspBackendRequests.validateOTPSecret
+      ).mockImplementationOnce(() => Promise.resolve())
+
+      const model = await create(validateData, modelConfig)
+      try {
+        // start validation step
+        await model.fsm.validateAuthToken()
+        shouldNotBeExecuted()
+      } catch (err) {
+        expect(err.apiErrorCode.code).toEqual('7206')
+      }
+
+      // check a PUT /consentsRequest/{ID}/error response was sent to source participant
+      // todo: better and more descriptive error handling
+      expect(modelConfig.thirdpartyRequests.putConsentRequestsError).toBeCalledWith(
+        'b51ec534-ee48-4575-b6a9-ead2955b8069',
+        {
+          errorInformation: {
+            errorCode: '7206',
+            errorDescription: 'FSP failed to validate OTP'
+          }
+        },
+        'pispa'
+      )
+    })
+
+    it('should handle exceptions and send PUT /consentsRequest/{ID}/error response', async () => {
+      mocked(
+        modelConfig.dfspBackendRequests.validateOTPSecret
+      ).mockImplementationOnce(
+        () => {
+          throw new Error('mocked validateOTPSecret exception')
+        }
+      )
+
+      const model = await create(validateData, modelConfig)
+      try {
+        // start validation step
+        await model.fsm.validateAuthToken()
+        shouldNotBeExecuted()
+      } catch (err) {
+        expect(err.message).toEqual('mocked validateOTPSecret exception')
+      }
+
+      // check a PUT /consentsRequest/{ID}/error response was sent to source participant
+      expect(modelConfig.thirdpartyRequests.putConsentRequestsError).toBeCalledWith(
+        'b51ec534-ee48-4575-b6a9-ead2955b8069',
+        {
+          errorInformation: {
+            errorCode: '2001',
+            errorDescription: 'Internal server error'
+          }
+        },
+        'pispa'
+      )
+    })
+  })
+
+  describe('Send consent to PISP', () => {
+    let validateData: DFSPLinkingData
+
+    beforeEach(async () => {
+      validateData = {
+        toParticipantId: 'pispa',
+        currentState: 'authTokenValidated',
+        consentRequestId: 'b51ec534-ee48-4575-b6a9-ead2955b8069',
+        consentRequestsPostRequest: mockData.consentRequestsPost.payload,
+        backendValidateConsentRequestsResponse: mockData.consentRequestsPost.response,
+        consentRequestsIDPatchRequest: mockData.consentRequestsIDPatchRequest.payload,
+        scopes: [{
+          accountId: 'some-id',
+          actions: [
+            'accounts.getBalance',
+            'accounts.transfer'
+          ]
+        }]
+      }
+    })
+
+    it('should be well constructed', async () => {
+      const model = await create(validateData, modelConfig)
+      checkDFSPLinkingModelLayout(model, validateData)
+    })
+
+    it('registerConsent() should transition from scopes received to sent consent when successful', async () => {
+      const model = await create(validateData, modelConfig)
+
+      // start send consent step
+      await model.fsm.grantConsent()
+
+      // check that the fsm was able to transition properly
+      expect(model.data.currentState).toEqual('consentGranted')
+
+      // check we made a call to thirdpartyRequests.postConsents
+      expect(modelConfig.thirdpartyRequests.postConsents).toBeCalledWith(
+        {
+          consentId: '00000000-0000-1000-8000-000000000001',
+          consentRequestId: 'b51ec534-ee48-4575-b6a9-ead2955b8069',
+          scopes: [{
+            accountId: 'some-id',
+            actions: [
+              'accounts.getBalance',
+              'accounts.transfer'
+            ]
+          }]
+        },
+        'pispa'
+      )
+    })
+
+    it('should handle exceptions and send PUT /consentsRequest/{ID}/error response', async () => {
+      mocked(modelConfig.thirdpartyRequests.postConsents).mockImplementationOnce(
+        () => {
+          throw new Error('mocked postConsents exception')
+        }
+      )
+
+      const model = await create(validateData, modelConfig)
+      try {
+        // start send consent step
+        await model.fsm.grantConsent()
+        shouldNotBeExecuted()
+      } catch (err) {
+        expect(err.message).toEqual('mocked postConsents exception')
+      }
+
+      // check a PUT /consentsRequest/{ID}/error response was sent to source participant
+      expect(modelConfig.thirdpartyRequests.putConsentRequestsError).toBeCalledWith(
+        'b51ec534-ee48-4575-b6a9-ead2955b8069',
+        {
+          errorInformation: {
+            errorCode: '2001',
+            errorDescription: 'Internal server error'
+          }
+        },
+        'pispa'
+      )
+    })
+
+  })
   describe('loadFromKVS', () => {
     it('should properly call `KVS.get`, get expected data in `context.data` and setup state of machine', async () => {
       const dataFromCache = {

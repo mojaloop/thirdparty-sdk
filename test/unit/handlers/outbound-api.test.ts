@@ -685,6 +685,20 @@ describe('Outbound API routes', (): void => {
     expect(response.result).toEqual(expectedResp)
   })
 
+  // since the PISPLinkingModel is run in a series of requests, we can't
+  // run error tests for now since the tests require the calls to be run in
+  // sequence and an error populates the saved model's errorInformation data
+  // which breaks tests later in the sequence.
+
+  // the solution is to have multiple sequence requests that break at each
+  // level of the state machine, but that is really cumbersome to test
+  // A->Error A->B->Error A->B->C->Error.
+
+  // each sequence of requests would also need there own requests/model keys
+  // to not overlap each other.
+
+  // todo: investigate solution.
+
   /*
   it('/linking/request-consent - error', async (): Promise<void> => {
     const request = {

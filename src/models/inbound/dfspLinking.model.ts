@@ -88,16 +88,6 @@ export class DFSPLinkingModel
     return this.config.thirdpartyRequests
   }
 
-  /*
-  static notificationChannel (phase: DFSPLinkingPhase, consentRequestId: string): string {
-    if (!consentRequestId) {
-      throw new Error('DFSPLinkingModel.notificationChannel: \'consentRequestId\' parameter is required')
-    }
-    // channel name
-    return `DFSPLinking_${phase}_${consentRequestId}`
-  }
-  */
-
   async onValidateRequest (): Promise<void> {
     const { consentRequestsPostRequest, toParticipantId } = this.data
 
@@ -182,7 +172,7 @@ export class DFSPLinkingModel
 
     try {
       const isValidOTP = await this.dfspBackendRequests.validateOTPSecret(
-        consentRequestId,
+        consentRequestId!,
         consentRequestsIDPatchRequest!.authToken
       ) as BackendValidateOTPResponse
 
@@ -210,7 +200,7 @@ export class DFSPLinkingModel
       this.logger.push({ mojaloopError }).info(`Sending error response to ${toParticipantId}`)
 
       await this.thirdpartyRequests.putConsentRequestsError(
-        consentRequestId,
+        consentRequestId!,
         mojaloopError as unknown as fspiopAPI.Schemas.ErrorInformationObject,
         toParticipantId
       )
@@ -225,7 +215,7 @@ export class DFSPLinkingModel
 
     const postConsentRequestsPayload: tpAPI.Schemas.ConsentsPostRequest = {
       consentId: uuid(),
-      consentRequestId: consentRequestId,
+      consentRequestId: consentRequestId!,
       scopes: scopes || []
     }
 
@@ -242,7 +232,7 @@ export class DFSPLinkingModel
 
       // note: if the POST /consents fails at the DFSP we report that back to the pisp
       await this.thirdpartyRequests.putConsentRequestsError(
-        consentRequestId,
+        consentRequestId!,
         mojaloopError as unknown as fspiopAPI.Schemas.ErrorInformationObject,
         toParticipantId
       )
