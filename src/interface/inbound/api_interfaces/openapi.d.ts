@@ -1126,7 +1126,11 @@ export interface components {
       id?: components["schemas"]["AccountId"];
       currency: components["schemas"]["Currency"];
     };
-    /** Data model for the complex type AccountList. */
+    /**
+     * Data model for the complex type AccountList.
+     * TODO: This component is outdated. Need flatten object and remove `account`.
+     *       Not sure what will break so leaving this for now.
+     */
     AccountList: {
       /** Accounts associated with the Party. */
       account: components["schemas"]["Account"][];
