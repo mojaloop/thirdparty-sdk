@@ -1,5 +1,5 @@
 
-title: LinkingRequestConsentIDValidateResponse
+title: LinkingRequestConsentIDAuthenticateResponse
 type: object
 properties:
   consent:
@@ -7,7 +7,7 @@ properties:
   challenge:
     type: string
   currentState:
-    $ref: '../../components/schemas/LinkingRequestConsentIDValidateState.yaml'
+    $ref: '../../components/schemas/LinkingRequestConsentIDAuthenticateState.yaml'
 required:
   - consent
   - currentState

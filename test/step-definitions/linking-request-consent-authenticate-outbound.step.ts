@@ -36,7 +36,7 @@ import { RedisConnectionConfig } from '~/shared/redis-connection'
 import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
 
 const apiPath = path.resolve(__dirname, '../../src/interface/api-outbound.yaml')
-const featurePath = path.resolve(__dirname, '../features/linking-request-consent-validate-outbound.feature')
+const featurePath = path.resolve(__dirname, '../features/linking-request-consent-authenticate-outbound.feature')
 const feature = loadFeature(featurePath)
 
 jest.mock('@mojaloop/sdk-standard-components', () => {
@@ -120,7 +120,7 @@ defineFeature(feature, (test): void => {
     server.stop()
   })
 
-  test('PatchLinkingRequestConsentIDValidate', ({ given, when, then }): void => {
+  test('PatchLinkingRequestConsentIDAuthenticate', ({ given, when, then }): void => {
     const postConsentsIDPatchResponse: tpAPI.Schemas.ConsentsPostRequest = {
       consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
       consentRequestId: '997c89f4-053c-4283-bfec-45a1a0a28fba',
@@ -138,7 +138,7 @@ defineFeature(feature, (test): void => {
       server = await prepareOutboundAPIServer()
     })
 
-    when('I send a \'PatchLinkingRequestConsentIDValidate\' request', async (): Promise<ServerInjectResponse> => {
+    when('I send a \'PatchLinkingRequestConsentIDAuthenticate\' request', async (): Promise<ServerInjectResponse> => {
       jest.mock('~/shared/kvs')
       jest.mock('~/shared/pub-sub')
       const pubSub = new PubSub({} as RedisConnectionConfig)
@@ -196,11 +196,11 @@ defineFeature(feature, (test): void => {
       ), 10)
       await server.inject(postRequest)
 
-      // test linking-request-consent-validate-outbound now that the model has
+      // test linking-request-consent-authenticate-outbound now that the model has
       // been saved to KVS
       const request = {
         method: 'PATCH',
-        url: '/linking/request-consent/bbce3ce8-c247-4153-aab1-f89768c93b18/validate',
+        url: '/linking/request-consent/bbce3ce8-c247-4153-aab1-f89768c93b18/authenticate',
         headers: {
           'Content-Type': 'application/json',
           Date: 'Thu, 24 Jan 2019 10:22:12 GMT',

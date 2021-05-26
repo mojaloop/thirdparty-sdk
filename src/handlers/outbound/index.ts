@@ -33,7 +33,7 @@ import ThirdpartyTransactionIDInitiate from './thirdpartyTransaction/{ID}/initia
 import ThirdpartyTransactionIDApprove from './thirdpartyTransaction/{ID}/approve'
 import LinkingAccounts from './linking/{fspId}/{userId}'
 import LinkingRequestConsent from './linking/request-consent'
-import LinkingRequestConsentIDValidate from './linking/request-consent/{ID}/validate'
+import LinkingRequestConsentIDAuthenticate from './linking/request-consent/{ID}/authenticate'
 import LinkingProviders from './linking/providers'
 
 export default {
@@ -45,5 +45,5 @@ export default {
   GetLinkingProviders: LinkingProviders.get,
   GetLinkingAccountsByUserId: LinkingAccounts.get,
   PostLinkingRequestConsent: LinkingRequestConsent.post,
-  PatchLinkingRequestConsentIDValidate: LinkingRequestConsentIDValidate.patch,
+  PatchLinkingRequestConsentIDAuthenticate: LinkingRequestConsentIDAuthenticate.patch,
 }

@@ -34,8 +34,8 @@ export interface paths {
   '/linking/request-consent': {
     post: operations['PostLinkingRequestConsent'];
   };
-  '/linking/request-consent/{ID}/validate': {
-    patch: operations['PatchLinkingRequestConsentIDValidate'];
+  '/linking/request-consent/{ID}/authenticate': {
+    patch: operations['PatchLinkingRequestConsentIDAuthenticate'];
   };
 }
 
@@ -230,17 +230,17 @@ export interface operations {
    * Used in the authentication phase of account linking.
    * Used by the PISP to pass an Auth token on behalf of the user to the DFSP to establish a chain of trust.
    */
-  PatchLinkingRequestConsentIDValidate: {
+  PatchLinkingRequestConsentIDAuthenticate: {
     parameters: {
       path: {
         ID: components['schemas']['CorrelationId'];
       };
     };
     requestBody: {
-      'application/json': components['schemas']['LinkingRequestConsentIDValidateRequest'];
+      'application/json': components['schemas']['LinkingRequestConsentIDAuthenticateRequest'];
     };
     responses: {
-      200: components['responses']['LinkingRequestConsentIDValidateResponse'];
+      200: components['responses']['LinkingRequestConsentIDAuthenticateResponse'];
       400: components['responses']['400'];
       401: components['responses']['401'];
       403: components['responses']['403'];
@@ -959,17 +959,17 @@ export interface components {
     LinkingRequestConsentResponse:
     | components['schemas']['LinkingRequestConsentResponseError']
     | components['schemas']['LinkingRequestConsentResponseSuccess'];
-    /** PATCH /linking/request-consent/{ID}/validate Request object */
-    LinkingRequestConsentIDValidateRequest: {
+    /** PATCH /linking/request-consent/{ID}/authenticate Request object */
+    LinkingRequestConsentIDAuthenticateRequest: {
       authToken: string;
     };
-    /** State of PATCH linking request consent validate */
-    LinkingRequestConsentIDValidateState:
+    /** State of PATCH linking request consent Authenticate */
+    LinkingRequestConsentIDAuthenticateState:
     | 'errored'
     | 'consentReceivedAwaitingCredential';
-    LinkingRequestConsentIDValidateResponseError: {
+    LinkingRequestConsentIDAuthenticateResponseError: {
       errorInformation: components['schemas']['ErrorInformation'];
-      currentState: components['schemas']['LinkingRequestConsentIDValidateState'];
+      currentState: components['schemas']['LinkingRequestConsentIDAuthenticateState'];
     };
     /** The object sent in a `POST /consents` request. */
     ConsentsPostRequest: {
@@ -986,14 +986,14 @@ export interface components {
       consentRequestId: components['schemas']['CorrelationId'];
       scopes: components['schemas']['Scope'][];
     };
-    LinkingRequestConsentIDValidateResponseSuccess: {
+    LinkingRequestConsentIDAuthenticateResponseSuccess: {
       consent: components['schemas']['ConsentsPostRequest'];
       challenge?: string;
-      currentState: components['schemas']['LinkingRequestConsentIDValidateState'];
+      currentState: components['schemas']['LinkingRequestConsentIDAuthenticateState'];
     };
-    LinkingRequestConsentIDValidateResponse:
-    | components['schemas']['LinkingRequestConsentIDValidateResponseError']
-    | components['schemas']['LinkingRequestConsentIDValidateResponseSuccess'];
+    LinkingRequestConsentIDAuthenticateResponse:
+    | components['schemas']['LinkingRequestConsentIDAuthenticateResponseError']
+    | components['schemas']['LinkingRequestConsentIDAuthenticateResponseSuccess'];
   };
   responses: {
     /** OK */
@@ -1136,10 +1136,10 @@ export interface components {
         'application/json': components['schemas']['LinkingRequestConsentResponse'];
       };
     };
-    /** Linking request consent validate response */
-    LinkingRequestConsentIDValidateResponse: {
+    /** Linking request consent authenticate response */
+    LinkingRequestConsentIDAuthenticateResponse: {
       content: {
-        'application/json': components['schemas']['LinkingRequestConsentIDValidateResponse'];
+        'application/json': components['schemas']['LinkingRequestConsentIDAuthenticateResponse'];
       };
     };
   };

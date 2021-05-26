@@ -1,5 +1,5 @@
 patch:
-  operationId: PatchLinkingRequestConsentIDValidate
+  operationId: PatchLinkingRequestConsentIDAuthenticate
   summary: Outbound PATCH /linking/request-consent/{ID}/authenticate endpoint
   description: |
     Used in the authentication phase of account linking.
@@ -13,15 +13,15 @@ patch:
       schema:
         $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/schemas/CorrelationId.yaml'
   requestBody:
-    description: Linking request consent validate request details
+    description: Linking request consent authenticate request details
     required: true
     content:
       application/json:
         schema:
-          $ref: '../components/schemas/LinkingRequestConsentIDValidateRequest.yaml'
+          $ref: '../components/schemas/LinkingRequestConsentIDAuthenticateRequest.yaml'
   responses:
     '200':
-      $ref: '../components/responses/LinkingRequestConsentIDValidateResponse.yaml'
+      $ref: '../components/responses/LinkingRequestConsentIDAuthenticateResponse.yaml'
     '400':
       $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/400.yaml'
     '401':

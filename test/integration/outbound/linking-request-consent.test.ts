@@ -70,12 +70,12 @@ describe('PISP requests DFSP to validate user consentRequests for linking', (): 
       expect(consentRequestsResponse.data).toEqual(expectedResponse)
     })
 
-    it('WEB: request consent validate should be success', async (): Promise<void> => {
+    it('WEB: request consent authenticate should be success', async (): Promise<void> => {
       const consentRequestId = 'b51ec534-ee48-4575-b6a9-ead2955b8069'
-      const linkingRequestConsentValidateURI = `${env.outbound.baseUri}/linking/request-consent/${consentRequestId}/validate`
+      const linkingRequestConsentAuthenticateURI = `${env.outbound.baseUri}/linking/request-consent/${consentRequestId}/authenticate`
 
       // ttk uses an authToken of 123456 to return a valid response
-      const linkingRequestConsentValidateRequest = {
+      const linkingRequestConsentAuthenticateRequest = {
         authToken: '123456'
       }
       const expectedResponse = {
@@ -90,7 +90,7 @@ describe('PISP requests DFSP to validate user consentRequests for linking', (): 
         }
         ]
       }
-      const consentRequestsResponse = await axios.patch(linkingRequestConsentValidateURI, linkingRequestConsentValidateRequest)
+      const consentRequestsResponse = await axios.patch(linkingRequestConsentAuthenticateURI, linkingRequestConsentAuthenticateRequest)
       expect(consentRequestsResponse.status).toEqual(200)
       expect(consentRequestsResponse.data.currentState).toEqual('consentReceivedAwaitingCredential')
       expect(consentRequestsResponse.data.consent).toEqual(expectedResponse)
@@ -114,12 +114,12 @@ describe('PISP requests DFSP to validate user consentRequests for linking', (): 
       expect(consentRequestsResponse.data).toEqual(expectedResponse)
     })
 
-    it('OTP: request consent validate should be success', async (): Promise<void> => {
+    it('OTP: request consent authenticate should be success', async (): Promise<void> => {
       const consentRequestId = 'c51ec534-ee48-4575-b6a9-ead2955b8069'
-      const linkingRequestConsentValidateURI = `${env.outbound.baseUri}/linking/request-consent/${consentRequestId}/validate`
+      const linkingRequestConsentAuthenticateURI = `${env.outbound.baseUri}/linking/request-consent/${consentRequestId}/authenticate`
 
       // ttk uses an authToken of 123456 to return a valid response
-      const linkingRequestConsentValidateRequest = {
+      const linkingRequestConsentAuthenticateRequest = {
         authToken: '123456'
       }
       const expectedResponse = {
@@ -134,7 +134,7 @@ describe('PISP requests DFSP to validate user consentRequests for linking', (): 
         }
         ]
       }
-      const consentRequestsResponse = await axios.patch(linkingRequestConsentValidateURI, linkingRequestConsentValidateRequest)
+      const consentRequestsResponse = await axios.patch(linkingRequestConsentAuthenticateURI, linkingRequestConsentAuthenticateRequest)
       expect(consentRequestsResponse.status).toEqual(200)
       expect(consentRequestsResponse.data.currentState).toEqual('consentReceivedAwaitingCredential')
       expect(consentRequestsResponse.data.consent).toEqual(expectedResponse)
@@ -164,7 +164,7 @@ describe('PISP requests DFSP to validate user consentRequests for linking', (): 
   })
 
 
-  describe('PISP Linking flow WEB - Error @ consent request validate stage', (): void => {
+  describe('PISP Linking flow WEB - Error @ consent request authenticate stage', (): void => {
     it('WEB: request consent should be success', async (): Promise<void> => {
       // ttk returns WEB response for id 'b51ec534-ee48-4575-b6a9-ead2955b8069'
       const linkingRequestConsentRequest = {
@@ -181,12 +181,12 @@ describe('PISP requests DFSP to validate user consentRequests for linking', (): 
       expect(consentRequestsResponse.data).toEqual(expectedResponse)
     })
 
-    it('WEB: request consent validate should be errored', async (): Promise<void> => {
+    it('WEB: request consent authenticate should be errored', async (): Promise<void> => {
       const consentRequestId = 'b51ec534-ee48-4575-b6a9-ead2955b8069'
-      const linkingRequestConsentValidateURI = `${env.outbound.baseUri}/linking/request-consent/${consentRequestId}/validate`
+      const linkingRequestConsentAuthenticateURI = `${env.outbound.baseUri}/linking/request-consent/${consentRequestId}/authenticate`
 
       // ttk uses an authToken of 123456 to return a valid response
-      const linkingRequestConsentValidateRequest = {
+      const linkingRequestConsentAuthenticateRequest = {
         authToken: '654321'
       }
       const expectedResponse = {
@@ -197,7 +197,7 @@ describe('PISP requests DFSP to validate user consentRequests for linking', (): 
         currentState: 'errored'
       }
 
-      await axios.patch(linkingRequestConsentValidateURI, linkingRequestConsentValidateRequest)
+      await axios.patch(linkingRequestConsentAuthenticateURI, linkingRequestConsentAuthenticateRequest)
       .catch(error => {
         expect(error.response.status).toEqual(500)
         expect(error.response.data.currentState).toEqual('errored')

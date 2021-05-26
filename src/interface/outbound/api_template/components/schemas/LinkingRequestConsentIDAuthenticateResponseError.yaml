@@ -1,11 +1,11 @@
 
-title: LinkingRequestConsentIDValidateResponseError
+title: LinkingRequestConsentIDAuthenticateResponseError
 type: object
 properties:
   errorInformation:
       $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/ErrorInformation.yaml'
   currentState:
-    $ref: '../../components/schemas/LinkingRequestConsentIDValidateState.yaml'
+    $ref: '../../components/schemas/LinkingRequestConsentIDAuthenticateState.yaml'
 required:
   - errorInformation
   - currentState

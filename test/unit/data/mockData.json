@@ -124,7 +124,7 @@
       }
     }
   },
-  "backendValidateOTPRequest": {
+  "backendAuthenticateAuthTokenRequest": {
     "headers": {},
     "params": {},
     "payload": {
@@ -132,14 +132,14 @@
       "authToken": "123456"
     }
   },
-  "backendValidateOTPResponseValid": {
+  "backendAuthenticateAuthTokenResponseValid": {
     "headers": {},
     "params": {},
     "payload": {
       "isValid": true
     }
   },
-  "backendValidateOTPResponseInvalid": {
+  "backendAuthenticateAuthTokenResponseInvalid": {
     "headers": {},
     "params": {},
     "payload": {
@@ -377,7 +377,7 @@
       "authToken": "123456"
     }
   },
-  "linkingRequestConsentIDValidatePatchRequest": {
+  "linkingRequestConsentIDAuthenticatePatchRequest": {
     "headers": {},
     "params": {
       "ID": "b51ec534-ee48-4575-b6a9-ead2955b8069"

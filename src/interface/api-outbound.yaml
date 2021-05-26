@@ -365,9 +365,9 @@ paths:
           $ref: '#/components/responses/501'
         '503':
           $ref: '#/components/responses/503'
-  '/linking/request-consent/{ID}/validate':
+  '/linking/request-consent/{ID}/authenticate':
     patch:
-      operationId: PatchLinkingRequestConsentIDValidate
+      operationId: PatchLinkingRequestConsentIDAuthenticate
       summary: 'Outbound PATCH /linking/request-consent/{ID}/authenticate endpoint'
       description: >
         Used in the authentication phase of account linking.
@@ -383,15 +383,15 @@ paths:
           schema:
             $ref: '#/components/schemas/CorrelationId'
       requestBody:
-        description: Linking request consent validate request details
+        description: Linking request consent authenticate request details
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/LinkingRequestConsentIDValidateRequest'
+              $ref: '#/components/schemas/LinkingRequestConsentIDAuthenticateRequest'
       responses:
         '200':
-          $ref: '#/components/responses/LinkingRequestConsentIDValidateResponse'
+          $ref: '#/components/responses/LinkingRequestConsentIDAuthenticateResponse'
         '400':
           $ref: '#/components/responses/400'
         '401':
@@ -577,12 +577,12 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/LinkingRequestConsentResponse'
-    LinkingRequestConsentIDValidateResponse:
-      description: Linking request consent validate response
+    LinkingRequestConsentIDAuthenticateResponse:
+      description: Linking request consent authenticate response
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/LinkingRequestConsentIDValidateResponse'
+            $ref: '#/components/schemas/LinkingRequestConsentIDAuthenticateResponse'
   headers:
     Content-Length:
       required: false
@@ -2141,9 +2141,9 @@ components:
       oneOf:
         - $ref: '#/components/schemas/LinkingRequestConsentResponseError'
         - $ref: '#/components/schemas/LinkingRequestConsentResponseSuccess'
-    LinkingRequestConsentIDValidateRequest:
-      title: LinkingRequestConsentIDValidateRequest
-      description: 'PATCH /linking/request-consent/{ID}/validate Request object'
+    LinkingRequestConsentIDAuthenticateRequest:
+      title: LinkingRequestConsentIDAuthenticateRequest
+      description: 'PATCH /linking/request-consent/{ID}/authenticate Request object'
       type: object
       properties:
         authToken:
@@ -2151,21 +2151,21 @@ components:
       required:
         - authToken
       additionalProperties: false
-    LinkingRequestConsentIDValidateState:
-      title: LinkingRequestConsentIDValidateState
-      description: State of PATCH linking request consent validate
+    LinkingRequestConsentIDAuthenticateState:
+      title: LinkingRequestConsentIDAuthenticateState
+      description: State of PATCH linking request consent Authenticate
       type: string
       enum:
         - errored
         - consentReceivedAwaitingCredential
-    LinkingRequestConsentIDValidateResponseError:
-      title: LinkingRequestConsentIDValidateResponseError
+    LinkingRequestConsentIDAuthenticateResponseError:
+      title: LinkingRequestConsentIDAuthenticateResponseError
       type: object
       properties:
         errorInformation:
           $ref: '#/components/schemas/ErrorInformation'
         currentState:
-          $ref: '#/components/schemas/LinkingRequestConsentIDValidateState'
+          $ref: '#/components/schemas/LinkingRequestConsentIDAuthenticateState'
       required:
         - errorInformation
         - currentState
@@ -2195,8 +2195,8 @@ components:
         - consentId
         - consentRequestId
         - scopes
-    LinkingRequestConsentIDValidateResponseSuccess:
-      title: LinkingRequestConsentIDValidateResponse
+    LinkingRequestConsentIDAuthenticateResponseSuccess:
+      title: LinkingRequestConsentIDAuthenticateResponse
       type: object
       properties:
         consent:
@@ -2204,14 +2204,16 @@ components:
         challenge:
           type: string
         currentState:
-          $ref: '#/components/schemas/LinkingRequestConsentIDValidateState'
+          $ref: '#/components/schemas/LinkingRequestConsentIDAuthenticateState'
       required:
         - consent
         - currentState
-    LinkingRequestConsentIDValidateResponse:
+    LinkingRequestConsentIDAuthenticateResponse:
       oneOf:
-        - $ref: '#/components/schemas/LinkingRequestConsentIDValidateResponseError'
-        - $ref: '#/components/schemas/LinkingRequestConsentIDValidateResponseSuccess'
+        - $ref: >-
+            #/components/schemas/LinkingRequestConsentIDAuthenticateResponseError
+        - $ref: >-
+            #/components/schemas/LinkingRequestConsentIDAuthenticateResponseSuccess
   parameters:
     ID:
       name: ID

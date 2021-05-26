@@ -26,7 +26,7 @@
 
 import { Request } from '@hapi/hapi'
 import { StateResponseToolkit } from '~/server/plugins/state'
-import ConsentRequestsIDValidate from '~/handlers/outbound/linking/request-consent/{ID}/validate'
+import ConsentRequestsIDAuthenticate from '~/handlers/outbound/linking/request-consent/{ID}/authenticate'
 import mockLogger from '../mockLogger'
 
 // mock KVS default exported class
@@ -50,7 +50,7 @@ jest.mock('~/models/outbound/pispLinking.model', () => ({
   existsInKVS: jest.fn(() => Promise.resolve(false))
 }))
 
-describe('Outbound linking request consent ID validate handlers', () => {
+describe('Outbound linking request consent ID authenticate handlers', () => {
   const toolkit = {
     getKVS: jest.fn(),
     getPubSub: jest.fn(),
@@ -64,25 +64,25 @@ describe('Outbound linking request consent ID validate handlers', () => {
       }))
     }))
   }
-  const validateRequest = {
+  const authenticateRequest = {
     authToken: '123456',
     toParticipantId: 'dfspa'
   }
 
-  it('/linking/request-consent/{ID}/validate should report error when result from \'run\' is undefined', async () => {
+  it('/linking/request-consent/{ID}/authenticate should report error when result from \'run\' is undefined', async () => {
     const request = {
       method: 'PATCH',
-      url: '/linking/request-consent/{ID}/validate',
+      url: '/linking/request-consent/{ID}/authenticate',
       headers: {
         'Content-Type': 'application/json'
       },
       params: {
         ID: 'r51ec534-se48-8575-b6a9-ead2955b8067'
       },
-      payload: validateRequest
+      payload: authenticateRequest
     }
 
-    const result = await ConsentRequestsIDValidate.patch(
+    const result = await ConsentRequestsIDAuthenticate.patch(
       {},
       request as unknown as Request,
       toolkit as unknown as StateResponseToolkit

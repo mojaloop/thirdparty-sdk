@@ -92,7 +92,7 @@ export namespace Schemas {
   export type LinkingRequestConsentResponse = components['schemas']['LinkingRequestConsentResponse']
   export type LinkingRequestConsentState = components['schemas']['LinkingRequestConsentState']
   export type LinkingRequestConsentPostRequest = components['schemas']['LinkingRequestConsentPostRequest']
-  export type LinkingRequestConsentIDValidateRequest = components['schemas']['LinkingRequestConsentIDValidateRequest']
-  export type LinkingRequestConsentIDValidateState = components['schemas']['LinkingRequestConsentIDValidateState']
-  export type LinkingRequestConsentIDValidateResponse = components['schemas']['LinkingRequestConsentIDValidateResponse']
+  export type LinkingRequestConsentIDAuthenticateRequest = components['schemas']['LinkingRequestConsentIDAuthenticateRequest']
+  export type LinkingRequestConsentIDAuthenticateState = components['schemas']['LinkingRequestConsentIDAuthenticateState']
+  export type LinkingRequestConsentIDAuthenticateResponse = components['schemas']['LinkingRequestConsentIDAuthenticateResponse']
 }

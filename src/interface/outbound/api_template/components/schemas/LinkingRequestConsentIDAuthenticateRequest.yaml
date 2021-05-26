@@ -1,0 +1,9 @@
+title: LinkingRequestConsentIDAuthenticateRequest
+description: PATCH /linking/request-consent/{ID}/authenticate Request object
+type: object
+properties:
+  authToken:
+    type: string
+required:
+  - authToken
+additionalProperties: false

@@ -40,7 +40,7 @@ import * as OutboundAPI from '~/interface/outbound/api_interfaces'
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function patch (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
-  const payload = request.payload as OutboundAPI.Schemas.LinkingRequestConsentIDValidateRequest
+  const payload = request.payload as OutboundAPI.Schemas.LinkingRequestConsentIDAuthenticateRequest
   const consentRequestId = request.params.ID
 
   const modelConfig: PISPLinkingModelConfig = {
@@ -54,7 +54,7 @@ async function patch (_context: any, request: Request, h: StateResponseToolkit):
 
   try {
     const model: PISPLinkingModel = await loadFromKVS(modelConfig)
-    model.data.linkingRequestConsentIDValidatePatchRequest = payload
+    model.data.linkingRequestConsentIDAuthenticatePatchRequest = payload
 
     const result = await model.run()
     if (!result) {

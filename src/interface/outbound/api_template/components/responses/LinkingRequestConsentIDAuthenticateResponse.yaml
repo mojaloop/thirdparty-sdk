@@ -1,0 +1,5 @@
+description: Linking request consent authenticate response
+content:
+  application/json:
+    schema:
+      $ref: '../schemas/LinkingRequestConsentIDAuthenticateResponse.yaml'

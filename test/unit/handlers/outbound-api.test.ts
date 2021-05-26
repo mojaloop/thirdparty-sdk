@@ -642,11 +642,11 @@ describe('Outbound API routes', (): void => {
     expect(response.result).toEqual(expectedResp)
   })
 
-  it('/linking/request-consent/{ID}/validate - success', async (): Promise<void> => {
+  it('/linking/request-consent/{ID}/authenticate - success', async (): Promise<void> => {
     const consentRequestId = 'bbce3ce8-c247-4153-aab1-f89768c93b18'
     const request = {
       method: 'PATCH',
-      url: `/linking/request-consent/${consentRequestId}/validate`,
+      url: `/linking/request-consent/${consentRequestId}/authenticate`,
       payload: {
         authToken: '123456'
       }
@@ -727,11 +727,11 @@ describe('Outbound API routes', (): void => {
   })
 
 
-  it('/linking/request-consent/{ID}/validate - error', async (): Promise<void> => {
+  it('/linking/request-consent/{ID}/authenticate - error', async (): Promise<void> => {
     const consentRequestId = 'bbce3ce8-c247-4153-aab1-f89768c93b18'
     const request = {
       method: 'PATCH',
-      url: `/linking/request-consent/${consentRequestId}/validate`,
+      url: `/linking/request-consent/${consentRequestId}/authenticate`,
       payload: {
         toParticipantId: 'dfpsa',
         authToken: '123456'

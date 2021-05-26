@@ -322,7 +322,7 @@ describe('PISPLinkingModel', () => {
         toParticipantId: 'dfspA',
         consentRequestId: mockData.linkingRequestConsentPostRequest.payload.consentRequestId,
         linkingRequestConsentPostRequest: mockData.linkingRequestConsentPostRequest.payload,
-        linkingRequestConsentIDValidatePatchRequest: mockData.linkingRequestConsentIDValidatePatchRequest.payload,
+        linkingRequestConsentIDAuthenticatePatchRequest: mockData.linkingRequestConsentIDAuthenticatePatchRequest.payload,
         currentState: 'WebAuthenticationChannelResponseRecieved'
       }
       const consentPostResponse: tpAPI.Schemas.ConsentsPostRequest = {

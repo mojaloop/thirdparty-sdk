@@ -180,20 +180,20 @@ export class PISPLinkingModel
   }
 
   async onAuthenticate (): Promise<void> {
-    const { consentRequestId, linkingRequestConsentIDValidatePatchRequest } = this.data
+    const { consentRequestId, linkingRequestConsentIDAuthenticatePatchRequest } = this.data
 
     const channel = PISPLinkingModel.notificationChannel(
       PISPLinkingPhase.requestConsentAuthenticate,
       consentRequestId
     )
 
-    this.logger.push({ channel }).info('onValidateOTP - subscribe to channel')
+    this.logger.push({ channel }).info('onAuthenticate - subscribe to channel')
 
     return deferredJob(this.pubSub, channel)
     .init(async (channel) => {
       const res = await this.thirdpartyRequests.patchConsentRequests(
         consentRequestId,
-        { authToken: linkingRequestConsentIDValidatePatchRequest!.authToken },
+        { authToken: linkingRequestConsentIDAuthenticatePatchRequest!.authToken },
         this.data.toParticipantId!
       )
 
@@ -208,7 +208,7 @@ export class PISPLinkingModel
         if (putResponse.errorInformation) {
           this.data.errorInformation = putResponse.errorInformation
         } else {
-          this.data.linkingRequestConsentIDValidateInboundConsentResponse = {
+          this.data.linkingRequestConsentIDAuthenticateInboundConsentResponse = {
             ...message as unknown as tpAPI.Schemas.ConsentsPostRequest
           }
         }
@@ -223,7 +223,7 @@ export class PISPLinkingModel
 
   getResponse ():
     OutboundAPI.Schemas.LinkingRequestConsentResponse |
-    OutboundAPI.Schemas.LinkingRequestConsentIDValidateResponse |
+    OutboundAPI.Schemas.LinkingRequestConsentIDAuthenticateResponse |
     void {
     switch (this.data.currentState) {
       case 'OTPAuthenticationChannelResponseRecieved':
@@ -238,10 +238,10 @@ export class PISPLinkingModel
         } as OutboundAPI.Schemas.LinkingRequestConsentResponse
       case 'consentReceivedAwaitingCredential':
         return {
-          consent: this.data.linkingRequestConsentIDValidateInboundConsentResponse,
-          challenge: PISPLinkingModel.deriveChallenge(this.data.linkingRequestConsentIDValidateInboundConsentResponse!),
+          consent: this.data.linkingRequestConsentIDAuthenticateInboundConsentResponse,
+          challenge: PISPLinkingModel.deriveChallenge(this.data.linkingRequestConsentIDAuthenticateInboundConsentResponse!),
           currentState: this.data.currentState
-        } as OutboundAPI.Schemas.LinkingRequestConsentIDValidateResponse
+        } as OutboundAPI.Schemas.LinkingRequestConsentIDAuthenticateResponse
       case 'errored':
         return {
           errorInformation: this.data.errorInformation,
@@ -278,7 +278,7 @@ export class PISPLinkingModel
    */
   async run (): Promise<
     OutboundAPI.Schemas.LinkingRequestConsentResponse |
-    OutboundAPI.Schemas.LinkingRequestConsentIDValidateResponse |
+    OutboundAPI.Schemas.LinkingRequestConsentIDAuthenticateResponse |
     void> {
     const data = this.data
     try {

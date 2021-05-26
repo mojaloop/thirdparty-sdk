@@ -1,5 +1,0 @@
-description: Linking request consent validate response
-content:
-  application/json:
-    schema:
-      $ref: '../schemas/LinkingRequestConsentIDValidateResponse.yaml'

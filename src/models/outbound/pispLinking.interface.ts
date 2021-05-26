@@ -45,7 +45,7 @@ export enum PISPLinkingPhase {
 
 export type PISPLinkingModelState =
   OutboundAPI.Schemas.LinkingRequestConsentState
-  | OutboundAPI.Schemas.LinkingRequestConsentIDValidateState
+  | OutboundAPI.Schemas.LinkingRequestConsentIDAuthenticateState
 
 export interface PISPLinkingStateMachine extends ControlledStateMachine {
   requestConsent: Method
@@ -77,9 +77,9 @@ export interface PISPLinkingData extends StateData<PISPLinkingModelState> {
   linkingRequestConsentPostResponse?: OutboundAPI.Schemas.LinkingRequestConsentResponse
 
   // authentication phase
-  linkingRequestConsentIDValidatePatchRequest?: OutboundAPI.Schemas.LinkingRequestConsentIDValidateRequest
-  linkingRequestConsentIDValidateInboundConsentResponse?: tpAPI.Schemas.ConsentsPostRequest
-  linkingRequestConsentIDValidateResponse?: OutboundAPI.Schemas.LinkingRequestConsentIDValidateResponse
+  linkingRequestConsentIDAuthenticatePatchRequest?: OutboundAPI.Schemas.LinkingRequestConsentIDAuthenticateRequest
+  linkingRequestConsentIDAuthenticateInboundConsentResponse?: tpAPI.Schemas.ConsentsPostRequest
+  linkingRequestConsentIDAuthenticateResponse?: OutboundAPI.Schemas.LinkingRequestConsentIDAuthenticateResponse
 
   errorInformation?: tpAPI.Schemas.ErrorInformation
 }
