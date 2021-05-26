@@ -323,9 +323,7 @@ paths:
             schema:
               oneOf:
                 - $ref: '#/components/schemas/ConsentRequestsIDPutResponseWeb'
-                - $ref: '#/components/schemas/ConsentRequestsIDPutResponseWebAuth'
                 - $ref: '#/components/schemas/ConsentRequestsIDPutResponseOTP'
-                - $ref: '#/components/schemas/ConsentRequestsIDPutResponseOTPAuth'
       responses:
         '202':
           $ref: '#/components/responses/202'
@@ -1353,8 +1351,27 @@ components:
       properties:
         errorInformation:
           $ref: '#/components/schemas/ErrorInformation'
-    AccountAddress:
-      title: AccountAddress
+    Name:
+      title: Name
+      type: string
+      pattern: '^(?!\s*$)[\w .,''-]{1,128}$'
+      description: >-
+        The API data type Name is a JSON String, restricted by a regular
+        expression to avoid characters which are generally not used in a name.
+
+
+        Regular Expression - The regular expression for restricting the Name
+        type is "^(?!\s*$)[\w .,'-]{1,128}$". The restriction does not allow a
+        string consisting of whitespace only, all Unicode characters are
+        allowed, as well as the period (.) (apostrophe (‘), dash (-), comma (,)
+        and space characters ( ).
+
+
+        **Note:** In some programming languages, Unicode support must be
+        specifically enabled. For example, if Java is used, the flag
+        UNICODE_CHARACTER_CLASS must be enabled to allow Unicode characters.
+    AccountId:
+      title: AccountId
       type: string
       description: >
         A long-lived unique account identifier provided by the DFSP. This MUST
@@ -1552,9 +1569,9 @@ components:
               The object sent in a `PUT /accounts/{ID}` request.
             properties:
               accountNickname:
-                $ref: '#/components/schemas/AccountAddress'
+                $ref: '#/components/schemas/Name'
               id:
-                $ref: '#/components/schemas/AccountAddress'
+                $ref: '#/components/schemas/AccountId'
               currency:
                 $ref: '#/components/schemas/Currency'
             required:
@@ -1853,7 +1870,7 @@ components:
         }
       properties:
         accountId:
-          $ref: '#/components/schemas/AccountAddress'
+          $ref: '#/components/schemas/AccountId'
         actions:
           type: array
           items:
@@ -1876,13 +1893,11 @@ components:
       type: object
       description: The object sent in a `POST /consentRequests` request.
       properties:
-        id:
+        consentRequestId:
           $ref: '#/components/schemas/CorrelationId'
-        initiatorId:
+        userId:
           type: string
-          description: >-
-            The id of the PISP who will initiate transactions on a user's
-            behalf.
+          description: ID used to associate request with GET /accounts request.
         scopes:
           type: array
           items:
@@ -1897,8 +1912,8 @@ components:
             The callback uri that the user will be redirected to after
             completing the WEB auth channel.
       required:
-        - id
-        - initiatorId
+        - consentRequestId
+        - userId
         - scopes
         - authChannels
         - callbackUri
@@ -1925,11 +1940,8 @@ components:
 
         the user can prove their identity (e.g., by logging in).
       properties:
-        initiatorId:
-          type: string
-          description: >-
-            The id of the PISP who will initiate transactions on a user's
-            behalf.
+        consentRequestId:
+          $ref: '#/components/schemas/CorrelationId'
         scopes:
           type: array
           items:
@@ -1949,59 +1961,11 @@ components:
             The callback uri that the pisp app redirects to for user to complete
             their login.
       required:
-        - initiatorId
+        - consentRequestId
         - scopes
         - authChannels
         - callbackUri
         - authUri
-      additionalProperties: false
-    ConsentRequestsIDPutResponseWebAuth:
-      title: ConsentRequestsIDPutResponseWebAuth
-      type: object
-      description: >
-        The object sent in a `PUT /consentRequests/{ID}` request.
-
-
-        Schema used in the authentication phase of the account linking flow,
-
-        the user is expected to prove their identity to the DFSP by passing a
-        OTP
-
-        or secret to the PISP.
-      properties:
-        initiatorId:
-          type: string
-          description: >-
-            The id of the PISP who will initiate transactions on a user's
-            behalf.
-        scopes:
-          type: array
-          items:
-            $ref: '#/components/schemas/Scope'
-        authChannels:
-          type: array
-          items:
-            $ref: '#/components/schemas/ConsentRequestChannelTypeWeb'
-        callbackUri:
-          type: string
-          description: >-
-            The callback uri that the user will be redirected to after
-            completing the WEB auth channel.
-        authUri:
-          type: string
-          description: >-
-            The callback uri that the pisp app redirects to for user to complete
-            their login.
-        authToken:
-          type: string
-          description: The Auth token from the OTP or redirect to pisp app.
-      required:
-        - initiatorId
-        - scopes
-        - authChannels
-        - callbackUri
-        - authUri
-        - authToken
       additionalProperties: false
     ConsentRequestChannelTypeOTP:
       title: ConsentRequestChannelTypeOTP
@@ -2020,11 +1984,8 @@ components:
         Schema used in the request consent phase of the account linking OTP/SMS
         flow.
       properties:
-        initiatorId:
-          type: string
-          description: >-
-            The id of the PISP who will initiate transactions on a user's
-            behalf.
+        consentRequestId:
+          $ref: '#/components/schemas/CorrelationId'
         scopes:
           type: array
           items:
@@ -2039,52 +2000,10 @@ components:
             The callback uri that the user will be redirected to after
             completing the WEB auth channel.
       required:
-        - initiatorId
+        - consentRequestId
         - scopes
         - authChannels
         - callbackUri
-      additionalProperties: false
-    ConsentRequestsIDPutResponseOTPAuth:
-      title: ConsentRequestsIDPutResponseOTPAuth
-      type: object
-      description: >
-        The object sent in a `PUT /consentRequests/{ID}` request.
-
-
-        Schema used in the authentication phase of the account linking flow,
-
-        the user is expected to prove their identity to the DFSP by passing a
-        OTP
-
-        or secret to the PISP.
-      properties:
-        initiatorId:
-          type: string
-          description: >-
-            The id of the PISP who will initiate transactions on a user's
-            behalf.
-        scopes:
-          type: array
-          items:
-            $ref: '#/components/schemas/Scope'
-        authChannels:
-          type: array
-          items:
-            $ref: '#/components/schemas/ConsentRequestChannelTypeOTP'
-        callbackUri:
-          type: string
-          description: >-
-            The callback uri that the user will be redirected to after
-            completing the WEB auth channel.
-        authToken:
-          type: string
-          description: The Auth token from the OTP or redirect to pisp app.
-      required:
-        - initiatorId
-        - scopes
-        - authChannels
-        - callbackUri
-        - authToken
       additionalProperties: false
     ConsentRequestsIDPatchRequest:
       title: ConsentRequestsIDPatchRequest
@@ -2092,7 +2011,7 @@ components:
       description: 'The object sent in a `PATCH /consentRequests/{ID}` request.'
       properties:
         authToken:
-          $ref: '#/components/schemas/OtpValue'
+          type: string
       required:
         - authToken
     ConsentsPostRequest:
@@ -2121,42 +2040,28 @@ components:
         - consentId
         - consentRequestId
         - scopes
-    Name:
-      title: Name
-      type: string
-      pattern: '^(?!\s*$)[\w .,''-]{1,128}$'
-      description: >-
-        The API data type Name is a JSON String, restricted by a regular
-        expression to avoid characters which are generally not used in a name.
-
-
-        Regular Expression - The regular expression for restricting the Name
-        type is "^(?!\s*$)[\w .,'-]{1,128}$". The restriction does not allow a
-        string consisting of whitespace only, all Unicode characters are
-        allowed, as well as the period (.) (apostrophe (‘), dash (-), comma (,)
-        and space characters ( ).
-
-
-        **Note:** In some programming languages, Unicode support must be
-        specifically enabled. For example, if Java is used, the flag
-        UNICODE_CHARACTER_CLASS must be enabled to allow Unicode characters.
     Account:
       title: Account
       type: object
       description: Data model for the complex type Account.
       properties:
-        address:
-          $ref: '#/components/schemas/AccountAddress'
+        accountNickname:
+          $ref: '#/components/schemas/Name'
+        id:
+          $ref: '#/components/schemas/AccountId'
         currency:
           $ref: '#/components/schemas/Currency'
-        description:
-          $ref: '#/components/schemas/Name'
       required:
         - currency
     AccountList:
       title: AccountList
       type: object
-      description: Data model for the complex type AccountList.
+      description: >
+        Data model for the complex type AccountList.
+
+        TODO: This component is outdated. Need flatten object and remove
+        `account`.
+              Not sure what will break so leaving this for now.
       properties:
         account:
           type: array
@@ -2648,7 +2553,7 @@ components:
             transaction.
         sourceAccountId:
           allOf:
-            - $ref: '#/components/schemas/AccountAddress'
+            - $ref: '#/components/schemas/AccountId'
           description: 'DFSP specific account identifiers, e.g. `dfspa.alice.1234`'
         status:
           type: string
@@ -2686,7 +2591,7 @@ components:
             transaction.
         sourceAccountId:
           allOf:
-            - $ref: '#/components/schemas/AccountAddress'
+            - $ref: '#/components/schemas/AccountId'
           description: 'DFSP specific account identifiers, e.g. `dfspa.alice.1234`'
         status:
           type: string

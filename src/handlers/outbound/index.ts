@@ -32,8 +32,8 @@ import ThirdpartyTransactionPartyLookup from './thirdpartyTransaction/partyLooku
 import ThirdpartyTransactionIDInitiate from './thirdpartyTransaction/{ID}/initiate'
 import ThirdpartyTransactionIDApprove from './thirdpartyTransaction/{ID}/approve'
 import LinkingAccounts from './linking/{fspId}/{userId}'
-import ConsentRequestsIDValidate from './consentRequests/{ID}/validate'
-import ConsentRequests from './consentRequests'
+import LinkingRequestConsent from './linking/request-consent'
+import LinkingRequestConsentIDAuthenticate from './linking/request-consent/{ID}/authenticate'
 import LinkingProviders from './linking/providers'
 
 export default {
@@ -42,8 +42,8 @@ export default {
   ThirdpartyTransactionPartyLookup: ThirdpartyTransactionPartyLookup.post,
   ThirdpartyTransactionIDInitiate: ThirdpartyTransactionIDInitiate.post,
   ThirdpartyTransactionIDApprove: ThirdpartyTransactionIDApprove.post,
-  GetAccountsByUserId: LinkingAccounts.get,
-  OutboundConsentRequestsValidatePatch: ConsentRequestsIDValidate.patch,
-  OutboundConsentRequestsPost: ConsentRequests.post,
-  GetProviders: LinkingProviders.get
+  GetLinkingProviders: LinkingProviders.get,
+  GetLinkingAccountsByUserId: LinkingAccounts.get,
+  PostLinkingRequestConsent: LinkingRequestConsent.post,
+  PatchLinkingRequestConsentIDAuthenticate: LinkingRequestConsentIDAuthenticate.patch,
 }

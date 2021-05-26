@@ -1,6 +1,6 @@
 Feature: Outbound API server
 
-Scenario: GetProviders
+Scenario: GetLinkingProviders
   Given Outbound API server
-  When I send a 'GetProviders' request
+  When I send a 'GetLinkingProviders' request
   Then I get a response with a status code of '200'

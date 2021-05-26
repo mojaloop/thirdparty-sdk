@@ -490,9 +490,7 @@ paths:
             schema:
               oneOf:
                 - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/ConsentRequestsIDPutResponseWeb.yaml'
-                - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/ConsentRequestsIDPutResponseWebAuth.yaml'
                 - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/ConsentRequestsIDPutResponseOTP.yaml'
-                - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/ConsentRequestsIDPutResponseOTPAuth.yaml'
       responses:
         200:
           $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/200.yaml'
@@ -680,7 +678,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/ConsentsIDPatchResponse.yaml'
+              $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/ConsentsIDPatchResponseRevoked.yaml'
       parameters:
         #Path
         - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/parameters/ID.yaml'

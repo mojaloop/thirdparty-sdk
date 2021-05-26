@@ -334,9 +334,7 @@ export interface operations {
     requestBody: {
       "application/json":
         | components["schemas"]["ConsentRequestsIDPutResponseWeb"]
-        | components["schemas"]["ConsentRequestsIDPutResponseWebAuth"]
-        | components["schemas"]["ConsentRequestsIDPutResponseOTP"]
-        | components["schemas"]["ConsentRequestsIDPutResponseOTPAuth"];
+        | components["schemas"]["ConsentRequestsIDPutResponseOTP"];
     };
     responses: {
       202: components["responses"]["202"];
@@ -766,11 +764,19 @@ export interface components {
       errorInformation?: components["schemas"]["ErrorInformation"];
     };
     /**
+     * The API data type Name is a JSON String, restricted by a regular expression to avoid characters which are generally not used in a name.
+     *
+     * Regular Expression - The regular expression for restricting the Name type is "^(?!\s*$)[\w .,'-]{1,128}$". The restriction does not allow a string consisting of whitespace only, all Unicode characters are allowed, as well as the period (.) (apostrophe (‘), dash (-), comma (,) and space characters ( ).
+     *
+     * **Note:** In some programming languages, Unicode support must be specifically enabled. For example, if Java is used, the flag UNICODE_CHARACTER_CLASS must be enabled to allow Unicode characters.
+     */
+    Name: string;
+    /**
      * A long-lived unique account identifier provided by the DFSP. This MUST NOT
      * be Bank Account Number or anything that may expose a User's private bank
      * account information.
      */
-    AccountAddress: string;
+    AccountId: string;
     /** The currency codes defined in [ISO 4217](https://www.iso.org/iso-4217-currency-codes.html) as three-letter alphabetic codes are used as the standard naming representation for currencies. */
     Currency:
       | "AED"
@@ -938,8 +944,8 @@ export interface components {
     /** The object sent in a `PUT /accounts/{ID}` request. */
     AccountsIDPutResponse: {
       accounts: {
-        accountNickname: components["schemas"]["AccountAddress"];
-        id: components["schemas"]["AccountAddress"];
+        accountNickname: components["schemas"]["Name"];
+        id: components["schemas"]["AccountId"];
         currency: components["schemas"]["Currency"];
       }[];
     };
@@ -1043,7 +1049,7 @@ export interface components {
     ConsentScopeType: "accounts.getBalance" | "accounts.transfer";
     /** Scope + Account Identifier mapping for a Consent. */
     Scope: {
-      accountId: components["schemas"]["AccountAddress"];
+      accountId: components["schemas"]["AccountId"];
       actions: components["schemas"]["ConsentScopeType"][];
     };
     /**
@@ -1054,9 +1060,9 @@ export interface components {
     ConsentRequestChannelType: "WEB" | "OTP";
     /** The object sent in a `POST /consentRequests` request. */
     ConsentRequestsPostRequest: {
-      id: components["schemas"]["CorrelationId"];
-      /** The id of the PISP who will initiate transactions on a user's behalf. */
-      initiatorId: string;
+      consentRequestId: components["schemas"]["CorrelationId"];
+      /** ID used to associate request with GET /accounts request. */
+      userId: string;
       scopes: components["schemas"]["Scope"][];
       authChannels: components["schemas"]["ConsentRequestChannelType"][];
       /** The callback uri that the user will be redirected to after completing the WEB auth channel. */
@@ -1073,33 +1079,13 @@ export interface components {
      * the user can prove their identity (e.g., by logging in).
      */
     ConsentRequestsIDPutResponseWeb: {
-      /** The id of the PISP who will initiate transactions on a user's behalf. */
-      initiatorId: string;
+      consentRequestId: components["schemas"]["CorrelationId"];
       scopes: components["schemas"]["Scope"][];
       authChannels: components["schemas"]["ConsentRequestChannelTypeWeb"][];
       /** The callback uri that the user will be redirected to after completing the WEB auth channel. */
       callbackUri: string;
       /** The callback uri that the pisp app redirects to for user to complete their login. */
       authUri: string;
-    };
-    /**
-     * The object sent in a `PUT /consentRequests/{ID}` request.
-     *
-     * Schema used in the authentication phase of the account linking flow,
-     * the user is expected to prove their identity to the DFSP by passing a OTP
-     * or secret to the PISP.
-     */
-    ConsentRequestsIDPutResponseWebAuth: {
-      /** The id of the PISP who will initiate transactions on a user's behalf. */
-      initiatorId: string;
-      scopes: components["schemas"]["Scope"][];
-      authChannels: components["schemas"]["ConsentRequestChannelTypeWeb"][];
-      /** The callback uri that the user will be redirected to after completing the WEB auth channel. */
-      callbackUri: string;
-      /** The callback uri that the pisp app redirects to for user to complete their login. */
-      authUri: string;
-      /** The Auth token from the OTP or redirect to pisp app. */
-      authToken: string;
     };
     /** The OTP auth channel being used for PUT consentRequest/{ID} request. */
     ConsentRequestChannelTypeOTP: "OTP";
@@ -1109,33 +1095,15 @@ export interface components {
      * Schema used in the request consent phase of the account linking OTP/SMS flow.
      */
     ConsentRequestsIDPutResponseOTP: {
-      /** The id of the PISP who will initiate transactions on a user's behalf. */
-      initiatorId: string;
+      consentRequestId: components["schemas"]["CorrelationId"];
       scopes: components["schemas"]["Scope"][];
       authChannels: components["schemas"]["ConsentRequestChannelTypeOTP"][];
       /** The callback uri that the user will be redirected to after completing the WEB auth channel. */
       callbackUri: string;
-    };
-    /**
-     * The object sent in a `PUT /consentRequests/{ID}` request.
-     *
-     * Schema used in the authentication phase of the account linking flow,
-     * the user is expected to prove their identity to the DFSP by passing a OTP
-     * or secret to the PISP.
-     */
-    ConsentRequestsIDPutResponseOTPAuth: {
-      /** The id of the PISP who will initiate transactions on a user's behalf. */
-      initiatorId: string;
-      scopes: components["schemas"]["Scope"][];
-      authChannels: components["schemas"]["ConsentRequestChannelTypeOTP"][];
-      /** The callback uri that the user will be redirected to after completing the WEB auth channel. */
-      callbackUri: string;
-      /** The Auth token from the OTP or redirect to pisp app. */
-      authToken: string;
     };
     /** The object sent in a `PATCH /consentRequests/{ID}` request. */
     ConsentRequestsIDPatchRequest: {
-      authToken: components["schemas"]["OtpValue"];
+      authToken: string;
     };
     /** The object sent in a `POST /consents` request. */
     ConsentsPostRequest: {
@@ -1152,21 +1120,17 @@ export interface components {
       consentRequestId: components["schemas"]["CorrelationId"];
       scopes: components["schemas"]["Scope"][];
     };
-    /**
-     * The API data type Name is a JSON String, restricted by a regular expression to avoid characters which are generally not used in a name.
-     *
-     * Regular Expression - The regular expression for restricting the Name type is "^(?!\s*$)[\w .,'-]{1,128}$". The restriction does not allow a string consisting of whitespace only, all Unicode characters are allowed, as well as the period (.) (apostrophe (‘), dash (-), comma (,) and space characters ( ).
-     *
-     * **Note:** In some programming languages, Unicode support must be specifically enabled. For example, if Java is used, the flag UNICODE_CHARACTER_CLASS must be enabled to allow Unicode characters.
-     */
-    Name: string;
     /** Data model for the complex type Account. */
     Account: {
-      address?: components["schemas"]["AccountAddress"];
+      accountNickname?: components["schemas"]["Name"];
+      id?: components["schemas"]["AccountId"];
       currency: components["schemas"]["Currency"];
-      description?: components["schemas"]["Name"];
     };
-    /** Data model for the complex type AccountList. */
+    /**
+     * Data model for the complex type AccountList.
+     * TODO: This component is outdated. Need flatten object and remove `account`.
+     *       Not sure what will break so leaving this for now.
+     */
     AccountList: {
       /** Accounts associated with the Party. */
       account: components["schemas"]["Account"][];
@@ -1365,7 +1329,7 @@ export interface components {
       /** Common ID between the PISP and FSP for the Consent object This tells DFSP and auth-service which consent allows the PISP to initiate transaction. */
       consentId: components["schemas"]["CorrelationId"];
       /** DFSP specific account identifiers, e.g. `dfspa.alice.1234` */
-      sourceAccountId: components["schemas"]["AccountAddress"];
+      sourceAccountId: components["schemas"]["AccountId"];
       /** The status of the authorization. This value must be `VERIFIED` for a PUT request. */
       status: "VERIFIED";
     };
@@ -1378,7 +1342,7 @@ export interface components {
       /** Common ID between the PISP and FSP for the Consent object This tells DFSP and auth-service which constent allows the PISP to initiate transaction. */
       consentId: components["schemas"]["CorrelationId"];
       /** DFSP specific account identifiers, e.g. `dfspa.alice.1234` */
-      sourceAccountId: components["schemas"]["AccountAddress"];
+      sourceAccountId: components["schemas"]["AccountId"];
       /** The status of the authorization. This MUST be PENDING for a POST request */
       status: "PENDING";
     };

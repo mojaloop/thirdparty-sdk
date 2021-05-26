@@ -1,0 +1,40 @@
+title: LinkingRequestConsentPostRequest
+type: object
+description: The object sent in a `POST /linking/request-consent` request.
+properties:
+  toParticipantId:
+    type: string
+  consentRequestId:
+    $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/CorrelationId.yaml'
+  accounts:
+    type: array
+    items:
+      type: object
+      description: |
+        The object sent in a `PUT /accounts/{ID}` request.
+      properties:
+        accountNickname:
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/Name.yaml'
+        id:
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/AccountId.yaml'
+        currency:
+          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/Currency.yaml'
+      required:
+        - accountNickname
+        - id
+        - currency
+  userId:
+    type: string
+    description: >-
+      ID used to associate request with GET /accounts request.
+  callbackUri:
+    type: string
+    description: >-
+      The callback uri that the user will be redirected to after completing the
+      WEB auth channel.
+required:
+  - toParticipantId
+  - consentRequestId
+  - accounts
+  - userId
+  - callbackUri

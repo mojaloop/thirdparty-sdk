@@ -109,7 +109,6 @@ export interface ServiceConfig {
     SDK_NOTIFY_ABOUT_TRANSFER_URI: string
     DFSP_BACKEND_VALIDATE_OTP_PATH: string
     DFSP_BACKEND_VALIDATE_CONS_REQ_PATH: string
-    DFSP_BACKEND_GET_SCOPES_PATH: string
     DFSP_BACKEND_SEND_OTP_REQ_PATH: string
     DFSP_BACKEND_STORE_CONS_REQ_PATH: string
     JWS_SIGN: boolean
@@ -333,11 +332,6 @@ export const ConvictConfig = Convict<ServiceConfig>({
       doc: 'uri to sdk-scheme-adapter validateOTP endpoint',
       format: '*',
       default: 'validateOTP'
-    },
-    DFSP_BACKEND_GET_SCOPES_PATH: {
-      doc: 'uri to sdk-scheme-adapter getScopes endpoint',
-      format: '*',
-      default: 'scopes/{ID}'
     },
     DFSP_BACKEND_VALIDATE_THIRDPARTY_TRANSACTION_REQUEST: {
       doc: 'path used by DFSPBackendRequests.validateThirdpartyTransactionRequest',

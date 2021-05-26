@@ -32,46 +32,39 @@ import {
 import { Request, ResponseObject } from '@hapi/hapi'
 import { StateResponseToolkit } from '~/server/plugins/state'
 import { Enum } from '@mojaloop/central-services-shared'
-import { DFSPOTPValidateModel } from '~/models/inbound/dfspOTPValidate.model';
+import { DFSPLinkingModel, loadFromKVS } from '~/models/inbound/dfspLinking.model';
 import {
-  DFSPOTPValidateData,
-  DFSPOTPValidateModelConfig
-} from '~/models/inbound/dfspOTPValidate.interface'
+  DFSPLinkingModelConfig
+} from '~/models/inbound/dfspLinking.interface'
 import inspect from '~/shared/inspect';
-import { PISPConsentRequestsModel } from '~/models/outbound/pispConsentRequests.model';
+import { PISPLinkingModel } from '~/models/outbound/pispLinking.model';
 import { Message } from '~/shared/pub-sub'
+import { PISPLinkingPhase } from '~/models/outbound/pispLinking.interface';
 
 async function patch (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const payload = request.payload as tpAPI.Schemas.ConsentRequestsIDPatchRequest
-  const consentRequestsRequestId = request.params.ID
-  const authToken = payload.authToken
+  const consentRequestId = request.params.ID
 
-  // pull the PISP's ID to send back the POST /consents
-  const sourceFspId = request.headers['fspiop-source']
-
-  const data: DFSPOTPValidateData = {
-    currentState: 'start',
-    consentRequestsRequestId: consentRequestsRequestId,
-    authToken: authToken,
-    toParticipantId: sourceFspId
-  }
-  // if the OTP is valid the DFSP issues out a POST /consents request.
-  const modelConfig: DFSPOTPValidateModelConfig = {
+  // if the authToken is valid the DFSP issues out a POST /consents request.
+  const modelConfig: DFSPLinkingModelConfig = {
     kvs: h.getKVS(),
     pubSub: h.getPubSub(),
-    key: consentRequestsRequestId,
+    key: consentRequestId,
     logger: h.getLogger(),
     dfspBackendRequests: h.getDFSPBackendRequests(),
     thirdpartyRequests: h.getThirdpartyRequests(),
   }
-  const model = new DFSPOTPValidateModel(data, modelConfig)
 
   // don't await on promise to be resolved
   setImmediate(async () => {
     try {
+      const model: DFSPLinkingModel = await loadFromKVS(modelConfig)
+      model.data.consentRequestsIDPatchRequest = payload
       await model.run()
     } catch (error) {
-      h.getLogger().info(`Error running DFSPOTPValidateModel : ${inspect(error)}`)
+      // todo: add an PUT /consentRequests/{ID} error call back if model not
+      //       found or is unable to run workflow
+      h.getLogger().info(`Error running DFSPLinkingModel : ${inspect(error)}`)
     }
   })
 
@@ -84,15 +77,15 @@ async function patch (_context: unknown, request: Request, h: StateResponseToolk
  * Handles an inbound `PUT /consentRequests/{ID}` request
  */
 async function put (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
-  const consentRequesttId = request.params.ID
+  const consentRequestId = request.params.ID
 
-  const channel = PISPConsentRequestsModel.notificationChannel(consentRequesttId)
-  const pubSub = h.getPubSub()
-  // don't await on promise to resolve, let finish publish in background
-  setImmediate(async () => {
-    pubSub.publish(channel, request.payload as unknown as Message)
-    h.getLogger().info(`Inbound received PUT /consentRequests/{ID} response and published to channel : ${channel}`)
-  })
+  PISPLinkingModel.triggerWorkflow(
+    PISPLinkingPhase.requestConsent,
+    consentRequestId,
+    h.getPubSub(),
+    request.payload as unknown as Message
+  )
+  h.getLogger().info(`Inbound received PUT /consentRequests/{ID} response`)
 
   return h.response().code(200)
 }

@@ -43,15 +43,12 @@ async function put (_context: unknown, request: Request, h: StateResponseToolkit
   if (serviceType == ServiceType.THIRD_PARTY_DFSP) {
     const pubSub = h.getPubSub()
 
-    // don't await on promise to resolve, let finish publish in background
-    setImmediate(async () => {
-      await PISPPrelinkingModel.triggerWorkflow(
-        serviceType,
-        pubSub,
-        payload
-      )
-      h.getLogger().info(`Inbound received PUT /services/{ServiceType} response`)
-    })
+    PISPPrelinkingModel.triggerWorkflow(
+      serviceType,
+      pubSub,
+      payload
+    )
+    h.getLogger().info(`Inbound received PUT /services/{ServiceType} response`)
   }
 
   return h.response().code(Enum.Http.ReturnCodes.OK.CODE)

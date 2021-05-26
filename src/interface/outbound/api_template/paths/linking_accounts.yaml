@@ -1,10 +1,10 @@
 get:
-  operationId: GetAccountsByUserId
-  summary: GetAccountsByUserId
+  operationId: GetLinkingAccountsByUserId
+  summary: GetLinkingAccountsByUserId
   description: |
     The HTTP request `GET /linking/accounts/{fspId}/{userId}` is used to retrieve the list of potential accounts available for linking.
   tags:
-    - accounts
+    - linking
   parameters:
     - name: fspId
       in: path
@@ -15,7 +15,7 @@ get:
       in: path
       required: true
       schema:
-        $ref: '../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/AccountAddress.yaml'
+        $ref: '../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/AccountId.yaml'
   responses:
     '200':
       $ref: '../components/responses/AccountsByUserIdResponse.yaml'

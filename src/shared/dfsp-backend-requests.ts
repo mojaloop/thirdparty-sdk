@@ -28,15 +28,12 @@
 import { HttpRequestsConfig, HttpRequests } from '~/shared/http-requests'
 import { thirdparty as tpAPI, v1_1 as fspiopAPI } from '@mojaloop/api-snippets'
 import {
-  BackendValidateOTPResponse,
-  BackendGetScopesResponse
-} from '../models/inbound/dfspOTPValidate.interface'
-import {
   BackendValidateConsentRequestsResponse,
   BackendSendOTPRequest,
   BackendSendOTPResponse,
-  BackendStoreScopesRequest
-} from '~/models/inbound/dfspConsentRequests.interface'
+  BackendStoreScopesRequest,
+  BackendValidateOTPResponse
+} from '~/models/inbound/dfspLinking.interface'
 
 export interface IsValidResponse {
   isValid: boolean
@@ -46,7 +43,6 @@ export interface DFSPBackendConfig extends HttpRequestsConfig {
   verifyConsentPath: string
   getUserAccountsPath: string
   validateOTPPath: string
-  getScopesPath: string
   validateThirdpartyTransactionRequestPath: string
   validateConsentRequestsPath: string
   sendOTPPath: string
@@ -92,11 +88,6 @@ export class DFSPBackendRequests extends HttpRequests {
     return this.config.validateOTPPath
   }
 
-  // get scopes path getter
-  get getScopesPath (): string {
-    return this.config.getScopesPath
-  }
-
   // get path for validation of ThirdpartyTransactionRequest
   get validateThirdpartyTransactionRequestPath (): string {
     return this.config.validateThirdpartyTransactionRequestPath
@@ -136,7 +127,7 @@ export class DFSPBackendRequests extends HttpRequests {
     request: tpAPI.Schemas.ConsentRequestsPostRequest
   ): Promise<BackendSendOTPResponse | void> {
     const otpRequest: BackendSendOTPRequest = {
-      consentRequestId: request.id,
+      consentRequestId: request.consentRequestId,
       username: 'TBD',
       message: 'TBD'
     }
@@ -146,7 +137,7 @@ export class DFSPBackendRequests extends HttpRequests {
   async storeConsentRequests (
     request: tpAPI.Schemas.ConsentRequestsPostRequest
   ): Promise<void> {
-    const path = this.storeConsentRequestsPath.replace('{ID}', request.id)
+    const path = this.storeConsentRequestsPath.replace('{ID}', request.consentRequestId)
     const scopesReq: BackendStoreScopesRequest = {
       scopes: request.scopes
     }
@@ -163,13 +154,6 @@ export class DFSPBackendRequests extends HttpRequests {
     }
 
     return this.post(this.validateOTPPath, validateRequest)
-  }
-
-  // retrieve the scopes that PISP is granted on a user's behalf
-  async getScopes (consentRequestId: string): Promise<BackendGetScopesResponse | void> {
-    const uri = this.getScopesPath.replace('{ID}', consentRequestId)
-
-    return this.get(uri)
   }
 
   // validate ThirdpartyTransactionRequest

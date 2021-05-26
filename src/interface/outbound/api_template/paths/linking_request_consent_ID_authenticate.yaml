@@ -1,0 +1,40 @@
+patch:
+  operationId: PatchLinkingRequestConsentIDAuthenticate
+  summary: Outbound PATCH /linking/request-consent/{ID}/authenticate endpoint
+  description: |
+    Used in the authentication phase of account linking.
+    Used by the PISP to pass an Auth token on behalf of the user to the DFSP to establish a chain of trust.
+  tags:
+    - linking
+  parameters:
+    - name: ID
+      in: path
+      required: true
+      schema:
+        $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/schemas/CorrelationId.yaml'
+  requestBody:
+    description: Linking request consent authenticate request details
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../components/schemas/LinkingRequestConsentIDAuthenticateRequest.yaml'
+  responses:
+    '200':
+      $ref: '../components/responses/LinkingRequestConsentIDAuthenticateResponse.yaml'
+    '400':
+      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/400.yaml'
+    '401':
+      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/401.yaml'
+    '403':
+      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/403.yaml'
+    '404':
+      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/404.yaml'
+    '405':
+      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/405.yaml'
+    '406':
+      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/406.yaml'
+    '501':
+      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/501.yaml'
+    '503':
+      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/503.yaml'

@@ -1,8 +1,0 @@
-title: ConsentRequestsState
-description: State of POST consent requests
-type: string
-enum:
-  - start
-  - errored
-  - success
-  - RequestIsValid

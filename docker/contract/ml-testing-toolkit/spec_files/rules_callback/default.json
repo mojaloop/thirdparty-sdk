@@ -312,7 +312,7 @@
   {
     "ruleId": 6,
     "priority": 1,
-    "description": "post /consentRequests -WEB",
+    "description": "post /consentRequests - WEB",
     "apiVersion": {
       "minorVersion": 1,
       "majorVersion": 0,
@@ -325,7 +325,7 @@
           "fact": "body",
           "operator": "equal",
           "value": "b51ec534-ee48-4575-b6a9-ead2955b8069",
-          "path": "id"
+          "path": "consentRequestId"
         },
         {
           "fact": "operationPath",
@@ -350,10 +350,7 @@
           "FSPIOP-Source": "DFSPA"
         },
         "body": {
-          "initiatorId": "pispA",
-          "authChannels": [
-            "WEB"
-          ],
+          "consentRequestId": "b51ec534-ee48-4575-b6a9-ead2955b8069",
           "scopes": [
             {
               "accountId": "dfspa.username.1234",
@@ -371,7 +368,10 @@
             }
           ],
           "callbackUri": "pisp-app://callback.com",
-          "authUri": "dfspa.com/authorize?consentRequestId=456"
+          "authUri": "dfspa.com/authorize?consentRequestId=456",
+          "authChannels": [
+            "WEB"
+          ]
         },
         "scripts": {}
       },
@@ -383,7 +383,7 @@
   {
     "ruleId": 7,
     "priority": 1,
-    "description": "post /consentRequests -OTP",
+    "description": "post /consentRequests - OTP",
     "apiVersion": {
       "minorVersion": 1,
       "majorVersion": 0,
@@ -396,7 +396,7 @@
           "fact": "body",
           "operator": "equal",
           "value": "c51ec534-ee48-4575-b6a9-ead2955b8069",
-          "path": "id"
+          "path": "consentRequestId"
         },
         {
           "fact": "operationPath",
@@ -421,10 +421,7 @@
           "FSPIOP-Source": "DFSPA"
         },
         "body": {
-          "initiatorId": "pispA",
-          "authChannels": [
-            "OTP"
-          ],
+          "consentRequestId": "b51ec534-ee48-4575-b6a9-ead2955b8069",
           "scopes": [
             {
               "accountId": "dfspa.username.1234",
@@ -441,7 +438,10 @@
               ]
             }
           ],
-          "callbackUri": "pisp-app://callback.com"
+          "callbackUri": "pisp-app://callback.com",
+          "authChannels": [
+            "OTP"
+          ]
         },
         "scripts": {}
       },

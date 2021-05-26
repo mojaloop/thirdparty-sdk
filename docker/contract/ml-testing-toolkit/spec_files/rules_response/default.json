@@ -126,7 +126,7 @@
             "    mode: 'raw',",
             "    raw: JSON.stringify({",
             "      \"errorInformation\": {",
-            "        \"errorCode\": \"6000\",",
+            "        \"errorCode\": \"7000\",",
             "        \"errorDescription\": \"Generic thirdparty error\"",
             "      }",
             "    })",

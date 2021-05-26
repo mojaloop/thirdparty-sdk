@@ -68,9 +68,9 @@ describe('POST /consents', (): void => {
       await pubSub.connect()
       expect(pubSub.isConnected).toBeTruthy()
 
-      pubSub.subscribe('PISPOTPValidate-997c89f4-053c-4283-bfec-45a1a0a28fbb',
+      pubSub.subscribe('PISPLinking_requestConsentAuthenticate_997c89f4-053c-4283-bfec-45a1a0a28fbb',
         async (channel: string, message: Message) => {
-          expect(channel).toEqual('PISPOTPValidate-997c89f4-053c-4283-bfec-45a1a0a28fbb')
+          expect(channel).toEqual('PISPLinking_requestConsentAuthenticate_997c89f4-053c-4283-bfec-45a1a0a28fbb')
           expect(message).toEqual(payload)
           await pubSub.disconnect()
           expect(pubSub.isConnected).toBeFalsy()

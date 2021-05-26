@@ -1,0 +1,6 @@
+title: LinkingRequestConsentIDAuthenticateState
+description: State of PATCH linking request consent Authenticate
+type: string
+enum:
+  - errored
+  - consentReceivedAwaitingCredential

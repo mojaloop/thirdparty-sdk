@@ -118,7 +118,7 @@ defineFeature(feature, (test): void => {
     server.stop({ timeout:0 })
   })
 
-  test('GetProviders', ({ given, when, then }): void => {
+  test('GetLinkingProviders', ({ given, when, then }): void => {
     const servicesServiceTypePutResponse: tpAPI.Schemas.ServicesServiceTypePutResponse = {
       providers: ['dfspA', 'dfspB']
     }
@@ -127,7 +127,7 @@ defineFeature(feature, (test): void => {
       server = await prepareOutboundAPIServer()
     })
 
-    when('I send a \'GetProviders\' request', async (): Promise<ServerInjectResponse> => {
+    when('I send a \'GetLinkingProviders\' request', async (): Promise<ServerInjectResponse> => {
       jest.mock('~/shared/kvs')
       jest.mock('~/shared/pub-sub')
       const request = {

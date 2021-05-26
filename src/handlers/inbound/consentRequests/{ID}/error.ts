@@ -27,9 +27,9 @@ import {
 } from '@mojaloop/api-snippets'
 import { Message } from '~/shared/pub-sub'
 import { StateResponseToolkit } from '~/server/plugins/state'
-import { PISPOTPValidateModel } from '~/models/outbound/pispOTPValidate.model';
 import { Enum } from '@mojaloop/central-services-shared';
-import { PISPConsentRequestsModel } from '~/models/outbound/pispConsentRequests.model'
+import { PISPLinkingModel } from '~/models/outbound/pispLinking.model'
+import { PISPLinkingPhase } from '~/models/outbound/pispLinking.interface';
 
 /**
  * Handles a inbound PUT /consentRequests/{ID}/error request
@@ -38,20 +38,22 @@ async function put (_context: any, request: Request, h: StateResponseToolkit): P
   // PUT /consentsRequests/{ID}/error is a response to PATCH /consentRequests
   // when an OTP or secret failed to validate.
   // We publish the request on the PISPConsentRequestModel
+  const consentRequestId = request.params.ID
   const payload = request.payload as fspiopAPI.Schemas.ErrorInformation
-  const channel = PISPOTPValidateModel.notificationChannel(
-    request.params.ID
-  )
-  const pubSub = h.getPubSub()
 
-  const consentReqChannel = PISPConsentRequestsModel.notificationChannel(
-    request.params.ID
+  PISPLinkingModel.triggerWorkflow(
+    PISPLinkingPhase.requestConsent,
+    consentRequestId,
+    h.getPubSub(),
+    payload as unknown as Message
   )
-  // don't await on promise to resolve, let finish publish in background
-  setImmediate(async () => {
-    pubSub.publish(channel, payload as unknown as Message)
-    pubSub.publish(consentReqChannel, payload as unknown as Message)
-  })
+
+  PISPLinkingModel.triggerWorkflow(
+    PISPLinkingPhase.requestConsentAuthenticate,
+    consentRequestId,
+    h.getPubSub(),
+    payload as unknown as Message
+  )
   return h.response({}).code(Enum.Http.ReturnCodes.OK.CODE)
 }
 
