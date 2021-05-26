@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+### [11.37.4](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.37.3...v11.37.4) (2021-05-26)
+
+
+### Code Refactor
+
+* refactor old models into PISP and DFSP Linking Models ([#98](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/98)) ([6953389](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/6953389765a69b31f997639b2896e7fd2c5876f7))
+
 ### [11.37.3](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.37.2...v11.37.3) (2021-05-21)
 
 
