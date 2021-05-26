@@ -166,7 +166,8 @@ describe('dfspLinkingModel', () => {
       validateData = {
         toParticipantId: 'pispa',
         consentRequestsPostRequest: mockData.consentRequestsPost.payload,
-        currentState: 'start'
+        currentState: 'start',
+        consentRequestId: mockData.consentRequestsPost.payload.consentRequestId,
       }
     })
 
@@ -219,7 +220,7 @@ describe('dfspLinkingModel', () => {
         await model.fsm.validateRequest()
         shouldNotBeExecuted()
       } catch (err) {
-        expect(err.apiErrorCode.code).toEqual('7204')
+        expect(err.code).toEqual('7204')
       }
 
       // check a PUT /consentsRequest/{ID}/error response was sent to source participant
@@ -241,7 +242,7 @@ describe('dfspLinkingModel', () => {
         await model.fsm.validateRequest()
         shouldNotBeExecuted()
       } catch (err) {
-        expect(err.apiErrorCode.code).toEqual('7208')
+        expect(err.code).toEqual('7208')
       }
 
       // check a PUT /consentsRequest/{ID}/error response was sent to source participant
@@ -450,6 +451,7 @@ describe('dfspLinkingModel', () => {
         toParticipantId: 'pispa',
         consentRequestsPostRequest: mockData.consentRequestsPost.payload,
         backendValidateConsentRequestsResponse: mockData.consentRequestsPost.response,
+        consentRequestId: mockData.consentRequestsPost.payload.consentRequestId,
         currentState: 'requestIsValid'
       }
     })
@@ -584,7 +586,7 @@ describe('dfspLinkingModel', () => {
         await model.fsm.validateAuthToken()
         shouldNotBeExecuted()
       } catch (err) {
-        expect(err.apiErrorCode.code).toEqual('7205')
+        expect(err.code).toEqual('7205')
       }
 
       // check a PUT /consentsRequest/{ID}/error response was sent to source participant
@@ -612,7 +614,7 @@ describe('dfspLinkingModel', () => {
         await model.fsm.validateAuthToken()
         shouldNotBeExecuted()
       } catch (err) {
-        expect(err.apiErrorCode.code).toEqual('7206')
+        expect(err.code).toEqual('7206')
       }
 
       // check a PUT /consentsRequest/{ID}/error response was sent to source participant
@@ -749,7 +751,8 @@ describe('dfspLinkingModel', () => {
         toParticipantId: 'pispa',
         consentRequestsPostRequest: mockData.consentRequestsPost.payload,
         backendValidateConsentRequestsResponse: mockData.consentRequestsPost.response,
-        currentState: 'consentRequestValidatedAndStored'
+        currentState: 'consentRequestValidatedAndStored',
+        consentRequestId: mockData.consentRequestsPost.payload.consentRequestId,
       }
       mocked(modelConfig.kvs.get).mockImplementationOnce(async () => dataFromCache)
       const am = await loadFromKVS(modelConfig)

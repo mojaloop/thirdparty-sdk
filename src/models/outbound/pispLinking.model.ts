@@ -22,6 +22,8 @@
  - Name Surname <name.surname@gatesfoundation.com>
 
  - Sridhar Voruganti <sridhar.voruganti@modusbox.com>
+ - Kevin Leyow <kevin.leyow@modusbox.com>
+
  --------------
  ******/
 

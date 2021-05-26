@@ -51,8 +51,10 @@ async function post (_context: unknown, request: Request, h: StateResponseToolki
   const data: DFSPLinkingData = {
     currentState: 'start',
     toParticipantId: sourceFspId,
-    consentRequestsPostRequest: payload
+    consentRequestsPostRequest: payload,
+    consentRequestId: payload.consentRequestId
   }
+
   // if the request is valid then DFSP returns response via PUT /consentRequests/{ID} call.
   const modelConfig: DFSPLinkingModelConfig = {
     kvs: h.getKVS(),
@@ -62,13 +64,15 @@ async function post (_context: unknown, request: Request, h: StateResponseToolki
     dfspBackendRequests: h.getDFSPBackendRequests(),
     thirdpartyRequests: h.getThirdpartyRequests(),
   }
-  const model = new DFSPLinkingModel(data, modelConfig)
 
   // don't await on promise to be resolved
   setImmediate(async () => {
     try {
+      const model = new DFSPLinkingModel(data, modelConfig)
       await model.run()
     } catch (error) {
+      // todo: add an PUT /consentRequests/{ID} error call back if model
+      //       is unable to run workflow
       h.getLogger().info(`Error running DFSPLinkingModel : ${inspect(error)}`)
     }
   })

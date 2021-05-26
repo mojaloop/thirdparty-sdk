@@ -34,7 +34,6 @@ import {
   thirdparty as tpAPI
 } from '@mojaloop/api-snippets'
 import inspect from '~/shared/inspect'
-import { reformatError, mkMojaloopFSPIOPError } from '~/shared/util'
 import {
   DFSPLinkingData,
   DFSPLinkingStateMachine,
@@ -42,8 +41,8 @@ import {
 } from '~/models/inbound/dfspLinking.interface'
 import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
 import { BackendValidateOTPResponse } from './dfspLinking.interface';
-import { HTTPResponseError } from '../../shared/http-response-error';
 import { uuid } from 'uuidv4';
+import { reformatError } from '~/shared/api-error';
 
 // DFSPLinkingModel is the passive inbound handler for inbound
 // POST /consentRequests requests and no response is generated from `model.run()`
@@ -91,18 +90,15 @@ export class DFSPLinkingModel
   async onValidateRequest (): Promise<void> {
     const { consentRequestsPostRequest, toParticipantId } = this.data
 
-    // store consentRequestId since this will be referenced often
-    this.data.consentRequestId = consentRequestsPostRequest.consentRequestId
-
     try {
       const response = await this.dfspBackendRequests.validateConsentRequests(consentRequestsPostRequest)
 
       if (!response) {
-        throw mkMojaloopFSPIOPError(Errors.MojaloopApiErrorCodes.TP_CONSENT_REQ_VALIDATION_ERROR)
+        throw Errors.MojaloopApiErrorCodes.TP_CONSENT_REQ_VALIDATION_ERROR
       }
 
       if (!response.isValid) {
-        throw mkMojaloopFSPIOPError(Errors.MojaloopApiErrorCodeFromCode(`${response.errorInformation?.errorCode}`))
+        throw Errors.MojaloopApiErrorCodeFromCode(`${response.errorInformation?.errorCode}`)
       }
 
       this.data.backendValidateConsentRequestsResponse = response
@@ -121,7 +117,7 @@ export class DFSPLinkingModel
       await this.thirdpartyRequests.putConsentRequests(consentRequestsPostRequest.consentRequestId, consentRequestResponse, toParticipantId)
 
     } catch (error) {
-      const mojaloopError = await reformatError(error)
+      const mojaloopError = reformatError(error, this.logger)
 
       this.logger.push({ error }).error('start -> requestIsValid')
       this.logger.push({ mojaloopError }).info(`Sending error response to ${toParticipantId}`)
@@ -162,6 +158,8 @@ export class DFSPLinkingModel
 
     } catch (error) {
       this.logger.push({ error }).error('requestIsValid -> consentRequestValidatedAndStored')
+      // TODO: PUT /consentRequest/{ID}/error if DFSP is unable to store consent Request or
+      //       send OTP
       // throw error to stop state machine
       throw error
     }
@@ -177,24 +175,15 @@ export class DFSPLinkingModel
       ) as BackendValidateOTPResponse
 
       if (!isValidOTP) {
-        throw new Errors.MojaloopFSPIOPError(
-          null as unknown as string,
-          null as unknown as string,
-          null as unknown as string,
-          Errors.MojaloopApiErrorCodes.TP_FSP_OTP_VALIDATION_ERROR
-        )
+        throw Errors.MojaloopApiErrorCodes.TP_FSP_OTP_VALIDATION_ERROR
       }
 
       if (!isValidOTP.isValid) {
-        throw new Errors.MojaloopFSPIOPError(
-          null as unknown as string,
-          null as unknown as string,
-          null as unknown as string,
-          Errors.MojaloopApiErrorCodes.TP_OTP_VALIDATION_ERROR
-        )
+        throw Errors.MojaloopApiErrorCodes.TP_OTP_VALIDATION_ERROR
       }
+
     } catch (error) {
-      const mojaloopError = this.reformatError(error)
+      const mojaloopError = reformatError(error, this.logger)
 
       this.logger.push({ error }).error('consentRequestValidatedAndStored -> authTokenValidated')
       this.logger.push({ mojaloopError }).info(`Sending error response to ${toParticipantId}`)
@@ -225,7 +214,7 @@ export class DFSPLinkingModel
         toParticipantId
       )
     } catch (error) {
-      const mojaloopError = this.reformatError(error)
+      const mojaloopError = reformatError(error, this.logger)
 
       this.logger.push({ error }).error('authTokenValidated -> consentGranted')
       this.logger.push(error).error('ThirdpartyRequests.postConsents request error')
@@ -289,6 +278,7 @@ export class DFSPLinkingModel
           return
       }
     } catch (err) {
+      // TOOD: reformatError: https://github.com/mojaloop/thirdparty-scheme-adapter/blob/master/src/models/dfspTransaction.model.ts#L378
       this.logger.info(`Error running DFSPLinkingModel : ${inspect(err)}`)
 
       // as this function is recursive, we don't want to error the state machine multiple times
@@ -305,38 +295,6 @@ export class DFSPLinkingModel
       }
       throw err
     }
-  }
-
-  reformatError (err: Error): Errors.MojaloopApiErrorObject {
-    if (err instanceof Errors.MojaloopFSPIOPError) {
-      return err.toApiErrorObject()
-    }
-
-    let mojaloopErrorCode = Errors.MojaloopApiErrorCodes.INTERNAL_SERVER_ERROR
-
-    if (err instanceof HTTPResponseError) {
-      const e = err.getData()
-      if (e.res && (e.res.body || e.res.data)) {
-        if (e.res.body) {
-          try {
-            const bodyObj = JSON.parse(e.res.body)
-            mojaloopErrorCode = Errors.MojaloopApiErrorCodeFromCode(`${bodyObj.statusCode}`)
-          } catch (ex) {
-            // do nothing
-            this.logger.push({ ex }).error('Error parsing error message body as JSON')
-          }
-        } else if (e.res.data) {
-          mojaloopErrorCode = Errors.MojaloopApiErrorCodeFromCode(`${e.res.data.statusCode}`)
-        }
-      }
-    }
-
-    return new Errors.MojaloopFSPIOPError(
-      err,
-      null as unknown as string,
-      null as unknown as string,
-      mojaloopErrorCode
-    ).toApiErrorObject()
   }
 }
 

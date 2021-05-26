@@ -115,7 +115,7 @@ export class PISPDiscoveryModel
           }
 
           if (putResponse.errorInformation) {
-            this.data.response!.errorInformation = { ...putResponse.errorInformation }
+            this.data.response.errorInformation = { ...putResponse.errorInformation }
           }
           resolve()
         })

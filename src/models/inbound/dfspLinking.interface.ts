@@ -43,6 +43,9 @@ export enum DFSPLinkingPhase {
   requestConsent = 'requestConsent',
   requestConsentAuthenticate = 'requestConsentAuthenticate',
 }
+
+// TODO: Let keep Backend* interfaces in DFSPBackendRequests
+// https://github.com/mojaloop/thirdparty-scheme-adapter/blob/master/src/shared/dfsp-backend-requests.ts
 export interface BackendValidateConsentRequestsResponse {
   isValid: boolean
   data: {
@@ -92,7 +95,7 @@ export interface DFSPLinkingModelConfig extends PersistentModelConfig {
 }
 export interface DFSPLinkingData extends StateData {
   toParticipantId: string
-  consentRequestId?: string
+  consentRequestId: string
   // scopes from the initial `consentRequestsPostRequest` will be stored
   // for later reference to save the DFSP from having to retrieve them from
   // their backend

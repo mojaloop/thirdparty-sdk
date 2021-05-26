@@ -55,14 +55,15 @@ async function patch (_context: unknown, request: Request, h: StateResponseToolk
     thirdpartyRequests: h.getThirdpartyRequests(),
   }
 
-  const model: DFSPLinkingModel = await loadFromKVS(modelConfig)
-  model.data.consentRequestsIDPatchRequest = payload
-
   // don't await on promise to be resolved
   setImmediate(async () => {
     try {
+      const model: DFSPLinkingModel = await loadFromKVS(modelConfig)
+      model.data.consentRequestsIDPatchRequest = payload
       await model.run()
     } catch (error) {
+      // todo: add an PUT /consentRequests/{ID} error call back if model not
+      //       found or is unable to run workflow
       h.getLogger().info(`Error running DFSPLinkingModel : ${inspect(error)}`)
     }
   })

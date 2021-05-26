@@ -65,6 +65,8 @@ async function patch (_context: any, request: Request, h: StateResponseToolkit):
     const statusCode = (result.currentState == 'errored') ? 500 : 200
     return h.response(result).code(statusCode)
   } catch(error) {
+    // TODO: PUT /consents/{ID}/error to DFSP if PISP is unable to handle
+    //       the incoming POST /consents request
     h.getLogger().info(`Error running PISPLinkingModel : ${inspect(error)}`)
     return h.response({}).code(500)
   }
