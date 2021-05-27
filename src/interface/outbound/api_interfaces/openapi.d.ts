@@ -37,6 +37,9 @@ export interface paths {
   '/linking/request-consent/{ID}/authenticate': {
     patch: operations['PatchLinkingRequestConsentIDAuthenticate'];
   };
+  '/linking/request-consent/{ID}/pass-credential': {
+    post: operations['PostLinkingRequestConsentIDPassCredential'];
+  };
 }
 
 export interface operations {
@@ -241,6 +244,31 @@ export interface operations {
     };
     responses: {
       200: components['responses']['LinkingRequestConsentIDAuthenticateResponse'];
+      400: components['responses']['400'];
+      401: components['responses']['401'];
+      403: components['responses']['403'];
+      404: components['responses']['404'];
+      405: components['responses']['405'];
+      406: components['responses']['406'];
+      501: components['responses']['501'];
+      503: components['responses']['503'];
+    };
+  };
+  /**
+   * Used in the credential registration phase of account linking.
+   * Used by the PISP to pass an credential on behalf of the user to the DFSP.
+   */
+  PostLinkingRequestConsentIDPassCredential: {
+    parameters: {
+      path: {
+        ID: components['schemas']['CorrelationId'];
+      };
+    };
+    requestBody: {
+      'application/json': components['schemas']['LinkingRequestConsentIDPassCredentialRequest'];
+    };
+    responses: {
+      200: components['responses']['LinkingRequestConsentIDPassCredentialResponse'];
       400: components['responses']['400'];
       401: components['responses']['401'];
       403: components['responses']['403'];
@@ -994,6 +1022,42 @@ export interface components {
     LinkingRequestConsentIDAuthenticateResponse:
     | components['schemas']['LinkingRequestConsentIDAuthenticateResponseError']
     | components['schemas']['LinkingRequestConsentIDAuthenticateResponseSuccess'];
+    /**
+     * An object sent in a `PUT /consents/{ID}` request.
+     * Based on https://w3c.github.io/webauthn/#iface-pkcredential
+     */
+    PublicKeyCredential: {
+      /** TBD */
+      id: string;
+      response: {
+        /** TBD */
+        clientDataJSON: string;
+      };
+    };
+    /** POST /linking/request-consent/{ID}/pass-credential request object */
+    LinkingRequestConsentIDPassCredentialRequest: {
+      credential: components['schemas']['PublicKeyCredential'];
+    };
+    /** State of post linking request consent pass credential */
+    LinkingRequestConsentIDPassCredentialState: 'errored' | 'accountsLinked';
+    LinkingRequestConsentIDPassCredentialResponseError: {
+      errorInformation: components['schemas']['ErrorInformation'];
+      currentState: components['schemas']['LinkingRequestConsentIDPassCredentialState'];
+    };
+    /**
+     * The status of the Consent.
+     * - "VERIFIED" - The Consent is valid and verified.
+     */
+    ConsentStatusTypeVerified: 'VERIFIED';
+    LinkingRequestConsentIDPassCredentialResponseSuccess: {
+      credential: {
+        status: components['schemas']['ConsentStatusTypeVerified'];
+      };
+      currentState: components['schemas']['LinkingRequestConsentIDPassCredentialState'];
+    };
+    LinkingRequestConsentIDPassCredentialResponse:
+    | components['schemas']['LinkingRequestConsentIDPassCredentialResponseError']
+    | components['schemas']['LinkingRequestConsentIDPassCredentialResponseSuccess'];
   };
   responses: {
     /** OK */
@@ -1140,6 +1204,12 @@ export interface components {
     LinkingRequestConsentIDAuthenticateResponse: {
       content: {
         'application/json': components['schemas']['LinkingRequestConsentIDAuthenticateResponse'];
+      };
+    };
+    /** Linking request consent pass credential response */
+    LinkingRequestConsentIDPassCredentialResponse: {
+      content: {
+        'application/json': components['schemas']['LinkingRequestConsentIDPassCredentialResponse'];
       };
     };
   };

@@ -470,6 +470,221 @@ paths:
           $ref: '#/components/responses/501'
         '503':
           $ref: '#/components/responses/503'
+  '/consents/{ID}':
+    parameters:
+      - $ref: '#/components/parameters/ID'
+      - $ref: '#/components/parameters/Content-Type'
+      - $ref: '#/components/parameters/Date'
+      - $ref: '#/components/parameters/X-Forwarded-For'
+      - $ref: '#/components/parameters/FSPIOP-Source'
+      - $ref: '#/components/parameters/FSPIOP-Destination'
+      - $ref: '#/components/parameters/FSPIOP-Encryption'
+      - $ref: '#/components/parameters/FSPIOP-Signature'
+      - $ref: '#/components/parameters/FSPIOP-URI'
+      - $ref: '#/components/parameters/FSPIOP-HTTP-Method'
+    get:
+      description: >
+        The HTTP request `GET /consents/{ID}` is used to get information
+        regarding a consent object created or requested earlier. The `{ID}` in
+        the URI should contain the `{ID}` that was used in the `POST /consents`.
+        summary: GetConsent
+      tags:
+        - consents
+      operationId: GetConsent
+      summary: GetConsent
+      parameters:
+        - $ref: '#/components/parameters/Accept'
+      responses:
+        '202':
+          $ref: '#/components/responses/202'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '405':
+          $ref: '#/components/responses/405'
+        '406':
+          $ref: '#/components/responses/406'
+        '501':
+          $ref: '#/components/responses/501'
+        '503':
+          $ref: '#/components/responses/503'
+    patch:
+      description: >
+        The HTTP request `PATCH /consents/{ID}` is used
+
+
+        - In account linking in the Credential Registration phase. Used by a
+        DFSP
+          to notify a PISP a credential has been verified and registered with an
+          Auth service.
+
+        - In account unlinking by a hub hosted auth service and by DFSPs
+          in non-hub hosted scenarios to notify participants of a consent being revoked.
+
+          Called by a `auth-service` to notify a PISP and DFSP of consent status in hub hosted scenario.
+          Called by a `DFSP` to notify a PISP of consent status in non-hub hosted scenario.
+      tags:
+        - consents
+        - sampled
+      operationId: PatchConsentByID
+      summary: PatchConsentByID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/ConsentsIDPatchResponseVerified'
+                - $ref: '#/components/schemas/ConsentsIDPatchResponseRevoked'
+      parameters:
+        - $ref: '#/components/parameters/Content-Length'
+      responses:
+        '200':
+          $ref: '#/components/responses/200'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '405':
+          $ref: '#/components/responses/405'
+        '406':
+          $ref: '#/components/responses/406'
+        '501':
+          $ref: '#/components/responses/501'
+        '503':
+          $ref: '#/components/responses/503'
+    put:
+      description: >
+        The HTTP request `PUT /consents/{ID}` is used by the PISP and Auth
+        Service.
+
+
+        - Called by a `PISP` to after signing a challenge. Sent to an DFSP for
+        verification.
+
+        - Called by a `auth-service` to notify a DFSP that a credential has been
+        verified and registered.
+      tags:
+        - consents
+        - sampled
+      operationId: PutConsentByID
+      summary: PutConsentByID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/ConsentsIDPutResponseSigned'
+                - $ref: '#/components/schemas/ConsentsIDPutResponseVerified'
+      parameters:
+        - $ref: '#/components/parameters/Content-Length'
+      responses:
+        '200':
+          $ref: '#/components/responses/200'
+        '202':
+          $ref: '#/components/responses/202'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '405':
+          $ref: '#/components/responses/405'
+        '406':
+          $ref: '#/components/responses/406'
+        '501':
+          $ref: '#/components/responses/501'
+        '503':
+          $ref: '#/components/responses/503'
+    delete:
+      description: >
+        The HTTP request `DELETE /consents/{ID}` is used to mark as deleted a
+        previously created consent.
+
+
+        - Called by a PISP when a user wants to remove their consent.
+      operationId: DeleteConsentByID
+      tags:
+        - consents
+      responses:
+        '202':
+          $ref: '#/components/responses/202'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '405':
+          $ref: '#/components/responses/405'
+        '406':
+          $ref: '#/components/responses/406'
+        '501':
+          $ref: '#/components/responses/501'
+        '503':
+          $ref: '#/components/responses/503'
+  '/consents/{ID}/error':
+    put:
+      tags:
+        - consents
+      operationId: NotifyErrorConsents
+      summary: NotifyErrorConsents
+      description: >
+        DFSP responds to the PISP if something went wrong with validating or
+        storing consent.
+      parameters:
+        - $ref: '#/components/parameters/ID'
+        - $ref: '#/components/parameters/Content-Length'
+        - $ref: '#/components/parameters/Content-Type'
+        - $ref: '#/components/parameters/Date'
+        - $ref: '#/components/parameters/X-Forwarded-For'
+        - $ref: '#/components/parameters/FSPIOP-Source'
+        - $ref: '#/components/parameters/FSPIOP-Destination'
+        - $ref: '#/components/parameters/FSPIOP-Encryption'
+        - $ref: '#/components/parameters/FSPIOP-Signature'
+        - $ref: '#/components/parameters/FSPIOP-URI'
+        - $ref: '#/components/parameters/FSPIOP-HTTP-Method'
+      requestBody:
+        description: Error information returned.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ErrorInformationObject'
+      responses:
+        '200':
+          $ref: '#/components/responses/200'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '405':
+          $ref: '#/components/responses/405'
+        '406':
+          $ref: '#/components/responses/406'
+        '501':
+          $ref: '#/components/responses/501'
+        '503':
+          $ref: '#/components/responses/503'
   /health:
     get:
       tags:
@@ -524,6 +739,225 @@ paths:
       operationId: MetricsGet
       summary: Prometheus metrics endpoint
       description: The HTTP request GET /metrics is used to return metrics for the API.
+  '/participants/{Type}/{ID}':
+    parameters:
+      - $ref: '#/components/parameters/Type'
+      - $ref: '#/components/parameters/ID'
+      - $ref: '#/components/parameters/Content-Type'
+      - $ref: '#/components/parameters/Date'
+      - $ref: '#/components/parameters/X-Forwarded-For'
+      - $ref: '#/components/parameters/FSPIOP-Source'
+      - $ref: '#/components/parameters/FSPIOP-Destination'
+      - $ref: '#/components/parameters/FSPIOP-Encryption'
+      - $ref: '#/components/parameters/FSPIOP-Signature'
+      - $ref: '#/components/parameters/FSPIOP-URI'
+      - $ref: '#/components/parameters/FSPIOP-HTTP-Method'
+    post:
+      description: >-
+        The HTTP request `POST /participants/{Type}/{ID}` (or `POST
+        /participants/{Type}/{ID}/{SubId}`) is used to create information in the
+        server regarding the provided identity, defined by `{Type}`, `{ID}`, and
+        optionally `{SubId}` (for example, `POST /participants/MSISDN/123456789`
+        or `POST /participants/BUSINESS/shoecompany/employee1`). An
+        ExtensionList element has been added to this reqeust in version v1.1
+      summary: Create participant information
+      tags:
+        - participants
+      operationId: ParticipantsByIDAndType
+      parameters:
+        - $ref: '#/components/parameters/Accept'
+        - $ref: '#/components/parameters/Content-Length'
+      requestBody:
+        description: Participant information to be created.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ParticipantsTypeIDSubIDPostRequest'
+      responses:
+        '202':
+          $ref: '#/components/responses/202'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '405':
+          $ref: '#/components/responses/405'
+        '406':
+          $ref: '#/components/responses/406'
+        '501':
+          $ref: '#/components/responses/501'
+        '503':
+          $ref: '#/components/responses/503'
+    get:
+      description: >-
+        The HTTP request `GET /participants/{Type}/{ID}` (or `GET
+        /participants/{Type}/{ID}/{SubId}`) is used to find out in which FSP the
+        requested Party, defined by `{Type}`, `{ID}` and optionally `{SubId}`,
+        is located (for example, `GET /participants/MSISDN/123456789`, or `GET
+        /participants/BUSINESS/shoecompany/employee1`). This HTTP request should
+        support a query string for filtering of currency. To use filtering of
+        currency, the HTTP request `GET /participants/{Type}/{ID}?currency=XYZ`
+        should be used, where `XYZ` is the requested currency.
+      summary: Look up participant information
+      tags:
+        - participants
+      operationId: ParticipantsByTypeAndID
+      parameters:
+        - $ref: '#/components/parameters/Accept'
+      responses:
+        '202':
+          $ref: '#/components/responses/202'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '405':
+          $ref: '#/components/responses/405'
+        '406':
+          $ref: '#/components/responses/406'
+        '501':
+          $ref: '#/components/responses/501'
+        '503':
+          $ref: '#/components/responses/503'
+    put:
+      description: >-
+        The callback `PUT /participants/{Type}/{ID}` (or `PUT
+        /participants/{Type}/{ID}/{SubId}`) is used to inform the client of a
+        successful result of the lookup, creation, or deletion of the FSP
+        information related to the Party. If the FSP information is deleted, the
+        fspId element should be empty; otherwise the element should include the
+        FSP information for the Party.
+      summary: Return participant information
+      tags:
+        - participants
+      operationId: ParticipantsByTypeAndID3
+      parameters:
+        - $ref: '#/components/parameters/Content-Length'
+      requestBody:
+        description: Participant information returned.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ParticipantsTypeIDPutResponse'
+      responses:
+        '200':
+          $ref: '#/components/responses/200'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '405':
+          $ref: '#/components/responses/405'
+        '406':
+          $ref: '#/components/responses/406'
+        '501':
+          $ref: '#/components/responses/501'
+        '503':
+          $ref: '#/components/responses/503'
+    delete:
+      description: >-
+        The HTTP request `DELETE /participants/{Type}/{ID}` (or `DELETE
+        /participants/{Type}/{ID}/{SubId}`) is used to delete information in the
+        server regarding the provided identity, defined by `{Type}` and `{ID}`)
+        (for example, `DELETE /participants/MSISDN/123456789`), and optionally
+        `{SubId}`. This HTTP request should support a query string to delete FSP
+        information regarding a specific currency only. To delete a specific
+        currency only, the HTTP request `DELETE
+        /participants/{Type}/{ID}?currency=XYZ` should be used, where `XYZ` is
+        the requested currency.
+
+
+        **Note:** The Account Lookup System should verify that it is the Party’s
+        current FSP that is deleting the FSP information.
+      summary: Delete participant information
+      tags:
+        - participants
+      operationId: ParticipantsByTypeAndID2
+      parameters:
+        - $ref: '#/components/parameters/Accept'
+      responses:
+        '202':
+          $ref: '#/components/responses/202'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '405':
+          $ref: '#/components/responses/405'
+        '406':
+          $ref: '#/components/responses/406'
+        '501':
+          $ref: '#/components/responses/501'
+        '503':
+          $ref: '#/components/responses/503'
+  '/participants/{Type}/{ID}/error':
+    put:
+      description: >-
+        If the server is unable to find, create or delete the associated FSP of
+        the provided identity, or another processing error occurred, the error
+        callback `PUT /participants/{Type}/{ID}/error` (or `PUT
+        /participants/{Type}/{ID}/{SubId}/error`) is used.
+      summary: Return participant information error
+      tags:
+        - participants
+      operationId: ParticipantsErrorByTypeAndID
+      parameters:
+        - $ref: '#/components/parameters/Type'
+        - $ref: '#/components/parameters/ID'
+        - $ref: '#/components/parameters/Content-Length'
+        - $ref: '#/components/parameters/Content-Type'
+        - $ref: '#/components/parameters/Date'
+        - $ref: '#/components/parameters/X-Forwarded-For'
+        - $ref: '#/components/parameters/FSPIOP-Source'
+        - $ref: '#/components/parameters/FSPIOP-Destination'
+        - $ref: '#/components/parameters/FSPIOP-Encryption'
+        - $ref: '#/components/parameters/FSPIOP-Signature'
+        - $ref: '#/components/parameters/FSPIOP-URI'
+        - $ref: '#/components/parameters/FSPIOP-HTTP-Method'
+      requestBody:
+        description: Details of the error returned.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ErrorInformationObject'
+      responses:
+        '200':
+          $ref: '#/components/responses/200'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '405':
+          $ref: '#/components/responses/405'
+        '406':
+          $ref: '#/components/responses/406'
+        '501':
+          $ref: '#/components/responses/501'
+        '503':
+          $ref: '#/components/responses/503'
   /thirdpartyRequests/transactions:
     parameters:
       - $ref: '#/components/parameters/Accept'
@@ -1149,6 +1583,13 @@ components:
       description: >-
         The `Content-Type` header indicates the specific version of the API used
         to send the payload body.
+    Type:
+      name: Type
+      in: path
+      required: true
+      schema:
+        type: string
+      description: 'The type of the party identifier. For example, `MSISDN`, `PERSONAL_ID`.'
     ServiceType:
       name: ServiceType
       in: path
@@ -2040,6 +2481,215 @@ components:
         - consentId
         - consentRequestId
         - scopes
+    CredentialType:
+      title: CredentialType
+      type: string
+      enum:
+        - FIDO
+      description: |
+        The type of the Credential.
+        - "FIDO" - A FIDO public/private keypair.
+    PublicKeyCredential:
+      title: PublicKeyCredential
+      type: object
+      description: |
+        An object sent in a `PUT /consents/{ID}` request.
+        Based on https://w3c.github.io/webauthn/#iface-pkcredential
+      properties:
+        id:
+          type: string
+          description: TBD
+        response:
+          properties:
+            clientDataJSON:
+              type: string
+              description: TBD
+          required:
+            - clientDataJSON
+      required:
+        - id
+        - response
+    SignedCredential:
+      title: SignedCredential
+      type: object
+      description: >
+        A credential used to allow a user to prove their identity and access
+
+        to an account with a DFSP.
+
+
+        SignedCredential is a special formatting of the credential to allow us
+        to be
+
+        more explicit about the `status` field - it should only ever be PENDING
+        when
+
+        updating a credential.
+      properties:
+        credentialType:
+          $ref: '#/components/schemas/CredentialType'
+        status:
+          type: string
+          enum:
+            - PENDING
+          description: The challenge has signed but not yet verified.
+        payload:
+          $ref: '#/components/schemas/PublicKeyCredential'
+      required:
+        - credentialType
+        - status
+        - payload
+      additionalProperties: false
+    ConsentsIDPutResponseSigned:
+      title: ConsentsIDPutResponseSigned
+      type: object
+      description: >
+        The HTTP request `PUT /consents/{ID}` is used by the PISP to update a
+        Consent with a signed challenge and register a credential.
+
+        Called by a `PISP` to after signing a challenge. Sent to a DFSP for
+        verification.
+      properties:
+        scopes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Scope'
+        credential:
+          $ref: '#/components/schemas/SignedCredential'
+      required:
+        - scopes
+        - credential
+    VerifiedCredential:
+      title: VerifiedCredential
+      type: object
+      description: >
+        A credential used to allow a user to prove their identity and access
+
+        to an account with a DFSP.
+
+
+        VerifiedCredential is a special formatting of the credential to allow us
+        to be
+
+        more explicit about the `status` field - it should only ever be VERIFIED
+        when
+
+        updating a credential.
+      properties:
+        credentialType:
+          $ref: '#/components/schemas/CredentialType'
+        status:
+          type: string
+          enum:
+            - VERIFIED
+          description: 'The Credential is valid, and ready to be used by the PISP.'
+        payload:
+          $ref: '#/components/schemas/PublicKeyCredential'
+      required:
+        - credentialType
+        - status
+        - payload
+      additionalProperties: false
+    ConsentsIDPutResponseVerified:
+      title: ConsentsIDPutResponseVerified
+      type: object
+      description: >
+        The HTTP request `PUT /consents/{ID}` is used by the DFSP or
+        Auth-Service to update a Consent object once it has been Verified.
+
+        Called by a `auth-service` to notify a DFSP that a credential has been
+        verified and registered.
+      properties:
+        scopes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Scope'
+        credential:
+          $ref: '#/components/schemas/VerifiedCredential'
+      required:
+        - scopes
+        - credential
+    ConsentStatusTypeVerified:
+      title: ConsentStatusType
+      type: string
+      enum:
+        - VERIFIED
+      description: |
+        The status of the Consent.
+        - "VERIFIED" - The Consent is valid and verified.
+    ConsentsIDPatchResponseVerified:
+      title: ConsentsIDPatchResponseVerified
+      description: |
+        PATCH /consents/{ID} request object.
+
+        Sent by the DFSP to the PISP when a consent is verified.
+        Used in the "Register Credential" part of the Account linking flow.
+      type: object
+      properties:
+        credential:
+          type: object
+          properties:
+            status:
+              $ref: '#/components/schemas/ConsentStatusTypeVerified'
+          required:
+            - status
+      required:
+        - credential
+    ConsentStatusTypeRevoked:
+      title: ConsentStatusType
+      type: string
+      enum:
+        - REVOKED
+      description: |
+        The status of the Consent.
+        - "REVOKED" - The Consent is no longer valid and has been revoked.
+    ConsentsIDPatchResponseRevoked:
+      title: ConsentsIDPatchResponseRevoked
+      description: |
+        PATCH /consents/{ID} request object.
+
+        Sent to both the PISP and DFSP when a consent is revoked.
+        Used in the "Unlinking" part of the Account Unlinking flow.
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/ConsentStatusTypeRevoked'
+        revokedAt:
+          $ref: '#/components/schemas/DateTime'
+      required:
+        - status
+        - revokedAt
+    FspId:
+      title: FspId
+      type: string
+      minLength: 1
+      maxLength: 32
+      description: FSP identifier.
+    ParticipantsTypeIDPutResponse:
+      title: ParticipantsTypeIDPutResponse
+      type: object
+      description: >-
+        The object sent in the PUT /participants/{Type}/{ID}/{SubId} and
+        /participants/{Type}/{ID} callbacks.
+      properties:
+        fspId:
+          $ref: '#/components/schemas/FspId'
+    ParticipantsTypeIDSubIDPostRequest:
+      title: ParticipantsTypeIDSubIDPostRequest
+      type: object
+      description: >-
+        The object sent in the POST /participants/{Type}/{ID}/{SubId} and
+        /participants/{Type}/{ID} requests. An additional optional ExtensionList
+        element has been added as part of v1.1 changes.
+      properties:
+        fspId:
+          $ref: '#/components/schemas/FspId'
+        currency:
+          $ref: '#/components/schemas/Currency'
+        extensionList:
+          $ref: '#/components/schemas/ExtensionList'
+      required:
+        - fspId
     Account:
       title: Account
       type: object
@@ -2198,12 +2848,6 @@ components:
       description: >-
         Either a sub-identifier of a PartyIdentifier, or a sub-type of the
         PartyIdType, normally a PersonalIdentifierType.
-    FspId:
-      title: FspId
-      type: string
-      minLength: 1
-      maxLength: 32
-      description: FSP identifier.
     PartyIdInfo:
       title: PartyIdInfo
       type: object
