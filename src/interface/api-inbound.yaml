@@ -1152,7 +1152,7 @@ paths:
       summary: GetThirdpartyTransactionRequests
       description: >
         The HTTP request `GET /thirdpartyRequests/transactions/{ID}` is used to
-        request the
+        request the 
 
         retrieval of a third party transaction request.
       responses:
@@ -1997,6 +1997,21 @@ components:
         - ZAR
         - ZMW
         - ZWD
+    Account:
+      title: Account
+      type: object
+      description: Data model for the complex type Account.
+      properties:
+        accountNickname:
+          $ref: '#/components/schemas/Name'
+        id:
+          $ref: '#/components/schemas/AccountId'
+        currency:
+          $ref: '#/components/schemas/Currency'
+      required:
+        - accountNickname
+        - id
+        - currency
     AccountsIDPutResponse:
       title: AccountsIDPutResponse
       type: object
@@ -2005,20 +2020,7 @@ components:
         accounts:
           type: array
           items:
-            type: object
-            description: |
-              The object sent in a `PUT /accounts/{ID}` request.
-            properties:
-              accountNickname:
-                $ref: '#/components/schemas/Name'
-              id:
-                $ref: '#/components/schemas/AccountId'
-              currency:
-                $ref: '#/components/schemas/Currency'
-            required:
-              - accountNickname
-              - id
-              - currency
+            $ref: '#/components/schemas/Account'
       required:
         - accounts
     ErrorInformationObject:
@@ -2691,19 +2693,6 @@ components:
           $ref: '#/components/schemas/ExtensionList'
       required:
         - fspId
-    Account:
-      title: Account
-      type: object
-      description: Data model for the complex type Account.
-      properties:
-        accountNickname:
-          $ref: '#/components/schemas/Name'
-        id:
-          $ref: '#/components/schemas/AccountId'
-        currency:
-          $ref: '#/components/schemas/Currency'
-      required:
-        - currency
     AccountList:
       title: AccountList
       type: object
@@ -2849,12 +2838,6 @@ components:
       description: >-
         Either a sub-identifier of a PartyIdentifier, or a sub-type of the
         PartyIdType, normally a PersonalIdentifierType.
-    FspId:
-      title: FspId
-      type: string
-      minLength: 1
-      maxLength: 32
-      description: FSP identifier.
     PartyIdInfo:
       title: PartyIdInfo
       type: object

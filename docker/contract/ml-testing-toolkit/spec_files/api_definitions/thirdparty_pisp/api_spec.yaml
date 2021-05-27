@@ -1521,6 +1521,8 @@ components:
         currency:
           $ref: '#/components/schemas/Currency'
       required:
+        - accountNickname
+        - id
         - currency
     AccountList:
       title: AccountList
@@ -2449,6 +2451,7 @@ components:
           type: string
           description: TBD
         response:
+          type: object
           properties:
             clientDataJSON:
               type: string
@@ -2577,20 +2580,7 @@ components:
         accounts:
           type: array
           items:
-            type: object
-            description: |
-              The object sent in a `PUT /accounts/{ID}` request.
-            properties:
-              accountNickname:
-                $ref: '#/components/schemas/Name'
-              id:
-                $ref: '#/components/schemas/AccountId'
-              currency:
-                $ref: '#/components/schemas/Currency'
-            required:
-              - accountNickname
-              - id
-              - currency
+            $ref: '#/components/schemas/Account'
       required:
         - accounts
     ServicesServiceTypePutResponse:

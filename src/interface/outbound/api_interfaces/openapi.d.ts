@@ -689,8 +689,8 @@ export interface components {
     AccountId: string;
     /** Data model for the complex type Account. */
     Account: {
-      accountNickname?: components['schemas']['Name'];
-      id?: components['schemas']['AccountId'];
+      accountNickname: components['schemas']['Name'];
+      id: components['schemas']['AccountId'];
       currency: components['schemas']['Currency'];
     };
     /**
@@ -903,11 +903,7 @@ export interface components {
     | components['schemas']['LinkingProvidersResponseSuccess'];
     /** The object sent in a `PUT /accounts/{ID}` request. */
     AccountsIDPutResponse: {
-      accounts: {
-        accountNickname: components['schemas']['Name'];
-        id: components['schemas']['AccountId'];
-        currency: components['schemas']['Currency'];
-      }[];
+      accounts: components['schemas']['Account'][];
     };
     /** The object sent in a `POST /linking/request-consent` request. */
     LinkingRequestConsentPostRequest: {

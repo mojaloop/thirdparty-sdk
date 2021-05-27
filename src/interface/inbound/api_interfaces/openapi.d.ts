@@ -1253,13 +1253,15 @@ export interface components {
       | "ZAR"
       | "ZMW"
       | "ZWD";
+    /** Data model for the complex type Account. */
+    Account: {
+      accountNickname: components["schemas"]["Name"];
+      id: components["schemas"]["AccountId"];
+      currency: components["schemas"]["Currency"];
+    };
     /** The object sent in a `PUT /accounts/{ID}` request. */
     AccountsIDPutResponse: {
-      accounts: {
-        accountNickname: components["schemas"]["Name"];
-        id: components["schemas"]["AccountId"];
-        currency: components["schemas"]["Currency"];
-      }[];
+      accounts: components["schemas"]["Account"][];
     };
     /** Data model for the complex type object that contains ErrorInformation. */
     ErrorInformationObject: {
@@ -1535,12 +1537,6 @@ export interface components {
       fspId: components["schemas"]["FspId"];
       currency?: components["schemas"]["Currency"];
       extensionList?: components["schemas"]["ExtensionList"];
-    };
-    /** Data model for the complex type Account. */
-    Account: {
-      accountNickname?: components["schemas"]["Name"];
-      id?: components["schemas"]["AccountId"];
-      currency: components["schemas"]["Currency"];
     };
     /**
      * Data model for the complex type AccountList.

@@ -546,7 +546,7 @@ components:
           $ref: '#/components/headers/Content-Type'
     AuthorizationsResponse:
       description: >
-        response body of POST/authorizations
+        response body of POST/authorizations 
 
         derived from AuthorizationsIDPutResponse by Inbound Service via Pub/Sub
         channel
@@ -627,6 +627,12 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/LinkingRequestConsentIDAuthenticateResponse'
+    LinkingRequestConsentIDPassCredentialResponse:
+      description: Linking request consent pass credential response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/LinkingRequestConsentIDPassCredentialResponse'
   headers:
     Content-Length:
       required: false
@@ -1451,6 +1457,8 @@ components:
         currency:
           $ref: '#/components/schemas/Currency'
       required:
+        - accountNickname
+        - id
         - currency
     AccountList:
       title: AccountList
@@ -1974,20 +1982,7 @@ components:
         accounts:
           type: array
           items:
-            type: object
-            description: |
-              The object sent in a `PUT /accounts/{ID}` request.
-            properties:
-              accountNickname:
-                $ref: '#/components/schemas/Name'
-              id:
-                $ref: '#/components/schemas/AccountId'
-              currency:
-                $ref: '#/components/schemas/Currency'
-            required:
-              - accountNickname
-              - id
-              - currency
+            $ref: '#/components/schemas/Account'
       required:
         - accounts
     LinkingRequestConsentPostRequest:
