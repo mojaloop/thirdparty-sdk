@@ -1280,7 +1280,7 @@ paths:
         used.
 
         The `{ID}` in the URI should contain the `transactionRequestId` that was
-        used for the creation of
+        used for the creation of 
 
         the thirdparty transaction request.
       parameters:
@@ -2849,6 +2849,12 @@ components:
       description: >-
         Either a sub-identifier of a PartyIdentifier, or a sub-type of the
         PartyIdType, normally a PersonalIdentifierType.
+    FspId:
+      title: FspId
+      type: string
+      minLength: 1
+      maxLength: 32
+      description: FSP identifier.
     PartyIdInfo:
       title: PartyIdInfo
       type: object

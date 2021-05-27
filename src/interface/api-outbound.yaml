@@ -599,7 +599,7 @@ components:
             $ref: '#/components/schemas/LinkingProvidersResponse'
     AccountsByUserIdResponse:
       description: >
-        response body of GET /accounts/{ID}
+        response body of GET /accounts/{ID} 
 
         derived from UpdateAccountsByUserId by Inbound Service via Pub/Sub
         channel
@@ -627,12 +627,6 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/LinkingRequestConsentIDAuthenticateResponse'
-    LinkingRequestConsentIDPassCredentialResponse:
-      description: Linking request consent pass credential response
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/LinkingRequestConsentIDPassCredentialResponse'
   headers:
     Content-Length:
       required: false
