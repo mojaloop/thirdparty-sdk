@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+### [11.37.5](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.37.4...v11.37.5) (2021-05-27)
+
+
+### Maintenance
+
+* add interface and types for credential registration phase ([#99](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/99)) ([9fb5071](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/9fb50712b759d53bba00be6b901df2ae9a5e7cbc))
+
 ### [11.37.4](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.37.3...v11.37.4) (2021-05-26)
 
 
