@@ -1971,6 +1971,10 @@ components:
           type: string
         consentRequestId:
           $ref: '#/components/schemas/CorrelationId'
+        accounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Account'
         userId:
           type: string
           description: ID used to associate request with GET /accounts request.

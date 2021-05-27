@@ -898,6 +898,7 @@ export interface components {
     LinkingRequestConsentPostRequest: {
       toParticipantId: string;
       consentRequestId: components['schemas']['CorrelationId'];
+      accounts: components['schemas']['Account'][];
       /** ID used to associate request with GET /accounts request. */
       userId: string;
       /** The callback uri that the user will be redirected to after completing the WEB auth channel. */
