@@ -408,6 +408,50 @@ paths:
           $ref: '#/components/responses/501'
         '503':
           $ref: '#/components/responses/503'
+  '/linking/request-consent/{ID}/pass-credential':
+    post:
+      operationId: PostLinkingRequestConsentIDPassCredential
+      summary: 'Outbound POST /linking/request-consent/{ID}/pass-credential endpoint'
+      description: >
+        Used in the credential registration phase of account linking.
+
+        Used by the PISP to pass an credential on behalf of the user to the
+        DFSP.
+      tags:
+        - linking
+      parameters:
+        - name: ID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/CorrelationId'
+      requestBody:
+        description: Linking request consent pass credential request details
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: >-
+                #/components/schemas/LinkingRequestConsentIDPassCredentialRequest
+      responses:
+        '200':
+          $ref: '#/components/responses/LinkingRequestConsentIDPassCredentialResponse'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '405':
+          $ref: '#/components/responses/405'
+        '406':
+          $ref: '#/components/responses/406'
+        '501':
+          $ref: '#/components/responses/501'
+        '503':
+          $ref: '#/components/responses/503'
 components:
   responses:
     '200':
@@ -583,6 +627,12 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/LinkingRequestConsentIDAuthenticateResponse'
+    LinkingRequestConsentIDPassCredentialResponse:
+      description: Linking request consent pass credential response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/LinkingRequestConsentIDPassCredentialResponse'
   headers:
     Content-Length:
       required: false
@@ -2214,6 +2264,84 @@ components:
             #/components/schemas/LinkingRequestConsentIDAuthenticateResponseError
         - $ref: >-
             #/components/schemas/LinkingRequestConsentIDAuthenticateResponseSuccess
+    PublicKeyCredential:
+      title: PublicKeyCredential
+      type: object
+      description: |
+        An object sent in a `PUT /consents/{ID}` request.
+        Based on https://w3c.github.io/webauthn/#iface-pkcredential
+      properties:
+        id:
+          type: string
+          description: TBD
+        response:
+          properties:
+            clientDataJSON:
+              type: string
+              description: TBD
+          required:
+            - clientDataJSON
+      required:
+        - id
+        - response
+    LinkingRequestConsentIDPassCredentialRequest:
+      title: LinkingRequestConsentIDPassCredentialRequest
+      description: 'POST /linking/request-consent/{ID}/pass-credential request object'
+      type: object
+      properties:
+        credential:
+          $ref: '#/components/schemas/PublicKeyCredential'
+      required:
+        - credential
+      additionalProperties: false
+    LinkingRequestConsentIDPassCredentialState:
+      title: LinkingRequestConsentIDPassCredentialState
+      description: State of post linking request consent pass credential
+      type: string
+      enum:
+        - errored
+        - accountsLinked
+    LinkingRequestConsentIDPassCredentialResponseError:
+      title: LinkingRequestConsentIDPassCredentialResponseError
+      type: object
+      properties:
+        errorInformation:
+          $ref: '#/components/schemas/ErrorInformation'
+        currentState:
+          $ref: '#/components/schemas/LinkingRequestConsentIDPassCredentialState'
+      required:
+        - errorInformation
+        - currentState
+    ConsentStatusTypeVerified:
+      title: ConsentStatusType
+      type: string
+      enum:
+        - VERIFIED
+      description: |
+        The status of the Consent.
+        - "VERIFIED" - The Consent is valid and verified.
+    LinkingRequestConsentIDPassCredentialResponseSuccess:
+      title: LinkingRequestConsentIDPassCredentialResponseSuccess
+      type: object
+      properties:
+        credential:
+          type: object
+          properties:
+            status:
+              $ref: '#/components/schemas/ConsentStatusTypeVerified'
+          required:
+            - status
+        currentState:
+          $ref: '#/components/schemas/LinkingRequestConsentIDPassCredentialState'
+      required:
+        - credential
+        - currentState
+    LinkingRequestConsentIDPassCredentialResponse:
+      oneOf:
+        - $ref: >-
+            #/components/schemas/LinkingRequestConsentIDPassCredentialResponseError
+        - $ref: >-
+            #/components/schemas/LinkingRequestConsentIDPassCredentialResponseSuccess
   parameters:
     ID:
       name: ID

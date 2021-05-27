@@ -79,11 +79,62 @@ export interface paths {
   "/consents": {
     post: operations["PostConsents"];
   };
+  "/consents/{ID}": {
+    get: operations["GetConsent"];
+    patch: operations["PatchConsentByID"];
+    put: operations["PutConsentByID"];
+    delete: operations["DeleteConsentByID"];
+    parameters: {
+      path: {
+        ID: components["parameters"]["ID"];
+      };
+      header: {
+        "Content-Type": components["parameters"]["Content-Type"];
+        Date: components["parameters"]["Date"];
+        "X-Forwarded-For"?: components["parameters"]["X-Forwarded-For"];
+        "FSPIOP-Source": components["parameters"]["FSPIOP-Source"];
+        "FSPIOP-Destination"?: components["parameters"]["FSPIOP-Destination"];
+        "FSPIOP-Encryption"?: components["parameters"]["FSPIOP-Encryption"];
+        "FSPIOP-Signature"?: components["parameters"]["FSPIOP-Signature"];
+        "FSPIOP-URI"?: components["parameters"]["FSPIOP-URI"];
+        "FSPIOP-HTTP-Method"?: components["parameters"]["FSPIOP-HTTP-Method"];
+      };
+    };
+  };
+  "/consents/{ID}/error": {
+    put: operations["NotifyErrorConsents"];
+  };
   "/health": {
     get: operations["HealthGet"];
   };
   "/metrics": {
     get: operations["MetricsGet"];
+  };
+  "/participants/{Type}/{ID}": {
+    post: operations["ParticipantsByIDAndType"];
+    get: operations["ParticipantsByTypeAndID"];
+    put: operations["ParticipantsByTypeAndID3"];
+    delete: operations["ParticipantsByTypeAndID2"];
+    parameters: {
+      path: {
+        Type: components["parameters"]["Type"];
+        ID: components["parameters"]["ID"];
+      };
+      header: {
+        "Content-Type": components["parameters"]["Content-Type"];
+        Date: components["parameters"]["Date"];
+        "X-Forwarded-For"?: components["parameters"]["X-Forwarded-For"];
+        "FSPIOP-Source": components["parameters"]["FSPIOP-Source"];
+        "FSPIOP-Destination"?: components["parameters"]["FSPIOP-Destination"];
+        "FSPIOP-Encryption"?: components["parameters"]["FSPIOP-Encryption"];
+        "FSPIOP-Signature"?: components["parameters"]["FSPIOP-Signature"];
+        "FSPIOP-URI"?: components["parameters"]["FSPIOP-URI"];
+        "FSPIOP-HTTP-Method"?: components["parameters"]["FSPIOP-HTTP-Method"];
+      };
+    };
+  };
+  "/participants/{Type}/{ID}/error": {
+    put: operations["ParticipantsErrorByTypeAndID"];
   };
   "/thirdpartyRequests/transactions": {
     post: operations["CreateThirdpartyTransactionRequests"];
@@ -431,6 +482,143 @@ export interface operations {
       503: components["responses"]["503"];
     };
   };
+  /** The HTTP request `GET /consents/{ID}` is used to get information regarding a consent object created or requested earlier. The `{ID}` in the URI should contain the `{ID}` that was used in the `POST /consents`. summary: GetConsent */
+  GetConsent: {
+    parameters: {
+      header: {
+        Accept: components["parameters"]["Accept"];
+      };
+    };
+    responses: {
+      202: components["responses"]["202"];
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      405: components["responses"]["405"];
+      406: components["responses"]["406"];
+      501: components["responses"]["501"];
+      503: components["responses"]["503"];
+    };
+  };
+  /**
+   * The HTTP request `PATCH /consents/{ID}` is used
+   *
+   * - In account linking in the Credential Registration phase. Used by a DFSP
+   *   to notify a PISP a credential has been verified and registered with an
+   *   Auth service.
+   *
+   * - In account unlinking by a hub hosted auth service and by DFSPs
+   *   in non-hub hosted scenarios to notify participants of a consent being revoked.
+   *
+   *   Called by a `auth-service` to notify a PISP and DFSP of consent status in hub hosted scenario.
+   *   Called by a `DFSP` to notify a PISP of consent status in non-hub hosted scenario.
+   */
+  PatchConsentByID: {
+    parameters: {
+      header: {
+        "Content-Length"?: components["parameters"]["Content-Length"];
+      };
+    };
+    requestBody: {
+      "application/json":
+        | components["schemas"]["ConsentsIDPatchResponseVerified"]
+        | components["schemas"]["ConsentsIDPatchResponseRevoked"];
+    };
+    responses: {
+      200: components["responses"]["200"];
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      405: components["responses"]["405"];
+      406: components["responses"]["406"];
+      501: components["responses"]["501"];
+      503: components["responses"]["503"];
+    };
+  };
+  /**
+   * The HTTP request `PUT /consents/{ID}` is used by the PISP and Auth Service.
+   *
+   * - Called by a `PISP` to after signing a challenge. Sent to an DFSP for verification.
+   * - Called by a `auth-service` to notify a DFSP that a credential has been verified and registered.
+   */
+  PutConsentByID: {
+    parameters: {
+      header: {
+        "Content-Length"?: components["parameters"]["Content-Length"];
+      };
+    };
+    requestBody: {
+      "application/json":
+        | components["schemas"]["ConsentsIDPutResponseSigned"]
+        | components["schemas"]["ConsentsIDPutResponseVerified"];
+    };
+    responses: {
+      200: components["responses"]["200"];
+      202: components["responses"]["202"];
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      405: components["responses"]["405"];
+      406: components["responses"]["406"];
+      501: components["responses"]["501"];
+      503: components["responses"]["503"];
+    };
+  };
+  /**
+   * The HTTP request `DELETE /consents/{ID}` is used to mark as deleted a previously created consent.
+   *
+   * - Called by a PISP when a user wants to remove their consent.
+   */
+  DeleteConsentByID: {
+    responses: {
+      202: components["responses"]["202"];
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      405: components["responses"]["405"];
+      406: components["responses"]["406"];
+      501: components["responses"]["501"];
+      503: components["responses"]["503"];
+    };
+  };
+  /** DFSP responds to the PISP if something went wrong with validating or storing consent. */
+  NotifyErrorConsents: {
+    parameters: {
+      path: {
+        ID: components["parameters"]["ID"];
+      };
+      header: {
+        "Content-Length"?: components["parameters"]["Content-Length"];
+        "Content-Type": components["parameters"]["Content-Type"];
+        Date: components["parameters"]["Date"];
+        "X-Forwarded-For"?: components["parameters"]["X-Forwarded-For"];
+        "FSPIOP-Source": components["parameters"]["FSPIOP-Source"];
+        "FSPIOP-Destination"?: components["parameters"]["FSPIOP-Destination"];
+        "FSPIOP-Encryption"?: components["parameters"]["FSPIOP-Encryption"];
+        "FSPIOP-Signature"?: components["parameters"]["FSPIOP-Signature"];
+        "FSPIOP-URI"?: components["parameters"]["FSPIOP-URI"];
+        "FSPIOP-HTTP-Method"?: components["parameters"]["FSPIOP-HTTP-Method"];
+      };
+    };
+    requestBody: {
+      "application/json": components["schemas"]["ErrorInformationObject"];
+    };
+    responses: {
+      200: components["responses"]["200"];
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      405: components["responses"]["405"];
+      406: components["responses"]["406"];
+      501: components["responses"]["501"];
+      503: components["responses"]["503"];
+    };
+  };
   /** The HTTP request GET /health is used to return the current status of the API. */
   HealthGet: {
     responses: {
@@ -447,6 +635,128 @@ export interface operations {
   };
   /** The HTTP request GET /metrics is used to return metrics for the API. */
   MetricsGet: {
+    responses: {
+      200: components["responses"]["200"];
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      405: components["responses"]["405"];
+      406: components["responses"]["406"];
+      501: components["responses"]["501"];
+      503: components["responses"]["503"];
+    };
+  };
+  /** The HTTP request `POST /participants/{Type}/{ID}` (or `POST /participants/{Type}/{ID}/{SubId}`) is used to create information in the server regarding the provided identity, defined by `{Type}`, `{ID}`, and optionally `{SubId}` (for example, `POST /participants/MSISDN/123456789` or `POST /participants/BUSINESS/shoecompany/employee1`). An ExtensionList element has been added to this reqeust in version v1.1 */
+  ParticipantsByIDAndType: {
+    parameters: {
+      header: {
+        Accept: components["parameters"]["Accept"];
+        "Content-Length"?: components["parameters"]["Content-Length"];
+      };
+    };
+    requestBody: {
+      "application/json": components["schemas"]["ParticipantsTypeIDSubIDPostRequest"];
+    };
+    responses: {
+      202: components["responses"]["202"];
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      405: components["responses"]["405"];
+      406: components["responses"]["406"];
+      501: components["responses"]["501"];
+      503: components["responses"]["503"];
+    };
+  };
+  /** The HTTP request `GET /participants/{Type}/{ID}` (or `GET /participants/{Type}/{ID}/{SubId}`) is used to find out in which FSP the requested Party, defined by `{Type}`, `{ID}` and optionally `{SubId}`, is located (for example, `GET /participants/MSISDN/123456789`, or `GET /participants/BUSINESS/shoecompany/employee1`). This HTTP request should support a query string for filtering of currency. To use filtering of currency, the HTTP request `GET /participants/{Type}/{ID}?currency=XYZ` should be used, where `XYZ` is the requested currency. */
+  ParticipantsByTypeAndID: {
+    parameters: {
+      header: {
+        Accept: components["parameters"]["Accept"];
+      };
+    };
+    responses: {
+      202: components["responses"]["202"];
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      405: components["responses"]["405"];
+      406: components["responses"]["406"];
+      501: components["responses"]["501"];
+      503: components["responses"]["503"];
+    };
+  };
+  /** The callback `PUT /participants/{Type}/{ID}` (or `PUT /participants/{Type}/{ID}/{SubId}`) is used to inform the client of a successful result of the lookup, creation, or deletion of the FSP information related to the Party. If the FSP information is deleted, the fspId element should be empty; otherwise the element should include the FSP information for the Party. */
+  ParticipantsByTypeAndID3: {
+    parameters: {
+      header: {
+        "Content-Length"?: components["parameters"]["Content-Length"];
+      };
+    };
+    requestBody: {
+      "application/json": components["schemas"]["ParticipantsTypeIDPutResponse"];
+    };
+    responses: {
+      200: components["responses"]["200"];
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      405: components["responses"]["405"];
+      406: components["responses"]["406"];
+      501: components["responses"]["501"];
+      503: components["responses"]["503"];
+    };
+  };
+  /**
+   * The HTTP request `DELETE /participants/{Type}/{ID}` (or `DELETE /participants/{Type}/{ID}/{SubId}`) is used to delete information in the server regarding the provided identity, defined by `{Type}` and `{ID}`) (for example, `DELETE /participants/MSISDN/123456789`), and optionally `{SubId}`. This HTTP request should support a query string to delete FSP information regarding a specific currency only. To delete a specific currency only, the HTTP request `DELETE /participants/{Type}/{ID}?currency=XYZ` should be used, where `XYZ` is the requested currency.
+   *
+   * **Note:** The Account Lookup System should verify that it is the Party’s current FSP that is deleting the FSP information.
+   */
+  ParticipantsByTypeAndID2: {
+    parameters: {
+      header: {
+        Accept: components["parameters"]["Accept"];
+      };
+    };
+    responses: {
+      202: components["responses"]["202"];
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      405: components["responses"]["405"];
+      406: components["responses"]["406"];
+      501: components["responses"]["501"];
+      503: components["responses"]["503"];
+    };
+  };
+  /** If the server is unable to find, create or delete the associated FSP of the provided identity, or another processing error occurred, the error callback `PUT /participants/{Type}/{ID}/error` (or `PUT /participants/{Type}/{ID}/{SubId}/error`) is used. */
+  ParticipantsErrorByTypeAndID: {
+    parameters: {
+      path: {
+        Type: components["parameters"]["Type"];
+        ID: components["parameters"]["ID"];
+      };
+      header: {
+        "Content-Length"?: components["parameters"]["Content-Length"];
+        "Content-Type": components["parameters"]["Content-Type"];
+        Date: components["parameters"]["Date"];
+        "X-Forwarded-For"?: components["parameters"]["X-Forwarded-For"];
+        "FSPIOP-Source": components["parameters"]["FSPIOP-Source"];
+        "FSPIOP-Destination"?: components["parameters"]["FSPIOP-Destination"];
+        "FSPIOP-Encryption"?: components["parameters"]["FSPIOP-Encryption"];
+        "FSPIOP-Signature"?: components["parameters"]["FSPIOP-Signature"];
+        "FSPIOP-URI"?: components["parameters"]["FSPIOP-URI"];
+        "FSPIOP-HTTP-Method"?: components["parameters"]["FSPIOP-HTTP-Method"];
+      };
+    };
+    requestBody: {
+      "application/json": components["schemas"]["ErrorInformationObject"];
+    };
     responses: {
       200: components["responses"]["200"];
       400: components["responses"]["400"];
@@ -731,6 +1041,8 @@ export interface components {
     "Content-Length": number;
     /** The `Content-Type` header indicates the specific version of the API used to send the payload body. */
     "Content-Type": string;
+    /** The type of the party identifier. For example, `MSISDN`, `PERSONAL_ID`. */
+    Type: string;
     /** The type of the service identifier. For example, `THIRD_PARTY_DFSP` */
     ServiceType: string;
   };
@@ -1120,6 +1432,110 @@ export interface components {
       consentRequestId: components["schemas"]["CorrelationId"];
       scopes: components["schemas"]["Scope"][];
     };
+    /**
+     * The type of the Credential.
+     * - "FIDO" - A FIDO public/private keypair.
+     */
+    CredentialType: "FIDO";
+    /**
+     * An object sent in a `PUT /consents/{ID}` request.
+     * Based on https://w3c.github.io/webauthn/#iface-pkcredential
+     */
+    PublicKeyCredential: {
+      /** TBD */
+      id: string;
+      response: {
+        /** TBD */
+        clientDataJSON: string;
+      };
+    };
+    /**
+     * A credential used to allow a user to prove their identity and access
+     * to an account with a DFSP.
+     *
+     * SignedCredential is a special formatting of the credential to allow us to be
+     * more explicit about the `status` field - it should only ever be PENDING when
+     * updating a credential.
+     */
+    SignedCredential: {
+      credentialType: components["schemas"]["CredentialType"];
+      /** The challenge has signed but not yet verified. */
+      status: "PENDING";
+      payload: components["schemas"]["PublicKeyCredential"];
+    };
+    /**
+     * The HTTP request `PUT /consents/{ID}` is used by the PISP to update a Consent with a signed challenge and register a credential.
+     * Called by a `PISP` to after signing a challenge. Sent to a DFSP for verification.
+     */
+    ConsentsIDPutResponseSigned: {
+      scopes: components["schemas"]["Scope"][];
+      credential: components["schemas"]["SignedCredential"];
+    };
+    /**
+     * A credential used to allow a user to prove their identity and access
+     * to an account with a DFSP.
+     *
+     * VerifiedCredential is a special formatting of the credential to allow us to be
+     * more explicit about the `status` field - it should only ever be VERIFIED when
+     * updating a credential.
+     */
+    VerifiedCredential: {
+      credentialType: components["schemas"]["CredentialType"];
+      /** The Credential is valid, and ready to be used by the PISP. */
+      status: "VERIFIED";
+      payload: components["schemas"]["PublicKeyCredential"];
+    };
+    /**
+     * The HTTP request `PUT /consents/{ID}` is used by the DFSP or Auth-Service to update a Consent object once it has been Verified.
+     * Called by a `auth-service` to notify a DFSP that a credential has been verified and registered.
+     */
+    ConsentsIDPutResponseVerified: {
+      scopes: components["schemas"]["Scope"][];
+      credential: components["schemas"]["VerifiedCredential"];
+    };
+    /**
+     * The status of the Consent.
+     * - "VERIFIED" - The Consent is valid and verified.
+     */
+    ConsentStatusTypeVerified: "VERIFIED";
+    /**
+     * PATCH /consents/{ID} request object.
+     *
+     * Sent by the DFSP to the PISP when a consent is verified.
+     * Used in the "Register Credential" part of the Account linking flow.
+     */
+    ConsentsIDPatchResponseVerified: {
+      credential: {
+        status: components["schemas"]["ConsentStatusTypeVerified"];
+      };
+    };
+    /**
+     * The status of the Consent.
+     * - "REVOKED" - The Consent is no longer valid and has been revoked.
+     */
+    ConsentStatusTypeRevoked: "REVOKED";
+    /**
+     * PATCH /consents/{ID} request object.
+     *
+     * Sent to both the PISP and DFSP when a consent is revoked.
+     * Used in the "Unlinking" part of the Account Unlinking flow.
+     */
+    ConsentsIDPatchResponseRevoked: {
+      status: components["schemas"]["ConsentStatusTypeRevoked"];
+      revokedAt: components["schemas"]["DateTime"];
+    };
+    /** FSP identifier. */
+    FspId: string;
+    /** The object sent in the PUT /participants/{Type}/{ID}/{SubId} and /participants/{Type}/{ID} callbacks. */
+    ParticipantsTypeIDPutResponse: {
+      fspId?: components["schemas"]["FspId"];
+    };
+    /** The object sent in the POST /participants/{Type}/{ID}/{SubId} and /participants/{Type}/{ID} requests. An additional optional ExtensionList element has been added as part of v1.1 changes. */
+    ParticipantsTypeIDSubIDPostRequest: {
+      fspId: components["schemas"]["FspId"];
+      currency?: components["schemas"]["Currency"];
+      extensionList?: components["schemas"]["ExtensionList"];
+    };
     /** Data model for the complex type Account. */
     Account: {
       accountNickname?: components["schemas"]["Name"];
@@ -1192,8 +1608,6 @@ export interface components {
     PartyIdentifier: string;
     /** Either a sub-identifier of a PartyIdentifier, or a sub-type of the PartyIdType, normally a PersonalIdentifierType. */
     PartySubIdOrType: string;
-    /** FSP identifier. */
-    FspId: string;
     /** Data model for the complex type PartyIdInfo. */
     PartyIdInfo: {
       partyIdType: components["schemas"]["PartyIdType"];
