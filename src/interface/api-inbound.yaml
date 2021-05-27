@@ -2693,25 +2693,6 @@ components:
           $ref: '#/components/schemas/ExtensionList'
       required:
         - fspId
-    AccountList:
-      title: AccountList
-      type: object
-      description: >
-        Data model for the complex type AccountList.
-
-        TODO: This component is outdated. Need flatten object and remove
-        `account`.
-              Not sure what will break so leaving this for now.
-      properties:
-        account:
-          type: array
-          items:
-            $ref: '#/components/schemas/Account'
-          minItems: 1
-          maxItems: 32
-          description: Accounts associated with the Party.
-      required:
-        - account
     PartyIdType:
       title: PartyIdType
       type: string
@@ -2926,8 +2907,6 @@ components:
       type: object
       description: Data model for the complex type Party.
       properties:
-        accounts:
-          $ref: '#/components/schemas/AccountList'
         partyIdInfo:
           $ref: '#/components/schemas/PartyIdInfo'
         merchantClassificationCode:

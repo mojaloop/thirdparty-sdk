@@ -65,8 +65,13 @@ async function patch (_context: any, request: Request, h: StateResponseToolkit):
     const statusCode = (result.currentState == 'errored') ? 500 : 200
     return h.response(result).code(statusCode)
   } catch(error) {
-    // TODO: PUT /consents/{ID}/error to DFSP if PISP is unable to handle
-    //       the incoming POST /consents request
+    // todo: PUT /consentsRequest/{ID}/error to DFSP if PISP is unable to handle
+    //       the previous PUT /consentRequests/{ID} request
+    //       The handler doesn't know the DFSP's ID due to it being stored in the model
+    //       if the model is not found then we don't know the ID
+    //       We might need to pass the ID in LinkingRequestConsentIDAuthenticateRequest.
+    //       Though...do we need to notify the DFSP here...? Shouldn't it just be
+    //       the PISP? I don't think we do.
     h.getLogger().info(`Error running PISPLinkingModel : ${inspect(error)}`)
     return h.response({}).code(500)
   }

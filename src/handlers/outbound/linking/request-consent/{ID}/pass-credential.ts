@@ -40,6 +40,8 @@ import * as OutboundAPI from '~/interface/outbound/api_interfaces'
  * Handles outbound POST /linking/request-consent/{ID}/pass-credential request
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
+// todo: consider changing this to PUT /linking/request-consent/{ID}/pass-credential
+//       since the flow triggers a PUT /consents/{ID}
 async function post (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const payload = request.payload as OutboundAPI.Schemas.LinkingRequestConsentIDPassCredentialRequest
   const consentRequestId = request.params.ID
@@ -66,8 +68,10 @@ async function post (_context: any, request: Request, h: StateResponseToolkit): 
     const statusCode = (result.currentState == 'errored') ? 500 : 200
     return h.response(result).code(statusCode)
   } catch(error) {
-    // TODO: PUT /consents/{ID}/error to DFSP if PISP is unable to handle
-    //       the incoming POST /consents request
+    // todo: PUT /consents/{ID}/error to DFSP if PISP is unable to handle
+    //       the previous inbound POST /consents request
+    //       Do we need to notify the DFSP here...? Shouldn't it just be
+    //       the PISP?
     h.getLogger().info(`Error running PISPLinkingModel : ${inspect(error)}`)
     return h.response({}).code(500)
   }
