@@ -546,7 +546,7 @@ components:
           $ref: '#/components/headers/Content-Type'
     AuthorizationsResponse:
       description: >
-        response body of POST/authorizations 
+        response body of POST/authorizations
 
         derived from AuthorizationsIDPutResponse by Inbound Service via Pub/Sub
         channel
@@ -599,7 +599,7 @@ components:
             $ref: '#/components/schemas/LinkingProvidersResponse'
     AccountsByUserIdResponse:
       description: >
-        response body of GET /accounts/{ID} 
+        response body of GET /accounts/{ID}
 
         derived from UpdateAccountsByUserId by Inbound Service via Pub/Sub
         channel
@@ -2275,6 +2275,7 @@ components:
           type: string
           description: TBD
         response:
+          type: object
           properties:
             clientDataJSON:
               type: string
@@ -2290,7 +2291,12 @@ components:
       type: object
       properties:
         credential:
-          $ref: '#/components/schemas/PublicKeyCredential'
+          type: object
+          properties:
+            payload:
+              $ref: '#/components/schemas/PublicKeyCredential'
+          required:
+            - payload
       required:
         - credential
       additionalProperties: false

@@ -385,5 +385,55 @@
     "payload": {
       "authToken": "123456"
     }
+  },
+  "linkingRequestConsentIDPassCredentialPostRequest": {
+    "headers": {},
+    "params": {
+      "ID": "b51ec534-ee48-4575-b6a9-ead2955b8069"
+    },
+    "payload": {
+      "credential": {
+        "payload": {
+          "id": "some-credential-id",
+          "response": {
+            "clientDataJSON": "client-data"
+          }
+        }
+      }
+    }
+  },
+  "inboundConsentsVerifiedPatchRequest": {
+    "headers": {},
+    "params": {
+      "ID": "8e34f91d-d078-4077-8263-2c047876fcf6"
+    },
+    "payload": {
+      "credential": {
+        "status": "VERIFIED"
+      }
+    }
+  },
+  "putConsentsIdRequestError": {
+    "headers": {
+      "fspiop-source": "switch",
+      "fspiop-destination": "pispA"
+    },
+    "params": {
+      "ID": "520f9165-7be6-4a40-9fc8-b30fcf4f62ab"
+    },
+    "payload": {
+      "errorInformation": {
+        "errorCode": "7212",
+        "errorDescription": "Signed challenge does not match derived challenge",
+        "extensionList": {
+          "extension": [
+            {
+              "key": "test",
+              "value": "test"
+            }
+          ]
+        }
+      }
+    }
   }
 }

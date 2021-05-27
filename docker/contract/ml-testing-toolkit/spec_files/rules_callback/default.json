@@ -588,7 +588,10 @@
           "Content-Length": ""
         },
         "body": {
-          "providers": ["dfspA", "dfspB"]
+          "providers": [
+            "dfspA",
+            "dfspB"
+          ]
         }
       },
       "delay": 0,

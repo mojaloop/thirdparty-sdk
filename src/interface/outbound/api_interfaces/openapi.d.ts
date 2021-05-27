@@ -1036,7 +1036,9 @@ export interface components {
     };
     /** POST /linking/request-consent/{ID}/pass-credential request object */
     LinkingRequestConsentIDPassCredentialRequest: {
-      credential: components['schemas']['PublicKeyCredential'];
+      credential: {
+        payload: components['schemas']['PublicKeyCredential'];
+      };
     };
     /** State of post linking request consent pass credential */
     LinkingRequestConsentIDPassCredentialState: 'errored' | 'accountsLinked';
