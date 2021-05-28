@@ -59,12 +59,14 @@ export class PISPLinkingModel
         { name: 'changeToOTPAuthentication', from: 'channelResponseReceived', to: 'OTPAuthenticationChannelResponseRecieved' },
         { name: 'changeToWebAuthentication', from: 'channelResponseReceived', to: 'WebAuthenticationChannelResponseRecieved' },
         { name: 'authenticate', from: 'OTPAuthenticationChannelResponseRecieved', to: 'consentReceivedAwaitingCredential' },
-        { name: 'authenticate', from: 'WebAuthenticationChannelResponseRecieved', to: 'consentReceivedAwaitingCredential' }
+        { name: 'authenticate', from: 'WebAuthenticationChannelResponseRecieved', to: 'consentReceivedAwaitingCredential' },
+        { name: 'registerCredential', from: 'consentReceivedAwaitingCredential', to: 'accountsLinked' }
       ],
       methods: {
         // specific transitions handlers methods
         onRequestConsent: () => this.onRequestConsent(),
-        onAuthenticate: () => this.onAuthenticate()
+        onAuthenticate: () => this.onAuthenticate(),
+        onRegisterCredential: () => this.onRegisterCredential()
       }
     }
     super(data, config, spec)
@@ -80,21 +82,21 @@ export class PISPLinkingModel
     return this.config.thirdpartyRequests
   }
 
-  static notificationChannel (phase: PISPLinkingPhase, consentRequestId: string): string {
-    if (!consentRequestId) {
-      throw new Error('PISPLinkingModel.notificationChannel: \'consentRequestId\' parameter is required')
+  static notificationChannel (phase: PISPLinkingPhase, id: string): string {
+    if (!id) {
+      throw new Error('PISPLinkingModel.notificationChannel: \'id\' parameter is required')
     }
     // channel name
-    return `PISPLinking_${phase}_${consentRequestId}`
+    return `PISPLinking_${phase}_${id}`
   }
 
   static async triggerWorkflow (
     phase: PISPLinkingPhase,
-    consentRequestId: string,
+    id: string,
     pubSub: PubSub,
     message: Message
   ): Promise<void> {
-    const channel = PISPLinkingModel.notificationChannel(phase, consentRequestId)
+    const channel = PISPLinkingModel.notificationChannel(phase, id)
     return deferredJob(pubSub, channel).trigger(message)
   }
 
@@ -221,9 +223,69 @@ export class PISPLinkingModel
     .wait(this.config.requestProcessingTimeoutSeconds * 1000)
   }
 
+  async onRegisterCredential (): Promise<void> {
+    const {
+      linkingRequestConsentIDAuthenticateInboundConsentResponse,
+      linkingRequestConsentIDPassCredentialPostRequest,
+    } = this.data
+
+    // pull consentId from previous step
+    const consentId = linkingRequestConsentIDAuthenticateInboundConsentResponse!.consentId
+
+    // we're using consentId from this point onwards since consentRequestId
+    // is not used at this point forward
+    const channel = PISPLinkingModel.notificationChannel(
+      PISPLinkingPhase.registerCredential,
+      consentId
+    )
+
+    this.logger.push({ channel }).info('onRegisterCredential - subscribe to channel')
+
+    return deferredJob(this.pubSub, channel)
+    .init(async (channel) => {
+      // todo: need credential type distinguishing logic once we support more
+      //       credential types
+      const res = await this.thirdpartyRequests.putConsents(
+        consentId,
+        {
+          scopes: this.data.linkingRequestConsentIDAuthenticateInboundConsentResponse!.scopes,
+          credential: {
+            credentialType: 'FIDO',
+            status: 'PENDING',
+            payload: linkingRequestConsentIDPassCredentialPostRequest!.credential.payload
+          }
+        },
+        this.data.toParticipantId!
+      )
+
+      this.logger.push({ res, channel })
+        .log('ThirdpartyRequests.putConsents request call sent to peer, listening on response')
+    })
+    .job(async (message: Message): Promise<void> => {
+      try {
+        type PutResponseOrError = tpAPI.Schemas.ConsentsIDPatchResponseVerified & fspiopAPI.Schemas.ErrorInformationObject
+        const putResponse = message as unknown as PutResponseOrError
+
+        if (putResponse.errorInformation) {
+          this.data.errorInformation = putResponse.errorInformation
+        } else {
+          this.data.linkingRequestConsentIDPassCredentialInboundConsentResponse = {
+            ...message as unknown as tpAPI.Schemas.ConsentsIDPatchResponseVerified
+          }
+        }
+
+      } catch (error) {
+        this.logger.push(error).error('ThirdpartyRequests.putConsents request error')
+        return Promise.reject(error)
+      }
+    })
+    .wait(this.config.requestProcessingTimeoutSeconds * 1000)
+  }
+
   getResponse ():
     OutboundAPI.Schemas.LinkingRequestConsentResponse |
     OutboundAPI.Schemas.LinkingRequestConsentIDAuthenticateResponse |
+    OutboundAPI.Schemas.LinkingRequestConsentIDPassCredentialResponse |
     void {
     switch (this.data.currentState) {
       case 'OTPAuthenticationChannelResponseRecieved':
@@ -242,6 +304,13 @@ export class PISPLinkingModel
           challenge: PISPLinkingModel.deriveChallenge(this.data.linkingRequestConsentIDAuthenticateInboundConsentResponse!),
           currentState: this.data.currentState
         } as OutboundAPI.Schemas.LinkingRequestConsentIDAuthenticateResponse
+      case 'accountsLinked':
+        return {
+          credential: {
+            status: this.data.linkingRequestConsentIDPassCredentialInboundConsentResponse!.credential.status
+          },
+          currentState: this.data.currentState
+        } as OutboundAPI.Schemas.LinkingRequestConsentIDPassCredentialResponse
       case 'errored':
         return {
           errorInformation: this.data.errorInformation,
@@ -279,6 +348,7 @@ export class PISPLinkingModel
   async run (): Promise<
     OutboundAPI.Schemas.LinkingRequestConsentResponse |
     OutboundAPI.Schemas.LinkingRequestConsentIDAuthenticateResponse |
+    OutboundAPI.Schemas.LinkingRequestConsentIDPassCredentialResponse |
     void> {
     const data = this.data
     try {
@@ -309,6 +379,15 @@ export class PISPLinkingModel
             `validateRequest for ${data.consentRequestId},  currentState: ${data.currentState}`
           )
           await this.fsm.authenticate()
+          await this.checkModelDataForErrorInformation()
+          await this.saveToKVS()
+          return this.getResponse()
+
+        case 'consentReceivedAwaitingCredential':
+          this.logger.info(
+            `registerCredential for ${data.consentRequestId},  currentState: ${data.currentState}`
+          )
+          await this.fsm.registerCredential()
           await this.checkModelDataForErrorInformation()
           await this.saveToKVS()
           return this.getResponse()

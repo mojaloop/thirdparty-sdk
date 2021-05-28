@@ -83,7 +83,8 @@ describe('PISPLinkingModel', () => {
       requestProcessingTimeoutSeconds: 3,
       thirdpartyRequests: {
         postConsentRequests: jest.fn(() => Promise.resolve({ statusCode: 202 })),
-        patchConsentRequests: jest.fn(() => Promise.resolve({ statusCode: 202 }))
+        patchConsentRequests: jest.fn(() => Promise.resolve({ statusCode: 202 })),
+        putConsents: jest.fn(() => Promise.resolve({ statusCode: 202 }))
       } as unknown as ThirdpartyRequests
     }
     await modelConfig.kvs.connect()
@@ -114,8 +115,9 @@ describe('PISPLinkingModel', () => {
     expect(sortedArray(am.fsm.allStates())).toEqual([
       'OTPAuthenticationChannelResponseRecieved',
       'WebAuthenticationChannelResponseRecieved',
+      'accountsLinked',
       'channelResponseReceived',
-      "consentReceivedAwaitingCredential",
+      'consentReceivedAwaitingCredential',
       'errored',
       'none',
       'start'
@@ -126,6 +128,7 @@ describe('PISPLinkingModel', () => {
       'changeToWebAuthentication',
       'error',
       'init',
+      'registerCredential',
       'requestConsent'
     ])
   }
@@ -394,6 +397,118 @@ describe('PISPLinkingModel', () => {
         ))
 
         const model = await create(validateData, modelConfig)
+        const result = await model.run()
+
+        expect(result).toEqual({
+          currentState: 'errored',
+          errorInformation: {
+            errorCode: '6000',
+            errorDescription: 'Generic thirdparty error'
+          }
+        })
+      })
+    })
+
+    describe('run registerCredential workflow', () => {
+      const consentRequestId = 'bbce3ce8-c247-4153-aab1-f89768c93b18'
+      const consentPostResponse: tpAPI.Schemas.ConsentsPostRequest = {
+        consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
+        consentRequestId: consentRequestId,
+        scopes: [{
+          accountId: 'some-id',
+          actions: [
+            'accounts.getBalance',
+            'accounts.transfer'
+          ]
+        }]
+      }
+      const consentPatchResponse: tpAPI.Schemas.ConsentsIDPatchResponseVerified = {
+        credential: {
+          status: 'VERIFIED'
+        }
+      }
+
+      const registerCredentialData: PISPLinkingData = {
+        toParticipantId: 'dfspA',
+        consentRequestId: mockData.linkingRequestConsentPostRequest.payload.consentRequestId,
+        linkingRequestConsentPostRequest: mockData.linkingRequestConsentPostRequest.payload,
+        linkingRequestConsentIDAuthenticatePatchRequest: mockData.linkingRequestConsentIDAuthenticatePatchRequest.payload,
+        linkingRequestConsentIDPassCredentialPostRequest: mockData.linkingRequestConsentIDPassCredentialPostRequest.payload,
+        linkingRequestConsentIDAuthenticateInboundConsentResponse: consentPostResponse,
+        scopes: consentPostResponse.scopes,
+        currentState: 'consentReceivedAwaitingCredential'
+      }
+
+      const registerCredentialChannel = PISPLinkingModel.notificationChannel(
+        PISPLinkingPhase.registerCredential,
+        registerCredentialData.linkingRequestConsentIDAuthenticateInboundConsentResponse!.consentId
+      )
+
+      const genericErrorResponse: fspiopAPI.Schemas.ErrorInformationObject = {
+        errorInformation: {
+          errorCode: '6000',
+          errorDescription: 'Generic thirdparty error'
+        }
+      }
+
+      it('should be well constructed', async () => {
+        const model = await create(registerCredentialData, modelConfig)
+        checkPISPLinkingModelLayout(model, registerCredentialData)
+      })
+
+      it('registerCredential() should transition consentReceivedAwaitingCredential to accountsLinked state when successful', async () => {
+        const model = await create(registerCredentialData, modelConfig)
+
+        // defer publication to notification channel
+        setImmediate(() => model.pubSub.publish(
+          registerCredentialChannel,
+          consentPatchResponse as unknown as Message
+        ))
+        const result = await model.run()
+
+        // check that the fsm was able to transition properly
+        expect(model.data.currentState).toEqual('accountsLinked')
+
+        // check we made a call to thirdpartyRequests.putConsents
+        expect(modelConfig.thirdpartyRequests.putConsents).toBeCalledWith(
+          registerCredentialData.linkingRequestConsentIDAuthenticateInboundConsentResponse!.consentId,
+          {
+            credential: {
+              credentialType: 'FIDO',
+              payload: {
+                id: 'some-credential-id',
+                response: {
+                  clientDataJSON: 'client-data'
+                }
+              },
+              status: 'PENDING',
+            },
+            scopes: [{
+              accountId: 'some-id',
+              actions: [
+                'accounts.getBalance',
+                'accounts.transfer'
+              ]
+            }]
+          },
+          'dfspA'
+        )
+
+        expect(result).toEqual({
+          credential: {
+            status: 'VERIFIED'
+          },
+          currentState: 'accountsLinked'
+        })
+      })
+
+      it('should handle a PUT /consents/{ID}/error response', async () => {
+        setImmediate(() => model.pubSub.publish(
+          registerCredentialChannel,
+          genericErrorResponse as unknown as Message
+        ))
+
+        const model = await create(registerCredentialData, modelConfig)
         const result = await model.run()
 
         expect(result).toEqual({

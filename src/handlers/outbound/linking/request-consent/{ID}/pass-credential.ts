@@ -20,6 +20,7 @@
  optionally within square brackets <email>.
  * Gates Foundation
  - Name Surname <name.surname@gatesfoundation.com>
+
  - Kevin Leyow <kevin.leyow@modusbox.com>
  --------------
  ******/
@@ -36,11 +37,13 @@ import * as OutboundAPI from '~/interface/outbound/api_interfaces'
 
 
 /**
- * Handles outbound PATCH /linking/request-consent/{ID}/authenticate request
+ * Handles outbound POST /linking/request-consent/{ID}/pass-credential request
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function patch (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
-  const payload = request.payload as OutboundAPI.Schemas.LinkingRequestConsentIDAuthenticateRequest
+// todo: consider changing this to PUT /linking/request-consent/{ID}/pass-credential
+//       since the flow triggers a PUT /consents/{ID}
+async function post (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+  const payload = request.payload as OutboundAPI.Schemas.LinkingRequestConsentIDPassCredentialRequest
   const consentRequestId = request.params.ID
 
   const modelConfig: PISPLinkingModelConfig = {
@@ -54,29 +57,26 @@ async function patch (_context: any, request: Request, h: StateResponseToolkit):
 
   try {
     const model: PISPLinkingModel = await loadFromKVS(modelConfig)
-    model.data.linkingRequestConsentIDAuthenticatePatchRequest = payload
+    model.data.linkingRequestConsentIDPassCredentialPostRequest = payload
 
     const result = await model.run()
     if (!result) {
-      h.getLogger().error('outbound PATCH /linking/request-consent/{ID}/authenticate unexpected result from workflow')
+      h.getLogger().error('outbound POST /linking/request-consent/{ID}/pass-credential unexpected result from workflow')
       return h.response({}).code(500)
     }
 
     const statusCode = (result.currentState == 'errored') ? 500 : 200
     return h.response(result).code(statusCode)
   } catch(error) {
-    // todo: PUT /consentsRequest/{ID}/error to DFSP if PISP is unable to handle
-    //       the previous PUT /consentRequests/{ID} request
-    //       The handler doesn't know the DFSP's ID due to it being stored in the model
-    //       if the model is not found then we don't know the ID
-    //       We might need to pass the ID in LinkingRequestConsentIDAuthenticateRequest.
-    //       Though...do we need to notify the DFSP here...? Shouldn't it just be
-    //       the PISP? I don't think we do.
+    // todo: PUT /consents/{ID}/error to DFSP if PISP is unable to handle
+    //       the previous inbound POST /consents request
+    //       Do we need to notify the DFSP here...? Shouldn't it just be
+    //       the PISP?
     h.getLogger().info(`Error running PISPLinkingModel : ${inspect(error)}`)
     return h.response({}).code(500)
   }
 }
 
 export default {
-  patch
+  post
 }

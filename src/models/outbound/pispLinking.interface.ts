@@ -40,12 +40,13 @@ import * as OutboundAPI from '~/interface/outbound/api_interfaces'
 export enum PISPLinkingPhase {
   requestConsent = 'requestConsent',
   requestConsentAuthenticate = 'requestConsentAuthenticate',
-  passCredential = 'passCredential'
+  registerCredential = 'registerCredential'
 }
 
 export type PISPLinkingModelState =
-  OutboundAPI.Schemas.LinkingRequestConsentState
-  | OutboundAPI.Schemas.LinkingRequestConsentIDAuthenticateState
+  OutboundAPI.Schemas.LinkingRequestConsentState |
+  OutboundAPI.Schemas.LinkingRequestConsentIDAuthenticateState |
+  OutboundAPI.Schemas.LinkingRequestConsentIDPassCredentialState
 
 export interface PISPLinkingStateMachine extends ControlledStateMachine {
   requestConsent: Method
@@ -54,6 +55,8 @@ export interface PISPLinkingStateMachine extends ControlledStateMachine {
   changeToOTPAuthentication: Method
   authenticate: Method
   onAuthenticate: Method
+  registerCredential: Method
+  onRegisterCredential: Method
 }
 
 export interface PISPLinkingModelConfig extends PersistentModelConfig {
@@ -80,6 +83,11 @@ export interface PISPLinkingData extends StateData<PISPLinkingModelState> {
   linkingRequestConsentIDAuthenticatePatchRequest?: OutboundAPI.Schemas.LinkingRequestConsentIDAuthenticateRequest
   linkingRequestConsentIDAuthenticateInboundConsentResponse?: tpAPI.Schemas.ConsentsPostRequest
   linkingRequestConsentIDAuthenticateResponse?: OutboundAPI.Schemas.LinkingRequestConsentIDAuthenticateResponse
+
+  // pass/register credential phase
+  linkingRequestConsentIDPassCredentialPostRequest?: OutboundAPI.Schemas.LinkingRequestConsentIDPassCredentialRequest
+  linkingRequestConsentIDPassCredentialInboundConsentResponse?: tpAPI.Schemas.ConsentsIDPatchResponseVerified
+  linkingRequestConsentIDPassCredentialResponse?: OutboundAPI.Schemas.LinkingRequestConsentIDPassCredentialResponse
 
   errorInformation?: tpAPI.Schemas.ErrorInformation
 }

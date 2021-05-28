@@ -673,35 +673,6 @@ export interface components {
       complexName?: components['schemas']['PartyComplexName'];
       dateOfBirth?: components['schemas']['DateOfBirth'];
     };
-    /**
-     * The API data type Name is a JSON String, restricted by a regular expression to avoid characters which are generally not used in a name.
-     *
-     * Regular Expression - The regular expression for restricting the Name type is "^(?!\s*$)[\w .,'-]{1,128}$". The restriction does not allow a string consisting of whitespace only, all Unicode characters are allowed, as well as the period (.) (apostrophe (‘), dash (-), comma (,) and space characters ( ).
-     *
-     * **Note:** In some programming languages, Unicode support must be specifically enabled. For example, if Java is used, the flag UNICODE_CHARACTER_CLASS must be enabled to allow Unicode characters.
-     */
-    Name: string;
-    /**
-     * A long-lived unique account identifier provided by the DFSP. This MUST NOT
-     * be Bank Account Number or anything that may expose a User's private bank
-     * account information.
-     */
-    AccountId: string;
-    /** Data model for the complex type Account. */
-    Account: {
-      accountNickname?: components['schemas']['Name'];
-      id?: components['schemas']['AccountId'];
-      currency: components['schemas']['Currency'];
-    };
-    /**
-     * Data model for the complex type AccountList.
-     * TODO: This component is outdated. Need flatten object and remove `account`.
-     *       Not sure what will break so leaving this for now.
-     */
-    AccountList: {
-      /** Accounts associated with the Party. */
-      account: components['schemas']['Account'][];
-    };
     ThirdpartyTransactionPartyLookupResponseSuccess: {
       currentState: components['schemas']['ThirdpartyTransactionPartyLookupState'];
       party: {
@@ -709,7 +680,6 @@ export interface components {
         merchantClassificationCode?: components['schemas']['MerchantClassificationCode'];
         name?: components['schemas']['PartyName'];
         personalInfo?: components['schemas']['PartyPersonalInfo'];
-        accounts?: components['schemas']['AccountList'];
       };
     };
     ThirdpartyTransactionPartyLookupResponse:
@@ -717,7 +687,6 @@ export interface components {
     | components['schemas']['ThirdpartyTransactionPartyLookupResponseSuccess'];
     /** Data model for the complex type Party. */
     Party: {
-      accounts?: components['schemas']['AccountList'];
       partyIdInfo: components['schemas']['PartyIdInfo'];
       merchantClassificationCode?: components['schemas']['MerchantClassificationCode'];
       name?: components['schemas']['PartyName'];
@@ -862,6 +831,12 @@ export interface components {
     | components['schemas']['ThirdpartyTransactionIDApproveResponseSuccess'];
     /** The API data type BinaryString is a JSON String. The string is a base64url  encoding of a string of raw bytes, where padding (character ‘=’) is added at the end of the data if needed to ensure that the string is a multiple of 4 characters. The length restriction indicates the allowed number of characters. */
     BinaryString: string;
+    /**
+     * A long-lived unique account identifier provided by the DFSP. This MUST NOT
+     * be Bank Account Number or anything that may expose a User's private bank
+     * account information.
+     */
+    AccountId: string;
     /** The object sent in the POST /thirdpartyRequests/transactions/{id}/authorizations request. */
     ThirdpartyRequestsTransactionsIDAuthorizationsPostRequest: {
       /** Base64 encoded binary string - the original challenge. */
@@ -901,23 +876,29 @@ export interface components {
     LinkingProvidersResponse:
     | components['schemas']['LinkingProvidersResponseError']
     | components['schemas']['LinkingProvidersResponseSuccess'];
+    /**
+     * The API data type Name is a JSON String, restricted by a regular expression to avoid characters which are generally not used in a name.
+     *
+     * Regular Expression - The regular expression for restricting the Name type is "^(?!\s*$)[\w .,'-]{1,128}$". The restriction does not allow a string consisting of whitespace only, all Unicode characters are allowed, as well as the period (.) (apostrophe (‘), dash (-), comma (,) and space characters ( ).
+     *
+     * **Note:** In some programming languages, Unicode support must be specifically enabled. For example, if Java is used, the flag UNICODE_CHARACTER_CLASS must be enabled to allow Unicode characters.
+     */
+    Name: string;
+    /** Data model for the complex type Account. */
+    Account: {
+      accountNickname: components['schemas']['Name'];
+      id: components['schemas']['AccountId'];
+      currency: components['schemas']['Currency'];
+    };
     /** The object sent in a `PUT /accounts/{ID}` request. */
     AccountsIDPutResponse: {
-      accounts: {
-        accountNickname: components['schemas']['Name'];
-        id: components['schemas']['AccountId'];
-        currency: components['schemas']['Currency'];
-      }[];
+      accounts: components['schemas']['Account'][];
     };
     /** The object sent in a `POST /linking/request-consent` request. */
     LinkingRequestConsentPostRequest: {
       toParticipantId: string;
       consentRequestId: components['schemas']['CorrelationId'];
-      accounts: {
-        accountNickname: components['schemas']['Name'];
-        id: components['schemas']['AccountId'];
-        currency: components['schemas']['Currency'];
-      }[];
+      accounts: components['schemas']['Account'][];
       /** ID used to associate request with GET /accounts request. */
       userId: string;
       /** The callback uri that the user will be redirected to after completing the WEB auth channel. */
@@ -1036,7 +1017,9 @@ export interface components {
     };
     /** POST /linking/request-consent/{ID}/pass-credential request object */
     LinkingRequestConsentIDPassCredentialRequest: {
-      credential: components['schemas']['PublicKeyCredential'];
+      credential: {
+        payload: components['schemas']['PublicKeyCredential'];
+      };
     };
     /** State of post linking request consent pass credential */
     LinkingRequestConsentIDPassCredentialState: 'errored' | 'accountsLinked';

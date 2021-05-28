@@ -628,10 +628,7 @@ paths:
         content:
           application/json:
             schema:
-              oneOf:
-                - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/ConsentsIDPutResponseSigned.yaml'
-                - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/ConsentsIDPutResponseUnsigned.yaml'
-                - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/ConsentsIDPutResponseVerified.yaml'
+              $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/ConsentsIDPutResponseSigned.yaml'
       parameters:
         #Path
         - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/parameters/ID.yaml'
@@ -678,7 +675,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/ConsentsIDPatchResponseRevoked.yaml'
+              oneOf:
+                - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/ConsentsIDPatchResponseVerified.yaml'
+                - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/ConsentsIDPatchResponseRevoked.yaml'
       parameters:
         #Path
         - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/parameters/ID.yaml'

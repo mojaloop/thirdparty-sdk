@@ -95,4 +95,7 @@ export namespace Schemas {
   export type LinkingRequestConsentIDAuthenticateRequest = components['schemas']['LinkingRequestConsentIDAuthenticateRequest']
   export type LinkingRequestConsentIDAuthenticateState = components['schemas']['LinkingRequestConsentIDAuthenticateState']
   export type LinkingRequestConsentIDAuthenticateResponse = components['schemas']['LinkingRequestConsentIDAuthenticateResponse']
+  export type LinkingRequestConsentIDPassCredentialRequest = components['schemas']['LinkingRequestConsentIDPassCredentialRequest']
+  export type LinkingRequestConsentIDPassCredentialState = components['schemas']['LinkingRequestConsentIDPassCredentialState']
+  export type LinkingRequestConsentIDPassCredentialResponse = components['schemas']['LinkingRequestConsentIDPassCredentialResponse']
 }

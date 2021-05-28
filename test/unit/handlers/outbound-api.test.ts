@@ -138,7 +138,8 @@ jest.mock('@mojaloop/sdk-standard-components', () => {
       getAccounts: jest.fn(() => Promise.resolve(mockData.accountsRequest.payload)),
       patchConsentRequests: jest.fn(() => Promise.resolve(mockData.inboundConsentsPostRequest)),
       postConsentRequests: jest.fn(() => Promise.resolve(mockData.consentRequestsPut.payload)),
-      getServices: jest.fn(() => Promise.resolve(mockData.putServicesByServiceTypeRequest.payload))
+      getServices: jest.fn(() => Promise.resolve(mockData.putServicesByServiceTypeRequest.payload)),
+      putConsents: jest.fn(() => Promise.resolve(mockData.inboundConsentsVerifiedPatchRequest.payload)),
     })),
     WSO2Auth: jest.fn(),
     Logger: {
@@ -680,6 +681,49 @@ describe('Outbound API routes', (): void => {
       consent: expectedConsent,
       challenge: PISPLinkingModel.deriveChallenge(expectedConsent),
       currentState: 'consentReceivedAwaitingCredential'
+    }
+    expect(response.result).toEqual(expectedResp)
+  })
+
+  it('/linking/request-consent/{ID}/pass-credential - success', async (): Promise<void> => {
+    const consentRequestId = 'bbce3ce8-c247-4153-aab1-f89768c93b18'
+    const request = {
+      method: 'POST',
+      url: `/linking/request-consent/${consentRequestId}/pass-credential`,
+      payload: {
+        credential: {
+          payload: {
+            id: "some-credential-id",
+            response: {
+              clientDataJSON: "client-data"
+            }
+          }
+        }
+      }
+    }
+    const pubSub = new PubSub({} as RedisConnectionConfig)
+    // defer publication to notification channel
+    // the dfsp should respond to a PISP with a POST /consents request
+    // where the inbound handler will publish the message
+    setTimeout(() => pubSub.publish(
+      PISPLinkingModel.notificationChannel(
+        PISPLinkingPhase.registerCredential,
+        '8e34f91d-d078-4077-8263-2c047876fcf6'
+      ),
+      mockData.inboundConsentsVerifiedPatchRequest.payload as unknown as Message
+    ), 10)
+    const response = await server.inject(request)
+    const expectedConsent: tpAPI.Schemas.ConsentsIDPatchResponseVerified = {
+      credential: {
+        status: 'VERIFIED'
+      }
+    }
+    expect(response.statusCode).toBe(200)
+    const expectedResp = {
+      credential: {
+        status: expectedConsent.credential.status
+      },
+      currentState: 'accountsLinked'
     }
     expect(response.result).toEqual(expectedResp)
   })

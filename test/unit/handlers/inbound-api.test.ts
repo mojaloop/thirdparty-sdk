@@ -52,6 +52,8 @@ import {
 import { PISPTransactionPhase } from '~/models/pispTransaction.interface'
 import ThirdpartyAuthorizations from '~/handlers/inbound/thirdpartyRequests/transactions/{ID}/authorizations'
 import ConsentsHandler from '~/handlers/inbound/consents'
+import ConsentsIdHandler from '~/handlers/inbound/consents/{ID}'
+import ConsentsIdErrorHandler from '~/handlers/inbound/consents/{ID}/error'
 import ConsentRequestsHandler from '~/handlers/inbound/consentRequests'
 import ConsentRequestsIdHandler from '~/handlers/inbound/consentRequests/{ID}'
 import ConsentRequestsIdErrorHandler from '~/handlers/inbound/consentRequests/{ID}/error'
@@ -1095,6 +1097,122 @@ describe('Inbound API routes', (): void => {
           'FSPIOP-Destination': 'pispA'
         },
         payload: mockData.putServicesByServiceTypeRequestError.payload
+      }
+      const response = await server.inject(request)
+      expect(response.statusCode).toBe(200)
+    })
+  })
+
+  describe('PUT /consents/{ID}/error', () => {
+    it('handler && pubSub invocation', async (): Promise<void> => {
+      const errorRequest: Request = mockData.putConsentsIdRequestError
+      const request = {
+        payload: errorRequest,
+        params: {
+          ID: 'T520f9165-7be6-4a40-9fc8-b30fcf4f62ab'
+        },
+        headers: {
+          'Content-Type': 'application/json',
+          'FSPIOP-Source': 'switch',
+          Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
+          'FSPIOP-Destination': 'pispA'
+        }
+      }
+      const pubSubMock = {
+        publish: jest.fn()
+      }
+      const toolkit = {
+        getPubSub: jest.fn(() => pubSubMock),
+        response: jest.fn(() => ({
+          code: jest.fn((code: number) => ({
+            statusCode: code
+          }))
+        })),
+        getLogger: jest.fn(() => logger),
+        getKVS: jest.fn(() => ({
+          set: jest.fn()
+        }))
+      }
+
+      const result = await ConsentsIdErrorHandler.put(
+        {},
+        request as unknown as Request,
+        toolkit as unknown as StateResponseToolkit
+      )
+
+      expect(result.statusCode).toEqual(200)
+    })
+
+    it('input validation', async (): Promise<void> => {
+      const request = {
+        method: 'PUT',
+        url: '/consents/520f9165-7be6-4a40-9fc8-b30fcf4f62ab/error',
+        headers: {
+          'Content-Type': 'application/json',
+          'FSPIOP-Source': 'switch',
+          Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
+          'FSPIOP-Destination': 'pispA'
+        },
+        payload: mockData.putConsentsIdRequestError.payload
+      }
+      const response = await server.inject(request)
+      expect(response.statusCode).toBe(200)
+    })
+  })
+
+  describe('PATCH /consents/{ID}', () => {
+    it('handler && pubSub invocation', async (): Promise<void> => {
+      const request = {
+        payload: mockData.inboundConsentsVerifiedPatchRequest.payload,
+        params: {
+          ID: '520f9165-7be6-4a40-9fc8-b30fcf4f62ab'
+        },
+        headers: {
+          'Content-Type': 'application/json',
+          'FSPIOP-Source': 'switch',
+          Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
+          'FSPIOP-Destination': 'pispA'
+        }
+      }
+      const pubSubMock = {
+        publish: jest.fn()
+      }
+      const toolkit = {
+        getPubSub: jest.fn(() => pubSubMock),
+        response: jest.fn(() => ({
+          code: jest.fn((code: number) => ({
+            statusCode: code
+          }))
+        })),
+        getLogger: jest.fn(() => logger),
+        getThirdpartyRequests: jest.fn(() => ({
+          postConsents: jest.fn()
+        })),
+        getKVS: jest.fn(() => ({
+          set: jest.fn()
+        }))
+      }
+
+      const result = await ConsentsIdHandler.patch(
+        {},
+        request as unknown as Request,
+        toolkit as unknown as StateResponseToolkit
+      )
+
+      expect(result.statusCode).toEqual(200)
+    })
+
+    it('input validation', async (): Promise<void> => {
+      const request = {
+        method: 'PATCH',
+        url: '/consents/520f9165-7be6-4a40-9fc8-b30fcf4f62ab',
+        headers: {
+          'Content-Type': 'application/json',
+          'FSPIOP-Source': 'switch',
+          Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
+          'FSPIOP-Destination': 'pispA'
+        },
+        payload: mockData.inboundConsentsVerifiedPatchRequest.payload
       }
       const response = await server.inject(request)
       expect(response.statusCode).toBe(200)

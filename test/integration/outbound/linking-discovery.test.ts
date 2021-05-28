@@ -48,7 +48,6 @@ describe('GET /linking/accounts/{fspId}/{userId}', (): void => {
     const scenariosURI = 'http://127.0.0.1:4006/linking/accounts/dfspa/username1234'
     // Act
     const response = await axios.get(scenariosURI)
-
     // Assert
     expect(response.status).toBe(200)
     expect(response.data).toEqual(expectedResp)
