@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+## [11.38.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.37.5...v11.38.0) (2021-05-28)
+
+
+### Features
+
+* complete PISP side of linking flow ([#100](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/100)) ([23877ab](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/23877abb84eeca30921ed5e4bbeb6a73611d95bd))
+
 ### [11.37.5](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.37.4...v11.37.5) (2021-05-27)
 
 
