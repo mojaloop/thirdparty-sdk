@@ -31,6 +31,10 @@ import { StateResponseToolkit } from '~/server/plugins/state'
 import { PISPLinkingModel } from '~/models/outbound/pispLinking.model'
 import { Message } from '~/shared/pub-sub'
 import { PISPLinkingPhase } from '~/models/outbound/pispLinking.interface'
+import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
+import { loadFromKVS } from '~/models/inbound/dfspLinking.model'
+import { DFSPLinkingModelConfig } from '~/models/inbound/dfspLinking.interface'
+import { DFSPLinkingModel } from '~/models/inbound/dfspLinking.model'
 
 /**
  * Handles an inbound `PATCH /consents/{ID}` request
@@ -49,6 +53,31 @@ async function patch (_context: unknown, request: Request, h: StateResponseToolk
   return h.response().code(200)
 }
 
+/**
+ * Handles an inbound `PUT /consents/{ID}` request
+ */
+ async function put (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+  const consentId = request.params.ID
+  const payload = request.payload as tpAPI.Schemas.ConsentsIDPutResponseSigned
+
+  // prepare model config
+  const modelConfig: DFSPLinkingModelConfig = {
+    kvs: h.getKVS(),
+    pubSub: h.getPubSub(),
+    key: consentId,
+    logger: h.getLogger(),
+    dfspBackendRequests: h.getDFSPBackendRequests(),
+    thirdpartyRequests: h.getThirdpartyRequests(),
+  }
+  // load model
+  const model: DFSPLinkingModel = await loadFromKVS(modelConfig)
+  model.data.consentIDPutRequest = payload
+
+
+  return h.response().code(202)
+}
+
 export default {
-  patch
+  patch,
+  put
 }

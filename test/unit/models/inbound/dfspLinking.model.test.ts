@@ -134,22 +134,27 @@ describe('dfspLinkingModel', () => {
     expect(typeof dfspLinkingModel.onStoreReqAndSendOTP).toEqual('function')
 
     expect(sortedArray(dfspLinkingModel.fsm.allStates())).toEqual([
+      'PISPDFSPLinkEstablished',
       'authTokenValidated',
       'consentGranted',
+      'consentRegisteredAndValidated',
       'consentRequestValidatedAndStored',
       'errored',
       'none',
+      'notificationSent',
       'requestIsValid',
       'start'
     ])
     expect(sortedArray(dfspLinkingModel.fsm.allTransitions())).toEqual([
       'error',
+      'finalizeConsentWithALS',
       'grantConsent',
       'init',
+      'notifyVerificationToPISP',
       'storeReqAndSendOTP',
       'validateAuthToken',
       'validateRequest',
-
+      'validateWithAuthService'
     ])
   }
 

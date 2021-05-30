@@ -30,14 +30,13 @@ import {
   StateData
 } from '~/models/persistent.model'
 import { Method } from 'javascript-state-machine'
-import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components';
+import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
 import {
   v1_1 as fspiopAPI,
   thirdparty as tpAPI
 } from '@mojaloop/api-snippets'
 import { PubSub } from '~/shared/pub-sub'
-import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests';
-
+import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
 
 export enum DFSPLinkingPhase {
   requestConsent = 'requestConsent',
@@ -86,6 +85,12 @@ export interface DFSPLinkingStateMachine extends ControlledStateMachine {
   onValidateAuthToken: Method
   grantConsent: Method
   onGrantConsent: Method
+  validateWithAuthService: Method
+  onValidateWithAuthService: Method
+  finalizeConsentWithALS: Method
+  onFinalizeConsentWithALS: Method
+  notifyVerificationToPISP: Method
+  onNotifyVerificationToPISP: Method
 }
 
 export interface DFSPLinkingModelConfig extends PersistentModelConfig {
@@ -107,5 +112,13 @@ export interface DFSPLinkingData extends StateData {
 
   // authenticate phase
   consentRequestsIDPatchRequest?: tpAPI.Schemas.ConsentRequestsIDPatchRequest
-  consentRequestPostRequest?: tpAPI.Schemas.ConsentsPostRequest
+
+  // grant consent phase
+  consentPostRequest?: tpAPI.Schemas.ConsentsPostRequest
+
+  // credential registration phase
+  consentIDPutRequest?: tpAPI.Schemas.ConsentsIDPutResponseSigned
+  consentPostRequestToALS?: tpAPI.Schemas.ConsentsPostRequest
+  thirdpartyLinkRequestsToALS?: tpAPI.Schemas.ParticipantsPostRequest[]
+  consentIDPatchRequest?: tpAPI.Schemas.ConsentRequestsIDPatchRequest
 }

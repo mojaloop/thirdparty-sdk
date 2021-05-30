@@ -60,7 +60,10 @@ export class DFSPLinkingModel
         { name: 'validateRequest', from: 'start', to: 'requestIsValid' },
         { name: 'storeReqAndSendOTP', from: 'requestIsValid', to: 'consentRequestValidatedAndStored' },
         { name: 'validateAuthToken', from: 'consentRequestValidatedAndStored', to: 'authTokenValidated' },
-        { name: 'grantConsent', from: 'authTokenValidated', to: 'consentGranted' }
+        { name: 'grantConsent', from: 'authTokenValidated', to: 'consentGranted' },
+        { name: 'validateWithAuthService', from: 'consentGranted', to: 'consentRegisteredAndValidated' },
+        { name: 'finalizeConsentWithALS', from: 'consentRegisteredAndValidated', to: 'PISPDFSPLinkEstablished' },
+        { name: 'notifyVerificationToPISP', from: 'PISPDFSPLinkEstablished', to: 'notificationSent' },
       ],
       methods: {
         // specific transitions handlers methods
@@ -201,18 +204,43 @@ export class DFSPLinkingModel
 
   async onGrantConsent (): Promise<void> {
     const { consentRequestId, toParticipantId, scopes } = this.data
+    const consentId = uuid()
 
-    const postConsentRequestsPayload: tpAPI.Schemas.ConsentsPostRequest = {
-      consentId: uuid(),
+    const postConsentPayload: tpAPI.Schemas.ConsentsPostRequest = {
+      consentId,
       consentRequestId: consentRequestId!,
       scopes: scopes || []
     }
 
+    // save POST /consent request
+    this.data.consentPostRequest = postConsentPayload
+
     try {
       await this.thirdpartyRequests.postConsents(
-        postConsentRequestsPayload,
+        postConsentPayload,
         toParticipantId
       )
+
+      // We create a copy of the persistant model with `consentId` as the new
+      // key. consentRequestId is no longer passed through requests after this
+      // point so we need a soft copy of this model to retrieve the model
+      // on later requests.
+      const data: DFSPLinkingData = {
+        ...this.data,
+        currentState: 'consentGranted'
+      }
+      const consentIdModelConfig: DFSPLinkingModelConfig = {
+        kvs: this.config.kvs,
+        pubSub: this.config.pubSub,
+        key: consentId,
+        logger: this.config.logger,
+        dfspBackendRequests: this.config.dfspBackendRequests,
+        thirdpartyRequests: this.config.thirdpartyRequests
+      }
+
+      const model: DFSPLinkingModel = await create(data, consentIdModelConfig)
+      await model.saveToKVS
+
     } catch (error) {
       const mojaloopError = reformatError(error, this.logger)
 
