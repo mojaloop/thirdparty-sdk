@@ -38,6 +38,7 @@ import {
 } from '~/models/inbound/dfspLinking.interface'
 import { DFSPLinkingModel } from '~/models/inbound/dfspLinking.model';
 import inspect from '~/shared/inspect';
+import config from '~/shared/config';
 
 /**
  * Handles an inbound `POST /consentRequests` request
@@ -51,6 +52,7 @@ async function post (_context: unknown, request: Request, h: StateResponseToolki
   const data: DFSPLinkingData = {
     currentState: 'start',
     toParticipantId: sourceFspId,
+    toAuthServiceParticipantId: 'central-auth',
     consentRequestsPostRequest: payload,
     consentRequestId: payload.consentRequestId
   }
@@ -63,6 +65,7 @@ async function post (_context: unknown, request: Request, h: StateResponseToolki
     logger: h.getLogger(),
     dfspBackendRequests: h.getDFSPBackendRequests(),
     thirdpartyRequests: h.getThirdpartyRequests(),
+    requestProcessingTimeoutSeconds: config.REQUEST_PROCESSING_TIMEOUT_SECONDS
   }
 
   // don't await on promise to be resolved

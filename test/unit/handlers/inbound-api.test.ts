@@ -696,7 +696,7 @@ describe('Inbound API routes', (): void => {
 
       const channel = PISPLinkingModel.notificationChannel(
         PISPLinkingPhase.requestConsentAuthenticate,
-        postConsentRequest.consentRequestId
+        postConsentRequest.consentRequestId!
       )
       expect(toolkit.getPubSub).toBeCalledTimes(1)
       expect(pubSubMock.publish).toBeCalledWith(channel, postConsentRequest)

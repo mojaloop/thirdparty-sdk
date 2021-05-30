@@ -41,6 +41,8 @@ import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
 export enum DFSPLinkingPhase {
   requestConsent = 'requestConsent',
   requestConsentAuthenticate = 'requestConsentAuthenticate',
+  waitOnAuthServiceResponse = 'waitOnAuthServiceResponse',
+  waitOnALSParticipantResponse = 'waitOnALSParticipantResponse'
 }
 
 // TODO: Let keep Backend* interfaces in DFSPBackendRequests
@@ -97,10 +99,13 @@ export interface DFSPLinkingModelConfig extends PersistentModelConfig {
   pubSub: PubSub
   thirdpartyRequests: ThirdpartyRequests
   dfspBackendRequests: DFSPBackendRequests
+  requestProcessingTimeoutSeconds: number
 }
 export interface DFSPLinkingData extends StateData {
   toParticipantId: string
+  toAuthServiceParticipantId: string
   consentRequestId: string
+  consentId?: string
   // scopes from the initial `consentRequestsPostRequest` will be stored
   // for later reference to save the DFSP from having to retrieve them from
   // their backend
@@ -118,7 +123,9 @@ export interface DFSPLinkingData extends StateData {
 
   // credential registration phase
   consentIDPutRequest?: tpAPI.Schemas.ConsentsIDPutResponseSigned
-  consentPostRequestToALS?: tpAPI.Schemas.ConsentsPostRequest
+  consentPostRequestToAuthService?: tpAPI.Schemas.ConsentsPostRequest
+  consentIDPutRequestFromAuthService?: tpAPI.Schemas.ConsentsIDPutResponseVerified
+  participantPutRequestFromALS?: fspiopAPI.Schemas.ParticipantsIDPutResponse
   thirdpartyLinkRequestsToALS?: tpAPI.Schemas.ParticipantsPostRequest[]
   consentIDPatchRequest?: tpAPI.Schemas.ConsentRequestsIDPatchRequest
 }

@@ -40,9 +40,11 @@ import {
   DFSPLinkingModelConfig
 } from '~/models/inbound/dfspLinking.interface'
 import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
-import { BackendValidateOTPResponse } from './dfspLinking.interface';
+import { BackendValidateOTPResponse, DFSPLinkingPhase } from './dfspLinking.interface';
 import { uuid } from 'uuidv4';
 import { reformatError } from '~/shared/api-error';
+import deferredJob from '../../shared/deferred-job';
+import { Message } from '../../shared/pub-sub';
 
 // DFSPLinkingModel is the passive inbound handler for inbound
 // POST /consentRequests requests and no response is generated from `model.run()`
@@ -89,6 +91,15 @@ export class DFSPLinkingModel
   get thirdpartyRequests (): ThirdpartyRequests {
     return this.config.thirdpartyRequests
   }
+
+  static notificationChannel (phase: DFSPLinkingPhase, id: string): string {
+    if (!id) {
+      throw new Error('DFSPLinkingModel.notificationChannel: \'id\' parameter is required')
+    }
+    // channel name
+    return `DFSPLinking_${phase}_${id}`
+  }
+
 
   async onValidateRequest (): Promise<void> {
     const { consentRequestsPostRequest, toParticipantId } = this.data
@@ -206,6 +217,9 @@ export class DFSPLinkingModel
     const { consentRequestId, toParticipantId, scopes } = this.data
     const consentId = uuid()
 
+    // save consentId for later
+    this.data.consentId = consentId
+
     const postConsentPayload: tpAPI.Schemas.ConsentsPostRequest = {
       consentId,
       consentRequestId: consentRequestId!,
@@ -235,7 +249,8 @@ export class DFSPLinkingModel
         key: consentId,
         logger: this.config.logger,
         dfspBackendRequests: this.config.dfspBackendRequests,
-        thirdpartyRequests: this.config.thirdpartyRequests
+        thirdpartyRequests: this.config.thirdpartyRequests,
+        requestProcessingTimeoutSeconds: this.config.requestProcessingTimeoutSeconds
       }
 
       const model: DFSPLinkingModel = await create(data, consentIdModelConfig)
@@ -256,6 +271,65 @@ export class DFSPLinkingModel
       // throw error to stop state machine
       throw error
     }
+  }
+
+  async onValidateWithAuthService (): Promise<void> {
+    const { consentIDPutRequest, consentId } = this.data
+
+    const consentPostRequestToAuthService: tpAPI.Schemas.ConsentsPostRequest = {
+      consentId: consentId!,
+      scopes: consentIDPutRequest!.scopes,
+      credential: consentIDPutRequest!.credential
+    }
+
+    const waitOnAuthServiceResponse = DFSPLinkingModel.notificationChannel(
+      DFSPLinkingPhase.waitOnAuthServiceResponse,
+      consentId!
+    )
+    const waitOnALSParticipantResponse = DFSPLinkingModel.notificationChannel(
+      DFSPLinkingPhase.waitOnAuthServiceResponse,
+      consentId!
+    )
+
+    const waitOnAuthService =deferredJob(this.pubSub, waitOnAuthServiceResponse)
+      .init(async (channel) => {
+        const res = await this.thirdpartyRequests.postConsents(
+          consentPostRequestToAuthService,
+          this.data.toAuthServiceParticipantId
+        )
+
+        this.logger.push({ res, channel })
+          .log('ThirdpartyRequests.postConsents call sent to auth service, listening on response')
+      })
+      .job(async (message: Message): Promise<void> => {
+        try {
+          type PutResponse =
+            tpAPI.Schemas.ConsentsIDPutResponseVerified
+          type PutResponseOrError = PutResponse & fspiopAPI.Schemas.ErrorInformationObject
+          const putResponse = message as unknown as PutResponseOrError
+
+          if (putResponse.errorInformation) {
+            this.data.errorInformation = putResponse.errorInformation
+          } else {
+            this.data.consentIDPutRequestFromAuthService = { ...message as unknown as PutResponse }
+          }
+        } catch (error) {
+          this.logger.push(error).error('ThirdpartyRequests.postConsents request error')
+          return Promise.reject(error)
+        }
+      })
+      .wait(this.config.requestProcessingTimeoutSeconds * 1000)
+
+    const waitOnALS = deferredJob(this.pubSub, waitOnALSParticipantResponse)
+      .init(async (): Promise<void> => {
+        return Promise.resolve()
+      })
+      .job(async (message: Message): Promise<void> => {
+        this.data.participantPutRequestFromALS = { ...message as unknown as fspiopAPI.Schemas.ParticipantsIDPutResponse }
+      })
+      .wait(this.config.requestProcessingTimeoutSeconds * 1000)
+
+    await Promise.all([waitOnAuthService, waitOnALS])
   }
 
   /**

@@ -91,7 +91,8 @@ describe('dfspLinkingModel', () => {
         validateOTPSecret: jest.fn(() => Promise.resolve({
           isValid: true
         }))
-      } as unknown as DFSPBackendRequests
+      } as unknown as DFSPBackendRequests,
+      requestProcessingTimeoutSeconds: 3
     }
     mocked(modelConfig.pubSub.subscribe).mockImplementationOnce(
       (_channel: string, cb: NotificationCallback) => {
@@ -170,6 +171,7 @@ describe('dfspLinkingModel', () => {
     beforeEach(async () => {
       validateData = {
         toParticipantId: 'pispa',
+        toAuthServiceParticipantId: 'central-auth',
         consentRequestsPostRequest: mockData.consentRequestsPost.payload,
         currentState: 'start',
         consentRequestId: mockData.consentRequestsPost.payload.consentRequestId,
@@ -454,6 +456,7 @@ describe('dfspLinkingModel', () => {
     beforeEach(async () => {
       validateData = {
         toParticipantId: 'pispa',
+        toAuthServiceParticipantId: 'central-auth',
         consentRequestsPostRequest: mockData.consentRequestsPost.payload,
         backendValidateConsentRequestsResponse: mockData.consentRequestsPost.response,
         consentRequestId: mockData.consentRequestsPost.payload.consentRequestId,
@@ -547,6 +550,7 @@ describe('dfspLinkingModel', () => {
     beforeEach(async () => {
       validateData = {
         toParticipantId: 'pispa',
+        toAuthServiceParticipantId: 'central-auth',
         currentState: 'consentRequestValidatedAndStored',
         consentRequestId: 'b51ec534-ee48-4575-b6a9-ead2955b8069',
         consentRequestsPostRequest: mockData.consentRequestsPost.payload,
@@ -674,6 +678,7 @@ describe('dfspLinkingModel', () => {
     beforeEach(async () => {
       validateData = {
         toParticipantId: 'pispa',
+        toAuthServiceParticipantId: 'central-auth',
         currentState: 'authTokenValidated',
         consentRequestId: 'b51ec534-ee48-4575-b6a9-ead2955b8069',
         consentRequestsPostRequest: mockData.consentRequestsPost.payload,
@@ -754,6 +759,7 @@ describe('dfspLinkingModel', () => {
     it('should properly call `KVS.get`, get expected data in `context.data` and setup state of machine', async () => {
       const dataFromCache = {
         toParticipantId: 'pispa',
+        toAuthServiceParticipantId: 'central-auth',
         consentRequestsPostRequest: mockData.consentRequestsPost.payload,
         backendValidateConsentRequestsResponse: mockData.consentRequestsPost.response,
         currentState: 'consentRequestValidatedAndStored',
