@@ -33,7 +33,7 @@ import { OutboundThirdpartyAuthorizationsModel } from '~/models/outbound/thirdpa
 /**
  * Handles a inbound PUT /thirdpartyRequests/transactions/{ID} request
  */
-async function put (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+async function put (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const transactionRequest = request.payload as tpAPI.Schemas.ThirdpartyRequestsTransactionsIDAuthorizationsPutResponse
   const transactionRequestId: string = request.params.ID
   const channel = OutboundThirdpartyAuthorizationsModel.notificationChannel(transactionRequestId)

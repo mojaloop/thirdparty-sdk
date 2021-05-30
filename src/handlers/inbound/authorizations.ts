@@ -43,8 +43,7 @@ import { StateResponseToolkit } from '~/server/plugins/state'
 
 import config from '~/shared/config'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function put (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+async function put (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const payload = request.payload as unknown as fspiopAPI.Schemas.AuthorizationsIDPutResponse
   const pubSub = h.getPubSub()
 
@@ -62,8 +61,7 @@ async function put (_context: any, request: Request, h: StateResponseToolkit): P
   return h.response().code(200)
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function post (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+async function post (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   // this handler will be shared with ThirdpartyRequestTransactionModel so there is a need
   // to properly handle two different models here - via configuration flag
   const payload = request.payload as tpAPI.Schemas.AuthorizationsPostRequest

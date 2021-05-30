@@ -38,7 +38,7 @@ import { ServiceType } from '~/models/outbound/pispPrelinking.interface';
 /**
 * Handles a inbound PUT /services/{ServiceType}/error request
 */
-async function put (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+async function put (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const payload = request.payload as fspiopAPI.Schemas.ErrorInformation
   const serviceType = request.params.ServiceType
 

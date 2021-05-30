@@ -43,7 +43,6 @@ import { StateResponseToolkit } from '~/server/plugins/state'
 /**
  * Handles an inbound PUT /accounts/{ID} request
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function put (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const payload = request.payload as unknown as tpAPI.Schemas.AccountsIDPutResponse
   const userId: string = request.params.ID
@@ -58,7 +57,6 @@ async function put (_context: unknown, request: Request, h: StateResponseToolkit
  * Handles an inbound GET /accounts/{ID} request
  */
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function get (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const userId: string = request.params.ID
   const logger = h.getLogger()

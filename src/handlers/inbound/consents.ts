@@ -36,8 +36,7 @@ import { Enum } from '@mojaloop/central-services-shared'
 import { PISPLinkingModel } from '~/models/outbound/pispLinking.model'
 import { PISPLinkingPhase } from '~/models/outbound/pispLinking.interface'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function post (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+async function post (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const payload = request.payload as tpAPI.Schemas.ConsentsPostRequest
 
   // POST /consents is a follow-up request to PATCH /consentRequests

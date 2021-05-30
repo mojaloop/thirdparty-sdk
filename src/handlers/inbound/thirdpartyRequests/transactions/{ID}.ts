@@ -31,8 +31,7 @@ import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
 /**
  * Handles a inbound PATCH /thirdpartyRequests/transactions/{ID} request
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function patch (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+async function patch (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const payload = request.payload as tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPatchResponse
   const pubSub = h.getPubSub()
 
@@ -49,8 +48,7 @@ async function patch (_context: any, request: Request, h: StateResponseToolkit):
   return h.response({}).code(200)
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function put (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+async function put (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const payload = request.payload as tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPutResponse
   const pubSub = h.getPubSub()
 

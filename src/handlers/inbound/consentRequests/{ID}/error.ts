@@ -34,7 +34,7 @@ import { PISPLinkingPhase } from '~/models/outbound/pispLinking.interface';
 /**
  * Handles a inbound PUT /consentRequests/{ID}/error request
  */
-async function put (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+async function put (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   // PUT /consentsRequests/{ID}/error is a response to PATCH /consentRequests
   // when an OTP or secret failed to validate.
   // We publish the request on the PISPConsentRequestModel

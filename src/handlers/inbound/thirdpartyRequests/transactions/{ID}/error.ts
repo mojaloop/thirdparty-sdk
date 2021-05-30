@@ -30,9 +30,9 @@ import { PISPTransactionModel } from '~/models/pispTransaction.model'
 /**
  * Handles a inbound PUT /thirdpartyRequests/transactions/{ID}/error request
  */
-async function put (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+async function put (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
     const channel = PISPTransactionModel.notificationChannel(
-        PISPTransactionPhase.approval, 
+        PISPTransactionPhase.approval,
         request.params.ID)
     const pubSub = h.getPubSub()
     // don't await on promise to resolve, let finish publish in background

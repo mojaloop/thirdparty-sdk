@@ -34,7 +34,7 @@
  /**
   * Handles a inbound PUT /consents/{ID}/error request
   */
- async function put (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+ async function put (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
    // PUT /consents/{ID}/error is a response to PUT /consents/{ID}
    // when something went wrong registering a credential
    const consentId = request.params.ID
