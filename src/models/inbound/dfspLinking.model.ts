@@ -344,6 +344,9 @@ export class DFSPLinkingModel
       .wait(this.config.requestProcessingTimeoutSeconds * 1000)
 
     await Promise.all([waitOnAuthService, waitOnALS])
+
+    // todo: if either promise fails we need to send a PUT /consents/{ID}/error
+    //       request back to the PISP
   }
 
   async onFinalizeConsentWithALS (): Promise<void> {
@@ -383,6 +386,9 @@ export class DFSPLinkingModel
     .job(async (message: Message): Promise<void> => {
     })
     .wait(this.config.requestProcessingTimeoutSeconds * 1000)
+
+    // todo: if promise fails we need to send a PUT /consents/{ID}/error
+    //       request back to the PISP
     */
   }
 

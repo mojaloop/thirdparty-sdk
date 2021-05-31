@@ -138,19 +138,6 @@ jest.mock('~/models/inbound/authorizations.model', () => ({
   }))
 }))
 
-jest.mock('~/models/inbound/dfspLinking.model', () => ({
-  DFSPLinkingModel: jest.fn(() => {
-    return {
-      run: jest.fn(),
-    }
-  }),
-  loadFromKVS: jest.fn(() => {
-    return {
-      data: {}
-    }
-  })
-}))
-
 const putResponse: fspiopAPI.Schemas.AuthorizationsIDPutResponse = {
   authenticationInfo: {
     authentication: 'U2F',
@@ -572,8 +559,10 @@ describe('Inbound API routes', (): void => {
       const toolkit = {
         getPubSub: jest.fn(() => pubSubMock),
         getLogger: jest.fn(() => logger),
+        getDFSPId: jest.fn(() => 'dfspA'),
         getDFSPBackendRequests: jest.fn(),
         getThirdpartyRequests: jest.fn(),
+        getMojaloopRequests: jest.fn(),
         response: jest.fn(() => ({
           code: jest.fn((code: number) => ({
             statusCode: code
@@ -617,8 +606,10 @@ describe('Inbound API routes', (): void => {
       const toolkit = {
         getPubSub: jest.fn(() => pubSubMock),
         getLogger: jest.fn(() => logger),
+        getDFSPId: jest.fn(() => 'dfspA'),
         getDFSPBackendRequests: jest.fn(),
         getThirdpartyRequests: jest.fn(),
+        getMojaloopRequests: jest.fn(),
         response: jest.fn(() => ({
           code: jest.fn((code: number) => ({
             statusCode: code
@@ -643,8 +634,10 @@ describe('Inbound API routes', (): void => {
       const toolkit = {
         getPubSub: jest.fn(() => pubSubMock),
         getLogger: jest.fn(() => logger),
+        getDFSPId: jest.fn(() => 'dfspA'),
         getDFSPBackendRequests: jest.fn(),
         getThirdpartyRequests: jest.fn(),
+        getMojaloopRequests: jest.fn(),
         response: jest.fn(() => ({
           code: jest.fn((code: number) => ({
             statusCode: code
@@ -742,6 +735,7 @@ describe('Inbound API routes', (): void => {
           }))
         })),
         getLogger: jest.fn(() => logger),
+        getDFSPId: jest.fn(() => 'dfspA'),
         getDFSPBackendRequests: jest.fn(() => ({
           validateConsentRequests: jest.fn(() => Promise.resolve(mockData.consentRequestsPost.response)),
           storeConsentRequests: jest.fn(() => Promise.resolve()),
@@ -751,6 +745,7 @@ describe('Inbound API routes', (): void => {
           putConsentRequests: jest.fn(),
           putConsentRequestsError: jest.fn()
         })),
+        getMojaloopRequests: jest.fn(),
         getKVS: jest.fn(() => ({
           set: jest.fn()
         }))
@@ -794,8 +789,10 @@ describe('Inbound API routes', (): void => {
       const toolkit = {
         getPubSub: jest.fn(() => pubSubMock),
         getLogger: jest.fn(() => logger),
+        getDFSPId: jest.fn(() => 'dfspA'),
         getDFSPBackendRequests: jest.fn(),
         getThirdpartyRequests: jest.fn(),
+        getMojaloopRequests: jest.fn(),
         response: jest.fn(() => ({
           code: jest.fn((code: number) => ({
             statusCode: code
@@ -843,8 +840,10 @@ describe('Inbound API routes', (): void => {
       const toolkit = {
         getPubSub: jest.fn(() => pubSubMock),
         getLogger: jest.fn(() => logger),
+        getDFSPId: jest.fn(() => 'dfspA'),
         getDFSPBackendRequests: jest.fn(),
         getThirdpartyRequests: jest.fn(),
+        getMojaloopRequests: jest.fn(),
         response: jest.fn(() => ({
           code: jest.fn((code: number) => ({
             statusCode: code
@@ -900,6 +899,7 @@ describe('Inbound API routes', (): void => {
           }))
         })),
         getLogger: jest.fn(() => logger),
+        getDFSPId: jest.fn(() => 'dfspA'),
         getDFSPBackendRequests: jest.fn(() => ({
           validateOTPSecret: jest.fn(() => Promise.resolve({
             isValid: true
@@ -908,6 +908,7 @@ describe('Inbound API routes', (): void => {
         getThirdpartyRequests: jest.fn(() => ({
           postConsents: jest.fn()
         })),
+        getMojaloopRequests: jest.fn(),
         getKVS: jest.fn(() => ({
           set: jest.fn()
         }))

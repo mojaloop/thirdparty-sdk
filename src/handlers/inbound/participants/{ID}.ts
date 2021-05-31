@@ -29,19 +29,19 @@
 import { Request, ResponseObject } from '@hapi/hapi'
 import { StateResponseToolkit } from '~/server/plugins/state'
 import { Message } from '~/shared/pub-sub'
-import { v1_1 as fspiopAPI } from '@mojaloop/api-snippets';
+import { thirdparty as tpAPI } from '@mojaloop/api-snippets';
 import { DFSPLinkingPhase } from '~/models/inbound/dfspLinking.interface'
 import { DFSPLinkingModel } from '~/models/inbound/dfspLinking.model'
 
 /**
- * Handles an inbound `PUT /participants/{Type}/{ID}` request
+ * Handles an inbound `PUT /participants/{ID}` request
  */
  async function put (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const consentId = request.params.ID
-  const type = request.params.Type
-  const payload = request.payload as fspiopAPI.Schemas.ParticipantsIDPutResponse
+  const payload = request.payload as tpAPI.Schemas.ParticipantsIDPutResponse
+  const type = payload.partyList[0].partyId.partyIdType
 
-  if (type == 'CONSENTS') {
+  if (type == 'CONSENT') {
     DFSPLinkingModel.triggerWorkflow(
       DFSPLinkingPhase.waitOnAuthServiceResponse,
       consentId,

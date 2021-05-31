@@ -31,7 +31,7 @@ import {
   NotificationCallback,
   PubSub
 } from '~/shared/pub-sub'
-import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
+import { ThirdpartyRequests, MojaloopRequests } from '@mojaloop/sdk-standard-components';
 import {
   DFSPLinkingModel,
   create,
@@ -92,6 +92,9 @@ describe('dfspLinkingModel', () => {
           isValid: true
         }))
       } as unknown as DFSPBackendRequests,
+      mojaloopRequests: {
+        postParticipants: jest.fn(() => Promise.resolve({ statusCode: 202 })),
+      } as unknown as MojaloopRequests,
       requestProcessingTimeoutSeconds: 3
     }
     mocked(modelConfig.pubSub.subscribe).mockImplementationOnce(
@@ -763,6 +766,7 @@ describe('dfspLinkingModel', () => {
     it('should properly call `KVS.get`, get expected data in `context.data` and setup state of machine', async () => {
       const dataFromCache = {
         toParticipantId: 'pispa',
+        dfspId: 'dfspA',
         toAuthServiceParticipantId: 'central-auth',
         consentRequestsPostRequest: mockData.consentRequestsPost.payload,
         backendValidateConsentRequestsResponse: mockData.consentRequestsPost.response,
