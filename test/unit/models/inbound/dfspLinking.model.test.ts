@@ -170,6 +170,7 @@ describe('dfspLinkingModel', () => {
 
     beforeEach(async () => {
       validateData = {
+        dfspId: 'dfspa',
         toParticipantId: 'pispa',
         toAuthServiceParticipantId: 'central-auth',
         consentRequestsPostRequest: mockData.consentRequestsPost.payload,
@@ -455,6 +456,7 @@ describe('dfspLinkingModel', () => {
 
     beforeEach(async () => {
       validateData = {
+        dfspId: 'dfspa',
         toParticipantId: 'pispa',
         toAuthServiceParticipantId: 'central-auth',
         consentRequestsPostRequest: mockData.consentRequestsPost.payload,
@@ -549,6 +551,7 @@ describe('dfspLinkingModel', () => {
 
     beforeEach(async () => {
       validateData = {
+        dfspId: 'dfspa',
         toParticipantId: 'pispa',
         toAuthServiceParticipantId: 'central-auth',
         currentState: 'consentRequestValidatedAndStored',
@@ -677,6 +680,7 @@ describe('dfspLinkingModel', () => {
 
     beforeEach(async () => {
       validateData = {
+        dfspId: 'dfspa',
         toParticipantId: 'pispa',
         toAuthServiceParticipantId: 'central-auth',
         currentState: 'authTokenValidated',

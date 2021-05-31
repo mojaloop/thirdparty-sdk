@@ -99,4 +99,98 @@ defineFeature(feature, (test): void => {
       expect(response.statusCode).toBe(202)
     })
   })
+
+  test('PutConsentByID Signed', ({ given, when, then }): void => {
+    given('Inbound API server', async (): Promise<void> => {
+      server = await prepareInboundAPIServer()
+    })
+
+    when('I receive a \'PutConsentByID\' request', async (): Promise<ServerInjectResponse> => {
+      jest.mock('~/shared/kvs')
+      jest.mock('~/shared/pub-sub')
+      const request = {
+        method: 'PUT',
+        url: '/consents/8e34f91d-d078-4077-8263-2c047876fcf6',
+        headers: {
+          'Content-Type': 'application/json',
+          'FSPIOP-Source': 'switch',
+          'Accept': 'application/json',
+          Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
+          'FSPIOP-Destination': 'dfspA'
+        },
+        payload: {
+          scopes: [{
+            accountId: 'some-id',
+            actions: [
+              'accounts.getBalance',
+              'accounts.transfer'
+            ]
+          }],
+          credential: {
+            credentialType: 'FIDO',
+            status: 'PENDING',
+            payload: {
+              id: 'some-credential-id',
+              response: {
+                clientDataJSON: 'client-data'
+              }
+            }
+          }
+        }
+      }
+      response = await server.inject(request)
+      return response
+    })
+
+    then('I get a response with a status code of \'202\'', (): void => {
+      expect(response.statusCode).toBe(202)
+    })
+  })
+
+  test('PutConsentByID Verified', ({ given, when, then }): void => {
+    given('Inbound API server', async (): Promise<void> => {
+      server = await prepareInboundAPIServer()
+    })
+
+    when('I receive a \'PutConsentByID\' request', async (): Promise<ServerInjectResponse> => {
+      jest.mock('~/shared/kvs')
+      jest.mock('~/shared/pub-sub')
+      const request = {
+        method: 'PUT',
+        url: '/consents/8e34f91d-d078-4077-8263-2c047876fcf6',
+        headers: {
+          'Content-Type': 'application/json',
+          'FSPIOP-Source': 'switch',
+          'Accept': 'application/json',
+          Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
+          'FSPIOP-Destination': 'dfspA'
+        },
+        payload: {
+          scopes: [{
+            accountId: 'some-id',
+            actions: [
+              'accounts.getBalance',
+              'accounts.transfer'
+            ]
+          }],
+          credential: {
+            credentialType: 'FIDO',
+            status: 'VERIFIED',
+            payload: {
+              id: 'some-credential-id',
+              response: {
+                clientDataJSON: 'client-data'
+              }
+            }
+          }
+        }
+      }
+      response = await server.inject(request)
+      return response
+    })
+
+    then('I get a response with a status code of \'200\'', (): void => {
+      expect(response.statusCode).toBe(200)
+    })
+  })
 })

@@ -30,7 +30,7 @@ import {
   StateData
 } from '~/models/persistent.model'
 import { Method } from 'javascript-state-machine'
-import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
+import { ThirdpartyRequests, MojaloopRequests } from '@mojaloop/sdk-standard-components';
 import {
   v1_1 as fspiopAPI,
   thirdparty as tpAPI
@@ -42,7 +42,9 @@ export enum DFSPLinkingPhase {
   requestConsent = 'requestConsent',
   requestConsentAuthenticate = 'requestConsentAuthenticate',
   waitOnAuthServiceResponse = 'waitOnAuthServiceResponse',
-  waitOnALSParticipantResponse = 'waitOnALSParticipantResponse'
+  waitOnALSParticipantResponse = 'waitOnALSParticipantResponse',
+  waitOnThirdpartyLinkRegistrationResponse = 'waitOnThirdpartyLinkRegistrationResponse',
+  waitOnVerificationNotification = 'waitOnVerificationNotification'
 }
 
 // TODO: Let keep Backend* interfaces in DFSPBackendRequests
@@ -98,10 +100,12 @@ export interface DFSPLinkingStateMachine extends ControlledStateMachine {
 export interface DFSPLinkingModelConfig extends PersistentModelConfig {
   pubSub: PubSub
   thirdpartyRequests: ThirdpartyRequests
+  mojaloopRequests: MojaloopRequests
   dfspBackendRequests: DFSPBackendRequests
   requestProcessingTimeoutSeconds: number
 }
 export interface DFSPLinkingData extends StateData {
+  dfspId: string
   toParticipantId: string
   toAuthServiceParticipantId: string
   consentRequestId: string

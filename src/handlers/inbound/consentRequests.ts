@@ -50,6 +50,7 @@ async function post (_context: unknown, request: Request, h: StateResponseToolki
   const sourceFspId = request.headers['fspiop-source']
 
   const data: DFSPLinkingData = {
+    dfspId: h.getDFSPId(),
     currentState: 'start',
     toParticipantId: sourceFspId,
     toAuthServiceParticipantId: 'central-auth',
@@ -65,6 +66,7 @@ async function post (_context: unknown, request: Request, h: StateResponseToolki
     logger: h.getLogger(),
     dfspBackendRequests: h.getDFSPBackendRequests(),
     thirdpartyRequests: h.getThirdpartyRequests(),
+    mojaloopRequests: h.getMojaloopRequests(),
     requestProcessingTimeoutSeconds: config.REQUEST_PROCESSING_TIMEOUT_SECONDS
   }
 

@@ -21,35 +21,44 @@
  - Kevin Leyow <kevin.leyow@modusbox.com>
  --------------
  ******/
- import { Request, ResponseObject } from '@hapi/hapi'
- import {
-   v1_1 as fspiopAPI
- } from '@mojaloop/api-snippets'
- import { Message } from '~/shared/pub-sub'
- import { StateResponseToolkit } from '~/server/plugins/state'
- import { Enum } from '@mojaloop/central-services-shared';
- import { PISPLinkingModel } from '~/models/outbound/pispLinking.model'
- import { PISPLinkingPhase } from '~/models/outbound/pispLinking.interface';
+import { Request, ResponseObject } from '@hapi/hapi'
+import {
+  v1_1 as fspiopAPI
+} from '@mojaloop/api-snippets'
+import { Message } from '~/shared/pub-sub'
+import { StateResponseToolkit } from '~/server/plugins/state'
+import { Enum } from '@mojaloop/central-services-shared'
+import { PISPLinkingModel } from '~/models/outbound/pispLinking.model'
+import { PISPLinkingPhase } from '~/models/outbound/pispLinking.interface'
+import { DFSPLinkingModel } from '~/models/inbound/dfspLinking.model'
+import { DFSPLinkingPhase } from '~/models/inbound/dfspLinking.interface'
 
- /**
-  * Handles a inbound PUT /consents/{ID}/error request
-  */
- async function put (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
-   // PUT /consents/{ID}/error is a response to PUT /consents/{ID}
-   // when something went wrong registering a credential
-   const consentId = request.params.ID
-   const payload = request.payload as fspiopAPI.Schemas.ErrorInformation
+/**
+* Handles a inbound PUT /consents/{ID}/error request
+*/
+async function put (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+  // PUT /consents/{ID}/error is a response to PUT /consents/{ID}
+  // when something went wrong registering a credential
+  const consentId = request.params.ID
+  const payload = request.payload as fspiopAPI.Schemas.ErrorInformation
 
-   PISPLinkingModel.triggerWorkflow(
-     PISPLinkingPhase.registerCredential,
-     consentId,
-     h.getPubSub(),
-     payload as unknown as Message
-   )
+  PISPLinkingModel.triggerWorkflow(
+    PISPLinkingPhase.registerCredential,
+    consentId,
+    h.getPubSub(),
+    payload as unknown as Message
+  )
 
-   return h.response({}).code(Enum.Http.ReturnCodes.OK.CODE)
- }
+  DFSPLinkingModel.triggerWorkflow(
+    DFSPLinkingPhase.waitOnAuthServiceResponse,
+    consentId,
+    h.getPubSub(),
+    payload as unknown as Message
+  )
 
- export default {
-   put
- }
+  return h.response({}).code(Enum.Http.ReturnCodes.OK.CODE)
+}
+
+export default {
+  put
+}

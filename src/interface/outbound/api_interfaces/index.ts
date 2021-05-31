@@ -50,7 +50,6 @@ export namespace Schemas {
   export type AccountId = components['schemas']['AccountId']
   export type Name = components['schemas']['Name']
   export type Account = components['schemas']['Account']
-  export type AccountList = components['schemas']['AccountList']
   export type ThirdpartyTransactionPartyLookupResponseSuccess = components['schemas']['ThirdpartyTransactionPartyLookupResponseSuccess']
   export type ThirdpartyTransactionPartyLookupResponseError = components['schemas']['ThirdpartyTransactionPartyLookupResponseError']
   export type ThirdpartyTransactionPartyLookupResponse = components['schemas']['ThirdpartyTransactionPartyLookupResponse']

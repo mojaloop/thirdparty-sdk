@@ -26,34 +26,42 @@
  --------------
  ******/
 
-import {
-  thirdparty as tpAPI
-} from '@mojaloop/api-snippets'
-import { Message } from '~/shared/pub-sub'
 import { Request, ResponseObject } from '@hapi/hapi'
 import { StateResponseToolkit } from '~/server/plugins/state'
-import { Enum } from '@mojaloop/central-services-shared'
-import { PISPLinkingModel } from '~/models/outbound/pispLinking.model'
-import { PISPLinkingPhase } from '~/models/outbound/pispLinking.interface'
+import { Message } from '~/shared/pub-sub'
+import { v1_1 as fspiopAPI } from '@mojaloop/api-snippets';
+import { DFSPLinkingPhase } from '~/models/inbound/dfspLinking.interface'
+import { DFSPLinkingModel } from '~/models/inbound/dfspLinking.model'
 
-async function post (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
-  const payload = request.payload as tpAPI.Schemas.ConsentsPostRequest
+/**
+ * Handles an inbound `PUT /participants/{Type}/{ID}` request
+ */
+ async function put (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+  const consentId = request.params.ID
+  const type = request.params.Type
+  const payload = request.payload as fspiopAPI.Schemas.ParticipantsIDPutResponse
 
-  // POST /consents is a follow-up request to PATCH /consentRequests
-  // so we publish the request on the PISPConsentRequestModel
-  PISPLinkingModel.triggerWorkflow(
-    PISPLinkingPhase.requestConsentAuthenticate,
-    payload.consentRequestId!,
-    h.getPubSub(),
-    payload as unknown as Message
-  )
-  h.getLogger().info('PISPConsentRequestModel handled POST /consents request')
+  if (type == 'CONSENTS') {
+    DFSPLinkingModel.triggerWorkflow(
+      DFSPLinkingPhase.waitOnAuthServiceResponse,
+      consentId,
+      h.getPubSub(),
+      payload as unknown as Message
+    )
+  }
 
-  // Note that we will have passed request validation, JWS etc... by this point
-  // so it is safe to return 202
-  return h.response().code(Enum.Http.ReturnCodes.ACCEPTED.CODE)
+  if (type == 'THIRD_PARTY_LINK') {
+    DFSPLinkingModel.triggerWorkflow(
+      DFSPLinkingPhase.waitOnThirdpartyLinkRegistrationResponse,
+      consentId,
+      h.getPubSub(),
+      payload as unknown as Message
+    )
+  }
+
+  return h.response().code(200)
 }
 
 export default {
-  post
+  put
 }

@@ -32,14 +32,15 @@ import {
 import { Request, ResponseObject } from '@hapi/hapi'
 import { StateResponseToolkit } from '~/server/plugins/state'
 import { Enum } from '@mojaloop/central-services-shared'
-import { DFSPLinkingModel, loadFromKVS } from '~/models/inbound/dfspLinking.model';
+import { DFSPLinkingModel, loadFromKVS } from '~/models/inbound/dfspLinking.model'
 import {
   DFSPLinkingModelConfig
 } from '~/models/inbound/dfspLinking.interface'
-import inspect from '~/shared/inspect';
-import { PISPLinkingModel } from '~/models/outbound/pispLinking.model';
+import inspect from '~/shared/inspect'
+import { PISPLinkingModel } from '~/models/outbound/pispLinking.model'
 import { Message } from '~/shared/pub-sub'
-import { PISPLinkingPhase } from '~/models/outbound/pispLinking.interface';
+import { PISPLinkingPhase } from '~/models/outbound/pispLinking.interface'
+import config from '~/shared/config'
 
 async function patch (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const payload = request.payload as tpAPI.Schemas.ConsentRequestsIDPatchRequest
@@ -53,6 +54,8 @@ async function patch (_context: unknown, request: Request, h: StateResponseToolk
     logger: h.getLogger(),
     dfspBackendRequests: h.getDFSPBackendRequests(),
     thirdpartyRequests: h.getThirdpartyRequests(),
+    mojaloopRequests: h.getMojaloopRequests(),
+    requestProcessingTimeoutSeconds: config.REQUEST_PROCESSING_TIMEOUT_SECONDS
   }
 
   // don't await on promise to be resolved

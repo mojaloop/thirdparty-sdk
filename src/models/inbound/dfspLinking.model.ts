@@ -28,7 +28,7 @@
 import { PubSub } from '~/shared/pub-sub'
 import { PersistentModel } from '~/models/persistent.model'
 import { StateMachineConfig } from 'javascript-state-machine'
-import { ThirdpartyRequests, Errors } from '@mojaloop/sdk-standard-components';
+import { ThirdpartyRequests, Errors, MojaloopRequests } from '@mojaloop/sdk-standard-components';
 import {
   v1_1 as fspiopAPI,
   thirdparty as tpAPI
@@ -92,6 +92,10 @@ export class DFSPLinkingModel
     return this.config.thirdpartyRequests
   }
 
+  get mojaloopRequests (): MojaloopRequests {
+    return this.config.mojaloopRequests
+  }
+
   static notificationChannel (phase: DFSPLinkingPhase, id: string): string {
     if (!id) {
       throw new Error('DFSPLinkingModel.notificationChannel: \'id\' parameter is required')
@@ -100,6 +104,15 @@ export class DFSPLinkingModel
     return `DFSPLinking_${phase}_${id}`
   }
 
+  static async triggerWorkflow (
+    phase: DFSPLinkingPhase,
+    id: string,
+    pubSub: PubSub,
+    message: Message
+  ): Promise<void> {
+    const channel = DFSPLinkingModel.notificationChannel(phase, id)
+    return deferredJob(pubSub, channel).trigger(message)
+  }
 
   async onValidateRequest (): Promise<void> {
     const { consentRequestsPostRequest, toParticipantId } = this.data
@@ -235,7 +248,7 @@ export class DFSPLinkingModel
         toParticipantId
       )
 
-      // We create a copy of the persistant model with `consentId` as the new
+      // We create a copy of the persistent model with `consentId` as the new
       // key. consentRequestId is no longer passed through requests after this
       // point so we need a soft copy of this model to retrieve the model
       // on later requests.
@@ -250,6 +263,7 @@ export class DFSPLinkingModel
         logger: this.config.logger,
         dfspBackendRequests: this.config.dfspBackendRequests,
         thirdpartyRequests: this.config.thirdpartyRequests,
+        mojaloopRequests: this.config.mojaloopRequests,
         requestProcessingTimeoutSeconds: this.config.requestProcessingTimeoutSeconds
       }
 
@@ -287,11 +301,11 @@ export class DFSPLinkingModel
       consentId!
     )
     const waitOnALSParticipantResponse = DFSPLinkingModel.notificationChannel(
-      DFSPLinkingPhase.waitOnAuthServiceResponse,
+      DFSPLinkingPhase.waitOnALSParticipantResponse,
       consentId!
     )
 
-    const waitOnAuthService =deferredJob(this.pubSub, waitOnAuthServiceResponse)
+    const waitOnAuthService = deferredJob(this.pubSub, waitOnAuthServiceResponse)
       .init(async (channel) => {
         const res = await this.thirdpartyRequests.postConsents(
           consentPostRequestToAuthService,
@@ -330,6 +344,62 @@ export class DFSPLinkingModel
       .wait(this.config.requestProcessingTimeoutSeconds * 1000)
 
     await Promise.all([waitOnAuthService, waitOnALS])
+  }
+
+  async onFinalizeConsentWithALS (): Promise<void> {
+    // todo: send a bulk POST /participants request to ALS to
+    //       store THIRD_PARTY_LINK entries
+
+    /*
+    const partyList: tpAPI.Schemas.PartyIdInfo[] = []
+    for (const scope of this.data.scopes as tpAPI.Schemas.Scope[]) {
+      var partyIdInfo: tpAPI.Schemas.PartyIdInfo = {
+        partyIdType: 'THIRD_PARTY_LINK',
+        partyIdentifier: scope.accountId
+      }
+      partyList.push(partyIdInfo)
+    }
+
+    const consentPostRequestToALSService: tpAPI.Schemas.ParticipantsPostRequest = {
+      requestId: this.data.consentId!,
+      partyList
+    }
+
+    const channel = DFSPLinkingModel.notificationChannel(
+      DFSPLinkingPhase.waitOnThirdpartyLinkRegistrationResponse,
+      this.data.consentId!
+    )
+
+    return deferredJob(this.pubSub, channel)
+    .init(async (): Promise<void> => {
+      // need to update `mojaloopRequests.postParticipants` to accept
+      // 'THIRD_PARTY_LINK'
+      const res = await this.mojaloopRequests.postParticipants(
+        consentPostRequestToALSService,
+        'auth-service'
+      )
+      this.logger.push({ res }).info('MojaloopRequests.postParticipants request sent to peer')
+    })
+    .job(async (message: Message): Promise<void> => {
+    })
+    .wait(this.config.requestProcessingTimeoutSeconds * 1000)
+    */
+  }
+
+  async onNotifyVerificationToPISP (): Promise<void> {
+    const { consentId } = this.data
+
+    const consentPatchVerifiedRequest: tpAPI.Schemas.ConsentsIDPatchResponseVerified = {
+      credential: {
+        status: 'VERIFIED'
+      }
+    }
+
+    this.thirdpartyRequests.patchConsents(
+      consentId!,
+      consentPatchVerifiedRequest,
+      this.data.toParticipantId
+    )
   }
 
   /**
@@ -373,6 +443,24 @@ export class DFSPLinkingModel
           await this.fsm.grantConsent()
           await this.saveToKVS()
           // PATCH /consentRequest{ID} handled
+          return
+
+        case 'consentGranted':
+          await this.fsm.validateWithAuthService()
+          this.logger.info(
+            `grantConsent requested for ${data.consentId},  currentState: ${data.currentState}`
+          )
+          await this.saveToKVS()
+          return this.run()
+
+        case 'consentRegisteredAndValidated':
+          await this.fsm.finalizeConsentWithALS()
+          await this.saveToKVS()
+          return
+
+        case 'PISPDFSPLinkEstablished':
+          await this.fsm.notifyVerificationToPISP()
+          await this.saveToKVS()
           return
 
         default:
