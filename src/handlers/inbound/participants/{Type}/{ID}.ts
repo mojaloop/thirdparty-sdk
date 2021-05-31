@@ -20,34 +20,31 @@
  optionally within square brackets <email>.
  * Gates Foundation
  - Name Surname <name.surname@gatesfoundation.com>
-
  - Kevin Leyow <kevin.leyow@modusbox.com>
-
  --------------
  ******/
 
 import { Request, ResponseObject } from '@hapi/hapi'
 import { StateResponseToolkit } from '~/server/plugins/state'
 import { Message } from '~/shared/pub-sub'
-import { thirdparty as tpAPI } from '@mojaloop/api-snippets';
+import { v1_1 as fspiopAPI } from '@mojaloop/api-snippets';
 import { DFSPLinkingPhase } from '~/models/inbound/dfspLinking.interface'
 import { DFSPLinkingModel } from '~/models/inbound/dfspLinking.model'
 
 /**
- * Handles an inbound `PUT /participants/{ID}` request
+ * Handles an inbound `PUT /participants/{Type}/{ID}` request
  */
  async function put (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
-  const id = request.params.ID
-  const payload = request.payload as tpAPI.Schemas.ParticipantsIDPutResponse
-  const type = payload.partyList[0].partyId.partyIdType
+  // the ID should be the `consentId` used previous in the DFSPLinking flow
+  const consentId = request.params.ID
+  const type = request.params.Type
+  const payload = request.payload as fspiopAPI.Schemas.ParticipantsIDPutResponse
   // this is a inbound request coming from the ALS in response to
-  // DFSPLinkingModel.onFinalizeConsentWithALS where a POST /participant
-  // bulk create request is made to the ALS.
-  // DFSPLinkingModel.onFinalizeConsentWithALS is not yet implemented
-  if (type == 'THIRD_PARTY_LINK') {
+  // DFSPLinkingModel.onValidateWithAuthService
+  if (type == 'CONSENTS') {
     DFSPLinkingModel.triggerWorkflow(
-      DFSPLinkingPhase.waitOnThirdpartyLinkRegistrationResponse,
-      id,
+      DFSPLinkingPhase.waitOnALSParticipantResponse,
+      consentId,
       h.getPubSub(),
       payload as unknown as Message
     )

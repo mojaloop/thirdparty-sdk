@@ -1161,6 +1161,131 @@ describe('Inbound API routes', (): void => {
     })
   })
 
+  describe('PUT /consents/{ID}', () => {
+    describe('Signed Credential request body', () => {
+      it('handler && pubSub invocation', async (): Promise<void> => {
+        const request = {
+          payload: mockData.inboundPutConsentsIdRequestSignedCredential.payload,
+          params: {
+            ID: '520f9165-7be6-4a40-9fc8-b30fcf4f62ab'
+          },
+          headers: {
+            'Content-Type': 'application/json',
+            'FSPIOP-Source': 'switch',
+            Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
+            'FSPIOP-Destination': 'dfspA'
+          }
+        }
+        const pubSubMock = {
+          publish: jest.fn()
+        }
+        const toolkit = {
+          getPubSub: jest.fn(() => pubSubMock),
+          response: jest.fn(() => ({
+            code: jest.fn((code: number) => ({
+              statusCode: code
+            }))
+          })),
+          getLogger: jest.fn(() => logger),
+          getDFSPBackendRequests: jest.fn(),
+          getThirdpartyRequests: jest.fn(() => ({
+            postConsents: jest.fn()
+          })),
+          getMojaloopRequests: jest.fn(),
+          getKVS: jest.fn(() => ({
+            set: jest.fn()
+          }))
+        }
+
+        const result = await ConsentsIdHandler.put(
+          {},
+          request as unknown as Request,
+          toolkit as unknown as StateResponseToolkit
+        )
+
+        expect(result.statusCode).toEqual(202)
+      })
+
+      it('input validation', async (): Promise<void> => {
+        const request = {
+          method: 'PUT',
+          url: '/consents/520f9165-7be6-4a40-9fc8-b30fcf4f62ab',
+          headers: {
+            'Content-Type': 'application/json',
+            'FSPIOP-Source': 'switch',
+            Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
+            'FSPIOP-Destination': 'pispA'
+          },
+          payload: mockData.inboundPutConsentsIdRequestSignedCredential.payload
+        }
+        const response = await server.inject(request)
+        expect(response.statusCode).toBe(202)
+      })
+    })
+
+    describe('Verified Credential request body', () => {
+      it('handler && pubSub invocation', async (): Promise<void> => {
+        const request = {
+          payload: mockData.inboundPutConsentsIdRequestVerifiedCredential.payload,
+          params: {
+            ID: '520f9165-7be6-4a40-9fc8-b30fcf4f62ab'
+          },
+          headers: {
+            'Content-Type': 'application/json',
+            'FSPIOP-Source': 'switch',
+            Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
+            'FSPIOP-Destination': 'pispA'
+          }
+        }
+        const pubSubMock = {
+          publish: jest.fn()
+        }
+        const toolkit = {
+          getPubSub: jest.fn(() => pubSubMock),
+          response: jest.fn(() => ({
+            code: jest.fn((code: number) => ({
+              statusCode: code
+            }))
+          })),
+          getLogger: jest.fn(() => logger),
+          getDFSPBackendRequests: jest.fn(),
+          getThirdpartyRequests: jest.fn(() => ({
+            postConsents: jest.fn()
+          })),
+          getMojaloopRequests: jest.fn(),
+          getKVS: jest.fn(() => ({
+            set: jest.fn()
+          }))
+        }
+
+        const result = await ConsentsIdHandler.put(
+          {},
+          request as unknown as Request,
+          toolkit as unknown as StateResponseToolkit
+        )
+
+        expect(result.statusCode).toEqual(200)
+      })
+
+      it('input validation', async (): Promise<void> => {
+        const request = {
+          method: 'PUT',
+          url: '/consents/520f9165-7be6-4a40-9fc8-b30fcf4f62ab',
+          headers: {
+            'Content-Type': 'application/json',
+            'FSPIOP-Source': 'switch',
+            Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
+            'FSPIOP-Destination': 'pispA'
+          },
+          payload: mockData.inboundPutConsentsIdRequestVerifiedCredential.payload
+        }
+        const response = await server.inject(request)
+        expect(response.statusCode).toBe(200)
+      })
+    })
+
+  })
+
   describe('PATCH /consents/{ID}', () => {
     it('handler && pubSub invocation', async (): Promise<void> => {
       const request = {

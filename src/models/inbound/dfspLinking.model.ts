@@ -454,7 +454,7 @@ export class DFSPLinkingModel
         case 'consentGranted':
           await this.fsm.validateWithAuthService()
           this.logger.info(
-            `grantConsent requested for ${data.consentId},  currentState: ${data.currentState}`
+            `validateWithAuthService requested for ${data.consentId},  currentState: ${data.currentState}`
           )
           await this.saveToKVS()
           return this.run()

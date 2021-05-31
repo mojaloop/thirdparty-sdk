@@ -435,5 +435,79 @@
         }
       }
     }
+  },
+  "inboundPutConsentsIdRequestSignedCredential": {
+    "headers": {
+      "fspiop-source": "switch",
+      "fspiop-destination": "dfspA"
+    },
+    "params": {
+      "ID": "520f9165-7be6-4a40-9fc8-b30fcf4f62ab"
+    },
+    "payload": {
+      "scopes": [
+        {
+          "accountId": "dfspa.username.1234",
+          "actions": [
+            "accounts.transfer",
+            "accounts.getBalance"
+          ]
+        },
+        {
+          "accountId": "dfspa.username.5678",
+          "actions": [
+            "accounts.transfer",
+            "accounts.getBalance"
+          ]
+        }
+      ],
+      "credential": {
+        "credentialType": "FIDO",
+        "status": "PENDING",
+        "payload": {
+          "id": "some-credential-id",
+          "response": {
+            "clientDataJSON": "client-data"
+          }
+        }
+      }
+    }
+  },
+  "inboundPutConsentsIdRequestVerifiedCredential": {
+    "headers": {
+      "fspiop-source": "switch",
+      "fspiop-destination": "dfspA"
+    },
+    "params": {
+      "ID": "520f9165-7be6-4a40-9fc8-b30fcf4f62ab"
+    },
+    "payload": {
+      "scopes": [
+        {
+          "accountId": "dfspa.username.1234",
+          "actions": [
+            "accounts.transfer",
+            "accounts.getBalance"
+          ]
+        },
+        {
+          "accountId": "dfspa.username.5678",
+          "actions": [
+            "accounts.transfer",
+            "accounts.getBalance"
+          ]
+        }
+      ],
+      "credential": {
+        "credentialType": "FIDO",
+        "status": "VERIFIED",
+        "payload": {
+          "id": "some-credential-id",
+          "response": {
+            "clientDataJSON": "client-data"
+          }
+        }
+      }
+    }
   }
 }

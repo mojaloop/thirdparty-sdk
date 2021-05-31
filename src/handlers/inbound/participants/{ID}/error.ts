@@ -26,32 +26,29 @@
  --------------
  ******/
 
-import { Request, ResponseObject } from '@hapi/hapi'
-import { StateResponseToolkit } from '~/server/plugins/state'
-import { Message } from '~/shared/pub-sub'
-import { thirdparty as tpAPI } from '@mojaloop/api-snippets';
-import { DFSPLinkingPhase } from '~/models/inbound/dfspLinking.interface'
-import { DFSPLinkingModel } from '~/models/inbound/dfspLinking.model'
+ import { Request, ResponseObject } from '@hapi/hapi'
+ import { StateResponseToolkit } from '~/server/plugins/state'
+ import { Message } from '~/shared/pub-sub'
+ import { thirdparty as tpAPI } from '@mojaloop/api-snippets';
+ import { DFSPLinkingPhase } from '~/models/inbound/dfspLinking.interface'
+ import { DFSPLinkingModel } from '~/models/inbound/dfspLinking.model'
 
 /**
- * Handles an inbound `PUT /participants/{ID}` request
- */
- async function put (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+* Handles an inbound `PUT /participants/{ID}/error` request
+*/
+async function put (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const id = request.params.ID
-  const payload = request.payload as tpAPI.Schemas.ParticipantsIDPutResponse
-  const type = payload.partyList[0].partyId.partyIdType
+  const payload = request.payload as tpAPI.Schemas.ErrorInformation
   // this is a inbound request coming from the ALS in response to
   // DFSPLinkingModel.onFinalizeConsentWithALS where a POST /participant
   // bulk create request is made to the ALS.
   // DFSPLinkingModel.onFinalizeConsentWithALS is not yet implemented
-  if (type == 'THIRD_PARTY_LINK') {
-    DFSPLinkingModel.triggerWorkflow(
-      DFSPLinkingPhase.waitOnThirdpartyLinkRegistrationResponse,
-      id,
-      h.getPubSub(),
-      payload as unknown as Message
-    )
-  }
+  DFSPLinkingModel.triggerWorkflow(
+    DFSPLinkingPhase.waitOnThirdpartyLinkRegistrationResponse,
+    id,
+    h.getPubSub(),
+    payload as unknown as Message
+  )
 
   return h.response().code(200)
 }
