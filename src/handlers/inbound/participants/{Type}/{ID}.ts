@@ -38,7 +38,7 @@ import { DFSPLinkingModel } from '~/models/inbound/dfspLinking.model'
   // the ID should be the `consentId` used previous in the DFSPLinking flow
   const consentId = request.params.ID
   const type = request.params.Type
-  const payload = request.payload as fspiopAPI.Schemas.ParticipantsIDPutResponse
+  const payload = request.payload as fspiopAPI.Schemas.ParticipantsTypeIDPutResponse
   // this is a inbound request coming from the ALS in response to
   // DFSPLinkingModel.onValidateWithAuthService
   if (type == 'CONSENTS') {

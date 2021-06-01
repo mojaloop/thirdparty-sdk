@@ -1048,35 +1048,6 @@ describe('dfspLinkingModel', () => {
   describe('Register THIRD_PARTY_LINKS with als', () => {
     let validateData: DFSPLinkingData
 
-    const consentsIDPutResponseVerified: tpAPI.Schemas.ConsentsIDPutResponseVerified = {
-      scopes: [
-        {
-          accountId: 'dfspa.username.1234',
-          actions: [
-            'accounts.transfer',
-            'accounts.getBalance'
-          ]
-        },
-        {
-          accountId: 'dfspa.username.5678',
-          actions: [
-            'accounts.transfer',
-            'accounts.getBalance'
-          ]
-        }
-      ],
-      credential: {
-        credentialType: 'FIDO',
-        status: 'VERIFIED',
-        payload: {
-          id: 'some-credential-id',
-          response: {
-            clientDataJSON: 'client-data'
-          }
-        }
-      }
-    }
-
     const participantsTypeIDPutResponse: tpAPI.Schemas.ParticipantsTypeIDPutResponse = {
       fspId: 'central-auth'
     }
@@ -1093,7 +1064,7 @@ describe('dfspLinkingModel', () => {
         backendValidateConsentRequestsResponse: mockData.consentRequestsPost.response,
         consentRequestsIDPatchRequest: mockData.consentRequestsIDPatchRequest.payload,
         consentIDPutResponse: mockData.inboundPutConsentsIdRequestSignedCredential.payload,
-        consentIDPutResponseFromAuthService: consentsIDPutResponseVerified,
+        consentIDPutResponseFromAuthService: mockData.inboundPutConsentsIdRequestVerifiedCredential.payload,
         participantPutResponseFromALS: participantsTypeIDPutResponse,
         scopes: [
           {
@@ -1132,35 +1103,6 @@ describe('dfspLinkingModel', () => {
   describe('Notify PISP of successful account linking', () => {
     let validateData: DFSPLinkingData
 
-    const consentsIDPutResponseVerified: tpAPI.Schemas.ConsentsIDPutResponseVerified = {
-      scopes: [
-        {
-          accountId: 'dfspa.username.1234',
-          actions: [
-            'accounts.transfer',
-            'accounts.getBalance'
-          ]
-        },
-        {
-          accountId: 'dfspa.username.5678',
-          actions: [
-            'accounts.transfer',
-            'accounts.getBalance'
-          ]
-        }
-      ],
-      credential: {
-        credentialType: 'FIDO',
-        status: 'VERIFIED',
-        payload: {
-          id: 'some-credential-id',
-          response: {
-            clientDataJSON: 'client-data'
-          }
-        }
-      }
-    }
-
     const participantsTypeIDPutResponse: tpAPI.Schemas.ParticipantsTypeIDPutResponse = {
       fspId: 'central-auth'
     }
@@ -1177,7 +1119,7 @@ describe('dfspLinkingModel', () => {
         backendValidateConsentRequestsResponse: mockData.consentRequestsPost.response,
         consentRequestsIDPatchRequest: mockData.consentRequestsIDPatchRequest.payload,
         consentIDPutResponse: mockData.inboundPutConsentsIdRequestSignedCredential.payload,
-        consentIDPutResponseFromAuthService: consentsIDPutResponseVerified,
+        consentIDPutResponseFromAuthService: mockData.inboundPutConsentsIdRequestVerifiedCredential.payload,
         participantPutResponseFromALS: participantsTypeIDPutResponse,
         scopes: [
           {

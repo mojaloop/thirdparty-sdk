@@ -509,5 +509,40 @@
         }
       }
     }
+  },
+  "inboundPutParticipantsTypeIdRequest": {
+    "headers": {
+      "fspiop-source": "switch",
+      "fspiop-destination": "pispA"
+    },
+    "params": {
+      "ID": "520f9165-7be6-4a40-9fc8-b30fcf4f62ab"
+    },
+    "payload": {
+      "fspId": "central-auth"
+    }
+  },
+  "inboundPutParticipantsTypeIdRequestError": {
+    "headers": {
+      "fspiop-source": "switch",
+      "fspiop-destination": "pispA"
+    },
+    "params": {
+      "ID": "520f9165-7be6-4a40-9fc8-b30fcf4f62ab"
+    },
+    "payload": {
+      "errorInformation": {
+        "errorCode": "3200",
+        "errorDescription": "Generic ID not found",
+        "extensionList": {
+          "extension": [
+            {
+              "key": "test",
+              "value": "test"
+            }
+          ]
+        }
+      }
+    }
   }
 }
