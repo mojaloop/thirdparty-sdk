@@ -91,8 +91,8 @@ export interface DFSPLinkingStateMachine extends ControlledStateMachine {
   onGrantConsent: Method
   validateWithAuthService: Method
   onValidateWithAuthService: Method
-  finalizeConsentWithALS: Method
-  onFinalizeConsentWithALS: Method
+  finalizeThirdpartyLinkWithALS: Method
+  onFinalizeThirdpartyLinkWithALS: Method
   notifyVerificationToPISP: Method
   onNotifyVerificationToPISP: Method
 }
@@ -126,10 +126,25 @@ export interface DFSPLinkingData extends StateData {
   consentPostRequest?: tpAPI.Schemas.ConsentsPostRequest
 
   // credential registration phase
-  consentIDPutRequest?: tpAPI.Schemas.ConsentsIDPutResponseSigned
+  // inbound PUT /consent/{ID} response which contains the signed credential
+  consentIDPutResponse?: tpAPI.Schemas.ConsentsIDPutResponseSigned
+
+  // request that passes signed credential to auth-service
   consentPostRequestToAuthService?: tpAPI.Schemas.ConsentsPostRequest
-  consentIDPutRequestFromAuthService?: tpAPI.Schemas.ConsentsIDPutResponseVerified
-  participantPutRequestFromALS?: fspiopAPI.Schemas.ParticipantsIDPutResponse
+
+  // two responses expected from the consentPostRequestToAuthService request
+  // one from the auth-service itself and another from the ALS for saving the
+  // CONSENT object
+  consentIDPutResponseFromAuthService?: tpAPI.Schemas.ConsentsIDPutResponseVerified
+  participantPutResponseFromALS?: fspiopAPI.Schemas.ParticipantsTypeIDPutResponse
+
+  // unimplemented request to ALS to batch create THIRD_PARTY_LINK objects
+  // for accountId's
   thirdpartyLinkRequestsToALS?: tpAPI.Schemas.ParticipantsPostRequest[]
+  thirdpartyLinkResponseFromALS?: tpAPI.Schemas.ParticipantsIDPutResponse
+
+  // final request to notify the PISP that consent has been established
   consentIDPatchRequest?: tpAPI.Schemas.ConsentRequestsIDPatchRequest
+
+  errorInformation?: tpAPI.Schemas.ErrorInformation
 }

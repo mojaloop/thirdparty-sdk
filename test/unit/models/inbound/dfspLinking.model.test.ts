@@ -54,6 +54,7 @@ import {
 import shouldNotBeExecuted from 'test/unit/shouldNotBeExecuted'
 import TestData from 'test/unit/data/mockData.json'
 import { HTTPResponseError } from '../../../../src/shared/http-response-error'
+import { DFSPLinkingPhase } from '~/models/inbound/dfspLinking.interface';
 
 // mock KVS default exported class
 jest.mock('~/shared/kvs')
@@ -72,7 +73,7 @@ describe('dfspLinkingModel', () => {
 
   beforeEach(async () => {
     let subId = 0
-    let handler: NotificationCallback
+    const handlers: {[key: string]: NotificationCallback } = {}
 
     modelConfig = {
       key: 'cache-key',
@@ -83,6 +84,8 @@ describe('dfspLinkingModel', () => {
         putConsentRequests: jest.fn(() => Promise.resolve({ statusCode: 202 })),
         putConsentRequestsError: jest.fn(() => Promise.resolve({ statusCode: 202 })),
         postConsents: jest.fn(() => Promise.resolve({ statusCode: 202 })),
+        patchConsents: jest.fn(() => Promise.resolve({ statusCode: 200 })),
+        putConsentsError: jest.fn(() => Promise.resolve({ statusCode: 200 })),
       } as unknown as ThirdpartyRequests,
       dfspBackendRequests: {
         validateConsentRequests: jest.fn(() => Promise.resolve(mockData.consentRequestsPost.response)),
@@ -97,15 +100,15 @@ describe('dfspLinkingModel', () => {
       } as unknown as MojaloopRequests,
       requestProcessingTimeoutSeconds: 3
     }
-    mocked(modelConfig.pubSub.subscribe).mockImplementationOnce(
-      (_channel: string, cb: NotificationCallback) => {
-        handler = cb
+    mocked(modelConfig.pubSub.subscribe).mockImplementation(
+      (channel: string, cb: NotificationCallback) => {
+        handlers[channel] = cb
         return ++subId
       }
     )
 
-    mocked(modelConfig.pubSub.publish).mockImplementationOnce(
-      async (channel: string, message: Message) => handler(channel, message, subId)
+    mocked(modelConfig.pubSub.publish).mockImplementation(
+      async (channel: string, message: Message) => handlers[channel](channel, message, subId)
     )
     await modelConfig.kvs.connect()
     await modelConfig.pubSub.connect()
@@ -151,7 +154,7 @@ describe('dfspLinkingModel', () => {
     ])
     expect(sortedArray(dfspLinkingModel.fsm.allTransitions())).toEqual([
       'error',
-      'finalizeConsentWithALS',
+      'finalizeThirdpartyLinkWithALS',
       'grantConsent',
       'init',
       'notifyVerificationToPISP',
@@ -691,13 +694,22 @@ describe('dfspLinkingModel', () => {
         consentRequestsPostRequest: mockData.consentRequestsPost.payload,
         backendValidateConsentRequestsResponse: mockData.consentRequestsPost.response,
         consentRequestsIDPatchRequest: mockData.consentRequestsIDPatchRequest.payload,
-        scopes: [{
-          accountId: 'some-id',
-          actions: [
-            'accounts.getBalance',
-            'accounts.transfer'
-          ]
-        }]
+        scopes: [
+          {
+            accountId: 'dfspa.username.1234',
+            actions: [
+              'accounts.transfer',
+              'accounts.getBalance'
+            ]
+          },
+          {
+            accountId: 'dfspa.username.5678',
+            actions: [
+              'accounts.transfer',
+              'accounts.getBalance'
+            ]
+          }
+        ]
       }
     })
 
@@ -720,13 +732,22 @@ describe('dfspLinkingModel', () => {
         {
           consentId: '00000000-0000-1000-8000-000000000001',
           consentRequestId: 'b51ec534-ee48-4575-b6a9-ead2955b8069',
-          scopes: [{
-            accountId: 'some-id',
-            actions: [
-              'accounts.getBalance',
-              'accounts.transfer'
-            ]
-          }]
+          scopes: [
+            {
+              accountId: 'dfspa.username.1234',
+              actions: [
+                'accounts.transfer',
+                'accounts.getBalance'
+              ]
+            },
+            {
+              accountId: 'dfspa.username.5678',
+              actions: [
+                'accounts.transfer',
+                'accounts.getBalance'
+              ]
+            }
+          ]
         },
         'pispa'
       )
@@ -760,8 +781,478 @@ describe('dfspLinkingModel', () => {
         'pispa'
       )
     })
-
   })
+
+  describe('Send signed challenge to auth service', () => {
+    let validateData: DFSPLinkingData
+
+    const consentsIDPutResponseVerified: tpAPI.Schemas.ConsentsIDPutResponseVerified = {
+      scopes: [
+        {
+          accountId: 'dfspa.username.1234',
+          actions: [
+            'accounts.transfer',
+            'accounts.getBalance'
+          ]
+        },
+        {
+          accountId: 'dfspa.username.5678',
+          actions: [
+            'accounts.transfer',
+            'accounts.getBalance'
+          ]
+        }
+      ],
+      credential: {
+        credentialType: 'FIDO',
+        status: 'VERIFIED',
+        payload: {
+          id: 'some-credential-id',
+          response: {
+            clientDataJSON: 'client-data'
+          }
+        }
+      }
+    }
+
+    const participantsTypeIDPutResponse: tpAPI.Schemas.ParticipantsTypeIDPutResponse = {
+      fspId: 'central-auth'
+    }
+
+    beforeEach(async () => {
+      validateData = {
+        dfspId: 'dfspa',
+        toParticipantId: 'pispa',
+        toAuthServiceParticipantId: 'central-auth',
+        currentState: 'consentGranted',
+        consentId: '00000000-0000-1000-8000-000000000001',
+        consentRequestId: 'b51ec534-ee48-4575-b6a9-ead2955b8069',
+        consentRequestsPostRequest: mockData.consentRequestsPost.payload,
+        backendValidateConsentRequestsResponse: mockData.consentRequestsPost.response,
+        consentRequestsIDPatchRequest: mockData.consentRequestsIDPatchRequest.payload,
+        consentIDPutResponse: mockData.inboundPutConsentsIdRequestSignedCredential.payload,
+        scopes: [
+          {
+            accountId: 'dfspa.username.1234',
+            actions: [
+              'accounts.transfer',
+              'accounts.getBalance'
+            ]
+          },
+          {
+            accountId: 'dfspa.username.5678',
+            actions: [
+              'accounts.transfer',
+              'accounts.getBalance'
+            ]
+          }
+        ],
+      }
+    })
+
+    it('should be well constructed', async () => {
+      const model = await create(validateData, modelConfig)
+      checkDFSPLinkingModelLayout(model, validateData)
+    })
+
+    it('onValidateWithAuthService() should transition from consent granted to consent registered and validated when successful', async () => {
+      const model = await create(validateData, modelConfig)
+      const waitOnAuthServiceResponse = DFSPLinkingModel.notificationChannel(
+        DFSPLinkingPhase.waitOnAuthServiceResponse,
+        validateData.consentId!
+      )
+      const waitOnALSParticipantResponse = DFSPLinkingModel.notificationChannel(
+        DFSPLinkingPhase.waitOnALSParticipantResponse,
+        validateData.consentId!
+      )
+
+      // defer publication to notification channel
+      setImmediate(() => {
+        model.pubSub.publish(
+          waitOnAuthServiceResponse,
+          consentsIDPutResponseVerified as unknown as Message
+        )
+        model.pubSub.publish(
+          waitOnALSParticipantResponse,
+          participantsTypeIDPutResponse as unknown as Message
+        )
+      })
+
+      // start send consent step
+      await model.fsm.validateWithAuthService()
+
+      // check that the fsm was able to transition properly
+      expect(model.data.currentState).toEqual('consentRegisteredAndValidated')
+
+      // check we made a call to thirdpartyRequests.postConsents
+      expect(modelConfig.thirdpartyRequests.postConsents).toBeCalledWith(
+        {
+          consentId: '00000000-0000-1000-8000-000000000001',
+          scopes: [
+            {
+              accountId: 'dfspa.username.1234',
+              actions: [
+                'accounts.transfer',
+                'accounts.getBalance'
+              ]
+            },
+            {
+              accountId: 'dfspa.username.5678',
+              actions: [
+                'accounts.transfer',
+                'accounts.getBalance'
+              ]
+            }
+          ],
+          credential: {
+            credentialType: 'FIDO',
+            status: 'PENDING',
+            payload: {
+              id: 'some-credential-id',
+              response: {
+                clientDataJSON: 'client-data'
+              }
+            }
+          }
+        },
+        'central-auth'
+      )
+    })
+
+    it('onValidateWithAuthService() should transition from consent granted to errored when receiving error response from Auth service', async () => {
+      const model = await create(validateData, modelConfig)
+      const waitOnAuthServiceResponse = DFSPLinkingModel.notificationChannel(
+        DFSPLinkingPhase.waitOnAuthServiceResponse,
+        validateData.consentId!
+      )
+      const waitOnALSParticipantResponse = DFSPLinkingModel.notificationChannel(
+        DFSPLinkingPhase.waitOnALSParticipantResponse,
+        validateData.consentId!
+      )
+
+      // defer publication to notification channel
+      setImmediate(() => {
+        model.pubSub.publish(
+          waitOnAuthServiceResponse,
+          {
+            errorInformation: {
+              errorCode: '7200',
+              errorDescription: 'Generic Thirdparty account linking error'
+            }
+          } as unknown as Message
+        )
+        model.pubSub.publish(
+          waitOnALSParticipantResponse,
+          participantsTypeIDPutResponse as unknown as Message
+        )
+      })
+
+      // start send consent step
+      await model.fsm.validateWithAuthService()
+      // check for errors
+      await model.checkModelDataForErrorInformation()
+      // check that the fsm was able to transition properly
+      expect(model.data.currentState).toEqual('errored')
+
+      // check we made a call to thirdpartyRequests.postConsents
+      expect(modelConfig.thirdpartyRequests.putConsentsError).toBeCalledWith(
+        validateData.consentId,
+        {
+          errorInformation: {
+            errorCode: '7213',
+            errorDescription: 'Consent is invalid'
+          }
+        },
+        'pispa'
+      )
+    })
+
+    it('onValidateWithAuthService() should transition from consent granted to errored when receiving error response from ALS', async () => {
+      const model = await create(validateData, modelConfig)
+      const waitOnAuthServiceResponse = DFSPLinkingModel.notificationChannel(
+        DFSPLinkingPhase.waitOnAuthServiceResponse,
+        validateData.consentId!
+      )
+      const waitOnALSParticipantResponse = DFSPLinkingModel.notificationChannel(
+        DFSPLinkingPhase.waitOnALSParticipantResponse,
+        validateData.consentId!
+      )
+
+      // defer publication to notification channel
+      setImmediate(() => {
+        model.pubSub.publish(
+          waitOnAuthServiceResponse,
+          consentsIDPutResponseVerified as unknown as Message
+        )
+        model.pubSub.publish(
+          waitOnALSParticipantResponse,
+          {
+            errorInformation: {
+              errorCode: '3000',
+              errorDescription: 'Generic participant error'
+            }
+          } as unknown as Message
+        )
+      })
+
+      // start send consent step
+      await model.fsm.validateWithAuthService()
+      // check for errors
+      await model.checkModelDataForErrorInformation()
+      // check that the fsm was able to transition properly
+      expect(model.data.currentState).toEqual('errored')
+
+      // check we made a call to thirdpartyRequests.postConsents
+      expect(modelConfig.thirdpartyRequests.putConsentsError).toBeCalledWith(
+        validateData.consentId,
+        {
+          errorInformation: {
+            errorCode: '7200',
+            errorDescription: 'Generic Thirdparty account linking error'
+          }
+        },
+        'pispa'
+      )
+    })
+
+    it('should handle exceptions and send PUT /consents/{ID}/error response', async () => {
+      mocked(modelConfig.thirdpartyRequests.postConsents).mockImplementationOnce(
+        () => {
+          throw new Error('mocked postConsents exception')
+        }
+      )
+
+      const model = await create(validateData, modelConfig)
+      try {
+        // start send consent step
+        await model.fsm.validateWithAuthService()
+        shouldNotBeExecuted()
+      } catch (err) {
+        expect(err.message).toEqual('mocked postConsents exception')
+      }
+
+      // check a PUT /consents/{ID}/error response was sent to source participant
+      expect(modelConfig.thirdpartyRequests.putConsentsError).toBeCalledWith(
+        '00000000-0000-1000-8000-000000000001',
+        {
+          errorInformation: {
+            errorCode: '7200',
+            errorDescription: 'Generic Thirdparty account linking error'
+          }
+        },
+        'pispa'
+      )
+    })
+  })
+
+  describe('Register THIRD_PARTY_LINKS with als', () => {
+    let validateData: DFSPLinkingData
+
+    const consentsIDPutResponseVerified: tpAPI.Schemas.ConsentsIDPutResponseVerified = {
+      scopes: [
+        {
+          accountId: 'dfspa.username.1234',
+          actions: [
+            'accounts.transfer',
+            'accounts.getBalance'
+          ]
+        },
+        {
+          accountId: 'dfspa.username.5678',
+          actions: [
+            'accounts.transfer',
+            'accounts.getBalance'
+          ]
+        }
+      ],
+      credential: {
+        credentialType: 'FIDO',
+        status: 'VERIFIED',
+        payload: {
+          id: 'some-credential-id',
+          response: {
+            clientDataJSON: 'client-data'
+          }
+        }
+      }
+    }
+
+    const participantsTypeIDPutResponse: tpAPI.Schemas.ParticipantsTypeIDPutResponse = {
+      fspId: 'central-auth'
+    }
+
+    beforeEach(async () => {
+      validateData = {
+        dfspId: 'dfspa',
+        toParticipantId: 'pispa',
+        toAuthServiceParticipantId: 'central-auth',
+        currentState: 'consentRegisteredAndValidated',
+        consentId: '00000000-0000-1000-8000-000000000001',
+        consentRequestId: 'b51ec534-ee48-4575-b6a9-ead2955b8069',
+        consentRequestsPostRequest: mockData.consentRequestsPost.payload,
+        backendValidateConsentRequestsResponse: mockData.consentRequestsPost.response,
+        consentRequestsIDPatchRequest: mockData.consentRequestsIDPatchRequest.payload,
+        consentIDPutResponse: mockData.inboundPutConsentsIdRequestSignedCredential.payload,
+        consentIDPutResponseFromAuthService: consentsIDPutResponseVerified,
+        participantPutResponseFromALS: participantsTypeIDPutResponse,
+        scopes: [
+          {
+            accountId: 'dfspa.username.1234',
+            actions: [
+              'accounts.transfer',
+              'accounts.getBalance'
+            ]
+          },
+          {
+            accountId: 'dfspa.username.5678',
+            actions: [
+              'accounts.transfer',
+              'accounts.getBalance'
+            ]
+          }
+        ],
+      }
+    })
+
+    it('should be well constructed', async () => {
+      const model = await create(validateData, modelConfig)
+      checkDFSPLinkingModelLayout(model, validateData)
+    })
+
+    it('onValidateWithAuthService() should transition from consent registered and validated to PISP DFSP LinkEstablished when successful', async () => {
+      const model = await create(validateData, modelConfig)
+      // start send consent step
+      await model.fsm.finalizeThirdpartyLinkWithALS()
+
+      // check that the fsm was able to transition properly
+      expect(model.data.currentState).toEqual('PISPDFSPLinkEstablished')
+    })
+  })
+
+  describe('Notify PISP of successful account linking', () => {
+    let validateData: DFSPLinkingData
+
+    const consentsIDPutResponseVerified: tpAPI.Schemas.ConsentsIDPutResponseVerified = {
+      scopes: [
+        {
+          accountId: 'dfspa.username.1234',
+          actions: [
+            'accounts.transfer',
+            'accounts.getBalance'
+          ]
+        },
+        {
+          accountId: 'dfspa.username.5678',
+          actions: [
+            'accounts.transfer',
+            'accounts.getBalance'
+          ]
+        }
+      ],
+      credential: {
+        credentialType: 'FIDO',
+        status: 'VERIFIED',
+        payload: {
+          id: 'some-credential-id',
+          response: {
+            clientDataJSON: 'client-data'
+          }
+        }
+      }
+    }
+
+    const participantsTypeIDPutResponse: tpAPI.Schemas.ParticipantsTypeIDPutResponse = {
+      fspId: 'central-auth'
+    }
+
+    beforeEach(async () => {
+      validateData = {
+        dfspId: 'dfspa',
+        toParticipantId: 'pispa',
+        toAuthServiceParticipantId: 'central-auth',
+        currentState: 'PISPDFSPLinkEstablished',
+        consentId: '00000000-0000-1000-8000-000000000001',
+        consentRequestId: 'b51ec534-ee48-4575-b6a9-ead2955b8069',
+        consentRequestsPostRequest: mockData.consentRequestsPost.payload,
+        backendValidateConsentRequestsResponse: mockData.consentRequestsPost.response,
+        consentRequestsIDPatchRequest: mockData.consentRequestsIDPatchRequest.payload,
+        consentIDPutResponse: mockData.inboundPutConsentsIdRequestSignedCredential.payload,
+        consentIDPutResponseFromAuthService: consentsIDPutResponseVerified,
+        participantPutResponseFromALS: participantsTypeIDPutResponse,
+        scopes: [
+          {
+            accountId: 'dfspa.username.1234',
+            actions: [
+              'accounts.transfer',
+              'accounts.getBalance'
+            ]
+          },
+          {
+            accountId: 'dfspa.username.5678',
+            actions: [
+              'accounts.transfer',
+              'accounts.getBalance'
+            ]
+          }
+        ],
+      }
+    })
+
+    it('should be well constructed', async () => {
+      const model = await create(validateData, modelConfig)
+      checkDFSPLinkingModelLayout(model, validateData)
+    })
+
+    it('onNotifyVerificationToPISP() should transition from PISP DFSP LinkEstablished to verification notification sent to PISP  when successful', async () => {
+      const model = await create(validateData, modelConfig)
+      // start send consent step
+      await model.fsm.notifyVerificationToPISP()
+
+      // check that the fsm was able to transition properly
+      expect(model.data.currentState).toEqual('notificationSent')
+
+      // check we made a call to thirdpartyRequests.postConsents
+      expect(modelConfig.thirdpartyRequests.patchConsents).toBeCalledWith(
+        validateData.consentId!,
+        {
+          credential: {
+            status: 'VERIFIED'
+          }
+        },
+        'pispa'
+      )
+    })
+
+    it('should handle exceptions and send PUT /consents/{ID}/error response', async () => {
+      mocked(modelConfig.thirdpartyRequests.patchConsents).mockImplementationOnce(
+        () => {
+          throw new Error('mocked patchConsents exception')
+        }
+      )
+
+      const model = await create(validateData, modelConfig)
+      try {
+        // start send consent step
+        await model.fsm.notifyVerificationToPISP()
+        shouldNotBeExecuted()
+      } catch (err) {
+        expect(err.message).toEqual('mocked patchConsents exception')
+      }
+
+      // check a PUT /consents/{ID}/error response was sent to source participant
+      expect(modelConfig.thirdpartyRequests.putConsentsError).toBeCalledWith(
+        '00000000-0000-1000-8000-000000000001',
+        {
+          errorInformation: {
+            errorCode: '7200',
+            errorDescription: 'Generic Thirdparty account linking error'
+          }
+        },
+        'pispa'
+      )
+    })
+  })
+
   describe('loadFromKVS', () => {
     it('should properly call `KVS.get`, get expected data in `context.data` and setup state of machine', async () => {
       const dataFromCache = {
