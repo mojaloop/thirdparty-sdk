@@ -41,7 +41,7 @@
 
   // this is a inbound request coming from the ALS in response to
   // DFSPLinkingModel.onValidateWithAuthService
-  if (type == 'CONSENTS') {
+  if (type == 'CONSENT') {
     DFSPLinkingModel.triggerWorkflow(
       DFSPLinkingPhase.waitOnALSParticipantResponse,
       id,

@@ -279,7 +279,7 @@ export class DFSPLinkingModel
       }
 
       const model: DFSPLinkingModel = await create(data, consentIdModelConfig)
-      await model.saveToKVS
+      await model.saveToKVS()
 
     } catch (error) {
       const mojaloopError = reformatError(error, this.logger)

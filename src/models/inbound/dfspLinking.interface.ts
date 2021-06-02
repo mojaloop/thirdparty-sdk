@@ -41,6 +41,7 @@ import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
 export enum DFSPLinkingPhase {
   requestConsent = 'requestConsent',
   requestConsentAuthenticate = 'requestConsentAuthenticate',
+  waitOnSignedCredential = 'waitOnSignedCredential',
   waitOnAuthServiceResponse = 'waitOnAuthServiceResponse',
   waitOnALSParticipantResponse = 'waitOnALSParticipantResponse',
   waitOnThirdpartyLinkRegistrationResponse = 'waitOnThirdpartyLinkRegistrationResponse',

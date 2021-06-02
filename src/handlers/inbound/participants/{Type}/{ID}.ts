@@ -41,7 +41,11 @@ import { DFSPLinkingModel } from '~/models/inbound/dfspLinking.model'
   const payload = request.payload as fspiopAPI.Schemas.ParticipantsTypeIDPutResponse
   // this is a inbound request coming from the ALS in response to
   // DFSPLinkingModel.onValidateWithAuthService
-  if (type == 'CONSENTS') {
+  console.log('hello')
+  console.log(DFSPLinkingModel.notificationChannel(DFSPLinkingPhase.waitOnALSParticipantResponse, consentId))
+
+  if (type == 'CONSENT') {
+    console.log(DFSPLinkingModel.notificationChannel(DFSPLinkingPhase.waitOnALSParticipantResponse, consentId))
     DFSPLinkingModel.triggerWorkflow(
       DFSPLinkingPhase.waitOnALSParticipantResponse,
       consentId,
