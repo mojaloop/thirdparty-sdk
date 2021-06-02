@@ -2172,51 +2172,14 @@ components:
       required:
         - errorInformation
         - currentState
-    ConsentsPostRequest:
-      title: ConsentPostRequest
-      type: object
-      description: The object sent in a `POST /consents` request.
-      properties:
-        consentId:
-          allOf:
-            - $ref: '#/components/schemas/CorrelationId'
-          description: |
-            Common ID between the PISP and FSP for the Consent object
-            decided by the DFSP who creates the Consent
-            This field is REQUIRED for POST /consent.
-        consentRequestId:
-          allOf:
-            - $ref: '#/components/schemas/CorrelationId'
-          description: |
-            The id of the ConsentRequest that was used to initiate the
-            creation of this Consent.
-        scopes:
-          type: array
-          items:
-            $ref: '#/components/schemas/Scope'
-      required:
-        - consentId
-        - consentRequestId
-        - scopes
-    LinkingRequestConsentIDAuthenticateResponseSuccess:
-      title: LinkingRequestConsentIDAuthenticateResponse
-      type: object
-      properties:
-        consent:
-          $ref: '#/components/schemas/ConsentsPostRequest'
-        challenge:
-          type: string
-        currentState:
-          $ref: '#/components/schemas/LinkingRequestConsentIDAuthenticateState'
-      required:
-        - consent
-        - currentState
-    LinkingRequestConsentIDAuthenticateResponse:
-      oneOf:
-        - $ref: >-
-            #/components/schemas/LinkingRequestConsentIDAuthenticateResponseError
-        - $ref: >-
-            #/components/schemas/LinkingRequestConsentIDAuthenticateResponseSuccess
+    CredentialType:
+      title: CredentialType
+      type: string
+      enum:
+        - FIDO
+      description: |
+        The type of the Credential.
+        - "FIDO" - A FIDO public/private keypair.
     PublicKeyCredential:
       title: PublicKeyCredential
       type: object
@@ -2238,6 +2201,83 @@ components:
       required:
         - id
         - response
+    SignedCredential:
+      title: SignedCredential
+      type: object
+      description: >
+        A credential used to allow a user to prove their identity and access
+
+        to an account with a DFSP.
+
+
+        SignedCredential is a special formatting of the credential to allow us
+        to be
+
+        more explicit about the `status` field - it should only ever be PENDING
+        when
+
+        updating a credential.
+      properties:
+        credentialType:
+          $ref: '#/components/schemas/CredentialType'
+        status:
+          type: string
+          enum:
+            - PENDING
+          description: The challenge has signed but not yet verified.
+        payload:
+          $ref: '#/components/schemas/PublicKeyCredential'
+      required:
+        - credentialType
+        - status
+        - payload
+      additionalProperties: false
+    ConsentsPostRequest:
+      title: ConsentPostRequest
+      type: object
+      description: The object sent in a `POST /consents` request.
+      properties:
+        consentId:
+          allOf:
+            - $ref: '#/components/schemas/CorrelationId'
+          description: |
+            Common ID between the PISP and FSP for the Consent object
+            decided by the DFSP who creates the Consent
+            This field is REQUIRED for POST /consent.
+        consentRequestId:
+          allOf:
+            - $ref: '#/components/schemas/CorrelationId'
+          description: |
+            The id of the ConsentRequest that was used to initiate the
+            creation of this Consent.
+        credential:
+          $ref: '#/components/schemas/SignedCredential'
+        scopes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Scope'
+      required:
+        - consentId
+        - scopes
+    LinkingRequestConsentIDAuthenticateResponseSuccess:
+      title: LinkingRequestConsentIDAuthenticateResponse
+      type: object
+      properties:
+        consent:
+          $ref: '#/components/schemas/ConsentsPostRequest'
+        challenge:
+          type: string
+        currentState:
+          $ref: '#/components/schemas/LinkingRequestConsentIDAuthenticateState'
+      required:
+        - consent
+        - currentState
+    LinkingRequestConsentIDAuthenticateResponse:
+      oneOf:
+        - $ref: >-
+            #/components/schemas/LinkingRequestConsentIDAuthenticateResponseError
+        - $ref: >-
+            #/components/schemas/LinkingRequestConsentIDAuthenticateResponseSuccess
     LinkingRequestConsentIDPassCredentialRequest:
       title: LinkingRequestConsentIDPassCredentialRequest
       description: 'POST /linking/request-consent/{ID}/pass-credential request object'
