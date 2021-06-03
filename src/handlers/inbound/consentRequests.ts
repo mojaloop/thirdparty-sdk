@@ -57,7 +57,7 @@ async function post (_context: unknown, request: Request, h: StateResponseToolki
     dfspId: h.getDFSPId(),
     currentState: 'start',
     toParticipantId: sourceFspId,
-    toAuthServiceParticipantId: 'central-auth',
+    toAuthServiceParticipantId: h.getAuthServiceParticipantId(),
     consentRequestsPostRequest: payload,
     consentRequestId: consentRequestId
   }

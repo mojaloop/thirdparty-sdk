@@ -87,6 +87,7 @@ export interface ServiceConfig {
     SERVICES_ENDPOINT?: string
     THIRDPARTY_REQUESTS_ENDPOINT?: string
     TRANSACTION_REQUEST_ENDPOINT?: string
+    AUTH_SERVICE_PARTICIPANT_ID: string
     DFSP_ID: string
     DFSP_BACKEND_URI: string
     DFSP_BACKEND_HTTP_SCHEME: string
@@ -282,6 +283,11 @@ export const ConvictConfig = Convict<ServiceConfig>({
       format: '*',
       env: 'TRANSACTION_REQUEST_ENDPOINT',
       default: undefined
+    },
+    AUTH_SERVICE_PARTICIPANT_ID: {
+      doc: 'Participant ID of an auth service',
+      format: '*',
+      default: 'central-auth'
     },
     DFSP_ID: {
       doc: 'Id of DFSP',

@@ -679,6 +679,7 @@ describe('Inbound API routes', (): void => {
       }
       const toolkit = {
         getPubSub: jest.fn(() => pubSubMock),
+        getAuthServiceParticipantId: jest.fn(() => 'central-auth'),
         response: jest.fn(() => ({
           code: jest.fn((code: number) => ({
             statusCode: code
@@ -744,6 +745,7 @@ describe('Inbound API routes', (): void => {
         })),
         getLogger: jest.fn(() => logger),
         getDFSPId: jest.fn(() => 'dfspA'),
+        getAuthServiceParticipantId: jest.fn(() => 'central-auth'),
         getDFSPBackendRequests: jest.fn(() => ({
           validateConsentRequests: jest.fn(() => Promise.resolve(mockData.consentRequestsPost.response)),
           storeConsentRequests: jest.fn(() => Promise.resolve()),
