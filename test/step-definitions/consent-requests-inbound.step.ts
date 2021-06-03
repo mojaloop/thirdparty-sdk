@@ -53,16 +53,25 @@ defineFeature(feature, (test): void => {
   let server: Server
   let response: ServerInjectResponse
 
-  afterEach((done): void => {
+  // tests seem to not like the server booting up/down between tests.
+  // so we prepare a server for all tests in the feature
+  beforeAll(async (): Promise<void> => {
+    server = await prepareInboundAPIServer()
+  })
+
+  afterAll(async (done): Promise<void> => {
+    server.events.on('stop', done)
+    server.stop({ timeout:0 })
+  })
+
+  afterEach((): void => {
     jest.resetAllMocks()
     jest.resetModules()
-    server.events.on('stop', done)
-    server.stop()
   })
 
   test('PatchConsentRequest', ({ given, when, then }): void => {
     given('Inbound API server', async (): Promise<void> => {
-      server = await prepareInboundAPIServer()
+      // do nothing
     })
 
     when('I receive a \'PatchConsentRequest\' request', async (): Promise<ServerInjectResponse> => {
@@ -92,7 +101,7 @@ defineFeature(feature, (test): void => {
 
   test('NotifyErrorConsentRequests', ({ given, when, then }): void => {
     given('Inbound API server', async (): Promise<void> => {
-      server = await prepareInboundAPIServer()
+      // do nothing
     })
 
     when('I receive a \'NotifyErrorConsentRequests\' request', async (): Promise<ServerInjectResponse> => {

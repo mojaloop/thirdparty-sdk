@@ -114,11 +114,20 @@ defineFeature(feature, (test): void => {
   let server: Server
   let response: ServerInjectResponse
 
-  afterEach((done): void => {
+  // tests seem to not like the server booting up/down between tests.
+  // so we prepare a server for all tests in the feature
+  beforeAll(async (): Promise<void> => {
+    server = await prepareOutboundAPIServer()
+  })
+
+  afterAll(async (done): Promise<void> => {
+    server.events.on('stop', done)
+    server.stop({ timeout:0 })
+  })
+
+  afterEach((): void => {
     jest.resetAllMocks()
     jest.resetModules()
-    server.events.on('stop', done)
-    server.stop()
   })
 
   test('PostLinkingRequestConsentIDPassCredential', ({ given, when, then }): void => {
@@ -167,7 +176,7 @@ defineFeature(feature, (test): void => {
     }
 
     given('Outbound API server', async (): Promise<void> => {
-      server = await prepareOutboundAPIServer()
+      // do nothing
     })
 
     when('I send a \'PostLinkingRequestConsentIDPassCredential\' request', async (): Promise<ServerInjectResponse> => {
