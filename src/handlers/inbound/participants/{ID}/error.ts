@@ -29,7 +29,7 @@
  import { Request, ResponseObject } from '@hapi/hapi'
  import { StateResponseToolkit } from '~/server/plugins/state'
  import { Message } from '~/shared/pub-sub'
- import { thirdparty as tpAPI } from '@mojaloop/api-snippets';
+ import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
  import { DFSPLinkingPhase } from '~/models/inbound/dfspLinking.interface'
  import { DFSPLinkingModel } from '~/models/inbound/dfspLinking.model'
 

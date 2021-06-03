@@ -26,13 +26,13 @@
 
 import { StateResponseToolkit } from '~/server/plugins/state'
 import { Request, ResponseObject } from '@hapi/hapi'
-import { PISPPrelinkingModel, create } from '~/models/outbound/pispPrelinking.model';
+import { PISPPrelinkingModel, create } from '~/models/outbound/pispPrelinking.model'
 import {
   PISPPrelinkingData,
   PISPPrelinkingModelConfig
 } from '~/models/outbound/pispPrelinking.interface'
-import config from '~/shared/config';
-import inspect from '~/shared/inspect';
+import config from '~/shared/config'
+import inspect from '~/shared/inspect'
 
 /**
  * Handles outbound GET /linking/providers request

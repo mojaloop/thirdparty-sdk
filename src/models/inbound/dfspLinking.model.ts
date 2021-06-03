@@ -28,7 +28,7 @@
 import { PubSub } from '~/shared/pub-sub'
 import { PersistentModel } from '~/models/persistent.model'
 import { StateMachineConfig } from 'javascript-state-machine'
-import { ThirdpartyRequests, Errors, MojaloopRequests } from '@mojaloop/sdk-standard-components';
+import { ThirdpartyRequests, Errors, MojaloopRequests } from '@mojaloop/sdk-standard-components'
 import {
   v1_1 as fspiopAPI,
   thirdparty as tpAPI
@@ -40,11 +40,11 @@ import {
   DFSPLinkingModelConfig
 } from '~/models/inbound/dfspLinking.interface'
 import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
-import { BackendValidateOTPResponse, DFSPLinkingPhase } from './dfspLinking.interface';
-import { uuid } from 'uuidv4';
-import { reformatError } from '~/shared/api-error';
-import deferredJob from '../../shared/deferred-job';
-import { Message } from '../../shared/pub-sub';
+import { BackendValidateOTPResponse, DFSPLinkingPhase } from './dfspLinking.interface'
+import { uuid } from 'uuidv4'
+import { reformatError } from '~/shared/api-error'
+import deferredJob from '~/shared/deferred-job'
+import { Message } from '~/shared/pub-sub'
 
 // DFSPLinkingModel is the passive inbound handler for inbound
 // POST /consentRequests requests and no response is generated from `model.run()`

@@ -27,22 +27,22 @@
  --------------
  ******/
 
-import { thirdparty as tpAPI, v1_1 as fspiopAPI } from '@mojaloop/api-snippets';
-import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components';
-import { StateMachineConfig } from 'javascript-state-machine';
-import { canonicalize } from 'json-canonicalize';
-import sha256 from 'crypto-js/sha256';
-import * as OutboundAPI from '~/interface/outbound/api_interfaces';
+import { thirdparty as tpAPI, v1_1 as fspiopAPI } from '@mojaloop/api-snippets'
+import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
+import { StateMachineConfig } from 'javascript-state-machine'
+import { canonicalize } from 'json-canonicalize'
+import sha256 from 'crypto-js/sha256'
+import * as OutboundAPI from '~/interface/outbound/api_interfaces'
 import {
   PISPLinkingData,
   PISPLinkingModelConfig,
   PISPLinkingStateMachine
-} from '~/models/outbound/pispLinking.interface';
-import { PersistentModel } from '~/models/persistent.model';
-import deferredJob from '~/shared/deferred-job';
-import inspect from '~/shared/inspect';
-import { Message, PubSub } from '~/shared/pub-sub';
-import { PISPLinkingPhase } from './pispLinking.interface';
+} from '~/models/outbound/pispLinking.interface'
+import { PersistentModel } from '~/models/persistent.model'
+import deferredJob from '~/shared/deferred-job'
+import inspect from '~/shared/inspect'
+import { Message, PubSub } from '~/shared/pub-sub'
+import { PISPLinkingPhase } from './pispLinking.interface'
 
 export class PISPLinkingModel
   extends PersistentModel<PISPLinkingStateMachine, PISPLinkingData> {

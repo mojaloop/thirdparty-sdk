@@ -27,12 +27,12 @@
 
 import { StateResponseToolkit } from '~/server/plugins/state'
 import { Request, ResponseObject } from '@hapi/hapi'
-import { PISPLinkingModel, loadFromKVS } from '~/models/outbound/pispLinking.model';
+import { PISPLinkingModel, loadFromKVS } from '~/models/outbound/pispLinking.model'
 import {
   PISPLinkingModelConfig,
 } from '~/models/outbound/pispLinking.interface'
-import config from '~/shared/config';
-import inspect from '~/shared/inspect';
+import config from '~/shared/config'
+import inspect from '~/shared/inspect'
 import * as OutboundAPI from '~/interface/outbound/api_interfaces'
 
 

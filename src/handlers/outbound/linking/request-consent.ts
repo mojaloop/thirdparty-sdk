@@ -27,13 +27,13 @@
 
 import { StateResponseToolkit } from '~/server/plugins/state'
 import { Request, ResponseObject } from '@hapi/hapi'
-import { PISPLinkingModel, create } from '~/models/outbound/pispLinking.model';
+import { PISPLinkingModel, create } from '~/models/outbound/pispLinking.model'
 import {
   PISPLinkingData,
   PISPLinkingModelConfig
 } from '~/models/outbound/pispLinking.interface'
 import * as OutboundAPI from '~/interface/outbound/api_interfaces'
-import config from '~/shared/config';
+import config from '~/shared/config'
 
 /**
  * Handles outbound POST /linking/request-consent request

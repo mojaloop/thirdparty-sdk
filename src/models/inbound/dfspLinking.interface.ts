@@ -30,7 +30,7 @@ import {
   StateData
 } from '~/models/persistent.model'
 import { Method } from 'javascript-state-machine'
-import { ThirdpartyRequests, MojaloopRequests } from '@mojaloop/sdk-standard-components';
+import { ThirdpartyRequests, MojaloopRequests } from '@mojaloop/sdk-standard-components'
 import {
   v1_1 as fspiopAPI,
   thirdparty as tpAPI

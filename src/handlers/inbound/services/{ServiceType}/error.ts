@@ -30,9 +30,9 @@ import {
   v1_1 as fspiopAPI
 } from '@mojaloop/api-snippets'
 import { StateResponseToolkit } from '~/server/plugins/state'
-import { PISPPrelinkingModel } from '~/models/outbound/pispPrelinking.model';
-import { Enum } from '@mojaloop/central-services-shared';
-import { ServiceType } from '~/models/outbound/pispPrelinking.interface';
+import { PISPPrelinkingModel } from '~/models/outbound/pispPrelinking.model'
+import { Enum } from '@mojaloop/central-services-shared'
+import { ServiceType } from '~/models/outbound/pispPrelinking.interface'
 
 
 /**

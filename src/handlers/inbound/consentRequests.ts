@@ -26,8 +26,9 @@
  --------------
  ******/
 
-import { thirdparty as tpAPI, v1_1 as fspiopAPI } from '@mojaloop/api-snippets';
-  thirdparty as tpAPI
+import {
+  thirdparty as tpAPI,
+  v1_1 as fspiopAPI
 } from '@mojaloop/api-snippets'
 import { Request, ResponseObject } from '@hapi/hapi'
 import { StateResponseToolkit } from '~/server/plugins/state'
@@ -36,11 +37,11 @@ import {
   DFSPLinkingData,
   DFSPLinkingModelConfig
 } from '~/models/inbound/dfspLinking.interface'
-import { DFSPLinkingModel } from '~/models/inbound/dfspLinking.model';
-import inspect from '~/shared/inspect';
-import config from '~/shared/config';
-import { reformatError } from '../../shared/api-error';
-import { Errors } from '@mojaloop/sdk-standard-components';
+import { DFSPLinkingModel } from '~/models/inbound/dfspLinking.model'
+import inspect from '~/shared/inspect'
+import config from '~/shared/config'
+import { reformatError } from '~/shared/api-error'
+import { Errors } from '@mojaloop/sdk-standard-components'
 
 /**
  * Handles an inbound `POST /consentRequests` request

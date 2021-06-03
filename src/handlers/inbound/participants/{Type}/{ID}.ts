@@ -27,7 +27,7 @@
 import { Request, ResponseObject } from '@hapi/hapi'
 import { StateResponseToolkit } from '~/server/plugins/state'
 import { Message } from '~/shared/pub-sub'
-import { v1_1 as fspiopAPI } from '@mojaloop/api-snippets';
+import { v1_1 as fspiopAPI } from '@mojaloop/api-snippets'
 import { DFSPLinkingPhase } from '~/models/inbound/dfspLinking.interface'
 import { DFSPLinkingModel } from '~/models/inbound/dfspLinking.model'
 

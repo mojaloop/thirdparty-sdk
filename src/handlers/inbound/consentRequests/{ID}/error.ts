@@ -27,9 +27,9 @@ import {
 } from '@mojaloop/api-snippets'
 import { Message } from '~/shared/pub-sub'
 import { StateResponseToolkit } from '~/server/plugins/state'
-import { Enum } from '@mojaloop/central-services-shared';
+import { Enum } from '@mojaloop/central-services-shared'
 import { PISPLinkingModel } from '~/models/outbound/pispLinking.model'
-import { PISPLinkingPhase } from '~/models/outbound/pispLinking.interface';
+import { PISPLinkingPhase } from '~/models/outbound/pispLinking.interface'
 
 /**
  * Handles a inbound PUT /consentRequests/{ID}/error request

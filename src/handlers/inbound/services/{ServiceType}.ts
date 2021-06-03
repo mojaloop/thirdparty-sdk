@@ -27,10 +27,10 @@
  ******/
 import { Request, ResponseObject } from '@hapi/hapi'
 import { StateResponseToolkit } from '~/server/plugins/state'
-import { PISPPrelinkingModel } from '~/models/outbound/pispPrelinking.model';
-import { Enum } from '@mojaloop/central-services-shared';
-import { ServiceType } from '~/models/outbound/pispPrelinking.interface';
-import { thirdparty as tpAPI } from '@mojaloop/api-snippets';
+import { PISPPrelinkingModel } from '~/models/outbound/pispPrelinking.model'
+import { Enum } from '@mojaloop/central-services-shared'
+import { ServiceType } from '~/models/outbound/pispPrelinking.interface'
+import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
 
 
 /**

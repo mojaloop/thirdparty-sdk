@@ -92,7 +92,12 @@ jest.mock('@mojaloop/sdk-standard-components', () => {
     info: jest.fn(),
     fatal: jest.fn()
   }
+
+  // exclude mocks that are not explicitly defined
+  const sdkStandardComponentsActual = jest.requireActual('@mojaloop/sdk-standard-components');
+
   return {
+    ...sdkStandardComponentsActual,
     MojaloopRequests: jest.fn(() => {
       return {
         postQuotes: __postQuotes
@@ -100,7 +105,8 @@ jest.mock('@mojaloop/sdk-standard-components', () => {
     }),
     ThirdpartyRequests: jest.fn(() => {
       return {
-        postConsents: __postConsents
+        postConsents: __postConsents,
+        putConsentRequestsError: jest.fn(() => Promise.resolve())
       }
     }),
     WSO2Auth: jest.fn(),
