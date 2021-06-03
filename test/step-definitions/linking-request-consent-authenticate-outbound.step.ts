@@ -130,7 +130,7 @@ defineFeature(feature, (test): void => {
   })
 
   test('PatchLinkingRequestConsentIDAuthenticate', ({ given, when, then }): void => {
-    const postConsentsIDPatchResponse: tpAPI.Schemas.ConsentsPostRequest = {
+    const postConsentsIDPatchResponse: tpAPI.Schemas.ConsentsPostRequestPISP = {
       consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
       consentRequestId: '997c89f4-053c-4283-bfec-45a1a0a28fba',
       scopes: [{
@@ -139,8 +139,7 @@ defineFeature(feature, (test): void => {
           'accounts.getBalance',
           'accounts.transfer'
         ]
-      }
-      ]
+      }]
     }
 
     given('Outbound API server', async (): Promise<void> => {

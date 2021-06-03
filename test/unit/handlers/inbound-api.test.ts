@@ -164,7 +164,7 @@ const putThirdpartyAuthResponse: tpAPI.Schemas.ThirdpartyRequestsTransactionsIDA
   value: 'value'
 }
 
-const postConsentRequest: tpAPI.Schemas.ConsentsPostRequest = {
+const postConsentRequest: tpAPI.Schemas.ConsentsPostRequestPISP = {
   consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
   consentRequestId: '997c89f4-053c-4283-bfec-45a1a0a28fba',
   scopes: [{

@@ -141,7 +141,22 @@ defineFeature(feature, (test): void => {
             payload: {
               id: 'some-credential-id',
               response: {
-                clientDataJSON: 'client-data'
+                clientData: {
+                  challenge: 'the-challenge',
+                  origin: 'pisp.mojaloop.io',
+                  type: 'webauthn.create'
+                },
+                attestation: {
+                  authData: 'some-auth-data-with-PublicKey-and-some-' +
+                    'metadata-authData-must-not-have-fewer-than-196-characters-' +
+                    'Lorem-ipsum-dolor-sit-amet-consectetur-adipiscing-elit-sed' +
+                    '-do-eiusmod-tempor-incididunt-ut-labore-et-dolore-magna-aliqua',
+                  format: 'fido-u2f',
+                  statement: {
+                    sig: 'signature-sig-must-not-have-fewer-than-70-characters-Lorem-ipsum-dolor-sit-amet',
+                    x5c: 'x.509 certificate'
+                  }
+                }
               }
             }
           }
@@ -188,7 +203,22 @@ defineFeature(feature, (test): void => {
             payload: {
               id: 'some-credential-id',
               response: {
-                clientDataJSON: 'client-data'
+                clientData: {
+                  challenge: 'the-challenge',
+                  origin: 'pisp.mojaloop.io',
+                  type: 'webauthn.create'
+                },
+                attestation: {
+                  authData: 'some-auth-data-with-PublicKey-and-some-' +
+                    'metadata-authData-must-not-have-fewer-than-196-characters-' +
+                    'Lorem-ipsum-dolor-sit-amet-consectetur-adipiscing-elit-sed' +
+                    '-do-eiusmod-tempor-incididunt-ut-labore-et-dolore-magna-aliqua',
+                  format: 'fido-u2f',
+                  statement: {
+                    sig: 'signature-sig-must-not-have-fewer-than-70-characters-Lorem-ipsum-dolor-sit-amet',
+                    x5c: 'x.509 certificate'
+                  }
+                }
               }
             }
           }

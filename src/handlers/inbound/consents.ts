@@ -37,7 +37,7 @@ import { PISPLinkingModel } from '~/models/outbound/pispLinking.model'
 import { PISPLinkingPhase } from '~/models/outbound/pispLinking.interface'
 
 async function post (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
-  const payload = request.payload as tpAPI.Schemas.ConsentsPostRequest
+  const payload = request.payload as tpAPI.Schemas.ConsentsPostRequestPISP
 
   // POST /consents is a follow-up request to PATCH /consentRequests
   // so we publish the request on the PISPConsentRequestModel

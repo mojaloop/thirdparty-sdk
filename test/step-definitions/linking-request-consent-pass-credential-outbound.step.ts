@@ -131,7 +131,7 @@ defineFeature(feature, (test): void => {
   })
 
   test('PostLinkingRequestConsentIDPassCredential', ({ given, when, then }): void => {
-    const postConsentsIDPatchResponse: tpAPI.Schemas.ConsentsPostRequest = {
+    const postConsentsIDPatchResponse: tpAPI.Schemas.ConsentsPostRequestPISP = {
       consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
       consentRequestId: '997c89f4-053c-4283-bfec-45a1a0a28fba',
       scopes: [{
@@ -140,8 +140,7 @@ defineFeature(feature, (test): void => {
           'accounts.getBalance',
           'accounts.transfer'
         ]
-      }
-      ]
+      }]
     }
 
     const consentRequestsIDPutResponseWeb: tpAPI.Schemas.ConsentRequestsIDPutResponseWeb = {
@@ -246,7 +245,22 @@ defineFeature(feature, (test): void => {
             payload: {
               id: 'some-credential-id',
               response: {
-                clientDataJSON: 'client-data'
+                clientData: {
+                  challenge: 'the-challenge',
+                  origin: 'pisp.mojaloop.io',
+                  type: 'webauthn.create'
+                },
+                attestation: {
+                  authData: 'some-auth-data-with-PublicKey-and-some-' +
+                    'metadata-authData-must-not-have-fewer-than-196-characters-' +
+                    'Lorem-ipsum-dolor-sit-amet-consectetur-adipiscing-elit-sed' +
+                    '-do-eiusmod-tempor-incididunt-ut-labore-et-dolore-magna-aliqua',
+                  format: 'fido-u2f',
+                  statement: {
+                    sig: 'signature-sig-must-not-have-fewer-than-70-characters-Lorem-ipsum-dolor-sit-amet',
+                    x5c: 'x.509 certificate'
+                  }
+                }
               }
             }
           }

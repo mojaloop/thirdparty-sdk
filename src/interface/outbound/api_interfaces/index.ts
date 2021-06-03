@@ -85,7 +85,7 @@ export namespace Schemas {
   export type AccountsIDPutResponse = components['schemas']['AccountsIDPutResponse']
   export type ConsentScopeType = components['schemas']['ConsentScopeType']
   export type Scope = components['schemas']['Scope']
-  export type ConsentsPostRequest = components['schemas']['ConsentsPostRequest']
+  export type ConsentsPostRequestPISP = components['schemas']['ConsentsPostRequestPISP']
   export type LinkingProvidersState = components['schemas']['LinkingProvidersState']
   export type LinkingProvidersResponse = components['schemas']['LinkingProvidersResponse']
   export type LinkingRequestConsentResponse = components['schemas']['LinkingRequestConsentResponse']

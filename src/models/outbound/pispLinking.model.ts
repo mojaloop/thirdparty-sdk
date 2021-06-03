@@ -122,7 +122,7 @@ export class PISPLinkingModel
     return postConsentRequest
   }
 
-  static deriveChallenge(consentsPostRequest: tpAPI.Schemas.ConsentsPostRequest): string {
+  static deriveChallenge(consentsPostRequest: tpAPI.Schemas.ConsentsPostRequestPISP): string {
     if (!consentsPostRequest) {
       throw new Error('PISPLinkingModel.deriveChallenge: \'consentRequestsPostRequest\' parameter is required')
     }
@@ -204,14 +204,14 @@ export class PISPLinkingModel
     })
     .job(async (message: Message): Promise<void> => {
       try {
-        type PutResponseOrError = tpAPI.Schemas.ConsentsPostRequest & fspiopAPI.Schemas.ErrorInformationObject
+        type PutResponseOrError = tpAPI.Schemas.ConsentsPostRequestPISP & fspiopAPI.Schemas.ErrorInformationObject
         const putResponse = message as unknown as PutResponseOrError
 
         if (putResponse.errorInformation) {
           this.data.errorInformation = putResponse.errorInformation
         } else {
           this.data.linkingRequestConsentIDAuthenticateInboundConsentResponse = {
-            ...message as unknown as tpAPI.Schemas.ConsentsPostRequest
+            ...message as unknown as tpAPI.Schemas.ConsentsPostRequestPISP
           }
         }
 

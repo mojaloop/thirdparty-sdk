@@ -320,7 +320,7 @@ export class DFSPLinkingModel
     // save consentId for later
     this.data.consentId = consentId
 
-    const postConsentPayload: tpAPI.Schemas.ConsentsPostRequest = {
+    const postConsentPayload: tpAPI.Schemas.ConsentsPostRequestPISP = {
       consentId,
       consentRequestId: consentRequestId!,
       scopes: scopes || []
@@ -396,7 +396,7 @@ export class DFSPLinkingModel
   async onValidateWithAuthService (): Promise<void> {
     const { consentIDPutResponseSignedCredentialFromPISP, consentId } = this.data
 
-    const consentPostRequestToAuthService: tpAPI.Schemas.ConsentsPostRequest = {
+    const consentPostRequestToAuthService: tpAPI.Schemas.ConsentsPostRequestAUTH = {
       consentId: consentId!,
       scopes: this.data.scopes!,
       credential: consentIDPutResponseSignedCredentialFromPISP!.credential

@@ -328,7 +328,7 @@ describe('PISPLinkingModel', () => {
         linkingRequestConsentIDAuthenticatePatchRequest: mockData.linkingRequestConsentIDAuthenticatePatchRequest.payload,
         currentState: 'WebAuthenticationChannelResponseRecieved'
       }
-      const consentPostResponse: tpAPI.Schemas.ConsentsPostRequest = {
+      const consentPostResponse: tpAPI.Schemas.ConsentsPostRequestPISP = {
         consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
         consentRequestId: consentRequestId,
         scopes: [{
@@ -371,7 +371,7 @@ describe('PISPLinkingModel', () => {
           { authToken: '123456' },
           'dfspA'
         )
-        const expectedConsent: tpAPI.Schemas.ConsentsPostRequest = {
+        const expectedConsent: tpAPI.Schemas.ConsentsPostRequestPISP = {
           consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
           consentRequestId,
           scopes: [{
@@ -411,7 +411,7 @@ describe('PISPLinkingModel', () => {
 
     describe('run registerCredential workflow', () => {
       const consentRequestId = 'bbce3ce8-c247-4153-aab1-f89768c93b18'
-      const consentPostResponse: tpAPI.Schemas.ConsentsPostRequest = {
+      const consentPostResponse: tpAPI.Schemas.ConsentsPostRequestPISP = {
         consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
         consentRequestId: consentRequestId,
         scopes: [{
@@ -478,7 +478,22 @@ describe('PISPLinkingModel', () => {
               payload: {
                 id: 'some-credential-id',
                 response: {
-                  clientDataJSON: 'client-data'
+                  clientData: {
+                    challenge: 'the-challenge',
+                    origin: 'pisp.mojaloop.io',
+                    type: 'webauthn.create'
+                  },
+                  attestation: {
+                    authData: 'some-auth-data-with-PublicKey-and-some-' +
+                      'metadata-authData-must-not-have-fewer-than-196-characters-' +
+                      'Lorem-ipsum-dolor-sit-amet-consectetur-adipiscing-elit-sed' +
+                      '-do-eiusmod-tempor-incididunt-ut-labore-et-dolore-magna-aliqua',
+                    format: 'fido-u2f',
+                    statement: {
+                      sig: 'signature-sig-must-not-have-fewer-than-70-characters-Lorem-ipsum-dolor-sit-amet',
+                      x5c: 'x.509 certificate'
+                    }
+                  }
                 }
               },
               status: 'PENDING',

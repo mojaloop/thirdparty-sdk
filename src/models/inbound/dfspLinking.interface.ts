@@ -130,14 +130,14 @@ export interface DFSPLinkingData extends StateData {
   consentRequestsIDPatchResponse?: tpAPI.Schemas.ConsentRequestsIDPatchRequest
 
   // grant consent phase
-  consentPostRequest?: tpAPI.Schemas.ConsentsPostRequest
+  consentPostRequest?: tpAPI.Schemas.ConsentsPostRequestPISP
 
   // credential registration phase
   // inbound PUT /consent/{ID} response which contains the signed credential
   consentIDPutResponseSignedCredentialFromPISP?: tpAPI.Schemas.ConsentsIDPutResponseSigned
 
   // request that passes signed credential to auth-service
-  consentPostRequestToAuthService?: tpAPI.Schemas.ConsentsPostRequest
+  consentPostRequestToAuthService?: tpAPI.Schemas.ConsentsPostRequestAUTH
 
   // two responses expected from the consentPostRequestToAuthService request
   // one from the auth-service itself and another from the ALS for saving the
