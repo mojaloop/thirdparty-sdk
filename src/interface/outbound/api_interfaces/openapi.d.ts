@@ -980,8 +980,8 @@ export interface components {
       errorInformation: components['schemas']['ErrorInformation'];
       currentState: components['schemas']['LinkingRequestConsentIDAuthenticateState'];
     };
-    /** The object sent in a `POST /consents` request. */
-    ConsentsPostRequest: {
+    /** The object sent in a `POST /consents` request to PISP by DFSP to ask for delivering the credential object. */
+    ConsentsPostRequestPISP: {
       /**
        * Common ID between the PISP and FSP for the Consent object
        * decided by the DFSP who creates the Consent
@@ -996,8 +996,8 @@ export interface components {
       scopes: components['schemas']['Scope'][];
     };
     LinkingRequestConsentIDAuthenticateResponseSuccess: {
-      consent: components['schemas']['ConsentsPostRequest'];
-      challenge?: string;
+      consent: components['schemas']['ConsentsPostRequestPISP'];
+      challenge: string;
       currentState: components['schemas']['LinkingRequestConsentIDAuthenticateState'];
     };
     LinkingRequestConsentIDAuthenticateResponse:
@@ -1006,19 +1006,71 @@ export interface components {
     /**
      * An object sent in a `PUT /consents/{ID}` request.
      * Based on https://w3c.github.io/webauthn/#iface-pkcredential
+     * and mostly on: https://webauthn.guide/#registration
+     * AuthenticatorAttestationResponse
+     * https://w3c.github.io/webauthn/#dom-authenticatorattestationresponse-attestationobject
      */
-    PublicKeyCredential: {
-      /** TBD */
+    FIDOPublicKeyCredential: {
+      /**
+       * credential id: identifier of pair of keys, base64 encoded
+       * https://w3c.github.io/webauthn/#ref-for-dom-credential-id
+       */
       id: string;
+      /** AuthenticatorAttestationResponse */
       response: {
-        /** TBD */
-        clientDataJSON: string;
+        /**
+         * parsed AuthenticatorAttestationResponse.clientDataJSON
+         * client data used to create credential
+         * https://webauthn.guide/#registration
+         */
+        clientData: {
+          /** the challenge used to create credential */
+          challenge: string;
+          /** the origin used to create credential */
+          origin: string;
+          /**
+           * If another string is provided, it indicates that the authenticator performed an incorrect operation.
+           * In such case OpenAPI framework will send back the status 400
+           */
+          type: 'webauthn.create';
+        };
+        /**
+         * CBOR.Decoded AuthenticatorAttestationResponse.attestationObject
+         * https://webauthn.guide/#registration
+         */
+        attestation: {
+          /**
+           * base64 encoded byte array Uint8Array(196) with publicKey and metadata
+           * parsing example can be found here:
+           * https://webauthn.guide/#registration
+           */
+          authData?: string;
+          /**
+           * attestation statement format
+           * Authenticators can provide attestation data in a number of ways; this indicates how the server should parse and validate the attestation data
+           * https://webauthn.guide/#registration
+           */
+          format?: 'fido-u2f';
+          /**
+           * The FIDO statement format when `format: 'fido-u2f'` only!
+           * It can differ when other format types are enabled!
+           */
+          statement?: {
+            /**
+             * signature
+             * base64 encoded Uint8Array(70)
+             */
+            sig: string;
+            /** attestation certificate in X.509 format */
+            x5c: string;
+          };
+        };
       };
     };
     /** POST /linking/request-consent/{ID}/pass-credential request object */
     LinkingRequestConsentIDPassCredentialRequest: {
       credential: {
-        payload: components['schemas']['PublicKeyCredential'];
+        payload: components['schemas']['FIDOPublicKeyCredential'];
       };
     };
     /** State of post linking request consent pass credential */

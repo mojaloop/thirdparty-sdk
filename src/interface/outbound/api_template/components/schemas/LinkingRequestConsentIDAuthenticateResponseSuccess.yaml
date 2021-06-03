@@ -3,11 +3,12 @@ title: LinkingRequestConsentIDAuthenticateResponse
 type: object
 properties:
   consent:
-    $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/ConsentsPostRequest.yaml'
+    $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/ConsentsPostRequestPISP.yaml'
   challenge:
     type: string
   currentState:
     $ref: '../../components/schemas/LinkingRequestConsentIDAuthenticateState.yaml'
 required:
   - consent
+  - challenge
   - currentState
