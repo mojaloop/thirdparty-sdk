@@ -36,17 +36,6 @@ const apiPath = path.resolve(__dirname, '../../src/interface/api-inbound.yaml')
 const featurePath = path.resolve(__dirname, '../features/consent-requests-inbound.feature')
 const feature = loadFeature(featurePath)
 
-jest.mock('~/models/inbound/dfspLinking.model', () => {
-  return {
-    loadFromKVS: jest.fn(() => {
-      return {
-        data: {},
-        run: jest.fn()
-      }
-    })
-  }
-})
-
 async function prepareInboundAPIServer (): Promise<Server> {
   const serverConfig: ServerConfig = {
     port: Config.INBOUND.PORT,

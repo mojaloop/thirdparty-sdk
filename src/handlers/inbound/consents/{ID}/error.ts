@@ -41,7 +41,7 @@ async function put (_context: unknown, request: Request, h: StateResponseToolkit
   const payload = request.payload as fspiopAPI.Schemas.ErrorInformation
 
   // ideally we look at the status codes of the error message to determine
-  // what Model we trigger. since error codes are still a WIP and that
+  // what model we trigger. since error codes are still a WIP and that
   // codes can be generic codes, we need to think about what gets triggered.
   // for now we just trigger all workflows.
 
@@ -55,7 +55,7 @@ async function put (_context: unknown, request: Request, h: StateResponseToolkit
   )
 
   // PUT /consents/{ID}/error is a response from the auth-service to a POST /consents
-  // to an auth-service when something went wrong validating the
+  // from the DFSP when something went wrong validating the
   // credential with the auth-service
   DFSPLinkingModel.triggerWorkflow(
     DFSPLinkingPhase.waitOnAuthServiceResponse,
@@ -64,11 +64,16 @@ async function put (_context: unknown, request: Request, h: StateResponseToolkit
     payload as unknown as Message
   )
 
-  // todo: handle a PUT /consents/{ID}/error response from a PISP to a
-  //       POST /consents request from a DFSP. this is a bit tricky
-  //       since at this point we are switching from a state machine that
-  //       used `consentRequestId` as a key over to a duplicated state machine
-  //       that uses `consentId` as a key.
+  // PUT /consents/{ID}/error is a response from the PISP to a POST /consents
+  // from the DFSP when something went wrong in sending back
+  // a signed credential
+  DFSPLinkingModel.triggerWorkflow(
+    DFSPLinkingPhase.waitOnSignedCredentialFromPISPResponse,
+    consentId,
+    h.getPubSub(),
+    payload as unknown as Message
+  )
+
   return h.response({}).code(Enum.Http.ReturnCodes.OK.CODE)
 }
 

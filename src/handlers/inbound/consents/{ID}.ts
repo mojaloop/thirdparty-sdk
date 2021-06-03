@@ -32,11 +32,8 @@ import { PISPLinkingModel } from '~/models/outbound/pispLinking.model'
 import { Message } from '~/shared/pub-sub'
 import { PISPLinkingPhase } from '~/models/outbound/pispLinking.interface'
 import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
-import { loadFromKVS } from '~/models/inbound/dfspLinking.model'
-import { DFSPLinkingModelConfig, DFSPLinkingPhase } from '~/models/inbound/dfspLinking.interface'
+import { DFSPLinkingPhase } from '~/models/inbound/dfspLinking.interface'
 import { DFSPLinkingModel } from '~/models/inbound/dfspLinking.model'
-import config from '~/shared/config';
-import inspect from '~/shared/inspect'
 
 /**
  * Handles an inbound `PATCH /consents/{ID}` request
@@ -64,32 +61,15 @@ async function patch (_context: unknown, request: Request, h: StateResponseToolk
     tpAPI.Schemas.ConsentsIDPutResponseSigned |
     tpAPI.Schemas.ConsentsIDPatchResponseVerified
 
-  // prepare model config
-  const modelConfig: DFSPLinkingModelConfig = {
-    kvs: h.getKVS(),
-    pubSub: h.getPubSub(),
-    key: consentId,
-    logger: h.getLogger(),
-    dfspBackendRequests: h.getDFSPBackendRequests(),
-    thirdpartyRequests: h.getThirdpartyRequests(),
-    mojaloopRequests: h.getMojaloopRequests(),
-    requestProcessingTimeoutSeconds: config.REQUEST_PROCESSING_TIMEOUT_SECONDS
-  }
-
   if (payload.credential.status == 'PENDING') {
     const payload = request.payload as tpAPI.Schemas.ConsentsIDPutResponseSigned
-    // don't await on promise to be resolved
-    setImmediate(async () => {
-      try {
-        const model: DFSPLinkingModel = await loadFromKVS(modelConfig)
-        model.data.consentIDPutRequest = payload
-        await model.run()
-      } catch (error) {
-        // todo: add an PUT /consents/{ID}/error error call back if model
-        //       is unable to run workflow
-        h.getLogger().info(`Error running DFSPLinkingModel : ${inspect(error)}`)
-      }
-    })
+
+    DFSPLinkingModel.triggerWorkflow(
+      DFSPLinkingPhase.waitOnSignedCredentialFromPISPResponse,
+      consentId,
+      h.getPubSub(),
+      payload as unknown as Message
+    )
   } else if (payload.credential.status == 'VERIFIED') {
     const payload = request.payload as tpAPI.Schemas.ConsentsIDPutResponseVerified
 

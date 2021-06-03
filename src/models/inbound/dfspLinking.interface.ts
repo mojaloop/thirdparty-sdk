@@ -41,7 +41,8 @@ import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
 export enum DFSPLinkingPhase {
   requestConsent = 'requestConsent',
   requestConsentAuthenticate = 'requestConsentAuthenticate',
-  waitOnSignedCredential = 'waitOnSignedCredential',
+  waitOnAuthTokenFromPISPResponse = 'waitOnAuthTokenFromPISPResponse',
+  waitOnSignedCredentialFromPISPResponse = 'waitOnSignedCredentialFromPISPResponse',
   waitOnAuthServiceResponse = 'waitOnAuthServiceResponse',
   waitOnALSParticipantResponse = 'waitOnALSParticipantResponse',
   waitOnThirdpartyLinkRegistrationResponse = 'waitOnThirdpartyLinkRegistrationResponse',
@@ -86,6 +87,8 @@ export interface DFSPLinkingStateMachine extends ControlledStateMachine {
   onValidateRequest: Method
   storeReqAndSendOTP: Method
   onStoreReqAndSendOTP: Method
+  sendLinkingChannelResponse: Method
+  onSendLinkingChannelResponse: Method
   validateAuthToken: Method
   onValidateAuthToken: Method
   grantConsent: Method
@@ -121,14 +124,17 @@ export interface DFSPLinkingData extends StateData {
   backendValidateConsentRequestsResponse?: BackendValidateConsentRequestsResponse
 
   // authenticate phase
-  consentRequestsIDPatchRequest?: tpAPI.Schemas.ConsentRequestsIDPatchRequest
+  consentRequestsIDPutRequest?:
+    tpAPI.Schemas.ConsentRequestsIDPutResponseOTP &
+    tpAPI.Schemas.ConsentRequestsIDPutResponseWeb
+  consentRequestsIDPatchResponse?: tpAPI.Schemas.ConsentRequestsIDPatchRequest
 
   // grant consent phase
   consentPostRequest?: tpAPI.Schemas.ConsentsPostRequest
 
   // credential registration phase
   // inbound PUT /consent/{ID} response which contains the signed credential
-  consentIDPutResponse?: tpAPI.Schemas.ConsentsIDPutResponseSigned
+  consentIDPutResponseSignedCredentialFromPISP?: tpAPI.Schemas.ConsentsIDPutResponseSigned
 
   // request that passes signed credential to auth-service
   consentPostRequestToAuthService?: tpAPI.Schemas.ConsentsPostRequest
