@@ -44,6 +44,7 @@ async function put (_context: unknown, request: Request, h: StateResponseToolkit
   // what model we trigger. since error codes are still a WIP and that
   // codes can be generic codes, we need to think about what gets triggered.
   // for now we just trigger all workflows.
+  // TODO: choose the proper phase/PubChannel depending on error.code
 
   // PUT /consents/{ID}/error is a response from a DFSP to a PUT /consents/{ID}
   // sent by a PISP when something went wrong registering a credential

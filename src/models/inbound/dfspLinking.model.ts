@@ -282,6 +282,7 @@ export class DFSPLinkingModel
     const { consentRequestId, consentRequestsIDPatchResponse, toParticipantId } = this.data
 
     try {
+      // todo: change this to validateAuthToken, here and throughout code.
       const isValidOTP = await this.dfspBackendRequests.validateOTPSecret(
         consentRequestId!,
         consentRequestsIDPatchResponse!.authToken

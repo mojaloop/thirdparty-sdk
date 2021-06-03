@@ -61,6 +61,7 @@ async function post (_context: any, request: Request, h: StateResponseToolkit): 
   const result = await model.run()
   if (!result) {
     h.getLogger().error('outbound POST /linking/request-consent unexpected result from workflow')
+    // todo: change to `central-services` Enum code once typescript is updated
     return h.response({}).code(500)
   }
 

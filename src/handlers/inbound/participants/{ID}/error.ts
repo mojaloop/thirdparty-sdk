@@ -32,6 +32,7 @@
  import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
  import { DFSPLinkingPhase } from '~/models/inbound/dfspLinking.interface'
  import { DFSPLinkingModel } from '~/models/inbound/dfspLinking.model'
+import { Enum } from '@mojaloop/central-services-shared';
 
 /**
 * Handles an inbound `PUT /participants/{ID}/error` request
@@ -50,7 +51,7 @@ async function put (_context: unknown, request: Request, h: StateResponseToolkit
     payload as unknown as Message
   )
 
-  return h.response().code(200)
+  return h.response({}).code(Enum.Http.ReturnCodes.OK.CODE)
 }
 
 export default {

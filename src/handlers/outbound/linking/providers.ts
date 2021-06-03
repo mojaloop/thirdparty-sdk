@@ -60,6 +60,7 @@ async function get (_context: unknown, _request: Request, h: StateResponseToolki
     const result = await model.run()
     if (!result) {
       h.getLogger().error('outbound GET /linking/providers unexpected result from workflow')
+      // todo: change to `central-services` Enum code once typescript is updated
       return h.response({}).code(500)
     }
 
@@ -67,6 +68,7 @@ async function get (_context: unknown, _request: Request, h: StateResponseToolki
     return h.response(result).code(statusCode)
   } catch(error) {
     h.getLogger().info(`Error running PISPPrelinkingModel : ${inspect(error)}`)
+    // todo: change to `central-services` Enum code once typescript is updated
     return h.response({}).code(500)
   }
 }

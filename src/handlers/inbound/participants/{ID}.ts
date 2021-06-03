@@ -32,6 +32,7 @@ import { Message } from '~/shared/pub-sub'
 import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
 import { DFSPLinkingPhase } from '~/models/inbound/dfspLinking.interface'
 import { DFSPLinkingModel } from '~/models/inbound/dfspLinking.model'
+import { Enum } from '@mojaloop/central-services-shared';
 
 /**
  * Handles an inbound `PUT /participants/{ID}` request
@@ -44,6 +45,7 @@ import { DFSPLinkingModel } from '~/models/inbound/dfspLinking.model'
   // DFSPLinkingModel.onFinalizeConsentWithALS where a POST /participant
   // bulk create request is made to the ALS.
   // DFSPLinkingModel.onFinalizeConsentWithALS is not yet implemented
+  // Only one `type` value is allowed by validation rule specified in API definition, so OpenAPI framework will send 400 for any other `type` value
   if (type == 'THIRD_PARTY_LINK') {
     DFSPLinkingModel.triggerWorkflow(
       DFSPLinkingPhase.waitOnThirdpartyLinkRegistrationResponse,
@@ -53,7 +55,7 @@ import { DFSPLinkingModel } from '~/models/inbound/dfspLinking.model'
     )
   }
 
-  return h.response().code(200)
+  return h.response({}).code(Enum.Http.ReturnCodes.OK.CODE)
 }
 
 export default {

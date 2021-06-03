@@ -74,6 +74,7 @@ async function post (_context: any, request: Request, h: StateResponseToolkit): 
     //       if the model is not found then we don't know the ID
     //       We might need to pass the ID in LinkingRequestConsentIDPassCredentialRequest.
     h.getLogger().info(`Error running PISPLinkingModel : ${inspect(error)}`)
+    // todo: change to `central-services` Enum code once typescript is updated
     return h.response({}).code(500)
   }
 }

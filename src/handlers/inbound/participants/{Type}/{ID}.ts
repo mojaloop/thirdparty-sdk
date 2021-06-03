@@ -30,6 +30,7 @@ import { Message } from '~/shared/pub-sub'
 import { v1_1 as fspiopAPI } from '@mojaloop/api-snippets'
 import { DFSPLinkingPhase } from '~/models/inbound/dfspLinking.interface'
 import { DFSPLinkingModel } from '~/models/inbound/dfspLinking.model'
+import { Enum } from '@mojaloop/central-services-shared';
 
 /**
  * Handles an inbound `PUT /participants/{Type}/{ID}` request
@@ -50,7 +51,7 @@ import { DFSPLinkingModel } from '~/models/inbound/dfspLinking.model'
     )
   }
 
-  return h.response().code(200)
+  return h.response({}).code(Enum.Http.ReturnCodes.OK.CODE)
 }
 
 export default {

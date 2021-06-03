@@ -74,7 +74,7 @@ async function post (_context: unknown, request: Request, h: StateResponseToolki
     requestProcessingTimeoutSeconds: config.REQUEST_PROCESSING_TIMEOUT_SECONDS
   }
 
-  // don't await on promise to be resolved
+  // postpone model execution to next event loop cycle so we can return response ASAP
   setImmediate(async () => {
     try {
       const model = new DFSPLinkingModel(data, modelConfig)
