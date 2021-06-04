@@ -100,30 +100,27 @@ describe('PISP requests DFSP to validate user consentRequests for linking', (): 
       const consentRequestId = 'b51ec534-ee48-4575-b6a9-ead2955b8069'
       const linkingRequestConsentPassCredentialURI = `${env.outbound.baseUri}/linking/request-consent/${consentRequestId}/pass-credential`
 
-      // ttk uses an credential.payload.id of credential-id for a verified response
+      // ttk uses an credential.payload.id of below for a verified response
       const linkingRequestConsentPassCredentialRequest = {
         credential: {
           payload: {
-            id: 'credential-id',
+            id: 'credential id: identifier of pair of keys, base64 encoded, min length 59',
+            rawId: 'raw credential id: identifier of pair of keys, base64 encoded, min length 59',
             response: {
-              clientData: {
-                challenge: 'the-challenge',
-                origin: 'pisp.mojaloop.io',
-                type: 'webauthn.create'
-              },
-              attestation: {
-                authData: 'some-auth-data-with-PublicKey-and-some-' +
-                  'metadata-authData-must-not-have-fewer-than-196-characters-' +
-                  'Lorem-ipsum-dolor-sit-amet-consectetur-adipiscing-elit-sed' +
-                  '-do-eiusmod-tempor-incididunt-ut-labore-et-dolore-magna-aliqua',
-                format: 'fido-u2f',
-                statement: {
-                  sig: 'signature-sig-must-not-have-fewer-than-70-characters-Lorem-ipsum-dolor-sit-amet',
-                  x5c: 'x.509 certificate'
-                }
-              }
-            }
-          }
+              clientDataJSON: 'clientDataJSON-must-not-have-fewer-than-121-' +
+                'characters Lorem ipsum dolor sit amet, consectetur adipiscing ' +
+                'elit, sed do eiusmod tempor incididunt ut labore et dolore magna ' +
+                'aliqua.',
+              attestationObject: 'attestationObject-must-not-have-fewer-than-' +
+                '306-characters Lorem ipsum dolor sit amet, consectetur ' +
+                'adipiscing elit, sed do eiusmod tempor incididunt ut ' +
+                'labore et dolore magna aliqua. Ut enim ad minim veniam, ' +
+                'quis nostrud exercitation ullamco laboris nisi ut aliquip ' +
+                'ex ea commodo consequat. Duis aute irure dolor in reprehenderit ' +
+                'in voluptate velit esse cillum dolore eu fugiat nulla pariatur.'
+            },
+            type: 'public-key'
+          },
         }
       }
       const expectedResponse = {
@@ -186,30 +183,27 @@ describe('PISP requests DFSP to validate user consentRequests for linking', (): 
       const consentRequestId = 'c51ec534-ee48-4575-b6a9-ead2955b8069'
       const linkingRequestConsentPassCredentialURI = `${env.outbound.baseUri}/linking/request-consent/${consentRequestId}/pass-credential`
 
-      // ttk uses an credential.payload.id of credential-id for a verified response
+      // ttk uses an credential.payload.id of below for a verified response
       const linkingRequestConsentPassCredentialRequest = {
         credential: {
           payload: {
-            id: 'credential-id',
+            id: 'credential id: identifier of pair of keys, base64 encoded, min length 59',
+            rawId: 'raw credential id: identifier of pair of keys, base64 encoded, min length 59',
             response: {
-              clientData: {
-                challenge: 'the-challenge',
-                origin: 'pisp.mojaloop.io',
-                type: 'webauthn.create'
-              },
-              attestation: {
-                authData: 'some-auth-data-with-PublicKey-and-some-' +
-                  'metadata-authData-must-not-have-fewer-than-196-characters-' +
-                  'Lorem-ipsum-dolor-sit-amet-consectetur-adipiscing-elit-sed' +
-                  '-do-eiusmod-tempor-incididunt-ut-labore-et-dolore-magna-aliqua',
-                format: 'fido-u2f',
-                statement: {
-                  sig: 'signature-sig-must-not-have-fewer-than-70-characters-Lorem-ipsum-dolor-sit-amet',
-                  x5c: 'x.509 certificate'
-                }
-              }
-            }
-          }
+              clientDataJSON: 'clientDataJSON-must-not-have-fewer-than-121-' +
+                'characters Lorem ipsum dolor sit amet, consectetur adipiscing ' +
+                'elit, sed do eiusmod tempor incididunt ut labore et dolore magna ' +
+                'aliqua.',
+              attestationObject: 'attestationObject-must-not-have-fewer-than-' +
+                '306-characters Lorem ipsum dolor sit amet, consectetur ' +
+                'adipiscing elit, sed do eiusmod tempor incididunt ut ' +
+                'labore et dolore magna aliqua. Ut enim ad minim veniam, ' +
+                'quis nostrud exercitation ullamco laboris nisi ut aliquip ' +
+                'ex ea commodo consequat. Duis aute irure dolor in reprehenderit ' +
+                'in voluptate velit esse cillum dolore eu fugiat nulla pariatur.'
+            },
+            type: 'public-key'
+          },
         }
       }
       const expectedResponse = {
@@ -338,30 +332,27 @@ describe('PISP requests DFSP to validate user consentRequests for linking', (): 
       const consentRequestId = 'b51ec534-ee48-4575-b6a9-ead2955b8069'
       const linkingRequestConsentPassCredentialURI = `${env.outbound.baseUri}/linking/request-consent/${consentRequestId}/pass-credential`
 
-      // ttk uses an credential.payload.id of credential-id-error for a error response
+      // ttk uses an credential.payload.id of below for a error response
       const linkingRequestConsentPassCredentialRequest = {
         credential: {
           payload: {
-            id: 'credential-id-error',
+            id: 'credential id error: identifier of pair of keys, base64 encoded, min length 59',
+            rawId: 'raw credential id: identifier of pair of keys, base64 encoded, min length 59',
             response: {
-              clientData: {
-                challenge: 'the-challenge',
-                origin: 'pisp.mojaloop.io',
-                type: 'webauthn.create'
-              },
-              attestation: {
-                authData: 'some-auth-data-with-PublicKey-and-some-' +
-                  'metadata-authData-must-not-have-fewer-than-196-characters-' +
-                  'Lorem-ipsum-dolor-sit-amet-consectetur-adipiscing-elit-sed' +
-                  '-do-eiusmod-tempor-incididunt-ut-labore-et-dolore-magna-aliqua',
-                format: 'fido-u2f',
-                statement: {
-                  sig: 'signature-sig-must-not-have-fewer-than-70-characters-Lorem-ipsum-dolor-sit-amet',
-                  x5c: 'x.509 certificate'
-                }
-              }
-            }
-          }
+              clientDataJSON: 'clientDataJSON-must-not-have-fewer-than-121-' +
+                'characters Lorem ipsum dolor sit amet, consectetur adipiscing ' +
+                'elit, sed do eiusmod tempor incididunt ut labore et dolore magna ' +
+                'aliqua.',
+              attestationObject: 'attestationObject-must-not-have-fewer-than-' +
+                '306-characters Lorem ipsum dolor sit amet, consectetur ' +
+                'adipiscing elit, sed do eiusmod tempor incididunt ut ' +
+                'labore et dolore magna aliqua. Ut enim ad minim veniam, ' +
+                'quis nostrud exercitation ullamco laboris nisi ut aliquip ' +
+                'ex ea commodo consequat. Duis aute irure dolor in reprehenderit ' +
+                'in voluptate velit esse cillum dolore eu fugiat nulla pariatur.'
+            },
+            type: 'public-key'
+          },
         }
       }
       const expectedResponse = {

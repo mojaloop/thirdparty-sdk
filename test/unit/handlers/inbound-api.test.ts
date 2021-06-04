@@ -1212,7 +1212,6 @@ describe('Inbound API routes', (): void => {
           request as unknown as Request,
           toolkit as unknown as StateResponseToolkit
         )
-
         expect(result.statusCode).toEqual(202)
       })
 

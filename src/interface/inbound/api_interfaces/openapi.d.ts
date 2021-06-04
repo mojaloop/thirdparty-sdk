@@ -110,6 +110,12 @@ export interface paths {
   "/metrics": {
     get: operations["MetricsGet"];
   };
+  "/participants/{ID}": {
+    put: operations["PutParticipantsByID"];
+  };
+  "/participants/{ID}/error": {
+    put: operations["PutParticipantsByIDAndError"];
+  };
   "/participants/{Type}/{ID}": {
     post: operations["ParticipantsByIDAndType"];
     get: operations["ParticipantsByTypeAndID"];
@@ -450,7 +456,7 @@ export interface operations {
       503: components["responses"]["503"];
     };
   };
-  /** DFSP sends this request to the PISP after granting consent. */
+  /** DFSP sends this request to the PISP after granting consent. DFSP sends this request to an Auth service to validate a signed consent. */
   PostConsents: {
     parameters: {
       header: {
@@ -468,7 +474,9 @@ export interface operations {
       };
     };
     requestBody: {
-      "application/json": components["schemas"]["ConsentsPostRequest"];
+      "application/json":
+        | components["schemas"]["ConsentsPostRequestAUTH"]
+        | components["schemas"]["ConsentsPostRequestPISP"];
     };
     responses: {
       202: components["responses"]["202"];
@@ -635,6 +643,74 @@ export interface operations {
   };
   /** The HTTP request GET /metrics is used to return metrics for the API. */
   MetricsGet: {
+    responses: {
+      200: components["responses"]["200"];
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      405: components["responses"]["405"];
+      406: components["responses"]["406"];
+      501: components["responses"]["501"];
+      503: components["responses"]["503"];
+    };
+  };
+  /** The callback `PUT /participants/{ID}` is used to inform the client of the result of the creation of the provided list of identities. */
+  PutParticipantsByID: {
+    parameters: {
+      path: {
+        ID: components["parameters"]["ID"];
+      };
+      header: {
+        "Content-Length"?: components["parameters"]["Content-Length"];
+        "Content-Type": components["parameters"]["Content-Type"];
+        Date: components["parameters"]["Date"];
+        "X-Forwarded-For"?: components["parameters"]["X-Forwarded-For"];
+        "FSPIOP-Source": components["parameters"]["FSPIOP-Source"];
+        "FSPIOP-Destination"?: components["parameters"]["FSPIOP-Destination"];
+        "FSPIOP-Encryption"?: components["parameters"]["FSPIOP-Encryption"];
+        "FSPIOP-Signature"?: components["parameters"]["FSPIOP-Signature"];
+        "FSPIOP-URI"?: components["parameters"]["FSPIOP-URI"];
+        "FSPIOP-HTTP-Method"?: components["parameters"]["FSPIOP-HTTP-Method"];
+      };
+    };
+    requestBody: {
+      "application/json": components["schemas"]["ParticipantsIDPutResponse"];
+    };
+    responses: {
+      200: components["responses"]["200"];
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      405: components["responses"]["405"];
+      406: components["responses"]["406"];
+      501: components["responses"]["501"];
+      503: components["responses"]["503"];
+    };
+  };
+  /** If there is an error during FSP information creation in the server, the error callback `PUT /participants/{ID}/error` is used. The `{ID}` in the URI should contain the requestId that was used for the creation of the participant information. */
+  PutParticipantsByIDAndError: {
+    parameters: {
+      path: {
+        ID: components["parameters"]["ID"];
+      };
+      header: {
+        "Content-Length"?: components["parameters"]["Content-Length"];
+        "Content-Type": components["parameters"]["Content-Type"];
+        Date: components["parameters"]["Date"];
+        "X-Forwarded-For"?: components["parameters"]["X-Forwarded-For"];
+        "FSPIOP-Source": components["parameters"]["FSPIOP-Source"];
+        "FSPIOP-Destination"?: components["parameters"]["FSPIOP-Destination"];
+        "FSPIOP-Encryption"?: components["parameters"]["FSPIOP-Encryption"];
+        "FSPIOP-Signature"?: components["parameters"]["FSPIOP-Signature"];
+        "FSPIOP-URI"?: components["parameters"]["FSPIOP-URI"];
+        "FSPIOP-HTTP-Method"?: components["parameters"]["FSPIOP-HTTP-Method"];
+      };
+    };
+    requestBody: {
+      "application/json": components["schemas"]["ErrorInformationObject"];
+    };
     responses: {
       200: components["responses"]["200"];
       400: components["responses"]["400"];
@@ -1419,37 +1495,35 @@ export interface components {
     ConsentRequestsIDPatchRequest: {
       authToken: string;
     };
-    /** The object sent in a `POST /consents` request. */
-    ConsentsPostRequest: {
-      /**
-       * Common ID between the PISP and FSP for the Consent object
-       * decided by the DFSP who creates the Consent
-       * This field is REQUIRED for POST /consent.
-       */
-      consentId: components["schemas"]["CorrelationId"];
-      /**
-       * The id of the ConsentRequest that was used to initiate the
-       * creation of this Consent.
-       */
-      consentRequestId: components["schemas"]["CorrelationId"];
-      scopes: components["schemas"]["Scope"][];
-    };
     /**
      * The type of the Credential.
-     * - "FIDO" - A FIDO public/private keypair.
+     * - "FIDO" - A FIDO public/private keypair
      */
     CredentialType: "FIDO";
     /**
      * An object sent in a `PUT /consents/{ID}` request.
      * Based on https://w3c.github.io/webauthn/#iface-pkcredential
+     * and mostly on: https://webauthn.guide/#registration
+     * AuthenticatorAttestationResponse
+     * https://w3c.github.io/webauthn/#dom-authenticatorattestationresponse-attestationobject
      */
-    PublicKeyCredential: {
-      /** TBD */
+    FIDOPublicKeyCredential: {
+      /**
+       * credential id: identifier of pair of keys, base64 encoded
+       * https://w3c.github.io/webauthn/#ref-for-dom-credential-id
+       */
       id: string;
+      /** raw credential id: identifier of pair of keys, base64 encoded */
+      rawId: string;
+      /** AuthenticatorAttestationResponse */
       response: {
-        /** TBD */
+        /** JSON string with client data */
         clientDataJSON: string;
+        /** CBOR.encoded attestation object */
+        attestationObject: string;
       };
+      /** response type, we need only the type of public-key */
+      type: "public-key";
     };
     /**
      * A credential used to allow a user to prove their identity and access
@@ -1463,7 +1537,37 @@ export interface components {
       credentialType: components["schemas"]["CredentialType"];
       /** The challenge has signed but not yet verified. */
       status: "PENDING";
-      payload: components["schemas"]["PublicKeyCredential"];
+      payload: components["schemas"]["FIDOPublicKeyCredential"];
+    };
+    /**
+     * The object sent in a `POST /consents` request to AUTH-SERVICE by DFSP to store registered consent with PublicKey
+     * and whatever needed to perform authorization validation later
+     */
+    ConsentsPostRequestAUTH: {
+      /**
+       * Common ID between the PISP and FSP for the Consent object
+       * decided by the DFSP who creates the Consent
+       * This field is REQUIRED for POST /consent.
+       * creation of this Consent.
+       */
+      consentId: components["schemas"]["CorrelationId"];
+      scopes: components["schemas"]["Scope"][];
+      credential: components["schemas"]["SignedCredential"];
+    };
+    /** The object sent in a `POST /consents` request to PISP by DFSP to ask for delivering the credential object. */
+    ConsentsPostRequestPISP: {
+      /**
+       * Common ID between the PISP and FSP for the Consent object
+       * decided by the DFSP who creates the Consent
+       * This field is REQUIRED for POST /consent.
+       */
+      consentId: components["schemas"]["CorrelationId"];
+      /**
+       * The id of the ConsentRequest that was used to initiate the
+       * creation of this Consent.
+       */
+      consentRequestId: components["schemas"]["CorrelationId"];
+      scopes: components["schemas"]["Scope"][];
     };
     /**
      * The HTTP request `PUT /consents/{ID}` is used by the PISP to update a Consent with a signed challenge and register a credential.
@@ -1485,7 +1589,7 @@ export interface components {
       credentialType: components["schemas"]["CredentialType"];
       /** The Credential is valid, and ready to be used by the PISP. */
       status: "VERIFIED";
-      payload: components["schemas"]["PublicKeyCredential"];
+      payload: components["schemas"]["FIDOPublicKeyCredential"];
     };
     /**
      * The HTTP request `PUT /consents/{ID}` is used by the DFSP or Auth-Service to update a Consent object once it has been Verified.
@@ -1525,18 +1629,6 @@ export interface components {
     ConsentsIDPatchResponseRevoked: {
       status: components["schemas"]["ConsentStatusTypeRevoked"];
       revokedAt: components["schemas"]["DateTime"];
-    };
-    /** FSP identifier. */
-    FspId: string;
-    /** The object sent in the PUT /participants/{Type}/{ID}/{SubId} and /participants/{Type}/{ID} callbacks. */
-    ParticipantsTypeIDPutResponse: {
-      fspId?: components["schemas"]["FspId"];
-    };
-    /** The object sent in the POST /participants/{Type}/{ID}/{SubId} and /participants/{Type}/{ID} requests. An additional optional ExtensionList element has been added as part of v1.1 changes. */
-    ParticipantsTypeIDSubIDPostRequest: {
-      fspId: components["schemas"]["FspId"];
-      currency?: components["schemas"]["Currency"];
-      extensionList?: components["schemas"]["ExtensionList"];
     };
     /**
      * This is a variant based on FSPIOP `PartyIdType` specification.
@@ -1595,12 +1687,35 @@ export interface components {
     PartyIdentifier: string;
     /** Either a sub-identifier of a PartyIdentifier, or a sub-type of the PartyIdType, normally a PersonalIdentifierType. */
     PartySubIdOrType: string;
+    /** FSP identifier. */
+    FspId: string;
     /** Data model for the complex type PartyIdInfo. */
     PartyIdInfo: {
       partyIdType: components["schemas"]["PartyIdType"];
       partyIdentifier: components["schemas"]["PartyIdentifier"];
       partySubIdOrType?: components["schemas"]["PartySubIdOrType"];
       fspId?: components["schemas"]["FspId"];
+      extensionList?: components["schemas"]["ExtensionList"];
+    };
+    /** Data model for the complex type PartyResult. */
+    PartyResult: {
+      partyId: components["schemas"]["PartyIdInfo"];
+      errorInformation?: components["schemas"]["ErrorInformation"];
+    };
+    /** The object sent in the PUT /participants/{ID} callback. */
+    ParticipantsIDPutResponse: {
+      /** List of PartyResult elements that were either created or failed to be created. */
+      partyList: components["schemas"]["PartyResult"][];
+      currency?: components["schemas"]["Currency"];
+    };
+    /** The object sent in the PUT /participants/{Type}/{ID}/{SubId} and /participants/{Type}/{ID} callbacks. */
+    ParticipantsTypeIDPutResponse: {
+      fspId?: components["schemas"]["FspId"];
+    };
+    /** The object sent in the POST /participants/{Type}/{ID}/{SubId} and /participants/{Type}/{ID} requests. An additional optional ExtensionList element has been added as part of v1.1 changes. */
+    ParticipantsTypeIDSubIDPostRequest: {
+      fspId: components["schemas"]["FspId"];
+      currency?: components["schemas"]["Currency"];
       extensionList?: components["schemas"]["ExtensionList"];
     };
     /** A limited set of pre-defined numbers. This list would be a limited set of numbers identifying a set of popular merchant types like School Fees, Pubs and Restaurants, Groceries, etc. */

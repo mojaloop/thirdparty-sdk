@@ -1016,56 +1016,17 @@ export interface components {
        * https://w3c.github.io/webauthn/#ref-for-dom-credential-id
        */
       id: string;
+      /** raw credential id: identifier of pair of keys, base64 encoded */
+      rawId: string;
       /** AuthenticatorAttestationResponse */
       response: {
-        /**
-         * parsed AuthenticatorAttestationResponse.clientDataJSON
-         * client data used to create credential
-         * https://webauthn.guide/#registration
-         */
-        clientData: {
-          /** the challenge used to create credential */
-          challenge: string;
-          /** the origin used to create credential */
-          origin: string;
-          /**
-           * If another string is provided, it indicates that the authenticator performed an incorrect operation.
-           * In such case OpenAPI framework will send back the status 400
-           */
-          type: 'webauthn.create';
-        };
-        /**
-         * CBOR.Decoded AuthenticatorAttestationResponse.attestationObject
-         * https://webauthn.guide/#registration
-         */
-        attestation: {
-          /**
-           * base64 encoded byte array Uint8Array(196) with publicKey and metadata
-           * parsing example can be found here:
-           * https://webauthn.guide/#registration
-           */
-          authData?: string;
-          /**
-           * attestation statement format
-           * Authenticators can provide attestation data in a number of ways; this indicates how the server should parse and validate the attestation data
-           * https://webauthn.guide/#registration
-           */
-          format?: 'fido-u2f';
-          /**
-           * The FIDO statement format when `format: 'fido-u2f'` only!
-           * It can differ when other format types are enabled!
-           */
-          statement?: {
-            /**
-             * signature
-             * base64 encoded Uint8Array(70)
-             */
-            sig: string;
-            /** attestation certificate in X.509 format */
-            x5c: string;
-          };
-        };
+        /** JSON string with client data */
+        clientDataJSON: string;
+        /** CBOR.encoded attestation object */
+        attestationObject: string;
       };
+      /** response type, we need only the type of public-key */
+      type: 'public-key';
     };
     /** POST /linking/request-consent/{ID}/pass-credential request object */
     LinkingRequestConsentIDPassCredentialRequest: {
