@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+## [11.39.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.38.0...v11.39.0) (2021-06-04)
+
+
+### Features
+
+* add credential phase handling for DFSP Linking model ([#101](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/101)) ([4b624ce](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/4b624ce0d5d0e8f9f1b2d5e28f346c58743b5f88))
+
 ## [11.38.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.37.5...v11.38.0) (2021-05-28)
 
 
