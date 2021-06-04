@@ -911,7 +911,7 @@ describe('Inbound API routes', (): void => {
         getLogger: jest.fn(() => logger),
         getDFSPId: jest.fn(() => 'dfspA'),
         getDFSPBackendRequests: jest.fn(() => ({
-          validateOTPSecret: jest.fn(() => Promise.resolve({
+          validateAuthToken: jest.fn(() => Promise.resolve({
             isValid: true
           }))
         })),

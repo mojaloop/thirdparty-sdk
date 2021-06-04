@@ -132,7 +132,9 @@ export class DFSPLinkingModel
 
     try {
       const response = await this.dfspBackendRequests.validateConsentRequests(consentRequestsPostRequest)
-
+      this.logger.info(
+        `received ${response}, from DFSP backend for validating consent ${consentRequestsPostRequest}`
+      )
       if (!response) {
         throw Errors.MojaloopApiErrorCodes.TP_CONSENT_REQ_VALIDATION_ERROR
       }
@@ -280,8 +282,7 @@ export class DFSPLinkingModel
     const { consentRequestId, consentRequestsIDPatchResponse, toParticipantId } = this.data
 
     try {
-      // todo: change this to validateAuthToken, here and throughout code.
-      const isValidOTP = await this.dfspBackendRequests.validateOTPSecret(
+      const isValidOTP = await this.dfspBackendRequests.validateAuthToken(
         consentRequestId!,
         consentRequestsIDPatchResponse!.authToken
       ) as BackendValidateOTPResponse

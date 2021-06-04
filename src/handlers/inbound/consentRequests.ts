@@ -37,11 +37,12 @@ import {
   DFSPLinkingData,
   DFSPLinkingModelConfig
 } from '~/models/inbound/dfspLinking.interface'
-import { DFSPLinkingModel } from '~/models/inbound/dfspLinking.model'
+import { DFSPLinkingModel, create } from '~/models/inbound/dfspLinking.model'
 import inspect from '~/shared/inspect'
 import config from '~/shared/config'
 import { reformatError } from '~/shared/api-error'
 import { Errors } from '@mojaloop/sdk-standard-components'
+
 
 /**
  * Handles an inbound `POST /consentRequests` request
@@ -77,7 +78,7 @@ async function post (_context: unknown, request: Request, h: StateResponseToolki
   // postpone model execution to next event loop cycle so we can return response ASAP
   setImmediate(async () => {
     try {
-      const model = new DFSPLinkingModel(data, modelConfig)
+      const model: DFSPLinkingModel = await create(data, modelConfig)
       await model.run()
     } catch (error) {
       // catch any unplanned errors

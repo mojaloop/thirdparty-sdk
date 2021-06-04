@@ -90,7 +90,7 @@ describe('dfspLinkingModel', () => {
         validateConsentRequests: jest.fn(() => Promise.resolve(mockData.consentRequestsPost.response)),
         storeConsentRequests: jest.fn(() => Promise.resolve()),
         sendOTP: jest.fn(() => Promise.resolve(mockData.consentRequestsPost.otpResponse)),
-        validateOTPSecret: jest.fn(() => Promise.resolve({
+        validateAuthToken: jest.fn(() => Promise.resolve({
           isValid: true
         }))
       } as unknown as DFSPBackendRequests,
@@ -639,7 +639,7 @@ describe('dfspLinkingModel', () => {
 
     it('validateAuthToken() should transition start to authTokenValidated state when successful', async () => {
       const model = await create(validateData, modelConfig)
-      mocked(modelConfig.dfspBackendRequests.validateOTPSecret).mockImplementationOnce(() => Promise.resolve({
+      mocked(modelConfig.dfspBackendRequests.validateAuthToken).mockImplementationOnce(() => Promise.resolve({
         isValid: true
       }))
 
@@ -649,15 +649,15 @@ describe('dfspLinkingModel', () => {
       // check that the fsm was able to transition properly
       expect(model.data.currentState).toEqual('authTokenValidated')
 
-      // check we made a call to dfspBackendRequests.validateOTPSecret
-      expect(modelConfig.dfspBackendRequests.validateOTPSecret).toBeCalledWith(
+      // check we made a call to dfspBackendRequests.validateAuthToken
+      expect(modelConfig.dfspBackendRequests.validateAuthToken).toBeCalledWith(
         'b51ec534-ee48-4575-b6a9-ead2955b8069', '123456'
       )
     })
 
     it('should handle failed OTP backend validation and send PUT /consentsRequest/{ID}/error response', async () => {
       mocked(
-        modelConfig.dfspBackendRequests.validateOTPSecret
+        modelConfig.dfspBackendRequests.validateAuthToken
       ).mockImplementationOnce(() => Promise.resolve({
         isValid: false
       }))
@@ -687,7 +687,7 @@ describe('dfspLinkingModel', () => {
 
     it('should handle empty OTP validation response and send PUT /consentsRequest/{ID}/error response', async () => {
       mocked(
-        modelConfig.dfspBackendRequests.validateOTPSecret
+        modelConfig.dfspBackendRequests.validateAuthToken
       ).mockImplementationOnce(() => Promise.resolve())
 
       const model = await create(validateData, modelConfig)
@@ -715,10 +715,10 @@ describe('dfspLinkingModel', () => {
 
     it('should handle exceptions and send PUT /consentsRequest/{ID}/error response', async () => {
       mocked(
-        modelConfig.dfspBackendRequests.validateOTPSecret
+        modelConfig.dfspBackendRequests.validateAuthToken
       ).mockImplementationOnce(
         () => {
-          throw new Error('mocked validateOTPSecret exception')
+          throw new Error('mocked validateAuthToken exception')
         }
       )
 
@@ -728,7 +728,7 @@ describe('dfspLinkingModel', () => {
         await model.fsm.validateAuthToken()
         shouldNotBeExecuted()
       } catch (err) {
-        expect(err.message).toEqual('mocked validateOTPSecret exception')
+        expect(err.message).toEqual('mocked validateAuthToken exception')
       }
 
       // check a PUT /consentsRequest/{ID}/error response was sent to source participant
@@ -1361,7 +1361,7 @@ describe('dfspLinkingModel', () => {
     it('start', async () => {
       mocked(modelConfig.dfspBackendRequests.validateConsentRequests).mockImplementationOnce(() => Promise.resolve(mockData.consentRequestsPost.response))
       mocked(modelConfig.dfspBackendRequests.storeConsentRequests).mockImplementationOnce(() => Promise.resolve())
-      mocked(modelConfig.dfspBackendRequests.validateOTPSecret).mockImplementationOnce(() => Promise.resolve({
+      mocked(modelConfig.dfspBackendRequests.validateAuthToken).mockImplementationOnce(() => Promise.resolve({
         isValid: true
       }))
 

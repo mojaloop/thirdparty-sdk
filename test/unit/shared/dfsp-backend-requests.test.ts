@@ -42,7 +42,7 @@ describe('backendRequests', () => {
     verifyAuthorizationPath: 'verify-authorization',
     verifyConsentPath: 'verify-consent',
     getUserAccountsPath: 'accounts/{ID}',
-    validateOTPPath: 'validateOTP',
+    validateAuthTokenPath: 'validateAuthToken',
     validateThirdpartyTransactionRequestPath: 'validate-third-party-transaction-request',
     validateConsentRequestsPath: 'validateConsentRequests',
     sendOTPPath: 'sendOTP',
@@ -90,7 +90,7 @@ describe('backendRequests', () => {
     })
   })
 
-  describe('validateOTPSecret', () => {
+  describe('validateAuthToken', () => {
     it('should propagate the call to post', async () => {
       const response = { isValid: true }
       const postSpy = jest.spyOn(dfspBackendRequests, 'post').mockImplementationOnce(
@@ -98,9 +98,9 @@ describe('backendRequests', () => {
       )
       const consentRequestId = uuid()
       const authToken = uuid()
-      const result = await dfspBackendRequests.validateOTPSecret(consentRequestId, authToken)
+      const result = await dfspBackendRequests.validateAuthToken(consentRequestId, authToken)
       expect(result).toEqual(response)
-      expect(postSpy).toBeCalledWith(dfspBackendRequests.validateOTPPath, { authToken, consentRequestId })
+      expect(postSpy).toBeCalledWith(dfspBackendRequests.validateAuthTokenPath, { authToken, consentRequestId })
     })
   })
 

@@ -74,7 +74,7 @@ export interface BackendStoreScopesRequest {
   scopes: tpAPI.Schemas.Scope[]
 }
 
-export interface BackendValidateOTPResponse {
+export interface BackendValidateAuthTokenResponse {
   isValid: boolean
 }
 
