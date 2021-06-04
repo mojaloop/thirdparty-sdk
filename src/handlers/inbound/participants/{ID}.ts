@@ -25,31 +25,34 @@
 
  --------------
  ******/
-import { Request, ResponseObject } from '@hapi/hapi'
-import {
-  v1_1 as fspiopAPI
-} from '@mojaloop/api-snippets'
-import { StateResponseToolkit } from '~/server/plugins/state'
-import { PISPPrelinkingModel } from '~/models/outbound/pispPrelinking.model'
-import { Enum } from '@mojaloop/central-services-shared'
-import { ServiceType } from '~/models/outbound/pispPrelinking.interface'
 
+import { Request, ResponseObject } from '@hapi/hapi'
+import { StateResponseToolkit } from '~/server/plugins/state'
+import { Message } from '~/shared/pub-sub'
+import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
+import { DFSPLinkingPhase } from '~/models/inbound/dfspLinking.interface'
+import { DFSPLinkingModel } from '~/models/inbound/dfspLinking.model'
+import { Enum } from '@mojaloop/central-services-shared';
 
 /**
-* Handles a inbound PUT /services/{ServiceType}/error request
-*/
-async function put (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
-  const payload = request.payload as fspiopAPI.Schemas.ErrorInformation
-  const serviceType = request.params.ServiceType
-
-  if (serviceType == ServiceType.THIRD_PARTY_DFSP) {
-    const pubSub = h.getPubSub()
-    PISPPrelinkingModel.triggerWorkflow(
-      serviceType,
-      pubSub,
-      payload
+ * Handles an inbound `PUT /participants/{ID}` request
+ */
+ async function put (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+  const id = request.params.ID
+  const payload = request.payload as tpAPI.Schemas.ParticipantsIDPutResponse
+  const type = payload.partyList[0].partyId.partyIdType
+  // this is a inbound request coming from the ALS in response to
+  // DFSPLinkingModel.onFinalizeConsentWithALS where a POST /participant
+  // bulk create request is made to the ALS.
+  // DFSPLinkingModel.onFinalizeConsentWithALS is not yet implemented
+  // Only one `type` value is allowed by validation rule specified in API definition, so OpenAPI framework will send 400 for any other `type` value
+  if (type == 'THIRD_PARTY_LINK') {
+    DFSPLinkingModel.triggerWorkflow(
+      DFSPLinkingPhase.waitOnThirdpartyLinkRegistrationResponse,
+      id,
+      h.getPubSub(),
+      payload as unknown as Message
     )
-    h.getLogger().info(`Inbound received PUT /services/{ServiceType}/error response`)
   }
 
   return h.response({}).code(Enum.Http.ReturnCodes.OK.CODE)

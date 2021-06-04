@@ -27,13 +27,14 @@
 
 import { StateResponseToolkit } from '~/server/plugins/state'
 import { Request, ResponseObject } from '@hapi/hapi'
-import { PISPLinkingModel, loadFromKVS } from '~/models/outbound/pispLinking.model';
+import { PISPLinkingModel, loadFromKVS } from '~/models/outbound/pispLinking.model'
 import {
   PISPLinkingModelConfig,
 } from '~/models/outbound/pispLinking.interface'
-import config from '~/shared/config';
-import inspect from '~/shared/inspect';
+import config from '~/shared/config'
+import inspect from '~/shared/inspect'
 import * as OutboundAPI from '~/interface/outbound/api_interfaces'
+import { Enum } from '@mojaloop/central-services-shared';
 
 
 /**
@@ -62,7 +63,7 @@ async function post (_context: any, request: Request, h: StateResponseToolkit): 
     const result = await model.run()
     if (!result) {
       h.getLogger().error('outbound POST /linking/request-consent/{ID}/pass-credential unexpected result from workflow')
-      return h.response({}).code(500)
+      return h.response({}).code(Enum.Http.ReturnCodes.INTERNALSERVERERRROR.CODE)
     }
 
     const statusCode = (result.currentState == 'errored') ? 500 : 200
@@ -70,10 +71,11 @@ async function post (_context: any, request: Request, h: StateResponseToolkit): 
   } catch(error) {
     // todo: PUT /consents/{ID}/error to DFSP if PISP is unable to handle
     //       the previous inbound POST /consents request
-    //       Do we need to notify the DFSP here...? Shouldn't it just be
-    //       the PISP?
+    //       The handler doesn't know the DFSP's ID due to it being stored in the model
+    //       if the model is not found then we don't know the ID
+    //       We might need to pass the ID in LinkingRequestConsentIDPassCredentialRequest.
     h.getLogger().info(`Error running PISPLinkingModel : ${inspect(error)}`)
-    return h.response({}).code(500)
+    return h.response({}).code(Enum.Http.ReturnCodes.INTERNALSERVERERRROR.CODE)
   }
 }
 

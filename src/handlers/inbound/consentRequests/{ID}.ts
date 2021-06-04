@@ -25,51 +25,28 @@
 
  --------------
  ******/
-
-import {
-  thirdparty as tpAPI
-} from '@mojaloop/api-snippets'
 import { Request, ResponseObject } from '@hapi/hapi'
 import { StateResponseToolkit } from '~/server/plugins/state'
 import { Enum } from '@mojaloop/central-services-shared'
-import { DFSPLinkingModel, loadFromKVS } from '~/models/inbound/dfspLinking.model';
+import { DFSPLinkingModel } from '~/models/inbound/dfspLinking.model'
 import {
-  DFSPLinkingModelConfig
+  DFSPLinkingPhase
 } from '~/models/inbound/dfspLinking.interface'
-import inspect from '~/shared/inspect';
-import { PISPLinkingModel } from '~/models/outbound/pispLinking.model';
+import { PISPLinkingModel } from '~/models/outbound/pispLinking.model'
 import { Message } from '~/shared/pub-sub'
-import { PISPLinkingPhase } from '~/models/outbound/pispLinking.interface';
+import { PISPLinkingPhase } from '~/models/outbound/pispLinking.interface'
 
 async function patch (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
-  const payload = request.payload as tpAPI.Schemas.ConsentRequestsIDPatchRequest
   const consentRequestId = request.params.ID
 
-  // if the authToken is valid the DFSP issues out a POST /consents request.
-  const modelConfig: DFSPLinkingModelConfig = {
-    kvs: h.getKVS(),
-    pubSub: h.getPubSub(),
-    key: consentRequestId,
-    logger: h.getLogger(),
-    dfspBackendRequests: h.getDFSPBackendRequests(),
-    thirdpartyRequests: h.getThirdpartyRequests(),
-  }
+  DFSPLinkingModel.triggerWorkflow(
+    DFSPLinkingPhase.waitOnAuthTokenFromPISPResponse,
+    consentRequestId,
+    h.getPubSub(),
+    request.payload as unknown as Message
+  )
+  h.getLogger().info(`Inbound received PUT /consentRequests/{ID} response`)
 
-  // don't await on promise to be resolved
-  setImmediate(async () => {
-    try {
-      const model: DFSPLinkingModel = await loadFromKVS(modelConfig)
-      model.data.consentRequestsIDPatchRequest = payload
-      await model.run()
-    } catch (error) {
-      // todo: add an PUT /consentRequests/{ID} error call back if model not
-      //       found or is unable to run workflow
-      h.getLogger().info(`Error running DFSPLinkingModel : ${inspect(error)}`)
-    }
-  })
-
-  // Note that we will have passed request validation, JWS etc... by this point
-  // so it is safe to return 202
   return h.response().code(Enum.Http.ReturnCodes.ACCEPTED.CODE)
 }
 
@@ -87,7 +64,7 @@ async function put (_context: unknown, request: Request, h: StateResponseToolkit
   )
   h.getLogger().info(`Inbound received PUT /consentRequests/{ID} response`)
 
-  return h.response().code(200)
+  return h.response().code(Enum.Http.ReturnCodes.OK.CODE)
 }
 
 export default {

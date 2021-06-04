@@ -21,35 +21,63 @@
  - Kevin Leyow <kevin.leyow@modusbox.com>
  --------------
  ******/
- import { Request, ResponseObject } from '@hapi/hapi'
- import {
-   v1_1 as fspiopAPI
- } from '@mojaloop/api-snippets'
- import { Message } from '~/shared/pub-sub'
- import { StateResponseToolkit } from '~/server/plugins/state'
- import { Enum } from '@mojaloop/central-services-shared';
- import { PISPLinkingModel } from '~/models/outbound/pispLinking.model'
- import { PISPLinkingPhase } from '~/models/outbound/pispLinking.interface';
+import { Request, ResponseObject } from '@hapi/hapi'
+import {
+  v1_1 as fspiopAPI
+} from '@mojaloop/api-snippets'
+import { Message } from '~/shared/pub-sub'
+import { StateResponseToolkit } from '~/server/plugins/state'
+import { Enum } from '@mojaloop/central-services-shared'
+import { PISPLinkingModel } from '~/models/outbound/pispLinking.model'
+import { PISPLinkingPhase } from '~/models/outbound/pispLinking.interface'
+import { DFSPLinkingModel } from '~/models/inbound/dfspLinking.model'
+import { DFSPLinkingPhase } from '~/models/inbound/dfspLinking.interface'
 
- /**
-  * Handles a inbound PUT /consents/{ID}/error request
-  */
- async function put (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
-   // PUT /consents/{ID}/error is a response to PUT /consents/{ID}
-   // when something went wrong registering a credential
-   const consentId = request.params.ID
-   const payload = request.payload as fspiopAPI.Schemas.ErrorInformation
+/**
+* Handles a inbound PUT /consents/{ID}/error request
+*/
+async function put (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+  const consentId = request.params.ID
+  const payload = request.payload as fspiopAPI.Schemas.ErrorInformation
 
-   PISPLinkingModel.triggerWorkflow(
-     PISPLinkingPhase.registerCredential,
-     consentId,
-     h.getPubSub(),
-     payload as unknown as Message
-   )
+  // ideally we look at the status codes of the error message to determine
+  // what model we trigger. since error codes are still a WIP and that
+  // codes can be generic codes, we need to think about what gets triggered.
+  // for now we just trigger all workflows.
+  // TODO: choose the proper phase/PubChannel depending on error.code
 
-   return h.response({}).code(Enum.Http.ReturnCodes.OK.CODE)
- }
+  // PUT /consents/{ID}/error is a response from a DFSP to a PUT /consents/{ID}
+  // sent by a PISP when something went wrong registering a credential
+  PISPLinkingModel.triggerWorkflow(
+    PISPLinkingPhase.registerCredential,
+    consentId,
+    h.getPubSub(),
+    payload as unknown as Message
+  )
 
- export default {
-   put
- }
+  // PUT /consents/{ID}/error is a response from the auth-service to a POST /consents
+  // from the DFSP when something went wrong validating the
+  // credential with the auth-service
+  DFSPLinkingModel.triggerWorkflow(
+    DFSPLinkingPhase.waitOnAuthServiceResponse,
+    consentId,
+    h.getPubSub(),
+    payload as unknown as Message
+  )
+
+  // PUT /consents/{ID}/error is a response from the PISP to a POST /consents
+  // from the DFSP when something went wrong in sending back
+  // a signed credential
+  DFSPLinkingModel.triggerWorkflow(
+    DFSPLinkingPhase.waitOnSignedCredentialFromPISPResponse,
+    consentId,
+    h.getPubSub(),
+    payload as unknown as Message
+  )
+
+  return h.response({}).code(Enum.Http.ReturnCodes.OK.CODE)
+}
+
+export default {
+  put
+}

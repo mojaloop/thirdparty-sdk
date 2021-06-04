@@ -272,7 +272,7 @@
         {
           "fact": "body",
           "operator": "equal",
-          "value": "credential-id",
+          "value": "credential id: identifier of pair of keys, base64 encoded, min length 59",
           "path": "credential.payload.id"
         },
         {
@@ -349,7 +349,7 @@
         {
           "fact": "body",
           "operator": "equal",
-          "value": "credential-id-error",
+          "value": "credential id error: identifier of pair of keys, base64 encoded, min length 59",
           "path": "credential.payload.id"
         },
         {

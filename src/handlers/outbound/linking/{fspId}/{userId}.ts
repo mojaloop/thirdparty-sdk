@@ -24,6 +24,7 @@
 
 import { StateResponseToolkit } from '~/server/plugins/state'
 import { Request, ResponseObject } from '@hapi/hapi'
+import { Enum } from '@mojaloop/central-services-shared';
 import {
   PISPDiscoveryData,
   PISPDiscoveryModelConfig,
@@ -56,8 +57,9 @@ async function get (_context: any, request: Request, h: StateResponseToolkit): P
 
   const model: PISPDiscoveryModel = await create(data, config)
   const result = (await model.run()) as PISPDiscoveryGetResponse
-  const statusCode = (result.errorInformation) ? 500 : 200
-
+  const statusCode = (result.errorInformation) ?
+    Enum.Http.ReturnCodes.INTERNALSERVERERRROR.CODE :
+    Enum.Http.ReturnCodes.OK.CODE
   return h.response(result).code(statusCode)
 }
 

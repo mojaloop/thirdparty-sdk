@@ -30,18 +30,23 @@ import {
   StateData
 } from '~/models/persistent.model'
 import { Method } from 'javascript-state-machine'
-import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components';
+import { ThirdpartyRequests, MojaloopRequests } from '@mojaloop/sdk-standard-components'
 import {
   v1_1 as fspiopAPI,
   thirdparty as tpAPI
 } from '@mojaloop/api-snippets'
 import { PubSub } from '~/shared/pub-sub'
-import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests';
-
+import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
 
 export enum DFSPLinkingPhase {
   requestConsent = 'requestConsent',
   requestConsentAuthenticate = 'requestConsentAuthenticate',
+  waitOnAuthTokenFromPISPResponse = 'waitOnAuthTokenFromPISPResponse',
+  waitOnSignedCredentialFromPISPResponse = 'waitOnSignedCredentialFromPISPResponse',
+  waitOnAuthServiceResponse = 'waitOnAuthServiceResponse',
+  waitOnALSParticipantResponse = 'waitOnALSParticipantResponse',
+  waitOnThirdpartyLinkRegistrationResponse = 'waitOnThirdpartyLinkRegistrationResponse',
+  waitOnVerificationNotification = 'waitOnVerificationNotification'
 }
 
 // TODO: Let keep Backend* interfaces in DFSPBackendRequests
@@ -82,20 +87,33 @@ export interface DFSPLinkingStateMachine extends ControlledStateMachine {
   onValidateRequest: Method
   storeReqAndSendOTP: Method
   onStoreReqAndSendOTP: Method
+  sendLinkingChannelResponse: Method
+  onSendLinkingChannelResponse: Method
   validateAuthToken: Method
   onValidateAuthToken: Method
   grantConsent: Method
   onGrantConsent: Method
+  validateWithAuthService: Method
+  onValidateWithAuthService: Method
+  finalizeThirdpartyLinkWithALS: Method
+  onFinalizeThirdpartyLinkWithALS: Method
+  notifyVerificationToPISP: Method
+  onNotifyVerificationToPISP: Method
 }
 
 export interface DFSPLinkingModelConfig extends PersistentModelConfig {
   pubSub: PubSub
   thirdpartyRequests: ThirdpartyRequests
+  mojaloopRequests: MojaloopRequests
   dfspBackendRequests: DFSPBackendRequests
+  requestProcessingTimeoutSeconds: number
 }
 export interface DFSPLinkingData extends StateData {
+  dfspId: string
   toParticipantId: string
+  toAuthServiceParticipantId: string
   consentRequestId: string
+  consentId?: string
   // scopes from the initial `consentRequestsPostRequest` will be stored
   // for later reference to save the DFSP from having to retrieve them from
   // their backend
@@ -106,6 +124,34 @@ export interface DFSPLinkingData extends StateData {
   backendValidateConsentRequestsResponse?: BackendValidateConsentRequestsResponse
 
   // authenticate phase
-  consentRequestsIDPatchRequest?: tpAPI.Schemas.ConsentRequestsIDPatchRequest
-  consentRequestPostRequest?: tpAPI.Schemas.ConsentsPostRequest
+  consentRequestsIDPutRequest?:
+    tpAPI.Schemas.ConsentRequestsIDPutResponseOTP &
+    tpAPI.Schemas.ConsentRequestsIDPutResponseWeb
+  consentRequestsIDPatchResponse?: tpAPI.Schemas.ConsentRequestsIDPatchRequest
+
+  // grant consent phase
+  consentPostRequest?: tpAPI.Schemas.ConsentsPostRequestPISP
+
+  // credential registration phase
+  // inbound PUT /consent/{ID} response which contains the signed credential
+  consentIDPutResponseSignedCredentialFromPISP?: tpAPI.Schemas.ConsentsIDPutResponseSigned
+
+  // request that passes signed credential to auth-service
+  consentPostRequestToAuthService?: tpAPI.Schemas.ConsentsPostRequestAUTH
+
+  // two responses expected from the consentPostRequestToAuthService request
+  // one from the auth-service itself and another from the ALS for saving the
+  // CONSENT object
+  consentIDPutResponseFromAuthService?: tpAPI.Schemas.ConsentsIDPutResponseVerified
+  participantPutResponseFromALS?: fspiopAPI.Schemas.ParticipantsTypeIDPutResponse
+
+  // unimplemented request to ALS to batch create THIRD_PARTY_LINK objects
+  // for accountId's
+  thirdpartyLinkRequestsToALS?: tpAPI.Schemas.ParticipantsPostRequest[]
+  thirdpartyLinkResponseFromALS?: tpAPI.Schemas.ParticipantsIDPutResponse
+
+  // final request to notify the PISP that consent has been established
+  consentIDPatchRequest?: tpAPI.Schemas.ConsentRequestsIDPatchRequest
+
+  errorInformation?: tpAPI.Schemas.ErrorInformation
 }

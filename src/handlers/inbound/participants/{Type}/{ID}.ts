@@ -20,38 +20,40 @@
  optionally within square brackets <email>.
  * Gates Foundation
  - Name Surname <name.surname@gatesfoundation.com>
-
- - Kevin Leyow - kevin.leyow@modusbox.com
+ - Kevin Leyow <kevin.leyow@modusbox.com>
  --------------
  ******/
- import {
-  ControlledStateMachine,
-  PersistentModelConfig, StateData
-} from '~/models/persistent.model'
-import { Method } from 'javascript-state-machine'
-import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
-import {
-  thirdparty as tpAPI
-} from '@mojaloop/api-snippets'
-import { PubSub } from '~/shared/pub-sub'
-import * as OutboundAPI from '~/interface/outbound/api_interfaces'
 
-export enum ServiceType {
-  THIRD_PARTY_DFSP = 'THIRD_PARTY_DFSP'
-}
-export interface PISPPrelinkingStateMachine extends ControlledStateMachine {
-  getProviders: Method
-  onGetProviders: Method
+import { Request, ResponseObject } from '@hapi/hapi'
+import { StateResponseToolkit } from '~/server/plugins/state'
+import { Message } from '~/shared/pub-sub'
+import { v1_1 as fspiopAPI } from '@mojaloop/api-snippets'
+import { DFSPLinkingPhase } from '~/models/inbound/dfspLinking.interface'
+import { DFSPLinkingModel } from '~/models/inbound/dfspLinking.model'
+import { Enum } from '@mojaloop/central-services-shared';
+
+/**
+ * Handles an inbound `PUT /participants/{Type}/{ID}` request
+ */
+ async function put (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+  // the ID should be the `consentId` used previous in the DFSPLinking flow
+  const consentId = request.params.ID
+  const type = request.params.Type
+  const payload = request.payload as fspiopAPI.Schemas.ParticipantsTypeIDPutResponse
+  // this is a inbound request coming from the ALS in response to
+  // DFSPLinkingModel.onValidateWithAuthService
+  if (type == 'CONSENT') {
+    DFSPLinkingModel.triggerWorkflow(
+      DFSPLinkingPhase.waitOnALSParticipantResponse,
+      consentId,
+      h.getPubSub(),
+      payload as unknown as Message
+    )
+  }
+
+  return h.response({}).code(Enum.Http.ReturnCodes.OK.CODE)
 }
 
-export interface PISPPrelinkingModelConfig extends PersistentModelConfig {
-  pubSub: PubSub
-  thirdpartyRequests: ThirdpartyRequests
-  requestProcessingTimeoutSeconds: number
-}
-
-export interface PISPPrelinkingData extends StateData<OutboundAPI.Schemas.LinkingProvidersState> {
-  serviceType: string
-  providers?: string[]
-  errorInformation?: tpAPI.Schemas.ErrorInformation
+export default {
+  put
 }

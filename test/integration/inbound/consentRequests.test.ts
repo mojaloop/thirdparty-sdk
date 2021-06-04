@@ -34,7 +34,7 @@ import TestData from 'test/unit/data/mockData.json'
 
 const mockData = JSON.parse(JSON.stringify(TestData))
 
-describe('PISP Inbound', (): void => {
+describe('DFSP Inbound', (): void => {
   // these must be run in sequence since am inbound POST /consentRequests
   // initializes a recurringly used DFSPLinkingModel object.
   describe('POST /consentRequests', (): void => {

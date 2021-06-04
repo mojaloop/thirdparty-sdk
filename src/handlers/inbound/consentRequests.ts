@@ -27,7 +27,8 @@
  ******/
 
 import {
-  thirdparty as tpAPI
+  thirdparty as tpAPI,
+  v1_1 as fspiopAPI
 } from '@mojaloop/api-snippets'
 import { Request, ResponseObject } from '@hapi/hapi'
 import { StateResponseToolkit } from '~/server/plugins/state'
@@ -36,43 +37,61 @@ import {
   DFSPLinkingData,
   DFSPLinkingModelConfig
 } from '~/models/inbound/dfspLinking.interface'
-import { DFSPLinkingModel } from '~/models/inbound/dfspLinking.model';
-import inspect from '~/shared/inspect';
+import { DFSPLinkingModel } from '~/models/inbound/dfspLinking.model'
+import inspect from '~/shared/inspect'
+import config from '~/shared/config'
+import { reformatError } from '~/shared/api-error'
+import { Errors } from '@mojaloop/sdk-standard-components'
 
 /**
  * Handles an inbound `POST /consentRequests` request
  */
 async function post (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+  const logger = h.getLogger()
   const payload = request.payload as tpAPI.Schemas.ConsentRequestsPostRequest
-
+  const consentRequestId = payload.consentRequestId
   // pull the PISP's ID to send back the PUT /consentRequests/{ID}
   const sourceFspId = request.headers['fspiop-source']
 
   const data: DFSPLinkingData = {
+    dfspId: h.getDFSPId(),
     currentState: 'start',
     toParticipantId: sourceFspId,
+    toAuthServiceParticipantId: h.getAuthServiceParticipantId(),
     consentRequestsPostRequest: payload,
-    consentRequestId: payload.consentRequestId
+    consentRequestId: consentRequestId
   }
 
   // if the request is valid then DFSP returns response via PUT /consentRequests/{ID} call.
   const modelConfig: DFSPLinkingModelConfig = {
     kvs: h.getKVS(),
     pubSub: h.getPubSub(),
-    key: payload.consentRequestId,
-    logger: h.getLogger(),
+    key: consentRequestId,
+    logger: logger,
     dfspBackendRequests: h.getDFSPBackendRequests(),
     thirdpartyRequests: h.getThirdpartyRequests(),
+    mojaloopRequests: h.getMojaloopRequests(),
+    requestProcessingTimeoutSeconds: config.REQUEST_PROCESSING_TIMEOUT_SECONDS
   }
 
-  // don't await on promise to be resolved
+  // postpone model execution to next event loop cycle so we can return response ASAP
   setImmediate(async () => {
     try {
       const model = new DFSPLinkingModel(data, modelConfig)
       await model.run()
     } catch (error) {
-      // todo: add an PUT /consentRequests/{ID} error call back if model
-      //       is unable to run workflow
+      // catch any unplanned errors
+      // we send back an account linking error despite the actual error
+      const mojaloopError = reformatError(
+        Errors.MojaloopApiErrorCodes.TP_ACCOUNT_LINKING_ERROR,
+        logger
+      )
+
+      await h.getThirdpartyRequests().putConsentRequestsError(
+        consentRequestId,
+        mojaloopError as unknown as fspiopAPI.Schemas.ErrorInformationObject,
+        sourceFspId
+      )
       h.getLogger().info(`Error running DFSPLinkingModel : ${inspect(error)}`)
     }
   })

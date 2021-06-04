@@ -166,6 +166,8 @@ declare module '@mojaloop/central-services-shared' {
       OK: ReturnCode;
       ACCEPTED: ReturnCode;
       BADREQUEST: ReturnCode;
+      // note: yes this seems to be misspelled in @mojaloop/central-services-shared
+      INTERNALSERVERERRROR: ReturnCode;
     };
     RestMethods: {
       GET: string;
@@ -368,7 +370,7 @@ declare module 'javascript-state-machine' {
   type Method = (...args: unknown[]) => void | Promise<void>
   type Data = Record<string, string | number | boolean | unknown>
 
-  
+
     interface Transition {
       name: string;
       from: string;
@@ -394,7 +396,7 @@ declare module 'javascript-state-machine' {
 
     // return true if state s is the current state
     is(s: string): boolean
-  
+
     // return true if transition t can occur from the current state
     can(t: string): boolean
 
@@ -403,7 +405,7 @@ declare module 'javascript-state-machine' {
 
     // return list of transitions that are allowed from the current state
     transitions(): string[]
-  
+
     // return list of all possible transitions
     allTransitions(): string[]
 
@@ -418,7 +420,7 @@ declare module 'javascript-state-machine' {
 
     // return true if state s is the current state
     is(s: string): boolean
-  
+
     // return true if transition t can occur from the current state
     can(t: string): boolean
 
@@ -427,13 +429,13 @@ declare module 'javascript-state-machine' {
 
     // return list of transitions that are allowed from the current state
     transitions(): string[]
-  
+
     // return list of all possible transitions
     allTransitions(): string[]
 
     // return list of all possible states
     allStates(): string []
-    
+
     static factory(spec: StateMachineConfig): StateMachine
   }
 

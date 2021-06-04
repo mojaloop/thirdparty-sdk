@@ -27,22 +27,22 @@
  --------------
  ******/
 
-import { thirdparty as tpAPI, v1_1 as fspiopAPI } from '@mojaloop/api-snippets';
-import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components';
-import { StateMachineConfig } from 'javascript-state-machine';
-import { canonicalize } from 'json-canonicalize';
-import sha256 from 'crypto-js/sha256';
-import * as OutboundAPI from '~/interface/outbound/api_interfaces';
+import { thirdparty as tpAPI, v1_1 as fspiopAPI } from '@mojaloop/api-snippets'
+import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
+import { StateMachineConfig } from 'javascript-state-machine'
+import { canonicalize } from 'json-canonicalize'
+import sha256 from 'crypto-js/sha256'
+import * as OutboundAPI from '~/interface/outbound/api_interfaces'
 import {
   PISPLinkingData,
   PISPLinkingModelConfig,
   PISPLinkingStateMachine
-} from '~/models/outbound/pispLinking.interface';
-import { PersistentModel } from '~/models/persistent.model';
-import deferredJob from '~/shared/deferred-job';
-import inspect from '~/shared/inspect';
-import { Message, PubSub } from '~/shared/pub-sub';
-import { PISPLinkingPhase } from './pispLinking.interface';
+} from '~/models/outbound/pispLinking.interface'
+import { PersistentModel } from '~/models/persistent.model'
+import deferredJob from '~/shared/deferred-job'
+import inspect from '~/shared/inspect'
+import { Message, PubSub } from '~/shared/pub-sub'
+import { PISPLinkingPhase } from './pispLinking.interface'
 
 export class PISPLinkingModel
   extends PersistentModel<PISPLinkingStateMachine, PISPLinkingData> {
@@ -122,7 +122,7 @@ export class PISPLinkingModel
     return postConsentRequest
   }
 
-  static deriveChallenge(consentsPostRequest: tpAPI.Schemas.ConsentsPostRequest): string {
+  static deriveChallenge(consentsPostRequest: tpAPI.Schemas.ConsentsPostRequestPISP): string {
     if (!consentsPostRequest) {
       throw new Error('PISPLinkingModel.deriveChallenge: \'consentRequestsPostRequest\' parameter is required')
     }
@@ -204,14 +204,14 @@ export class PISPLinkingModel
     })
     .job(async (message: Message): Promise<void> => {
       try {
-        type PutResponseOrError = tpAPI.Schemas.ConsentsPostRequest & fspiopAPI.Schemas.ErrorInformationObject
+        type PutResponseOrError = tpAPI.Schemas.ConsentsPostRequestPISP & fspiopAPI.Schemas.ErrorInformationObject
         const putResponse = message as unknown as PutResponseOrError
 
         if (putResponse.errorInformation) {
           this.data.errorInformation = putResponse.errorInformation
         } else {
           this.data.linkingRequestConsentIDAuthenticateInboundConsentResponse = {
-            ...message as unknown as tpAPI.Schemas.ConsentsPostRequest
+            ...message as unknown as tpAPI.Schemas.ConsentsPostRequestPISP
           }
         }
 

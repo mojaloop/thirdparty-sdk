@@ -57,6 +57,8 @@ import ConsentsIdErrorHandler from '~/handlers/inbound/consents/{ID}/error'
 import ConsentRequestsHandler from '~/handlers/inbound/consentRequests'
 import ConsentRequestsIdHandler from '~/handlers/inbound/consentRequests/{ID}'
 import ConsentRequestsIdErrorHandler from '~/handlers/inbound/consentRequests/{ID}/error'
+import ParticipantTypeIdHandler from '~/handlers/inbound/participants/{Type}/{ID}'
+import ParticipantTypeIdHandlerError from '~/handlers/inbound/participants/{Type}/{ID}/error'
 import ServicesServiceTypeHandler from '~/handlers/inbound/services/{ServiceType}'
 import ServicesServiceTypeErrorHandler from '~/handlers/inbound/services/{ServiceType}/error'
 import { Server, Request } from '@hapi/hapi'
@@ -90,7 +92,12 @@ jest.mock('@mojaloop/sdk-standard-components', () => {
     info: jest.fn(),
     fatal: jest.fn()
   }
+
+  // exclude mocks that are not explicitly defined
+  const sdkStandardComponentsActual = jest.requireActual('@mojaloop/sdk-standard-components');
+
   return {
+    ...sdkStandardComponentsActual,
     MojaloopRequests: jest.fn(() => {
       return {
         postQuotes: __postQuotes
@@ -98,7 +105,8 @@ jest.mock('@mojaloop/sdk-standard-components', () => {
     }),
     ThirdpartyRequests: jest.fn(() => {
       return {
-        postConsents: __postConsents
+        postConsents: __postConsents,
+        putConsentRequestsError: jest.fn(() => Promise.resolve())
       }
     }),
     WSO2Auth: jest.fn(),
@@ -138,19 +146,6 @@ jest.mock('~/models/inbound/authorizations.model', () => ({
   }))
 }))
 
-jest.mock('~/models/inbound/dfspLinking.model', () => ({
-  DFSPLinkingModel: jest.fn(() => {
-    return {
-      run: jest.fn(),
-    }
-  }),
-  loadFromKVS: jest.fn(() => {
-    return {
-      data: {}
-    }
-  })
-}))
-
 const putResponse: fspiopAPI.Schemas.AuthorizationsIDPutResponse = {
   authenticationInfo: {
     authentication: 'U2F',
@@ -169,7 +164,7 @@ const putThirdpartyAuthResponse: tpAPI.Schemas.ThirdpartyRequestsTransactionsIDA
   value: 'value'
 }
 
-const postConsentRequest: tpAPI.Schemas.ConsentsPostRequest = {
+const postConsentRequest: tpAPI.Schemas.ConsentsPostRequestPISP = {
   consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
   consentRequestId: '997c89f4-053c-4283-bfec-45a1a0a28fba',
   scopes: [{
@@ -572,8 +567,10 @@ describe('Inbound API routes', (): void => {
       const toolkit = {
         getPubSub: jest.fn(() => pubSubMock),
         getLogger: jest.fn(() => logger),
+        getDFSPId: jest.fn(() => 'dfspA'),
         getDFSPBackendRequests: jest.fn(),
         getThirdpartyRequests: jest.fn(),
+        getMojaloopRequests: jest.fn(),
         response: jest.fn(() => ({
           code: jest.fn((code: number) => ({
             statusCode: code
@@ -617,8 +614,10 @@ describe('Inbound API routes', (): void => {
       const toolkit = {
         getPubSub: jest.fn(() => pubSubMock),
         getLogger: jest.fn(() => logger),
+        getDFSPId: jest.fn(() => 'dfspA'),
         getDFSPBackendRequests: jest.fn(),
         getThirdpartyRequests: jest.fn(),
+        getMojaloopRequests: jest.fn(),
         response: jest.fn(() => ({
           code: jest.fn((code: number) => ({
             statusCode: code
@@ -643,8 +642,10 @@ describe('Inbound API routes', (): void => {
       const toolkit = {
         getPubSub: jest.fn(() => pubSubMock),
         getLogger: jest.fn(() => logger),
+        getDFSPId: jest.fn(() => 'dfspA'),
         getDFSPBackendRequests: jest.fn(),
         getThirdpartyRequests: jest.fn(),
+        getMojaloopRequests: jest.fn(),
         response: jest.fn(() => ({
           code: jest.fn((code: number) => ({
             statusCode: code
@@ -678,6 +679,7 @@ describe('Inbound API routes', (): void => {
       }
       const toolkit = {
         getPubSub: jest.fn(() => pubSubMock),
+        getAuthServiceParticipantId: jest.fn(() => 'central-auth'),
         response: jest.fn(() => ({
           code: jest.fn((code: number) => ({
             statusCode: code
@@ -696,7 +698,7 @@ describe('Inbound API routes', (): void => {
 
       const channel = PISPLinkingModel.notificationChannel(
         PISPLinkingPhase.requestConsentAuthenticate,
-        postConsentRequest.consentRequestId
+        postConsentRequest.consentRequestId!
       )
       expect(toolkit.getPubSub).toBeCalledTimes(1)
       expect(pubSubMock.publish).toBeCalledWith(channel, postConsentRequest)
@@ -742,6 +744,8 @@ describe('Inbound API routes', (): void => {
           }))
         })),
         getLogger: jest.fn(() => logger),
+        getDFSPId: jest.fn(() => 'dfspA'),
+        getAuthServiceParticipantId: jest.fn(() => 'central-auth'),
         getDFSPBackendRequests: jest.fn(() => ({
           validateConsentRequests: jest.fn(() => Promise.resolve(mockData.consentRequestsPost.response)),
           storeConsentRequests: jest.fn(() => Promise.resolve()),
@@ -751,6 +755,7 @@ describe('Inbound API routes', (): void => {
           putConsentRequests: jest.fn(),
           putConsentRequestsError: jest.fn()
         })),
+        getMojaloopRequests: jest.fn(),
         getKVS: jest.fn(() => ({
           set: jest.fn()
         }))
@@ -794,8 +799,10 @@ describe('Inbound API routes', (): void => {
       const toolkit = {
         getPubSub: jest.fn(() => pubSubMock),
         getLogger: jest.fn(() => logger),
+        getDFSPId: jest.fn(() => 'dfspA'),
         getDFSPBackendRequests: jest.fn(),
         getThirdpartyRequests: jest.fn(),
+        getMojaloopRequests: jest.fn(),
         response: jest.fn(() => ({
           code: jest.fn((code: number) => ({
             statusCode: code
@@ -843,8 +850,10 @@ describe('Inbound API routes', (): void => {
       const toolkit = {
         getPubSub: jest.fn(() => pubSubMock),
         getLogger: jest.fn(() => logger),
+        getDFSPId: jest.fn(() => 'dfspA'),
         getDFSPBackendRequests: jest.fn(),
         getThirdpartyRequests: jest.fn(),
+        getMojaloopRequests: jest.fn(),
         response: jest.fn(() => ({
           code: jest.fn((code: number) => ({
             statusCode: code
@@ -900,6 +909,7 @@ describe('Inbound API routes', (): void => {
           }))
         })),
         getLogger: jest.fn(() => logger),
+        getDFSPId: jest.fn(() => 'dfspA'),
         getDFSPBackendRequests: jest.fn(() => ({
           validateOTPSecret: jest.fn(() => Promise.resolve({
             isValid: true
@@ -908,6 +918,7 @@ describe('Inbound API routes', (): void => {
         getThirdpartyRequests: jest.fn(() => ({
           postConsents: jest.fn()
         })),
+        getMojaloopRequests: jest.fn(),
         getKVS: jest.fn(() => ({
           set: jest.fn()
         }))
@@ -1160,6 +1171,130 @@ describe('Inbound API routes', (): void => {
     })
   })
 
+  describe('PUT /consents/{ID}', () => {
+    describe('Signed Credential request body', () => {
+      it('handler && pubSub invocation', async (): Promise<void> => {
+        const request = {
+          payload: mockData.inboundPutConsentsIdRequestSignedCredential.payload,
+          params: {
+            ID: '520f9165-7be6-4a40-9fc8-b30fcf4f62ab'
+          },
+          headers: {
+            'Content-Type': 'application/json',
+            'FSPIOP-Source': 'switch',
+            Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
+            'FSPIOP-Destination': 'dfspA'
+          }
+        }
+        const pubSubMock = {
+          publish: jest.fn()
+        }
+        const toolkit = {
+          getPubSub: jest.fn(() => pubSubMock),
+          response: jest.fn(() => ({
+            code: jest.fn((code: number) => ({
+              statusCode: code
+            }))
+          })),
+          getLogger: jest.fn(() => logger),
+          getDFSPBackendRequests: jest.fn(),
+          getThirdpartyRequests: jest.fn(() => ({
+            postConsents: jest.fn()
+          })),
+          getMojaloopRequests: jest.fn(),
+          getKVS: jest.fn(() => ({
+            set: jest.fn()
+          }))
+        }
+
+        const result = await ConsentsIdHandler.put(
+          {},
+          request as unknown as Request,
+          toolkit as unknown as StateResponseToolkit
+        )
+        expect(result.statusCode).toEqual(202)
+      })
+
+      it('input validation', async (): Promise<void> => {
+        const request = {
+          method: 'PUT',
+          url: '/consents/520f9165-7be6-4a40-9fc8-b30fcf4f62ab',
+          headers: {
+            'Content-Type': 'application/json',
+            'FSPIOP-Source': 'switch',
+            Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
+            'FSPIOP-Destination': 'pispA'
+          },
+          payload: mockData.inboundPutConsentsIdRequestSignedCredential.payload
+        }
+        const response = await server.inject(request)
+        expect(response.statusCode).toBe(202)
+      })
+    })
+
+    describe('Verified Credential request body', () => {
+      it('handler && pubSub invocation', async (): Promise<void> => {
+        const request = {
+          payload: mockData.inboundPutConsentsIdRequestVerifiedCredential.payload,
+          params: {
+            ID: '520f9165-7be6-4a40-9fc8-b30fcf4f62ab'
+          },
+          headers: {
+            'Content-Type': 'application/json',
+            'FSPIOP-Source': 'switch',
+            Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
+            'FSPIOP-Destination': 'pispA'
+          }
+        }
+        const pubSubMock = {
+          publish: jest.fn()
+        }
+        const toolkit = {
+          getPubSub: jest.fn(() => pubSubMock),
+          response: jest.fn(() => ({
+            code: jest.fn((code: number) => ({
+              statusCode: code
+            }))
+          })),
+          getLogger: jest.fn(() => logger),
+          getDFSPBackendRequests: jest.fn(),
+          getThirdpartyRequests: jest.fn(() => ({
+            postConsents: jest.fn()
+          })),
+          getMojaloopRequests: jest.fn(),
+          getKVS: jest.fn(() => ({
+            set: jest.fn()
+          }))
+        }
+
+        const result = await ConsentsIdHandler.put(
+          {},
+          request as unknown as Request,
+          toolkit as unknown as StateResponseToolkit
+        )
+
+        expect(result.statusCode).toEqual(200)
+      })
+
+      it('input validation', async (): Promise<void> => {
+        const request = {
+          method: 'PUT',
+          url: '/consents/520f9165-7be6-4a40-9fc8-b30fcf4f62ab',
+          headers: {
+            'Content-Type': 'application/json',
+            'FSPIOP-Source': 'switch',
+            Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
+            'FSPIOP-Destination': 'pispA'
+          },
+          payload: mockData.inboundPutConsentsIdRequestVerifiedCredential.payload
+        }
+        const response = await server.inject(request)
+        expect(response.statusCode).toBe(200)
+      })
+    })
+
+  })
+
   describe('PATCH /consents/{ID}', () => {
     it('handler && pubSub invocation', async (): Promise<void> => {
       const request = {
@@ -1213,6 +1348,125 @@ describe('Inbound API routes', (): void => {
           'FSPIOP-Destination': 'pispA'
         },
         payload: mockData.inboundConsentsVerifiedPatchRequest.payload
+      }
+      const response = await server.inject(request)
+      expect(response.statusCode).toBe(200)
+    })
+  })
+
+  describe('PUT /participants/{Type}/{ID}', () => {
+    it('handler && pubSub invocation', async (): Promise<void> => {
+      const request = {
+        payload: mockData.inboundPutParticipantsTypeIdRequest.payload,
+        params: {
+          Type: 'CONSENT',
+          ID: '520f9165-7be6-4a40-9fc8-b30fcf4f62ab'
+        },
+        headers: {
+          'Content-Type': 'application/json',
+          'FSPIOP-Source': 'switch',
+          Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
+          'FSPIOP-Destination': 'dfspA'
+        }
+      }
+      const pubSubMock = {
+        publish: jest.fn()
+      }
+      const toolkit = {
+        getPubSub: jest.fn(() => pubSubMock),
+        response: jest.fn(() => ({
+          code: jest.fn((code: number) => ({
+            statusCode: code
+          }))
+        })),
+        getLogger: jest.fn(() => logger),
+        getDFSPBackendRequests: jest.fn(),
+        getThirdpartyRequests: jest.fn(() => ({
+          postConsents: jest.fn()
+        })),
+        getMojaloopRequests: jest.fn(),
+        getKVS: jest.fn(() => ({
+          set: jest.fn()
+        }))
+      }
+
+      const result = await ParticipantTypeIdHandler.put(
+        {},
+        request as unknown as Request,
+        toolkit as unknown as StateResponseToolkit
+      )
+
+      expect(result.statusCode).toEqual(200)
+    })
+
+    it('input validation', async (): Promise<void> => {
+      const request = {
+        method: 'PUT',
+        url: '/participants/CONSENT/520f9165-7be6-4a40-9fc8-b30fcf4f62ab',
+        headers: {
+          'Content-Type': 'application/json',
+          'FSPIOP-Source': 'switch',
+          Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
+          'FSPIOP-Destination': 'dfspA'
+        },
+        payload: mockData.inboundPutParticipantsTypeIdRequest.payload
+      }
+      const response = await server.inject(request)
+      expect(response.statusCode).toBe(200)
+    })
+  })
+
+  describe('PUT /participants/{Type}/{ID}/error', () => {
+    it('handler && pubSub invocation', async (): Promise<void> => {
+      const request = {
+        payload: mockData.inboundPutParticipantsTypeIdRequestError.payload,
+        params: {
+          Type: 'CONSENT',
+          ID: 'T520f9165-7be6-4a40-9fc8-b30fcf4f62ab'
+        },
+        headers: {
+          'Content-Type': 'application/json',
+          'FSPIOP-Source': 'switch',
+          Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
+          'FSPIOP-Destination': 'pispA'
+        }
+      }
+      const pubSubMock = {
+        publish: jest.fn()
+      }
+      const toolkit = {
+        getPubSub: jest.fn(() => pubSubMock),
+        response: jest.fn(() => ({
+          code: jest.fn((code: number) => ({
+            statusCode: code
+          }))
+        })),
+        getLogger: jest.fn(() => logger),
+        getKVS: jest.fn(() => ({
+          set: jest.fn()
+        }))
+      }
+
+      const result = await ParticipantTypeIdHandlerError.put(
+        {},
+        request as unknown as Request,
+        toolkit as unknown as StateResponseToolkit
+      )
+
+      expect(result.statusCode).toEqual(200)
+    })
+
+    it('input validation', async (): Promise<void> => {
+      const request = {
+        method: 'PUT',
+        url: '/participants/CONSENT/520f9165-7be6-4a40-9fc8-b30fcf4f62ab/error',
+        headers: {
+          'Content-Type': 'application/json',
+          'FSPIOP-Source': 'switch',
+          Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
+          'FSPIOP-Destination': 'pispA'
+        },
+        payload: mockData.inboundPutParticipantsTypeIdRequestError.payload
       }
       const response = await server.inject(request)
       expect(response.statusCode).toBe(200)

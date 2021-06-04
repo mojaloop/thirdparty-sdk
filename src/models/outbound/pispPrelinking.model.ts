@@ -28,16 +28,16 @@
 import { PubSub } from '~/shared/pub-sub'
 import { PersistentModel } from '~/models/persistent.model'
 import { StateMachineConfig } from 'javascript-state-machine'
-import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components';
-import { thirdparty as tpAPI, v1_1 as fspiopAPI } from '@mojaloop/api-snippets';
+import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
+import { thirdparty as tpAPI, v1_1 as fspiopAPI } from '@mojaloop/api-snippets'
 import inspect from '~/shared/inspect'
 import {
   PISPPrelinkingData,
   PISPPrelinkingStateMachine,
   PISPPrelinkingModelConfig
-} from './pispPrelinking.interface';
-import { Message } from '~/shared/pub-sub';
-import deferredJob from '~/shared/deferred-job';
+} from './pispPrelinking.interface'
+import { Message } from '~/shared/pub-sub'
+import deferredJob from '~/shared/deferred-job'
 import * as OutboundAPI from '~/interface/outbound/api_interfaces'
 
 export class PISPPrelinkingModel

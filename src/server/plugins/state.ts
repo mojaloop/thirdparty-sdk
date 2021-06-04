@@ -54,6 +54,7 @@ export interface StateResponseToolkit extends ResponseToolkit {
   getDFSPBackendRequests: () => DFSPBackendRequests
   getSDKOutgoingRequests: () => SDKOutgoingRequests
   getDFSPId: () => string
+  getAuthServiceParticipantId: () => string
 }
 
 export const StatePlugin = {
@@ -170,6 +171,7 @@ export const StatePlugin = {
       server.decorate('toolkit', 'getDFSPBackendRequests', (): DFSPBackendRequests => dfspBackendRequests)
       server.decorate('toolkit', 'getSDKOutgoingRequests', (): SDKOutgoingRequests => sdkOutgoingRequests)
       server.decorate('toolkit', 'getDFSPId', (): string => config.SHARED.DFSP_ID)
+      server.decorate('toolkit', 'getAuthServiceParticipantId', (): string => config.SHARED.AUTH_SERVICE_PARTICIPANT_ID)
       // disconnect from redis when server is stopped
       server.events.on('stop', async () => {
         await Promise.allSettled([kvs.disconnect(), pubSub.disconnect()])

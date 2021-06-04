@@ -980,8 +980,8 @@ export interface components {
       errorInformation: components['schemas']['ErrorInformation'];
       currentState: components['schemas']['LinkingRequestConsentIDAuthenticateState'];
     };
-    /** The object sent in a `POST /consents` request. */
-    ConsentsPostRequest: {
+    /** The object sent in a `POST /consents` request to PISP by DFSP to ask for delivering the credential object. */
+    ConsentsPostRequestPISP: {
       /**
        * Common ID between the PISP and FSP for the Consent object
        * decided by the DFSP who creates the Consent
@@ -996,8 +996,8 @@ export interface components {
       scopes: components['schemas']['Scope'][];
     };
     LinkingRequestConsentIDAuthenticateResponseSuccess: {
-      consent: components['schemas']['ConsentsPostRequest'];
-      challenge?: string;
+      consent: components['schemas']['ConsentsPostRequestPISP'];
+      challenge: string;
       currentState: components['schemas']['LinkingRequestConsentIDAuthenticateState'];
     };
     LinkingRequestConsentIDAuthenticateResponse:
@@ -1006,19 +1006,32 @@ export interface components {
     /**
      * An object sent in a `PUT /consents/{ID}` request.
      * Based on https://w3c.github.io/webauthn/#iface-pkcredential
+     * and mostly on: https://webauthn.guide/#registration
+     * AuthenticatorAttestationResponse
+     * https://w3c.github.io/webauthn/#dom-authenticatorattestationresponse-attestationobject
      */
-    PublicKeyCredential: {
-      /** TBD */
+    FIDOPublicKeyCredential: {
+      /**
+       * credential id: identifier of pair of keys, base64 encoded
+       * https://w3c.github.io/webauthn/#ref-for-dom-credential-id
+       */
       id: string;
+      /** raw credential id: identifier of pair of keys, base64 encoded */
+      rawId: string;
+      /** AuthenticatorAttestationResponse */
       response: {
-        /** TBD */
+        /** JSON string with client data */
         clientDataJSON: string;
+        /** CBOR.encoded attestation object */
+        attestationObject: string;
       };
+      /** response type, we need only the type of public-key */
+      type: 'public-key';
     };
     /** POST /linking/request-consent/{ID}/pass-credential request object */
     LinkingRequestConsentIDPassCredentialRequest: {
       credential: {
-        payload: components['schemas']['PublicKeyCredential'];
+        payload: components['schemas']['FIDOPublicKeyCredential'];
       };
     };
     /** State of post linking request consent pass credential */

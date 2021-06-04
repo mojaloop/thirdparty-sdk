@@ -18,28 +18,40 @@
  * Gates Foundation
  - Name Surname <name.surname@gatesfoundation.com>
 
- - Sridhar Voruganti <sridhar.voruganti@modusbox.com>
+ - Kevin Leyow <kevin.leyow@modusbox.com>
  --------------
  ******/
-import { Request, ResponseObject } from '@hapi/hapi'
-import { Message } from '~/shared/pub-sub'
-import { StateResponseToolkit } from '~/server/plugins/state'
-import { PISPTransactionPhase } from '~/models/pispTransaction.interface'
-import { PISPTransactionModel } from '~/models/pispTransaction.model'
+ import { Request, ResponseObject } from '@hapi/hapi'
+ import {
+   v1_1 as fspiopAPI
+ } from '@mojaloop/api-snippets'
+ import { Message } from '~/shared/pub-sub'
+ import { StateResponseToolkit } from '~/server/plugins/state'
+ import { Enum } from '@mojaloop/central-services-shared'
+ import { DFSPLinkingModel } from '~/models/inbound/dfspLinking.model'
+ import { DFSPLinkingPhase } from '~/models/inbound/dfspLinking.interface'
 
-/**
- * Handles a inbound PUT /thirdpartyRequests/transactions/{ID}/error request
+ /**
+ * Handles a inbound PUT /participants/{Type}/{ID}/error request
  */
-async function put (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
-    const channel = PISPTransactionModel.notificationChannel(
-        PISPTransactionPhase.approval,
-        request.params.ID)
-    const pubSub = h.getPubSub()
-    // don't await on promise to resolve, let finish publish in background
-    pubSub.publish(channel, request.payload as unknown as Message)
-    return h.response({}).code(200)
-}
+ async function put (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+   const id = request.params.ID
+   const type = request.params.Type
+   const payload = request.payload as fspiopAPI.Schemas.ErrorInformation
 
-export default {
-    put
-}
+  // this is a inbound request coming from the ALS in response to
+  // DFSPLinkingModel.onValidateWithAuthService
+  if (type == 'CONSENT') {
+    DFSPLinkingModel.triggerWorkflow(
+      DFSPLinkingPhase.waitOnALSParticipantResponse,
+      id,
+      h.getPubSub(),
+      payload as unknown as Message
+    )
+  }
+   return h.response({}).code(Enum.Http.ReturnCodes.OK.CODE)
+ }
+
+ export default {
+   put
+ }

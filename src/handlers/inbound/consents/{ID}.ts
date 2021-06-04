@@ -31,6 +31,10 @@ import { StateResponseToolkit } from '~/server/plugins/state'
 import { PISPLinkingModel } from '~/models/outbound/pispLinking.model'
 import { Message } from '~/shared/pub-sub'
 import { PISPLinkingPhase } from '~/models/outbound/pispLinking.interface'
+import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
+import { DFSPLinkingPhase } from '~/models/inbound/dfspLinking.interface'
+import { DFSPLinkingModel } from '~/models/inbound/dfspLinking.model'
+import { Enum } from '@mojaloop/central-services-shared';
 
 /**
  * Handles an inbound `PATCH /consents/{ID}` request
@@ -49,6 +53,37 @@ async function patch (_context: unknown, request: Request, h: StateResponseToolk
   return h.response().code(200)
 }
 
+/**
+ * Handles an inbound `PUT /consents/{ID}` request
+ */
+ async function put (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+  const consentId = request.params.ID
+  const payload = request.payload as
+    tpAPI.Schemas.ConsentsIDPutResponseSigned |
+    tpAPI.Schemas.ConsentsIDPatchResponseVerified
+
+  // Select proper Pub channel basing on `credential.status`
+  if (payload.credential.status == 'PENDING') {
+    DFSPLinkingModel.triggerWorkflow(
+      DFSPLinkingPhase.waitOnSignedCredentialFromPISPResponse,
+      consentId,
+      h.getPubSub(),
+      payload as unknown as Message
+    )
+  } else if (payload.credential.status == 'VERIFIED') {
+    DFSPLinkingModel.triggerWorkflow(
+      DFSPLinkingPhase.waitOnAuthServiceResponse,
+      consentId,
+      h.getPubSub(),
+      payload as unknown as Message
+    )
+    return h.response().code(Enum.Http.ReturnCodes.OK.CODE)
+  }
+
+  return h.response().code(Enum.Http.ReturnCodes.ACCEPTED.CODE)
+}
+
 export default {
-  patch
+  patch,
+  put
 }

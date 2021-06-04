@@ -824,6 +824,106 @@
       "decision": "ignore",
       "madeAt": 1621884673783,
       "expiresAt": 1624476668791
+    },
+    "1748|@mojaloop/sdk-scheme-adapter>ws": {
+      "decision": "ignore",
+      "madeAt": 1622688960773,
+      "expiresAt": 1625280953384
+    },
+    "1748|@redocly/openapi-cli>simple-websocket>ws": {
+      "decision": "ignore",
+      "madeAt": 1622688960773,
+      "expiresAt": 1625280953384
+    },
+    "1748|jest>@jest/core>jest-config>jest-environment-jsdom>jsdom>ws": {
+      "decision": "ignore",
+      "madeAt": 1622688960773,
+      "expiresAt": 1625280953384
+    },
+    "1748|jest-cucumber>jest>@jest/core>jest-config>jest-environment-jsdom>jsdom>ws": {
+      "decision": "ignore",
+      "madeAt": 1622688960773,
+      "expiresAt": 1625280953384
+    },
+    "1748|jest>jest-cli>@jest/core>jest-config>jest-environment-jsdom>jsdom>ws": {
+      "decision": "ignore",
+      "madeAt": 1622688960773,
+      "expiresAt": 1625280953384
+    },
+    "1748|jest-cucumber>jest>jest-cli>@jest/core>jest-config>jest-environment-jsdom>jsdom>ws": {
+      "decision": "ignore",
+      "madeAt": 1622688960773,
+      "expiresAt": 1625280953384
+    },
+    "1748|jest>@jest/core>jest-runner>jest-config>jest-environment-jsdom>jsdom>ws": {
+      "decision": "ignore",
+      "madeAt": 1622688960773,
+      "expiresAt": 1625280953384
+    },
+    "1748|jest-cucumber>jest>@jest/core>jest-runner>jest-config>jest-environment-jsdom>jsdom>ws": {
+      "decision": "ignore",
+      "madeAt": 1622688960773,
+      "expiresAt": 1625280953384
+    },
+    "1748|jest>jest-cli>@jest/core>jest-runner>jest-config>jest-environment-jsdom>jsdom>ws": {
+      "decision": "ignore",
+      "madeAt": 1622688960773,
+      "expiresAt": 1625280953384
+    },
+    "1748|jest-cucumber>jest>jest-cli>@jest/core>jest-runner>jest-config>jest-environment-jsdom>jsdom>ws": {
+      "decision": "ignore",
+      "madeAt": 1622688960773,
+      "expiresAt": 1625280953384
+    },
+    "1748|jest>@jest/core>jest-runner>jest-runtime>jest-config>jest-environment-jsdom>jsdom>ws": {
+      "decision": "ignore",
+      "madeAt": 1622688960773,
+      "expiresAt": 1625280953384
+    },
+    "1748|jest-cucumber>jest>@jest/core>jest-runner>jest-runtime>jest-config>jest-environment-jsdom>jsdom>ws": {
+      "decision": "ignore",
+      "madeAt": 1622688960773,
+      "expiresAt": 1625280953384
+    },
+    "1748|jest>jest-cli>@jest/core>jest-runner>jest-runtime>jest-config>jest-environment-jsdom>jsdom>ws": {
+      "decision": "ignore",
+      "madeAt": 1622688960773,
+      "expiresAt": 1625280953384
+    },
+    "1748|jest-cucumber>jest>jest-cli>@jest/core>jest-runner>jest-runtime>jest-config>jest-environment-jsdom>jsdom>ws": {
+      "decision": "ignore",
+      "madeAt": 1622688960773,
+      "expiresAt": 1625280953384
+    },
+    "1748|jest>@jest/core>jest-runtime>jest-config>jest-environment-jsdom>jsdom>ws": {
+      "decision": "ignore",
+      "madeAt": 1622688960773,
+      "expiresAt": 1625280953384
+    },
+    "1748|jest-cucumber>jest>@jest/core>jest-runtime>jest-config>jest-environment-jsdom>jsdom>ws": {
+      "decision": "ignore",
+      "madeAt": 1622688960773,
+      "expiresAt": 1625280953384
+    },
+    "1748|jest>jest-cli>@jest/core>jest-runtime>jest-config>jest-environment-jsdom>jsdom>ws": {
+      "decision": "ignore",
+      "madeAt": 1622688960773,
+      "expiresAt": 1625280953384
+    },
+    "1748|jest-cucumber>jest>jest-cli>@jest/core>jest-runtime>jest-config>jest-environment-jsdom>jsdom>ws": {
+      "decision": "ignore",
+      "madeAt": 1622688960773,
+      "expiresAt": 1625280953384
+    },
+    "1748|jest>jest-cli>jest-config>jest-environment-jsdom>jsdom>ws": {
+      "decision": "ignore",
+      "madeAt": 1622688960773,
+      "expiresAt": 1625280953384
+    },
+    "1748|jest-cucumber>jest>jest-cli>jest-config>jest-environment-jsdom>jsdom>ws": {
+      "decision": "ignore",
+      "madeAt": 1622688960773,
+      "expiresAt": 1625280953384
     }
   },
   "rules": {},

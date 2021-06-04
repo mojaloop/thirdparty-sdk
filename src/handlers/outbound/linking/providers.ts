@@ -26,13 +26,14 @@
 
 import { StateResponseToolkit } from '~/server/plugins/state'
 import { Request, ResponseObject } from '@hapi/hapi'
-import { PISPPrelinkingModel, create } from '~/models/outbound/pispPrelinking.model';
+import { PISPPrelinkingModel, create } from '~/models/outbound/pispPrelinking.model'
 import {
   PISPPrelinkingData,
   PISPPrelinkingModelConfig
 } from '~/models/outbound/pispPrelinking.interface'
-import config from '~/shared/config';
-import inspect from '~/shared/inspect';
+import config from '~/shared/config'
+import inspect from '~/shared/inspect'
+import { Enum } from '@mojaloop/central-services-shared';
 
 /**
  * Handles outbound GET /linking/providers request
@@ -60,14 +61,14 @@ async function get (_context: unknown, _request: Request, h: StateResponseToolki
     const result = await model.run()
     if (!result) {
       h.getLogger().error('outbound GET /linking/providers unexpected result from workflow')
-      return h.response({}).code(500)
+      return h.response({}).code(Enum.Http.ReturnCodes.INTERNALSERVERERRROR.CODE)
     }
 
     const statusCode = (result.currentState == 'errored') ? 500 : 200
     return h.response(result).code(statusCode)
   } catch(error) {
     h.getLogger().info(`Error running PISPPrelinkingModel : ${inspect(error)}`)
-    return h.response({}).code(500)
+    return h.response({}).code(Enum.Http.ReturnCodes.INTERNALSERVERERRROR.CODE)
   }
 }
 

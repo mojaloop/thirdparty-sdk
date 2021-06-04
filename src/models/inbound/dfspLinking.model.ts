@@ -28,7 +28,7 @@
 import { PubSub } from '~/shared/pub-sub'
 import { PersistentModel } from '~/models/persistent.model'
 import { StateMachineConfig } from 'javascript-state-machine'
-import { ThirdpartyRequests, Errors } from '@mojaloop/sdk-standard-components';
+import { ThirdpartyRequests, Errors, MojaloopRequests } from '@mojaloop/sdk-standard-components'
 import {
   v1_1 as fspiopAPI,
   thirdparty as tpAPI
@@ -40,9 +40,11 @@ import {
   DFSPLinkingModelConfig
 } from '~/models/inbound/dfspLinking.interface'
 import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
-import { BackendValidateOTPResponse } from './dfspLinking.interface';
-import { uuid } from 'uuidv4';
-import { reformatError } from '~/shared/api-error';
+import { BackendValidateOTPResponse, DFSPLinkingPhase } from './dfspLinking.interface'
+import { uuid } from 'uuidv4'
+import { reformatError } from '~/shared/api-error'
+import deferredJob from '~/shared/deferred-job'
+import { Message } from '~/shared/pub-sub'
 
 // DFSPLinkingModel is the passive inbound handler for inbound
 // POST /consentRequests requests and no response is generated from `model.run()`
@@ -59,15 +61,23 @@ export class DFSPLinkingModel
       transitions: [
         { name: 'validateRequest', from: 'start', to: 'requestIsValid' },
         { name: 'storeReqAndSendOTP', from: 'requestIsValid', to: 'consentRequestValidatedAndStored' },
-        { name: 'validateAuthToken', from: 'consentRequestValidatedAndStored', to: 'authTokenValidated' },
-        { name: 'grantConsent', from: 'authTokenValidated', to: 'consentGranted' }
+        { name: 'sendLinkingChannelResponse', from: 'consentRequestValidatedAndStored', to: 'authTokenReceived'},
+        { name: 'validateAuthToken', from: 'authTokenReceived', to: 'authTokenValidated' },
+        { name: 'grantConsent', from: 'authTokenValidated', to: 'consentGranted' },
+        { name: 'validateWithAuthService', from: 'consentGranted', to: 'consentRegisteredAndValidated' },
+        { name: 'finalizeThirdpartyLinkWithALS', from: 'consentRegisteredAndValidated', to: 'PISPDFSPLinkEstablished' },
+        { name: 'notifyVerificationToPISP', from: 'PISPDFSPLinkEstablished', to: 'notificationSent' },
       ],
       methods: {
         // specific transitions handlers methods
         onValidateRequest: () => this.onValidateRequest(),
         onStoreReqAndSendOTP: () => this.onStoreReqAndSendOTP(),
+        onSendLinkingChannelResponse: () => this.onSendLinkingChannelResponse(),
         onValidateAuthToken: () => this.onValidateAuthToken(),
-        onGrantConsent: () => this.onGrantConsent()
+        onGrantConsent: () => this.onGrantConsent(),
+        onValidateWithAuthService: () => this.onValidateWithAuthService(),
+        onFinalizeThirdpartyLinkWithALS: () => this.onFinalizeThirdpartyLinkWithALS(),
+        onNotifyVerificationToPISP: () => this.onNotifyVerificationToPISP()
       }
     }
     super(data, config, spec)
@@ -85,6 +95,36 @@ export class DFSPLinkingModel
 
   get thirdpartyRequests (): ThirdpartyRequests {
     return this.config.thirdpartyRequests
+  }
+
+  get mojaloopRequests (): MojaloopRequests {
+    return this.config.mojaloopRequests
+  }
+
+  static notificationChannel (phase: DFSPLinkingPhase, id: string): string {
+    if (!id) {
+      throw new Error('DFSPLinkingModel.notificationChannel: \'id\' parameter is required')
+    }
+    // channel name
+    return `DFSPLinking_${phase}_${id}`
+  }
+
+  static async triggerWorkflow (
+    phase: DFSPLinkingPhase,
+    id: string,
+    pubSub: PubSub,
+    message: Message
+  ): Promise<void> {
+    const channel = DFSPLinkingModel.notificationChannel(phase, id)
+    return deferredJob(pubSub, channel).trigger(message)
+  }
+
+  // utility function to check if an error after a transistion which
+  // pub/subs for a response that can return a mojaloop error
+  async checkModelDataForErrorInformation (): Promise<void> {
+    if (this.data.errorInformation) {
+      await this.fsm.error(this.data.errorInformation)
+    }
   }
 
   async onValidateRequest (): Promise<void> {
@@ -106,7 +146,7 @@ export class DFSPLinkingModel
       type consentRequestResponseType = tpAPI.Schemas.ConsentRequestsIDPutResponseOTP &
         tpAPI.Schemas.ConsentRequestsIDPutResponseWeb
 
-      const consentRequestResponse = {
+      const consentRequestsIDPutRequest = {
         consentRequestId: consentRequestsPostRequest.consentRequestId,
         scopes: consentRequestsPostRequest.scopes,
         callbackUri: consentRequestsPostRequest.callbackUri,
@@ -114,8 +154,8 @@ export class DFSPLinkingModel
         authUri: response.data.authUri,
       } as consentRequestResponseType
 
-      await this.thirdpartyRequests.putConsentRequests(consentRequestsPostRequest.consentRequestId, consentRequestResponse, toParticipantId)
-
+      // save this for a later stage, not ready to send the response yet.
+      this.data.consentRequestsIDPutRequest = consentRequestsIDPutRequest
     } catch (error) {
       const mojaloopError = reformatError(error, this.logger)
 
@@ -134,11 +174,10 @@ export class DFSPLinkingModel
   }
 
   async onStoreReqAndSendOTP (): Promise<void> {
-    const { consentRequestsPostRequest, backendValidateConsentRequestsResponse } = this.data
+    const { consentRequestsPostRequest, backendValidateConsentRequestsResponse, toParticipantId} = this.data
 
     // store scopes in model for future requests
     this.data.scopes = consentRequestsPostRequest.scopes
-
     try {
       const channel = [...backendValidateConsentRequestsResponse!.data.authChannels].pop()
       switch (channel) {
@@ -157,21 +196,94 @@ export class DFSPLinkingModel
       }
 
     } catch (error) {
+      const mojaloopError = reformatError(error, this.logger)
       this.logger.push({ error }).error('requestIsValid -> consentRequestValidatedAndStored')
-      // TODO: PUT /consentRequest/{ID}/error if DFSP is unable to store consent Request or
-      //       send OTP
+
+      await this.thirdpartyRequests.putConsentRequestsError(
+        consentRequestsPostRequest.consentRequestId,
+        mojaloopError as unknown as fspiopAPI.Schemas.ErrorInformationObject,
+        toParticipantId
+      )
       // throw error to stop state machine
       throw error
     }
   }
 
+  async onSendLinkingChannelResponse (): Promise<void> {
+    const { consentRequestsPostRequest, consentRequestsIDPutRequest, toParticipantId} = this.data
+
+    // catch any unplanned errors and notify PISP
+    try {
+      const waitOnAuthTokenFromPISPResponseChannel = DFSPLinkingModel.notificationChannel(
+        DFSPLinkingPhase.waitOnAuthTokenFromPISPResponse,
+        consentRequestsPostRequest.consentRequestId
+      )
+      // now we send back a PUT /consentRequests/{ID}response to elicit
+      // a PATCH /consentRequests/{ID} response containing an authToken
+      await deferredJob(this.pubSub, waitOnAuthTokenFromPISPResponseChannel)
+        .init(async (channel) => {
+          const res = await this.thirdpartyRequests.putConsentRequests(
+            consentRequestsPostRequest.consentRequestId,
+            consentRequestsIDPutRequest,
+            toParticipantId
+          )
+
+          this.logger.push({ res, channel })
+            .log('ThirdpartyRequests.putConsentRequests call sent to auth service, listening on response')
+        })
+        .job(async (message: Message): Promise<void> => {
+          try {
+            type PutResponse =
+              tpAPI.Schemas.ConsentRequestsIDPatchRequest
+            type PutResponseOrError = PutResponse & fspiopAPI.Schemas.ErrorInformationObject
+            const putResponse = message as unknown as PutResponseOrError
+
+            if (putResponse.errorInformation) {
+              // if the PISP sends back any error, both machines will now
+              // need to be in an errored state
+              // store the error so we can transition to an errored state
+              this.data.errorInformation = putResponse.errorInformation as unknown as fspiopAPI.Schemas.ErrorInformation
+
+            } else {
+              this.data.consentRequestsIDPatchResponse = { ...message as unknown as PutResponse }
+            }
+          } catch (error) {
+            this.logger.push(error).error('ThirdpartyRequests.putConsentRequests request error')
+            return Promise.reject(error)
+          }
+        })
+        // since the PATCH /consentRequest/{ID} PISP response requires user input
+        // on the PISP side we need to make this a longer time.
+        // todo: figure out what time is adequate and make a new variable to store it
+        .wait(this.config.requestProcessingTimeoutSeconds * 1000)
+    } catch (error) {
+      // we send back an account linking error despite the actual error
+      const mojaloopError = reformatError(
+        Errors.MojaloopApiErrorCodes.TP_ACCOUNT_LINKING_ERROR,
+        this.logger
+      )
+
+      // if the flow fails to run for any reason notify the PISP that the account
+      // linking process has failed
+      await this.thirdpartyRequests.putConsentRequestsError(
+        consentRequestsPostRequest.consentRequestId,
+        mojaloopError as unknown as fspiopAPI.Schemas.ErrorInformationObject,
+        this.data.toParticipantId
+      )
+
+      // throw the actual error
+      throw error
+    }
+  }
+
   async onValidateAuthToken (): Promise<void> {
-    const { consentRequestId, consentRequestsIDPatchRequest, toParticipantId } = this.data
+    const { consentRequestId, consentRequestsIDPatchResponse, toParticipantId } = this.data
 
     try {
+      // todo: change this to validateAuthToken, here and throughout code.
       const isValidOTP = await this.dfspBackendRequests.validateOTPSecret(
         consentRequestId!,
-        consentRequestsIDPatchRequest!.authToken
+        consentRequestsIDPatchResponse!.authToken
       ) as BackendValidateOTPResponse
 
       if (!isValidOTP) {
@@ -201,31 +313,272 @@ export class DFSPLinkingModel
 
   async onGrantConsent (): Promise<void> {
     const { consentRequestId, toParticipantId, scopes } = this.data
+    const consentId = uuid()
 
-    const postConsentRequestsPayload: tpAPI.Schemas.ConsentsPostRequest = {
-      consentId: uuid(),
+    // save consentId for later
+    this.data.consentId = consentId
+
+    const postConsentPayload: tpAPI.Schemas.ConsentsPostRequestPISP = {
+      consentId,
       consentRequestId: consentRequestId!,
       scopes: scopes || []
     }
 
+    // save POST /consent request
+    this.data.consentPostRequest = postConsentPayload
+
+    // catch any unplanned errors and notify PISP
     try {
-      await this.thirdpartyRequests.postConsents(
-        postConsentRequestsPayload,
-        toParticipantId
+
+      const waitOnSignedCredentialChannel = DFSPLinkingModel.notificationChannel(
+        DFSPLinkingPhase.waitOnSignedCredentialFromPISPResponse,
+        consentId!
+      )
+
+      await deferredJob(this.pubSub, waitOnSignedCredentialChannel)
+        .init(async (channel) => {
+          const res = await this.thirdpartyRequests.postConsents(
+            postConsentPayload,
+            toParticipantId
+          )
+
+          this.logger.push({ res, channel })
+            .log('ThirdpartyRequests.postConsents call sent to auth service, listening on response')
+        })
+        .job(async (message: Message): Promise<void> => {
+          try {
+            type PutResponse =
+              tpAPI.Schemas.ConsentsIDPutResponseSigned
+            type PutResponseOrError = PutResponse & fspiopAPI.Schemas.ErrorInformationObject
+            const putResponse = message as unknown as PutResponseOrError
+
+            if (putResponse.errorInformation) {
+              // if the PISP sends back any error, both machines will now
+              // need to be in an errored state
+              // store the error so we can transition to an errored state
+              this.data.errorInformation = putResponse.errorInformation as unknown as fspiopAPI.Schemas.ErrorInformation
+
+            } else {
+              this.data.consentIDPutResponseSignedCredentialFromPISP = { ...message as unknown as PutResponse }
+            }
+          } catch (error) {
+            this.logger.push(error).error('ThirdpartyRequests.postConsents request error')
+            return Promise.reject(error)
+          }
+        })
+        // since the PUT /consents/{ID} PISP signed credential response requires
+        // user input on the PISP side we need to make this a longer time.
+        // todo: figure out what time is adequate and make a new variable to store it
+        .wait(this.config.requestProcessingTimeoutSeconds * 1000)
+    } catch (error) {
+      // we send back an account linking error despite the actual error
+      const mojaloopError = reformatError(
+        Errors.MojaloopApiErrorCodes.TP_ACCOUNT_LINKING_ERROR,
+        this.logger
+      )
+
+      // if the flow fails to run for any reason notify the PISP that the account
+      // linking process has failed
+      await this.thirdpartyRequests.putConsentsError(
+        consentId,
+        mojaloopError as unknown as fspiopAPI.Schemas.ErrorInformationObject,
+        this.data.toParticipantId
+      )
+
+      // throw the actual error
+      throw error
+    }
+  }
+
+  async onValidateWithAuthService (): Promise<void> {
+    const { consentIDPutResponseSignedCredentialFromPISP, consentId } = this.data
+
+    const consentPostRequestToAuthService: tpAPI.Schemas.ConsentsPostRequestAUTH = {
+      consentId: consentId!,
+      scopes: this.data.scopes!,
+      credential: consentIDPutResponseSignedCredentialFromPISP!.credential
+    }
+
+    // catch any unplanned errors and notify PISP
+    try {
+      const waitOnAuthServiceResponse = DFSPLinkingModel.notificationChannel(
+        DFSPLinkingPhase.waitOnAuthServiceResponse,
+        consentId!
+      )
+      const waitOnALSParticipantResponse = DFSPLinkingModel.notificationChannel(
+        DFSPLinkingPhase.waitOnALSParticipantResponse,
+        consentId!
+      )
+
+      const waitOnAuthService = deferredJob(this.pubSub, waitOnAuthServiceResponse)
+        .init(async (channel) => {
+          const res = await this.thirdpartyRequests.postConsents(
+            consentPostRequestToAuthService,
+            this.data.toAuthServiceParticipantId
+          )
+
+          this.logger.push({ res, channel })
+            .log('ThirdpartyRequests.postConsents call sent to auth service, listening on response')
+        })
+        .job(async (message: Message): Promise<void> => {
+          try {
+            type PutResponse =
+              tpAPI.Schemas.ConsentsIDPutResponseVerified
+            type PutResponseOrError = PutResponse & fspiopAPI.Schemas.ErrorInformationObject
+            const putResponse = message as unknown as PutResponseOrError
+
+            if (putResponse.errorInformation) {
+              // if the auth-service sends back any error, inform PISP
+              // that consent failed to validate with auth-service
+              // todo: more detailed error handling depending on auth-service error response
+              const mojaloopError = reformatError(
+                Errors.MojaloopApiErrorCodes.TP_CONSENT_INVALID,
+                this.logger
+              )
+
+              await this.thirdpartyRequests.putConsentsError(
+                this.data.consentId!,
+                mojaloopError as unknown as fspiopAPI.Schemas.ErrorInformationObject,
+                this.data.toParticipantId
+              )
+              // store the error so we can transition to an errored state
+              this.data.errorInformation = mojaloopError.errorInformation as unknown as fspiopAPI.Schemas.ErrorInformation
+            } else {
+              this.data.consentIDPutResponseFromAuthService = { ...message as unknown as PutResponse }
+            }
+          } catch (error) {
+            this.logger.push(error).error('ThirdpartyRequests.postConsents request error')
+            return Promise.reject(error)
+          }
+        })
+        .wait(this.config.requestProcessingTimeoutSeconds * 1000)
+
+      const waitOnALS = deferredJob(this.pubSub, waitOnALSParticipantResponse)
+        .init(async (): Promise<void> => {
+          return Promise.resolve()
+        })
+        .job(async (message: Message): Promise<void> => {
+          type PutResponse =
+            tpAPI.Schemas.ParticipantsTypeIDPutResponse
+          type PutResponseOrError = PutResponse & fspiopAPI.Schemas.ErrorInformationObject
+          const putResponse = message as unknown as PutResponseOrError
+
+          if (putResponse.errorInformation) {
+            // if the ALS sends back any error for now, notify the PISP that the account
+            // linking process has failed
+            // todo: more detailed error handling depending on auth-service error response
+            const mojaloopError = reformatError(
+              Errors.MojaloopApiErrorCodes.TP_ACCOUNT_LINKING_ERROR,
+              this.logger
+            )
+
+            await this.thirdpartyRequests.putConsentsError(
+              this.data.consentId!,
+              mojaloopError as unknown as fspiopAPI.Schemas.ErrorInformationObject,
+              this.data.toParticipantId
+            )
+            // store the error so we can transition to an errored state
+            this.data.errorInformation = mojaloopError.errorInformation as unknown as fspiopAPI.Schemas.ErrorInformation
+          } else {
+            this.data.participantPutResponseFromALS = { ...message as unknown as fspiopAPI.Schemas.ParticipantsTypeIDPutResponse}
+          }
+        })
+        .wait(this.config.requestProcessingTimeoutSeconds * 1000)
+
+      await Promise.all([waitOnALS, waitOnAuthService])
+    } catch (error) {
+      // we send back an account linking error despite the actual error
+      const mojaloopError = reformatError(
+        Errors.MojaloopApiErrorCodes.TP_ACCOUNT_LINKING_ERROR,
+        this.logger
+      )
+
+      // if the flow fails to run for any reason notify the PISP that the account
+      // linking process has failed
+      await this.thirdpartyRequests.putConsentsError(
+        this.data.consentId!,
+        mojaloopError as unknown as fspiopAPI.Schemas.ErrorInformationObject,
+        this.data.toParticipantId
+      )
+
+      // throw the actual error
+      throw error
+    }
+  }
+
+  async onFinalizeThirdpartyLinkWithALS (): Promise<void> {
+    // todo: send a bulk POST /participants request to ALS to
+    //       store THIRD_PARTY_LINK entries
+
+    /*
+    const partyList: tpAPI.Schemas.PartyIdInfo[] = []
+    for (const scope of this.data.scopes as tpAPI.Schemas.Scope[]) {
+      var partyIdInfo: tpAPI.Schemas.PartyIdInfo = {
+        partyIdType: 'THIRD_PARTY_LINK',
+        partyIdentifier: scope.accountId
+      }
+      partyList.push(partyIdInfo)
+    }
+
+    const consentPostRequestToALSService: tpAPI.Schemas.ParticipantsPostRequest = {
+      requestId: this.data.consentId!,
+      partyList
+    }
+
+    const channel = DFSPLinkingModel.notificationChannel(
+      DFSPLinkingPhase.waitOnThirdpartyLinkRegistrationResponse,
+      this.data.consentId!
+    )
+
+    return deferredJob(this.pubSub, channel)
+    .init(async (): Promise<void> => {
+      // need to update `mojaloopRequests.postParticipants` to accept
+      // 'THIRD_PARTY_LINK'
+      const res = await this.mojaloopRequests.postParticipants(
+        consentPostRequestToALSService,
+        'auth-service'
+      )
+      this.logger.push({ res }).info('MojaloopRequests.postParticipants request sent to peer')
+    })
+    .job(async (message: Message): Promise<void> => {
+    })
+    .wait(this.config.requestProcessingTimeoutSeconds * 1000)
+
+    // todo: if promise fails we need to send a PUT /consents/{ID}/error
+    //       request back to the PISP
+    */
+  }
+
+  async onNotifyVerificationToPISP (): Promise<void> {
+    const { consentId } = this.data
+
+    const consentPatchVerifiedRequest: tpAPI.Schemas.ConsentsIDPatchResponseVerified = {
+      credential: {
+        status: 'VERIFIED'
+      }
+    }
+    // catch any unplanned errors
+    try {
+      await this.thirdpartyRequests.patchConsents(
+        consentId!,
+        consentPatchVerifiedRequest,
+        this.data.toParticipantId
       )
     } catch (error) {
-      const mojaloopError = reformatError(error, this.logger)
-
-      this.logger.push({ error }).error('authTokenValidated -> consentGranted')
-      this.logger.push(error).error('ThirdpartyRequests.postConsents request error')
-
-      // note: if the POST /consents fails at the DFSP we report that back to the pisp
-      await this.thirdpartyRequests.putConsentRequestsError(
-        consentRequestId!,
-        mojaloopError as unknown as fspiopAPI.Schemas.ErrorInformationObject,
-        toParticipantId
+      // we send back an account linking error despite the actual error
+      const mojaloopError = reformatError(
+        Errors.MojaloopApiErrorCodes.TP_ACCOUNT_LINKING_ERROR,
+        this.logger
       )
-      // throw error to stop state machine
+      // if the flow fails to run for any reason notify the PISP that the account
+      // linking process has failed
+      await this.thirdpartyRequests.putConsentsError(
+        this.data.consentId!,
+        mojaloopError as unknown as fspiopAPI.Schemas.ErrorInformationObject,
+        this.data.toParticipantId
+      )
+
+      // throw actual error
       throw error
     }
   }
@@ -239,29 +592,32 @@ export class DFSPLinkingModel
       // run transitions based on incoming state
       switch (data.currentState) {
         case 'start':
-          await this.saveToKVS()
           this.logger.info(
             `validateRequest requested for ${data.consentRequestsPostRequest.consentRequestId},  currentState: ${data.currentState}`
           )
           await this.fsm.validateRequest()
-          await this.saveToKVS()
-          return this.run();
+          return this.run()
 
         case 'requestIsValid':
           this.logger.info(
             `storeReqAndSendOTP requested for ${data.consentRequestsPostRequest.consentRequestId},  currentState: ${data.currentState}`
           )
           await this.fsm.storeReqAndSendOTP()
-          await this.saveToKVS()
-          // POST /consentRequest handled wait for PATCH /consentRequest{ID}
-          return
+          return this.run()
 
         case 'consentRequestValidatedAndStored':
+          this.logger.info(
+            `storeReqAndSendOTP requested for ${data.consentRequestsPostRequest.consentRequestId},  currentState: ${data.currentState}`
+          )
+          await this.fsm.sendLinkingChannelResponse()
+          await this.checkModelDataForErrorInformation()
+          return this.run()
+
+        case 'authTokenReceived':
           this.logger.info(
             `validateAuthToken requested for ${data.consentRequestId},  currentState: ${data.currentState}`
           )
           await this.fsm.validateAuthToken()
-          await this.saveToKVS()
           return this.run();
 
         case 'authTokenValidated':
@@ -269,8 +625,25 @@ export class DFSPLinkingModel
             `grantConsent requested for ${data.consentRequestId},  currentState: ${data.currentState}`
           )
           await this.fsm.grantConsent()
-          await this.saveToKVS()
-          // PATCH /consentRequest{ID} handled
+          await this.checkModelDataForErrorInformation()
+          return this.run()
+
+        case 'consentGranted':
+          await this.fsm.validateWithAuthService()
+          await this.checkModelDataForErrorInformation()
+          this.logger.info(
+            `validateWithAuthService requested for ${data.consentId},  currentState: ${data.currentState}`
+          )
+          return this.run()
+
+        case 'consentRegisteredAndValidated':
+          await this.fsm.finalizeThirdpartyLinkWithALS()
+          await this.checkModelDataForErrorInformation()
+          return this.run()
+
+        case 'PISPDFSPLinkEstablished':
+          await this.fsm.notifyVerificationToPISP()
+          await this.checkModelDataForErrorInformation()
           return
 
         default:
@@ -298,10 +671,6 @@ export class DFSPLinkingModel
   }
 }
 
-export async function existsInKVS (config: DFSPLinkingModelConfig): Promise<boolean> {
-  return config.kvs.exists(config.key)
-}
-
 export async function create (
   data: DFSPLinkingData,
   config: DFSPLinkingModelConfig
@@ -314,26 +683,7 @@ export async function create (
   return model
 }
 
-// loads PersistentModel from KVS storage using given `config` and `spec`
-export async function loadFromKVS (
-  config: DFSPLinkingModelConfig
-): Promise<DFSPLinkingModel> {
-  try {
-    const data = await config.kvs.get<DFSPLinkingData>(config.key)
-    if (!data) {
-      throw new Error(`No data found in KVS for: ${config.key}`)
-    }
-    config.logger.push({ data }).info('data loaded from KVS')
-    return create(data, config)
-  } catch (err) {
-    config.logger.push({ err }).info(`Error loading data from KVS for key: ${config.key}`)
-    throw err
-  }
-}
-
 export default {
   DFSPLinkingModel,
-  existsInKVS,
-  create,
-  loadFromKVS
+  create
 }

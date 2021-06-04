@@ -114,15 +114,24 @@ defineFeature(feature, (test): void => {
   let server: Server
   let response: ServerInjectResponse
 
-  afterEach((done): void => {
+  // tests seem to not like the server booting up/down between tests.
+  // so we prepare a server for all tests in the feature
+  beforeAll(async (): Promise<void> => {
+    server = await prepareOutboundAPIServer()
+  })
+
+  afterAll(async (done): Promise<void> => {
+    server.events.on('stop', done)
+    server.stop({ timeout:0 })
+  })
+
+  afterEach((): void => {
     jest.resetAllMocks()
     jest.resetModules()
-    server.events.on('stop', done)
-    server.stop()
   })
 
   test('PostLinkingRequestConsentIDPassCredential', ({ given, when, then }): void => {
-    const postConsentsIDPatchResponse: tpAPI.Schemas.ConsentsPostRequest = {
+    const postConsentsIDPatchResponse: tpAPI.Schemas.ConsentsPostRequestPISP = {
       consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
       consentRequestId: '997c89f4-053c-4283-bfec-45a1a0a28fba',
       scopes: [{
@@ -131,8 +140,7 @@ defineFeature(feature, (test): void => {
           'accounts.getBalance',
           'accounts.transfer'
         ]
-      }
-      ]
+      }]
     }
 
     const consentRequestsIDPutResponseWeb: tpAPI.Schemas.ConsentRequestsIDPutResponseWeb = {
@@ -167,7 +175,7 @@ defineFeature(feature, (test): void => {
     }
 
     given('Outbound API server', async (): Promise<void> => {
-      server = await prepareOutboundAPIServer()
+      // do nothing
     })
 
     when('I send a \'PostLinkingRequestConsentIDPassCredential\' request', async (): Promise<ServerInjectResponse> => {
@@ -235,10 +243,22 @@ defineFeature(feature, (test): void => {
         payload: {
           credential: {
             payload: {
-              id: 'some-credential-id',
+              id: 'credential id: identifier of pair of keys, base64 encoded, min length 59',
+              rawId: 'raw credential id: identifier of pair of keys, base64 encoded, min length 59',
               response: {
-                clientDataJSON: 'client-data'
-              }
+                clientDataJSON: 'clientDataJSON-must-not-have-fewer-than-121-' +
+                  'characters Lorem ipsum dolor sit amet, consectetur adipiscing ' +
+                  'elit, sed do eiusmod tempor incididunt ut labore et dolore magna ' +
+                  'aliqua.',
+                attestationObject: 'attestationObject-must-not-have-fewer-than-' +
+                  '306-characters Lorem ipsum dolor sit amet, consectetur ' +
+                  'adipiscing elit, sed do eiusmod tempor incididunt ut ' +
+                  'labore et dolore magna aliqua. Ut enim ad minim veniam, ' +
+                  'quis nostrud exercitation ullamco laboris nisi ut aliquip ' +
+                  'ex ea commodo consequat. Duis aute irure dolor in reprehenderit ' +
+                  'in voluptate velit esse cillum dolore eu fugiat nulla pariatur.'
+              },
+              type: 'public-key'
             }
           }
         }

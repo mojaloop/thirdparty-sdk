@@ -394,10 +394,13 @@
     "payload": {
       "credential": {
         "payload": {
-          "id": "some-credential-id",
+          "id": "credential id: identifier of pair of keys, base64 encoded, min length 59",
+          "rawId": "raw credential id: identifier of pair of keys, base64 encoded, min length 59",
           "response": {
-            "clientDataJSON": "client-data"
-          }
+            "clientDataJSON": "clientDataJSON-must-not-have-fewer-than-121-characters Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            "attestationObject": "attestationObject-must-not-have-fewer-than-306-characters Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+          },
+          "type": "public-key"
         }
       }
     }
@@ -425,6 +428,121 @@
       "errorInformation": {
         "errorCode": "7212",
         "errorDescription": "Signed challenge does not match derived challenge",
+        "extensionList": {
+          "extension": [
+            {
+              "key": "test",
+              "value": "test"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "inboundPutConsentsIdRequestSignedCredential": {
+    "headers": {
+      "fspiop-source": "switch",
+      "fspiop-destination": "dfspA"
+    },
+    "params": {
+      "ID": "520f9165-7be6-4a40-9fc8-b30fcf4f62ab"
+    },
+    "payload": {
+      "scopes": [
+        {
+          "accountId": "dfspa.username.1234",
+          "actions": [
+            "accounts.transfer",
+            "accounts.getBalance"
+          ]
+        },
+        {
+          "accountId": "dfspa.username.5678",
+          "actions": [
+            "accounts.transfer",
+            "accounts.getBalance"
+          ]
+        }
+      ],
+      "credential": {
+        "credentialType": "FIDO",
+        "status": "PENDING",
+        "payload": {
+          "id": "credential id: identifier of pair of keys, base64 encoded, min length 59",
+          "rawId": "raw credential id: identifier of pair of keys, base64 encoded, min length 59",
+          "response": {
+            "clientDataJSON": "clientDataJSON-must-not-have-fewer-than-121-characters Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            "attestationObject": "attestationObject-must-not-have-fewer-than-306-characters Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+          },
+          "type": "public-key"
+        }
+      }
+    }
+  },
+  "inboundPutConsentsIdRequestVerifiedCredential": {
+    "headers": {
+      "fspiop-source": "switch",
+      "fspiop-destination": "dfspA"
+    },
+    "params": {
+      "ID": "520f9165-7be6-4a40-9fc8-b30fcf4f62ab"
+    },
+    "payload": {
+      "scopes": [
+        {
+          "accountId": "dfspa.username.1234",
+          "actions": [
+            "accounts.transfer",
+            "accounts.getBalance"
+          ]
+        },
+        {
+          "accountId": "dfspa.username.5678",
+          "actions": [
+            "accounts.transfer",
+            "accounts.getBalance"
+          ]
+        }
+      ],
+      "credential": {
+        "credentialType": "FIDO",
+        "status": "VERIFIED",
+        "payload": {
+          "id": "credential id: identifier of pair of keys, base64 encoded, min length 59",
+          "rawId": "raw credential id: identifier of pair of keys, base64 encoded, min length 59",
+          "response": {
+            "clientDataJSON": "clientDataJSON-must-not-have-fewer-than-121-characters Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            "attestationObject": "attestationObject-must-not-have-fewer-than-306-characters Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+          },
+          "type": "public-key"
+        }
+      }
+    }
+  },
+  "inboundPutParticipantsTypeIdRequest": {
+    "headers": {
+      "fspiop-source": "switch",
+      "fspiop-destination": "pispA"
+    },
+    "params": {
+      "ID": "520f9165-7be6-4a40-9fc8-b30fcf4f62ab"
+    },
+    "payload": {
+      "fspId": "central-auth"
+    }
+  },
+  "inboundPutParticipantsTypeIdRequestError": {
+    "headers": {
+      "fspiop-source": "switch",
+      "fspiop-destination": "pispA"
+    },
+    "params": {
+      "ID": "520f9165-7be6-4a40-9fc8-b30fcf4f62ab"
+    },
+    "payload": {
+      "errorInformation": {
+        "errorCode": "3200",
+        "errorDescription": "Generic ID not found",
         "extensionList": {
           "extension": [
             {

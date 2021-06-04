@@ -98,7 +98,6 @@ paths:
           $ref: ../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/501.yaml
         503:
           $ref: ../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/503.yaml
-
   /thirdpartyRequests/transactions:
     post:
       tags:
@@ -560,156 +559,11 @@ paths:
   /consentRequests/{ID}/error:
     $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/paths/consentRequests_ID_error.yaml'
   /consents:
-    post:
-      description: >
-        Create a consent object. Called by DFSP after the successful creation
-        and validation of a consentRequest.
-
-        Switch -> PISP
-      summary: CreateConsent
-      operationId: CreateConsent
-      tags:
-        - consent
-      requestBody:
-        description: The updated consentRequest body.
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/ConsentsPostRequest.yaml'
-      parameters:
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/parameters/Accept.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/parameters/Content-Length.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/parameters/Content-Type.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/parameters/Date.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/parameters/X-Forwarded-For.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/parameters/FSPIOP-Source.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/parameters/FSPIOP-Destination.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/parameters/FSPIOP-Encryption.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/parameters/FSPIOP-Signature.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/parameters/FSPIOP-URI.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/parameters/FSPIOP-HTTP-Method.yaml'
-      responses:
-        202:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/202.yaml'
-        400:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/400.yaml'
-        401:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/401.yaml'
-        403:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/403.yaml'
-        404:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/404.yaml'
-        405:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/405.yaml'
-        406:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/406.yaml'
-        501:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/501.yaml'
-        503:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/503.yaml'
+    $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/paths/consents.yaml'
   /consents/{ID}:
-    put:
-      description: |
-        The HTTP request `PUT /consents/{ID}` is used to update a specified consent object.
-        The `{ID}` in the URI should contain the `{ID}` that was used in the `POST /consents`.
-        - Called by a `auth-service` to add the credential details.
-
-        - Called by a `PISP` to add a signature of the challenge.
-
-        PISP -> Switch
-        Switch -> PISP
-      summary: UpdateConsent
-      tags:
-        - consent
-      operationId: UpdateConsent
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/ConsentsIDPutResponseSigned.yaml'
-      parameters:
-        #Path
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/parameters/ID.yaml'
-        #Headers
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/parameters/Content-Type.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/parameters/Date.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/parameters/X-Forwarded-For.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/parameters/FSPIOP-Source.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/parameters/FSPIOP-Destination.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/parameters/FSPIOP-Encryption.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/parameters/FSPIOP-Signature.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/parameters/FSPIOP-URI.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/parameters/FSPIOP-HTTP-Method.yaml'
-      responses:
-        200:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/200.yaml'
-        400:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/400.yaml'
-        401:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/401.yaml'
-        403:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/403.yaml'
-        404:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/404.yaml'
-        405:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/405.yaml'
-        406:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/406.yaml'
-        501:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/501.yaml'
-        503:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/503.yaml'
-    patch:
-      description: |
-        The HTTP request `PATCH /consents/{ID}` is used to notify the PISP and DFSP of revoked consent.
-
-        Switch -> PISP
-      summary: NotifyConsent
-      tags:
-        - consent
-      operationId: NotifyConsent
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              oneOf:
-                - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/ConsentsIDPatchResponseVerified.yaml'
-                - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/ConsentsIDPatchResponseRevoked.yaml'
-      parameters:
-        #Path
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/parameters/ID.yaml'
-        #Headers
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/parameters/Content-Type.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/parameters/Date.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/parameters/X-Forwarded-For.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/parameters/FSPIOP-Source.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/parameters/FSPIOP-Destination.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/parameters/FSPIOP-Encryption.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/parameters/FSPIOP-Signature.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/parameters/FSPIOP-URI.yaml'
-        - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/parameters/FSPIOP-HTTP-Method.yaml'
-      responses:
-        200:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/200.yaml'
-        400:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/400.yaml'
-        401:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/401.yaml'
-        403:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/403.yaml'
-        404:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/404.yaml'
-        405:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/405.yaml'
-        406:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/406.yaml'
-        501:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/501.yaml'
-        503:
-          $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/503.yaml'
+    $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/paths/consents_ID.yaml'
+  /consents/{ID}/error:
+    $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/paths/consents_ID_error.yaml'
   /consents/{ID}/generateChallenge:
     post:
       tags:
@@ -944,6 +798,10 @@ paths:
     $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/paths/services_ServiceType.yaml'
   /services/{ServiceType}/error:
     $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/paths/services_ServiceType_error.yaml'
+  /participants/{Type}/{ID}:
+    $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/paths/participants_Type_ID.yaml'
+  /participants/{Type}/{ID}/error:
+    $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/paths/participants_Type_ID_error.yaml'
 
 components:
   schemas:

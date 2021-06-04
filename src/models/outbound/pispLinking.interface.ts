@@ -29,7 +29,7 @@ import {
   PersistentModelConfig, StateData
 } from '~/models/persistent.model'
 import { Method } from 'javascript-state-machine'
-import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components';
+import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
 import {
   thirdparty as tpAPI
 } from '@mojaloop/api-snippets'
@@ -81,7 +81,7 @@ export interface PISPLinkingData extends StateData<PISPLinkingModelState> {
 
   // authentication phase
   linkingRequestConsentIDAuthenticatePatchRequest?: OutboundAPI.Schemas.LinkingRequestConsentIDAuthenticateRequest
-  linkingRequestConsentIDAuthenticateInboundConsentResponse?: tpAPI.Schemas.ConsentsPostRequest
+  linkingRequestConsentIDAuthenticateInboundConsentResponse?: tpAPI.Schemas.ConsentsPostRequestPISP
   linkingRequestConsentIDAuthenticateResponse?: OutboundAPI.Schemas.LinkingRequestConsentIDAuthenticateResponse
 
   // pass/register credential phase

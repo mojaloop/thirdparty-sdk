@@ -41,6 +41,10 @@ import InboundAccounts from './accounts/{ID}'
 import InboundAccountsError from './accounts/{ID}/error'
 import InboundServices from './services/{ServiceType}'
 import InboundServicesError from './services/{ServiceType}/error'
+import ParticipantsID from './participants/{ID}'
+import ParticipantsIDError from './participants/{ID}/error'
+import ParticipantsTypeID from './participants/{Type}/{ID}'
+import ParticipantsTypeIDError from './participants/{Type}/{ID}/error'
 
 export default {
   CreateThirdpartyTransactionRequests: ThirdpartyRequestsTransactions.post,
@@ -61,5 +65,10 @@ export default {
   PutServicesByServiceType: InboundServices.put,
   PutServicesByServiceTypeAndError: InboundServicesError.put,
   PatchConsentByID: InboundConsentsId.patch,
-  NotifyErrorConsents: InboundConsentsIdError.put
+  PutConsentByID: InboundConsentsId.put,
+  NotifyErrorConsents: InboundConsentsIdError.put,
+  PutParticipantsByID: ParticipantsID.put,
+  PutParticipantsByIDAndError:  ParticipantsIDError.put,
+  ParticipantsByTypeAndID3: ParticipantsTypeID.put,
+  ParticipantsErrorByTypeAndID: ParticipantsTypeIDError.put
 }
