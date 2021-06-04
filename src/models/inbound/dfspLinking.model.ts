@@ -212,52 +212,50 @@ export class DFSPLinkingModel
   async onSendLinkingChannelResponse (): Promise<void> {
     const { consentRequestsPostRequest, consentRequestsIDPutRequest, toParticipantId} = this.data
 
-    const waitOnAuthTokenFromPISPResponseChannel = DFSPLinkingModel.notificationChannel(
-      DFSPLinkingPhase.waitOnAuthTokenFromPISPResponse,
-      consentRequestsPostRequest.consentRequestId
-    )
-    // now we send back a PUT /consentRequests/{ID}response to elicit
-    // a PATCH /consentRequests/{ID} response containing an authToken
-    const waitOnAuthToken = deferredJob(this.pubSub, waitOnAuthTokenFromPISPResponseChannel)
-      .init(async (channel) => {
-        const res = await this.thirdpartyRequests.putConsentRequests(
-          consentRequestsPostRequest.consentRequestId,
-          consentRequestsIDPutRequest,
-          toParticipantId
-        )
-
-        this.logger.push({ res, channel })
-          .log('ThirdpartyRequests.putConsentRequests call sent to auth service, listening on response')
-      })
-      .job(async (message: Message): Promise<void> => {
-        try {
-          type PutResponse =
-            tpAPI.Schemas.ConsentRequestsIDPatchRequest
-          type PutResponseOrError = PutResponse & fspiopAPI.Schemas.ErrorInformationObject
-          const putResponse = message as unknown as PutResponseOrError
-
-          if (putResponse.errorInformation) {
-            // if the PISP sends back any error, both machines will now
-            // need to be in an errored state
-            // store the error so we can transition to an errored state
-            this.data.errorInformation = putResponse.errorInformation as unknown as fspiopAPI.Schemas.ErrorInformation
-
-          } else {
-            this.data.consentRequestsIDPatchResponse = { ...message as unknown as PutResponse }
-          }
-        } catch (error) {
-          this.logger.push(error).error('ThirdpartyRequests.putConsentRequests request error')
-          return Promise.reject(error)
-        }
-      })
-      // since the PATCH /consentRequest/{ID} PISP response requires user input
-      // on the PISP side we need to make this a longer time.
-      // todo: figure out what time is adequate and make a new variable to store it
-      .wait(this.config.requestProcessingTimeoutSeconds * 1000)
-
     // catch any unplanned errors and notify PISP
     try {
-      await waitOnAuthToken
+      const waitOnAuthTokenFromPISPResponseChannel = DFSPLinkingModel.notificationChannel(
+        DFSPLinkingPhase.waitOnAuthTokenFromPISPResponse,
+        consentRequestsPostRequest.consentRequestId
+      )
+      // now we send back a PUT /consentRequests/{ID}response to elicit
+      // a PATCH /consentRequests/{ID} response containing an authToken
+      await deferredJob(this.pubSub, waitOnAuthTokenFromPISPResponseChannel)
+        .init(async (channel) => {
+          const res = await this.thirdpartyRequests.putConsentRequests(
+            consentRequestsPostRequest.consentRequestId,
+            consentRequestsIDPutRequest,
+            toParticipantId
+          )
+
+          this.logger.push({ res, channel })
+            .log('ThirdpartyRequests.putConsentRequests call sent to auth service, listening on response')
+        })
+        .job(async (message: Message): Promise<void> => {
+          try {
+            type PutResponse =
+              tpAPI.Schemas.ConsentRequestsIDPatchRequest
+            type PutResponseOrError = PutResponse & fspiopAPI.Schemas.ErrorInformationObject
+            const putResponse = message as unknown as PutResponseOrError
+
+            if (putResponse.errorInformation) {
+              // if the PISP sends back any error, both machines will now
+              // need to be in an errored state
+              // store the error so we can transition to an errored state
+              this.data.errorInformation = putResponse.errorInformation as unknown as fspiopAPI.Schemas.ErrorInformation
+
+            } else {
+              this.data.consentRequestsIDPatchResponse = { ...message as unknown as PutResponse }
+            }
+          } catch (error) {
+            this.logger.push(error).error('ThirdpartyRequests.putConsentRequests request error')
+            return Promise.reject(error)
+          }
+        })
+        // since the PATCH /consentRequest/{ID} PISP response requires user input
+        // on the PISP side we need to make this a longer time.
+        // todo: figure out what time is adequate and make a new variable to store it
+        .wait(this.config.requestProcessingTimeoutSeconds * 1000)
     } catch (error) {
       // we send back an account linking error despite the actual error
       const mojaloopError = reformatError(
@@ -329,50 +327,49 @@ export class DFSPLinkingModel
     // save POST /consent request
     this.data.consentPostRequest = postConsentPayload
 
-    const waitOnSignedCredentialChannel = DFSPLinkingModel.notificationChannel(
-      DFSPLinkingPhase.waitOnSignedCredentialFromPISPResponse,
-      consentId!
-    )
-
-    const waitOnSignedCredential = deferredJob(this.pubSub, waitOnSignedCredentialChannel)
-      .init(async (channel) => {
-        const res = await this.thirdpartyRequests.postConsents(
-          postConsentPayload,
-          toParticipantId
-        )
-
-        this.logger.push({ res, channel })
-          .log('ThirdpartyRequests.postConsents call sent to auth service, listening on response')
-      })
-      .job(async (message: Message): Promise<void> => {
-        try {
-          type PutResponse =
-            tpAPI.Schemas.ConsentsIDPutResponseSigned
-          type PutResponseOrError = PutResponse & fspiopAPI.Schemas.ErrorInformationObject
-          const putResponse = message as unknown as PutResponseOrError
-
-          if (putResponse.errorInformation) {
-            // if the PISP sends back any error, both machines will now
-            // need to be in an errored state
-            // store the error so we can transition to an errored state
-            this.data.errorInformation = putResponse.errorInformation as unknown as fspiopAPI.Schemas.ErrorInformation
-
-          } else {
-            this.data.consentIDPutResponseSignedCredentialFromPISP = { ...message as unknown as PutResponse }
-          }
-        } catch (error) {
-          this.logger.push(error).error('ThirdpartyRequests.postConsents request error')
-          return Promise.reject(error)
-        }
-      })
-      // since the PUT /consents/{ID} PISP signed credential response requires
-      // user input on the PISP side we need to make this a longer time.
-      // todo: figure out what time is adequate and make a new variable to store it
-      .wait(this.config.requestProcessingTimeoutSeconds * 1000)
-
     // catch any unplanned errors and notify PISP
     try {
-      await waitOnSignedCredential
+
+      const waitOnSignedCredentialChannel = DFSPLinkingModel.notificationChannel(
+        DFSPLinkingPhase.waitOnSignedCredentialFromPISPResponse,
+        consentId!
+      )
+
+      await deferredJob(this.pubSub, waitOnSignedCredentialChannel)
+        .init(async (channel) => {
+          const res = await this.thirdpartyRequests.postConsents(
+            postConsentPayload,
+            toParticipantId
+          )
+
+          this.logger.push({ res, channel })
+            .log('ThirdpartyRequests.postConsents call sent to auth service, listening on response')
+        })
+        .job(async (message: Message): Promise<void> => {
+          try {
+            type PutResponse =
+              tpAPI.Schemas.ConsentsIDPutResponseSigned
+            type PutResponseOrError = PutResponse & fspiopAPI.Schemas.ErrorInformationObject
+            const putResponse = message as unknown as PutResponseOrError
+
+            if (putResponse.errorInformation) {
+              // if the PISP sends back any error, both machines will now
+              // need to be in an errored state
+              // store the error so we can transition to an errored state
+              this.data.errorInformation = putResponse.errorInformation as unknown as fspiopAPI.Schemas.ErrorInformation
+
+            } else {
+              this.data.consentIDPutResponseSignedCredentialFromPISP = { ...message as unknown as PutResponse }
+            }
+          } catch (error) {
+            this.logger.push(error).error('ThirdpartyRequests.postConsents request error')
+            return Promise.reject(error)
+          }
+        })
+        // since the PUT /consents/{ID} PISP signed credential response requires
+        // user input on the PISP side we need to make this a longer time.
+        // todo: figure out what time is adequate and make a new variable to store it
+        .wait(this.config.requestProcessingTimeoutSeconds * 1000)
     } catch (error) {
       // we send back an account linking error despite the actual error
       const mojaloopError = reformatError(
@@ -402,38 +399,76 @@ export class DFSPLinkingModel
       credential: consentIDPutResponseSignedCredentialFromPISP!.credential
     }
 
-    const waitOnAuthServiceResponse = DFSPLinkingModel.notificationChannel(
-      DFSPLinkingPhase.waitOnAuthServiceResponse,
-      consentId!
-    )
-    const waitOnALSParticipantResponse = DFSPLinkingModel.notificationChannel(
-      DFSPLinkingPhase.waitOnALSParticipantResponse,
-      consentId!
-    )
+    // catch any unplanned errors and notify PISP
+    try {
+      const waitOnAuthServiceResponse = DFSPLinkingModel.notificationChannel(
+        DFSPLinkingPhase.waitOnAuthServiceResponse,
+        consentId!
+      )
+      const waitOnALSParticipantResponse = DFSPLinkingModel.notificationChannel(
+        DFSPLinkingPhase.waitOnALSParticipantResponse,
+        consentId!
+      )
 
-    const waitOnAuthService = deferredJob(this.pubSub, waitOnAuthServiceResponse)
-      .init(async (channel) => {
-        const res = await this.thirdpartyRequests.postConsents(
-          consentPostRequestToAuthService,
-          this.data.toAuthServiceParticipantId
-        )
+      const waitOnAuthService = deferredJob(this.pubSub, waitOnAuthServiceResponse)
+        .init(async (channel) => {
+          const res = await this.thirdpartyRequests.postConsents(
+            consentPostRequestToAuthService,
+            this.data.toAuthServiceParticipantId
+          )
 
-        this.logger.push({ res, channel })
-          .log('ThirdpartyRequests.postConsents call sent to auth service, listening on response')
-      })
-      .job(async (message: Message): Promise<void> => {
-        try {
+          this.logger.push({ res, channel })
+            .log('ThirdpartyRequests.postConsents call sent to auth service, listening on response')
+        })
+        .job(async (message: Message): Promise<void> => {
+          try {
+            type PutResponse =
+              tpAPI.Schemas.ConsentsIDPutResponseVerified
+            type PutResponseOrError = PutResponse & fspiopAPI.Schemas.ErrorInformationObject
+            const putResponse = message as unknown as PutResponseOrError
+
+            if (putResponse.errorInformation) {
+              // if the auth-service sends back any error, inform PISP
+              // that consent failed to validate with auth-service
+              // todo: more detailed error handling depending on auth-service error response
+              const mojaloopError = reformatError(
+                Errors.MojaloopApiErrorCodes.TP_CONSENT_INVALID,
+                this.logger
+              )
+
+              await this.thirdpartyRequests.putConsentsError(
+                this.data.consentId!,
+                mojaloopError as unknown as fspiopAPI.Schemas.ErrorInformationObject,
+                this.data.toParticipantId
+              )
+              // store the error so we can transition to an errored state
+              this.data.errorInformation = mojaloopError.errorInformation as unknown as fspiopAPI.Schemas.ErrorInformation
+            } else {
+              this.data.consentIDPutResponseFromAuthService = { ...message as unknown as PutResponse }
+            }
+          } catch (error) {
+            this.logger.push(error).error('ThirdpartyRequests.postConsents request error')
+            return Promise.reject(error)
+          }
+        })
+        .wait(this.config.requestProcessingTimeoutSeconds * 1000)
+
+      const waitOnALS = deferredJob(this.pubSub, waitOnALSParticipantResponse)
+        .init(async (): Promise<void> => {
+          return Promise.resolve()
+        })
+        .job(async (message: Message): Promise<void> => {
           type PutResponse =
-            tpAPI.Schemas.ConsentsIDPutResponseVerified
+            tpAPI.Schemas.ParticipantsTypeIDPutResponse
           type PutResponseOrError = PutResponse & fspiopAPI.Schemas.ErrorInformationObject
           const putResponse = message as unknown as PutResponseOrError
 
           if (putResponse.errorInformation) {
-            // if the auth-service sends back any error, inform PISP
-            // that consent failed to validate with auth-service
+            // if the ALS sends back any error for now, notify the PISP that the account
+            // linking process has failed
             // todo: more detailed error handling depending on auth-service error response
             const mojaloopError = reformatError(
-              Errors.MojaloopApiErrorCodes.TP_CONSENT_INVALID,
+              Errors.MojaloopApiErrorCodes.TP_ACCOUNT_LINKING_ERROR,
               this.logger
             )
 
@@ -445,49 +480,11 @@ export class DFSPLinkingModel
             // store the error so we can transition to an errored state
             this.data.errorInformation = mojaloopError.errorInformation as unknown as fspiopAPI.Schemas.ErrorInformation
           } else {
-            this.data.consentIDPutResponseFromAuthService = { ...message as unknown as PutResponse }
+            this.data.participantPutResponseFromALS = { ...message as unknown as fspiopAPI.Schemas.ParticipantsTypeIDPutResponse}
           }
-        } catch (error) {
-          this.logger.push(error).error('ThirdpartyRequests.postConsents request error')
-          return Promise.reject(error)
-        }
-      })
-      .wait(this.config.requestProcessingTimeoutSeconds * 1000)
+        })
+        .wait(this.config.requestProcessingTimeoutSeconds * 1000)
 
-    const waitOnALS = deferredJob(this.pubSub, waitOnALSParticipantResponse)
-      .init(async (): Promise<void> => {
-        return Promise.resolve()
-      })
-      .job(async (message: Message): Promise<void> => {
-        type PutResponse =
-          tpAPI.Schemas.ParticipantsTypeIDPutResponse
-        type PutResponseOrError = PutResponse & fspiopAPI.Schemas.ErrorInformationObject
-        const putResponse = message as unknown as PutResponseOrError
-
-        if (putResponse.errorInformation) {
-          // if the ALS sends back any error for now, notify the PISP that the account
-          // linking process has failed
-          // todo: more detailed error handling depending on auth-service error response
-          const mojaloopError = reformatError(
-            Errors.MojaloopApiErrorCodes.TP_ACCOUNT_LINKING_ERROR,
-            this.logger
-          )
-
-          await this.thirdpartyRequests.putConsentsError(
-            this.data.consentId!,
-            mojaloopError as unknown as fspiopAPI.Schemas.ErrorInformationObject,
-            this.data.toParticipantId
-          )
-          // store the error so we can transition to an errored state
-          this.data.errorInformation = mojaloopError.errorInformation as unknown as fspiopAPI.Schemas.ErrorInformation
-        } else {
-          this.data.participantPutResponseFromALS = { ...message as unknown as fspiopAPI.Schemas.ParticipantsTypeIDPutResponse}
-        }
-      })
-      .wait(this.config.requestProcessingTimeoutSeconds * 1000)
-
-    // catch any unplanned errors and notify PISP
-    try {
       await Promise.all([waitOnALS, waitOnAuthService])
     } catch (error) {
       // we send back an account linking error despite the actual error
