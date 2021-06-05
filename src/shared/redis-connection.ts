@@ -161,13 +161,14 @@ export class RedisConnection {
       return
     }
 
-    // calling quit on any client should disconnect redis
+    // calling quit on any client should disconnect redis connection
     // disconnect from redis
     const asyncSubQuit = promisify(this.subscriptionClient.quit)
     await asyncSubQuit.call(this.subscriptionClient)
 
     // cleanup
     this.redisSubscriptionClient = null as unknown as RedisClient
+    this.redisClient = null as unknown as RedisClient
   }
 
   async ping (): Promise<boolean> {
