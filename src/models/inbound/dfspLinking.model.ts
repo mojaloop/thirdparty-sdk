@@ -40,8 +40,8 @@ import {
   DFSPLinkingModelConfig
 } from '~/models/inbound/dfspLinking.interface'
 import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
-import { BackendValidateOTPResponse, DFSPLinkingPhase } from './dfspLinking.interface'
-import { uuid } from 'uuidv4'
+import { BackendValidateAuthTokenResponse, DFSPLinkingPhase } from './dfspLinking.interface'
+import { v5 as uuidv5 } from 'uuid';
 import { reformatError } from '~/shared/api-error'
 import deferredJob from '~/shared/deferred-job'
 import { Message } from '~/shared/pub-sub'
@@ -231,23 +231,26 @@ export class DFSPLinkingModel
           )
 
           this.logger.push({ res, channel })
-            .log('ThirdpartyRequests.putConsentRequests call sent to auth service, listening on response')
+            .log('ThirdpartyRequests.putConsentRequests call sent to peer, listening on response')
         })
         .job(async (message: Message): Promise<void> => {
           try {
-            type PutResponse =
+            type PatchResponse =
               tpAPI.Schemas.ConsentRequestsIDPatchRequest
-            type PutResponseOrError = PutResponse & fspiopAPI.Schemas.ErrorInformationObject
-            const putResponse = message as unknown as PutResponseOrError
-
-            if (putResponse.errorInformation) {
+            type PatchResponseOrError = PatchResponse & fspiopAPI.Schemas.ErrorInformationObject
+            const patchResponse = message as unknown as PatchResponseOrError
+            console.log(patchResponse)
+            if (patchResponse.errorInformation) {
               // if the PISP sends back any error, both machines will now
               // need to be in an errored state
               // store the error so we can transition to an errored state
-              this.data.errorInformation = putResponse.errorInformation as unknown as fspiopAPI.Schemas.ErrorInformation
+              this.data.errorInformation = patchResponse.errorInformation as unknown as fspiopAPI.Schemas.ErrorInformation
 
             } else {
-              this.data.consentRequestsIDPatchResponse = { ...message as unknown as PutResponse }
+              this.logger.info(
+                `received ${patchResponse}, from PISP`
+              )
+              this.data.consentRequestsIDPatchResponse = { ...message as unknown as PatchResponse }
             }
           } catch (error) {
             this.logger.push(error).error('ThirdpartyRequests.putConsentRequests request error')
@@ -285,7 +288,7 @@ export class DFSPLinkingModel
       const isValidOTP = await this.dfspBackendRequests.validateAuthToken(
         consentRequestId!,
         consentRequestsIDPatchResponse!.authToken
-      ) as BackendValidateOTPResponse
+      ) as BackendValidateAuthTokenResponse
 
       if (!isValidOTP) {
         throw Errors.MojaloopApiErrorCodes.TP_FSP_OTP_VALIDATION_ERROR
@@ -314,7 +317,11 @@ export class DFSPLinkingModel
 
   async onGrantConsent (): Promise<void> {
     const { consentRequestId, toParticipantId, scopes } = this.data
-    const consentId = uuid()
+    // create a deterministic uuid for consentId
+    const consentId = uuidv5(
+      'consentId',
+      consentRequestId
+    )
 
     // save consentId for later
     this.data.consentId = consentId
@@ -344,7 +351,7 @@ export class DFSPLinkingModel
           )
 
           this.logger.push({ res, channel })
-            .log('ThirdpartyRequests.postConsents call sent to auth service, listening on response')
+            .log('ThirdpartyRequests.postConsents call sent to peer, listening on response')
         })
         .job(async (message: Message): Promise<void> => {
           try {

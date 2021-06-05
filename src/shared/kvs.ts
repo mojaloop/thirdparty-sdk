@@ -47,8 +47,8 @@ export class KVS extends RedisConnection {
   async get<T> (key: string): Promise<T|undefined> {
     InvalidKeyError.throwIfInvalid(key)
 
-    const asyncGet = promisify(this.client.get)
-    const value: string | null | undefined = await asyncGet.call(this.client, key)
+    const asyncGet = promisify(this.pubClient.get)
+    const value: string | null | undefined = await asyncGet.call(this.pubClient, key)
 
     return typeof value === 'string' ? JSON.parse(value) : undefined
   }
@@ -57,16 +57,16 @@ export class KVS extends RedisConnection {
   async set<T> (key: string, value: T): Promise<boolean> {
     InvalidKeyError.throwIfInvalid(key)
 
-    const asyncSet = promisify(this.client.set)
+    const asyncSet = promisify(this.pubClient.set)
     const stringified = JSON.stringify(value)
 
-    return asyncSet.call(this.client, key, stringified) as Promise<boolean>
+    return asyncSet.call(this.pubClient, key, stringified) as Promise<boolean>
   }
 
   // removes the value for given key
   async del (key: string): Promise<boolean> {
     InvalidKeyError.throwIfInvalid(key)
-    return this.client.del(key)
+    return this.pubClient.del(key)
   }
 
   // check is any data for given key
@@ -74,7 +74,7 @@ export class KVS extends RedisConnection {
     // there is problem with TS typings
     // so using `promisify` isn't working
     return new Promise((resolve, reject) => {
-      this.client.exists(key, (err: unknown, result: number) => {
+      this.pubClient.exists(key, (err: unknown, result: number) => {
         if (err) {
           return reject(err)
         }

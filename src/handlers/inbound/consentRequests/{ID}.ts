@@ -45,7 +45,8 @@ async function patch (_context: unknown, request: Request, h: StateResponseToolk
     h.getPubSub(),
     request.payload as unknown as Message
   )
-  h.getLogger().info(`Inbound received PUT /consentRequests/{ID} response`)
+  h.getLogger().info(`Inbound received PATCH /consentRequests/{ID} response`)
+  h.getLogger().info(`${consentRequestId}`)
 
   return h.response().code(Enum.Http.ReturnCodes.ACCEPTED.CODE)
 }
