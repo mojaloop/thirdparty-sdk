@@ -157,7 +157,7 @@ export class RedisConnection {
       this.redisSubscriptionClient = await this.createClient()
     }
 
-    if (!this.isClientConnected){
+    if (!this.isClientConnected) {
       // a redis connection to handle get, set and publish operations
       this.redisClient = await this.createClient()
     }
