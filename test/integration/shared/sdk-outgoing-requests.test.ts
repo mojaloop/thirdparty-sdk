@@ -30,7 +30,7 @@ import config from '~/shared/config'
 import { Scheme } from '~/shared/http-scheme'
 import mockLogger from 'test/unit/mockLogger'
 import { OutboundAPI } from '@mojaloop/sdk-scheme-adapter'
-import { uuid } from 'uuidv4'
+import { v4 as uuidv4 } from 'uuid'
 
 describe('SDKOutgoingRequests', () => {
   const sdkConfig: SDKOutgoingRequestsConfig = {
@@ -63,10 +63,10 @@ describe('SDKOutgoingRequests', () => {
   describe('requestQuote', () => {
     it('should return quotes information', async () => {
       const request: OutboundAPI.Schemas.quotesPostRequest = {
-        fspId: uuid().substr(0, 32), // fspid has limited length
+        fspId: uuidv4().substr(0, 32), // fspid has limited length
         quotesPostRequest: {
-          quoteId: uuid(),
-          transactionId: uuid(),
+          quoteId: uuidv4(),
+          transactionId: uuidv4(),
           payee: {
             partyIdInfo: {
               partyIdType: 'MSISDN',
@@ -111,8 +111,8 @@ describe('SDKOutgoingRequests', () => {
       const request: OutboundAPI.Schemas.authorizationsPostRequest = {
         fspId: 'pisp',
         authorizationsPostRequest: {
-          transactionId: uuid(),
-          transactionRequestId: uuid(),
+          transactionId: uuidv4(),
+          transactionRequestId: uuidv4(),
           authenticationType: 'U2F',
           retriesLeft: '1',
           amount: {
@@ -153,7 +153,7 @@ describe('SDKOutgoingRequests', () => {
 
   describe('requestTransfer', () => {
     it('should return transfer details', async () => {
-      const transferId = uuid()
+      const transferId = uuidv4()
       const request: OutboundAPI.Schemas.simpleTransfersPostRequest = {
         fspId: 'dfspa',
         transfersPostRequest: {
