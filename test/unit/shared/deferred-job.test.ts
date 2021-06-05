@@ -31,7 +31,7 @@ import { Message, NotificationCallback, PubSub } from '~/shared/pub-sub'
 import {
   RedisConnectionConfig
 } from '~/shared/redis-connection'
-import { uuid } from 'uuidv4'
+import { v4 as uuidv4 } from 'uuid'
 jest.mock('redis')
 
 describe('deferredJob', () => {
@@ -49,7 +49,7 @@ describe('deferredJob', () => {
     let spySubscribe: jest.SpyInstance
     let spyUnsubscribe: jest.SpyInstance
     let spyPublish: jest.SpyInstance
-    const channel = uuid()
+    const channel = uuidv4()
     const publishTimeoutInMs = 50
     beforeEach(async () => {
       pubSub = new PubSub(pubSubConfig)

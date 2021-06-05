@@ -28,7 +28,7 @@
 import { SDKOutgoingRequestsConfig, SDKOutgoingRequests } from '~/shared/sdk-outgoing-requests'
 import { Scheme } from '~/shared/http-scheme'
 import mockLogger from '../mockLogger'
-import { uuid } from 'uuidv4'
+import { v4 as uuidv4 } from 'uuid'
 import { OutboundRequestToPayTransferPostRequest } from '~/models/thirdparty.transactions.interface'
 import { OutboundAPI } from '@mojaloop/sdk-scheme-adapter'
 
@@ -49,7 +49,7 @@ describe('SDKOutgoingRequests', () => {
   }
 
   const requestToPayTransfer: OutboundRequestToPayTransferPostRequest = {
-    requestToPayTransactionId: uuid(),
+    requestToPayTransactionId: uuidv4(),
     from: {
       idType: 'MSISDN',
       idValue: '1234567890'
@@ -92,7 +92,7 @@ describe('SDKOutgoingRequests', () => {
           currentState: 'COMPLETED'
         })
       )
-      const partyId = uuid()
+      const partyId = uuidv4()
       const result = await sdkRequest.requestPartiesInformation('type', partyId, 'subId')
       expect(result).toEqual({
         party: { Iam: 'mocked-party' },
@@ -116,10 +116,10 @@ describe('SDKOutgoingRequests', () => {
   describe('requestQuote', () => {
     it('should propagate the call to post', async () => {
       const request: OutboundAPI.Schemas.quotesPostRequest = {
-        fspId: uuid(),
+        fspId: uuidv4(),
         quotesPostRequest: {
-          quoteId: uuid(),
-          transactionId: uuid(),
+          quoteId: uuidv4(),
+          transactionId: uuidv4(),
           payee: {
             partyIdInfo: {
               partyIdType: 'MSISDN',
@@ -169,10 +169,10 @@ describe('SDKOutgoingRequests', () => {
   describe('requestAuthorization', () => {
     it('should propagate the call to post', async () => {
       const request: OutboundAPI.Schemas.authorizationsPostRequest = {
-        fspId: uuid().substr(0, 32), // fspid has limited length
+        fspId: uuidv4().substr(0, 32), // fspid has limited length
         authorizationsPostRequest: {
-          transactionId: uuid(),
-          transactionRequestId: uuid(),
+          transactionId: uuidv4(),
+          transactionRequestId: uuidv4(),
           authenticationType: 'U2F',
           retriesLeft: '1',
           amount: {
@@ -216,7 +216,7 @@ describe('SDKOutgoingRequests', () => {
 
   describe('requestTransfer', () => {
     it('should propagate the call to post', async () => {
-      const transferId = uuid()
+      const transferId = uuidv4()
       const request: OutboundAPI.Schemas.simpleTransfersPostRequest = {
         fspId: 'dfspa',
         transfersPostRequest: {
