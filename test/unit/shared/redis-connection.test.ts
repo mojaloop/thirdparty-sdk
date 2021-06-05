@@ -54,7 +54,8 @@ describe('RedisConnection', () => {
     expect(redis.port).toBe(config.port)
     expect(redis.host).toEqual(config.host)
     expect(redis.logger).toEqual(config.logger)
-    expect(redis.isConnected).toBeFalsy()
+    expect(redis.isClientConnected).toBeFalsy()
+    expect(redis.isSubscriptionClientConnected).toBeFalsy()
     expect(redis.timeout).toBe(defaultTimeout)
   })
 
@@ -81,44 +82,53 @@ describe('RedisConnection', () => {
   it('should connect', async (): Promise<void> => {
     const redis = new RedisConnection(config)
     await redis.connect()
-    expect(redis.isConnected).toBeTruthy()
+    expect(redis.isSubscriptionClientConnected).toBeTruthy()
+    expect(redis.isClientConnected).toBeTruthy()
     expect(config.logger.info).toBeCalledWith(`createClient: Connected to REDIS at: ${config.host}:${config.port}`)
   })
 
   it('should connect if already connected', async (): Promise<void> => {
     const redis = new RedisConnection(config)
     await redis.connect()
-    expect(redis.isConnected).toBeTruthy()
+    expect(redis.isSubscriptionClientConnected).toBeTruthy()
+    expect(redis.isClientConnected).toBeTruthy()
     await redis.connect()
-    expect(redis.isConnected).toBeTruthy()
+    expect(redis.isSubscriptionClientConnected).toBeTruthy()
+    expect(redis.isClientConnected).toBeTruthy()
     expect(config.logger.info).toBeCalledWith(`createClient: Connected to REDIS at: ${config.host}:${config.port}`)
   })
 
   it('should throw if trying to access \'client\' property when not connected ', async (): Promise<void> => {
     const redis = new RedisConnection(config)
-    expect(redis.isConnected).toBeFalsy()
+    expect(redis.isSubscriptionClientConnected).toBeFalsy()
+    expect(redis.isClientConnected).toBeFalsy()
     expect(() => redis.client).toThrowError(new RedisConnectionError(config.port, config.host))
   })
 
   it('should throw if trying to access \'subscriptionClient\' property when not connected ', async (): Promise<void> => {
     const redis = new RedisConnection(config)
-    expect(redis.isConnected).toBeFalsy()
+    expect(redis.isSubscriptionClientConnected).toBeFalsy()
+    expect(redis.isClientConnected).toBeFalsy()
     expect(() => redis.subscriptionClient).toThrowError(new RedisConnectionError(config.port, config.host))
   })
 
   it('should disconnect when connected', async (): Promise<void> => {
     const redis = new RedisConnection(config)
     await redis.connect()
-    expect(redis.isConnected).toBeTruthy()
+    expect(redis.isSubscriptionClientConnected).toBeTruthy()
+    expect(redis.isClientConnected).toBeTruthy()
     await redis.disconnect()
-    expect(redis.isConnected).toBeFalsy()
+    expect(redis.isSubscriptionClientConnected).toBeFalsy()
+    expect(redis.isClientConnected).toBeFalsy()
   })
 
   it('should do nothing at disconnect when not connected', async (): Promise<void> => {
     const redis = new RedisConnection(config)
-    expect(redis.isConnected).toBeFalsy()
+    expect(redis.isSubscriptionClientConnected).toBeFalsy()
+    expect(redis.isClientConnected).toBeFalsy()
     await redis.disconnect()
-    expect(redis.isConnected).toBeFalsy()
+    expect(redis.isSubscriptionClientConnected).toBeFalsy()
+    expect(redis.isClientConnected).toBeFalsy()
   })
 
   it('should connect without timeout specified', async (): Promise<void> => {

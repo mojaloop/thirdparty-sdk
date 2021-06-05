@@ -45,7 +45,8 @@ describe('KVS: Key Value Storage', () => {
     expect(kvs.port).toBe(config.port)
     expect(kvs.host).toEqual(config.host)
     expect(kvs.logger).toEqual(config.logger)
-    expect(kvs.isConnected).toBeFalsy()
+    expect(kvs.isClientConnected).toBeFalsy()
+    expect(kvs.isSubscriptionClientConnected).toBeFalsy()
   })
 
   it('should GET value', async (): Promise<void> => {

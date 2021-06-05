@@ -173,7 +173,9 @@ jest.mock('~/shared/pub-sub', () => {
   let subId = 0
   return {
     PubSub: jest.fn(() => ({
-      isConnected: true,
+      isClientConnected: true,
+      isSubscriptionClientConnected: true,
+      areAllClientsConnected: true,
       subscribe: jest.fn(
         (channel: string, cb: NotificationCallback) => {
           handlers[channel] = cb

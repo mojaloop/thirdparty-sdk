@@ -158,7 +158,7 @@ export const StatePlugin = {
     try {
       // connect them all to Redis instance
       await Promise.all([kvs.connect(), pubSub.connect()])
-      logger.info(`StatePlugin: connecting KVS(${kvs.isConnected}) & PubSub(${pubSub.isConnected}):`)
+      logger.info(`StatePlugin: connecting KVS(${kvs.areAllClientsConnected}) & PubSub(${pubSub.areAllClientsConnected}):`)
 
       // prepare toolkit accessors
       server.decorate('toolkit', 'getKVS', (): KVS => kvs)

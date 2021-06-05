@@ -53,13 +53,15 @@ describe('PubSub', () => {
     expect(ps.port).toBe(config.port)
     expect(ps.host).toEqual(config.host)
     expect(ps.logger).toEqual(config.logger)
-    expect(ps.isConnected).toBeFalsy()
+    expect(ps.isClientConnected).toBeFalsy()
+    expect(ps.isSubscriptionClientConnected).toBeFalsy()
   })
 
   it('should connect', async (): Promise<void> => {
     const ps = new PubSub(config)
     await ps.connect()
-    expect(ps.isConnected).toBeTruthy()
+    expect(ps.isClientConnected).toBeTruthy()
+    expect(ps.isSubscriptionClientConnected).toBeTruthy()
   })
 
   it('should broadcast message to subscribed notification callbacks', (done): void => {

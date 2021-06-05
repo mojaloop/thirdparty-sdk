@@ -124,7 +124,9 @@ jest.mock('@mojaloop/sdk-standard-components', () => {
 jest.mock('~/shared/pub-sub', () => {
   return {
     PubSub: jest.fn(() => ({
-      isConnected: true,
+      isClientConnected: true,
+      isSubscriptionClientConnected: true,
+      areAllClientsConnected: true,
       publish: jest.fn(),
       connect: jest.fn(() => Promise.resolve()),
       disconnect: jest.fn()
