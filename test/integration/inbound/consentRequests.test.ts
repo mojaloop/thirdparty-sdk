@@ -152,14 +152,14 @@ describe('PISP Inbound', (): void => {
         return new Promise(async (resolve) => {
           const pubSub = new PubSub(config)
           await pubSub.connect()
-          expect(pubSub.isConnected).toBeTruthy()
+          expect(pubSub.areAllClientsConnected).toBeTruthy()
 
           pubSub.subscribe('PISPLinking_requestConsent_997c89f4-053c-4283-bfec-45a1a0a28fba',
             async (channel: string, message: Message, _id: number) => {
               expect(channel).toEqual('PISPLinking_requestConsent_997c89f4-053c-4283-bfec-45a1a0a28fba')
               expect(message).toEqual(payload)
               await pubSub.disconnect()
-              expect(pubSub.isConnected).toBeFalsy()
+              expect(pubSub.areAllClientsConnected).toBeFalsy()
 
               resolve()
             }
@@ -170,7 +170,7 @@ describe('PISP Inbound', (): void => {
               expect(channel).toEqual('PISPConsentRequests_requestConsentAuthenticate_997c89f4-053c-4283-bfec-45a1a0a28fba')
               expect(message).toEqual(payload)
               await pubSub.disconnect()
-              expect(pubSub.isConnected).toBeFalsy()
+              expect(pubSub.areAllClientsConnected).toBeFalsy()
 
               resolve()
             }
@@ -206,7 +206,7 @@ describe('PISP Inbound', (): void => {
       it('should propagate message via Redis PUB/SUB', async (done): Promise<void> => {
         const pubSub = new PubSub(config)
         await pubSub.connect()
-        expect(pubSub.isConnected).toBeTruthy()
+        expect(pubSub.areAllClientsConnected).toBeTruthy()
         pubSub.subscribe(
           'PISPLinking_requestConsent_997c89f4-053c-4283-bfec-45a1a0a28fbb',
           async (channel: string, message: Message, _id: number
@@ -214,7 +214,7 @@ describe('PISP Inbound', (): void => {
             expect(channel).toEqual('PISPLinking_requestConsent_997c89f4-053c-4283-bfec-45a1a0a28fbb')
             expect(message).toEqual(mockData.consentRequestsPut.payload)
             await pubSub.disconnect()
-            expect(pubSub.isConnected).toBeFalsy()
+            expect(pubSub.areAllClientsConnected).toBeFalsy()
 
             done()
           })

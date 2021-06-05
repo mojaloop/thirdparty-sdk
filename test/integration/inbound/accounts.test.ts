@@ -58,12 +58,12 @@ describe('PUT /accounts/{ID}', (): void => {
       return new Promise(async (resolve) => {
         const pubSub = new PubSub(config)
         await pubSub.connect()
-        expect(pubSub.isConnected).toBeTruthy()
+        expect(pubSub.areAllClientsConnected).toBeTruthy()
         pubSub.subscribe('accounts_username1234', async (channel: string, message: Message, _id: number) => {
           expect(channel).toEqual('accounts_username1234')
           expect(message).toEqual(payload)
           await pubSub.disconnect()
-          expect(pubSub.isConnected).toBeFalsy()
+          expect(pubSub.areAllClientsConnected).toBeFalsy()
 
           resolve()
         })

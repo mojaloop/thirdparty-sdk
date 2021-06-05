@@ -55,7 +55,7 @@ describe('PUT /services/{ServiceType}', (): void => {
     it('should propagate message via Redis PUB/SUB', async (done): Promise<void> => {
       const pubSub = new PubSub(config)
       await pubSub.connect()
-      expect(pubSub.isConnected).toBeTruthy()
+      expect(pubSub.areAllClientsConnected).toBeTruthy()
       pubSub.subscribe(
         'PISPPrelinking-THIRD_PARTY_DFSP',
         async (channel: string, message: Message, _id: number
@@ -63,7 +63,7 @@ describe('PUT /services/{ServiceType}', (): void => {
           expect(channel).toEqual('PISPPrelinking-THIRD_PARTY_DFSP')
           expect(message).toEqual(mockData.putServicesByServiceTypeRequest.payload)
           await pubSub.disconnect()
-          expect(pubSub.isConnected).toBeFalsy()
+          expect(pubSub.areAllClientsConnected).toBeFalsy()
 
           done()
         })
@@ -115,14 +115,14 @@ describe('PUT /services/{ServiceType}/error', (): void => {
       return new Promise(async (resolve) => {
         const pubSub = new PubSub(config)
         await pubSub.connect()
-        expect(pubSub.isConnected).toBeTruthy()
+        expect(pubSub.areAllClientsConnected).toBeTruthy()
 
         pubSub.subscribe('PISPPrelinking-THIRD_PARTY_DFSP',
           async (channel: string, message: Message, _id: number) => {
             expect(channel).toEqual('PISPPrelinking-THIRD_PARTY_DFSP')
             expect(message).toEqual(payload)
             await pubSub.disconnect()
-            expect(pubSub.isConnected).toBeFalsy()
+            expect(pubSub.areAllClientsConnected).toBeFalsy()
 
             resolve()
           }

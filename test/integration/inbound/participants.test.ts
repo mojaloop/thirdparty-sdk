@@ -67,14 +67,14 @@ describe('DFSP Inbound', (): void => {
       it('should propagate message via Redis PUB/SUB', async (done): Promise<void> => {
         const pubSub = new PubSub(config)
         await pubSub.connect()
-        expect(pubSub.isConnected).toBeTruthy()
+        expect(pubSub.areAllClientsConnected).toBeTruthy()
 
         pubSub.subscribe('DFSPLinking_waitOnALSParticipantResponse_8e34f91d-d078-4077-8263-2c047876fcf6',
           async (channel: string, message: Message) => {
             expect(channel).toEqual('DFSPLinking_waitOnALSParticipantResponse_8e34f91d-d078-4077-8263-2c047876fcf6')
             expect(message).toEqual(participantPayload)
             await pubSub.disconnect()
-            expect(pubSub.isConnected).toBeFalsy()
+            expect(pubSub.areAllClientsConnected).toBeFalsy()
 
             done()
           }
@@ -136,14 +136,14 @@ describe('DFSP Inbound', (): void => {
       it('should propagate message via Redis PUB/SUB', async (done): Promise<void> => {
         const pubSub = new PubSub(config)
         await pubSub.connect()
-        expect(pubSub.isConnected).toBeTruthy()
+        expect(pubSub.areAllClientsConnected).toBeTruthy()
 
         pubSub.subscribe('DFSPLinking_waitOnALSParticipantResponse_8e34f91d-d078-4077-8263-2c047876fcf6',
           async (channel: string, message: Message) => {
             expect(channel).toEqual('DFSPLinking_waitOnALSParticipantResponse_8e34f91d-d078-4077-8263-2c047876fcf6')
             expect(message).toEqual(errorPayload)
             await pubSub.disconnect()
-            expect(pubSub.isConnected).toBeFalsy()
+            expect(pubSub.areAllClientsConnected).toBeFalsy()
 
             done()
           }
