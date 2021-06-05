@@ -154,7 +154,7 @@ describe('PubSub', () => {
     const ps = new PubSub(config)
     await ps.connect()
 
-    ps.client.emit('message', 'not-existing')
+    ps.pubClient.emit('message', 'not-existing')
     await new Promise((resolve) => {
       expect(ps.logger.info).toBeCalledWith('broadcastMessage: no callbacks for \'not-existing\' channel')
       setTimeout(resolve, 10)

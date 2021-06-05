@@ -91,7 +91,7 @@ export class RedisConnection {
 
   static readonly defaultTimeout = 3000
 
-  constructor (config: RedisConnectionConfig) {
+    constructor (config: RedisConnectionConfig) {
     // input validation
     InvalidHostError.throwIfInvalid(config.host)
     InvalidPortError.throwIfInvalid(config.port)
@@ -158,15 +158,13 @@ export class RedisConnection {
       return
     }
 
+    // calling quit on any client should disconnect redis
     // disconnect from redis
     const asyncSubQuit = promisify(this.subClient.quit)
     await asyncSubQuit.call(this.subClient)
-    const asyncPubQuit = promisify(this.pubClient.quit)
-    await asyncPubQuit.call(this.pubClient)
 
     // cleanup
     this.redisSubClient = null as unknown as RedisClient
-    this.redisPubClient = null as unknown as RedisClient
   }
 
   async ping (): Promise<boolean> {

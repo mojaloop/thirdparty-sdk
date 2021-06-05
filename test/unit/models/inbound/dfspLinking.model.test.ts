@@ -53,7 +53,7 @@ import shouldNotBeExecuted from 'test/unit/shouldNotBeExecuted'
 import TestData from 'test/unit/data/mockData.json'
 import { HTTPResponseError } from '../../../../src/shared/http-response-error'
 import { DFSPLinkingPhase } from '~/models/inbound/dfspLinking.interface';
-import { resetUuid } from '../../__mocks__/uuidv4';
+import { resetUuid } from '../../__mocks__/uuid';
 
 // mock KVS default exported class
 jest.mock('~/shared/kvs')

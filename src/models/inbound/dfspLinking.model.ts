@@ -239,7 +239,7 @@ export class DFSPLinkingModel
               tpAPI.Schemas.ConsentRequestsIDPatchRequest
             type PatchResponseOrError = PatchResponse & fspiopAPI.Schemas.ErrorInformationObject
             const patchResponse = message as unknown as PatchResponseOrError
-            console.log(patchResponse)
+
             if (patchResponse.errorInformation) {
               // if the PISP sends back any error, both machines will now
               // need to be in an errored state

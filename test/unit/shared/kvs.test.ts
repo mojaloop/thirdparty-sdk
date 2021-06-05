@@ -52,7 +52,7 @@ describe('KVS: Key Value Storage', () => {
     const kvs = new KVS(config)
     await kvs.connect()
 
-    const getSpy = jest.spyOn(kvs.client, 'get').mockImplementationOnce(
+    const getSpy = jest.spyOn(kvs.pubClient, 'get').mockImplementationOnce(
       (_key: string, cb?: Callback<string>): boolean => {
         if (cb) {
           cb(null, JSON.stringify({ am: 'the-value' }))
@@ -93,19 +93,19 @@ describe('KVS: Key Value Storage', () => {
     // simulate returning null from kvs.client.get
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    kvs.client.get = jest.fn((key, cb) => cb(null, null))
+    kvs.pubClient.get = jest.fn((key, cb) => cb(null, null))
     const result = await kvs.get('not-existing-key')
     expect(result).toBeUndefined()
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    expect(kvs.client.get.mock.calls[0][0]).toEqual('not-existing-key')
+    expect(kvs.pubClient.get.mock.calls[0][0]).toEqual('not-existing-key')
   })
 
   it('should SET value', async (): Promise<void> => {
     const kvs = new KVS(config)
     await kvs.connect()
 
-    const setSpy = jest.spyOn(kvs.client, 'set').mockImplementationOnce((
+    const setSpy = jest.spyOn(kvs.pubClient, 'set').mockImplementationOnce((
       _key: string,
       _value: string,
       flag: string,
@@ -151,7 +151,7 @@ describe('KVS: Key Value Storage', () => {
     await kvs.connect()
     const key = 'the-key'
 
-    const delSpy = jest.spyOn(kvs.client, 'del').mockImplementationOnce((
+    const delSpy = jest.spyOn(kvs.pubClient, 'del').mockImplementationOnce((
       ...args: (string | Callback<number>)[]
     ): boolean => {
       const argKey: string = args[0] as unknown as string
@@ -180,7 +180,7 @@ describe('KVS: Key Value Storage', () => {
     const kvs = new KVS(config)
     await kvs.connect()
 
-    const spyExists = jest.spyOn(kvs.client, 'exists')
+    const spyExists = jest.spyOn(kvs.pubClient, 'exists')
     const result = await kvs.exists(key)
     expect(result).toBeFalsy()
     expect(spyExists).toBeCalledWith(key, expect.anything())
@@ -191,7 +191,7 @@ describe('KVS: Key Value Storage', () => {
     const kvs = new KVS(config)
     await kvs.connect()
 
-    const spyExists = jest.spyOn(kvs.client, 'exists').mockImplementationOnce((...args: (string | Callback<number>)[]
+    const spyExists = jest.spyOn(kvs.pubClient, 'exists').mockImplementationOnce((...args: (string | Callback<number>)[]
     ): boolean => {
       const cb = args[1] as Callback<number>
       cb(new Error('mocked-error'), 0)
