@@ -94,16 +94,16 @@ describe('RedisConnection', () => {
     expect(config.logger.info).toBeCalledWith(`createClient: Connected to REDIS at: ${config.host}:${config.port}`)
   })
 
-  it('should throw if trying to access \'pubClient\' property when not connected ', async (): Promise<void> => {
+  it('should throw if trying to access \'client\' property when not connected ', async (): Promise<void> => {
     const redis = new RedisConnection(config)
     expect(redis.isConnected).toBeFalsy()
-    expect(() => redis.pubClient).toThrowError(new RedisConnectionError(config.port, config.host))
+    expect(() => redis.client).toThrowError(new RedisConnectionError(config.port, config.host))
   })
 
-  it('should throw if trying to access \'subClient\' property when not connected ', async (): Promise<void> => {
+  it('should throw if trying to access \'subscriptionClient\' property when not connected ', async (): Promise<void> => {
     const redis = new RedisConnection(config)
     expect(redis.isConnected).toBeFalsy()
-    expect(() => redis.subClient).toThrowError(new RedisConnectionError(config.port, config.host))
+    expect(() => redis.subscriptionClient).toThrowError(new RedisConnectionError(config.port, config.host))
   })
 
   it('should disconnect when connected', async (): Promise<void> => {

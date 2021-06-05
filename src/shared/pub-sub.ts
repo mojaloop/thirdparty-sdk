@@ -88,8 +88,8 @@ export class PubSub extends RedisConnection {
   // overload RedisConnection.connect to add listener on messages
   async connect (): Promise<void> {
     await super.connect()
-    this.subClient.on('message', this.broadcastMessage.bind(this))
-    this.pubClient.on('message', this.broadcastMessage.bind(this))
+    this.subscriptionClient.on('message', this.broadcastMessage.bind(this))
+    this.client.on('message', this.broadcastMessage.bind(this))
   }
 
   // realize message broadcast over the channel to all registered notification callbacks
@@ -130,7 +130,7 @@ export class PubSub extends RedisConnection {
       this.callbacks.set(channel, new Map<number, NotificationCallback>())
 
       // only once time subscribe to Redis channel
-      this.subClient.subscribe(channel)
+      this.subscriptionClient.subscribe(channel)
     }
 
     const callbacksForChannel = this.callbacks.get(channel)
@@ -177,7 +177,7 @@ export class PubSub extends RedisConnection {
 
     // serialized Messages should be properly deserialized by broadcastMessage
     const stringified = JSON.stringify(message)
-    const asyncPublish = promisify(this.pubClient.publish)
-    await asyncPublish.call(this.pubClient, channel, stringified)
+    const asyncPublish = promisify(this.client.publish)
+    await asyncPublish.call(this.client, channel, stringified)
   }
 }
