@@ -74,4 +74,19 @@ describe('PubSub', () => {
     const cbId = listener.subscribe('the-channel', messageHandler)
     publisher.publish('the-channel', msg)
   })
+
+
+  it('should throw an error since since Subscribe and Publish can not be run on the same client', async (done): Promise<void> => {
+    const msg: Message = {
+      a: 1,
+      b: 'B',
+      c: true,
+      d: { nested: true }
+    }
+    const messageHandler = (_channel: string, _message: Message, _id: number) => {
+      done()
+    }
+    listener.subscribe('the-channel', messageHandler)
+    listener.publish('the-channel', msg)
+  })
 })
