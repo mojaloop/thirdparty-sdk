@@ -131,7 +131,7 @@ services:
     restart: always
 
   ml-testing-toolkit:
-    image: mojaloop/ml-testing-toolkit:v12.0.1
+    image: mojaloop/ml-testing-toolkit:v12.4.0
     container_name: ml-testing-toolkit
     volumes:
       - "./docker/contract/ml-testing-toolkit/spec_files:/opt/mojaloop-testing-toolkit/spec_files"

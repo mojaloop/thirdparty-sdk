@@ -26,9 +26,23 @@
  ******/
 import axios from 'axios'
 import env from '../env'
+import { thirdparty as tpAPI } from '@mojaloop/api-snippets';
+
+interface MLTestingToolkitRequest {
+  timestamp: string
+  method: string
+  path: string
+  headers: Record<string, unknown>
+  body: Record<string, unknown>
+}
 
 describe('DFSP Inbound', (): void => {
-  const ttkRequestsHistoryUri = `http://127.0.0.1:5050/api/objectStore/requestsHistory`
+  const ttkRequestsHistoryUri = `http://localhost:5050/api/history/requests`
+
+  beforeEach(async(): Promise<void> => {
+    // clear the request history in TTK between tests.
+    await axios.delete(ttkRequestsHistoryUri, {})
+  })
 
   describe('Happy Path WEB', (): void => {
     let consentId: string
@@ -94,9 +108,14 @@ describe('DFSP Inbound', (): void => {
         await new Promise(resolve => setTimeout(resolve, 50));
 
         // check that the DFSP has sent a PUT /consentRequests/{ID} to the PISP
-        const requestsHistory = await axios.get(ttkRequestsHistoryUri, axiosConfig)
-        const putConsentRequestsToPISP = requestsHistory.data['put /consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fba'].data.body
-        expect(putConsentRequestsToPISP).toEqual({
+        const requestsHistory: MLTestingToolkitRequest[] = (await axios.get(ttkRequestsHistoryUri, axiosConfig)).data
+        var putConsentRequestsToPISP = requestsHistory.filter(req => {
+          return req.method === 'put' && req.path === '/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fba'
+        })
+        expect(putConsentRequestsToPISP.length).toEqual(1)
+
+        const historyPayload = putConsentRequestsToPISP[0].body as tpAPI.Schemas.ConsentRequestsIDPutResponseOTP
+        expect(historyPayload).toEqual({
           "consentRequestId":"997c89f4-053c-4283-bfec-45a1a0a28fba",
           "scopes":[
             {
@@ -134,76 +153,92 @@ describe('DFSP Inbound', (): void => {
         await new Promise(resolve => setTimeout(resolve, 50));
 
         // check that the DFSP has sent a POST /consents to the PISP
-        const requestsHistory = await axios.get(ttkRequestsHistoryUri, axiosConfig)
-        const postConsentsToPISP = requestsHistory.data['post /consents'].data.body
+        const requestsHistory: MLTestingToolkitRequest[] = (await axios.get(ttkRequestsHistoryUri, axiosConfig)).data
+        const postConsentsToPISP = requestsHistory.filter(req => {
+          return req.method === 'post' && req.path === '/consents'
+        })
+        expect(postConsentsToPISP.length).toEqual(1)
+        const historyPayload = postConsentsToPISP[0].body as tpAPI.Schemas.ConsentsPostRequestPISP
+
+        expect(historyPayload).toEqual(
+          expect.objectContaining({
+            consentId: expect.any(String),
+            consentRequestId: '997c89f4-053c-4283-bfec-45a1a0a28fba',
+            scopes: expect.any(Array)
+          })
+        )
 
         // save consentId for later
-        consentId = postConsentsToPISP.consentId
-
-        expect(postConsentsToPISP.consentId).toBeDefined()
-        expect(postConsentsToPISP.consentRequestId).toBeDefined()
-        expect(postConsentsToPISP.scopes).toBeDefined()
+        consentId = historyPayload.consentId
       })
     })
 
     describe('Inbound PUT /consents/{ID} signed credential from PISP', (): void => {
       it('should send back POST /consents to Auth Service', async (): Promise<void> => {
-          // the PISP now sends back a PUT /consents/{ID} signed credential request to the DFSP
-          const putConsentsIDSignedCredentialPayload = {
-            "scopes": [
-              {
-                "accountId": "dfspa.username.1234",
-                "actions": [
-                  "accounts.transfer",
-                  "accounts.getBalance"
-                ]
+        // the PISP now sends back a PUT /consents/{ID} signed credential request to the DFSP
+        const putConsentsIDSignedCredentialPayload = {
+          "scopes": [
+            {
+              "accountId": "dfspa.username.1234",
+              "actions": [
+                "accounts.transfer",
+                "accounts.getBalance"
+              ]
+            },
+            {
+              "accountId": "dfspa.username.5678",
+              "actions": [
+                "accounts.transfer",
+                "accounts.getBalance"
+              ]
+            }
+          ],
+          "credential": {
+            "credentialType": "FIDO",
+            "status": "PENDING",
+            "payload": {
+              "id": "credential id: identifier of pair of keys, base64 encoded, min length 59",
+              "rawId": "raw credential id: identifier of pair of keys, base64 encoded, min length 59",
+              "response": {
+                "clientDataJSON": "clientDataJSON-must-not-have-fewer-" +
+                  "than-121-characters Lorem ipsum dolor sit amet, " +
+                  "consectetur adipiscing elit, sed do eiusmod tempor " +
+                  "incididunt ut labore et dolore magna aliqua.",
+                "attestationObject": "attestationObject-must-not-have-fewer" +
+                  "-than-306-characters Lorem ipsum dolor sit amet, " +
+                  "consectetur adipiscing elit, sed do eiusmod tempor " +
+                  "incididunt ut labore et dolore magna aliqua. Ut enim " +
+                  "ad minim veniam, quis nostrud exercitation ullamco " +
+                  "laboris nisi ut aliquip ex ea commodo consequat. Duis " +
+                  "aute irure dolor in reprehenderit in voluptate velit " +
+                  "esse cillum dolore eu fugiat nulla pariatur."
               },
-              {
-                "accountId": "dfspa.username.5678",
-                "actions": [
-                  "accounts.transfer",
-                  "accounts.getBalance"
-                ]
-              }
-            ],
-            "credential": {
-              "credentialType": "FIDO",
-              "status": "PENDING",
-              "payload": {
-                "id": "credential id: identifier of pair of keys, base64 encoded, min length 59",
-                "rawId": "raw credential id: identifier of pair of keys, base64 encoded, min length 59",
-                "response": {
-                  "clientDataJSON": "clientDataJSON-must-not-have-fewer-" +
-                    "than-121-characters Lorem ipsum dolor sit amet, " +
-                    "consectetur adipiscing elit, sed do eiusmod tempor " +
-                    "incididunt ut labore et dolore magna aliqua.",
-                  "attestationObject": "attestationObject-must-not-have-fewer" +
-                    "-than-306-characters Lorem ipsum dolor sit amet, " +
-                    "consectetur adipiscing elit, sed do eiusmod tempor " +
-                    "incididunt ut labore et dolore magna aliqua. Ut enim " +
-                    "ad minim veniam, quis nostrud exercitation ullamco " +
-                    "laboris nisi ut aliquip ex ea commodo consequat. Duis " +
-                    "aute irure dolor in reprehenderit in voluptate velit " +
-                    "esse cillum dolore eu fugiat nulla pariatur."
-                },
-                "type": "public-key"
-              }
+              "type": "public-key"
             }
           }
+        }
 
-          const putScenarioUri = `${env.inbound.baseUri}/consents/${consentId}`
-          const responseToPutConsents = await axios.put(putScenarioUri, putConsentsIDSignedCredentialPayload, axiosConfig)
-          expect(responseToPutConsents.status).toEqual(202)
+        const putScenarioUri = `${env.inbound.baseUri}/consents/${consentId}`
+        const responseToPutConsents = await axios.put(putScenarioUri, putConsentsIDSignedCredentialPayload, axiosConfig)
+        expect(responseToPutConsents.status).toEqual(202)
 
-          await new Promise(resolve => setTimeout(resolve, 50));
+        await new Promise(resolve => setTimeout(resolve, 50));
 
-          // check that the DFSP has sent a POST /consents to the auth-service
-          const requestsHistoryTwo = await axios.get(ttkRequestsHistoryUri, axiosConfig)
-          const postConsentsToAuthService = requestsHistoryTwo.data['post /consents'].data.body
+        // check that the DFSP has sent a POST /consents to the auth-service
+        const requestsHistory: MLTestingToolkitRequest[] = (await axios.get(ttkRequestsHistoryUri, axiosConfig)).data
+        const postConsentsToAuthService = requestsHistory.filter(req => {
+          return req.method === 'post' && req.path === '/consents'
+        })
+        expect(postConsentsToAuthService.length).toEqual(1)
+        const historyPayload = postConsentsToAuthService[0].body as tpAPI.Schemas.ConsentsPostRequestAUTH
 
-          expect(postConsentsToAuthService.consentId).toBeDefined()
-          expect(postConsentsToAuthService.credential).toBeDefined()
-          expect(postConsentsToAuthService.scopes).toBeDefined()
+        expect(historyPayload).toEqual(
+          expect.objectContaining({
+            consentId: consentId,
+            credential: expect.any(Object),
+            scopes: expect.any(Object)
+          })
+        )
       })
     })
 
@@ -267,12 +302,21 @@ describe('DFSP Inbound', (): void => {
 
           await new Promise(resolve => setTimeout(resolve, 50));
 
-          // check that the DFSP has sent a PATCH /consents/{ID} to the PISP
-          const requestsHistoryTwo = await axios.get(ttkRequestsHistoryUri, axiosConfig)
-          const patchConsentsToPISP = requestsHistoryTwo.data[`patch /consents/${consentId}`].data.body
+        // check that the DFSP has sent a PATCH /consents/{ID} to the PISP
+        const requestsHistory: MLTestingToolkitRequest[] = (await axios.get(ttkRequestsHistoryUri, axiosConfig)).data
+        const postConsentsToAuthService = requestsHistory.filter(req => {
+          return req.method === 'patch' && req.path === '/consents/' + consentId
+        })
+        expect(postConsentsToAuthService.length).toEqual(1)
+        const historyPayload = postConsentsToAuthService[0].body as tpAPI.Schemas.ConsentsIDPatchResponseVerified
 
-          expect(patchConsentsToPISP.credential).toBeDefined()
-          expect(patchConsentsToPISP.credential.status).toEqual('VERIFIED')
+        expect(historyPayload).toEqual(
+          expect.objectContaining({
+            credential: {
+              status: "VERIFIED"
+            }
+          })
+        )
       })
     })
   })
@@ -340,9 +384,14 @@ describe('DFSP Inbound', (): void => {
         await new Promise(resolve => setTimeout(resolve, 50));
 
         // check that the DFSP has sent a PUT /consentRequests/{ID} to the PISP
-        const requestsHistory = await axios.get(ttkRequestsHistoryUri, axiosConfig)
-        const putConsentRequestsToPISP = requestsHistory.data['put /consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fbb'].data.body
-        expect(putConsentRequestsToPISP).toEqual({
+        const requestsHistory: MLTestingToolkitRequest[] = (await axios.get(ttkRequestsHistoryUri, axiosConfig)).data
+        var putConsentRequestsToPISP = requestsHistory.filter(req => {
+          return req.method === 'put' && req.path === '/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fbb'
+        })
+        expect(putConsentRequestsToPISP.length).toEqual(1)
+
+        const historyPayload = putConsentRequestsToPISP[0].body as tpAPI.Schemas.ConsentRequestsIDPutResponseOTP
+        expect(historyPayload).toEqual({
           "consentRequestId":"997c89f4-053c-4283-bfec-45a1a0a28fbb",
           "scopes":[
             {
@@ -379,145 +428,170 @@ describe('DFSP Inbound', (): void => {
         await new Promise(resolve => setTimeout(resolve, 50));
 
         // check that the DFSP has sent a POST /consents to the PISP
-        const requestsHistory = await axios.get(ttkRequestsHistoryUri, axiosConfig)
-        const postConsentsToPISP = requestsHistory.data['post /consents'].data.body
+        const requestsHistory: MLTestingToolkitRequest[] = (await axios.get(ttkRequestsHistoryUri, axiosConfig)).data
+        const postConsentsToPISP = requestsHistory.filter(req => {
+          return req.method === 'post' && req.path === '/consents'
+        })
+        expect(postConsentsToPISP.length).toEqual(1)
+        const historyPayload = postConsentsToPISP[0].body as tpAPI.Schemas.ConsentsPostRequestPISP
+
+        expect(historyPayload).toEqual(
+          expect.objectContaining({
+            consentId: expect.any(String),
+            consentRequestId: '997c89f4-053c-4283-bfec-45a1a0a28fbb',
+            scopes: expect.any(Array)
+          })
+        )
 
         // save consentId for later
-        consentId = postConsentsToPISP.consentId
-
-        expect(postConsentsToPISP.consentId).toBeDefined()
-        expect(postConsentsToPISP.consentRequestId).toBeDefined()
-        expect(postConsentsToPISP.scopes).toBeDefined()
+        consentId = historyPayload.consentId
       })
     })
 
     describe('Inbound PUT /consents/{ID} signed credential from PISP', (): void => {
       it('should send back POST /consents to Auth Service', async (): Promise<void> => {
-          // the PISP now sends back a PUT /consents/{ID} signed credential request to the DFSP
-          const putConsentsIDSignedCredentialPayload = {
-            "scopes": [
-              {
-                "accountId": "dfspa.username.1234",
-                "actions": [
-                  "accounts.transfer",
-                  "accounts.getBalance"
-                ]
+        // the PISP now sends back a PUT /consents/{ID} signed credential request to the DFSP
+        const putConsentsIDSignedCredentialPayload = {
+          "scopes": [
+            {
+              "accountId": "dfspa.username.1234",
+              "actions": [
+                "accounts.transfer",
+                "accounts.getBalance"
+              ]
+            },
+            {
+              "accountId": "dfspa.username.5678",
+              "actions": [
+                "accounts.transfer",
+                "accounts.getBalance"
+              ]
+            }
+          ],
+          "credential": {
+            "credentialType": "FIDO",
+            "status": "PENDING",
+            "payload": {
+              "id": "credential id: identifier of pair of keys, base64 encoded, min length 59",
+              "rawId": "raw credential id: identifier of pair of keys, base64 encoded, min length 59",
+              "response": {
+                "clientDataJSON": "clientDataJSON-must-not-have-fewer-" +
+                  "than-121-characters Lorem ipsum dolor sit amet, " +
+                  "consectetur adipiscing elit, sed do eiusmod tempor " +
+                  "incididunt ut labore et dolore magna aliqua.",
+                "attestationObject": "attestationObject-must-not-have-fewer" +
+                  "-than-306-characters Lorem ipsum dolor sit amet, " +
+                  "consectetur adipiscing elit, sed do eiusmod tempor " +
+                  "incididunt ut labore et dolore magna aliqua. Ut enim " +
+                  "ad minim veniam, quis nostrud exercitation ullamco " +
+                  "laboris nisi ut aliquip ex ea commodo consequat. Duis " +
+                  "aute irure dolor in reprehenderit in voluptate velit " +
+                  "esse cillum dolore eu fugiat nulla pariatur."
               },
-              {
-                "accountId": "dfspa.username.5678",
-                "actions": [
-                  "accounts.transfer",
-                  "accounts.getBalance"
-                ]
-              }
-            ],
-            "credential": {
-              "credentialType": "FIDO",
-              "status": "PENDING",
-              "payload": {
-                "id": "credential id: identifier of pair of keys, base64 encoded, min length 59",
-                "rawId": "raw credential id: identifier of pair of keys, base64 encoded, min length 59",
-                "response": {
-                  "clientDataJSON": "clientDataJSON-must-not-have-fewer-" +
-                    "than-121-characters Lorem ipsum dolor sit amet, " +
-                    "consectetur adipiscing elit, sed do eiusmod tempor " +
-                    "incididunt ut labore et dolore magna aliqua.",
-                  "attestationObject": "attestationObject-must-not-have-fewer" +
-                    "-than-306-characters Lorem ipsum dolor sit amet, " +
-                    "consectetur adipiscing elit, sed do eiusmod tempor " +
-                    "incididunt ut labore et dolore magna aliqua. Ut enim " +
-                    "ad minim veniam, quis nostrud exercitation ullamco " +
-                    "laboris nisi ut aliquip ex ea commodo consequat. Duis " +
-                    "aute irure dolor in reprehenderit in voluptate velit " +
-                    "esse cillum dolore eu fugiat nulla pariatur."
-                },
-                "type": "public-key"
-              }
+              "type": "public-key"
             }
           }
+        }
 
-          const putScenarioUri = `${env.inbound.baseUri}/consents/${consentId}`
-          const responseToPutConsents = await axios.put(putScenarioUri, putConsentsIDSignedCredentialPayload, axiosConfig)
-          expect(responseToPutConsents.status).toEqual(202)
+        const putScenarioUri = `${env.inbound.baseUri}/consents/${consentId}`
+        const responseToPutConsents = await axios.put(putScenarioUri, putConsentsIDSignedCredentialPayload, axiosConfig)
+        expect(responseToPutConsents.status).toEqual(202)
 
-          await new Promise(resolve => setTimeout(resolve, 50));
+        await new Promise(resolve => setTimeout(resolve, 50));
 
-          // check that the DFSP has sent a POST /consents to the auth-service
-          const requestsHistoryTwo = await axios.get(ttkRequestsHistoryUri, axiosConfig)
-          const postConsentsToAuthService = requestsHistoryTwo.data['post /consents'].data.body
+        // check that the DFSP has sent a POST /consents to the auth-service
+        const requestsHistory: MLTestingToolkitRequest[] = (await axios.get(ttkRequestsHistoryUri, axiosConfig)).data
+        const postConsentsToAuthService = requestsHistory.filter(req => {
+          return req.method === 'post' && req.path === '/consents'
+        })
+        expect(postConsentsToAuthService.length).toEqual(1)
+        const historyPayload = postConsentsToAuthService[0].body as tpAPI.Schemas.ConsentsPostRequestAUTH
 
-          expect(postConsentsToAuthService.consentId).toBeDefined()
-          expect(postConsentsToAuthService.credential).toBeDefined()
-          expect(postConsentsToAuthService.scopes).toBeDefined()
+        expect(historyPayload).toEqual(
+          expect.objectContaining({
+            consentId: consentId,
+            credential: expect.any(Object),
+            scopes: expect.any(Object)
+          })
+        )
       })
     })
 
     describe('Inbound PUT /consents/{ID} verified credential from auth-service and PUT /participants/{Type}/{ID} from ALS', (): void => {
       it('should send back PATCH /consents/{ID} to PISP', async (): Promise<void> => {
-          // the auth-service now sends back a PUT /consents/{ID} confirming verification
-          const putConsentsIDVerifiedCredentialPayload = {
-            "scopes": [
-              {
-                "accountId": "dfspa.username.1234",
-                "actions": [
-                  "accounts.transfer",
-                  "accounts.getBalance"
-                ]
+        // the auth-service now sends back a PUT /consents/{ID} confirming verification
+        const putConsentsIDVerifiedCredentialPayload = {
+          "scopes": [
+            {
+              "accountId": "dfspa.username.1234",
+              "actions": [
+                "accounts.transfer",
+                "accounts.getBalance"
+              ]
+            },
+            {
+              "accountId": "dfspa.username.5678",
+              "actions": [
+                "accounts.transfer",
+                "accounts.getBalance"
+              ]
+            }
+          ],
+          "credential": {
+            "credentialType": "FIDO",
+            "status": "VERIFIED",
+            "payload": {
+              "id": "credential id: identifier of pair of keys, base64 encoded, min length 59",
+              "rawId": "raw credential id: identifier of pair of keys, base64 encoded, min length 59",
+              "response": {
+                "clientDataJSON": "clientDataJSON-must-not-have-fewer-" +
+                  "than-121-characters Lorem ipsum dolor sit amet, " +
+                  "consectetur adipiscing elit, sed do eiusmod tempor " +
+                  "incididunt ut labore et dolore magna aliqua.",
+                "attestationObject": "attestationObject-must-not-have-fewer" +
+                  "-than-306-characters Lorem ipsum dolor sit amet, " +
+                  "consectetur adipiscing elit, sed do eiusmod tempor " +
+                  "incididunt ut labore et dolore magna aliqua. Ut enim " +
+                  "ad minim veniam, quis nostrud exercitation ullamco " +
+                  "laboris nisi ut aliquip ex ea commodo consequat. Duis " +
+                  "aute irure dolor in reprehenderit in voluptate velit " +
+                  "esse cillum dolore eu fugiat nulla pariatur."
               },
-              {
-                "accountId": "dfspa.username.5678",
-                "actions": [
-                  "accounts.transfer",
-                  "accounts.getBalance"
-                ]
-              }
-            ],
-            "credential": {
-              "credentialType": "FIDO",
-              "status": "VERIFIED",
-              "payload": {
-                "id": "credential id: identifier of pair of keys, base64 encoded, min length 59",
-                "rawId": "raw credential id: identifier of pair of keys, base64 encoded, min length 59",
-                "response": {
-                  "clientDataJSON": "clientDataJSON-must-not-have-fewer-" +
-                    "than-121-characters Lorem ipsum dolor sit amet, " +
-                    "consectetur adipiscing elit, sed do eiusmod tempor " +
-                    "incididunt ut labore et dolore magna aliqua.",
-                  "attestationObject": "attestationObject-must-not-have-fewer" +
-                    "-than-306-characters Lorem ipsum dolor sit amet, " +
-                    "consectetur adipiscing elit, sed do eiusmod tempor " +
-                    "incididunt ut labore et dolore magna aliqua. Ut enim " +
-                    "ad minim veniam, quis nostrud exercitation ullamco " +
-                    "laboris nisi ut aliquip ex ea commodo consequat. Duis " +
-                    "aute irure dolor in reprehenderit in voluptate velit " +
-                    "esse cillum dolore eu fugiat nulla pariatur."
-                },
-                "type": "public-key"
-              }
+              "type": "public-key"
             }
           }
+        }
 
-          const putScenarioUri = `${env.inbound.baseUri}/consents/${consentId}`
-          const responseToPutConsents = await axios.put(putScenarioUri, putConsentsIDVerifiedCredentialPayload, axiosConfig)
-          expect(responseToPutConsents.status).toEqual(200)
+        const putScenarioUri = `${env.inbound.baseUri}/consents/${consentId}`
+        const responseToPutConsents = await axios.put(putScenarioUri, putConsentsIDVerifiedCredentialPayload, axiosConfig)
+        expect(responseToPutConsents.status).toEqual(200)
 
-          // the ALS now sends back a PUT /participants/CONSENT/{ID} confirming verification
-          const putParticipantsTypeIDPayload = {
-            "fspId": "auth-service"
-          }
+        // the ALS now sends back a PUT /participants/CONSENT/{ID} confirming verification
+        const putParticipantsTypeIDPayload = {
+          "fspId": "auth-service"
+        }
 
-          const putParticipantsScenarioUri = `${env.inbound.baseUri}/participants/CONSENT/${consentId}`
-          const responseToPutParticipants = await axios.put(putParticipantsScenarioUri, putParticipantsTypeIDPayload, axiosConfig)
-          expect(responseToPutParticipants.status).toEqual(200)
+        const putParticipantsScenarioUri = `${env.inbound.baseUri}/participants/CONSENT/${consentId}`
+        const responseToPutParticipants = await axios.put(putParticipantsScenarioUri, putParticipantsTypeIDPayload, axiosConfig)
+        expect(responseToPutParticipants.status).toEqual(200)
 
-          await new Promise(resolve => setTimeout(resolve, 50));
+        await new Promise(resolve => setTimeout(resolve, 50));
 
-          // check that the DFSP has sent a PATCH /consents/{ID} to the PISP
-          const requestsHistoryTwo = await axios.get(ttkRequestsHistoryUri, axiosConfig)
-          const patchConsentsToPISP = requestsHistoryTwo.data[`patch /consents/${consentId}`].data.body
+        // check that the DFSP has sent a PATCH /consents/{ID} to the PISP
+        const requestsHistory: MLTestingToolkitRequest[] = (await axios.get(ttkRequestsHistoryUri, axiosConfig)).data
+        const postConsentsToAuthService = requestsHistory.filter(req => {
+          return req.method === 'patch' && req.path === '/consents/' + consentId
+        })
+        expect(postConsentsToAuthService.length).toEqual(1)
+        const historyPayload = postConsentsToAuthService[0].body as tpAPI.Schemas.ConsentsIDPatchResponseVerified
 
-          expect(patchConsentsToPISP.credential).toBeDefined()
-          expect(patchConsentsToPISP.credential.status).toEqual('VERIFIED')
+        expect(historyPayload).toEqual(
+          expect.objectContaining({
+            credential: {
+              status: "VERIFIED"
+            }
+          })
+        )
       })
     })
   })
@@ -586,13 +660,15 @@ describe('DFSP Inbound', (): void => {
         await new Promise(resolve => setTimeout(resolve, 50));
 
         // check that the DFSP has sent a PUT /consentRequests/{ID}/error to the PISP
-        const requestsHistory = await axios.get(ttkRequestsHistoryUri, axiosConfig)
-        const putConsentRequestsErrorToPISP = requestsHistory.data['put /consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fbc/error'].data.body
-        expect(putConsentRequestsErrorToPISP.errorInformation).toBeDefined()
-        expect(putConsentRequestsErrorToPISP.errorInformation.errorCode).toEqual('7200')
-        expect(putConsentRequestsErrorToPISP.errorInformation.errorDescription).toEqual(
-          'Generic Thirdparty account linking error'
-        )
+        const requestsHistory: MLTestingToolkitRequest[] = (await axios.get(ttkRequestsHistoryUri, axiosConfig)).data
+        var putConsentRequestsErrorToPISP = requestsHistory.filter(req => {
+          return req.method === 'put' && req.path === '/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fbc/error'
+        })
+        expect(putConsentRequestsErrorToPISP.length).toEqual(1)
+        expect(putConsentRequestsErrorToPISP[0].body.errorInformation).toEqual({
+          errorCode: '7200',
+          errorDescription:  'Generic Thirdparty account linking error'
+        })
       })
     })
   })
@@ -660,13 +736,15 @@ describe('DFSP Inbound', (): void => {
         await new Promise(resolve => setTimeout(resolve, 50));
 
         // check that the DFSP has sent a PUT /consentRequests/{ID}/error to the PISP
-        const requestsHistory = await axios.get(ttkRequestsHistoryUri, axiosConfig)
-        const putConsentRequestsErrorToPISP = requestsHistory.data['put /consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fbd/error'].data.body
-        expect(putConsentRequestsErrorToPISP.errorInformation).toBeDefined()
-        expect(putConsentRequestsErrorToPISP.errorInformation.errorCode).toEqual('7209')
-        expect(putConsentRequestsErrorToPISP.errorInformation.errorDescription).toEqual(
-          'FSP does not find scopes suitable'
-        )
+        const requestsHistory: MLTestingToolkitRequest[] = (await axios.get(ttkRequestsHistoryUri, axiosConfig)).data
+        var putConsentRequestsErrorToPISP = requestsHistory.filter(req => {
+          return req.method === 'put' && req.path === '/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fbd/error'
+        })
+        expect(putConsentRequestsErrorToPISP.length).toEqual(1)
+        expect(putConsentRequestsErrorToPISP[0].body.errorInformation).toEqual({
+          errorCode: '7209',
+          errorDescription:  'FSP does not find scopes suitable'
+        })
       })
     })
   })
@@ -736,13 +814,15 @@ describe('DFSP Inbound', (): void => {
         await new Promise(resolve => setTimeout(resolve, 50));
 
         // check that the DFSP has sent a PUT /consentRequests/{ID}/error to the PISP
-        const requestsHistory = await axios.get(ttkRequestsHistoryUri, axiosConfig)
-        const putConsentRequestsErrorToPISP = requestsHistory.data['put /consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fbe/error'].data.body
-        expect(putConsentRequestsErrorToPISP.errorInformation).toBeDefined()
-        expect(putConsentRequestsErrorToPISP.errorInformation.errorCode).toEqual('7200')
-        expect(putConsentRequestsErrorToPISP.errorInformation.errorDescription).toEqual(
-          'Generic Thirdparty account linking error'
-        )
+        const requestsHistory: MLTestingToolkitRequest[] = (await axios.get(ttkRequestsHistoryUri, axiosConfig)).data
+        var putConsentRequestsErrorToPISP = requestsHistory.filter(req => {
+          return req.method === 'put' && req.path === '/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fbe/error'
+        })
+        expect(putConsentRequestsErrorToPISP.length).toEqual(1)
+        expect(putConsentRequestsErrorToPISP[0].body.errorInformation).toEqual({
+          errorCode: '7200',
+          errorDescription:  'Generic Thirdparty account linking error'
+        })
       })
     })
   })
@@ -812,13 +892,15 @@ describe('DFSP Inbound', (): void => {
         await new Promise(resolve => setTimeout(resolve, 50));
 
         // check that the DFSP has sent a PUT /consentRequests/{ID}/error to the PISP
-        const requestsHistory = await axios.get(ttkRequestsHistoryUri, axiosConfig)
-        const putConsentRequestsErrorToPISP = requestsHistory.data['put /consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fbf/error'].data.body
-        expect(putConsentRequestsErrorToPISP.errorInformation).toBeDefined()
-        expect(putConsentRequestsErrorToPISP.errorInformation.errorCode).toEqual('7200')
-        expect(putConsentRequestsErrorToPISP.errorInformation.errorDescription).toEqual(
-          'Generic Thirdparty account linking error'
-        )
+        const requestsHistory: MLTestingToolkitRequest[] = (await axios.get(ttkRequestsHistoryUri, axiosConfig)).data
+        var putConsentRequestsErrorToPISP = requestsHistory.filter(req => {
+          return req.method === 'put' && req.path === '/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fbf/error'
+        })
+        expect(putConsentRequestsErrorToPISP.length).toEqual(1)
+        expect(putConsentRequestsErrorToPISP[0].body.errorInformation).toEqual({
+          errorCode: '7200',
+          errorDescription:  'Generic Thirdparty account linking error'
+        })
       })
     })
   })
