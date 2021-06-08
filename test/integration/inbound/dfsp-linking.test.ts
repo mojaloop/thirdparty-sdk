@@ -105,7 +105,7 @@ describe('DFSP Inbound', (): void => {
         expect(response.status).toEqual(202)
 
         // wait a bit for the DFSP adapter to process the request
-        await new Promise(resolve => setTimeout(resolve, 50));
+        await new Promise(resolve => setTimeout(resolve, 200));
 
         // check that the DFSP has sent a PUT /consentRequests/{ID} to the PISP
         const requestsHistory: MLTestingToolkitRequest[] = (await axios.get(ttkRequestsHistoryUri, axiosConfig)).data
@@ -150,7 +150,7 @@ describe('DFSP Inbound', (): void => {
         expect(responseToPatchConsentRequests.status).toEqual(202)
 
         // wait a bit for the DFSP adapter to process the request
-        await new Promise(resolve => setTimeout(resolve, 50));
+        await new Promise(resolve => setTimeout(resolve, 200));
 
         // check that the DFSP has sent a POST /consents to the PISP
         const requestsHistory: MLTestingToolkitRequest[] = (await axios.get(ttkRequestsHistoryUri, axiosConfig)).data
@@ -222,7 +222,7 @@ describe('DFSP Inbound', (): void => {
         const responseToPutConsents = await axios.put(putScenarioUri, putConsentsIDSignedCredentialPayload, axiosConfig)
         expect(responseToPutConsents.status).toEqual(202)
 
-        await new Promise(resolve => setTimeout(resolve, 50));
+        await new Promise(resolve => setTimeout(resolve, 200));
 
         // check that the DFSP has sent a POST /consents to the auth-service
         const requestsHistory: MLTestingToolkitRequest[] = (await axios.get(ttkRequestsHistoryUri, axiosConfig)).data
@@ -300,7 +300,7 @@ describe('DFSP Inbound', (): void => {
           const responseToPutParticipants = await axios.put(putParticipantsScenarioUri, putParticipantsTypeIDPayload, axiosConfig)
           expect(responseToPutParticipants.status).toEqual(200)
 
-          await new Promise(resolve => setTimeout(resolve, 50));
+          await new Promise(resolve => setTimeout(resolve, 200));
 
         // check that the DFSP has sent a PATCH /consents/{ID} to the PISP
         const requestsHistory: MLTestingToolkitRequest[] = (await axios.get(ttkRequestsHistoryUri, axiosConfig)).data
@@ -381,7 +381,7 @@ describe('DFSP Inbound', (): void => {
         expect(response.status).toEqual(202)
 
         // wait a bit for the DFSP adapter to process the request
-        await new Promise(resolve => setTimeout(resolve, 50));
+        await new Promise(resolve => setTimeout(resolve, 200));
 
         // check that the DFSP has sent a PUT /consentRequests/{ID} to the PISP
         const requestsHistory: MLTestingToolkitRequest[] = (await axios.get(ttkRequestsHistoryUri, axiosConfig)).data
@@ -425,7 +425,7 @@ describe('DFSP Inbound', (): void => {
         expect(responseToPatchConsentRequests.status).toEqual(202)
 
         // wait a bit for the DFSP adapter to process the request
-        await new Promise(resolve => setTimeout(resolve, 50));
+        await new Promise(resolve => setTimeout(resolve, 200));
 
         // check that the DFSP has sent a POST /consents to the PISP
         const requestsHistory: MLTestingToolkitRequest[] = (await axios.get(ttkRequestsHistoryUri, axiosConfig)).data
@@ -497,7 +497,7 @@ describe('DFSP Inbound', (): void => {
         const responseToPutConsents = await axios.put(putScenarioUri, putConsentsIDSignedCredentialPayload, axiosConfig)
         expect(responseToPutConsents.status).toEqual(202)
 
-        await new Promise(resolve => setTimeout(resolve, 50));
+        await new Promise(resolve => setTimeout(resolve, 200));
 
         // check that the DFSP has sent a POST /consents to the auth-service
         const requestsHistory: MLTestingToolkitRequest[] = (await axios.get(ttkRequestsHistoryUri, axiosConfig)).data
@@ -575,7 +575,7 @@ describe('DFSP Inbound', (): void => {
         const responseToPutParticipants = await axios.put(putParticipantsScenarioUri, putParticipantsTypeIDPayload, axiosConfig)
         expect(responseToPutParticipants.status).toEqual(200)
 
-        await new Promise(resolve => setTimeout(resolve, 50));
+        await new Promise(resolve => setTimeout(resolve, 200));
 
         // check that the DFSP has sent a PATCH /consents/{ID} to the PISP
         const requestsHistory: MLTestingToolkitRequest[] = (await axios.get(ttkRequestsHistoryUri, axiosConfig)).data
@@ -657,7 +657,7 @@ describe('DFSP Inbound', (): void => {
         expect(response.status).toEqual(202)
 
         // wait a bit for the DFSP adapter to process the request
-        await new Promise(resolve => setTimeout(resolve, 50));
+        await new Promise(resolve => setTimeout(resolve, 200));
 
         // check that the DFSP has sent a PUT /consentRequests/{ID}/error to the PISP
         const requestsHistory: MLTestingToolkitRequest[] = (await axios.get(ttkRequestsHistoryUri, axiosConfig)).data
@@ -733,7 +733,7 @@ describe('DFSP Inbound', (): void => {
         expect(response.status).toEqual(202)
 
         // wait a bit for the DFSP adapter to process the request
-        await new Promise(resolve => setTimeout(resolve, 50));
+        await new Promise(resolve => setTimeout(resolve, 200));
 
         // check that the DFSP has sent a PUT /consentRequests/{ID}/error to the PISP
         const requestsHistory: MLTestingToolkitRequest[] = (await axios.get(ttkRequestsHistoryUri, axiosConfig)).data
@@ -811,7 +811,7 @@ describe('DFSP Inbound', (): void => {
         expect(response.status).toEqual(202)
 
         // wait a bit for the DFSP adapter to process the request
-        await new Promise(resolve => setTimeout(resolve, 50));
+        await new Promise(resolve => setTimeout(resolve, 200));
 
         // check that the DFSP has sent a PUT /consentRequests/{ID}/error to the PISP
         const requestsHistory: MLTestingToolkitRequest[] = (await axios.get(ttkRequestsHistoryUri, axiosConfig)).data
@@ -889,7 +889,7 @@ describe('DFSP Inbound', (): void => {
         expect(response.status).toEqual(202)
 
         // wait a bit for the DFSP adapter to process the request
-        await new Promise(resolve => setTimeout(resolve, 50));
+        await new Promise(resolve => setTimeout(resolve, 200));
 
         // check that the DFSP has sent a PUT /consentRequests/{ID}/error to the PISP
         const requestsHistory: MLTestingToolkitRequest[] = (await axios.get(ttkRequestsHistoryUri, axiosConfig)).data
@@ -965,7 +965,7 @@ describe('DFSP Inbound', (): void => {
         expect(response.status).toEqual(202)
 
         // wait a bit for the DFSP adapter to process the request
-        await new Promise(resolve => setTimeout(resolve, 50));
+        await new Promise(resolve => setTimeout(resolve, 200));
 
         // check that the DFSP has sent a PUT /consentRequests/{ID} to the PISP
         const requestsHistory: MLTestingToolkitRequest[] = (await axios.get(ttkRequestsHistoryUri, axiosConfig)).data
@@ -1009,7 +1009,7 @@ describe('DFSP Inbound', (): void => {
         expect(responseToPatchConsentRequests.status).toEqual(202)
 
         // wait a bit for the DFSP adapter to process the request
-        await new Promise(resolve => setTimeout(resolve, 50));
+        await new Promise(resolve => setTimeout(resolve, 200));
 
         // check that the DFSP has sent a POST /consents to the PISP
         const requestsHistory: MLTestingToolkitRequest[] = (await axios.get(ttkRequestsHistoryUri, axiosConfig)).data
@@ -1081,7 +1081,7 @@ describe('DFSP Inbound', (): void => {
         const responseToPutConsents = await axios.put(putScenarioUri, putConsentsIDSignedCredentialPayload, axiosConfig)
         expect(responseToPutConsents.status).toEqual(202)
 
-        await new Promise(resolve => setTimeout(resolve, 50));
+        await new Promise(resolve => setTimeout(resolve, 200));
 
         // check that the DFSP has sent a POST /consents to the auth-service
         const requestsHistory: MLTestingToolkitRequest[] = (await axios.get(ttkRequestsHistoryUri, axiosConfig)).data
@@ -1115,7 +1115,7 @@ describe('DFSP Inbound', (): void => {
         const responseToPutConsents = await axios.put(putScenarioUri, putConsentsIDErrorPayload, axiosConfig)
         expect(responseToPutConsents.status).toEqual(200)
 
-        await new Promise(resolve => setTimeout(resolve, 50));
+        await new Promise(resolve => setTimeout(resolve, 200));
 
         // check that the DFSP has sent a PUT /consents/{ID}/error to the PISP
         const requestsHistory: MLTestingToolkitRequest[] = (await axios.get(ttkRequestsHistoryUri, axiosConfig)).data
@@ -1197,7 +1197,7 @@ describe('DFSP Inbound', (): void => {
         expect(response.status).toEqual(202)
 
         // wait a bit for the DFSP adapter to process the request
-        await new Promise(resolve => setTimeout(resolve, 50));
+        await new Promise(resolve => setTimeout(resolve, 200));
 
         // check that the DFSP has sent a PUT /consentRequests/{ID} to the PISP
         const requestsHistory: MLTestingToolkitRequest[] = (await axios.get(ttkRequestsHistoryUri, axiosConfig)).data
@@ -1241,7 +1241,7 @@ describe('DFSP Inbound', (): void => {
         expect(responseToPatchConsentRequests.status).toEqual(202)
 
         // wait a bit for the DFSP adapter to process the request
-        await new Promise(resolve => setTimeout(resolve, 50));
+        await new Promise(resolve => setTimeout(resolve, 200));
 
         // check that the DFSP has sent a POST /consents to the PISP
         const requestsHistory: MLTestingToolkitRequest[] = (await axios.get(ttkRequestsHistoryUri, axiosConfig)).data
@@ -1313,7 +1313,7 @@ describe('DFSP Inbound', (): void => {
         const responseToPutConsents = await axios.put(putScenarioUri, putConsentsIDSignedCredentialPayload, axiosConfig)
         expect(responseToPutConsents.status).toEqual(202)
 
-        await new Promise(resolve => setTimeout(resolve, 50));
+        await new Promise(resolve => setTimeout(resolve, 200));
 
         // check that the DFSP has sent a POST /consents to the auth-service
         const requestsHistory: MLTestingToolkitRequest[] = (await axios.get(ttkRequestsHistoryUri, axiosConfig)).data
@@ -1348,7 +1348,7 @@ describe('DFSP Inbound', (): void => {
         const responseToPutParticipantsError = await axios.put(putParticipantsErrorScenarioUri, putParticipantsTypeIDPayload, axiosConfig)
         expect(responseToPutParticipantsError.status).toEqual(200)
 
-        await new Promise(resolve => setTimeout(resolve, 50));
+        await new Promise(resolve => setTimeout(resolve, 200));
 
         // check that the DFSP has sent a PUT /consents/{ID}/error to the PISP
         const requestsHistory: MLTestingToolkitRequest[] = (await axios.get(ttkRequestsHistoryUri, axiosConfig)).data
