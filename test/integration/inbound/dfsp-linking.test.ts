@@ -26,145 +26,42 @@
  ******/
 import axios from 'axios'
 import env from '../env'
-import { v5 as uuidv5 } from 'uuid';
-
-//const mockData = JSON.parse(JSON.stringify(TestData))
 
 describe('DFSP Inbound', (): void => {
-  const ttkPollIncomingRequestsUri = `http://127.0.0.1:5050/longpolling/requests`
-  const ttkPollCallbackRequestsUri = `http://127.0.0.1:5050/longpolling/callbacks`
-  // these must be run in sequence since am inbound POST /consentRequests
-  // initializes a recurringly used DFSPLinkingModel object.
-  describe('POST /consentRequests should create DFSP Linking and start the workflow', (): void => {
-    it('should send a PUT /consentRequests/{ID} to PISP(Testing Toolkit Switch) containing specified auth channel', async (): Promise<void> => {
-      const scenarioUri = `${env.inbound.baseUri}/consentRequests`
+  const ttkRequestsHistoryUri = `http://127.0.0.1:5050/api/objectStore/requestsHistory`
 
-      const payload = {
-        "consentRequestId": "997c89f4-053c-4283-bfec-45a1a0a28fba",
-        "userId": "dfspa.username",
-        "scopes": [
-          {
-            "accountId": "dfspa.username.1234",
-            "actions": [
-              "accounts.transfer",
-              "accounts.getBalance"
-            ]
-          },
-          {
-            "accountId": "dfspa.username.5678",
-            "actions": [
-              "accounts.transfer",
-              "accounts.getBalance"
-            ]
+  describe('Happy Path WEB', (): void => {
+    let consentId: string
+
+    const axiosConfig = {
+      headers: {
+        'Content-Type': 'application/json',
+        'FSPIOP-Source': 'switch',
+        Date: 'Thu, 24 Jan 2019 10:23:12 GMT',
+        'FSPIOP-Destination': 'dfspA'
+      }
+    }
+    describe('Inbound POST /consentRequests from PISP should create DFSP Linking and start the workflow', (): void => {
+      it('should send back PUT /consentRequests/{ID} containing the specified auth channel', async (): Promise<void> => {
+        const scenarioUri = `${env.inbound.baseUri}/consentRequests`
+        /*
+        the `consentRequestId` is the variable that changes the course of
+        the flow. the rules can be found in ./docker/dfsp_rules.json
+        997c89f4-053c-4283-bfec-45a1a0a28fba should return that the
+        consent request is valid and specify WEB as the authentication channel
+
+        "statusCode": 200,
+        "body": {
+          "isValid": true,
+          "data": {
+            "authChannels": ["WEB"],
+            "authUri": "dfspa.com/authorize?consentRequestId=997c89f4-053c-4283-bfec-45a1a0a28fba"
           }
-        ],
-        "authChannels": [
-          "WEB",
-          "OTP"
-        ],
-        "callbackUri": "pisp-app://callback.com"
-      }
-
-      const axiosConfig = {
-        headers: {
-          'Content-Type': 'application/json',
-          'FSPIOP-Source': 'pispA',
-          Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
-          'FSPIOP-Destination': 'dfspA'
         }
-      }
-
-      const response = await axios.post(scenarioUri, payload, axiosConfig)
-
-      // Switch should return Accepted code to DFSP
-      expect(response.status).toEqual(202)
-
-      // Switch should receive the PUT /consentRequests/{ID} request from DFSP
-      const checkResponse = await axios.get(
-        ttkPollIncomingRequestsUri + '/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fba',
-        axiosConfig
-      )
-      // note: the testing-toolkit seems to be doing something weird where
-      // the payload is sometimes in `data.data` and sometimes in `data.body`
-      var checkPayload
-
-      if (checkResponse.data.data) {
-        checkPayload = checkResponse.data.data
-      } else {
-        checkPayload = checkResponse.data.body
-      }
-
-      expect(checkPayload).toEqual({
-        "consentRequestId":"997c89f4-053c-4283-bfec-45a1a0a28fba",
-        "scopes":[
-          {
-            "accountId":"dfspa.username.1234",
-            "actions":[
-              "accounts.transfer",
-              "accounts.getBalance"
-            ]
-          },
-          {
-            "accountId":"dfspa.username.5678",
-            "actions":[
-              "accounts.transfer",
-              "accounts.getBalance"
-            ]
-          }],
-        "callbackUri":"pisp-app://callback.com",
-        "authChannels":["WEB"],
-        "authUri":"dfspa.com/authorize?consentRequestId=997c89f4-053c-4283-bfec-45a1a0a28fba"
-      })
-    })
-  })
-
-  describe('PATCH /consentRequests/{ID}', (): void => {
-    describe('Inbound API', (): void => {
-      const payload = {
-        authToken: '123456'
-      }
-
-      const axiosConfig = {
-        headers: {
-          'Content-Type': 'application/json',
-          'FSPIOP-Source': 'switch',
-          Date: 'Thu, 24 Jan 2019 10:23:12 GMT',
-          'FSPIOP-Destination': 'dfspA'
-        }
-      }
-
-      it('should pass the authToken from the PISP to the DFSP Linking Model on PATCH /consentRequests/{ID}', async (): Promise<void> => {
-        const scenarioUri = `${env.inbound.baseUri}/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fba`
-
-        const response = await axios.patch(scenarioUri, payload, axiosConfig)
-
-        expect(response.status).toEqual(202)
-
-        // will derive in to ed94658b-31d7-5ed3-8ee1-d8dfbf0b1949
-        const consentId = uuidv5(
-          'consentId',
-          '997c89f4-053c-4283-bfec-45a1a0a28fba'
-        )
-        // we can't check the POST /consents request to the TTK that the DFSP
-        // would send back since the TTK doesn't support longpolling POST requests.
-
-        // so we will check for a callback for the expected PUT /consent/{ID}
-        // that a PISP(TTK) would send in response to the POST /consents
-        const checkCallback = await axios.get(
-          ttkPollCallbackRequestsUri + `/consents/${consentId}`,
-          axiosConfig
-        )
-        // note: the testing-toolkit seems to be doing something weird where
-        // the payload is sometimes in `data.data` and sometimes in `data.body`
-        var checkCallbackPayload
-
-        if (checkCallback.data.data) {
-          checkCallbackPayload = checkCallback.data.data
-        } else {
-          checkCallbackPayload = checkCallback.data.body
-        }
-
-        expect(checkCallbackPayload).toEqual({
+        */
+        const payload = {
+          "consentRequestId": "997c89f4-053c-4283-bfec-45a1a0a28fba",
+          "userId": "dfspa.username",
           "scopes": [
             {
               "accountId": "dfspa.username.1234",
@@ -181,43 +78,747 @@ describe('DFSP Inbound', (): void => {
               ]
             }
           ],
-          "credential": {
-            "credentialType": "FIDO",
-            "status": "PENDING",
-            "payload": {
-              "id": "credential id: identifier of pair of keys, base64 encoded, min length 59",
-              "rawId": "raw credential id: identifier of pair of keys, base64 encoded, min length 59",
-              "response": {
-                "clientDataJSON": "clientDataJSON-must-not-have-fewer-than-" +
-                  "121-characters Lorem ipsum dolor sit amet, consectetur " +
-                  "adipiscing elit, sed do eiusmod tempor incididunt ut labore " +
-                  "et dolore magna aliqua.",
-                "attestationObject": "attestationObject-must-not-have-fewer-" +
-                  "than-306-characters Lorem ipsum dolor sit amet, consectetur " +
-                  "adipiscing elit, sed do eiusmod tempor incididunt ut labore " +
-                  "et dolore magna aliqua. Ut enim ad minim veniam, quis " +
-                  "nostrud exercitation ullamco laboris nisi ut aliquip ex " +
-                  "ea commodo consequat. Duis aute irure dolor in " +
-                  "reprehenderit in voluptate velit esse cillum dolore eu " +
-                  "fugiat nulla pariatur."
+          "authChannels": [
+            "WEB",
+            "OTP"
+          ],
+          "callbackUri": "pisp-app://callback.com"
+        }
+
+        const response = await axios.post(scenarioUri, payload, axiosConfig)
+
+        // Switch should return Accepted code to DFSP
+        expect(response.status).toEqual(202)
+
+        // wait a bit for the DFSP adapter to process the request
+        await new Promise(resolve => setTimeout(resolve, 50));
+
+        // check that the DFSP has sent a PUT /consentRequests/{ID} to the PISP
+        const requestsHistory = await axios.get(ttkRequestsHistoryUri, axiosConfig)
+        const putConsentRequestsToPISP = requestsHistory.data['put /consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fba'].data.body
+        expect(putConsentRequestsToPISP).toEqual({
+          "consentRequestId":"997c89f4-053c-4283-bfec-45a1a0a28fba",
+          "scopes":[
+            {
+              "accountId":"dfspa.username.1234",
+              "actions":[
+                "accounts.transfer",
+                "accounts.getBalance"
+              ]
+            },
+            {
+              "accountId":"dfspa.username.5678",
+              "actions":[
+                "accounts.transfer",
+                "accounts.getBalance"
+              ]
+            }],
+          "callbackUri":"pisp-app://callback.com",
+          "authChannels":["WEB"],
+          "authUri":"dfspa.com/authorize?consentRequestId=997c89f4-053c-4283-bfec-45a1a0a28fba"
+        })
+      })
+    })
+
+    describe('Inbound PATCH /consentRequests/{ID} from PISP', (): void => {
+      it('should send back POST /consents to PISP', async (): Promise<void> => {
+        const patchConsentRequestsPayload = {
+          authToken: '123456'
+        }
+        const patchScenarioUri = `${env.inbound.baseUri}/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fba`
+
+        const responseToPatchConsentRequests = await axios.patch(patchScenarioUri, patchConsentRequestsPayload, axiosConfig)
+        expect(responseToPatchConsentRequests.status).toEqual(202)
+
+        // wait a bit for the DFSP adapter to process the request
+        await new Promise(resolve => setTimeout(resolve, 50));
+
+        // check that the DFSP has sent a POST /consents to the PISP
+        const requestsHistory = await axios.get(ttkRequestsHistoryUri, axiosConfig)
+        const postConsentsToPISP = requestsHistory.data['post /consents'].data.body
+
+        // save consentId for later
+        consentId = postConsentsToPISP.consentId
+
+        expect(postConsentsToPISP.consentId).toBeDefined()
+        expect(postConsentsToPISP.consentRequestId).toBeDefined()
+        expect(postConsentsToPISP.scopes).toBeDefined()
+      })
+    })
+
+    describe('Inbound PUT /consents/{ID} signed credential from PISP', (): void => {
+      it('should send back POST /consents to Auth Service', async (): Promise<void> => {
+          // the PISP now sends back a PUT /consents/{ID} signed credential request to the DFSP
+          const putConsentsIDSignedCredentialPayload = {
+            "scopes": [
+              {
+                "accountId": "dfspa.username.1234",
+                "actions": [
+                  "accounts.transfer",
+                  "accounts.getBalance"
+                ]
               },
-              "type": "public-key"
+              {
+                "accountId": "dfspa.username.5678",
+                "actions": [
+                  "accounts.transfer",
+                  "accounts.getBalance"
+                ]
+              }
+            ],
+            "credential": {
+              "credentialType": "FIDO",
+              "status": "PENDING",
+              "payload": {
+                "id": "credential id: identifier of pair of keys, base64 encoded, min length 59",
+                "rawId": "raw credential id: identifier of pair of keys, base64 encoded, min length 59",
+                "response": {
+                  "clientDataJSON": "clientDataJSON-must-not-have-fewer-" +
+                    "than-121-characters Lorem ipsum dolor sit amet, " +
+                    "consectetur adipiscing elit, sed do eiusmod tempor " +
+                    "incididunt ut labore et dolore magna aliqua.",
+                  "attestationObject": "attestationObject-must-not-have-fewer" +
+                    "-than-306-characters Lorem ipsum dolor sit amet, " +
+                    "consectetur adipiscing elit, sed do eiusmod tempor " +
+                    "incididunt ut labore et dolore magna aliqua. Ut enim " +
+                    "ad minim veniam, quis nostrud exercitation ullamco " +
+                    "laboris nisi ut aliquip ex ea commodo consequat. Duis " +
+                    "aute irure dolor in reprehenderit in voluptate velit " +
+                    "esse cillum dolore eu fugiat nulla pariatur."
+                },
+                "type": "public-key"
+              }
             }
           }
+
+          const putScenarioUri = `${env.inbound.baseUri}/consents/${consentId}`
+          const responseToPutConsents = await axios.put(putScenarioUri, putConsentsIDSignedCredentialPayload, axiosConfig)
+          expect(responseToPutConsents.status).toEqual(202)
+
+          await new Promise(resolve => setTimeout(resolve, 50));
+
+          // check that the DFSP has sent a POST /consents to the auth-service
+          const requestsHistoryTwo = await axios.get(ttkRequestsHistoryUri, axiosConfig)
+          const postConsentsToAuthService = requestsHistoryTwo.data['post /consents'].data.body
+
+          expect(postConsentsToAuthService.consentId).toBeDefined()
+          expect(postConsentsToAuthService.credential).toBeDefined()
+          expect(postConsentsToAuthService.scopes).toBeDefined()
+      })
+    })
+
+    describe('Inbound PUT /consents/{ID} verified credential from auth-service and PUT /participants/{Type}/{ID} from ALS', (): void => {
+      it('should send back PATCH /consents/{ID} to PISP', async (): Promise<void> => {
+          // the auth-service now sends back a PUT /consents/{ID} confirming verification
+          const putConsentsIDVerifiedCredentialPayload = {
+            "scopes": [
+              {
+                "accountId": "dfspa.username.1234",
+                "actions": [
+                  "accounts.transfer",
+                  "accounts.getBalance"
+                ]
+              },
+              {
+                "accountId": "dfspa.username.5678",
+                "actions": [
+                  "accounts.transfer",
+                  "accounts.getBalance"
+                ]
+              }
+            ],
+            "credential": {
+              "credentialType": "FIDO",
+              "status": "VERIFIED",
+              "payload": {
+                "id": "credential id: identifier of pair of keys, base64 encoded, min length 59",
+                "rawId": "raw credential id: identifier of pair of keys, base64 encoded, min length 59",
+                "response": {
+                  "clientDataJSON": "clientDataJSON-must-not-have-fewer-" +
+                    "than-121-characters Lorem ipsum dolor sit amet, " +
+                    "consectetur adipiscing elit, sed do eiusmod tempor " +
+                    "incididunt ut labore et dolore magna aliqua.",
+                  "attestationObject": "attestationObject-must-not-have-fewer" +
+                    "-than-306-characters Lorem ipsum dolor sit amet, " +
+                    "consectetur adipiscing elit, sed do eiusmod tempor " +
+                    "incididunt ut labore et dolore magna aliqua. Ut enim " +
+                    "ad minim veniam, quis nostrud exercitation ullamco " +
+                    "laboris nisi ut aliquip ex ea commodo consequat. Duis " +
+                    "aute irure dolor in reprehenderit in voluptate velit " +
+                    "esse cillum dolore eu fugiat nulla pariatur."
+                },
+                "type": "public-key"
+              }
+            }
+          }
+
+          const putScenarioUri = `${env.inbound.baseUri}/consents/${consentId}`
+          const responseToPutConsents = await axios.put(putScenarioUri, putConsentsIDVerifiedCredentialPayload, axiosConfig)
+          expect(responseToPutConsents.status).toEqual(200)
+
+          // the ALS now sends back a PUT /participants/CONSENT/{ID} confirming verification
+          const putParticipantsTypeIDPayload = {
+            "fspId": "auth-service"
+          }
+
+          const putParticipantsScenarioUri = `${env.inbound.baseUri}/participants/CONSENT/${consentId}`
+          const responseToPutParticipants = await axios.put(putParticipantsScenarioUri, putParticipantsTypeIDPayload, axiosConfig)
+          expect(responseToPutParticipants.status).toEqual(200)
+
+          await new Promise(resolve => setTimeout(resolve, 50));
+
+          // check that the DFSP has sent a PATCH /consents/{ID} to the PISP
+          const requestsHistoryTwo = await axios.get(ttkRequestsHistoryUri, axiosConfig)
+          const patchConsentsToPISP = requestsHistoryTwo.data[`patch /consents/${consentId}`].data.body
+
+          expect(patchConsentsToPISP.credential).toBeDefined()
+          expect(patchConsentsToPISP.credential.status).toEqual('VERIFIED')
+      })
+    })
+  })
+
+  describe('Happy Path OTP', (): void => {
+    let consentId: string
+
+    const axiosConfig = {
+      headers: {
+        'Content-Type': 'application/json',
+        'FSPIOP-Source': 'switch',
+        Date: 'Thu, 24 Jan 2019 10:23:12 GMT',
+        'FSPIOP-Destination': 'dfspA'
+      }
+    }
+    describe('Inbound POST /consentRequests from PISP should create DFSP Linking and start the workflow', (): void => {
+      it('should send back PUT /consentRequests/{ID} containing the specified auth channel', async (): Promise<void> => {
+        const scenarioUri = `${env.inbound.baseUri}/consentRequests`
+        /*
+        the `consentRequestId` is the variable that changes the course of
+        the flow. the rules can be found in ./docker/dfsp_rules.json
+        997c89f4-053c-4283-bfec-45a1a0a28fbb should return that the
+        consent request is valid and specify OTP as the authentication channel
+
+        "statusCode": 200,
+        "body": {
+          "isValid": true,
+          "data": {
+            "authChannels": ["OTP"]
+          }
+        }
+        */
+        const payload = {
+          "consentRequestId": "997c89f4-053c-4283-bfec-45a1a0a28fbb",
+          "userId": "dfspa.username",
+          "scopes": [
+            {
+              "accountId": "dfspa.username.1234",
+              "actions": [
+                "accounts.transfer",
+                "accounts.getBalance"
+              ]
+            },
+            {
+              "accountId": "dfspa.username.5678",
+              "actions": [
+                "accounts.transfer",
+                "accounts.getBalance"
+              ]
+            }
+          ],
+          "authChannels": [
+            "WEB",
+            "OTP"
+          ],
+          "callbackUri": "pisp-app://callback.com"
+        }
+
+        const response = await axios.post(scenarioUri, payload, axiosConfig)
+
+        // Switch should return Accepted code to DFSP
+        expect(response.status).toEqual(202)
+
+        // wait a bit for the DFSP adapter to process the request
+        await new Promise(resolve => setTimeout(resolve, 50));
+
+        // check that the DFSP has sent a PUT /consentRequests/{ID} to the PISP
+        const requestsHistory = await axios.get(ttkRequestsHistoryUri, axiosConfig)
+        const putConsentRequestsToPISP = requestsHistory.data['put /consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fbb'].data.body
+        expect(putConsentRequestsToPISP).toEqual({
+          "consentRequestId":"997c89f4-053c-4283-bfec-45a1a0a28fbb",
+          "scopes":[
+            {
+              "accountId":"dfspa.username.1234",
+              "actions":[
+                "accounts.transfer",
+                "accounts.getBalance"
+              ]
+            },
+            {
+              "accountId":"dfspa.username.5678",
+              "actions":[
+                "accounts.transfer",
+                "accounts.getBalance"
+              ]
+            }],
+          "callbackUri":"pisp-app://callback.com",
+          "authChannels":["OTP"]
         })
+      })
+    })
 
-        // the DFSP at this point would have sent a POST /consents to the
-        // auth-service. the TTK will send back a PUT /consents/{ID}
-        // simulating an auth-service and a PUT /participant/CONSENT/{ID}
-        // simulating the ALS.
-        // these requests are a TTK script and can't be polled
+    describe('Inbound PATCH /consentRequests/{ID} from PISP', (): void => {
+      it('should send back POST /consents to PISP', async (): Promise<void> => {
+        const patchConsentRequestsPayload = {
+          authToken: '123456'
+        }
+        const patchScenarioUri = `${env.inbound.baseUri}/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fbb`
 
-        // at this point on the happy path the DFSP will send a
-        // PATCH /consents/{ID} to the PISP. it's existence means the previous
-        // happy path calls were successful
+        const responseToPatchConsentRequests = await axios.patch(patchScenarioUri, patchConsentRequestsPayload, axiosConfig)
+        expect(responseToPatchConsentRequests.status).toEqual(202)
 
-        // polling http://127.0.0.1:5050/longpolling/requests/consents/ed94658b-31d7-5ed3-8ee1-d8dfbf0b1949
-        // does not seem to return the passed PATCH request
+        // wait a bit for the DFSP adapter to process the request
+        await new Promise(resolve => setTimeout(resolve, 50));
+
+        // check that the DFSP has sent a POST /consents to the PISP
+        const requestsHistory = await axios.get(ttkRequestsHistoryUri, axiosConfig)
+        const postConsentsToPISP = requestsHistory.data['post /consents'].data.body
+
+        // save consentId for later
+        consentId = postConsentsToPISP.consentId
+
+        expect(postConsentsToPISP.consentId).toBeDefined()
+        expect(postConsentsToPISP.consentRequestId).toBeDefined()
+        expect(postConsentsToPISP.scopes).toBeDefined()
+      })
+    })
+
+    describe('Inbound PUT /consents/{ID} signed credential from PISP', (): void => {
+      it('should send back POST /consents to Auth Service', async (): Promise<void> => {
+          // the PISP now sends back a PUT /consents/{ID} signed credential request to the DFSP
+          const putConsentsIDSignedCredentialPayload = {
+            "scopes": [
+              {
+                "accountId": "dfspa.username.1234",
+                "actions": [
+                  "accounts.transfer",
+                  "accounts.getBalance"
+                ]
+              },
+              {
+                "accountId": "dfspa.username.5678",
+                "actions": [
+                  "accounts.transfer",
+                  "accounts.getBalance"
+                ]
+              }
+            ],
+            "credential": {
+              "credentialType": "FIDO",
+              "status": "PENDING",
+              "payload": {
+                "id": "credential id: identifier of pair of keys, base64 encoded, min length 59",
+                "rawId": "raw credential id: identifier of pair of keys, base64 encoded, min length 59",
+                "response": {
+                  "clientDataJSON": "clientDataJSON-must-not-have-fewer-" +
+                    "than-121-characters Lorem ipsum dolor sit amet, " +
+                    "consectetur adipiscing elit, sed do eiusmod tempor " +
+                    "incididunt ut labore et dolore magna aliqua.",
+                  "attestationObject": "attestationObject-must-not-have-fewer" +
+                    "-than-306-characters Lorem ipsum dolor sit amet, " +
+                    "consectetur adipiscing elit, sed do eiusmod tempor " +
+                    "incididunt ut labore et dolore magna aliqua. Ut enim " +
+                    "ad minim veniam, quis nostrud exercitation ullamco " +
+                    "laboris nisi ut aliquip ex ea commodo consequat. Duis " +
+                    "aute irure dolor in reprehenderit in voluptate velit " +
+                    "esse cillum dolore eu fugiat nulla pariatur."
+                },
+                "type": "public-key"
+              }
+            }
+          }
+
+          const putScenarioUri = `${env.inbound.baseUri}/consents/${consentId}`
+          const responseToPutConsents = await axios.put(putScenarioUri, putConsentsIDSignedCredentialPayload, axiosConfig)
+          expect(responseToPutConsents.status).toEqual(202)
+
+          await new Promise(resolve => setTimeout(resolve, 50));
+
+          // check that the DFSP has sent a POST /consents to the auth-service
+          const requestsHistoryTwo = await axios.get(ttkRequestsHistoryUri, axiosConfig)
+          const postConsentsToAuthService = requestsHistoryTwo.data['post /consents'].data.body
+
+          expect(postConsentsToAuthService.consentId).toBeDefined()
+          expect(postConsentsToAuthService.credential).toBeDefined()
+          expect(postConsentsToAuthService.scopes).toBeDefined()
+      })
+    })
+
+    describe('Inbound PUT /consents/{ID} verified credential from auth-service and PUT /participants/{Type}/{ID} from ALS', (): void => {
+      it('should send back PATCH /consents/{ID} to PISP', async (): Promise<void> => {
+          // the auth-service now sends back a PUT /consents/{ID} confirming verification
+          const putConsentsIDVerifiedCredentialPayload = {
+            "scopes": [
+              {
+                "accountId": "dfspa.username.1234",
+                "actions": [
+                  "accounts.transfer",
+                  "accounts.getBalance"
+                ]
+              },
+              {
+                "accountId": "dfspa.username.5678",
+                "actions": [
+                  "accounts.transfer",
+                  "accounts.getBalance"
+                ]
+              }
+            ],
+            "credential": {
+              "credentialType": "FIDO",
+              "status": "VERIFIED",
+              "payload": {
+                "id": "credential id: identifier of pair of keys, base64 encoded, min length 59",
+                "rawId": "raw credential id: identifier of pair of keys, base64 encoded, min length 59",
+                "response": {
+                  "clientDataJSON": "clientDataJSON-must-not-have-fewer-" +
+                    "than-121-characters Lorem ipsum dolor sit amet, " +
+                    "consectetur adipiscing elit, sed do eiusmod tempor " +
+                    "incididunt ut labore et dolore magna aliqua.",
+                  "attestationObject": "attestationObject-must-not-have-fewer" +
+                    "-than-306-characters Lorem ipsum dolor sit amet, " +
+                    "consectetur adipiscing elit, sed do eiusmod tempor " +
+                    "incididunt ut labore et dolore magna aliqua. Ut enim " +
+                    "ad minim veniam, quis nostrud exercitation ullamco " +
+                    "laboris nisi ut aliquip ex ea commodo consequat. Duis " +
+                    "aute irure dolor in reprehenderit in voluptate velit " +
+                    "esse cillum dolore eu fugiat nulla pariatur."
+                },
+                "type": "public-key"
+              }
+            }
+          }
+
+          const putScenarioUri = `${env.inbound.baseUri}/consents/${consentId}`
+          const responseToPutConsents = await axios.put(putScenarioUri, putConsentsIDVerifiedCredentialPayload, axiosConfig)
+          expect(responseToPutConsents.status).toEqual(200)
+
+          // the ALS now sends back a PUT /participants/CONSENT/{ID} confirming verification
+          const putParticipantsTypeIDPayload = {
+            "fspId": "auth-service"
+          }
+
+          const putParticipantsScenarioUri = `${env.inbound.baseUri}/participants/CONSENT/${consentId}`
+          const responseToPutParticipants = await axios.put(putParticipantsScenarioUri, putParticipantsTypeIDPayload, axiosConfig)
+          expect(responseToPutParticipants.status).toEqual(200)
+
+          await new Promise(resolve => setTimeout(resolve, 50));
+
+          // check that the DFSP has sent a PATCH /consents/{ID} to the PISP
+          const requestsHistoryTwo = await axios.get(ttkRequestsHistoryUri, axiosConfig)
+          const patchConsentsToPISP = requestsHistoryTwo.data[`patch /consents/${consentId}`].data.body
+
+          expect(patchConsentsToPISP.credential).toBeDefined()
+          expect(patchConsentsToPISP.credential.status).toEqual('VERIFIED')
+      })
+    })
+  })
+
+  describe('DFSP dfspBackendRequests.validateConsentRequests returns a HTTP error', (): void => {
+    describe('POST /consentRequests should create DFSP Linking and start the workflow', (): void => {
+      it('should send a PUT /consentRequests/{ID}/error to PISP', async (): Promise<void> => {
+        /*
+        the `consentRequestId` is the variable that changes the course of
+        the flow. the rules can be found in ./docker/dfsp_rules.json
+        997c89f4-053c-4283-bfec-45a1a0a28fbc should return that the
+        consent request is not valid and pass on
+        {
+          "statusCode": 400,
+          "errorData": {
+            "res": {
+              "body": {
+                "statusCode": "400",
+                "message": "Bad Request"
+              }
+            }
+          }
+        }
+        */
+        const scenarioUri = `${env.inbound.baseUri}/consentRequests`
+        const payload = {
+          "consentRequestId": "997c89f4-053c-4283-bfec-45a1a0a28fbc",
+          "userId": "dfspa.username",
+          "scopes": [
+            {
+              "accountId": "dfspa.username.1234",
+              "actions": [
+                "accounts.transfer",
+                "accounts.getBalance"
+              ]
+            },
+            {
+              "accountId": "dfspa.username.5678",
+              "actions": [
+                "accounts.transfer",
+                "accounts.getBalance"
+              ]
+            }
+          ],
+          "authChannels": [
+            "WEB",
+            "OTP"
+          ],
+          "callbackUri": "pisp-app://callback.com"
+        }
+
+        const axiosConfig = {
+          headers: {
+            'Content-Type': 'application/json',
+            'FSPIOP-Source': 'pispA',
+            Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
+            'FSPIOP-Destination': 'dfspA'
+          }
+        }
+
+        const response = await axios.post(scenarioUri, payload, axiosConfig)
+        // Switch should return Accepted code to DFSP
+        expect(response.status).toEqual(202)
+
+        // wait a bit for the DFSP adapter to process the request
+        await new Promise(resolve => setTimeout(resolve, 50));
+
+        // check that the DFSP has sent a PUT /consentRequests/{ID}/error to the PISP
+        const requestsHistory = await axios.get(ttkRequestsHistoryUri, axiosConfig)
+        const putConsentRequestsErrorToPISP = requestsHistory.data['put /consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fbc/error'].data.body
+        expect(putConsentRequestsErrorToPISP.errorInformation).toBeDefined()
+        expect(putConsentRequestsErrorToPISP.errorInformation.errorCode).toEqual('7200')
+        expect(putConsentRequestsErrorToPISP.errorInformation.errorDescription).toEqual(
+          'Generic Thirdparty account linking error'
+        )
+      })
+    })
+  })
+
+  describe('DFSP dfspBackendRequests.validateConsentRequests returns sucessfully but does not pass DFSP validation', (): void => {
+    describe('POST /consentRequests should create DFSP Linking and start the workflow', (): void => {
+      it('should send a PUT /consentRequests/{ID}/error to PISP', async (): Promise<void> => {
+        /*
+        the `consentRequestId` is the variable that changes the course of
+        the flow. the rules can be found in ./docker/dfsp_rules.json
+        997c89f4-053c-4283-bfec-45a1a0a28fbd should return that the
+        consent request is not valid and pass on
+
+        "statusCode": 200,
+        "body": {
+          "isValid": false,
+          "errorInformation": {
+            "errorCode": "400",
+            "errorDescription": "Any description the DFSP wants"
+          }
+        }
+        */
+        const scenarioUri = `${env.inbound.baseUri}/consentRequests`
+        const payload = {
+          "consentRequestId": "997c89f4-053c-4283-bfec-45a1a0a28fbd",
+          "userId": "dfspa.username",
+          "scopes": [
+            {
+              "accountId": "dfspa.username.1234",
+              "actions": [
+                "accounts.transfer",
+                "accounts.getBalance"
+              ]
+            },
+            {
+              "accountId": "dfspa.username.5678",
+              "actions": [
+                "accounts.transfer",
+                "accounts.getBalance"
+              ]
+            }
+          ],
+          "authChannels": [
+            "WEB",
+            "OTP"
+          ],
+          "callbackUri": "pisp-app://callback.com"
+        }
+
+        const axiosConfig = {
+          headers: {
+            'Content-Type': 'application/json',
+            'FSPIOP-Source': 'pispA',
+            Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
+            'FSPIOP-Destination': 'dfspA'
+          }
+        }
+
+        const response = await axios.post(scenarioUri, payload, axiosConfig)
+
+        // Switch should return Accepted code to DFSP
+        expect(response.status).toEqual(202)
+
+        // wait a bit for the DFSP adapter to process the request
+        await new Promise(resolve => setTimeout(resolve, 50));
+
+        // check that the DFSP has sent a PUT /consentRequests/{ID}/error to the PISP
+        const requestsHistory = await axios.get(ttkRequestsHistoryUri, axiosConfig)
+        const putConsentRequestsErrorToPISP = requestsHistory.data['put /consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fbd/error'].data.body
+        expect(putConsentRequestsErrorToPISP.errorInformation).toBeDefined()
+        expect(putConsentRequestsErrorToPISP.errorInformation.errorCode).toEqual('7209')
+        expect(putConsentRequestsErrorToPISP.errorInformation.errorDescription).toEqual(
+          'FSP does not find scopes suitable'
+        )
+      })
+    })
+  })
+
+  describe('DFSP dfspBackendRequests.storeConsentRequests returns a HTTP error', (): void => {
+    describe('Inbound POST /consentRequests from PISP should create DFSP Linking and start the workflow', (): void => {
+      it('should send a PUT /consentRequests/{ID}/error to PISP', async (): Promise<void> => {
+        /*
+        the `consentRequestId` is the variable that changes the course of
+        the flow. the rules can be found in ./docker/dfsp_rules.json
+        997c89f4-053c-4283-bfec-45a1a0a28fbe should return that the
+        consent request is not valid and pass on
+        {
+          "statusCode": 500,
+          "errorData": {
+            "res": {
+              "body": {
+                "statusCode": "500",
+                "message": "Internal Server Error"
+              }
+            }
+          }
+        }
+        */
+        const scenarioUri = `${env.inbound.baseUri}/consentRequests`
+        const payload = {
+          "consentRequestId": "997c89f4-053c-4283-bfec-45a1a0a28fbe",
+          "userId": "dfspa.username",
+          "scopes": [
+            {
+              "accountId": "dfspa.username.1234",
+              "actions": [
+                "accounts.transfer",
+                "accounts.getBalance"
+              ]
+            },
+            {
+              "accountId": "dfspa.username.5678",
+              "actions": [
+                "accounts.transfer",
+                "accounts.getBalance"
+              ]
+            }
+          ],
+          "authChannels": [
+            "WEB",
+            "OTP"
+          ],
+          "callbackUri": "pisp-app://callback.com"
+        }
+
+        const axiosConfig = {
+          headers: {
+            'Content-Type': 'application/json',
+            'FSPIOP-Source': 'pispA',
+            Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
+            'FSPIOP-Destination': 'dfspA'
+          }
+        }
+
+        const response = await axios.post(scenarioUri, payload, axiosConfig)
+
+        // Switch should return Accepted code to DFSP
+        expect(response.status).toEqual(202)
+
+        // wait a bit for the DFSP adapter to process the request
+        await new Promise(resolve => setTimeout(resolve, 50));
+
+        // check that the DFSP has sent a PUT /consentRequests/{ID}/error to the PISP
+        const requestsHistory = await axios.get(ttkRequestsHistoryUri, axiosConfig)
+        const putConsentRequestsErrorToPISP = requestsHistory.data['put /consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fbe/error'].data.body
+        expect(putConsentRequestsErrorToPISP.errorInformation).toBeDefined()
+        expect(putConsentRequestsErrorToPISP.errorInformation.errorCode).toEqual('7200')
+        expect(putConsentRequestsErrorToPISP.errorInformation.errorDescription).toEqual(
+          'Generic Thirdparty account linking error'
+        )
+      })
+    })
+  })
+
+  describe('DFSP dfspBackendRequests.sendOTP returns a HTTP error', (): void => {
+    describe('Inbound POST /consentRequests from PISP should create DFSP Linking and start the workflow', (): void => {
+      it('should send a PUT /consentRequests/{ID}/error to PISP', async (): Promise<void> => {
+        /*
+        the `consentRequestId` is the variable that changes the course of
+        the flow. the rules can be found in ./docker/dfsp_rules.json
+        997c89f4-053c-4283-bfec-45a1a0a28fbf should return that the
+        consent request is not valid and pass on
+        {
+          "statusCode": 500,
+          "errorData": {
+            "res": {
+              "body": {
+                "statusCode": "500",
+                "message": "Internal Server Error"
+              }
+            }
+          }
+        }
+        */
+        const scenarioUri = `${env.inbound.baseUri}/consentRequests`
+        const payload = {
+          "consentRequestId": "997c89f4-053c-4283-bfec-45a1a0a28fbf",
+          "userId": "dfspa.username",
+          "scopes": [
+            {
+              "accountId": "dfspa.username.1234",
+              "actions": [
+                "accounts.transfer",
+                "accounts.getBalance"
+              ]
+            },
+            {
+              "accountId": "dfspa.username.5678",
+              "actions": [
+                "accounts.transfer",
+                "accounts.getBalance"
+              ]
+            }
+          ],
+          "authChannels": [
+            "WEB",
+            "OTP"
+          ],
+          "callbackUri": "pisp-app://callback.com"
+        }
+
+        const axiosConfig = {
+          headers: {
+            'Content-Type': 'application/json',
+            'FSPIOP-Source': 'pispA',
+            Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
+            'FSPIOP-Destination': 'dfspA'
+          }
+        }
+
+        const response = await axios.post(scenarioUri, payload, axiosConfig)
+
+        // Switch should return Accepted code to DFSP
+        expect(response.status).toEqual(202)
+
+        // wait a bit for the DFSP adapter to process the request
+        await new Promise(resolve => setTimeout(resolve, 50));
+
+        // check that the DFSP has sent a PUT /consentRequests/{ID}/error to the PISP
+        const requestsHistory = await axios.get(ttkRequestsHistoryUri, axiosConfig)
+        const putConsentRequestsErrorToPISP = requestsHistory.data['put /consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fbf/error'].data.body
+        expect(putConsentRequestsErrorToPISP.errorInformation).toBeDefined()
+        expect(putConsentRequestsErrorToPISP.errorInformation.errorCode).toEqual('7200')
+        expect(putConsentRequestsErrorToPISP.errorInformation.errorDescription).toEqual(
+          'Generic Thirdparty account linking error'
+        )
       })
     })
   })

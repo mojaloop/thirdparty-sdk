@@ -41,7 +41,7 @@ import {
 } from '~/models/inbound/dfspLinking.interface'
 import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
 import { BackendValidateAuthTokenResponse, DFSPLinkingPhase } from './dfspLinking.interface'
-import { v5 as uuidv5 } from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 import { reformatError } from '~/shared/api-error'
 import deferredJob from '~/shared/deferred-job'
 import { Message } from '~/shared/pub-sub'
@@ -136,33 +136,55 @@ export class DFSPLinkingModel
         `received ${response}, from DFSP backend for validating consent ${consentRequestsPostRequest}`
       )
       if (!response) {
+        // this is a planned error case
         throw Errors.MojaloopApiErrorCodes.TP_CONSENT_REQ_VALIDATION_ERROR
       }
 
       if (!response.isValid) {
+        // this is a planned error case
+        // assuming the DFSP sends back a proper code the error
+        // will convey why it failed the consent request to PISP
         throw Errors.MojaloopApiErrorCodeFromCode(`${response.errorInformation?.errorCode}`)
       }
 
       this.data.backendValidateConsentRequestsResponse = response
 
-      type consentRequestResponseType = tpAPI.Schemas.ConsentRequestsIDPutResponseOTP &
-        tpAPI.Schemas.ConsentRequestsIDPutResponseWeb
 
-      const consentRequestsIDPutRequest = {
-        consentRequestId: consentRequestsPostRequest.consentRequestId,
-        scopes: consentRequestsPostRequest.scopes,
-        callbackUri: consentRequestsPostRequest.callbackUri,
-        authChannels: response.data.authChannels,
-        authUri: response.data.authUri,
-      } as consentRequestResponseType
+      let consentRequestsIDPutRequest
+      if (response.data.authChannels[0] == "WEB") {
+        consentRequestsIDPutRequest = {
+          consentRequestId: consentRequestsPostRequest.consentRequestId,
+          scopes: consentRequestsPostRequest.scopes,
+          callbackUri: consentRequestsPostRequest.callbackUri,
+          authChannels: response.data.authChannels,
+          authUri: response.data.authUri,
+        } as tpAPI.Schemas.ConsentRequestsIDPutResponseWeb
+      } else {
+        consentRequestsIDPutRequest = {
+          consentRequestId: consentRequestsPostRequest.consentRequestId,
+          scopes: consentRequestsPostRequest.scopes,
+          callbackUri: consentRequestsPostRequest.callbackUri,
+          authChannels: response.data.authChannels
+        } as tpAPI.Schemas.ConsentRequestsIDPutResponseOTP
+      }
+
 
       // save this for a later stage, not ready to send the response yet.
       this.data.consentRequestsIDPutRequest = consentRequestsIDPutRequest
     } catch (error) {
-      const mojaloopError = reformatError(error, this.logger)
-
       this.logger.push({ error }).error('start -> requestIsValid')
-      this.logger.push({ mojaloopError }).info(`Sending error response to ${toParticipantId}`)
+
+      let mojaloopError
+      // if error is planned and is a MojaloopApiErrorCode we send back that code
+      if ((error as Errors.MojaloopApiErrorCode).code) {
+        mojaloopError = reformatError(error, this.logger)
+      } else {
+        // if error is not planned send back a generalized error
+        mojaloopError = reformatError(
+          Errors.MojaloopApiErrorCodes.TP_ACCOUNT_LINKING_ERROR,
+          this.logger
+        )
+      }
 
       await this.thirdpartyRequests.putConsentRequestsError(
         consentRequestsPostRequest.consentRequestId,
@@ -198,8 +220,13 @@ export class DFSPLinkingModel
       }
 
     } catch (error) {
-      const mojaloopError = reformatError(error, this.logger)
       this.logger.push({ error }).error('requestIsValid -> consentRequestValidatedAndStored')
+
+      // we send back an account linking error despite the actual error
+      const mojaloopError = reformatError(
+        Errors.MojaloopApiErrorCodes.TP_ACCOUNT_LINKING_ERROR,
+        this.logger
+      )
 
       await this.thirdpartyRequests.putConsentRequestsError(
         consentRequestsPostRequest.consentRequestId,
@@ -317,11 +344,7 @@ export class DFSPLinkingModel
 
   async onGrantConsent (): Promise<void> {
     const { consentRequestId, toParticipantId, scopes } = this.data
-    // create a deterministic uuid for consentId
-    const consentId = uuidv5(
-      'consentId',
-      consentRequestId
-    )
+    const consentId = uuidv4()
 
     // save consentId for later
     this.data.consentId = consentId

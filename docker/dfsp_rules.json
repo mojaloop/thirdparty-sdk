@@ -116,7 +116,7 @@
   },
   {
     "ruleId": 5,
-    "description": "DFSP responds to validate consent request successfully and replies is valid and wants WEB channel authentication",
+    "description": "DFSP responds to /validateConsentRequests successfully and replies is valid and wants WEB channel authentication",
     "conditions": {
       "all": [
         {
@@ -153,7 +153,7 @@
   },
   {
     "ruleId": 6,
-    "description": "DFSP responds to validate consent request successfully and replies is valid and wants OTP channel authentication",
+    "description": "DFSP responds to /validateConsentRequests successfully and replies is valid and wants OTP channel authentication",
     "conditions": {
       "all": [
         {
@@ -181,8 +181,7 @@
         "body": {
           "isValid": true,
           "data": {
-            "authChannels": ["OTP"],
-            "authUri": ""
+            "authChannels": ["OTP"]
           }
         }
       }
@@ -190,7 +189,7 @@
   },
   {
     "ruleId": 7,
-    "description": "DFSP responds to validate consent request successfully and replies consent request not valid",
+    "description": "DFSP responds to /validateConsentRequests with a HTTP error failure",
     "conditions": {
       "all": [
         {
@@ -214,9 +213,157 @@
     "event": {
       "type": "FIXED_CALLBACK",
       "params": {
+        "statusCode": 400,
+        "errorData": {
+          "res": {
+            "body": {
+              "statusCode": "400",
+              "message": "Bad Request"
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "ruleId": 8,
+    "description": "DFSP responds to /validateConsentRequests successfully but does not pass DFSP validation",
+    "conditions": {
+      "all": [
+        {
+          "fact": "body",
+          "operator": "equal",
+          "value": "997c89f4-053c-4283-bfec-45a1a0a28fbd",
+          "path": "consentRequestId"
+        },
+        {
+          "fact": "path",
+          "operator": "equal",
+          "value": "/validateConsentRequests"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "POST"
+        }
+      ]
+    },
+    "event": {
+      "type": "FIXED_CALLBACK",
+      "params": {
         "statusCode": 200,
         "body": {
-          "isValid": false
+          "isValid": false,
+          "errorInformation": {
+            "errorCode": "7209",
+            "errorDescription": "FSP does not find scopes suitable"
+          }
+        }
+      }
+    }
+  },
+  {
+    "ruleId": 9,
+    "description": "DFSP responds to /storeConsentRequests with a HTTP error failure",
+    "conditions": {
+      "all": [
+        {
+          "fact": "path",
+          "operator": "equal",
+          "value": "/store/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fbe"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "POST"
+        }
+      ]
+    },
+    "event": {
+      "type": "FIXED_CALLBACK",
+      "params": {
+        "statusCode": 500,
+        "errorData": {
+          "res": {
+            "body": {
+              "statusCode": "500",
+              "message": "Internal Server Error"
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "ruleId": 10,
+    "description": "DFSP responds to /validateConsentRequests successfully with OTP channel (/sendOTP error case)",
+    "conditions": {
+      "all": [
+        {
+          "fact": "body",
+          "operator": "equal",
+          "value": "997c89f4-053c-4283-bfec-45a1a0a28fbf",
+          "path": "consentRequestId"
+        },
+        {
+          "fact": "path",
+          "operator": "equal",
+          "value": "/validateConsentRequests"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "POST"
+        }
+      ]
+    },
+    "event": {
+      "type": "FIXED_CALLBACK",
+      "params": {
+        "statusCode": 200,
+        "body": {
+          "isValid": true,
+          "data": {
+            "authChannels": ["OTP"]
+          }
+        }
+      }
+    }
+  },
+  {
+    "ruleId": 11,
+    "description": "DFSP responds to /sendOTP request with a HTTP error failure",
+    "conditions": {
+      "all": [
+        {
+          "fact": "body",
+          "operator": "equal",
+          "value": "997c89f4-053c-4283-bfec-45a1a0a28fbf",
+          "path": "consentRequestId"
+        },
+        {
+          "fact": "path",
+          "operator": "equal",
+          "value": "/sendOTP"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "POST"
+        }
+      ]
+    },
+    "event": {
+      "type": "FIXED_CALLBACK",
+      "params": {
+        "statusCode": 500,
+        "errorData": {
+          "res": {
+            "body": {
+              "statusCode": "500",
+              "message": "Internal Server Error"
+            }
+          }
         }
       }
     }

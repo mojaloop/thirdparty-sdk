@@ -320,8 +320,8 @@ describe('dfspLinkingModel', () => {
         mockData.consentRequestsPutError.params.ID,
         {
           errorInformation: {
-            errorCode: '2001',
-            errorDescription: 'Internal server error'
+            errorCode: '7200',
+            errorDescription: 'Generic Thirdparty account linking error'
           }
         },
         'pispa'
@@ -354,8 +354,8 @@ describe('dfspLinkingModel', () => {
         mockData.consentRequestsPutError.params.ID,
         {
           errorInformation: {
-            errorCode: '2003',
-            errorDescription: 'Service currently unavailable'
+            errorCode: '7200',
+            errorDescription: 'Generic Thirdparty account linking error'
           }
         },
         'pispa'
@@ -388,8 +388,8 @@ describe('dfspLinkingModel', () => {
         mockData.consentRequestsPutError.params.ID,
         {
           errorInformation: {
-            errorCode: '2002',
-            errorDescription: 'Not implemented'
+            errorCode: '7200',
+            errorDescription: 'Generic Thirdparty account linking error'
           }
         },
         'pispa'
@@ -417,8 +417,8 @@ describe('dfspLinkingModel', () => {
         mockData.consentRequestsPutError.params.ID,
         {
           errorInformation: {
-            errorCode: '2001',
-            errorDescription: 'Internal server error'
+            errorCode: '7200',
+            errorDescription: 'Generic Thirdparty account linking error'
           }
         },
         'pispa'

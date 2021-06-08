@@ -30,7 +30,3 @@ export function resetUuid (): void {
 export function v4 (): string {
   return `00000000-0000-1000-8000-${(++id).toString().padStart(12, '0')}`
 }
-
-export function v5 (): string {
-  return `00000000-0000-1000-8000-${(++id).toString().padStart(12, '0')}`
-}

@@ -36,7 +36,7 @@ export function reformatError (
       mojaloopErrorCode = (err as MojaloopApiErrorCode)
     }
   }
-
+  logger.info(mojaloopErrorCode)
   return new Errors.MojaloopFSPIOPError(
     err,
     mojaloopErrorCode.message || err.message,

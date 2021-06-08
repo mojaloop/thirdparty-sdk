@@ -125,7 +125,7 @@ export interface DFSPLinkingData extends StateData {
 
   // authenticate phase
   consentRequestsIDPutRequest?:
-    tpAPI.Schemas.ConsentRequestsIDPutResponseOTP &
+    tpAPI.Schemas.ConsentRequestsIDPutResponseOTP |
     tpAPI.Schemas.ConsentRequestsIDPutResponseWeb
   consentRequestsIDPatchResponse?: tpAPI.Schemas.ConsentRequestsIDPatchRequest
 
