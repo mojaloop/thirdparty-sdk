@@ -1119,11 +1119,11 @@ describe('DFSP Inbound', (): void => {
 
         // check that the DFSP has sent a PUT /consents/{ID}/error to the PISP
         const requestsHistory: MLTestingToolkitRequest[] = (await axios.get(ttkRequestsHistoryUri, axiosConfig)).data
-        const postConsentsToAuthService = requestsHistory.filter(req => {
+        const putConsentsErrorToPISP = requestsHistory.filter(req => {
           return req.method === 'put' && req.path === `/consents/${consentId}/error`
         })
-        expect(postConsentsToAuthService.length).toEqual(1)
-        const historyPayload = postConsentsToAuthService[0].body as tpAPI.Schemas.ErrorInformation
+        expect(putConsentsErrorToPISP.length).toEqual(1)
+        const historyPayload = putConsentsErrorToPISP[0].body as tpAPI.Schemas.ErrorInformation
 
         expect(historyPayload).toEqual(
           {
@@ -1137,7 +1137,7 @@ describe('DFSP Inbound', (): void => {
     })
   })
 
-  describe('DFSP recieves error from ALS after sending it PISP PENDING credential', (): void => {
+  describe('DFSP recieves error from ALS after sending the auth-service PISP PENDING credential', (): void => {
     let consentId: string
 
     const axiosConfig = {
@@ -1352,11 +1352,11 @@ describe('DFSP Inbound', (): void => {
 
         // check that the DFSP has sent a PUT /consents/{ID}/error to the PISP
         const requestsHistory: MLTestingToolkitRequest[] = (await axios.get(ttkRequestsHistoryUri, axiosConfig)).data
-        const postConsentsToAuthService = requestsHistory.filter(req => {
+        const putConsentsErrorToPISP = requestsHistory.filter(req => {
           return req.method === 'put' && req.path === `/consents/${consentId}/error`
         })
-        expect(postConsentsToAuthService.length).toEqual(1)
-        const historyPayload = postConsentsToAuthService[0].body as tpAPI.Schemas.ErrorInformation
+        expect(putConsentsErrorToPISP.length).toEqual(1)
+        const historyPayload = putConsentsErrorToPISP[0].body as tpAPI.Schemas.ErrorInformation
 
         expect(historyPayload).toEqual(
           {
