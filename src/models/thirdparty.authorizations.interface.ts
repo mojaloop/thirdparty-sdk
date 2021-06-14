@@ -58,7 +58,7 @@ export interface OutboundThirdpartyAuthorizationStateMachine extends ControlledS
 }
 
 export interface OutboundThirdpartyAuthorizationsModelConfig extends PersistentModelConfig {
-  pubSub: PubSub
+  subscriber: PubSub
   requests: ThirdpartyRequests
 }
 

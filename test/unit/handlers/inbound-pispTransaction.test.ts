@@ -15,7 +15,7 @@ describe('Inbound PISP transaction handlers', (): void => {
   }
   const toolkit = {
     getLogger: jest.fn(() => logger),
-    getPubSub: jest.fn(() => pubSubMock),
+    getPublisher: jest.fn(() => pubSubMock),
     getBackendRequests: jest.fn(),
     getMojaloopRequests: jest.fn(),
     response: jest.fn(() => ({

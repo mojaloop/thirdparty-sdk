@@ -45,7 +45,8 @@ import { Scheme } from '~/shared/http-scheme'
 
 export interface StateResponseToolkit extends ResponseToolkit {
   getKVS: () => KVS
-  getPubSub: () => PubSub
+  getPublisher: () => PubSub
+  getSubscriber: () => PubSub
   getLogger: () => SDKLogger.Logger
   getMojaloopRequests: () => MojaloopRequests
   getThirdpartyRequests: () => ThirdpartyRequests
@@ -72,8 +73,14 @@ export const StatePlugin = {
     }
 
     // prepare redis connection instances
+    // once the client enters the subscribed state it is not supposed to issue
+    // any other commands, except for additional SUBSCRIBE, PSUBSCRIBE,
+    // UNSUBSCRIBE, PUNSUBSCRIBE, PING and QUIT commands.
+    // So we create two connections, one for subscribing another for
+    // and publishing
     const kvs = new KVS(connection)
-    const pubSub = new PubSub(connection)
+    const publisher = new PubSub(connection)
+    const subscriber = new PubSub(connection)
 
     // interface to help casting
     interface TLSCreds {
@@ -157,12 +164,14 @@ export const StatePlugin = {
 
     try {
       // connect them all to Redis instance
-      await Promise.all([kvs.connect(), pubSub.connect()])
-      logger.info(`StatePlugin: connecting KVS(${kvs.areAllClientsConnected}) & PubSub(${pubSub.areAllClientsConnected}):`)
+      await Promise.all([kvs.connect(), subscriber.connect(), publisher.connect()])
+      logger.info(`StatePlugin: connecting KVS(${kvs.isConnected}) &
+        Publisher(${publisher.isConnected}) & Subscriber(${subscriber.isConnected}):`)
 
       // prepare toolkit accessors
       server.decorate('toolkit', 'getKVS', (): KVS => kvs)
-      server.decorate('toolkit', 'getPubSub', (): PubSub => pubSub)
+      server.decorate('toolkit', 'getPublisher', (): PubSub => publisher)
+      server.decorate('toolkit', 'getSubscriber', (): PubSub => subscriber)
       server.decorate('toolkit', 'getLogger', (): SDKLogger.Logger => logger)
       server.decorate('toolkit', 'getMojaloopRequests', (): MojaloopRequests => mojaloopRequests)
       server.decorate('toolkit', 'getThirdpartyRequests', (): ThirdpartyRequests => thirdpartyRequest)
@@ -174,7 +183,7 @@ export const StatePlugin = {
       server.decorate('toolkit', 'getAuthServiceParticipantId', (): string => config.SHARED.AUTH_SERVICE_PARTICIPANT_ID)
       // disconnect from redis when server is stopped
       server.events.on('stop', async () => {
-        await Promise.allSettled([kvs.disconnect(), pubSub.disconnect()])
+        await Promise.allSettled([kvs.disconnect(), publisher.disconnect(), subscriber.disconnect()])
         logger.info('StatePlugin: Server stopped -> disconnecting KVS & PubSub')
       })
     } catch (err) {

@@ -48,7 +48,7 @@ describe('RedisConnection', () => {
   })
 
   it('should be connected', async (): Promise<void> => {
-    expect(rc.areAllClientsConnected).toBeTruthy()
+    expect(rc.isConnected).toBeTruthy()
     const result = await rc.ping()
     expect(result).toEqual(true)
   })
@@ -60,6 +60,6 @@ describe('RedisConnection', () => {
     expect(invalidRC.connect()).rejects.toThrowError(
       new Error('Redis connection to localhost:8080 failed - connect ECONNREFUSED 127.0.0.1:8080')
     )
-    expect(invalidRC.areAllClientsConnected).toBeFalsy()
+    expect(invalidRC.isConnected).toBeFalsy()
   })
 })

@@ -62,7 +62,7 @@ async function post (_context: any, request: Request, h: StateResponseToolkit): 
   // prepare model config
   const modelConfig: OutboundAuthorizationsModelConfig = {
     kvs: h.getKVS(),
-    pubSub: h.getPubSub(),
+    subscriber: h.getSubscriber(),
     key: OutboundAuthorizationsModel.notificationChannel(data.request.transactionRequestId),
     logger: h.getLogger(),
     requests: h.getThirdpartyRequests()

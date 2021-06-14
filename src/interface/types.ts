@@ -122,7 +122,8 @@ export interface HealthResponse {
   startTime: string
   versionNumber: string
   KVSConnected: boolean
-  PubSubConnected: boolean
+  PublisherConnected: boolean
+  SubscriberConnected: boolean
   LoggerPresent: boolean
   MojaloopRequestsPresent: boolean
   ThirdpartyRequestsPresent: boolean

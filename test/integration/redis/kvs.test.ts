@@ -49,7 +49,7 @@ describe('KVS', () => {
   })
 
   it('should be connected', async (): Promise<void> => {
-    expect(kvs.areAllClientsConnected).toBeTruthy()
+    expect(kvs.isConnected).toBeTruthy()
     const result = await kvs.ping()
     expect(result).toEqual(true)
   })

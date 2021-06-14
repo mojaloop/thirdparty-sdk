@@ -173,9 +173,7 @@ jest.mock('~/shared/pub-sub', () => {
   let subId = 0
   return {
     PubSub: jest.fn(() => ({
-      isClientConnected: true,
-      isSubscriptionClientConnected: true,
-      areAllClientsConnected: true,
+      isConnected: true,
       subscribe: jest.fn(
         (channel: string, cb: NotificationCallback) => {
           handlers[channel] = cb
@@ -235,7 +233,8 @@ describe('Outbound API routes', (): void => {
     expect(result.status).toEqual('OK')
     expect(result.uptime).toBeGreaterThan(1.0)
     expect(result.KVSConnected).toBeTruthy()
-    expect(result.PubSubConnected).toBeTruthy()
+    expect(result.PublisherConnected).toBeTruthy()
+    expect(result.SubscriberConnected).toBeTruthy()
     expect(result.LoggerPresent).toBeTruthy()
     expect(result.MojaloopRequestsPresent).toBeTruthy()
     expect(result.ThirdpartyRequestsPresent).toBeTruthy()

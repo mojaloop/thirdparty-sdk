@@ -55,7 +55,7 @@ jest.mock('~/models/outbound/pispLinking.model', () => ({
 describe('Outbound Consent request handler', () => {
   const toolkit = {
     getKVS: jest.fn(),
-    getPubSub: jest.fn(),
+    getSubscriber: jest.fn(),
     getLogger: jest.fn(() => mockLogger()),
     getThirdpartyRequests: jest.fn(() => ({
       postConsentRequests: jest.fn()

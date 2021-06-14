@@ -47,7 +47,7 @@ async function put (_context: unknown, request: Request, h: StateResponseToolkit
   DFSPLinkingModel.triggerWorkflow(
     DFSPLinkingPhase.waitOnThirdpartyLinkRegistrationResponse,
     id,
-    h.getPubSub(),
+    h.getPublisher(),
     payload as unknown as Message
   )
 

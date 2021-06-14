@@ -77,15 +77,15 @@ class TestA2SModelConfig implements A2SModelConfig<TestArgs, TestResponse> {
   public readonly key: string
   public readonly kvs: KVS
   public readonly logger: SDKLogger.Logger
-  public readonly pubSub: PubSub
+  public readonly subscriber: PubSub
   public readonly modelName = 'TestA2SModel'
   public readonly requestProcessingTimeoutSeconds = 10000
 
-  constructor (key: string, kvs: KVS, logger: SDKLogger.Logger, pubSub: PubSub) {
+  constructor (key: string, kvs: KVS, logger: SDKLogger.Logger, subscriber: PubSub) {
     this.key = key
     this.kvs = kvs
     this.logger = logger
-    this.pubSub = pubSub
+    this.subscriber = subscriber
   }
 
   // generate a channel name
@@ -142,7 +142,7 @@ describe('A2SModel', () => {
       expect(m).toBeDefined()
 
       // check getters
-      expect(m.pubSub).toEqual(config.pubSub)
+      expect(m.subscriber).toEqual(config.subscriber)
       expect(m.key).toEqual(config.key)
       expect(m.kvs).toEqual(config.kvs)
       expect(m.modelName).toEqual(config.modelName)

@@ -64,6 +64,8 @@ describe('PISPLinkingModel', () => {
     logger: mockLogger()
   }
   let modelConfig: PISPLinkingModelConfig
+  let publisher: PubSub
+
   const expectedResp = {
     channelResponse: { ...mockData.consentRequestsPut.payload },
     currentState: 'WebAuthenticationChannelResponseRecieved'
@@ -75,11 +77,14 @@ describe('PISPLinkingModel', () => {
   }
 
   beforeEach(async () => {
+    publisher = new PubSub(connectionConfig)
+    await publisher.connect()
+
     modelConfig = {
       kvs: new KVS(connectionConfig),
       key: 'cache-key',
       logger: connectionConfig.logger,
-      pubSub: new PubSub(connectionConfig),
+      subscriber: new PubSub(connectionConfig),
       requestProcessingTimeoutSeconds: 3,
       thirdpartyRequests: {
         postConsentRequests: jest.fn(() => Promise.resolve({ statusCode: 202 })),
@@ -88,12 +93,13 @@ describe('PISPLinkingModel', () => {
       } as unknown as ThirdpartyRequests
     }
     await modelConfig.kvs.connect()
-    await modelConfig.pubSub.connect()
+    await modelConfig.subscriber.connect()
   })
 
   afterEach(async () => {
+    await publisher.disconnect()
     await modelConfig.kvs.disconnect()
-    await modelConfig.pubSub.disconnect()
+    await modelConfig.subscriber.disconnect()
   })
 
   function checkPISPLinkingModelLayout (am: PISPLinkingModel, optData?: PISPLinkingData) {
@@ -102,7 +108,7 @@ describe('PISPLinkingModel', () => {
     expect(am.fsm.state).toEqual(optData?.currentState || 'start')
 
     // check new getters
-    expect(am.pubSub).toEqual(modelConfig.pubSub)
+    expect(am.subscriber).toEqual(modelConfig.subscriber)
     expect(am.thirdpartyRequests).toEqual(modelConfig.thirdpartyRequests)
 
     // check is fsm correctly constructed
@@ -169,14 +175,14 @@ describe('PISPLinkingModel', () => {
     let putResponse: PutResponseOrError
 
     beforeEach(() => {
-      mocked(modelConfig.pubSub.subscribe).mockImplementationOnce(
+      mocked(modelConfig.subscriber.subscribe).mockImplementationOnce(
         (_channel: string, cb: NotificationCallback) => {
           handler = cb
           return ++subId
         }
       )
 
-      mocked(modelConfig.pubSub.publish).mockImplementationOnce(
+      mocked(publisher.publish).mockImplementationOnce(
         async (channel: string, message: Message) => handler(channel, message, subId)
       )
 
@@ -207,7 +213,7 @@ describe('PISPLinkingModel', () => {
 
     it('should give response properly populated from notification channel - success', async () => {
       const model = await create(data, modelConfig)
-      setImmediate(() => model.pubSub.publish(
+      setImmediate(() => publisher.publish(
         requestConsentChannel,
         putResponse as unknown as Message
       ))
@@ -219,9 +225,9 @@ describe('PISPLinkingModel', () => {
         model.linkingRequestConsentPostRequestToConsentRequestsPostRequest(),
         model.data.toParticipantId
       )
-      expect(mocked(modelConfig.pubSub.subscribe)).toBeCalledTimes(1)
-      expect(mocked(modelConfig.pubSub.unsubscribe)).toBeCalledWith(requestConsentChannel, subId)
-      expect(mocked(modelConfig.pubSub.publish)).toBeCalledWith(requestConsentChannel, putResponse)
+      expect(mocked(modelConfig.subscriber.subscribe)).toBeCalledTimes(1)
+      expect(mocked(modelConfig.subscriber.unsubscribe)).toBeCalledWith(requestConsentChannel, subId)
+      expect(mocked(publisher.publish)).toBeCalledWith(requestConsentChannel, putResponse)
     })
     it('should give response properly populated from notification channel - error response', async () => {
       data = {
@@ -232,7 +238,7 @@ describe('PISPLinkingModel', () => {
       }
       putResponse = mockData.consentRequestsPutError.payload
       const model = await create(data, modelConfig)
-      setImmediate(() => model.pubSub.publish(
+      setImmediate(() => publisher.publish(
         requestConsentChannel,
         putResponse as unknown as Message
       ))
@@ -244,9 +250,9 @@ describe('PISPLinkingModel', () => {
         model.linkingRequestConsentPostRequestToConsentRequestsPostRequest(),
         model.data.toParticipantId
       )
-      expect(mocked(modelConfig.pubSub.subscribe)).toBeCalledTimes(1)
-      expect(mocked(modelConfig.pubSub.unsubscribe)).toBeCalledWith(requestConsentChannel, subId)
-      expect(mocked(modelConfig.pubSub.publish)).toBeCalledWith(requestConsentChannel, putResponse)
+      expect(mocked(modelConfig.subscriber.subscribe)).toBeCalledTimes(1)
+      expect(mocked(modelConfig.subscriber.unsubscribe)).toBeCalledWith(requestConsentChannel, subId)
+      expect(mocked(publisher.publish)).toBeCalledWith(requestConsentChannel, putResponse)
     })
 
     it('should properly handle error from requests.postConsentRequests', async () => {
@@ -260,8 +266,8 @@ describe('PISPLinkingModel', () => {
         shouldNotBeExecuted()
       } catch (err) {
         expect(err).toEqual(new Error('error from requests.postConsentRequests'))
-        expect(mocked(modelConfig.pubSub.subscribe)).toBeCalledTimes(1)
-        expect(mocked(modelConfig.pubSub.unsubscribe)).toBeCalledWith(requestConsentChannel, subId)
+        expect(mocked(modelConfig.subscriber.subscribe)).toBeCalledTimes(1)
+        expect(mocked(modelConfig.subscriber.unsubscribe)).toBeCalledWith(requestConsentChannel, subId)
       }
     })
 
@@ -269,7 +275,7 @@ describe('PISPLinkingModel', () => {
       it('start', async () => {
         const model = await create(data, modelConfig)
 
-        setImmediate(() => model.pubSub.publish(
+        setImmediate(() => publisher.publish(
           requestConsentChannel,
           putResponse as unknown as Message
         ))
@@ -281,9 +287,9 @@ describe('PISPLinkingModel', () => {
           model.linkingRequestConsentPostRequestToConsentRequestsPostRequest(),
           model.data.toParticipantId
         )
-        expect(mocked(modelConfig.pubSub.subscribe)).toBeCalledTimes(1)
-        expect(mocked(modelConfig.pubSub.unsubscribe)).toBeCalledWith(requestConsentChannel, subId)
-        expect(mocked(modelConfig.pubSub.publish)).toBeCalledWith(requestConsentChannel, putResponse)
+        expect(mocked(modelConfig.subscriber.subscribe)).toBeCalledTimes(1)
+        expect(mocked(modelConfig.subscriber.unsubscribe)).toBeCalledWith(requestConsentChannel, subId)
+        expect(mocked(publisher.publish)).toBeCalledWith(requestConsentChannel, putResponse)
         mocked(modelConfig.logger.info).mockReset()
         expect(model.data.currentState).toEqual('WebAuthenticationChannelResponseRecieved')
       })
@@ -356,7 +362,7 @@ describe('PISPLinkingModel', () => {
       it('authenticate() should transition start to consentReceivedAwaitingCredential state when successful', async () => {
         const model = await create(validateData, modelConfig)
         // defer publication to notification channel
-        setImmediate(() => model.pubSub.publish(
+        setImmediate(() => publisher.publish(
           requestConsentAuthenticateChannel,
           consentPostResponse as unknown as Message
         ))
@@ -391,7 +397,7 @@ describe('PISPLinkingModel', () => {
       })
 
       it('should handle a PUT /consentsRequest/{ID}/error response', async () => {
-        setImmediate(() => model.pubSub.publish(
+        setImmediate(() => publisher.publish(
           requestConsentAuthenticateChannel,
           genericErrorResponse as unknown as Message
         ))
@@ -460,7 +466,7 @@ describe('PISPLinkingModel', () => {
         const model = await create(registerCredentialData, modelConfig)
 
         // defer publication to notification channel
-        setImmediate(() => model.pubSub.publish(
+        setImmediate(() => publisher.publish(
           registerCredentialChannel,
           consentPatchResponse as unknown as Message
         ))
@@ -515,7 +521,7 @@ describe('PISPLinkingModel', () => {
       })
 
       it('should handle a PUT /consents/{ID}/error response', async () => {
-        setImmediate(() => model.pubSub.publish(
+        setImmediate(() => publisher.publish(
           registerCredentialChannel,
           genericErrorResponse as unknown as Message
         ))

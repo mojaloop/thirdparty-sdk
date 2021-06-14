@@ -46,7 +46,7 @@ import { Enum } from '@mojaloop/central-services-shared';
     DFSPLinkingModel.triggerWorkflow(
       DFSPLinkingPhase.waitOnALSParticipantResponse,
       consentId,
-      h.getPubSub(),
+      h.getPublisher(),
       payload as unknown as Message
     )
   }

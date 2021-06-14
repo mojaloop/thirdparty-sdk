@@ -55,8 +55,7 @@ async function post (_context: unknown, request: Request, h: StateResponseToolki
   // prepare model config
   const modelConfig: PISPTransactionModelConfig = {
     kvs: h.getKVS(),
-    pubSub: h.getPubSub(),
-    // TODO refactor api-snippets to have this field mandatory!
+    subscriber: h.getSubscriber(),
     key: payload.transactionRequestId,
     logger: h.getLogger(),
     thirdpartyRequests: h.getThirdpartyRequests(),

@@ -56,7 +56,7 @@ export interface PISPDiscoveryStateMachine extends ControlledStateMachine {
 }
 
 export interface PISPDiscoveryModelConfig extends PersistentModelConfig {
-  pubSub: PubSub
+  subscriber: PubSub
   thirdpartyRequests: ThirdpartyRequests
 }
 

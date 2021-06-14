@@ -69,15 +69,19 @@ describe('dfspLinkingModel', () => {
     logger: mockLogger()
   }
   let modelConfig: DFSPLinkingModelConfig
+  let publisher: PubSub
 
   beforeEach(async () => {
     let subId = 0
     const handlers: {[key: string]: NotificationCallback } = {}
 
+    publisher = new PubSub(connectionConfig)
+    await publisher.connect()
+
     modelConfig = {
       key: 'cache-key',
       kvs: new KVS(connectionConfig),
-      pubSub: new PubSub(connectionConfig),
+      subscriber: new PubSub(connectionConfig),
       logger: connectionConfig.logger,
       thirdpartyRequests: {
         putConsentRequests: jest.fn(() => Promise.resolve({ statusCode: 202 })),
@@ -99,24 +103,25 @@ describe('dfspLinkingModel', () => {
       } as unknown as MojaloopRequests,
       requestProcessingTimeoutSeconds: 3
     }
-    mocked(modelConfig.pubSub.subscribe).mockImplementation(
+    mocked(modelConfig.subscriber.subscribe).mockImplementation(
       (channel: string, cb: NotificationCallback) => {
         handlers[channel] = cb
         return ++subId
       }
     )
 
-    mocked(modelConfig.pubSub.publish).mockImplementation(
+    mocked(publisher.publish).mockImplementation(
       async (channel: string, message: Message) => handlers[channel](channel, message, subId)
     )
     await modelConfig.kvs.connect()
-    await modelConfig.pubSub.connect()
+    await modelConfig.subscriber.connect()
   })
 
   afterEach(async () => {
     resetUuid()
+    await publisher.disconnect()
     await modelConfig.kvs.disconnect()
-    await modelConfig.pubSub.disconnect()
+    await modelConfig.subscriber.disconnect()
   })
 
   function checkDFSPLinkingModelLayout (
@@ -127,7 +132,7 @@ describe('dfspLinkingModel', () => {
     expect(dfspLinkingModel.fsm.state).toEqual(consentRequestsData?.currentState || 'start')
 
     // check new getters
-    expect(dfspLinkingModel.pubSub).toEqual(modelConfig.pubSub)
+    expect(dfspLinkingModel.subscriber).toEqual(modelConfig.subscriber)
     expect(dfspLinkingModel.dfspBackendRequests).toEqual(modelConfig.dfspBackendRequests)
     expect(dfspLinkingModel.thirdpartyRequests).toEqual(modelConfig.thirdpartyRequests)
 
@@ -561,7 +566,7 @@ describe('dfspLinkingModel', () => {
       const model = await create(validateData, modelConfig)
 
       setImmediate(() => {
-        model.pubSub.publish(
+        publisher.publish(
           waitOnAuthTokenFromPISPResponseChannel,
           mockData.consentRequestsIDPatchRequest.payload as unknown as Message
         )
@@ -790,7 +795,7 @@ describe('dfspLinkingModel', () => {
       const model = await create(validateData, modelConfig)
 
       setImmediate(() => {
-        model.pubSub.publish(
+        publisher.publish(
           waitOnSignedCredentialFromPISPResponseChannel,
           mockData.inboundPutConsentsIdRequestSignedCredential.payload as unknown as Message
         )
@@ -959,11 +964,11 @@ describe('dfspLinkingModel', () => {
 
       // defer publication to notification channel
       setImmediate(() => {
-        model.pubSub.publish(
+        publisher.publish(
           waitOnAuthServiceResponse,
           consentsIDPutResponseVerified as unknown as Message
         )
-        model.pubSub.publish(
+        publisher.publish(
           waitOnALSParticipantResponse,
           participantsTypeIDPutResponse as unknown as Message
         )
@@ -1035,7 +1040,7 @@ describe('dfspLinkingModel', () => {
 
       // defer publication to notification channel
       setImmediate(() => {
-        model.pubSub.publish(
+        publisher.publish(
           waitOnAuthServiceResponse,
           {
             errorInformation: {
@@ -1044,7 +1049,7 @@ describe('dfspLinkingModel', () => {
             }
           } as unknown as Message
         )
-        model.pubSub.publish(
+        publisher.publish(
           waitOnALSParticipantResponse,
           participantsTypeIDPutResponse as unknown as Message
         )
@@ -1083,11 +1088,11 @@ describe('dfspLinkingModel', () => {
 
       // defer publication to notification channel
       setImmediate(() => {
-        model.pubSub.publish(
+        publisher.publish(
           waitOnAuthServiceResponse,
           consentsIDPutResponseVerified as unknown as Message
         )
-        model.pubSub.publish(
+        publisher.publish(
           waitOnALSParticipantResponse,
           {
             errorInformation: {
@@ -1387,22 +1392,22 @@ describe('dfspLinkingModel', () => {
       // todo: this feels very fickle...research a good solution for
       //       publishing responses one after the other
       setImmediate(() => {
-        model.pubSub.publish(
+        publisher.publish(
           waitOnAuthTokenFromPISPResponseChannel,
           mockData.consentRequestsIDPatchRequest.payload as unknown as Message
         )
         setTimeout(() => {
-          model.pubSub.publish(
+          publisher.publish(
             waitOnSignedCredentialFromPISPResponseChannel,
             mockData.inboundPutConsentsIdRequestSignedCredential.payload as unknown as Message
           )
         }, 200)
         setTimeout(() => {
-          model.pubSub.publish(
+          publisher.publish(
             waitOnAuthServiceResponse,
             consentsIDPutResponseVerified as unknown as Message
           )
-          model.pubSub.publish(
+          publisher.publish(
             waitOnALSParticipantResponse,
             participantsTypeIDPutResponse as unknown as Message
           )

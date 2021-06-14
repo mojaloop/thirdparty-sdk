@@ -88,7 +88,6 @@ export class PubSub extends RedisConnection {
   // overload RedisConnection.connect to add listener on messages
   async connect (): Promise<void> {
     await super.connect()
-    this.subscriptionClient.on('message', this.broadcastMessage.bind(this))
     this.client.on('message', this.broadcastMessage.bind(this))
   }
 
@@ -130,7 +129,7 @@ export class PubSub extends RedisConnection {
       this.callbacks.set(channel, new Map<number, NotificationCallback>())
 
       // only once time subscribe to Redis channel
-      this.subscriptionClient.subscribe(channel)
+      this.client.subscribe(channel)
     }
 
     const callbacksForChannel = this.callbacks.get(channel)

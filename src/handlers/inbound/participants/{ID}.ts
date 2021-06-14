@@ -50,7 +50,7 @@ import { Enum } from '@mojaloop/central-services-shared';
     DFSPLinkingModel.triggerWorkflow(
       DFSPLinkingPhase.waitOnThirdpartyLinkRegistrationResponse,
       id,
-      h.getPubSub(),
+      h.getPublisher(),
       payload as unknown as Message
     )
   }

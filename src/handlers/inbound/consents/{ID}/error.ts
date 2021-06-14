@@ -39,7 +39,7 @@ import { DFSPLinkingPhase } from '~/models/inbound/dfspLinking.interface'
 async function put (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const consentId = request.params.ID
   const payload = request.payload as fspiopAPI.Schemas.ErrorInformation
-
+  const publisher = h.getPublisher()
   // ideally we look at the status codes of the error message to determine
   // what model we trigger. since error codes are still a WIP and that
   // codes can be generic codes, we need to think about what gets triggered.
@@ -51,7 +51,7 @@ async function put (_context: unknown, request: Request, h: StateResponseToolkit
   PISPLinkingModel.triggerWorkflow(
     PISPLinkingPhase.registerCredential,
     consentId,
-    h.getPubSub(),
+    publisher,
     payload as unknown as Message
   )
 
@@ -61,7 +61,7 @@ async function put (_context: unknown, request: Request, h: StateResponseToolkit
   DFSPLinkingModel.triggerWorkflow(
     DFSPLinkingPhase.waitOnAuthServiceResponse,
     consentId,
-    h.getPubSub(),
+    publisher,
     payload as unknown as Message
   )
 
@@ -71,7 +71,7 @@ async function put (_context: unknown, request: Request, h: StateResponseToolkit
   DFSPLinkingModel.triggerWorkflow(
     DFSPLinkingPhase.waitOnSignedCredentialFromPISPResponse,
     consentId,
-    h.getPubSub(),
+    publisher,
     payload as unknown as Message
   )
 

@@ -150,27 +150,27 @@ describe('PISP Inbound', (): void => {
       it('should propagate message via Redis PUB/SUB', async (): Promise<void> => {
         // eslint-disable-next-line no-async-promise-executor
         return new Promise(async (resolve) => {
-          const pubSub = new PubSub(config)
-          await pubSub.connect()
-          expect(pubSub.areAllClientsConnected).toBeTruthy()
+          const subscriber = new PubSub(config)
+          await subscriber.connect()
+          expect(subscriber.isConnected).toBeTruthy()
 
-          pubSub.subscribe('PISPLinking_requestConsent_997c89f4-053c-4283-bfec-45a1a0a28fba',
+          subscriber.subscribe('PISPLinking_requestConsent_997c89f4-053c-4283-bfec-45a1a0a28fba',
             async (channel: string, message: Message, _id: number) => {
               expect(channel).toEqual('PISPLinking_requestConsent_997c89f4-053c-4283-bfec-45a1a0a28fba')
               expect(message).toEqual(payload)
-              await pubSub.disconnect()
-              expect(pubSub.areAllClientsConnected).toBeFalsy()
+              await subscriber.disconnect()
+              expect(subscriber.isConnected).toBeFalsy()
 
               resolve()
             }
           )
 
-          pubSub.subscribe('PISPConsentRequests_requestConsentAuthenticate_997c89f4-053c-4283-bfec-45a1a0a28fba',
+          subscriber.subscribe('PISPConsentRequests_requestConsentAuthenticate_997c89f4-053c-4283-bfec-45a1a0a28fba',
             async (channel: string, message: Message, _id: number) => {
               expect(channel).toEqual('PISPConsentRequests_requestConsentAuthenticate_997c89f4-053c-4283-bfec-45a1a0a28fba')
               expect(message).toEqual(payload)
-              await pubSub.disconnect()
-              expect(pubSub.areAllClientsConnected).toBeFalsy()
+              await subscriber.disconnect()
+              expect(subscriber.isConnected).toBeFalsy()
 
               resolve()
             }
@@ -204,17 +204,17 @@ describe('PISP Inbound', (): void => {
       }
 
       it('should propagate message via Redis PUB/SUB', async (done): Promise<void> => {
-        const pubSub = new PubSub(config)
-        await pubSub.connect()
-        expect(pubSub.areAllClientsConnected).toBeTruthy()
-        pubSub.subscribe(
+        const subscriber = new PubSub(config)
+        await subscriber.connect()
+        expect(subscriber.isConnected).toBeTruthy()
+        subscriber.subscribe(
           'PISPLinking_requestConsent_997c89f4-053c-4283-bfec-45a1a0a28fbb',
           async (channel: string, message: Message, _id: number
           ) => {
             expect(channel).toEqual('PISPLinking_requestConsent_997c89f4-053c-4283-bfec-45a1a0a28fbb')
             expect(message).toEqual(mockData.consentRequestsPut.payload)
-            await pubSub.disconnect()
-            expect(pubSub.areAllClientsConnected).toBeFalsy()
+            await subscriber.disconnect()
+            expect(subscriber.isConnected).toBeFalsy()
 
             done()
           })

@@ -52,7 +52,7 @@ describe('PubSub', () => {
   })
 
   it('should be connected', async (): Promise<void> => {
-    expect(listener.areAllClientsConnected).toBeTruthy()
+    expect(listener.isConnected).toBeTruthy()
     const result = await listener.ping()
     expect(result).toEqual(true)
   })

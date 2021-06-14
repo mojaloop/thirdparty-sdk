@@ -65,24 +65,29 @@ describe('OutboundThirdpartyAuthorizationsModel', () => {
     logger: mockLogger()
   }
   let modelConfig: OutboundThirdpartyAuthorizationsModelConfig
+  let publisher: PubSub
 
   beforeEach(async () => {
+    publisher = new PubSub(ConnectionConfig)
+    await publisher.connect()
+
     modelConfig = {
       kvs: new KVS(ConnectionConfig),
       key: 'cache-key',
       logger: ConnectionConfig.logger,
-      pubSub: new PubSub(ConnectionConfig),
+      subscriber: new PubSub(ConnectionConfig),
       requests: {
         postThirdpartyRequestsTransactionsAuthorizations: jest.fn()
       } as unknown as ThirdpartyRequests
     }
     await modelConfig.kvs.connect()
-    await modelConfig.pubSub.connect()
+    await modelConfig.subscriber.connect()
   })
 
   afterEach(async () => {
+    await publisher.disconnect()
     await modelConfig.kvs.disconnect()
-    await modelConfig.pubSub.disconnect()
+    await modelConfig.subscriber.disconnect()
   })
 
   function checkThirdpartyAuthorizationsModelLayout (am: OutboundThirdpartyAuthorizationsModel, optData?: OutboundThirdpartyAuthorizationsData) {
@@ -91,7 +96,7 @@ describe('OutboundThirdpartyAuthorizationsModel', () => {
     expect(am.fsm.state).toEqual(optData?.currentState || 'start')
 
     // check new getters
-    expect(am.pubSub).toEqual(modelConfig.pubSub)
+    expect(am.subscriber).toEqual(modelConfig.subscriber)
     expect(am.requests).toEqual(modelConfig.requests)
 
     // check is fsm correctly constructed
@@ -130,14 +135,14 @@ describe('OutboundThirdpartyAuthorizationsModel', () => {
     let data: OutboundThirdpartyAuthorizationsData
     let putResponse:  tpAPI.Schemas.ThirdpartyRequestsTransactionsIDAuthorizationsPutResponse
     beforeEach(() => {
-      mocked(modelConfig.pubSub.subscribe).mockImplementationOnce(
+      mocked(modelConfig.subscriber.subscribe).mockImplementationOnce(
         (_channel: string, cb: NotificationCallback) => {
           handler = cb
           return ++subId
         }
       )
 
-      mocked(modelConfig.pubSub.publish).mockImplementationOnce(
+      mocked(publisher.publish).mockImplementationOnce(
         async (channel: string, message: Message) => handler(channel, message, subId)
       )
 
@@ -167,7 +172,7 @@ describe('OutboundThirdpartyAuthorizationsModel', () => {
     it('should give response properly populated from notification channel', async () => {
       const model = await create(data, modelConfig)
       // defer publication to notification channel
-      setImmediate(() => model.pubSub.publish(
+      setImmediate(() => publisher.publish(
         channel,
         putResponse as unknown as Message
       ))
@@ -184,9 +189,9 @@ describe('OutboundThirdpartyAuthorizationsModel', () => {
       })
       expect(mocked(modelConfig.requests.postThirdpartyRequestsTransactionsAuthorizations)).toHaveBeenCalledWith(
         model.data.request, modelConfig.key, model.data.toParticipantId)
-      expect(mocked(modelConfig.pubSub.subscribe)).toBeCalledTimes(1)
-      expect(mocked(modelConfig.pubSub.unsubscribe)).toBeCalledWith(channel, subId)
-      expect(mocked(modelConfig.pubSub.publish)).toBeCalledWith(channel, putResponse)
+      expect(mocked(modelConfig.subscriber.subscribe)).toBeCalledTimes(1)
+      expect(mocked(modelConfig.subscriber.unsubscribe)).toBeCalledWith(channel, subId)
+      expect(mocked(publisher.publish)).toBeCalledWith(channel, putResponse)
     })
 
     it('should properly handle error from requests.postThirdpartyRequestsTransactionsAuthorizations', async () => {
@@ -203,8 +208,8 @@ describe('OutboundThirdpartyAuthorizationsModel', () => {
         expect(err).toEqual(new Error('error from requests.postThirdpartyRequestsTransactionsAuthorizations'))
         const result = model.getResponse()
         expect(result).toBeUndefined()
-        expect(mocked(modelConfig.pubSub.subscribe)).toBeCalledTimes(1)
-        expect(mocked(modelConfig.pubSub.unsubscribe)).toBeCalledWith(channel, subId)
+        expect(mocked(modelConfig.subscriber.subscribe)).toBeCalledTimes(1)
+        expect(mocked(modelConfig.subscriber.unsubscribe)).toBeCalledWith(channel, subId)
       }
     })
 
@@ -213,7 +218,7 @@ describe('OutboundThirdpartyAuthorizationsModel', () => {
         const model = await create(data, modelConfig)
 
         // defer publication to notification channel
-        setImmediate(() => model.pubSub.publish(
+        setImmediate(() => publisher.publish(
           channel,
           putResponse as unknown as Message
         ))
@@ -226,9 +231,9 @@ describe('OutboundThirdpartyAuthorizationsModel', () => {
         })
         expect(mocked(modelConfig.requests.postThirdpartyRequestsTransactionsAuthorizations)).toHaveBeenCalledWith(
           model.data.request, modelConfig.key, model.data.toParticipantId)
-        expect(mocked(modelConfig.pubSub.subscribe)).toBeCalledTimes(1)
-        expect(mocked(modelConfig.pubSub.unsubscribe)).toBeCalledWith(channel, subId)
-        expect(mocked(modelConfig.pubSub.publish)).toBeCalledWith(channel, putResponse)
+        expect(mocked(modelConfig.subscriber.subscribe)).toBeCalledTimes(1)
+        expect(mocked(modelConfig.subscriber.unsubscribe)).toBeCalledWith(channel, subId)
+        expect(mocked(publisher.publish)).toBeCalledWith(channel, putResponse)
 
         expect(mocked(modelConfig.logger.info)).toBeCalledWith('ThirdpartyAuthorizations completed successfully')
         mocked(modelConfig.logger.info).mockReset()

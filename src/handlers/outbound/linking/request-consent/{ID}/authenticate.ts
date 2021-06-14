@@ -46,7 +46,7 @@ async function patch (_context: any, request: Request, h: StateResponseToolkit):
 
   const modelConfig: PISPLinkingModelConfig = {
     kvs: h.getKVS(),
-    pubSub: h.getPubSub(),
+    subscriber: h.getSubscriber(),
     key: consentRequestId,
     logger: h.getLogger(),
     thirdpartyRequests: h.getThirdpartyRequests(),

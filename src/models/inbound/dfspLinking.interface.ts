@@ -102,7 +102,7 @@ export interface DFSPLinkingStateMachine extends ControlledStateMachine {
 }
 
 export interface DFSPLinkingModelConfig extends PersistentModelConfig {
-  pubSub: PubSub
+  subscriber: PubSub
   thirdpartyRequests: ThirdpartyRequests
   mojaloopRequests: MojaloopRequests
   dfspBackendRequests: DFSPBackendRequests

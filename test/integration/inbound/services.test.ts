@@ -53,17 +53,17 @@ describe('PUT /services/{ServiceType}', (): void => {
     }
 
     it('should propagate message via Redis PUB/SUB', async (done): Promise<void> => {
-      const pubSub = new PubSub(config)
-      await pubSub.connect()
-      expect(pubSub.areAllClientsConnected).toBeTruthy()
-      pubSub.subscribe(
+      const subscriber = new PubSub(config)
+      await subscriber.connect()
+      expect(subscriber.isConnected).toBeTruthy()
+      subscriber.subscribe(
         'PISPPrelinking-THIRD_PARTY_DFSP',
         async (channel: string, message: Message, _id: number
         ) => {
           expect(channel).toEqual('PISPPrelinking-THIRD_PARTY_DFSP')
           expect(message).toEqual(mockData.putServicesByServiceTypeRequest.payload)
-          await pubSub.disconnect()
-          expect(pubSub.areAllClientsConnected).toBeFalsy()
+          await subscriber.disconnect()
+          expect(subscriber.isConnected).toBeFalsy()
 
           done()
         })
@@ -113,16 +113,16 @@ describe('PUT /services/{ServiceType}/error', (): void => {
     it('should propagate message via Redis PUB/SUB', async (): Promise<void> => {
       // eslint-disable-next-line no-async-promise-executor
       return new Promise(async (resolve) => {
-        const pubSub = new PubSub(config)
-        await pubSub.connect()
-        expect(pubSub.areAllClientsConnected).toBeTruthy()
+        const subscriber = new PubSub(config)
+        await subscriber.connect()
+        expect(subscriber.isConnected).toBeTruthy()
 
-        pubSub.subscribe('PISPPrelinking-THIRD_PARTY_DFSP',
+        subscriber.subscribe('PISPPrelinking-THIRD_PARTY_DFSP',
           async (channel: string, message: Message, _id: number) => {
             expect(channel).toEqual('PISPPrelinking-THIRD_PARTY_DFSP')
             expect(message).toEqual(payload)
-            await pubSub.disconnect()
-            expect(pubSub.areAllClientsConnected).toBeFalsy()
+            await subscriber.disconnect()
+            expect(subscriber.isConnected).toBeFalsy()
 
             resolve()
           }

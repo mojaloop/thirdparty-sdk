@@ -86,7 +86,6 @@ export interface RedisConnectionConfig {
 export class RedisConnection {
   protected readonly config: RedisConnectionConfig
 
-  private redisSubscriptionClient: RedisClient = null as unknown as RedisClient
   private redisClient: RedisClient = null as unknown as RedisClient
 
   static readonly defaultTimeout = 3000
@@ -101,17 +100,9 @@ export class RedisConnection {
     this.config = { timeout: RedisConnection.defaultTimeout, ...config }
   }
 
-  get subscriptionClient (): RedisClient {
-    // protect against any attempt to work with not connected redis client
-    if (!this.isSubscriptionClientConnected) {
-      throw new RedisConnectionError(this.port, this.host)
-    }
-    return this.redisSubscriptionClient
-  }
-
   get client (): RedisClient {
     // protect against any attempt to work with not connected redis client
-    if (!this.isClientConnected) {
+    if (!this.isConnected) {
       throw new RedisConnectionError(this.port, this.host)
     }
     return this.redisClient
@@ -133,58 +124,37 @@ export class RedisConnection {
     return this.config.timeout || RedisConnection.defaultTimeout
   }
 
-  get isSubscriptionClientConnected (): boolean {
-    return this.redisSubscriptionClient && this.redisSubscriptionClient.connected
-  }
-
-  get isClientConnected (): boolean {
+  get isConnected (): boolean {
     return this.redisClient && this.redisClient.connected
   }
 
-  get areAllClientsConnected (): boolean {
-    return this.isClientConnected && this.isSubscriptionClientConnected
-  }
-
   async connect (): Promise<void> {
-    // once the client enters the subscribed state it is not supposed to issue
-    // any other commands, except for additional SUBSCRIBE, PSUBSCRIBE,
-    // UNSUBSCRIBE, PUNSUBSCRIBE, PING and QUIT commands.
-    // So we create two clients, one for subscriptions another for get, set
-    // and publish operations
-
-    if (!this.isSubscriptionClientConnected) {
-      // a redis connection to handle subscription type operations
-      this.redisSubscriptionClient = await this.createClient()
+    // do nothing if already connected
+    if (this.isConnected) {
+      return
     }
 
-    if (!this.isClientConnected) {
-      // a redis connection to handle get, set and publish operations
-      this.redisClient = await this.createClient()
-    }
+    // connect to redis
+    this.redisClient = await this.createClient()
   }
 
   async disconnect (): Promise<void> {
-    if (this.isSubscriptionClientConnected) {
-      // disconnect from redis
-      const asyncSubQuit = promisify(this.subscriptionClient.quit)
-      await asyncSubQuit.call(this.subscriptionClient)
-
-      // cleanup
-      this.redisSubscriptionClient = null as unknown as RedisClient
+    // do nothing if already disconnected
+    if (!(this.isConnected)) {
+      return
     }
 
-    if (this.isClientConnected) {
-      const asyncClientQuit = promisify(this.client.quit)
-      await asyncClientQuit.call(this.client)
+    // disconnect from redis
+    const asyncQuit = promisify(this.client.quit)
+    await asyncQuit.call(this.client)
 
-      // cleanup
-      this.redisClient = null as unknown as RedisClient
-    }
+    // cleanup
+    this.redisClient = null as unknown as RedisClient
   }
 
   async ping (): Promise<boolean> {
-    const asyncPing = promisify(this.subscriptionClient.ping)
-    const response: string = await asyncPing.call(this.subscriptionClient) as string
+    const asyncPing = promisify(this.client.ping)
+    const response: string = await asyncPing.call(this.client) as string
     return response === 'PONG'
   }
 

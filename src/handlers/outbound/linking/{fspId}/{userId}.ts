@@ -51,7 +51,7 @@ async function get (_context: any, request: Request, h: StateResponseToolkit): P
     key: userId,
     kvs: h.getKVS(),
     logger: h.getLogger(),
-    pubSub: h.getPubSub(),
+    subscriber: h.getSubscriber(),
     thirdpartyRequests: h.getThirdpartyRequests()
   }
 

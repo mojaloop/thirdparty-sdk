@@ -60,7 +60,7 @@ export interface PISPLinkingStateMachine extends ControlledStateMachine {
 }
 
 export interface PISPLinkingModelConfig extends PersistentModelConfig {
-  pubSub: PubSub
+  subscriber: PubSub
   thirdpartyRequests: ThirdpartyRequests
   requestProcessingTimeoutSeconds: number
 }

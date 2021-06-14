@@ -63,7 +63,7 @@ async function post (_context: unknown, request: Request, h: StateResponseToolki
   // if the request is valid then DFSP returns response via PUT /consentRequests/{ID} call.
   const modelConfig: DFSPLinkingModelConfig = {
     kvs: h.getKVS(),
-    pubSub: h.getPubSub(),
+    subscriber: h.getSubscriber(),
     key: consentRequestId,
     logger: logger,
     dfspBackendRequests: h.getDFSPBackendRequests(),

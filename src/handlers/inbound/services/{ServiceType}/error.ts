@@ -43,10 +43,9 @@ async function put (_context: unknown, request: Request, h: StateResponseToolkit
   const serviceType = request.params.ServiceType
 
   if (serviceType == ServiceType.THIRD_PARTY_DFSP) {
-    const pubSub = h.getPubSub()
     PISPPrelinkingModel.triggerWorkflow(
       serviceType,
-      pubSub,
+      h.getPublisher(),
       payload
     )
     h.getLogger().info(`Inbound received PUT /services/{ServiceType}/error response`)

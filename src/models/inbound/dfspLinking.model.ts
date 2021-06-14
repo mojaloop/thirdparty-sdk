@@ -85,8 +85,8 @@ export class DFSPLinkingModel
   }
 
   // getters
-  get pubSub (): PubSub {
-    return this.config.pubSub
+  get subscriber (): PubSub {
+    return this.config.subscriber
   }
 
   get dfspBackendRequests (): DFSPBackendRequests {
@@ -249,7 +249,7 @@ export class DFSPLinkingModel
       )
       // now we send back a PUT /consentRequests/{ID}response to elicit
       // a PATCH /consentRequests/{ID} response containing an authToken
-      await deferredJob(this.pubSub, waitOnAuthTokenFromPISPResponseChannel)
+      await deferredJob(this.subscriber, waitOnAuthTokenFromPISPResponseChannel)
         .init(async (channel) => {
           const res = await this.thirdpartyRequests.putConsentRequests(
             consentRequestsPostRequest.consentRequestId,
@@ -366,7 +366,7 @@ export class DFSPLinkingModel
         consentId!
       )
 
-      await deferredJob(this.pubSub, waitOnSignedCredentialChannel)
+      await deferredJob(this.subscriber, waitOnSignedCredentialChannel)
         .init(async (channel) => {
           const res = await this.thirdpartyRequests.postConsents(
             postConsentPayload,
@@ -441,7 +441,7 @@ export class DFSPLinkingModel
         consentId!
       )
 
-      const waitOnAuthService = deferredJob(this.pubSub, waitOnAuthServiceResponse)
+      const waitOnAuthService = deferredJob(this.subscriber, waitOnAuthServiceResponse)
         .init(async (channel) => {
           const res = await this.thirdpartyRequests.postConsents(
             consentPostRequestToAuthService,
@@ -484,7 +484,7 @@ export class DFSPLinkingModel
         })
         .wait(this.config.requestProcessingTimeoutSeconds * 1000)
 
-      const waitOnALS = deferredJob(this.pubSub, waitOnALSParticipantResponse)
+      const waitOnALS = deferredJob(this.subscriber, waitOnALSParticipantResponse)
         .init(async (): Promise<void> => {
           return Promise.resolve()
         })
@@ -561,7 +561,7 @@ export class DFSPLinkingModel
       this.data.consentId!
     )
 
-    return deferredJob(this.pubSub, channel)
+    return deferredJob(this.subscriber, channel)
     .init(async (): Promise<void> => {
       // need to update `mojaloopRequests.postParticipants` to accept
       // 'THIRD_PARTY_LINK'

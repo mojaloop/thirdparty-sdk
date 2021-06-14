@@ -49,10 +49,10 @@ export interface A2SData<A2SActionResponse extends StateData> extends StateData 
 
 export interface A2SModelConfig<Args, A2SActionResponse extends StateData> extends PersistentModelConfig {
   /**
-   * @property pubSub
-   * @description PubSub instance used to publish & listen on message
+   * @property subscriber
+   * @description PubSub instance used to subscribe to messages
    */
-  pubSub: PubSub
+  subscriber: PubSub
 
   /**
    * @property modelName
@@ -123,8 +123,8 @@ export class A2SModel<Args, A2SActionResponse extends StateData>
   }
 
   // getters
-  get pubSub (): PubSub {
-    return this.config.pubSub
+  get subscriber (): PubSub {
+    return this.config.subscriber
   }
 
   get modelName (): string {
@@ -138,7 +138,7 @@ export class A2SModel<Args, A2SActionResponse extends StateData>
   async onRequestAction (): Promise<void> {
     this.logger.push({ args: this.args }).log('onRequestAction - arguments')
     const channel = this.config.channelName(this.args)
-    return deferredJob(this.pubSub, channel)
+    return deferredJob(this.subscriber, channel)
       .init(async (channel: string) => {
         const res = await this.config.requestAction(this.args)
         this.logger.push({ res, channel, args: this.args })

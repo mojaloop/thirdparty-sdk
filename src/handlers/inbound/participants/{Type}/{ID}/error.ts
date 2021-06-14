@@ -45,7 +45,7 @@
     DFSPLinkingModel.triggerWorkflow(
       DFSPLinkingPhase.waitOnALSParticipantResponse,
       id,
-      h.getPubSub(),
+      h.getPublisher(),
       payload as unknown as Message
     )
   }

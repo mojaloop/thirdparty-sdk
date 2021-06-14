@@ -64,8 +64,8 @@ export class OutboundThirdpartyAuthorizationsModel
   }
 
   // getters
-  get pubSub (): PubSub {
-    return this.config.pubSub
+  get subscriber (): PubSub {
+    return this.config.subscriber
   }
 
   get requests (): ThirdpartyRequests {
@@ -89,7 +89,7 @@ export class OutboundThirdpartyAuthorizationsModel
    */
   async onThirdpartyRequestAuthorization (): Promise<void> {
     const channel = OutboundThirdpartyAuthorizationsModel.notificationChannel(this.config.key)
-    const pubSub: PubSub = this.pubSub
+    const pubSub: PubSub = this.subscriber
 
     // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (resolve, reject) => {
@@ -97,7 +97,7 @@ export class OutboundThirdpartyAuthorizationsModel
       try {
         // in handlers/inbound is implemented putThirdpartyAuthorizationsById handler
         // which publish thirdparty authorizations response to channel
-        subId = this.pubSub.subscribe(channel, async (channel: string, message: Message, sid: number) => {
+        subId = this.subscriber.subscribe(channel, async (channel: string, message: Message, sid: number) => {
           // first unsubscribe
           pubSub.unsubscribe(channel, sid)
 

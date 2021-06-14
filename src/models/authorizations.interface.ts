@@ -49,7 +49,7 @@ export interface OutboundAuthorizationStateMachine extends ControlledStateMachin
 }
 
 export interface OutboundAuthorizationsModelConfig extends PersistentModelConfig {
-  pubSub: PubSub
+  subscriber: PubSub
   requests: ThirdpartyRequests
 }
 

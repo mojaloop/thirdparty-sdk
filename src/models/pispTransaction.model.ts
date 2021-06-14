@@ -87,8 +87,8 @@ export class PISPTransactionModel
   }
 
   // getters
-  get pubSub (): PubSub {
-    return this.config.pubSub
+  get subscriber (): PubSub {
+    return this.config.subscriber
   }
 
   get thirdpartyRequests (): ThirdpartyRequests {
@@ -187,7 +187,7 @@ export class PISPTransactionModel
     )
     // first deferredJob will only listen on first channel
     // where the message from PUT /thirdpartyRequests/{ID}/transaction should be published
-    const waitOnTransPut = deferredJob(this.pubSub, channelWaitOnTransPut)
+    const waitOnTransPut = deferredJob(this.subscriber, channelWaitOnTransPut)
       .init(async (): Promise<void> => {
         // initiate the workflow - forward request to DFSP
         const request: tpAPI.Schemas.ThirdpartyRequestsTransactionsPostRequest = {
@@ -219,7 +219,7 @@ export class PISPTransactionModel
 
     // second deferredJob will listen only on second channel
     // where the message from POST /authorization should be published
-    const waitOnAuthPost = deferredJob(this.pubSub, channelWaitOnAuthPost)
+    const waitOnAuthPost = deferredJob(this.subscriber, channelWaitOnAuthPost)
       .init(async (): Promise<void> => {
         // do nothing - workflow will be initiated by waitOnTrans.init above ^^^
         return Promise.resolve()
@@ -256,7 +256,7 @@ export class PISPTransactionModel
 
     this.logger.push({ channel }).info('onApprove - subscribe to channel')
 
-    return deferredJob(this.pubSub, channel)
+    return deferredJob(this.subscriber, channel)
       .init(async (): Promise<void> => {
         const res = await this.mojaloopRequests.putAuthorizations(
           this.data.transactionRequestId!,

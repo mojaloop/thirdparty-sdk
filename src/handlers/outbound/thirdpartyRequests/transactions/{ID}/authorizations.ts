@@ -53,7 +53,7 @@ async function post (_context: any, request: Request, h: StateResponseToolkit): 
     key: transactionRequestId,
     kvs: h.getKVS(),
     logger: h.getLogger(),
-    pubSub: h.getPubSub(),
+    subscriber: h.getSubscriber(),
     requests: h.getThirdpartyRequests()
   }
 

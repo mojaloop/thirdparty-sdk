@@ -124,9 +124,7 @@ jest.mock('@mojaloop/sdk-standard-components', () => {
 jest.mock('~/shared/pub-sub', () => {
   return {
     PubSub: jest.fn(() => ({
-      isClientConnected: true,
-      isSubscriptionClientConnected: true,
-      areAllClientsConnected: true,
+      isConnected: true,
       publish: jest.fn(),
       connect: jest.fn(() => Promise.resolve()),
       disconnect: jest.fn()
@@ -219,7 +217,7 @@ describe('Inbound API routes', (): void => {
         publish: jest.fn()
       }
       const toolkit = {
-        getPubSub: jest.fn(() => pubSubMock),
+        getPublisher: jest.fn(() => pubSubMock),
         response: jest.fn(() => ({
           code: jest.fn((code: number) => ({
             statusCode: code
@@ -234,7 +232,7 @@ describe('Inbound API routes', (): void => {
       )
 
       expect(result.statusCode).toEqual(200)
-      expect(toolkit.getPubSub).toBeCalledTimes(1)
+      expect(toolkit.getPublisher).toBeCalledTimes(1)
 
       // check default authorization mode
       const authChannel = OutboundAuthorizationsModel.notificationChannel(request.params.ID)
@@ -253,7 +251,7 @@ describe('Inbound API routes', (): void => {
         publish: jest.fn()
       }
       const toolkit = {
-        getPubSub: jest.fn(() => pubSubMock),
+        getPublisher: jest.fn(() => pubSubMock),
         response: jest.fn(() => ({
           code: jest.fn((code: number) => ({
             statusCode: code
@@ -268,7 +266,7 @@ describe('Inbound API routes', (): void => {
       )
 
       expect(result.statusCode).toEqual(200)
-      expect(toolkit.getPubSub).toBeCalledTimes(1)
+      expect(toolkit.getPublisher).toBeCalledTimes(1)
 
       // TODO: check proper publication on DFSPTransactionModel
       config.INBOUND.PISP_TRANSACTION_MODE = false
@@ -322,7 +320,7 @@ describe('Inbound API routes', (): void => {
       }
       const toolkit = {
         getLogger: jest.fn(() => logger),
-        getPubSub: jest.fn(() => pubSubMock),
+        getPublisher: jest.fn(() => pubSubMock),
         getPISPBackendRequests: jest.fn(),
         getMojaloopRequests: jest.fn(),
         response: jest.fn(() => ({
@@ -377,7 +375,7 @@ describe('Inbound API routes', (): void => {
       }
       const toolkit = {
         getLogger: jest.fn(() => logger),
-        getPubSub: jest.fn(() => pubSubMock),
+        getPublisher: jest.fn(() => pubSubMock),
         getPISPBackendRequests: jest.fn(),
         getMojaloopRequests: jest.fn(),
         response: jest.fn(() => ({
@@ -417,7 +415,8 @@ describe('Inbound API routes', (): void => {
     expect(result.status).toEqual('OK')
     expect(result.uptime).toBeGreaterThan(1.0)
     expect(result.KVSConnected).toBeTruthy()
-    expect(result.PubSubConnected).toBeTruthy()
+    expect(result.PublisherConnected).toBeTruthy()
+    expect(result.SubscriberConnected).toBeTruthy()
     expect(result.LoggerPresent).toBeTruthy()
     expect(result.MojaloopRequestsPresent).toBeTruthy()
     expect(result.ThirdpartyRequestsPresent).toBeTruthy()
@@ -521,7 +520,7 @@ describe('Inbound API routes', (): void => {
         publish: jest.fn()
       }
       const toolkit = {
-        getPubSub: jest.fn(() => pubSubMock),
+        getPublisher: jest.fn(() => pubSubMock),
         response: jest.fn(() => ({
           code: jest.fn((code: number) => ({
             statusCode: code
@@ -536,7 +535,7 @@ describe('Inbound API routes', (): void => {
       )
 
       expect(result.statusCode).toEqual(200)
-      expect(toolkit.getPubSub).toBeCalledTimes(1)
+      expect(toolkit.getPublisher).toBeCalledTimes(1)
 
       const channel = OutboundThirdpartyAuthorizationsModel.notificationChannel(request.params.ID)
       expect(pubSubMock.publish).toBeCalledWith(channel, putThirdpartyAuthResponse)
@@ -567,7 +566,7 @@ describe('Inbound API routes', (): void => {
         publish: jest.fn()
       }
       const toolkit = {
-        getPubSub: jest.fn(() => pubSubMock),
+        getPublisher: jest.fn(() => pubSubMock),
         getLogger: jest.fn(() => logger),
         getDFSPId: jest.fn(() => 'dfspA'),
         getDFSPBackendRequests: jest.fn(),
@@ -587,7 +586,7 @@ describe('Inbound API routes', (): void => {
       )
 
       expect(result.statusCode).toEqual(200)
-      expect(toolkit.getPubSub).toBeCalledTimes(1)
+      expect(toolkit.getPublisher).toBeCalledTimes(1)
 
       const channel = PISPDiscoveryModel.notificationChannel(request.params.ID)
       expect(pubSubMock.publish).toBeCalledWith(channel, request.payload)
@@ -614,7 +613,7 @@ describe('Inbound API routes', (): void => {
         publish: jest.fn()
       }
       const toolkit = {
-        getPubSub: jest.fn(() => pubSubMock),
+        getPublisher: jest.fn(() => pubSubMock),
         getLogger: jest.fn(() => logger),
         getDFSPId: jest.fn(() => 'dfspA'),
         getDFSPBackendRequests: jest.fn(),
@@ -642,7 +641,7 @@ describe('Inbound API routes', (): void => {
         publish: jest.fn()
       }
       const toolkit = {
-        getPubSub: jest.fn(() => pubSubMock),
+        getPublisher: jest.fn(() => pubSubMock),
         getLogger: jest.fn(() => logger),
         getDFSPId: jest.fn(() => 'dfspA'),
         getDFSPBackendRequests: jest.fn(),
@@ -662,7 +661,7 @@ describe('Inbound API routes', (): void => {
       )
 
       expect(result.statusCode).toEqual(200)
-      expect(toolkit.getPubSub).toBeCalledTimes(1)
+      expect(toolkit.getPublisher).toBeCalledTimes(1)
 
       const channel = PISPDiscoveryModel.notificationChannel(errorRequest.params.ID)
       expect(pubSubMock.publish).toBeCalledWith(channel, errorRequest.payload)
@@ -680,7 +679,7 @@ describe('Inbound API routes', (): void => {
         publish: jest.fn()
       }
       const toolkit = {
-        getPubSub: jest.fn(() => pubSubMock),
+        getPublisher: jest.fn(() => pubSubMock),
         getAuthServiceParticipantId: jest.fn(() => 'central-auth'),
         response: jest.fn(() => ({
           code: jest.fn((code: number) => ({
@@ -702,7 +701,7 @@ describe('Inbound API routes', (): void => {
         PISPLinkingPhase.requestConsentAuthenticate,
         postConsentRequest.consentRequestId!
       )
-      expect(toolkit.getPubSub).toBeCalledTimes(1)
+      expect(toolkit.getPublisher).toBeCalledTimes(1)
       expect(pubSubMock.publish).toBeCalledWith(channel, postConsentRequest)
     })
 
@@ -739,7 +738,7 @@ describe('Inbound API routes', (): void => {
         publish: jest.fn()
       }
       const toolkit = {
-        getPubSub: jest.fn(() => pubSubMock),
+        getSubscriber: jest.fn(() => pubSubMock),
         response: jest.fn(() => ({
           code: jest.fn((code: number) => ({
             statusCode: code
@@ -799,7 +798,7 @@ describe('Inbound API routes', (): void => {
         publish: jest.fn()
       }
       const toolkit = {
-        getPubSub: jest.fn(() => pubSubMock),
+        getPublisher: jest.fn(() => pubSubMock),
         getLogger: jest.fn(() => logger),
         getDFSPId: jest.fn(() => 'dfspA'),
         getDFSPBackendRequests: jest.fn(),
@@ -820,7 +819,7 @@ describe('Inbound API routes', (): void => {
 
       expect(result.statusCode).toEqual(200)
       jest.runAllImmediates()
-      expect(toolkit.getPubSub).toBeCalledTimes(1)
+      expect(toolkit.getPublisher).toBeCalledTimes(1)
 
       const channel = PISPLinkingModel.notificationChannel(
         PISPLinkingPhase.requestConsent,
@@ -850,7 +849,7 @@ describe('Inbound API routes', (): void => {
         publish: jest.fn()
       }
       const toolkit = {
-        getPubSub: jest.fn(() => pubSubMock),
+        getPublisher: jest.fn(() => pubSubMock),
         getLogger: jest.fn(() => logger),
         getDFSPId: jest.fn(() => 'dfspA'),
         getDFSPBackendRequests: jest.fn(),
@@ -870,7 +869,7 @@ describe('Inbound API routes', (): void => {
 
       expect(result.statusCode).toEqual(200)
       jest.runAllImmediates()
-      expect(toolkit.getPubSub).toBeCalledTimes(2)
+      expect(toolkit.getPublisher).toBeCalledTimes(2)
 
       const channel = PISPLinkingModel.notificationChannel(
         PISPLinkingPhase.requestConsent,
@@ -904,7 +903,7 @@ describe('Inbound API routes', (): void => {
         publish: jest.fn()
       }
       const toolkit = {
-        getPubSub: jest.fn(() => pubSubMock),
+        getPublisher: jest.fn(() => pubSubMock),
         response: jest.fn(() => ({
           code: jest.fn((code: number) => ({
             statusCode: code
@@ -964,7 +963,7 @@ describe('Inbound API routes', (): void => {
         publish: jest.fn()
       }
       const toolkit = {
-        getPubSub: jest.fn(() => pubSubMock),
+        getPublisher: jest.fn(() => pubSubMock),
         response: jest.fn(() => ({
           code: jest.fn((code: number) => ({
             statusCode: code
@@ -979,7 +978,7 @@ describe('Inbound API routes', (): void => {
       )
 
       expect(result.statusCode).toEqual(200)
-      expect(toolkit.getPubSub).toBeCalledTimes(1)
+      expect(toolkit.getPublisher).toBeCalledTimes(1)
 
       const channel = OutboundThirdpartyAuthorizationsModel.notificationChannel(request.params.ID)
       expect(pubSubMock.publish).toBeCalledWith(channel, putThirdpartyAuthResponse)
@@ -1021,7 +1020,7 @@ describe('Inbound API routes', (): void => {
         publish: jest.fn()
       }
       const toolkit = {
-        getPubSub: jest.fn(() => pubSubMock),
+        getPublisher: jest.fn(() => pubSubMock),
         response: jest.fn(() => ({
           code: jest.fn((code: number) => ({
             statusCode: code
@@ -1078,7 +1077,7 @@ describe('Inbound API routes', (): void => {
         publish: jest.fn()
       }
       const toolkit = {
-        getPubSub: jest.fn(() => pubSubMock),
+        getPublisher: jest.fn(() => pubSubMock),
         response: jest.fn(() => ({
           code: jest.fn((code: number) => ({
             statusCode: code
@@ -1135,7 +1134,7 @@ describe('Inbound API routes', (): void => {
         publish: jest.fn()
       }
       const toolkit = {
-        getPubSub: jest.fn(() => pubSubMock),
+        getPublisher: jest.fn(() => pubSubMock),
         response: jest.fn(() => ({
           code: jest.fn((code: number) => ({
             statusCode: code
@@ -1192,7 +1191,7 @@ describe('Inbound API routes', (): void => {
           publish: jest.fn()
         }
         const toolkit = {
-          getPubSub: jest.fn(() => pubSubMock),
+          getPublisher: jest.fn(() => pubSubMock),
           response: jest.fn(() => ({
             code: jest.fn((code: number) => ({
               statusCode: code
@@ -1252,7 +1251,7 @@ describe('Inbound API routes', (): void => {
           publish: jest.fn()
         }
         const toolkit = {
-          getPubSub: jest.fn(() => pubSubMock),
+          getPublisher: jest.fn(() => pubSubMock),
           response: jest.fn(() => ({
             code: jest.fn((code: number) => ({
               statusCode: code
@@ -1315,7 +1314,7 @@ describe('Inbound API routes', (): void => {
         publish: jest.fn()
       }
       const toolkit = {
-        getPubSub: jest.fn(() => pubSubMock),
+        getPublisher: jest.fn(() => pubSubMock),
         response: jest.fn(() => ({
           code: jest.fn((code: number) => ({
             statusCode: code
@@ -1375,7 +1374,7 @@ describe('Inbound API routes', (): void => {
         publish: jest.fn()
       }
       const toolkit = {
-        getPubSub: jest.fn(() => pubSubMock),
+        getPublisher: jest.fn(() => pubSubMock),
         response: jest.fn(() => ({
           code: jest.fn((code: number) => ({
             statusCode: code
@@ -1437,7 +1436,7 @@ describe('Inbound API routes', (): void => {
         publish: jest.fn()
       }
       const toolkit = {
-        getPubSub: jest.fn(() => pubSubMock),
+        getPublisher: jest.fn(() => pubSubMock),
         response: jest.fn(() => ({
           code: jest.fn((code: number) => ({
             statusCode: code
