@@ -89,7 +89,7 @@ export class OutboundThirdpartyAuthorizationsModel
    */
   async onThirdpartyRequestAuthorization (): Promise<void> {
     const channel = OutboundThirdpartyAuthorizationsModel.notificationChannel(this.config.key)
-    const pubSub: PubSub = this.subscriber
+    const subscriber: PubSub = this.subscriber
 
     // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (resolve, reject) => {
@@ -99,7 +99,7 @@ export class OutboundThirdpartyAuthorizationsModel
         // which publish thirdparty authorizations response to channel
         subId = this.subscriber.subscribe(channel, async (channel: string, message: Message, sid: number) => {
           // first unsubscribe
-          pubSub.unsubscribe(channel, sid)
+          subscriber.unsubscribe(channel, sid)
 
           const putResponse = { ...message as unknown as tpAPI.Schemas.ThirdpartyRequestsTransactionsIDAuthorizationsPutResponse }
           // store response which will be returned by 'getResponse' method in workflow 'run'

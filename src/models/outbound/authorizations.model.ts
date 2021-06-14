@@ -93,7 +93,7 @@ export class OutboundAuthorizationsModel
    */
   async onRequestAuthorization (): Promise<void> {
     const channel = OutboundAuthorizationsModel.notificationChannel(this.data.request.transactionRequestId)
-    const pubSub: PubSub = this.subscriber
+    const subscriber: PubSub = this.subscriber
 
     // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (resolve, reject) => {
@@ -103,7 +103,7 @@ export class OutboundAuthorizationsModel
         // which publish PutAuthorizationsResponse to channel
         subId = this.subscriber.subscribe(channel, async (channel: string, message: Message, sid: number) => {
           // first unsubscribe
-          pubSub.unsubscribe(channel, sid)
+          subscriber.unsubscribe(channel, sid)
 
           // TODO: investigate PubSub subscribe method and callback
           // should be a generic so casting here would be not necessary...
