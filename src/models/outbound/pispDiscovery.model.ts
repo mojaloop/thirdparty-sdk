@@ -125,7 +125,7 @@ export class PISPDiscoveryModel
         this.logger.push({ res }).info('getAccounts request sent to peer')
       } catch (error) {
         this.logger.push(error).error('getAccounts request error')
-        pubSub.unsubscribe(channel, subId)
+        subscriber.unsubscribe(channel, subId)
         reject(error)
       }
     })

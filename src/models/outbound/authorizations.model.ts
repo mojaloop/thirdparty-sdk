@@ -126,7 +126,7 @@ export class OutboundAuthorizationsModel
         this.logger.push({ res }).info('Authorizations request sent to peer')
       } catch (error) {
         this.logger.push(error).error('Authorization request error')
-        pubSub.unsubscribe(channel, subId)
+        subscriber.unsubscribe(channel, subId)
         reject(error)
       }
     })

@@ -123,7 +123,7 @@ export class OutboundThirdpartyAuthorizationsModel
       } catch (error) {
         this.logger.push(error)
         this.logger.error('ThirdpartyAuthorizations request error')
-        pubSub.unsubscribe(channel, subId)
+        subscriber.unsubscribe(channel, subId)
         reject(error)
       }
     })
