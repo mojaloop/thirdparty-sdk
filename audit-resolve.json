@@ -757,68 +757,68 @@
     },
     "1500|@mojaloop/central-services-health>@mojaloop/central-services-shared>widdershins>yargs>yargs-parser": {
       "decision": "ignore",
-      "madeAt": 1620661141707,
-      "expiresAt": 1623253125696
+      "madeAt": 1623687256476,
+      "expiresAt": 1626279249395
     },
     "1500|@mojaloop/central-services-shared>widdershins>yargs>yargs-parser": {
       "decision": "ignore",
-      "madeAt": 1620661141707,
-      "expiresAt": 1623253125696
+      "madeAt": 1623687260625,
+      "expiresAt": 1626279249395
     },
     "1673|@mojaloop/central-services-health>@mojaloop/central-services-error-handling>lodash": {
       "decision": "ignore",
-      "madeAt": 1620661143417,
-      "expiresAt": 1623253125696
+      "madeAt": 1623687256476,
+      "expiresAt": 1626279249395
     },
     "1673|@mojaloop/central-services-health>@mojaloop/central-services-shared>@mojaloop/central-services-error-handling>lodash": {
       "decision": "ignore",
-      "madeAt": 1620661143417,
-      "expiresAt": 1623253125696
+      "madeAt": 1623687256476,
+      "expiresAt": 1626279249395
     },
     "1673|@mojaloop/central-services-health>@mojaloop/central-services-shared>@mojaloop/event-sdk>lodash": {
       "decision": "ignore",
-      "madeAt": 1620661143417,
-      "expiresAt": 1623253125696
+      "madeAt": 1623687256476,
+      "expiresAt": 1626279249395
     },
     "1673|@mojaloop/central-services-shared>@mojaloop/event-sdk>lodash": {
       "decision": "ignore",
-      "madeAt": 1620661143417,
-      "expiresAt": 1623253125696
+      "madeAt": 1623687257948,
+      "expiresAt": 1626279249395
     },
     "1673|@mojaloop/central-services-health>@mojaloop/central-services-shared>lodash": {
       "decision": "ignore",
-      "madeAt": 1620661143417,
-      "expiresAt": 1623253125696
+      "madeAt": 1623687256476,
+      "expiresAt": 1626279249395
     },
     "1675|@mojaloop/central-services-health>@mojaloop/central-services-shared>shins>sanitize-html": {
       "decision": "ignore",
-      "madeAt": 1620661145110,
-      "expiresAt": 1623253125696
+      "madeAt": 1623687256476,
+      "expiresAt": 1626279249395
     },
     "1675|@mojaloop/central-services-shared>shins>sanitize-html": {
       "decision": "ignore",
-      "madeAt": 1620661145110,
-      "expiresAt": 1623253125696
+      "madeAt": 1623687261782,
+      "expiresAt": 1626279249395
     },
     "1676|@mojaloop/central-services-health>@mojaloop/central-services-shared>shins>sanitize-html": {
       "decision": "ignore",
-      "madeAt": 1620661145110,
-      "expiresAt": 1623253125696
+      "madeAt": 1623687256476,
+      "expiresAt": 1626279249395
     },
     "1676|@mojaloop/central-services-shared>shins>sanitize-html": {
       "decision": "ignore",
-      "madeAt": 1620661145110,
-      "expiresAt": 1623253125696
+      "madeAt": 1623687261782,
+      "expiresAt": 1626279249395
     },
     "1693|@mojaloop/central-services-health>@mojaloop/central-services-shared>shins>sanitize-html>postcss": {
       "decision": "ignore",
-      "madeAt": 1620717969522,
-      "expiresAt": 1623309950946
+      "madeAt": 1623687256476,
+      "expiresAt": 1626279249395
     },
     "1693|@mojaloop/central-services-shared>shins>sanitize-html>postcss": {
       "decision": "ignore",
-      "madeAt": 1620717969522,
-      "expiresAt": 1623309950946
+      "madeAt": 1623687263078,
+      "expiresAt": 1626279249395
     },
     "1677|00unidentified>openapi-typescript>meow>read-pkg-up>read-pkg>normalize-package-data>hosted-git-info": {
       "decision": "ignore",
@@ -1029,6 +1029,16 @@
       "decision": "ignore",
       "madeAt": 1623189809575,
       "expiresAt": 1625781718794
+    },
+    "1755|nodemon>update-notifier>latest-version>package-json>got>cacheable-request>normalize-url": {
+      "decision": "ignore",
+      "madeAt": 1623687259486,
+      "expiresAt": 1626279249395
+    },
+    "1755|npm-check-updates>update-notifier>latest-version>package-json>got>cacheable-request>normalize-url": {
+      "decision": "ignore",
+      "madeAt": 1623687259486,
+      "expiresAt": 1626279249395
     }
   },
   "rules": {},
