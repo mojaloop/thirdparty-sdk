@@ -242,7 +242,7 @@ describe('DFSP Inbound', (): void => {
       })
     })
 
-    describe('Inbound PUT /consents/{ID} verified credential from auth-service and PUT /participants/{Type}/{ID} from ALS', (): void => {
+    describe('Inbound PUT /consents/{ID} verified credential from auth-service', (): void => {
       it('should send back PATCH /consents/{ID} to PISP', async (): Promise<void> => {
           // the auth-service now sends back a PUT /consents/{ID} confirming verification
           const putConsentsIDVerifiedCredentialPayload = {
@@ -290,15 +290,6 @@ describe('DFSP Inbound', (): void => {
           const putScenarioUri = `${env.inbound.baseUri}/consents/${consentId}`
           const responseToPutConsents = await axios.put(putScenarioUri, putConsentsIDVerifiedCredentialPayload, axiosConfig)
           expect(responseToPutConsents.status).toEqual(200)
-
-          // the ALS now sends back a PUT /participants/CONSENT/{ID} confirming verification
-          const putParticipantsTypeIDPayload = {
-            "fspId": "auth-service"
-          }
-
-          const putParticipantsScenarioUri = `${env.inbound.baseUri}/participants/CONSENT/${consentId}`
-          const responseToPutParticipants = await axios.put(putParticipantsScenarioUri, putParticipantsTypeIDPayload, axiosConfig)
-          expect(responseToPutParticipants.status).toEqual(200)
 
           await new Promise(resolve => setTimeout(resolve, 200));
 
@@ -517,7 +508,7 @@ describe('DFSP Inbound', (): void => {
       })
     })
 
-    describe('Inbound PUT /consents/{ID} verified credential from auth-service and PUT /participants/{Type}/{ID} from ALS', (): void => {
+    describe('Inbound PUT /consents/{ID} verified credential from auth-service', (): void => {
       it('should send back PATCH /consents/{ID} to PISP', async (): Promise<void> => {
         // the auth-service now sends back a PUT /consents/{ID} confirming verification
         const putConsentsIDVerifiedCredentialPayload = {
@@ -565,15 +556,6 @@ describe('DFSP Inbound', (): void => {
         const putScenarioUri = `${env.inbound.baseUri}/consents/${consentId}`
         const responseToPutConsents = await axios.put(putScenarioUri, putConsentsIDVerifiedCredentialPayload, axiosConfig)
         expect(responseToPutConsents.status).toEqual(200)
-
-        // the ALS now sends back a PUT /participants/CONSENT/{ID} confirming verification
-        const putParticipantsTypeIDPayload = {
-          "fspId": "auth-service"
-        }
-
-        const putParticipantsScenarioUri = `${env.inbound.baseUri}/participants/CONSENT/${consentId}`
-        const responseToPutParticipants = await axios.put(putParticipantsScenarioUri, putParticipantsTypeIDPayload, axiosConfig)
-        expect(responseToPutParticipants.status).toEqual(200)
 
         await new Promise(resolve => setTimeout(resolve, 200));
 
@@ -1329,42 +1311,6 @@ describe('DFSP Inbound', (): void => {
             credential: expect.any(Object),
             scopes: expect.any(Object)
           })
-        )
-      })
-    })
-
-    describe('Inbound PUT /participants/{Type}/{ID}/error from ALS', (): void => {
-      it('should send back PUT /consents/{ID}/error to PISP', async (): Promise<void> => {
-
-        // the ALS now sends back a PUT /participants/CONSENT/{ID}/error
-        const putParticipantsTypeIDPayload = {
-          errorInformation: {
-            errorCode: '3003',
-            errorDescription: 'Add Party information error'
-          }
-        }
-
-        const putParticipantsErrorScenarioUri = `${env.inbound.baseUri}/participants/CONSENT/${consentId}/error`
-        const responseToPutParticipantsError = await axios.put(putParticipantsErrorScenarioUri, putParticipantsTypeIDPayload, axiosConfig)
-        expect(responseToPutParticipantsError.status).toEqual(200)
-
-        await new Promise(resolve => setTimeout(resolve, 200));
-
-        // check that the DFSP has sent a PUT /consents/{ID}/error to the PISP
-        const requestsHistory: MLTestingToolkitRequest[] = (await axios.get(ttkRequestsHistoryUri, axiosConfig)).data
-        const putConsentsErrorToPISP = requestsHistory.filter(req => {
-          return req.method === 'put' && req.path === `/consents/${consentId}/error`
-        })
-        expect(putConsentsErrorToPISP.length).toEqual(1)
-        const historyPayload = putConsentsErrorToPISP[0].body as tpAPI.Schemas.ErrorInformation
-
-        expect(historyPayload).toEqual(
-          {
-            errorInformation: {
-              errorCode: "7200",
-              errorDescription: "Generic Thirdparty account linking error"
-            }
-          }
         )
       })
     })

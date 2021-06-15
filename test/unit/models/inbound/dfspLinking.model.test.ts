@@ -911,10 +911,6 @@ describe('dfspLinkingModel', () => {
       }
     }
 
-    const participantsTypeIDPutResponse: tpAPI.Schemas.ParticipantsTypeIDPutResponse = {
-      fspId: 'central-auth'
-    }
-
     beforeEach(async () => {
       validateData = {
         dfspId: 'dfspa',
@@ -957,20 +953,12 @@ describe('dfspLinkingModel', () => {
         DFSPLinkingPhase.waitOnAuthServiceResponse,
         validateData.consentId!
       )
-      const waitOnALSParticipantResponse = DFSPLinkingModel.notificationChannel(
-        DFSPLinkingPhase.waitOnALSParticipantResponse,
-        validateData.consentId!
-      )
 
       // defer publication to notification channel
       setImmediate(() => {
         publisher.publish(
           waitOnAuthServiceResponse,
           consentsIDPutResponseVerified as unknown as Message
-        )
-        publisher.publish(
-          waitOnALSParticipantResponse,
-          participantsTypeIDPutResponse as unknown as Message
         )
       })
 
@@ -1033,10 +1021,6 @@ describe('dfspLinkingModel', () => {
         DFSPLinkingPhase.waitOnAuthServiceResponse,
         validateData.consentId!
       )
-      const waitOnALSParticipantResponse = DFSPLinkingModel.notificationChannel(
-        DFSPLinkingPhase.waitOnALSParticipantResponse,
-        validateData.consentId!
-      )
 
       // defer publication to notification channel
       setImmediate(() => {
@@ -1048,10 +1032,6 @@ describe('dfspLinkingModel', () => {
               errorDescription: 'Generic Thirdparty account linking error'
             }
           } as unknown as Message
-        )
-        publisher.publish(
-          waitOnALSParticipantResponse,
-          participantsTypeIDPutResponse as unknown as Message
         )
       })
 
@@ -1069,54 +1049,6 @@ describe('dfspLinkingModel', () => {
           errorInformation: {
             errorCode: '7213',
             errorDescription: 'Consent is invalid'
-          }
-        },
-        'pispa'
-      )
-    })
-
-    it('onValidateWithAuthService() should transition from consent granted to errored when receiving error response from ALS', async () => {
-      const model = await create(validateData, modelConfig)
-      const waitOnAuthServiceResponse = DFSPLinkingModel.notificationChannel(
-        DFSPLinkingPhase.waitOnAuthServiceResponse,
-        validateData.consentId!
-      )
-      const waitOnALSParticipantResponse = DFSPLinkingModel.notificationChannel(
-        DFSPLinkingPhase.waitOnALSParticipantResponse,
-        validateData.consentId!
-      )
-
-      // defer publication to notification channel
-      setImmediate(() => {
-        publisher.publish(
-          waitOnAuthServiceResponse,
-          consentsIDPutResponseVerified as unknown as Message
-        )
-        publisher.publish(
-          waitOnALSParticipantResponse,
-          {
-            errorInformation: {
-              errorCode: '3000',
-              errorDescription: 'Generic participant error'
-            }
-          } as unknown as Message
-        )
-      })
-
-      // start send consent step
-      await model.fsm.validateWithAuthService()
-      // check for errors
-      await model.checkModelDataForErrorInformation()
-      // check that the fsm was able to transition properly
-      expect(model.data.currentState).toEqual('errored')
-
-      // check we made a call to thirdpartyRequests.postConsents
-      expect(modelConfig.thirdpartyRequests.putConsentsError).toBeCalledWith(
-        validateData.consentId,
-        {
-          errorInformation: {
-            errorCode: '7200',
-            errorDescription: 'Generic Thirdparty account linking error'
           }
         },
         'pispa'
@@ -1156,10 +1088,6 @@ describe('dfspLinkingModel', () => {
   describe('Register THIRD_PARTY_LINKS with als', () => {
     let validateData: DFSPLinkingData
 
-    const participantsTypeIDPutResponse: tpAPI.Schemas.ParticipantsTypeIDPutResponse = {
-      fspId: 'central-auth'
-    }
-
     beforeEach(async () => {
       validateData = {
         dfspId: 'dfspa',
@@ -1173,7 +1101,6 @@ describe('dfspLinkingModel', () => {
         consentRequestsIDPatchResponse: mockData.consentRequestsIDPatchRequest.payload,
         consentIDPutResponseSignedCredentialFromPISP: mockData.inboundPutConsentsIdRequestSignedCredential.payload,
         consentIDPutResponseFromAuthService: mockData.inboundPutConsentsIdRequestVerifiedCredential.payload,
-        participantPutResponseFromALS: participantsTypeIDPutResponse,
         scopes: [
           {
             accountId: 'dfspa.username.1234',
@@ -1211,10 +1138,6 @@ describe('dfspLinkingModel', () => {
   describe('Notify PISP of successful account linking', () => {
     let validateData: DFSPLinkingData
 
-    const participantsTypeIDPutResponse: tpAPI.Schemas.ParticipantsTypeIDPutResponse = {
-      fspId: 'central-auth'
-    }
-
     beforeEach(async () => {
       validateData = {
         dfspId: 'dfspa',
@@ -1228,7 +1151,6 @@ describe('dfspLinkingModel', () => {
         consentRequestsIDPatchResponse: mockData.consentRequestsIDPatchRequest.payload,
         consentIDPutResponseSignedCredentialFromPISP: mockData.inboundPutConsentsIdRequestSignedCredential.payload,
         consentIDPutResponseFromAuthService: mockData.inboundPutConsentsIdRequestVerifiedCredential.payload,
-        participantPutResponseFromALS: participantsTypeIDPutResponse,
         scopes: [
           {
             accountId: 'dfspa.username.1234',
@@ -1348,10 +1270,6 @@ describe('dfspLinkingModel', () => {
       }
     }
 
-    const participantsTypeIDPutResponse: tpAPI.Schemas.ParticipantsTypeIDPutResponse = {
-      fspId: 'central-auth'
-    }
-
     beforeEach(async () => {
       validateData = {
         dfspId: 'dfspa',
@@ -1382,10 +1300,6 @@ describe('dfspLinkingModel', () => {
         DFSPLinkingPhase.waitOnAuthServiceResponse,
         '00000000-0000-1000-8000-000000000001'
       )
-      const waitOnALSParticipantResponse = DFSPLinkingModel.notificationChannel(
-        DFSPLinkingPhase.waitOnALSParticipantResponse,
-        '00000000-0000-1000-8000-000000000001'
-      )
 
       const model = await create(validateData, modelConfig)
 
@@ -1406,10 +1320,6 @@ describe('dfspLinkingModel', () => {
           publisher.publish(
             waitOnAuthServiceResponse,
             consentsIDPutResponseVerified as unknown as Message
-          )
-          publisher.publish(
-            waitOnALSParticipantResponse,
-            participantsTypeIDPutResponse as unknown as Message
           )
         }, 200)
       })

@@ -44,7 +44,6 @@ export enum DFSPLinkingPhase {
   waitOnAuthTokenFromPISPResponse = 'waitOnAuthTokenFromPISPResponse',
   waitOnSignedCredentialFromPISPResponse = 'waitOnSignedCredentialFromPISPResponse',
   waitOnAuthServiceResponse = 'waitOnAuthServiceResponse',
-  waitOnALSParticipantResponse = 'waitOnALSParticipantResponse',
   waitOnThirdpartyLinkRegistrationResponse = 'waitOnThirdpartyLinkRegistrationResponse',
   waitOnVerificationNotification = 'waitOnVerificationNotification'
 }
@@ -139,11 +138,8 @@ export interface DFSPLinkingData extends StateData {
   // request that passes signed credential to auth-service
   consentPostRequestToAuthService?: tpAPI.Schemas.ConsentsPostRequestAUTH
 
-  // two responses expected from the consentPostRequestToAuthService request
-  // one from the auth-service itself and another from the ALS for saving the
-  // CONSENT object
+  // response expected from the consentPostRequestToAuthService request
   consentIDPutResponseFromAuthService?: tpAPI.Schemas.ConsentsIDPutResponseVerified
-  participantPutResponseFromALS?: fspiopAPI.Schemas.ParticipantsTypeIDPutResponse
 
   // unimplemented request to ALS to batch create THIRD_PARTY_LINK objects
   // for accountId's

@@ -31,7 +31,7 @@ import axios from 'axios'
 import env from '../env'
 import mockLogger from '../../unit/mockLogger'
 
-describe('DFSP Inbound', (): void => {
+describe.skip('DFSP Inbound', (): void => {
   describe('PUT /participants/CONSENT/{ID}/ response from account lookup service', (): void => {
     const scenarioUri = `${env.inbound.baseUri}/participants/CONSENT/8e34f91d-d078-4077-8263-2c047876fcf6`
 

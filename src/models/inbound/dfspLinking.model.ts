@@ -436,12 +436,8 @@ export class DFSPLinkingModel
         DFSPLinkingPhase.waitOnAuthServiceResponse,
         consentId!
       )
-      const waitOnALSParticipantResponse = DFSPLinkingModel.notificationChannel(
-        DFSPLinkingPhase.waitOnALSParticipantResponse,
-        consentId!
-      )
 
-      const waitOnAuthService = deferredJob(this.subscriber, waitOnAuthServiceResponse)
+      await deferredJob(this.subscriber, waitOnAuthServiceResponse)
         .init(async (channel) => {
           const res = await this.thirdpartyRequests.postConsents(
             consentPostRequestToAuthService,
@@ -483,40 +479,6 @@ export class DFSPLinkingModel
           }
         })
         .wait(this.config.requestProcessingTimeoutSeconds * 1000)
-
-      const waitOnALS = deferredJob(this.subscriber, waitOnALSParticipantResponse)
-        .init(async (): Promise<void> => {
-          return Promise.resolve()
-        })
-        .job(async (message: Message): Promise<void> => {
-          type PutResponse =
-            tpAPI.Schemas.ParticipantsTypeIDPutResponse
-          type PutResponseOrError = PutResponse & fspiopAPI.Schemas.ErrorInformationObject
-          const putResponse = message as unknown as PutResponseOrError
-
-          if (putResponse.errorInformation) {
-            // if the ALS sends back any error for now, notify the PISP that the account
-            // linking process has failed
-            // todo: more detailed error handling depending on auth-service error response
-            const mojaloopError = reformatError(
-              Errors.MojaloopApiErrorCodes.TP_ACCOUNT_LINKING_ERROR,
-              this.logger
-            )
-
-            await this.thirdpartyRequests.putConsentsError(
-              this.data.consentId!,
-              mojaloopError as unknown as fspiopAPI.Schemas.ErrorInformationObject,
-              this.data.toParticipantId
-            )
-            // store the error so we can transition to an errored state
-            this.data.errorInformation = mojaloopError.errorInformation as unknown as fspiopAPI.Schemas.ErrorInformation
-          } else {
-            this.data.participantPutResponseFromALS = { ...message as unknown as fspiopAPI.Schemas.ParticipantsTypeIDPutResponse}
-          }
-        })
-        .wait(this.config.requestProcessingTimeoutSeconds * 1000)
-
-      await Promise.all([waitOnALS, waitOnAuthService])
     } catch (error) {
       // we send back an account linking error despite the actual error
       const mojaloopError = reformatError(
