@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+### [11.39.1](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.39.0...v11.39.1) (2021-06-16)
+
+
+### Tests
+
+* add robust DFSP side integration tests ([#102](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/102)) ([9dc88b6](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/9dc88b62be63d7d564e58c22463954a9260f7095))
+
 ## [11.39.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.38.0...v11.39.0) (2021-06-04)
 
 
