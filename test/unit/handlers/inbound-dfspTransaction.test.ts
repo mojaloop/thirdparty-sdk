@@ -1,7 +1,7 @@
 // import { logger } from '~/shared/logger'
 import { OutboundAPI as SDKOutboundAPI } from '@mojaloop/sdk-scheme-adapter'
 import { KVS } from '~/shared/kvs'
-import { uuid } from 'uuidv4'
+import { v4 as uuidv4 } from 'uuid'
 import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
 import { StateResponseToolkit } from '~/server/plugins/state'
 import ThirdpartyRequestsTransactions from '~/handlers/inbound/thirdpartyRequests/transactions'
@@ -24,7 +24,7 @@ describe('Inbound DFSP Transaction handler', () => {
   let dfspBackendRequestsMock: DFSPBackendRequests
   let sdkOutgoingRequestsMock: SDKOutgoingRequests
   beforeEach(() => {
-    transactionRequestId = uuid()
+    transactionRequestId = uuidv4()
     transactionRequestRequest = {
       transactionRequestId,
       payee: {

@@ -44,7 +44,7 @@ jest.mock('~/models/outbound/authorizations.model', () => ({
 describe('Outbound authorizations handlers', () => {
   const toolkit = {
     getKVS: jest.fn(),
-    getPubSub: jest.fn(),
+    getSubscriber: jest.fn(),
     getLogger: jest.fn(() => mockLogger()),
     getThirdpartyRequests: jest.fn(),
     response: jest.fn(() => ({

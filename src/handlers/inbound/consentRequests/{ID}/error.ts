@@ -44,14 +44,14 @@ async function put (_context: unknown, request: Request, h: StateResponseToolkit
   PISPLinkingModel.triggerWorkflow(
     PISPLinkingPhase.requestConsent,
     consentRequestId,
-    h.getPubSub(),
+    h.getPublisher(),
     payload as unknown as Message
   )
 
   PISPLinkingModel.triggerWorkflow(
     PISPLinkingPhase.requestConsentAuthenticate,
     consentRequestId,
-    h.getPubSub(),
+    h.getPublisher(),
     payload as unknown as Message
   )
   return h.response({}).code(Enum.Http.ReturnCodes.OK.CODE)

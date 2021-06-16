@@ -68,7 +68,7 @@ export interface PISPTransactionStateMachine extends ControlledStateMachine {
 }
 
 export interface PISPTransactionModelConfig extends PersistentModelConfig {
-  pubSub: PubSub
+  subscriber: PubSub
   thirdpartyRequests: ThirdpartyRequests
   mojaloopRequests: MojaloopRequests
   sdkOutgoingRequests: SDKOutgoingRequests

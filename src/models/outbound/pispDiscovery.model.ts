@@ -65,8 +65,8 @@ export class PISPDiscoveryModel
   }
 
   // getters
-  get pubSub (): PubSub {
-    return this.config.pubSub
+  get subscriber (): PubSub {
+    return this.config.subscriber
   }
 
   get thirdpartyRequests (): ThirdpartyRequests {
@@ -91,7 +91,7 @@ export class PISPDiscoveryModel
    */
   async onRequestAccounts (): Promise<void> {
     const channel = PISPDiscoveryModel.notificationChannel(this.data.userId)
-    const pubSub: PubSub = this.pubSub
+    const subscriber: PubSub = this.subscriber
 
     // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (resolve, reject) => {
@@ -99,9 +99,9 @@ export class PISPDiscoveryModel
       try {
         // in handlers/inbound is implemented UpdateAccountsByUserId handler
         // which publish getAccounts response to channel
-        subId = this.pubSub.subscribe(channel, async (channel: string, message: Message, sid: number) => {
+        subId = this.subscriber.subscribe(channel, async (channel: string, message: Message, sid: number) => {
           // first unsubscribe
-          pubSub.unsubscribe(channel, sid)
+          subscriber.unsubscribe(channel, sid)
 
           type PutResponseOrError = tpAPI.Schemas.AccountsIDPutResponse & fspiopAPI.Schemas.ErrorInformationObject
           const putResponse = message as unknown as PutResponseOrError
@@ -125,7 +125,7 @@ export class PISPDiscoveryModel
         this.logger.push({ res }).info('getAccounts request sent to peer')
       } catch (error) {
         this.logger.push(error).error('getAccounts request error')
-        pubSub.unsubscribe(channel, subId)
+        subscriber.unsubscribe(channel, subId)
         reject(error)
       }
     })

@@ -44,7 +44,7 @@ async function post (_context: any, request: Request, h: StateResponseToolkit): 
   // prepare model config
   const modelConfig: PISPTransactionModelConfig = {
     kvs: h.getKVS(),
-    pubSub: h.getPubSub(),
+    subscriber: h.getSubscriber(),
     key: request.params.ID,
     logger: h.getLogger(),
     thirdpartyRequests: h.getThirdpartyRequests(),

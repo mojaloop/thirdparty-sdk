@@ -34,9 +34,9 @@ import {
 async function put (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const userId: string = request.params.ID
   const channel = PISPDiscoveryModel.notificationChannel(userId)
-  const pubSub = h.getPubSub()
+
   // don't await on promise to resolve, let finish publish in background
-  pubSub.publish(channel, request.payload as unknown as Message)
+  h.getPublisher().publish(channel, request.payload as unknown as Message)
   return h.response().code(200)
 }
 

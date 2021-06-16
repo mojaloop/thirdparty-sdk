@@ -44,7 +44,7 @@ async function post (_context: unknown, request: Request, h: StateResponseToolki
   PISPLinkingModel.triggerWorkflow(
     PISPLinkingPhase.requestConsentAuthenticate,
     payload.consentRequestId!,
-    h.getPubSub(),
+    h.getPublisher(),
     payload as unknown as Message
   )
   h.getLogger().info('PISPConsentRequestModel handled POST /consents request')

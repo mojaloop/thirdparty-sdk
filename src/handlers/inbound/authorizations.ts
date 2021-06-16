@@ -45,7 +45,7 @@ import config from '~/shared/config'
 
 async function put (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const payload = request.payload as unknown as fspiopAPI.Schemas.AuthorizationsIDPutResponse
-  const pubSub = h.getPubSub()
+  const publisher = h.getPublisher()
 
   // select proper workflow to where message will be published
   if (config.INBOUND.PISP_TRANSACTION_MODE) {
@@ -54,7 +54,7 @@ async function put (_context: unknown, request: Request, h: StateResponseToolkit
     const channel = OutboundAuthorizationsModel.notificationChannel(request.params.ID)
     // don't await on promise to resolve
     // let finish publish in background
-    pubSub.publish(channel, payload as unknown as Message)
+    publisher.publish(channel, payload as unknown as Message)
   }
 
   // return asap
@@ -66,13 +66,13 @@ async function post (_context: unknown, request: Request, h: StateResponseToolki
   // to properly handle two different models here - via configuration flag
   const payload = request.payload as tpAPI.Schemas.AuthorizationsPostRequest
   const logger = h.getLogger()
-  const pubSub = h.getPubSub()
+  const publisher = h.getPublisher()
 
   if (config.INBOUND.PISP_TRANSACTION_MODE) {
     PISPTransactionModel.triggerWorkflow(
       PISPTransactionPhase.waitOnAuthorizationPost,
       payload.transactionRequestId,
-      pubSub,
+      publisher,
       payload as unknown as Message
     )
   } else {

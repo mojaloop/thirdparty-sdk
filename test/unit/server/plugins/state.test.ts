@@ -62,7 +62,7 @@ describe('StatePlugin', () => {
 
   it('happy flow: should properly register', async () => {
     mocked(KVS.prototype.connect).mockImplementationOnce(() => Promise.resolve())
-    mocked(PubSub.prototype.connect).mockImplementationOnce(() => Promise.resolve())
+    mocked(PubSub.prototype.connect).mockImplementation(() => Promise.resolve())
 
     await StatePlugin.register(ServerMock as unknown as Server)
 
@@ -71,21 +71,23 @@ describe('StatePlugin', () => {
     expect(ServerMock.decorate.mock.calls[0][0]).toEqual('toolkit')
     expect(ServerMock.decorate.mock.calls[0][1]).toEqual('getKVS')
     expect(ServerMock.decorate.mock.calls[1][0]).toEqual('toolkit')
-    expect(ServerMock.decorate.mock.calls[1][1]).toEqual('getPubSub')
+    expect(ServerMock.decorate.mock.calls[1][1]).toEqual('getPublisher')
     expect(ServerMock.decorate.mock.calls[2][0]).toEqual('toolkit')
-    expect(ServerMock.decorate.mock.calls[2][1]).toEqual('getLogger')
+    expect(ServerMock.decorate.mock.calls[2][1]).toEqual('getSubscriber')
     expect(ServerMock.decorate.mock.calls[3][0]).toEqual('toolkit')
-    expect(ServerMock.decorate.mock.calls[3][1]).toEqual('getMojaloopRequests')
+    expect(ServerMock.decorate.mock.calls[3][1]).toEqual('getLogger')
     expect(ServerMock.decorate.mock.calls[4][0]).toEqual('toolkit')
-    expect(ServerMock.decorate.mock.calls[4][1]).toEqual('getThirdpartyRequests')
+    expect(ServerMock.decorate.mock.calls[4][1]).toEqual('getMojaloopRequests')
     expect(ServerMock.decorate.mock.calls[5][0]).toEqual('toolkit')
-    expect(ServerMock.decorate.mock.calls[5][1]).toEqual('getWSO2Auth')
+    expect(ServerMock.decorate.mock.calls[5][1]).toEqual('getThirdpartyRequests')
     expect(ServerMock.decorate.mock.calls[6][0]).toEqual('toolkit')
-    expect(ServerMock.decorate.mock.calls[6][1]).toEqual('getPISPBackendRequests')
+    expect(ServerMock.decorate.mock.calls[6][1]).toEqual('getWSO2Auth')
     expect(ServerMock.decorate.mock.calls[7][0]).toEqual('toolkit')
-    expect(ServerMock.decorate.mock.calls[7][1]).toEqual('getDFSPBackendRequests')
+    expect(ServerMock.decorate.mock.calls[7][1]).toEqual('getPISPBackendRequests')
     expect(ServerMock.decorate.mock.calls[8][0]).toEqual('toolkit')
-    expect(ServerMock.decorate.mock.calls[8][1]).toEqual('getSDKOutgoingRequests')
+    expect(ServerMock.decorate.mock.calls[8][1]).toEqual('getDFSPBackendRequests')
+    expect(ServerMock.decorate.mock.calls[9][0]).toEqual('toolkit')
+    expect(ServerMock.decorate.mock.calls[9][1]).toEqual('getSDKOutgoingRequests')
 
     // check listener registration on 'stop' event
     expect(ServerMock.events.on).toBeCalledTimes(1)
@@ -95,7 +97,7 @@ describe('StatePlugin', () => {
   it('exceptions: should properly register', async () => {
     // eslint-disable-next-line prefer-promise-reject-errors
     mocked(KVS.prototype.connect).mockImplementationOnce(() => Promise.reject('can not connect'))
-    mocked(PubSub.prototype.connect).mockImplementationOnce(() => Promise.resolve())
+    mocked(PubSub.prototype.connect).mockImplementation(() => Promise.resolve())
 
     const mockExit = mockProcessExit()
     await StatePlugin.register(ServerMock as unknown as Server)

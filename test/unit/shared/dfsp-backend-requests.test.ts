@@ -29,7 +29,7 @@ import { DFSPBackendConfig, DFSPBackendRequests } from '~/shared/dfsp-backend-re
 import { Scheme } from '~/shared/http-scheme'
 import mockLogger from '../mockLogger'
 import TestData from 'test/unit/data/mockData.json'
-import { uuid } from 'uuidv4'
+import { v4 as uuidv4 } from 'uuid'
 import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
 
 describe('backendRequests', () => {
@@ -42,7 +42,7 @@ describe('backendRequests', () => {
     verifyAuthorizationPath: 'verify-authorization',
     verifyConsentPath: 'verify-consent',
     getUserAccountsPath: 'accounts/{ID}',
-    validateOTPPath: 'validateOTP',
+    validateAuthTokenPath: 'validateAuthToken',
     validateThirdpartyTransactionRequestPath: 'validate-third-party-transaction-request',
     validateConsentRequestsPath: 'validateConsentRequests',
     sendOTPPath: 'sendOTP',
@@ -90,24 +90,24 @@ describe('backendRequests', () => {
     })
   })
 
-  describe('validateOTPSecret', () => {
+  describe('validateAuthToken', () => {
     it('should propagate the call to post', async () => {
       const response = { isValid: true }
       const postSpy = jest.spyOn(dfspBackendRequests, 'post').mockImplementationOnce(
         () => Promise.resolve(response)
       )
-      const consentRequestId = uuid()
-      const authToken = uuid()
-      const result = await dfspBackendRequests.validateOTPSecret(consentRequestId, authToken)
+      const consentRequestId = uuidv4()
+      const authToken = uuidv4()
+      const result = await dfspBackendRequests.validateAuthToken(consentRequestId, authToken)
       expect(result).toEqual(response)
-      expect(postSpy).toBeCalledWith(dfspBackendRequests.validateOTPPath, { authToken, consentRequestId })
+      expect(postSpy).toBeCalledWith(dfspBackendRequests.validateAuthTokenPath, { authToken, consentRequestId })
     })
   })
 
   describe('validateThirdpartyTransactionRequest', () => {
     it('should propagate the call to post', async () => {
       const response = { isValid: true }
-      const transactionRequestId = uuid()
+      const transactionRequestId = uuidv4()
       const transactionRequestRequest: tpAPI.Schemas.ThirdpartyRequestsTransactionsPostRequest = {
         transactionRequestId,
         payee: {

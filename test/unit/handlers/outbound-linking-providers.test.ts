@@ -54,7 +54,7 @@ jest.mock('~/models/outbound/pispPrelinking.model', () => ({
 describe('Outbound linking provider handler', () => {
   const toolkit = {
     getKVS: jest.fn(),
-    getPubSub: jest.fn(),
+    getSubscriber: jest.fn(),
     getLogger: jest.fn(() => mockLogger()),
     getThirdpartyRequests: jest.fn(() => ({
       getServices: jest.fn()

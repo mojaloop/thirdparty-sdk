@@ -56,15 +56,14 @@ describe('PUT /accounts/{ID}', (): void => {
     it('should propagate message via Redis PUB/SUB', async (): Promise<void> => {
       // eslint-disable-next-line no-async-promise-executor
       return new Promise(async (resolve) => {
-        const pubSub = new PubSub(config)
-        await pubSub.connect()
-        expect(pubSub.isConnected).toBeTruthy()
-        pubSub.subscribe('accounts_username1234', async (channel: string, message: Message, _id: number) => {
+        const subscriber = new PubSub(config)
+        await subscriber.connect()
+        expect(subscriber.isConnected).toBeTruthy()
+        subscriber.subscribe('accounts_username1234', async (channel: string, message: Message, _id: number) => {
           expect(channel).toEqual('accounts_username1234')
           expect(message).toEqual(payload)
-          await pubSub.disconnect()
-          expect(pubSub.isConnected).toBeFalsy()
-
+          await subscriber.disconnect()
+          expect(subscriber.isConnected).toBeFalsy()
           resolve()
         })
         // Act

@@ -45,7 +45,7 @@ async function patch (_context: unknown, request: Request, h: StateResponseToolk
   PISPLinkingModel.triggerWorkflow(
     PISPLinkingPhase.registerCredential,
     consentId,
-    h.getPubSub(),
+    h.getPublisher(),
     request.payload as unknown as Message
   )
   h.getLogger().info(`Inbound received PATCH /consents/{ID} response`)
@@ -67,14 +67,14 @@ async function patch (_context: unknown, request: Request, h: StateResponseToolk
     DFSPLinkingModel.triggerWorkflow(
       DFSPLinkingPhase.waitOnSignedCredentialFromPISPResponse,
       consentId,
-      h.getPubSub(),
+      h.getPublisher(),
       payload as unknown as Message
     )
   } else if (payload.credential.status == 'VERIFIED') {
     DFSPLinkingModel.triggerWorkflow(
       DFSPLinkingPhase.waitOnAuthServiceResponse,
       consentId,
-      h.getPubSub(),
+      h.getPublisher(),
       payload as unknown as Message
     )
     return h.response().code(Enum.Http.ReturnCodes.OK.CODE)

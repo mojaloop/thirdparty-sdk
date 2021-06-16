@@ -24,26 +24,16 @@
  * Kevin Leyow <kevin.leyow@modusbox.com>
  --------------
  ******/
-import { RedisConnectionConfig } from '~/shared/redis-connection'
-import { Message, PubSub } from '~/shared/pub-sub'
-import Config from '~/shared/config'
 import axios from 'axios'
 import env from '../env'
-import mockLogger from '../../unit/mockLogger'
 
-describe('DFSP Inbound', (): void => {
+describe.skip('DFSP Inbound', (): void => {
   describe('PUT /participants/CONSENT/{ID}/ response from account lookup service', (): void => {
     const scenarioUri = `${env.inbound.baseUri}/participants/CONSENT/8e34f91d-d078-4077-8263-2c047876fcf6`
 
     describe('Inbound API', (): void => {
-      const config: RedisConnectionConfig = {
-        host: Config.REDIS.HOST,
-        port: Config.REDIS.PORT,
-        logger: mockLogger(),
-        timeout: Config.REDIS.TIMEOUT
-      }
       const participantPayload = {
-        'fspId': 'central-auth'
+        'fspId': 'dfspa'
       }
 
       const axiosConfig = {
@@ -62,30 +52,6 @@ describe('DFSP Inbound', (): void => {
         // Assert
         expect(response.status).toEqual(200)
       })
-
-
-      it('should propagate message via Redis PUB/SUB', async (done): Promise<void> => {
-        const pubSub = new PubSub(config)
-        await pubSub.connect()
-        expect(pubSub.isConnected).toBeTruthy()
-
-        pubSub.subscribe('DFSPLinking_waitOnALSParticipantResponse_8e34f91d-d078-4077-8263-2c047876fcf6',
-          async (channel: string, message: Message) => {
-            expect(channel).toEqual('DFSPLinking_waitOnALSParticipantResponse_8e34f91d-d078-4077-8263-2c047876fcf6')
-            expect(message).toEqual(participantPayload)
-            await pubSub.disconnect()
-            expect(pubSub.isConnected).toBeFalsy()
-
-            done()
-          }
-        )
-
-        // Act
-        const response = await axios.put(scenarioUri, participantPayload, axiosConfig)
-
-        // Assert
-        expect(response.status).toEqual(200)
-      })
     })
   })
 
@@ -94,12 +60,6 @@ describe('DFSP Inbound', (): void => {
   const scenarioUri = `${env.inbound.baseUri}/participants/CONSENT/8e34f91d-d078-4077-8263-2c047876fcf6/error`
 
     describe('Inbound API', (): void => {
-      const config: RedisConnectionConfig = {
-        host: Config.REDIS.HOST,
-        port: Config.REDIS.PORT,
-        logger: mockLogger(),
-        timeout: Config.REDIS.TIMEOUT
-      }
       const errorPayload = {
         errorInformation: {
           errorCode: '5100',
@@ -125,30 +85,6 @@ describe('DFSP Inbound', (): void => {
       }
 
       it('should return 200', async (): Promise<void> => {
-        // Act
-        const response = await axios.put(scenarioUri, errorPayload, axiosConfig)
-
-        // Assert
-        expect(response.status).toEqual(200)
-      })
-
-
-      it('should propagate message via Redis PUB/SUB', async (done): Promise<void> => {
-        const pubSub = new PubSub(config)
-        await pubSub.connect()
-        expect(pubSub.isConnected).toBeTruthy()
-
-        pubSub.subscribe('DFSPLinking_waitOnALSParticipantResponse_8e34f91d-d078-4077-8263-2c047876fcf6',
-          async (channel: string, message: Message) => {
-            expect(channel).toEqual('DFSPLinking_waitOnALSParticipantResponse_8e34f91d-d078-4077-8263-2c047876fcf6')
-            expect(message).toEqual(errorPayload)
-            await pubSub.disconnect()
-            expect(pubSub.isConnected).toBeFalsy()
-
-            done()
-          }
-        )
-
         // Act
         const response = await axios.put(scenarioUri, errorPayload, axiosConfig)
 

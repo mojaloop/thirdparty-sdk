@@ -48,7 +48,8 @@ const healthCheck = new Shared.HealthCheck.HealthCheck(PACKAGE, [])
 const get = async (_context: any, _request: Request, h: StateResponseToolkit): Promise<ResponseObject> => {
   const response = await healthCheck.getHealth()
   response.KVSConnected = h.getKVS().isConnected
-  response.PubSubConnected = h.getPubSub().isConnected
+  response.PublisherConnected = h.getPublisher().isConnected
+  response.SubscriberConnected = h.getPublisher().isConnected
   response.LoggerPresent = typeof h.getLogger() !== 'undefined'
   response.ThirdpartyRequestsPresent = typeof h.getThirdpartyRequests() !== 'undefined'
   response.MojaloopRequestsPresent = typeof h.getMojaloopRequests() !== 'undefined'

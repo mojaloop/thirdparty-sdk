@@ -53,7 +53,7 @@ import shouldNotBeExecuted from 'test/unit/shouldNotBeExecuted'
 import TestData from 'test/unit/data/mockData.json'
 import { HTTPResponseError } from '../../../../src/shared/http-response-error'
 import { DFSPLinkingPhase } from '~/models/inbound/dfspLinking.interface';
-import { resetUuid } from '../../__mocks__/uuidv4';
+import { resetUuid } from '../../__mocks__/uuid';
 
 // mock KVS default exported class
 jest.mock('~/shared/kvs')
@@ -69,15 +69,19 @@ describe('dfspLinkingModel', () => {
     logger: mockLogger()
   }
   let modelConfig: DFSPLinkingModelConfig
+  let publisher: PubSub
 
   beforeEach(async () => {
     let subId = 0
     const handlers: {[key: string]: NotificationCallback } = {}
 
+    publisher = new PubSub(connectionConfig)
+    await publisher.connect()
+
     modelConfig = {
       key: 'cache-key',
       kvs: new KVS(connectionConfig),
-      pubSub: new PubSub(connectionConfig),
+      subscriber: new PubSub(connectionConfig),
       logger: connectionConfig.logger,
       thirdpartyRequests: {
         putConsentRequests: jest.fn(() => Promise.resolve({ statusCode: 202 })),
@@ -90,7 +94,7 @@ describe('dfspLinkingModel', () => {
         validateConsentRequests: jest.fn(() => Promise.resolve(mockData.consentRequestsPost.response)),
         storeConsentRequests: jest.fn(() => Promise.resolve()),
         sendOTP: jest.fn(() => Promise.resolve(mockData.consentRequestsPost.otpResponse)),
-        validateOTPSecret: jest.fn(() => Promise.resolve({
+        validateAuthToken: jest.fn(() => Promise.resolve({
           isValid: true
         }))
       } as unknown as DFSPBackendRequests,
@@ -99,24 +103,25 @@ describe('dfspLinkingModel', () => {
       } as unknown as MojaloopRequests,
       requestProcessingTimeoutSeconds: 3
     }
-    mocked(modelConfig.pubSub.subscribe).mockImplementation(
+    mocked(modelConfig.subscriber.subscribe).mockImplementation(
       (channel: string, cb: NotificationCallback) => {
         handlers[channel] = cb
         return ++subId
       }
     )
 
-    mocked(modelConfig.pubSub.publish).mockImplementation(
+    mocked(publisher.publish).mockImplementation(
       async (channel: string, message: Message) => handlers[channel](channel, message, subId)
     )
     await modelConfig.kvs.connect()
-    await modelConfig.pubSub.connect()
+    await modelConfig.subscriber.connect()
   })
 
   afterEach(async () => {
     resetUuid()
+    await publisher.disconnect()
     await modelConfig.kvs.disconnect()
-    await modelConfig.pubSub.disconnect()
+    await modelConfig.subscriber.disconnect()
   })
 
   function checkDFSPLinkingModelLayout (
@@ -127,7 +132,7 @@ describe('dfspLinkingModel', () => {
     expect(dfspLinkingModel.fsm.state).toEqual(consentRequestsData?.currentState || 'start')
 
     // check new getters
-    expect(dfspLinkingModel.pubSub).toEqual(modelConfig.pubSub)
+    expect(dfspLinkingModel.subscriber).toEqual(modelConfig.subscriber)
     expect(dfspLinkingModel.dfspBackendRequests).toEqual(modelConfig.dfspBackendRequests)
     expect(dfspLinkingModel.thirdpartyRequests).toEqual(modelConfig.thirdpartyRequests)
 
@@ -320,8 +325,8 @@ describe('dfspLinkingModel', () => {
         mockData.consentRequestsPutError.params.ID,
         {
           errorInformation: {
-            errorCode: '2001',
-            errorDescription: 'Internal server error'
+            errorCode: '7200',
+            errorDescription: 'Generic Thirdparty account linking error'
           }
         },
         'pispa'
@@ -354,8 +359,8 @@ describe('dfspLinkingModel', () => {
         mockData.consentRequestsPutError.params.ID,
         {
           errorInformation: {
-            errorCode: '2003',
-            errorDescription: 'Service currently unavailable'
+            errorCode: '7200',
+            errorDescription: 'Generic Thirdparty account linking error'
           }
         },
         'pispa'
@@ -388,8 +393,8 @@ describe('dfspLinkingModel', () => {
         mockData.consentRequestsPutError.params.ID,
         {
           errorInformation: {
-            errorCode: '2002',
-            errorDescription: 'Not implemented'
+            errorCode: '7200',
+            errorDescription: 'Generic Thirdparty account linking error'
           }
         },
         'pispa'
@@ -417,8 +422,8 @@ describe('dfspLinkingModel', () => {
         mockData.consentRequestsPutError.params.ID,
         {
           errorInformation: {
-            errorCode: '2001',
-            errorDescription: 'Internal server error'
+            errorCode: '7200',
+            errorDescription: 'Generic Thirdparty account linking error'
           }
         },
         'pispa'
@@ -561,7 +566,7 @@ describe('dfspLinkingModel', () => {
       const model = await create(validateData, modelConfig)
 
       setImmediate(() => {
-        model.pubSub.publish(
+        publisher.publish(
           waitOnAuthTokenFromPISPResponseChannel,
           mockData.consentRequestsIDPatchRequest.payload as unknown as Message
         )
@@ -639,7 +644,7 @@ describe('dfspLinkingModel', () => {
 
     it('validateAuthToken() should transition start to authTokenValidated state when successful', async () => {
       const model = await create(validateData, modelConfig)
-      mocked(modelConfig.dfspBackendRequests.validateOTPSecret).mockImplementationOnce(() => Promise.resolve({
+      mocked(modelConfig.dfspBackendRequests.validateAuthToken).mockImplementationOnce(() => Promise.resolve({
         isValid: true
       }))
 
@@ -649,15 +654,15 @@ describe('dfspLinkingModel', () => {
       // check that the fsm was able to transition properly
       expect(model.data.currentState).toEqual('authTokenValidated')
 
-      // check we made a call to dfspBackendRequests.validateOTPSecret
-      expect(modelConfig.dfspBackendRequests.validateOTPSecret).toBeCalledWith(
+      // check we made a call to dfspBackendRequests.validateAuthToken
+      expect(modelConfig.dfspBackendRequests.validateAuthToken).toBeCalledWith(
         'b51ec534-ee48-4575-b6a9-ead2955b8069', '123456'
       )
     })
 
     it('should handle failed OTP backend validation and send PUT /consentsRequest/{ID}/error response', async () => {
       mocked(
-        modelConfig.dfspBackendRequests.validateOTPSecret
+        modelConfig.dfspBackendRequests.validateAuthToken
       ).mockImplementationOnce(() => Promise.resolve({
         isValid: false
       }))
@@ -687,7 +692,7 @@ describe('dfspLinkingModel', () => {
 
     it('should handle empty OTP validation response and send PUT /consentsRequest/{ID}/error response', async () => {
       mocked(
-        modelConfig.dfspBackendRequests.validateOTPSecret
+        modelConfig.dfspBackendRequests.validateAuthToken
       ).mockImplementationOnce(() => Promise.resolve())
 
       const model = await create(validateData, modelConfig)
@@ -715,10 +720,10 @@ describe('dfspLinkingModel', () => {
 
     it('should handle exceptions and send PUT /consentsRequest/{ID}/error response', async () => {
       mocked(
-        modelConfig.dfspBackendRequests.validateOTPSecret
+        modelConfig.dfspBackendRequests.validateAuthToken
       ).mockImplementationOnce(
         () => {
-          throw new Error('mocked validateOTPSecret exception')
+          throw new Error('mocked validateAuthToken exception')
         }
       )
 
@@ -728,7 +733,7 @@ describe('dfspLinkingModel', () => {
         await model.fsm.validateAuthToken()
         shouldNotBeExecuted()
       } catch (err) {
-        expect(err.message).toEqual('mocked validateOTPSecret exception')
+        expect(err.message).toEqual('mocked validateAuthToken exception')
       }
 
       // check a PUT /consentsRequest/{ID}/error response was sent to source participant
@@ -790,7 +795,7 @@ describe('dfspLinkingModel', () => {
       const model = await create(validateData, modelConfig)
 
       setImmediate(() => {
-        model.pubSub.publish(
+        publisher.publish(
           waitOnSignedCredentialFromPISPResponseChannel,
           mockData.inboundPutConsentsIdRequestSignedCredential.payload as unknown as Message
         )
@@ -906,10 +911,6 @@ describe('dfspLinkingModel', () => {
       }
     }
 
-    const participantsTypeIDPutResponse: tpAPI.Schemas.ParticipantsTypeIDPutResponse = {
-      fspId: 'central-auth'
-    }
-
     beforeEach(async () => {
       validateData = {
         dfspId: 'dfspa',
@@ -952,20 +953,12 @@ describe('dfspLinkingModel', () => {
         DFSPLinkingPhase.waitOnAuthServiceResponse,
         validateData.consentId!
       )
-      const waitOnALSParticipantResponse = DFSPLinkingModel.notificationChannel(
-        DFSPLinkingPhase.waitOnALSParticipantResponse,
-        validateData.consentId!
-      )
 
       // defer publication to notification channel
       setImmediate(() => {
-        model.pubSub.publish(
+        publisher.publish(
           waitOnAuthServiceResponse,
           consentsIDPutResponseVerified as unknown as Message
-        )
-        model.pubSub.publish(
-          waitOnALSParticipantResponse,
-          participantsTypeIDPutResponse as unknown as Message
         )
       })
 
@@ -1028,14 +1021,10 @@ describe('dfspLinkingModel', () => {
         DFSPLinkingPhase.waitOnAuthServiceResponse,
         validateData.consentId!
       )
-      const waitOnALSParticipantResponse = DFSPLinkingModel.notificationChannel(
-        DFSPLinkingPhase.waitOnALSParticipantResponse,
-        validateData.consentId!
-      )
 
       // defer publication to notification channel
       setImmediate(() => {
-        model.pubSub.publish(
+        publisher.publish(
           waitOnAuthServiceResponse,
           {
             errorInformation: {
@@ -1043,10 +1032,6 @@ describe('dfspLinkingModel', () => {
               errorDescription: 'Generic Thirdparty account linking error'
             }
           } as unknown as Message
-        )
-        model.pubSub.publish(
-          waitOnALSParticipantResponse,
-          participantsTypeIDPutResponse as unknown as Message
         )
       })
 
@@ -1064,54 +1049,6 @@ describe('dfspLinkingModel', () => {
           errorInformation: {
             errorCode: '7213',
             errorDescription: 'Consent is invalid'
-          }
-        },
-        'pispa'
-      )
-    })
-
-    it('onValidateWithAuthService() should transition from consent granted to errored when receiving error response from ALS', async () => {
-      const model = await create(validateData, modelConfig)
-      const waitOnAuthServiceResponse = DFSPLinkingModel.notificationChannel(
-        DFSPLinkingPhase.waitOnAuthServiceResponse,
-        validateData.consentId!
-      )
-      const waitOnALSParticipantResponse = DFSPLinkingModel.notificationChannel(
-        DFSPLinkingPhase.waitOnALSParticipantResponse,
-        validateData.consentId!
-      )
-
-      // defer publication to notification channel
-      setImmediate(() => {
-        model.pubSub.publish(
-          waitOnAuthServiceResponse,
-          consentsIDPutResponseVerified as unknown as Message
-        )
-        model.pubSub.publish(
-          waitOnALSParticipantResponse,
-          {
-            errorInformation: {
-              errorCode: '3000',
-              errorDescription: 'Generic participant error'
-            }
-          } as unknown as Message
-        )
-      })
-
-      // start send consent step
-      await model.fsm.validateWithAuthService()
-      // check for errors
-      await model.checkModelDataForErrorInformation()
-      // check that the fsm was able to transition properly
-      expect(model.data.currentState).toEqual('errored')
-
-      // check we made a call to thirdpartyRequests.postConsents
-      expect(modelConfig.thirdpartyRequests.putConsentsError).toBeCalledWith(
-        validateData.consentId,
-        {
-          errorInformation: {
-            errorCode: '7200',
-            errorDescription: 'Generic Thirdparty account linking error'
           }
         },
         'pispa'
@@ -1151,10 +1088,6 @@ describe('dfspLinkingModel', () => {
   describe('Register THIRD_PARTY_LINKS with als', () => {
     let validateData: DFSPLinkingData
 
-    const participantsTypeIDPutResponse: tpAPI.Schemas.ParticipantsTypeIDPutResponse = {
-      fspId: 'central-auth'
-    }
-
     beforeEach(async () => {
       validateData = {
         dfspId: 'dfspa',
@@ -1168,7 +1101,6 @@ describe('dfspLinkingModel', () => {
         consentRequestsIDPatchResponse: mockData.consentRequestsIDPatchRequest.payload,
         consentIDPutResponseSignedCredentialFromPISP: mockData.inboundPutConsentsIdRequestSignedCredential.payload,
         consentIDPutResponseFromAuthService: mockData.inboundPutConsentsIdRequestVerifiedCredential.payload,
-        participantPutResponseFromALS: participantsTypeIDPutResponse,
         scopes: [
           {
             accountId: 'dfspa.username.1234',
@@ -1206,10 +1138,6 @@ describe('dfspLinkingModel', () => {
   describe('Notify PISP of successful account linking', () => {
     let validateData: DFSPLinkingData
 
-    const participantsTypeIDPutResponse: tpAPI.Schemas.ParticipantsTypeIDPutResponse = {
-      fspId: 'central-auth'
-    }
-
     beforeEach(async () => {
       validateData = {
         dfspId: 'dfspa',
@@ -1223,7 +1151,6 @@ describe('dfspLinkingModel', () => {
         consentRequestsIDPatchResponse: mockData.consentRequestsIDPatchRequest.payload,
         consentIDPutResponseSignedCredentialFromPISP: mockData.inboundPutConsentsIdRequestSignedCredential.payload,
         consentIDPutResponseFromAuthService: mockData.inboundPutConsentsIdRequestVerifiedCredential.payload,
-        participantPutResponseFromALS: participantsTypeIDPutResponse,
         scopes: [
           {
             accountId: 'dfspa.username.1234',
@@ -1343,10 +1270,6 @@ describe('dfspLinkingModel', () => {
       }
     }
 
-    const participantsTypeIDPutResponse: tpAPI.Schemas.ParticipantsTypeIDPutResponse = {
-      fspId: 'central-auth'
-    }
-
     beforeEach(async () => {
       validateData = {
         dfspId: 'dfspa',
@@ -1361,7 +1284,7 @@ describe('dfspLinkingModel', () => {
     it('start', async () => {
       mocked(modelConfig.dfspBackendRequests.validateConsentRequests).mockImplementationOnce(() => Promise.resolve(mockData.consentRequestsPost.response))
       mocked(modelConfig.dfspBackendRequests.storeConsentRequests).mockImplementationOnce(() => Promise.resolve())
-      mocked(modelConfig.dfspBackendRequests.validateOTPSecret).mockImplementationOnce(() => Promise.resolve({
+      mocked(modelConfig.dfspBackendRequests.validateAuthToken).mockImplementationOnce(() => Promise.resolve({
         isValid: true
       }))
 
@@ -1377,34 +1300,26 @@ describe('dfspLinkingModel', () => {
         DFSPLinkingPhase.waitOnAuthServiceResponse,
         '00000000-0000-1000-8000-000000000001'
       )
-      const waitOnALSParticipantResponse = DFSPLinkingModel.notificationChannel(
-        DFSPLinkingPhase.waitOnALSParticipantResponse,
-        '00000000-0000-1000-8000-000000000001'
-      )
 
       const model = await create(validateData, modelConfig)
 
       // todo: this feels very fickle...research a good solution for
       //       publishing responses one after the other
       setImmediate(() => {
-        model.pubSub.publish(
+        publisher.publish(
           waitOnAuthTokenFromPISPResponseChannel,
           mockData.consentRequestsIDPatchRequest.payload as unknown as Message
         )
         setTimeout(() => {
-          model.pubSub.publish(
+          publisher.publish(
             waitOnSignedCredentialFromPISPResponseChannel,
             mockData.inboundPutConsentsIdRequestSignedCredential.payload as unknown as Message
           )
         }, 200)
         setTimeout(() => {
-          model.pubSub.publish(
+          publisher.publish(
             waitOnAuthServiceResponse,
             consentsIDPutResponseVerified as unknown as Message
-          )
-          model.pubSub.publish(
-            waitOnALSParticipantResponse,
-            participantsTypeIDPutResponse as unknown as Message
           )
         }, 200)
       })

@@ -30,7 +30,7 @@ import {
   validateGrantedConsent
 } from '~/domain/thirdpartyRequests/transactions'
 import TestData from 'test/unit/data/mockData.json'
-import { resetUuid } from 'test/unit/__mocks__/uuidv4'
+import { resetUuid } from 'test/unit/__mocks__/uuid'
 import { MojaloopRequests, BaseRequestConfigType } from '@mojaloop/sdk-standard-components'
 
 const mockData = JSON.parse(JSON.stringify(TestData))

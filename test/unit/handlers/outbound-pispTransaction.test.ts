@@ -52,7 +52,7 @@ jest.mock('~/models/pispTransaction.model', () => ({
 describe('Outbound PISP transaction handlers', () => {
   const toolkit = {
     getKVS: jest.fn(),
-    getPubSub: jest.fn(),
+    getSubscriber: jest.fn(),
     getLogger: jest.fn(() => mockLogger()),
     getThirdpartyRequests: jest.fn(),
     getMojaloopRequests: jest.fn(),

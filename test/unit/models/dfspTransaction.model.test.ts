@@ -27,7 +27,7 @@
 ******/
 
 import { mocked } from 'ts-jest/utils'
-import { uuid } from 'uuidv4'
+import { v4 as uuidv4 } from 'uuid'
 import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
 
 import { KVS } from '~/shared/kvs'
@@ -87,9 +87,9 @@ describe('DFSPTransactionModel', () => {
         verifyAuthorization: jest.fn(() => Promise.resolve({ isValid: true }))
       } as unknown as DFSPBackendRequests
     }
-    transactionRequestId = uuid()
-    participantId = uuid()
-    transferId = uuid()
+    transactionRequestId = uuidv4()
+    participantId = uuidv4()
+    transferId = uuidv4()
     transactionRequestRequest = {
       transactionRequestId,
       payee: {
@@ -116,13 +116,13 @@ describe('DFSPTransactionModel', () => {
       expiration: (new Date()).toISOString()
     }
     transactionRequestPutUpdate = {
-      transactionId: uuid(),
+      transactionId: uuidv4(),
       transactionRequestState: 'RECEIVED'
     }
     requestQuoteRequest = {
       fspId: transactionRequestRequest.payee.partyIdInfo.fspId!,
       quotesPostRequest: {
-        quoteId: uuid(),
+        quoteId: uuidv4(),
         transactionId: transactionRequestPutUpdate.transactionId,
         transactionRequestId,
         payee: { ...transactionRequestRequest.payee },

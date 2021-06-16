@@ -26,7 +26,7 @@
  --------------
  ******/
 import { ThirdpartyTransactionRequest, QuoteRequest } from '../../interface/types'
-import { uuid } from 'uuidv4'
+import { v4 as uuidv4 } from 'uuid'
 import SDK from '@mojaloop/sdk-standard-components'
 import {
   v1_1 as fspiopAPI
@@ -34,8 +34,8 @@ import {
 
 export function buildPayeeQuoteRequestFromTptRequest (request: ThirdpartyTransactionRequest): QuoteRequest {
   const quoteRequest = {
-    quoteId: uuid(),
-    transactionId: uuid(),
+    quoteId: uuidv4(),
+    transactionId: uuidv4(),
     transactionRequestId: request.transactionRequestId,
     payee: request.payee,
     payer: request.payer,

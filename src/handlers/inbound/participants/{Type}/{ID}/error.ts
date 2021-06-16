@@ -21,37 +21,17 @@
  - Kevin Leyow <kevin.leyow@modusbox.com>
  --------------
  ******/
- import { Request, ResponseObject } from '@hapi/hapi'
- import {
-   v1_1 as fspiopAPI
- } from '@mojaloop/api-snippets'
- import { Message } from '~/shared/pub-sub'
- import { StateResponseToolkit } from '~/server/plugins/state'
- import { Enum } from '@mojaloop/central-services-shared'
- import { DFSPLinkingModel } from '~/models/inbound/dfspLinking.model'
- import { DFSPLinkingPhase } from '~/models/inbound/dfspLinking.interface'
+import { Request, ResponseObject } from '@hapi/hapi'
+import { StateResponseToolkit } from '~/server/plugins/state'
+import { Enum } from '@mojaloop/central-services-shared'
 
- /**
+/**
  * Handles a inbound PUT /participants/{Type}/{ID}/error request
  */
- async function put (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
-   const id = request.params.ID
-   const type = request.params.Type
-   const payload = request.payload as fspiopAPI.Schemas.ErrorInformation
+async function put (_context: unknown, _request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+  return h.response({}).code(Enum.Http.ReturnCodes.OK.CODE)
+}
 
-  // this is a inbound request coming from the ALS in response to
-  // DFSPLinkingModel.onValidateWithAuthService
-  if (type == 'CONSENT') {
-    DFSPLinkingModel.triggerWorkflow(
-      DFSPLinkingPhase.waitOnALSParticipantResponse,
-      id,
-      h.getPubSub(),
-      payload as unknown as Message
-    )
-  }
-   return h.response({}).code(Enum.Http.ReturnCodes.OK.CODE)
- }
-
- export default {
-   put
- }
+export default {
+  put
+}

@@ -47,9 +47,9 @@ async function put (_context: unknown, request: Request, h: StateResponseToolkit
   const payload = request.payload as unknown as tpAPI.Schemas.AccountsIDPutResponse
   const userId: string = request.params.ID
   const channel = PISPDiscoveryModel.notificationChannel(userId)
-  const pubSub = h.getPubSub()
+  const publisher = h.getPublisher()
   // don't await on promise to resolve, let finish publish in background
-  pubSub.publish(channel, payload as unknown as Message)
+  publisher.publish(channel, payload as unknown as Message)
   return h.response().code(200)
 }
 

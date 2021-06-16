@@ -44,7 +44,6 @@ export enum DFSPLinkingPhase {
   waitOnAuthTokenFromPISPResponse = 'waitOnAuthTokenFromPISPResponse',
   waitOnSignedCredentialFromPISPResponse = 'waitOnSignedCredentialFromPISPResponse',
   waitOnAuthServiceResponse = 'waitOnAuthServiceResponse',
-  waitOnALSParticipantResponse = 'waitOnALSParticipantResponse',
   waitOnThirdpartyLinkRegistrationResponse = 'waitOnThirdpartyLinkRegistrationResponse',
   waitOnVerificationNotification = 'waitOnVerificationNotification'
 }
@@ -74,7 +73,7 @@ export interface BackendStoreScopesRequest {
   scopes: tpAPI.Schemas.Scope[]
 }
 
-export interface BackendValidateOTPResponse {
+export interface BackendValidateAuthTokenResponse {
   isValid: boolean
 }
 
@@ -102,7 +101,7 @@ export interface DFSPLinkingStateMachine extends ControlledStateMachine {
 }
 
 export interface DFSPLinkingModelConfig extends PersistentModelConfig {
-  pubSub: PubSub
+  subscriber: PubSub
   thirdpartyRequests: ThirdpartyRequests
   mojaloopRequests: MojaloopRequests
   dfspBackendRequests: DFSPBackendRequests
@@ -125,7 +124,7 @@ export interface DFSPLinkingData extends StateData {
 
   // authenticate phase
   consentRequestsIDPutRequest?:
-    tpAPI.Schemas.ConsentRequestsIDPutResponseOTP &
+    tpAPI.Schemas.ConsentRequestsIDPutResponseOTP |
     tpAPI.Schemas.ConsentRequestsIDPutResponseWeb
   consentRequestsIDPatchResponse?: tpAPI.Schemas.ConsentRequestsIDPatchRequest
 
@@ -139,11 +138,8 @@ export interface DFSPLinkingData extends StateData {
   // request that passes signed credential to auth-service
   consentPostRequestToAuthService?: tpAPI.Schemas.ConsentsPostRequestAUTH
 
-  // two responses expected from the consentPostRequestToAuthService request
-  // one from the auth-service itself and another from the ALS for saving the
-  // CONSENT object
+  // response expected from the consentPostRequestToAuthService request
   consentIDPutResponseFromAuthService?: tpAPI.Schemas.ConsentsIDPutResponseVerified
-  participantPutResponseFromALS?: fspiopAPI.Schemas.ParticipantsTypeIDPutResponse
 
   // unimplemented request to ALS to batch create THIRD_PARTY_LINK objects
   // for accountId's

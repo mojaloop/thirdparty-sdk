@@ -28,7 +28,7 @@
  ******/
 
 import { StateMachineConfig } from 'javascript-state-machine'
-import { uuid } from 'uuidv4'
+import { v4 as uuidv4 } from 'uuid'
 import { thirdparty as tpAPI, v1_1 as fspiopAPI } from '@mojaloop/api-snippets'
 
 import { PersistentModel } from './persistent.model'
@@ -132,7 +132,7 @@ export class DFSPTransactionModel
     }
 
     // allocate new id
-    this.data.transactionId = uuid()
+    this.data.transactionId = uuidv4()
 
     // so let prepare notification payload to be send to PISPTransactionModel
     this.data.transactionRequestPutUpdate = {
@@ -172,7 +172,7 @@ export class DFSPTransactionModel
       fspId: tr.payee.partyIdInfo.fspId!,
       quotesPostRequest: {
         // allocate quoteId
-        quoteId: uuid(),
+        quoteId: uuidv4(),
 
         // copy from previously allocated
         transactionId: this.data.transactionRequestPutUpdate!.transactionId,
@@ -251,7 +251,7 @@ export class DFSPTransactionModel
         this.data.transactionRequestState = 'ACCEPTED'
 
         // TODO: to have or not to have transferId - what has been passed to quote - investigate!!!
-        this.data.transferId = uuid()
+        this.data.transferId = uuidv4()
 
         const tr = this.data.transactionRequestRequest
         const quote = this.data.requestQuoteResponse!.quotes

@@ -42,10 +42,10 @@ async function patch (_context: unknown, request: Request, h: StateResponseToolk
   DFSPLinkingModel.triggerWorkflow(
     DFSPLinkingPhase.waitOnAuthTokenFromPISPResponse,
     consentRequestId,
-    h.getPubSub(),
+    h.getPublisher(),
     request.payload as unknown as Message
   )
-  h.getLogger().info(`Inbound received PUT /consentRequests/{ID} response`)
+  h.getLogger().info(`Inbound received PATCH /consentRequests/{ID} response`)
 
   return h.response().code(Enum.Http.ReturnCodes.ACCEPTED.CODE)
 }
@@ -59,7 +59,7 @@ async function put (_context: unknown, request: Request, h: StateResponseToolkit
   PISPLinkingModel.triggerWorkflow(
     PISPLinkingPhase.requestConsent,
     consentRequestId,
-    h.getPubSub(),
+    h.getPublisher(),
     request.payload as unknown as Message
   )
   h.getLogger().info(`Inbound received PUT /consentRequests/{ID} response`)

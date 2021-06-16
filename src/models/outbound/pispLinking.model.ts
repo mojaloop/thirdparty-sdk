@@ -74,8 +74,8 @@ export class PISPLinkingModel
   }
 
   // getters
-  get pubSub (): PubSub {
-    return this.config.pubSub
+  get subscriber (): PubSub {
+    return this.config.subscriber
   }
 
   get thirdpartyRequests (): ThirdpartyRequests {
@@ -150,7 +150,7 @@ export class PISPLinkingModel
 
     const postConsentRequest = this.linkingRequestConsentPostRequestToConsentRequestsPostRequest()
 
-    return deferredJob(this.pubSub, channel)
+    return deferredJob(this.subscriber, channel)
       .init(async (channel) => {
         const res = await this.thirdpartyRequests.postConsentRequests(
           postConsentRequest,
@@ -191,7 +191,7 @@ export class PISPLinkingModel
 
     this.logger.push({ channel }).info('onAuthenticate - subscribe to channel')
 
-    return deferredJob(this.pubSub, channel)
+    return deferredJob(this.subscriber, channel)
     .init(async (channel) => {
       const res = await this.thirdpartyRequests.patchConsentRequests(
         consentRequestId,
@@ -241,7 +241,7 @@ export class PISPLinkingModel
 
     this.logger.push({ channel }).info('onRegisterCredential - subscribe to channel')
 
-    return deferredJob(this.pubSub, channel)
+    return deferredJob(this.subscriber, channel)
     .init(async (channel) => {
       // todo: need credential type distinguishing logic once we support more
       //       credential types

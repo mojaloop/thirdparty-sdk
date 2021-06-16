@@ -63,8 +63,8 @@ export class PISPPrelinkingModel
   }
 
   // getters
-  get pubSub (): PubSub {
-    return this.config.pubSub
+  get subscriber (): PubSub {
+    return this.config.subscriber
   }
 
   get thirdpartyRequests (): ThirdpartyRequests {
@@ -93,7 +93,7 @@ export class PISPPrelinkingModel
 
     this.logger.push({ channel }).info('onGetProviders - subscribe to channel')
 
-    return deferredJob(this.pubSub, channel)
+    return deferredJob(this.subscriber, channel)
     .init(async (channel) => {
       const res = await this.thirdpartyRequests.getServices(
         serviceType

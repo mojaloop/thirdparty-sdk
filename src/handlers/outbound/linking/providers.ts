@@ -49,7 +49,7 @@ async function get (_context: unknown, _request: Request, h: StateResponseToolki
 
   const modelConfig: PISPPrelinkingModelConfig = {
     kvs: h.getKVS(),
-    pubSub: h.getPubSub(),
+    subscriber: h.getSubscriber(),
     key: serviceType,
     logger: h.getLogger(),
     thirdpartyRequests: h.getThirdpartyRequests(),

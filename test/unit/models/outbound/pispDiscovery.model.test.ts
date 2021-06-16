@@ -63,6 +63,7 @@ describe('PISPDiscoveryModel', () => {
     logger: mockLogger()
   }
   let modelConfig: PISPDiscoveryModelConfig
+  let publisher: PubSub
   const expectedResp = {
     accounts: [
       {
@@ -88,22 +89,26 @@ describe('PISPDiscoveryModel', () => {
   }
 
   beforeEach(async () => {
+    publisher = new PubSub(connectionConfig)
+    await publisher.connect()
+
     modelConfig = {
       kvs: new KVS(connectionConfig),
       key: 'cache-key',
       logger: connectionConfig.logger,
-      pubSub: new PubSub(connectionConfig),
+      subscriber: new PubSub(connectionConfig),
       thirdpartyRequests: {
         getAccounts: jest.fn()
       } as unknown as ThirdpartyRequests
     }
     await modelConfig.kvs.connect()
-    await modelConfig.pubSub.connect()
+    await modelConfig.subscriber.connect()
   })
 
   afterEach(async () => {
+    await publisher.disconnect()
     await modelConfig.kvs.disconnect()
-    await modelConfig.pubSub.disconnect()
+    await modelConfig.subscriber.disconnect()
   })
 
   function checkPISPDiscoveryModelLayout (am: PISPDiscoveryModel, optData?: PISPDiscoveryData) {
@@ -112,7 +117,7 @@ describe('PISPDiscoveryModel', () => {
     expect(am.fsm.state).toEqual(optData?.currentState || 'start')
 
     // check new getters
-    expect(am.pubSub).toEqual(modelConfig.pubSub)
+    expect(am.subscriber).toEqual(modelConfig.subscriber)
     expect(am.thirdpartyRequests).toEqual(modelConfig.thirdpartyRequests)
 
     // check is fsm correctly constructed
@@ -154,14 +159,14 @@ describe('PISPDiscoveryModel', () => {
 
     const mockData = JSON.parse(JSON.stringify(TestData))
     beforeEach(() => {
-      mocked(modelConfig.pubSub.subscribe).mockImplementationOnce(
+      mocked(modelConfig.subscriber.subscribe).mockImplementationOnce(
         (_channel: string, cb: NotificationCallback) => {
           handler = cb
           return ++subId
         }
       )
 
-      mocked(modelConfig.pubSub.publish).mockImplementationOnce(
+      mocked(publisher.publish).mockImplementationOnce(
         async (channel: string, message: Message) => handler(channel, message, subId)
       )
 
@@ -184,7 +189,7 @@ describe('PISPDiscoveryModel', () => {
     it('should give response properly populated from notification channel - success', async () => {
       const model = await create(data, modelConfig)
       // defer publication to notification channel
-      setImmediate(() => model.pubSub.publish(
+      setImmediate(() => publisher.publish(
         channel,
         putResponse as unknown as Message
       ))
@@ -198,15 +203,15 @@ describe('PISPDiscoveryModel', () => {
       expect(mocked(modelConfig.thirdpartyRequests.getAccounts)).toHaveBeenCalledWith(
         model.data.userId, model.data.toParticipantId
       )
-      expect(mocked(modelConfig.pubSub.subscribe)).toBeCalledTimes(1)
-      expect(mocked(modelConfig.pubSub.unsubscribe)).toBeCalledWith(channel, subId)
-      expect(mocked(modelConfig.pubSub.publish)).toBeCalledWith(channel, putResponse)
+      expect(mocked(modelConfig.subscriber.subscribe)).toBeCalledTimes(1)
+      expect(mocked(modelConfig.subscriber.unsubscribe)).toBeCalledWith(channel, subId)
+      expect(mocked(publisher.publish)).toBeCalledWith(channel, putResponse)
     })
     it('should give response properly populated from notification channel - ID not found', async () => {
       putResponse = mockData.accountsRequestError.payload
       const model = await create(data, modelConfig)
       // defer publication to notification channel
-      setImmediate(() => model.pubSub.publish(
+      setImmediate(() => publisher.publish(
         channel,
         putResponse as unknown as Message
       ))
@@ -220,9 +225,9 @@ describe('PISPDiscoveryModel', () => {
       expect(mocked(modelConfig.thirdpartyRequests.getAccounts)).toHaveBeenCalledWith(
         model.data.userId, model.data.toParticipantId
       )
-      expect(mocked(modelConfig.pubSub.subscribe)).toBeCalledTimes(1)
-      expect(mocked(modelConfig.pubSub.unsubscribe)).toBeCalledWith(channel, subId)
-      expect(mocked(modelConfig.pubSub.publish)).toBeCalledWith(channel, putResponse)
+      expect(mocked(modelConfig.subscriber.subscribe)).toBeCalledTimes(1)
+      expect(mocked(modelConfig.subscriber.unsubscribe)).toBeCalledWith(channel, subId)
+      expect(mocked(publisher.publish)).toBeCalledWith(channel, putResponse)
     })
 
     it('should properly handle error from requests.getAccounts', async () => {
@@ -239,8 +244,8 @@ describe('PISPDiscoveryModel', () => {
         expect(err).toEqual(new Error('error from requests.getAccounts'))
         const result = model.getResponse()
         expect(result).toBeUndefined()
-        expect(mocked(modelConfig.pubSub.subscribe)).toBeCalledTimes(1)
-        expect(mocked(modelConfig.pubSub.unsubscribe)).toBeCalledWith(channel, subId)
+        expect(mocked(modelConfig.subscriber.subscribe)).toBeCalledTimes(1)
+        expect(mocked(modelConfig.subscriber.unsubscribe)).toBeCalledWith(channel, subId)
       }
     })
 
@@ -249,7 +254,7 @@ describe('PISPDiscoveryModel', () => {
         const model = await create(data, modelConfig)
 
         // defer publication to notification channel
-        setImmediate(() => model.pubSub.publish(
+        setImmediate(() => publisher.publish(
           channel,
           putResponse as unknown as Message
         ))
@@ -260,9 +265,9 @@ describe('PISPDiscoveryModel', () => {
         expect(mocked(modelConfig.thirdpartyRequests.getAccounts)).toHaveBeenCalledWith(
           model.data.userId, model.data.toParticipantId
         )
-        expect(mocked(modelConfig.pubSub.subscribe)).toBeCalledTimes(1)
-        expect(mocked(modelConfig.pubSub.unsubscribe)).toBeCalledWith(channel, subId)
-        expect(mocked(modelConfig.pubSub.publish)).toBeCalledWith(channel, putResponse)
+        expect(mocked(modelConfig.subscriber.subscribe)).toBeCalledTimes(1)
+        expect(mocked(modelConfig.subscriber.unsubscribe)).toBeCalledWith(channel, subId)
+        expect(mocked(publisher.publish)).toBeCalledWith(channel, putResponse)
 
         expect(mocked(modelConfig.logger.info)).toBeCalledWith('getAccounts completed successfully')
         mocked(modelConfig.logger.info).mockReset()

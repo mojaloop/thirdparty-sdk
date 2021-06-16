@@ -32,7 +32,7 @@ import {
   BackendSendOTPRequest,
   BackendSendOTPResponse,
   BackendStoreScopesRequest,
-  BackendValidateOTPResponse
+  BackendValidateAuthTokenResponse
 } from '~/models/inbound/dfspLinking.interface'
 
 export interface IsValidResponse {
@@ -42,7 +42,7 @@ export interface DFSPBackendConfig extends HttpRequestsConfig {
   verifyAuthorizationPath: string
   verifyConsentPath: string
   getUserAccountsPath: string
-  validateOTPPath: string
+  validateAuthTokenPath: string
   validateThirdpartyTransactionRequestPath: string
   validateConsentRequestsPath: string
   sendOTPPath: string
@@ -83,9 +83,9 @@ export class DFSPBackendRequests extends HttpRequests {
     return this.config.getUserAccountsPath
   }
 
-  // validate OTP path getter
-  get validateOTPPath (): string {
-    return this.config.validateOTPPath
+  // validate auth token path getter
+  get validateAuthTokenPath (): string {
+    return this.config.validateAuthTokenPath
   }
 
   // get path for validation of ThirdpartyTransactionRequest
@@ -147,13 +147,13 @@ export class DFSPBackendRequests extends HttpRequests {
   // POST the consent request ID and authToken for a DFSP to validate.
   // This check is needed to continue the flow of responding to a /consentRequest
   // with either a POST /consents or PUT /consentRequests/{ID}/error
-  async validateOTPSecret (consentRequestId: string, authToken: string): Promise<BackendValidateOTPResponse | void> {
+  async validateAuthToken (consentRequestId: string, authToken: string): Promise<BackendValidateAuthTokenResponse | void> {
     const validateRequest = {
       consentRequestId: consentRequestId,
       authToken: authToken
     }
 
-    return this.post(this.validateOTPPath, validateRequest)
+    return this.post(this.validateAuthTokenPath, validateRequest)
   }
 
   // validate ThirdpartyTransactionRequest

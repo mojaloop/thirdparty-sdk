@@ -28,7 +28,6 @@
 
 import {
   thirdparty as tpAPI,
-  v1_1 as fspiopAPI
 } from '@mojaloop/api-snippets'
 import { Request, ResponseObject } from '@hapi/hapi'
 import { StateResponseToolkit } from '~/server/plugins/state'
@@ -37,11 +36,10 @@ import {
   DFSPLinkingData,
   DFSPLinkingModelConfig
 } from '~/models/inbound/dfspLinking.interface'
-import { DFSPLinkingModel } from '~/models/inbound/dfspLinking.model'
+import { DFSPLinkingModel, create } from '~/models/inbound/dfspLinking.model'
 import inspect from '~/shared/inspect'
 import config from '~/shared/config'
-import { reformatError } from '~/shared/api-error'
-import { Errors } from '@mojaloop/sdk-standard-components'
+
 
 /**
  * Handles an inbound `POST /consentRequests` request
@@ -65,7 +63,7 @@ async function post (_context: unknown, request: Request, h: StateResponseToolki
   // if the request is valid then DFSP returns response via PUT /consentRequests/{ID} call.
   const modelConfig: DFSPLinkingModelConfig = {
     kvs: h.getKVS(),
-    pubSub: h.getPubSub(),
+    subscriber: h.getSubscriber(),
     key: consentRequestId,
     logger: logger,
     dfspBackendRequests: h.getDFSPBackendRequests(),
@@ -77,21 +75,11 @@ async function post (_context: unknown, request: Request, h: StateResponseToolki
   // postpone model execution to next event loop cycle so we can return response ASAP
   setImmediate(async () => {
     try {
-      const model = new DFSPLinkingModel(data, modelConfig)
+      const model: DFSPLinkingModel = await create(data, modelConfig)
       await model.run()
     } catch (error) {
-      // catch any unplanned errors
-      // we send back an account linking error despite the actual error
-      const mojaloopError = reformatError(
-        Errors.MojaloopApiErrorCodes.TP_ACCOUNT_LINKING_ERROR,
-        logger
-      )
-
-      await h.getThirdpartyRequests().putConsentRequestsError(
-        consentRequestId,
-        mojaloopError as unknown as fspiopAPI.Schemas.ErrorInformationObject,
-        sourceFspId
-      )
+      // the model catches all planned, catches unplanned errors,
+      // handles callbacks and also rethrows the error to stop the state machine
       h.getLogger().info(`Error running DFSPLinkingModel : ${inspect(error)}`)
     }
   })
