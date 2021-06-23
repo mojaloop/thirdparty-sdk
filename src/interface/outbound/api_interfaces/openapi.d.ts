@@ -5,287 +5,69 @@
 
 export interface paths {
   '/health': {
+    /** The HTTP request GET /health is used to return the current status of the API. */
     get: operations['HealthGet'];
   };
   '/metrics': {
+    /** The HTTP request GET /metrics is used to return metrics for the API. */
     get: operations['MetricsGet'];
   };
   '/authorizations': {
+    /** DFSP Requests Authorization of Transaction from the End User */
     post: operations['OutboundAuthorizationsPost'];
   };
   '/thirdpartyTransaction/partyLookup': {
+    /** The HTTP request `POST /thirdpartyTransaction/partyLookup` is used to lookup information regarding the requested Party, defined by `Type`, `ID` and optionally `SubId`. */
     post: operations['ThirdpartyTransactionPartyLookup'];
   };
   '/thirdpartyTransaction/{ID}/initiate': {
+    /** The HTTP request `POST /thirdpartyTransaction/{ID}/initiate` is sent to the Switch to initiate a third party request transaction. */
     post: operations['ThirdpartyTransactionIDInitiate'];
   };
   '/thirdpartyTransaction/{ID}/approve': {
+    /** The HTTP request `POST /thirdpartyTransaction/{ID}/approve` is used to approve a third party transaction . */
     post: operations['ThirdpartyTransactionIDApprove'];
   };
   '/thirdpartyRequests/transactions/{ID}/authorizations': {
+    /** The HTTP request `POST /thirdpartyRequests/transactions/{ID}/authorizations` is used by the DFSP to verify a third party authorization. */
     post: operations['VerifyThirdPartyAuthorization'];
   };
   '/linking/providers': {
+    /** The HTTP request `GET /linking/providers` is used to retrieve a list of thirdparty enabled DFSP identifiers. */
     get: operations['GetLinkingProviders'];
   };
   '/linking/accounts/{fspId}/{userId}': {
+    /** The HTTP request `GET /linking/accounts/{fspId}/{userId}` is used to retrieve the list of potential accounts available for linking. */
     get: operations['GetLinkingAccountsByUserId'];
   };
   '/linking/request-consent': {
+    /**
+     * The HTTP request `POST /linking/request-consent` is used to by a PISP to ask
+     * a specific DFSP to start the process of establishing consent between three parties.
+     *
+     * - The PISP
+     * - The DFSP
+     * - A user presumed to be a customer of 'The DFSP'
+     */
     post: operations['PostLinkingRequestConsent'];
   };
   '/linking/request-consent/{ID}/authenticate': {
+    /**
+     * Used in the authentication phase of account linking.
+     * Used by the PISP to pass an Auth token on behalf of the user to the DFSP to establish a chain of trust.
+     */
     patch: operations['PatchLinkingRequestConsentIDAuthenticate'];
   };
   '/linking/request-consent/{ID}/pass-credential': {
+    /**
+     * Used in the credential registration phase of account linking.
+     * Used by the PISP to pass an credential on behalf of the user to the DFSP.
+     */
     post: operations['PostLinkingRequestConsentIDPassCredential'];
   };
 }
 
-export interface operations {
-  /** The HTTP request GET /health is used to return the current status of the API. */
-  HealthGet: {
-    responses: {
-      200: components['responses']['200'];
-      400: components['responses']['400'];
-      401: components['responses']['401'];
-      403: components['responses']['403'];
-      404: components['responses']['404'];
-      405: components['responses']['405'];
-      406: components['responses']['406'];
-      501: components['responses']['501'];
-      503: components['responses']['503'];
-    };
-  };
-  /** The HTTP request GET /metrics is used to return metrics for the API. */
-  MetricsGet: {
-    responses: {
-      200: components['responses']['200'];
-      400: components['responses']['400'];
-      401: components['responses']['401'];
-      403: components['responses']['403'];
-      404: components['responses']['404'];
-      405: components['responses']['405'];
-      406: components['responses']['406'];
-      501: components['responses']['501'];
-      503: components['responses']['503'];
-    };
-  };
-  /** DFSP Requests Authorization of Transaction from the End User */
-  OutboundAuthorizationsPost: {
-    requestBody: {
-      'application/json': components['schemas']['AuthorizationsRequest'];
-    };
-    responses: {
-      200: components['responses']['AuthorizationsResponse'];
-      400: components['responses']['400'];
-      401: components['responses']['401'];
-      403: components['responses']['403'];
-      404: components['responses']['404'];
-      405: components['responses']['405'];
-      406: components['responses']['406'];
-      501: components['responses']['501'];
-      503: components['responses']['503'];
-    };
-  };
-  /** The HTTP request `POST /thirdpartyTransaction/partyLookup` is used to lookup information regarding the requested Party, defined by `Type`, `ID` and optionally `SubId`. */
-  ThirdpartyTransactionPartyLookup: {
-    requestBody: {
-      'application/json': components['schemas']['ThirdpartyTransactionPartyLookupRequest'];
-    };
-    responses: {
-      200: components['responses']['ThirdpartyTransactionPartyLookupResponse'];
-      400: components['responses']['400'];
-      401: components['responses']['401'];
-      403: components['responses']['403'];
-      404: components['responses']['404'];
-      405: components['responses']['405'];
-      406: components['responses']['406'];
-      501: components['responses']['501'];
-      503: components['responses']['503'];
-    };
-  };
-  /** The HTTP request `POST /thirdpartyTransaction/{ID}/initiate` is sent to the Switch to initiate a third party request transaction. */
-  ThirdpartyTransactionIDInitiate: {
-    parameters: {
-      path: {
-        ID: components['parameters']['ID'];
-      };
-    };
-    requestBody: {
-      'application/json': components['schemas']['ThirdpartyTransactionIDInitiateRequest'];
-    };
-    responses: {
-      200: components['responses']['ThirdpartyTransactionIDInitiateResponse'];
-      400: components['responses']['400'];
-      401: components['responses']['401'];
-      403: components['responses']['403'];
-      404: components['responses']['404'];
-      405: components['responses']['405'];
-      406: components['responses']['406'];
-      501: components['responses']['501'];
-      503: components['responses']['503'];
-    };
-  };
-  /** The HTTP request `POST /thirdpartyTransaction/{ID}/approve` is used to approve a third party transaction . */
-  ThirdpartyTransactionIDApprove: {
-    parameters: {
-      path: {
-        ID: components['parameters']['ID'];
-      };
-    };
-    requestBody: {
-      'application/json': components['schemas']['ThirdpartyTransactionIDApproveRequest'];
-    };
-    responses: {
-      200: components['responses']['ThirdpartyTransactionIDApproveResponse'];
-      400: components['responses']['400'];
-      401: components['responses']['401'];
-      403: components['responses']['403'];
-      404: components['responses']['404'];
-      405: components['responses']['405'];
-      406: components['responses']['406'];
-      501: components['responses']['501'];
-      503: components['responses']['503'];
-    };
-  };
-  /** The HTTP request `POST /thirdpartyRequests/transactions/{ID}/authorizations` is used by the DFSP to verify a third party authorization. */
-  VerifyThirdPartyAuthorization: {
-    parameters: {
-      path: {
-        ID: components['parameters']['ID'];
-      };
-    };
-    requestBody: {
-      'application/json': components['schemas']['ThirdpartyRequestsTransactionsIDAuthorizationsPostRequest'];
-    };
-    responses: {
-      200: components['responses']['ThirdpartyRequestsTransactionsIDAuthzResponse'];
-      400: components['responses']['400'];
-      401: components['responses']['401'];
-      403: components['responses']['403'];
-      404: components['responses']['404'];
-      405: components['responses']['405'];
-      406: components['responses']['406'];
-      501: components['responses']['501'];
-      503: components['responses']['503'];
-    };
-  };
-  /** The HTTP request `GET /linking/providers` is used to retrieve a list of thirdparty enabled DFSP identifiers. */
-  GetLinkingProviders: {
-    responses: {
-      200: components['responses']['LinkingProvidersResponse'];
-      400: components['responses']['400'];
-      401: components['responses']['401'];
-      403: components['responses']['403'];
-      404: components['responses']['404'];
-      405: components['responses']['405'];
-      406: components['responses']['406'];
-      501: components['responses']['501'];
-      503: components['responses']['503'];
-    };
-  };
-  /** The HTTP request `GET /linking/accounts/{fspId}/{userId}` is used to retrieve the list of potential accounts available for linking. */
-  GetLinkingAccountsByUserId: {
-    parameters: {
-      path: {
-        fspId: components['schemas']['FspId'];
-        userId: components['schemas']['AccountId'];
-      };
-    };
-    responses: {
-      200: components['responses']['AccountsByUserIdResponse'];
-      400: components['responses']['400'];
-      401: components['responses']['401'];
-      403: components['responses']['403'];
-      404: components['responses']['404'];
-      405: components['responses']['405'];
-      406: components['responses']['406'];
-      501: components['responses']['501'];
-      503: components['responses']['503'];
-    };
-  };
-  /**
-   * The HTTP request `POST /linking/request-consent` is used to by a PISP to ask
-   * a specific DFSP to start the process of establishing consent between three parties.
-   *
-   * - The PISP
-   * - The DFSP
-   * - A user presumed to be a customer of 'The DFSP'
-   */
-  PostLinkingRequestConsent: {
-    requestBody: {
-      'application/json': components['schemas']['LinkingRequestConsentPostRequest'];
-    };
-    responses: {
-      200: components['responses']['LinkingRequestConsentResponse'];
-      400: components['responses']['400'];
-      401: components['responses']['401'];
-      403: components['responses']['403'];
-      404: components['responses']['404'];
-      405: components['responses']['405'];
-      406: components['responses']['406'];
-      501: components['responses']['501'];
-      503: components['responses']['503'];
-    };
-  };
-  /**
-   * Used in the authentication phase of account linking.
-   * Used by the PISP to pass an Auth token on behalf of the user to the DFSP to establish a chain of trust.
-   */
-  PatchLinkingRequestConsentIDAuthenticate: {
-    parameters: {
-      path: {
-        ID: components['schemas']['CorrelationId'];
-      };
-    };
-    requestBody: {
-      'application/json': components['schemas']['LinkingRequestConsentIDAuthenticateRequest'];
-    };
-    responses: {
-      200: components['responses']['LinkingRequestConsentIDAuthenticateResponse'];
-      400: components['responses']['400'];
-      401: components['responses']['401'];
-      403: components['responses']['403'];
-      404: components['responses']['404'];
-      405: components['responses']['405'];
-      406: components['responses']['406'];
-      501: components['responses']['501'];
-      503: components['responses']['503'];
-    };
-  };
-  /**
-   * Used in the credential registration phase of account linking.
-   * Used by the PISP to pass an credential on behalf of the user to the DFSP.
-   */
-  PostLinkingRequestConsentIDPassCredential: {
-    parameters: {
-      path: {
-        ID: components['schemas']['CorrelationId'];
-      };
-    };
-    requestBody: {
-      'application/json': components['schemas']['LinkingRequestConsentIDPassCredentialRequest'];
-    };
-    responses: {
-      200: components['responses']['LinkingRequestConsentIDPassCredentialResponse'];
-      400: components['responses']['400'];
-      401: components['responses']['401'];
-      403: components['responses']['403'];
-      404: components['responses']['404'];
-      405: components['responses']['405'];
-      406: components['responses']['406'];
-      501: components['responses']['501'];
-      503: components['responses']['503'];
-    };
-  };
-}
-
 export interface components {
-  parameters: {
-    /** The identifier value. */
-    ID: string;
-  };
   schemas: {
     /** The API data type ErrorCode is a JSON String of four characters, consisting of digits only. Negative numbers are not allowed. A leading zero is not allowed. Each error code in the API is a four-digit number, for example, 1234, where the first number (1 in the example) represents the high-level error category, the second number (2 in the example) represents the low-level error category, and the last two numbers (34 in the example) represent the specific error. */
     ErrorCode: string;
@@ -1057,85 +839,61 @@ export interface components {
   };
   responses: {
     /** OK */
-    '200': {};
+    200: unknown;
     /** Bad Request */
-    '400': {
+    400: {
+      headers: {};
       content: {
         'application/json': components['schemas']['ErrorInformationResponse'];
-      };
-      headers: {
-        'Content-Length': components['headers']['Content-Length'];
-        'Content-Type': components['headers']['Content-Type'];
       };
     };
     /** Unauthorized */
-    '401': {
+    401: {
+      headers: {};
       content: {
         'application/json': components['schemas']['ErrorInformationResponse'];
-      };
-      headers: {
-        'Content-Length': components['headers']['Content-Length'];
-        'Content-Type': components['headers']['Content-Type'];
       };
     };
     /** Forbidden */
-    '403': {
+    403: {
+      headers: {};
       content: {
         'application/json': components['schemas']['ErrorInformationResponse'];
-      };
-      headers: {
-        'Content-Length': components['headers']['Content-Length'];
-        'Content-Type': components['headers']['Content-Type'];
       };
     };
     /** Not Found */
-    '404': {
+    404: {
+      headers: {};
       content: {
         'application/json': components['schemas']['ErrorInformationResponse'];
-      };
-      headers: {
-        'Content-Length': components['headers']['Content-Length'];
-        'Content-Type': components['headers']['Content-Type'];
       };
     };
     /** Method Not Allowed */
-    '405': {
+    405: {
+      headers: {};
       content: {
         'application/json': components['schemas']['ErrorInformationResponse'];
-      };
-      headers: {
-        'Content-Length': components['headers']['Content-Length'];
-        'Content-Type': components['headers']['Content-Type'];
       };
     };
     /** Not Acceptable */
-    '406': {
+    406: {
+      headers: {};
       content: {
         'application/json': components['schemas']['ErrorInformationResponse'];
-      };
-      headers: {
-        'Content-Length': components['headers']['Content-Length'];
-        'Content-Type': components['headers']['Content-Type'];
       };
     };
     /** Not Implemented */
-    '501': {
+    501: {
+      headers: {};
       content: {
         'application/json': components['schemas']['ErrorInformationResponse'];
-      };
-      headers: {
-        'Content-Length': components['headers']['Content-Length'];
-        'Content-Type': components['headers']['Content-Type'];
       };
     };
     /** Service Unavailable */
-    '503': {
+    503: {
+      headers: {};
       content: {
         'application/json': components['schemas']['ErrorInformationResponse'];
-      };
-      headers: {
-        'Content-Length': components['headers']['Content-Length'];
-        'Content-Type': components['headers']['Content-Type'];
       };
     };
     /**
@@ -1209,4 +967,286 @@ export interface components {
       };
     };
   };
+  parameters: {
+    /** The identifier value. */
+    ID: string;
+  };
+  headers: {
+    /**
+     * The `Content-Length` header field indicates the anticipated size of the payload body. Only sent if there is a body.
+     *
+     * **Note:** The API supports a maximum size of 5242880 bytes (5 Megabytes).
+     */
+    'Content-Length'?: number;
+    /** The `Content-Type` header indicates the specific version of the API used to send the payload body. */
+    'Content-Type': string;
+  };
 }
+
+export interface operations {
+  /** The HTTP request GET /health is used to return the current status of the API. */
+  HealthGet: {
+    responses: {
+      200: components['responses']['200'];
+      400: components['responses']['400'];
+      401: components['responses']['401'];
+      403: components['responses']['403'];
+      404: components['responses']['404'];
+      405: components['responses']['405'];
+      406: components['responses']['406'];
+      501: components['responses']['501'];
+      503: components['responses']['503'];
+    };
+  };
+  /** The HTTP request GET /metrics is used to return metrics for the API. */
+  MetricsGet: {
+    responses: {
+      200: components['responses']['200'];
+      400: components['responses']['400'];
+      401: components['responses']['401'];
+      403: components['responses']['403'];
+      404: components['responses']['404'];
+      405: components['responses']['405'];
+      406: components['responses']['406'];
+      501: components['responses']['501'];
+      503: components['responses']['503'];
+    };
+  };
+  /** DFSP Requests Authorization of Transaction from the End User */
+  OutboundAuthorizationsPost: {
+    responses: {
+      200: components['responses']['AuthorizationsResponse'];
+      400: components['responses']['400'];
+      401: components['responses']['401'];
+      403: components['responses']['403'];
+      404: components['responses']['404'];
+      405: components['responses']['405'];
+      406: components['responses']['406'];
+      501: components['responses']['501'];
+      503: components['responses']['503'];
+    };
+    /** Authorization request details */
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['AuthorizationsRequest'];
+      };
+    };
+  };
+  /** The HTTP request `POST /thirdpartyTransaction/partyLookup` is used to lookup information regarding the requested Party, defined by `Type`, `ID` and optionally `SubId`. */
+  ThirdpartyTransactionPartyLookup: {
+    responses: {
+      200: components['responses']['ThirdpartyTransactionPartyLookupResponse'];
+      400: components['responses']['400'];
+      401: components['responses']['401'];
+      403: components['responses']['403'];
+      404: components['responses']['404'];
+      405: components['responses']['405'];
+      406: components['responses']['406'];
+      501: components['responses']['501'];
+      503: components['responses']['503'];
+    };
+    /** Thirdparty transaction party lookup body. */
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ThirdpartyTransactionPartyLookupRequest'];
+      };
+    };
+  };
+  /** The HTTP request `POST /thirdpartyTransaction/{ID}/initiate` is sent to the Switch to initiate a third party request transaction. */
+  ThirdpartyTransactionIDInitiate: {
+    parameters: {
+      path: {
+        /** The identifier value. */
+        ID: components['parameters']['ID'];
+      };
+    };
+    responses: {
+      200: components['responses']['ThirdpartyTransactionIDInitiateResponse'];
+      400: components['responses']['400'];
+      401: components['responses']['401'];
+      403: components['responses']['403'];
+      404: components['responses']['404'];
+      405: components['responses']['405'];
+      406: components['responses']['406'];
+      501: components['responses']['501'];
+      503: components['responses']['503'];
+    };
+    /** Thirdparty transaction initiate request body. */
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ThirdpartyTransactionIDInitiateRequest'];
+      };
+    };
+  };
+  /** The HTTP request `POST /thirdpartyTransaction/{ID}/approve` is used to approve a third party transaction . */
+  ThirdpartyTransactionIDApprove: {
+    parameters: {
+      path: {
+        /** The identifier value. */
+        ID: components['parameters']['ID'];
+      };
+    };
+    responses: {
+      200: components['responses']['ThirdpartyTransactionIDApproveResponse'];
+      400: components['responses']['400'];
+      401: components['responses']['401'];
+      403: components['responses']['403'];
+      404: components['responses']['404'];
+      405: components['responses']['405'];
+      406: components['responses']['406'];
+      501: components['responses']['501'];
+      503: components['responses']['503'];
+    };
+    /** Thirdparty transaction approve request body contains Authorization details */
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ThirdpartyTransactionIDApproveRequest'];
+      };
+    };
+  };
+  /** The HTTP request `POST /thirdpartyRequests/transactions/{ID}/authorizations` is used by the DFSP to verify a third party authorization. */
+  VerifyThirdPartyAuthorization: {
+    parameters: {
+      path: {
+        /** The identifier value. */
+        ID: components['parameters']['ID'];
+      };
+    };
+    responses: {
+      200: components['responses']['ThirdpartyRequestsTransactionsIDAuthzResponse'];
+      400: components['responses']['400'];
+      401: components['responses']['401'];
+      403: components['responses']['403'];
+      404: components['responses']['404'];
+      405: components['responses']['405'];
+      406: components['responses']['406'];
+      501: components['responses']['501'];
+      503: components['responses']['503'];
+    };
+    /** The thirdparty authorization details to verify */
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ThirdpartyRequestsTransactionsIDAuthorizationsPostRequest'];
+      };
+    };
+  };
+  /** The HTTP request `GET /linking/providers` is used to retrieve a list of thirdparty enabled DFSP identifiers. */
+  GetLinkingProviders: {
+    responses: {
+      200: components['responses']['LinkingProvidersResponse'];
+      400: components['responses']['400'];
+      401: components['responses']['401'];
+      403: components['responses']['403'];
+      404: components['responses']['404'];
+      405: components['responses']['405'];
+      406: components['responses']['406'];
+      501: components['responses']['501'];
+      503: components['responses']['503'];
+    };
+  };
+  /** The HTTP request `GET /linking/accounts/{fspId}/{userId}` is used to retrieve the list of potential accounts available for linking. */
+  GetLinkingAccountsByUserId: {
+    parameters: {
+      path: {
+        fspId: components['schemas']['FspId'];
+        userId: components['schemas']['AccountId'];
+      };
+    };
+    responses: {
+      200: components['responses']['AccountsByUserIdResponse'];
+      400: components['responses']['400'];
+      401: components['responses']['401'];
+      403: components['responses']['403'];
+      404: components['responses']['404'];
+      405: components['responses']['405'];
+      406: components['responses']['406'];
+      501: components['responses']['501'];
+      503: components['responses']['503'];
+    };
+  };
+  /**
+   * The HTTP request `POST /linking/request-consent` is used to by a PISP to ask
+   * a specific DFSP to start the process of establishing consent between three parties.
+   *
+   * - The PISP
+   * - The DFSP
+   * - A user presumed to be a customer of 'The DFSP'
+   */
+  PostLinkingRequestConsent: {
+    responses: {
+      200: components['responses']['LinkingRequestConsentResponse'];
+      400: components['responses']['400'];
+      401: components['responses']['401'];
+      403: components['responses']['403'];
+      404: components['responses']['404'];
+      405: components['responses']['405'];
+      406: components['responses']['406'];
+      501: components['responses']['501'];
+      503: components['responses']['503'];
+    };
+    /** Consent requests validate request details */
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['LinkingRequestConsentPostRequest'];
+      };
+    };
+  };
+  /**
+   * Used in the authentication phase of account linking.
+   * Used by the PISP to pass an Auth token on behalf of the user to the DFSP to establish a chain of trust.
+   */
+  PatchLinkingRequestConsentIDAuthenticate: {
+    parameters: {
+      path: {
+        ID: components['schemas']['CorrelationId'];
+      };
+    };
+    responses: {
+      200: components['responses']['LinkingRequestConsentIDAuthenticateResponse'];
+      400: components['responses']['400'];
+      401: components['responses']['401'];
+      403: components['responses']['403'];
+      404: components['responses']['404'];
+      405: components['responses']['405'];
+      406: components['responses']['406'];
+      501: components['responses']['501'];
+      503: components['responses']['503'];
+    };
+    /** Linking request consent authenticate request details */
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['LinkingRequestConsentIDAuthenticateRequest'];
+      };
+    };
+  };
+  /**
+   * Used in the credential registration phase of account linking.
+   * Used by the PISP to pass an credential on behalf of the user to the DFSP.
+   */
+  PostLinkingRequestConsentIDPassCredential: {
+    parameters: {
+      path: {
+        ID: components['schemas']['CorrelationId'];
+      };
+    };
+    responses: {
+      200: components['responses']['LinkingRequestConsentIDPassCredentialResponse'];
+      400: components['responses']['400'];
+      401: components['responses']['401'];
+      403: components['responses']['403'];
+      404: components['responses']['404'];
+      405: components['responses']['405'];
+      406: components['responses']['406'];
+      501: components['responses']['501'];
+      503: components['responses']['503'];
+    };
+    /** Linking request consent pass credential request details */
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['LinkingRequestConsentIDPassCredentialRequest'];
+      };
+    };
+  };
+}
+
+export interface external {}
