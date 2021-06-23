@@ -243,11 +243,16 @@ export class DFSPLinkingModel
 
     // catch any unplanned errors and notify PISP
     try {
+
+      if (!consentRequestsIDPutRequest) {
+        throw new Error('consentRequestsIDPutRequest is null or undefined')
+      }
+
       const waitOnAuthTokenFromPISPResponseChannel = DFSPLinkingModel.notificationChannel(
         DFSPLinkingPhase.waitOnAuthTokenFromPISPResponse,
         consentRequestsPostRequest.consentRequestId
       )
-      // now we send back a PUT /consentRequests/{ID}response to elicit
+      // now we send back a PUT /consentRequests/{ID} response to elicit
       // a PATCH /consentRequests/{ID} response containing an authToken
       await deferredJob(this.subscriber, waitOnAuthTokenFromPISPResponseChannel)
         .init(async (channel) => {

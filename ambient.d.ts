@@ -39,7 +39,7 @@ declare module '@mojaloop/central-services-error-handling'{
   }
   class FSPIOPError {
     public toString(): string;
-    public toApiErrorRecord<string, unknown>(options: { includeCauseExtension?: boolean; truncateExtensions?: boolean }): APIError
+    public toApiErrorRecord(options: { includeCauseExtension?: boolean; truncateExtensions?: boolean }): APIError
   }
   interface FactoryI {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -317,7 +317,7 @@ declare module '@mojaloop/central-services-shared' {
 
   import OpenAPIBackend, { Context, Handler } from 'openapi-backend'
   import { SpawnSyncOptions } from 'child_process'
-  import Ajv from 'ajv'
+  import { InstanceOptions } from 'ajv'
 
   class Request {
     public sendRequest(
@@ -344,7 +344,7 @@ declare module '@mojaloop/central-services-shared' {
       initialise(
         definitionPath: string,
         handlers: { [handler: string]: Handler },
-        ajvOpts?: Ajv.Options,
+        ajvOpts?: InstanceOptions,
         regexFlags?: string
       ): Promise<OpenAPIBackend>;
 
