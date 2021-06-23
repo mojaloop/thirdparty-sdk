@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+### [11.39.2](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.39.1...v11.39.2) (2021-06-23)
+
+
+### Maintenance
+
+* **deps:** update dependencies to be able to handle longer clientDataJSON and attestation objects ([#105](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/105)) ([9d59171](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/9d591719875c2063fd80b801b0845c5a06b72fa2))
+
 ### [11.39.1](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.39.0...v11.39.1) (2021-06-16)
 
 
