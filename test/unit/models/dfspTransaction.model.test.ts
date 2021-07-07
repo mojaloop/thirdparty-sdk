@@ -85,7 +85,8 @@ describe('DFSPTransactionModel', () => {
       dfspBackendRequests: {
         validateThirdpartyTransactionRequest: jest.fn(() => Promise.resolve({ isValid: true })),
         verifyAuthorization: jest.fn(() => Promise.resolve({ isValid: true }))
-      } as unknown as DFSPBackendRequests
+      } as unknown as DFSPBackendRequests,
+      tempOverrideQuotesPartyIdType: undefined
     }
     transactionRequestId = uuidv4()
     participantId = uuidv4()

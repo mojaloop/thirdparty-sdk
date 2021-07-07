@@ -172,7 +172,7 @@ export class DFSPTransactionModel
     // party information for a given THIRD_PARTY_LINK party
     // see #2316 - https://github.com/mojaloop/project/issues/2316 for more information
     // TEMP_OVERRIDE_QUOTES_PARTY_ID_TYPE
-    const payer = { partyIdInfo: { ... tr.payer }}
+    const payer: fspiopAPI.Schemas.Party | tpAPI.Schemas.Party = { partyIdInfo: { ... tr.payer }}
     if (this.config.tempOverrideQuotesPartyIdType) {
       payer.partyIdInfo.partyIdType = this.config.tempOverrideQuotesPartyIdType
     }
