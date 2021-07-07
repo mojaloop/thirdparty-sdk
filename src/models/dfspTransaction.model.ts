@@ -193,7 +193,7 @@ export class DFSPTransactionModel
         payee: { ...tr.payee },
         // TODO: investigate quotes interface and payer 'THIRD_PARTY_LINK' problem
         // TODO: repl
-        payer: { partyIdInfo: { ...tr.payer } },
+        payer,
         amountType: tr.amountType,
         amount: { ...tr.amount },
         transactionType: { ...tr.transactionType }
