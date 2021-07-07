@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+## [11.40.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.39.2...v11.40.0) (2021-07-07)
+
+
+### Features
+
+* **quotes:** add temporary config to workaround quotes `partyIdType` issue ([#106](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/106)) ([a71a46c](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/a71a46c0e8b677a3b4fe6b44c9882fac730a11ba))
+
 ### [11.39.2](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.39.1...v11.39.2) (2021-06-23)
 
 
