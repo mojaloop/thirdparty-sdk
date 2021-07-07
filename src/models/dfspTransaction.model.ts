@@ -166,6 +166,17 @@ export class DFSPTransactionModel
     // shortcut
     const tr = this.data.transactionRequestRequest
 
+    // override the PARTY_ID_TYPE of the payer field
+    // TODO: this is a temporary workaround to get e2e tests working
+    // In the future, we should talk to the DFSP backend to get the _real_
+    // party information for a given THIRD_PARTY_LINK party
+    // see #2316 - https://github.com/mojaloop/project/issues/2316 for more information
+    // TEMP_OVERRIDE_QUOTES_PARTY_ID_TYPE
+    const payer: fspiopAPI.Schemas.Party | tpAPI.Schemas.Party = { partyIdInfo: { ...tr.payer } }
+    if (this.config.tempOverrideQuotesPartyIdType) {
+      payer.partyIdInfo.partyIdType = this.config.tempOverrideQuotesPartyIdType
+    }
+
     // prepare request for quote
     this.data.requestQuoteRequest = {
       // TODO: fspId field for payee.partyIdInfo should be mandatory, now it is optional
@@ -181,7 +192,8 @@ export class DFSPTransactionModel
         transactionRequestId: tr.transactionRequestId,
         payee: { ...tr.payee },
         // TODO: investigate quotes interface and payer 'THIRD_PARTY_LINK' problem
-        payer: { partyIdInfo: { ...tr.payer } },
+        // TODO: repl
+        payer,
         amountType: tr.amountType,
         amount: { ...tr.amount },
         transactionType: { ...tr.transactionType }

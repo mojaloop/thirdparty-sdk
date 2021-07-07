@@ -33,6 +33,7 @@ import { StateResponseToolkit } from '~/server/plugins/state'
 import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
 import { DFSPTransactionModel, create } from '~/models/dfspTransaction.model'
 import { DFSPTransactionModelConfig, DFSPTransactionData } from '~/models/dfspTransaction.interface'
+import config from '~/shared/config'
 /**
  * Handles a DFSP inbound POST /thirdpartyRequests/transaction request
  */
@@ -42,14 +43,15 @@ async function post (
   const transactionRequest = request.payload as tpAPI.Schemas.ThirdpartyRequestsTransactionsPostRequest
   const participantId = request.headers['fspiop-source']
 
-  const config: DFSPTransactionModelConfig = {
+  const modelConfig: DFSPTransactionModelConfig = {
     dfspId: h.getDFSPId(),
     thirdpartyRequests: h.getThirdpartyRequests(),
     sdkOutgoingRequests: h.getSDKOutgoingRequests(),
     dfspBackendRequests: h.getDFSPBackendRequests(),
     logger: h.getLogger(),
     kvs: h.getKVS(),
-    key: `dfspTransaction-${transactionRequest.transactionRequestId}`
+    key: `dfspTransaction-${transactionRequest.transactionRequestId}`,
+    tempOverrideQuotesPartyIdType: config.SHARED.TEMP_OVERRIDE_QUOTES_PARTY_ID_TYPE
   }
 
   setImmediate(async () => {
@@ -60,7 +62,7 @@ async function post (
       currentState: 'start',
       transactionRequestRequest: transactionRequest
     }
-    const model: DFSPTransactionModel = await create(data, config)
+    const model: DFSPTransactionModel = await create(data, modelConfig)
     await model.run()
   })
   return h.response({}).code(Enum.Http.ReturnCodes.ACCEPTED.CODE)

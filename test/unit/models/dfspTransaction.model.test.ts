@@ -85,7 +85,8 @@ describe('DFSPTransactionModel', () => {
       dfspBackendRequests: {
         validateThirdpartyTransactionRequest: jest.fn(() => Promise.resolve({ isValid: true })),
         verifyAuthorization: jest.fn(() => Promise.resolve({ isValid: true }))
-      } as unknown as DFSPBackendRequests
+      } as unknown as DFSPBackendRequests,
+      tempOverrideQuotesPartyIdType: undefined
     }
     transactionRequestId = uuidv4()
     participantId = uuidv4()
@@ -508,6 +509,43 @@ describe('DFSPTransactionModel', () => {
         expect(err).toEqual(Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_REQUEST_QUOTE_FAILED)
         done()
       }
+    })
+
+    it('should translate the partyIdType in the quote request if tempOverrideQuotesPartyIdType is set', async () => {
+      mocked(modelConfig.kvs.set).mockImplementationOnce(() => Promise.resolve(true))
+      modelConfig.tempOverrideQuotesPartyIdType = 'EMAIL'
+
+      // mocked(modelConfig.thirdpartyRequests.putThirdpartyRequestsTransactions)
+      //   // eslint-disable-next-line prefer-promise-reject-errors
+      //   .mockImplementationOnce(() => Promise.reject({ statusCode: 400 }))
+      const data: DFSPTransactionData = {
+        transactionRequestId,
+        transactionRequestState: 'RECEIVED',
+        participantId,
+        transactionRequestRequest,
+        transactionRequestPutUpdate,
+        currentState: 'transactionRequestIsValid'
+      }
+      const model = await create(data, modelConfig)
+      await model.fsm.notifyTransactionRequestIsValid()
+
+
+      // check properly requestQuoteRequest
+      expect(model.data.requestQuoteRequest).toBeDefined()
+      expect(model.data.requestQuoteRequest).toBeDefined()
+
+      // shortcuts
+      const rq = model.data.requestQuoteRequest!
+      console.log('rq.quotesPostRequest', rq.quotesPostRequest)
+
+      // shortcut
+      const rqr = rq.quotesPostRequest
+
+      // quote id should be allocated
+      expect(rqr.quoteId).toBeDefined()
+
+      // quote.payer.partyIfInfo.partyIdType must match the above
+      expect(rqr.payer.partyIdInfo.partyIdType).toEqual('EMAIL')
     })
 
     it('should throw if requestAuthorization failed', async (done) => {
