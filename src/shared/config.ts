@@ -115,6 +115,7 @@ export interface ServiceConfig {
     JWS_SIGN: boolean
     JWS_SIGNING_KEY: PathLike | Buffer
     TLS: BaseRequestTLSConfig
+    TEMP_OVERRIDE_QUOTES_PARTY_ID_TYPE?: string
   }
 }
 
@@ -421,6 +422,12 @@ export const ConvictConfig = Convict<ServiceConfig>({
         cert: '',
         key: ''
       }
+    },
+    TEMP_OVERRIDE_QUOTES_PARTY_ID_TYPE: {
+      doc: 'If set, this will override the PARTY_ID_TYPE in the POST /quotes call after receiving a POST /thirdpartyRequests/transactions call',
+      format: '*',
+      env: 'TEMP_OVERRIDE_QUOTES_PARTY_ID_TYPE',
+      default: undefined
     }
   }
 })

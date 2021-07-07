@@ -69,6 +69,7 @@ export interface DFSPTransactionModelConfig extends PersistentModelConfig {
   thirdpartyRequests: ThirdpartyRequests
   sdkOutgoingRequests: SDKOutgoingRequests
   dfspBackendRequests: DFSPBackendRequests
+  tempOverrideQuotesPartyIdType: string | undefined
 }
 
 export interface DFSPTransactionData extends StateData<DFSPTransactionModelState> {
