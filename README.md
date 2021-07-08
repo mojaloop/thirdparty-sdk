@@ -9,7 +9,7 @@ The API between the scheme adapter and the Thirdparty backend is synchronous HTT
 
 This package exemplifies the use of the Mojaloop SDK Standard Components for TLS, JWS and ILP and is should be use together with [mojaloop/sdk-scheme-adapter](https://github.com/mojaloop/sdk-scheme-adapter)
 
-
+Testing weird redis thing...
 ## Quick Start
 > The steps shown below illustrate setting up the Mojaloop Thirdparty Scheme Adapter locally and how to run Inbound  and Outbound API services listening on `localhost`
 
@@ -29,12 +29,12 @@ This package exemplifies the use of the Mojaloop SDK Standard Components for TLS
    ```bash
    docker-compose up redis
    ```
-5. Start Inbound API server 
+5. Start Inbound API server
    ```bash
    npm run start:inbound
    ```
    then visit in your web browser http://localhost:4005/health
-   
+
    In case to start the test environment
    ```bash
    NODE_ENV=test npm run start:inbound
@@ -54,11 +54,11 @@ This package exemplifies the use of the Mojaloop SDK Standard Components for TLS
 > This package delivers implementation Inbound and Outbound API services which will be used by Thirdparty to integrate with `Mojaloop Switch`
 
 ### Inbound API
-  `Inbound API` service is called by `Mojaloop Switch`.  
+  `Inbound API` service is called by `Mojaloop Switch`.
   Its responsibility is to forward calls to `Thirdparty Backend` or help to deliver synchronous response for calls initiated by `Thirdparty backend` on `Outbound API`
 
 ### Outbound API
-  `Outbound API` service is used by `Thirdparty backend` to make a call to `Mojaloop Switch`  
+  `Outbound API` service is used by `Thirdparty backend` to make a call to `Mojaloop Switch`
   Its responsibility is to transform asynchronous Mojaloop API native interface's set of calls to a synchronous call.
 
 ## Integration Test
@@ -67,7 +67,7 @@ This package exemplifies the use of the Mojaloop SDK Standard Components for TLS
    ```bash
    docker-compose build && docker-compose up
    ```
-   
+
    then start `docker-compose` inside `docker` folder in a separate window.
    ```bash
    cd docker
