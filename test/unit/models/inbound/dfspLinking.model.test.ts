@@ -1367,4 +1367,124 @@ describe('dfspLinkingModel', () => {
       expect(model.run()).rejects.toEqual(error)
     })
   })
+
+  describe('ConsentId override', () => {
+    let validateData: DFSPLinkingData
+    const waitOnSignedCredentialFromPISPResponseChannel = DFSPLinkingModel.notificationChannel(
+      DFSPLinkingPhase.waitOnSignedCredentialFromPISPResponse,
+      '12340000-0000-1000-8000-000000000001'
+    )
+
+    beforeEach(async () => {
+      validateData = {
+        dfspId: 'dfspa',
+        toParticipantId: 'pispa',
+        toAuthServiceParticipantId: 'central-auth',
+        currentState: 'authTokenValidated',
+        consentRequestId: 'b51ec534-ee48-4575-b6a9-ead2955b8069',
+        consentRequestsPostRequest: mockData.consentRequestsPost.payload,
+        backendValidateConsentRequestsResponse: mockData.consentRequestsPost.response,
+        consentRequestsIDPatchResponse: mockData.consentRequestsIDPatchRequest.payload,
+        scopes: [
+          {
+            accountId: 'dfspa.username.1234',
+            actions: [
+              'accounts.transfer',
+              'accounts.getBalance'
+            ]
+          },
+          {
+            accountId: 'dfspa.username.5678',
+            actions: [
+              'accounts.transfer',
+              'accounts.getBalance'
+            ]
+          }
+        ]
+      }
+    })
+
+    it('should be well constructed', async () => {
+      modelConfig.testOverrideConsentID = '12340000-0000-1000-8000-000000000001'
+      const model = await create(validateData, modelConfig)
+      checkDFSPLinkingModelLayout(model, validateData)
+    })
+
+    it('grantConsent() should transition from auth token validated to sent consent when successful with consentId override', async () => {
+      modelConfig.testOverrideConsentID = '12340000-0000-1000-8000-000000000001'
+      const model = await create(validateData, modelConfig)
+
+      setImmediate(() => {
+        publisher.publish(
+          waitOnSignedCredentialFromPISPResponseChannel,
+          mockData.inboundPutConsentsIdRequestSignedCredential.payload as unknown as Message
+        )
+      })
+
+      // start send consent step
+      await model.fsm.grantConsent()
+
+      // check that the fsm was able to transition properly
+      expect(model.data.currentState).toEqual('consentGranted')
+
+      // check the signed credential response is stored in model data
+      expect(model.data.consentIDPutResponseSignedCredentialFromPISP).toEqual(
+        mockData.inboundPutConsentsIdRequestSignedCredential.payload
+      )
+      // check we made a call to thirdpartyRequests.postConsents
+      expect(modelConfig.thirdpartyRequests.postConsents).toBeCalledWith(
+        {
+          consentId: '12340000-0000-1000-8000-000000000001',
+          consentRequestId: 'b51ec534-ee48-4575-b6a9-ead2955b8069',
+          scopes: [
+            {
+              accountId: 'dfspa.username.1234',
+              actions: [
+                'accounts.transfer',
+                'accounts.getBalance'
+              ]
+            },
+            {
+              accountId: 'dfspa.username.5678',
+              actions: [
+                'accounts.transfer',
+                'accounts.getBalance'
+              ]
+            }
+          ]
+        },
+        'pispa'
+      )
+    })
+
+    it('should handle exceptions and send PUT /consents/{ID}/error response with consentId override', async () => {
+      modelConfig.testOverrideConsentID = '12340000-0000-1000-8000-000000000001'
+      mocked(modelConfig.thirdpartyRequests.postConsents).mockImplementationOnce(
+        () => {
+          throw new Error('mocked postConsents exception')
+        }
+      )
+
+      const model = await create(validateData, modelConfig)
+      try {
+        // start send consent step
+        await model.fsm.grantConsent()
+        shouldNotBeExecuted()
+      } catch (err) {
+        expect(err.message).toEqual('mocked postConsents exception')
+      }
+
+      // check a PUT /consents/{ID}/error response was sent to source participant
+      expect(modelConfig.thirdpartyRequests.putConsentsError).toBeCalledWith(
+        '12340000-0000-1000-8000-000000000001',
+        {
+          errorInformation: {
+            errorCode: '7200',
+            errorDescription: 'Generic Thirdparty account linking error'
+          }
+        },
+        'pispa'
+      )
+    })
+  })
 })

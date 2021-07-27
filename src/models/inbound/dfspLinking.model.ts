@@ -349,8 +349,10 @@ export class DFSPLinkingModel
 
   async onGrantConsent (): Promise<void> {
     const { consentRequestId, toParticipantId, scopes } = this.data
-    const consentId = uuidv4()
-
+    let consentId = uuidv4()
+    if (this.config.testOverrideConsentID) {
+      consentId = this.config.testOverrideConsentID
+    }
     // save consentId for later
     this.data.consentId = consentId
 

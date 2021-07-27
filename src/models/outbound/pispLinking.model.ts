@@ -108,7 +108,7 @@ export class PISPLinkingModel
     for (const account of linkingRequestConsentPostRequest.accounts as unknown as tpAPI.Schemas.Account[]) {
       scopes.push({
         accountId: account.id!,
-        actions: ['accounts.getBalance', 'accounts.transfer']
+        actions: linkingRequestConsentPostRequest.actions
       })
     }
 
