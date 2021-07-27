@@ -360,6 +360,7 @@ declare module '@mojaloop/central-services-shared' {
   const HealthCheck: any
 }
 
+declare module '@mojaloop/central-services-metrics'
 declare module '@hapi/good'
 declare module 'blipp'
 declare module 'convict-commander'
