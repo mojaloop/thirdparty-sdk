@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+## [11.41.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.40.0...v11.41.0) (2021-07-28)
+
+
+### Features
+
+* add consentId override and allow pisp to specify scope actions ([#108](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/108)) ([9caff2e](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/9caff2efd35cc52ebb24c288c201d100ba0825e6))
+
 ## [11.40.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.39.2...v11.40.0) (2021-07-07)
 
 
