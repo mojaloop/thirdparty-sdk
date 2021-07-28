@@ -349,8 +349,11 @@ export class DFSPLinkingModel
 
   async onGrantConsent (): Promise<void> {
     const { consentRequestId, toParticipantId, scopes } = this.data
-    const consentId = uuidv4()
-
+    let consentId = uuidv4()
+    if (this.config.testOverrideConsentID) {
+      this.logger.warn('TEST_OVERRIDE_CONSENT_ID is set in config. This variable is NOT to be set/used in production')
+      consentId = this.config.testOverrideConsentID
+    }
     // save consentId for later
     this.data.consentId = consentId
 

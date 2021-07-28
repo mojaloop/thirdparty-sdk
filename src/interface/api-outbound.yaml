@@ -1962,6 +1962,16 @@ components:
             $ref: '#/components/schemas/Account'
       required:
         - accounts
+    ConsentScopeType:
+      title: ConsentScopeType
+      type: string
+      enum:
+        - accounts.getBalance
+        - accounts.transfer
+      description: |
+        The scopes requested for a ConsentRequest.
+        - "accounts.getBalance" - Get the balance of a given account.
+        - "accounts.transfer" - Initiate a transfer from an account.
     LinkingRequestConsentPostRequest:
       title: LinkingRequestConsentPostRequest
       type: object
@@ -1975,6 +1985,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Account'
+        actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConsentScopeType'
         userId:
           type: string
           description: ID used to associate request with GET /accounts request.
@@ -1989,6 +2003,7 @@ components:
         - accounts
         - userId
         - callbackUri
+        - actions
     LinkingRequestConsentState:
       title: LinkingRequestConsentState
       description: State of `POST /linking/request-consent` request
@@ -2010,16 +2025,6 @@ components:
       required:
         - errorInformation
         - currentState
-    ConsentScopeType:
-      title: ConsentScopeType
-      type: string
-      enum:
-        - accounts.getBalance
-        - accounts.transfer
-      description: |
-        The scopes requested for a ConsentRequest.
-        - "accounts.getBalance" - Get the balance of a given account.
-        - "accounts.transfer" - Initiate a transfer from an account.
     Scope:
       title: Scope
       type: object

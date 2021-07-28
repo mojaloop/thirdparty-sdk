@@ -10,6 +10,10 @@ properties:
     type: array
     items:
       $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/Account.yaml'
+  actions:
+    type: array
+    items:
+      $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/ConsentScopeType.yaml'
   userId:
     type: string
     description: >-
@@ -25,3 +29,4 @@ required:
   - accounts
   - userId
   - callbackUri
+  - actions

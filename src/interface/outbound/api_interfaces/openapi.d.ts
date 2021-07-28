@@ -676,11 +676,18 @@ export interface components {
     AccountsIDPutResponse: {
       accounts: components['schemas']['Account'][];
     };
+    /**
+     * The scopes requested for a ConsentRequest.
+     * - "accounts.getBalance" - Get the balance of a given account.
+     * - "accounts.transfer" - Initiate a transfer from an account.
+     */
+    ConsentScopeType: 'accounts.getBalance' | 'accounts.transfer';
     /** The object sent in a `POST /linking/request-consent` request. */
     LinkingRequestConsentPostRequest: {
       toParticipantId: string;
       consentRequestId: components['schemas']['CorrelationId'];
       accounts: components['schemas']['Account'][];
+      actions: components['schemas']['ConsentScopeType'][];
       /** ID used to associate request with GET /accounts request. */
       userId: string;
       /** The callback uri that the user will be redirected to after completing the WEB auth channel. */
@@ -697,12 +704,6 @@ export interface components {
       errorInformation: components['schemas']['ErrorInformation'];
       currentState: components['schemas']['LinkingRequestConsentState'];
     };
-    /**
-     * The scopes requested for a ConsentRequest.
-     * - "accounts.getBalance" - Get the balance of a given account.
-     * - "accounts.transfer" - Initiate a transfer from an account.
-     */
-    ConsentScopeType: 'accounts.getBalance' | 'accounts.transfer';
     /** Scope + Account Identifier mapping for a Consent. */
     Scope: {
       accountId: components['schemas']['AccountId'];

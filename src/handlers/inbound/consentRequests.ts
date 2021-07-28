@@ -69,7 +69,8 @@ async function post (_context: unknown, request: Request, h: StateResponseToolki
     dfspBackendRequests: h.getDFSPBackendRequests(),
     thirdpartyRequests: h.getThirdpartyRequests(),
     mojaloopRequests: h.getMojaloopRequests(),
-    requestProcessingTimeoutSeconds: config.REQUEST_PROCESSING_TIMEOUT_SECONDS
+    requestProcessingTimeoutSeconds: config.REQUEST_PROCESSING_TIMEOUT_SECONDS,
+    testOverrideConsentID: config.SHARED.TEST_OVERRIDE_CONSENT_ID
   }
 
   // postpone model execution to next event loop cycle so we can return response ASAP
