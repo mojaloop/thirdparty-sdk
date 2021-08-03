@@ -35,7 +35,7 @@ POST /linking/request-consent
     { accountNickname: "SpeXXXXXXXXnt", id: "dfspa.username.5678", currency: "USD" }
   ],
   userId: "username1234", // so the dfsp can associate this request with GET /accounts
-  callbackURI: 'pisp-app://callback'
+  callbackUri: 'pisp-app://callback'
 }
 end note
 
@@ -65,7 +65,7 @@ FSIOP-Destination: dfspa
   }],
   // model will add `authChannels`
   authChannels: ["WEB", "OTP"],
-  callbackURI: 'pisp-app://callback...'
+  callbackUri: 'pisp-app://callback...'
 }
 end note
 
@@ -114,7 +114,7 @@ FSIOP-Destination: dfspa
     actions: ['accounts.getBalance', 'accounts.transfer'],
   }],
   authChannels: ["OTP"], // updated with the channel in use
-  callbackURI: 'pisp-app://callback...',
+  callbackUri: 'pisp-app://callback...',
   // note: no authURI for OTP flow
 }
 end note
@@ -144,7 +144,7 @@ rnote left of PISP_TP_OUT #LightBlue
       actions: ['accounts.getBalance', 'accounts.transfer'],
     }],
     authChannels: ["OTP"],
-    callbackURI: 'pisp-app://callback...',
+    callbackUri: 'pisp-app://callback...',
     authURI: 'dfspa.com/authorize?consentRequestId=f6ab43b0-71cc-49f9-b763-2ac3f05ac8c1' // this is new
   },
   currentState="OTPAuthenticationChannelResponseReceived"
