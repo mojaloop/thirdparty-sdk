@@ -28,6 +28,8 @@ PISP -> PISP_TP_OUT: POST /linking/request-consent
 rnote right of PISP #LightBlue
 POST /linking/request-consent
 {
+  toParticipantId: "dfspa",
+  consentRequestId: "f6ab43b0-71cc-49f9-b763-2ac3f05ac8c1",
   accounts: [
     { accountNickname: "XXXXXXnt", id: "dfspa.username.1234", currency: "ZAR" },
     { accountNickname: "SpeXXXXXXXXnt", id: "dfspa.username.5678", currency: "USD" }
@@ -53,7 +55,7 @@ POST /consentRequests
 FSIOP-Source: pispa
 FSIOP-Destination: dfspa
 {
-  consentRequestId: 6789
+  consentRequestId: "f6ab43b0-71cc-49f9-b763-2ac3f05ac8c1"
   userId: "username1234"
   scopes: [{
     accountId: 'dfspa.username.1234',
@@ -85,7 +87,7 @@ activate DFSPAuthorizeSimulator
 rnote right of DFSP_LM #LightBlue
 POST /sendOTP
 {
-  consentRequestId: 6789,
+  consentRequestId: "f6ab43b0-71cc-49f9-b763-2ac3f05ac8c1",
   username: "username.1234",
   message: "0987"
 }
@@ -96,15 +98,15 @@ rnote right of DFSP_LM: state: consentRequestValidatedAndStored
 deactivate DFSPAuthorizeSimulator
 deactivate DFSP_TP_IN
 
-DFSP_LM -> Switch: PUT /consentRequests/6789
+DFSP_LM -> Switch: PUT /consentRequests/f6ab43b0-71cc-49f9-b763-2ac3f05ac8c1
 activate Switch
 
 rnote left of DFSP_LM #LightBlue
-PUT /consentRequests/6789
+PUT /consentRequests/f6ab43b0-71cc-49f9-b763-2ac3f05ac8c1
 FSIOP-Source: pispa
 FSIOP-Destination: dfspa
 {
-  consentRequestId: 6789
+  consentRequestId: "f6ab43b0-71cc-49f9-b763-2ac3f05ac8c1",
   scopes: [{
     accountId: 'dfspa.username.1234',
     actions: ['accounts.getBalance', 'accounts.transfer'],
@@ -119,7 +121,7 @@ end note
 Switch --> DFSP_LM: 202 ACCEPTED
 deactivate DFSP_LM
 
-Switch ->  PISP_TP_IN: PUT /consentRequests/6789
+Switch ->  PISP_TP_IN: PUT /consentRequests/f6ab43b0-71cc-49f9-b763-2ac3f05ac8c1
 activate PISP_TP_IN
 PISP_TP_IN --> Switch: 200 OK
 deactivate Switch
@@ -134,7 +136,7 @@ PISP_TP_OUT --> PISP: 200 OK Authentication Response
 rnote left of PISP_TP_OUT #LightBlue
 {
   channelResponse: {
-    consentRequestId: 6789
+    consentRequestId: "6ab43b0-71cc-49f9-b763-2ac3f05ac8c1",
     scopes: [{
       accountId: 'dfspa.username.1234',
       actions: ['accounts.getBalance', 'accounts.transfer'],
@@ -143,7 +145,7 @@ rnote left of PISP_TP_OUT #LightBlue
     }],
     authChannels: ["OTP"],
     callbackURI: 'pisp-app://callback...',
-    authURI: 'dfspa.com/authorize?consentRequestId=6789' // this is new
+    authURI: 'dfspa.com/authorize?consentRequestId=f6ab43b0-71cc-49f9-b763-2ac3f05ac8c1' // this is new
   },
   currentState="OTPAuthenticationChannelResponseReceived"
 }
@@ -161,9 +163,9 @@ autonumber 1 "<b>AUTHENTICATION-#</b>"
 rnote right of PISP
 PISP has obtained authToken from end-user(OTP) or through a callback(Web).
 end note
-PISP -> PISP_TP_OUT: POST /linking/request-consent/6789/authenticate
+PISP -> PISP_TP_OUT: POST /linking/request-consent/f6ab43b0-71cc-49f9-b763-2ac3f05ac8c1/authenticate
 rnote right of PISP #LightBlue
-POST /linking/request-consent/6789/authenticate
+POST /linking/request-consent/f6ab43b0-71cc-49f9-b763-2ac3f05ac8c1/authenticate
 {
   authToken: '123456'
 }
@@ -172,16 +174,16 @@ end note
 activate PISP
 activate PISP_TP_OUT
 
-PISP_TP_OUT -> PISP_TP_OUT: const model = await loadFromKVS({key: 6789})
+PISP_TP_OUT -> PISP_TP_OUT: const model = await loadFromKVS({key: "f6ab43b0-71cc-49f9-b763-2ac3f05ac8c1"})
 rnote right of PISP_TP_OUT: state: webAuthenticationChannelResponseReceived or OTPAuthenticationChannelResponseReceived
 PISP_TP_OUT -> PISP_LM: model.authenticate()
 
 activate PISP_LM
 
 PISP_LM -> PISP_LM: ThirdpartyRequests.patchConsentRequests()
-PISP_LM -> Switch: PATCH /consentRequests/6789
+PISP_LM -> Switch: PATCH /consentRequests/f6ab43b0-71cc-49f9-b763-2ac3f05ac8c1
 rnote right of PISP_LM #LightBlue
-PATCH /consentRequests/6789
+PATCH /consentRequests/f6ab43b0-71cc-49f9-b763-2ac3f05ac8c1
 FSIOP-Source: pispa
 FSIOP-Destination: dfspa
 {
@@ -192,11 +194,11 @@ end note
 activate Switch
 Switch --> PISP_LM: 202 Accepted
 deactivate PISP_LM
-Switch -> DFSP_TP_IN: PATCH /consentRequests/6789
+Switch -> DFSP_TP_IN: PATCH /consentRequests/f6ab43b0-71cc-49f9-b763-2ac3f05ac8c1
 activate DFSP_TP_IN
 DFSP_TP_IN --> Switch: 202 Accepted
 deactivate Switch
-DFSP_TP_IN -> DFSP_TP_IN: const model = await loadFromKVS({key: 6789})
+DFSP_TP_IN -> DFSP_TP_IN: const model = await loadFromKVS({key: "f6ab43b0-71cc-49f9-b763-2ac3f05ac8c1"})
 rnote right of DFSP_TP_IN: state: consentRequestValidatedAndStored
 DFSP_TP_IN -> DFSP_LM: model.validateAuthToken()
 deactivate DFSP_TP_IN
@@ -210,7 +212,7 @@ validate both cases with one endpoint?
 
 POST /validateAuthToken
 {
-  consentRequestId: '6789'
+  consentRequestId: 'f6ab43b0-71cc-49f9-b763-2ac3f05ac8c1',
   authChannel: model.data.authChannel,
   authToken: '124356'
 }
@@ -240,8 +242,8 @@ POST /consents
 FSIOP-Source: dfspa
 FSIOP-Destination: pispa
 {
-  consentId: 1a2b3c4d
-  consentRequestId: 6789
+  consentId: 1a2b3c4d,
+  consentRequestId: "f6ab43b0-71cc-49f9-b763-2ac3f05ac8c1",
   scopes: model.data.scopes
 }
 end note
@@ -249,7 +251,7 @@ Switch --> DFSP_LM: 202 ACCEPTED
 deactivate DFSP_LM
 Switch ->  PISP_TP_IN: POST /consents
 activate PISP_TP_IN
-PISP_TP_IN -> PISP_TP_IN: const model = await loadFromKVS({key: 6789})
+PISP_TP_IN -> PISP_TP_IN: const model = await loadFromKVS({key: 'f6ab43b0-71cc-49f9-b763-2ac3f05ac8c1'})
 PISP_TP_IN -> PISP_LM: model.consentReceivedAwaitCredential()
 activate PISP_LM
 PISP_LM --> PISP_LM: const challenge = deriveChallenge(consentRequest)
@@ -270,16 +272,16 @@ end note
 rnote right of PISP
 PISP has obtained credential from the end-user
 end note
-PISP -> PISP_TP_OUT: POST /linking/request-consent/6789/authenticate
+PISP -> PISP_TP_OUT: POST /linking/request-consent/f6ab43b0-71cc-49f9-b763-2ac3f05ac8c1/authenticate
 rnote right of PISP #LightBlue
-POST /linking/request-consent/6789/pass-credential
+POST /linking/request-consent/f6ab43b0-71cc-49f9-b763-2ac3f05ac8c1/pass-credential
 {
   credential: {
     payload: PublicKeyCredential
   }
 }
 end note
-PISP_TP_OUT -> PISP_TP_OUT: const model = await loadFromKVS({key: 6789})
+PISP_TP_OUT -> PISP_TP_OUT: const model = await loadFromKVS({key: 'f6ab43b0-71cc-49f9-b763-2ac3f05ac8c1'})
 PISP_TP_OUT -> PISP_LM: model.registerCredential()
 activate PISP_LM
 
