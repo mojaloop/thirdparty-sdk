@@ -30,18 +30,16 @@ end box
 == Party Lookup ==
 autonumber 1 "<b>LOOK-#</b>"
 rnote right of PISP #LightBlue
-POST /thirdpartyTransactions
+POST /thirdpartyTransaction/partyLookup
 {
-  transactionRequestId: "12345",
+  transactionRequestId: "b51ec534-ee48-4575-b6a9-ead2955b8069",
   payee: {
-    partyIdInfo: {
-      partyIdType: "MSISDN",
-      partyIdentifier: "+123456789"
-    }
+    partyIdType: "MSISDN",
+    partyIdentifier: "+123456789"
   }
 }
 end note
-PISP -> PISP_TP_OUT: POST /thirdpartyTransactions
+PISP -> PISP_TP_OUT: POST /thirdpartyTransaction/partyLookup
 activate PISP
 activate PISP_TP_OUT
 ' TODO: line up with state-models.md doc
