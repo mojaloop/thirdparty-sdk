@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+### [11.41.1](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.41.0...v11.41.1) (2021-08-03)
+
+
+### Bug Fixes
+
+* **puml:** missing some payloads, change consentRequestId to valid uuid ([#109](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/109)) ([f7cbd19](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/f7cbd199f2f7b2f45407a87cec7bcfd058cfeac9))
+
 ## [11.41.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.40.0...v11.41.0) (2021-07-28)
 
 
