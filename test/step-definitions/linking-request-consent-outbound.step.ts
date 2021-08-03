@@ -174,6 +174,7 @@ defineFeature(feature, (test): void => {
             { "accountNickname": "XXXXXXnt", "id": "dfspa.username.1234", "currency": "ZAR" },
             { "accountNickname": "SpeXXXXXXXXnt", "id": "dfspa.username.5678", "currency": "USD" }
           ],
+          actions: ["accounts.getBalance", "accounts.transfer"],
           userId: "username1234",
           callbackUri: "pisp-app://callback.com"
         }

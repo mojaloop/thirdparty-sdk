@@ -30,8 +30,8 @@ import { Request, ResponseObject, ResponseToolkit } from '@hapi/hapi'
 import Metrics from '@mojaloop/central-services-metrics'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function get (_context: any, _request: Request, h: ResponseToolkit): ResponseObject {
-  const metrics = Metrics.getMetricsForPrometheus()
+async function get (_context: any, _request: Request, h: ResponseToolkit): Promise<ResponseObject> {
+  const metrics = await Metrics.getMetricsForPrometheus()
   return h.response(metrics).code(200)
 }
 
