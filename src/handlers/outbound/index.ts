@@ -26,8 +26,6 @@
 
  --------------
  ******/
-import Authorizations from './authorizations'
-import ThirdpartyAuthorizations from './thirdpartyRequests/transactions/{ID}/authorizations'
 import ThirdpartyTransactionPartyLookup from './thirdpartyTransaction/partyLookup'
 import ThirdpartyTransactionIDInitiate from './thirdpartyTransaction/{ID}/initiate'
 import ThirdpartyTransactionIDApprove from './thirdpartyTransaction/{ID}/approve'
@@ -38,8 +36,6 @@ import LinkingRequestConsentIDPassCredentialRequest from './linking/request-cons
 import LinkingProviders from './linking/providers'
 
 export default {
-  OutboundAuthorizationsPost: Authorizations.post,
-  VerifyThirdPartyAuthorization: ThirdpartyAuthorizations.post,
   ThirdpartyTransactionPartyLookup: ThirdpartyTransactionPartyLookup.post,
   ThirdpartyTransactionIDInitiate: ThirdpartyTransactionIDInitiate.post,
   ThirdpartyTransactionIDApprove: ThirdpartyTransactionIDApprove.post,

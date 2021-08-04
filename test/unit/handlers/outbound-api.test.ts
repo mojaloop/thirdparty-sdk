@@ -27,9 +27,6 @@
  --------------
  ******/
 
-import { OutboundAuthorizationsModelState } from '~/models/authorizations.interface'
-import { OutboundAuthorizationsModel } from '~/models/outbound/authorizations.model'
-import { OutboundThirdpartyAuthorizationsModel } from '~/models/outbound/thirdparty.authorizations.model'
 import { PISPDiscoveryModel } from '~/models/outbound/pispDiscovery.model'
 import { PISPLinkingModel } from '~/models/outbound/pispLinking.model'
 import { PISPPrelinkingModel } from '~/models/outbound/pispPrelinking.model';
@@ -40,9 +37,6 @@ import {
 import { OutboundAPI } from '@mojaloop/sdk-scheme-adapter'
 import { HealthResponse } from '~/interface/types'
 import { NotificationCallback, Message, PubSub } from '~/shared/pub-sub'
-import {
-  OutboundThirdpartyAuthorizationsModelState
-} from '~/models/thirdparty.authorizations.interface'
 import {
   RequestPartiesInformationState
   , PISPTransactionPhase
@@ -248,79 +242,6 @@ describe('Outbound API routes', (): void => {
 
     const response = await server.inject(request)
     expect(response.statusCode).toBe(200)
-  })
-
-  it('/authorizations', async (): Promise<void> => {
-    const request = {
-      method: 'POST',
-      url: '/authorizations',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      payload: {
-        toParticipantId: 'pisp',
-        authenticationType: 'U2F',
-        retriesLeft: '1',
-        amount: {
-          currency: 'USD',
-          amount: '100'
-        },
-        transactionId: 'c87e9f61-e0d1-4a1c-a992-002718daf402',
-        transactionRequestId: 'aca279be-60c6-42ff-aab5-901d61b5e35c',
-        quote: {
-          transferAmount: {
-            currency: 'USD',
-            amount: '105'
-          },
-          expiration: '2020-07-15T09:48:54.961Z',
-          ilpPacket: 'ilp-packet-value',
-          condition: 'condition-000000000-111111111-222222222-abc'
-        }
-      }
-    }
-    const pubSub = new PubSub({} as RedisConnectionConfig)
-
-    // defer publication to notification channel
-    setTimeout(() => pubSub.publish(
-      OutboundAuthorizationsModel.notificationChannel(request.payload.transactionRequestId),
-      putResponse as unknown as Message // TODO: think about generic Message so casting will not be necessary
-    ), 10)
-    const response = await server.inject(request)
-    expect(response.statusCode).toBe(200)
-    expect(response.result).toEqual({
-      ...putResponse,
-      currentState: OutboundAuthorizationsModelState.succeeded
-    })
-  })
-
-  it('/thirdpartyRequests/transactions/{ID}/authorizations', async (): Promise<void> => {
-    const request = {
-      method: 'POST',
-      url: '/thirdpartyRequests/transactions/123/authorizations',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      payload: {
-        toParticipantId: 'dfspA',
-        challenge: 'challenge',
-        consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
-        sourceAccountId: 'dfspa.alice.1234',
-        status: 'PENDING',
-        value: 'value'
-      }
-    }
-    const pubSub = new PubSub({} as RedisConnectionConfig)
-    // defer publication to notification channel
-    setTimeout(() => pubSub.publish(
-      OutboundThirdpartyAuthorizationsModel.notificationChannel('123'),
-      putThirdpartyAuthResponse as unknown as Message
-    ), 10)
-    const response = await server.inject(request)
-    expect(response.statusCode).toBe(200)
-    expect(response.result).toEqual({
-      ...putThirdpartyAuthResponse,
-      currentState: OutboundThirdpartyAuthorizationsModelState.succeeded
-    })
   })
 
   it('/thirdpartyTransaction/partyLookup', async (): Promise<void> => {
