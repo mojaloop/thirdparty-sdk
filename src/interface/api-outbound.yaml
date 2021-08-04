@@ -163,13 +163,13 @@ paths:
             schema:
               $ref: '#/components/schemas/ThirdpartyTransactionIDApproveRequest'
             example:
-              authorizationResponse: null
-              authenticationInfo:
-                authentication: U2F
-                authenticationValue:
-                  pinValue: xxxxxxxxxxx
-                  counter: '1'
-              responseType: ENTERED
+              authorizationResponse:
+                authenticationInfo:
+                  authentication: U2F
+                  authenticationValue:
+                    pinValue: xxxxxxxxxxx
+                    counter: '1'
+                responseType: ENTERED
       responses:
         '200':
           $ref: '#/components/responses/ThirdpartyTransactionIDApproveResponse'
@@ -247,6 +247,8 @@ paths:
                 - accountNickname: SpeXXXXXXXXnt
                   id: dfspa.username.5678
                   currency: USD
+              actions:
+                - accounts.transfer
               userId: username1234
               callbackUri: 'pisp-app://callback'
       responses:

@@ -17,12 +17,12 @@ post:
           $ref: '../components/schemas/ThirdpartyTransactionIDApproveRequest.yaml'
         example:
           authorizationResponse:
-          authenticationInfo:
-            authentication: 'U2F'
-            authenticationValue:
-              pinValue: 'xxxxxxxxxxx'
-              counter: '1'
-          responseType: 'ENTERED'
+            authenticationInfo:
+              authentication: 'U2F'
+              authenticationValue:
+                pinValue: 'xxxxxxxxxxx'
+                counter: '1'
+            responseType: 'ENTERED'
   responses:
     '200':
       $ref: '../components/responses/ThirdpartyTransactionIDApproveResponse.yaml'
