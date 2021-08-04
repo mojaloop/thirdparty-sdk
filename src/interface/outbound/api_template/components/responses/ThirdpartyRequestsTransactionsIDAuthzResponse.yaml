@@ -1,5 +1,0 @@
-description: 'Thirdparty requests transactions authorizations response'
-content:
-  application/json:
-    schema:
-      $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/ThirdpartyRequestsTransactionsIDAuthorizationsPutResponse.yaml'

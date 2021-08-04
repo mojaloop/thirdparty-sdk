@@ -4,3 +4,8 @@ content:
   application/json:
     schema:
       $ref: '../schemas/LinkingProvidersResponse.yaml'
+    example:
+      providers: 
+        - dfspa
+        - dfspb
+      currentState: providersLookupSuccess

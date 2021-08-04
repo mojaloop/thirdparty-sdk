@@ -3,3 +3,8 @@ content:
   application/json:
     schema:
       $ref: '../../components/schemas/ThirdpartyTransactionIDApproveResponse.yaml'
+    example:
+      transactionStatus:
+        transactionId: '8f6b2a9c-df32-4248-b115-799beada85ec'
+        transactionRequestState: 'ACCEPTED'
+      currentState: 'transactionStatusReceived'
