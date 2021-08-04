@@ -1,38 +1,36 @@
+# Note: I've manually edited the `responses` section to replace all errors with a single
+# `default` entry, as suggested in https://swagger.io/docs/specification/describing-responses/
+# This is because each of the error responses contains the same schema.
+# Doing do makes the swagger doc much more readable, especially when rendered
 openapi: 3.0.1
 info:
   title: Mojaloop Thirdparty Outbound Scheme Adapter
   description: >
-    Specification for the Thirdparty Outbound Scheme Adapter API
+    Specification for the Thirdparty Outbound Scheme Adapter API.
+
+    This API is a synchronous API which makes integrating with the Mojaloop 3rd Party API easier. 
 
     Please see other documentation on
     https://github.com/mojaloop/thirdparty-scheme-adapter for more information.
-
-
-    **Note on terminology:** The term "Switch" is equal to the term "Hub", and
-    the term "FSP" is equal to the term "DFSP".
   license:
-    name: 'TBD'
-    url: 'TBD'
-  version: 0.1.0
+    name: Apache 2.0
+  version: 0.1.1
+servers:
+  - url: http://sandbox.mojaloop.io/switch-ttk-backend
+    description: The mock 3p-scheme-adapter server running in the Mojaloop Sandbox
+  - url: http://localhost:15000
+    description: A locally running TTK instance
 paths:
   /health:
     $ref: '../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/paths/health.yaml'
   /metrics:
     $ref: '../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/paths/metrics.yaml'
-  /authorizations:
-    $ref: paths/authorizations.yaml
-
-  # pispTransaction.model
   /thirdpartyTransaction/partyLookup:
     $ref: paths/thirdpartyTransaction_partyLookup.yaml
   /thirdpartyTransaction/{ID}/initiate:
     $ref: paths/thirdpartyTransaction_ID_initiate.yaml
   /thirdpartyTransaction/{ID}/approve:
     $ref: paths/thirdpartyTransaction_ID_approve.yaml
-
-  /thirdpartyRequests/transactions/{ID}/authorizations:
-    $ref: paths/thirdpartyRequests_transactions_ID_authorizations.yaml
-
   /linking/providers:
     $ref:  paths/linking_providers.yaml
   /linking/accounts/{fspId}/{userId}:
