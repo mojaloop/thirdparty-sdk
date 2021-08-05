@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+## [11.42.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.41.1...v11.42.0) (2021-08-05)
+
+
+### Features
+
+* **outbound:** update the outbound interface ([#110](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/110)) ([fa999f3](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/fa999f32181319eab2d58d62344353fdd7ffdfe5))
+
 ### [11.41.1](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.41.0...v11.41.1) (2021-08-03)
 
 
