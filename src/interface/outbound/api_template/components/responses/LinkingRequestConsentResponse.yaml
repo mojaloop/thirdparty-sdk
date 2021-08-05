@@ -4,3 +4,19 @@ content:
   application/json:
     schema:
       $ref: '../schemas/LinkingRequestConsentResponse.yaml'
+    example:
+      channelResponse:
+        consentRequestId: f6ab43b0-71cc-49f9-b763-2ac3f05ac8c1
+        scopes: 
+          - accountId: 'dfspa.username.1234'
+            actions:
+              - accounts.getBalance
+              - accounts.transfer
+          - accountId: 'dfspa.username.5678'
+            actions:
+              - accounts.getBalance
+              - accounts.transfer
+        authChannels: 
+          - OTP
+        callbackUri: 'pisp-app://callback...'
+      currentState: OTPAuthenticationChannelResponseReceived

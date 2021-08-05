@@ -3,3 +3,11 @@ content:
   application/json:
     schema:
       $ref: '../schemas/ThirdpartyTransactionPartyLookupResponse.yaml'
+    example:
+      currentState: 'partyLookupSuccess'
+      party:
+        partyIdInfo:
+          partyIdType: MSISDN
+          partyIdentifier: '16135551212'
+          fspId: dfspb
+        name: "Bob bobbington"

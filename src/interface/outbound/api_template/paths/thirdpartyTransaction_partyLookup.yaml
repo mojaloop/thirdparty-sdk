@@ -12,22 +12,13 @@ post:
       application/json:
         schema:
           $ref: '../components/schemas/ThirdpartyTransactionPartyLookupRequest.yaml'
+        example:
+          transactionRequestId: b51ec534-ee48-4575-b6a9-ead2955b8069
+          payee:
+            partyIdType: MSISDN
+            partyIdentifier: '16135551212'
   responses:
     '200':
       $ref: '../components/responses/ThirdpartyTransactionPartyLookupResponse.yaml'
-    '400':
+    'default':
       $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/400.yaml'
-    '401':
-      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/401.yaml'
-    '403':
-      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/403.yaml'
-    '404':
-      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/404.yaml'
-    '405':
-      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/405.yaml'
-    '406':
-      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/406.yaml'
-    '501':
-      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/501.yaml'
-    '503':
-      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/503.yaml'

@@ -17,22 +17,19 @@ post:
       application/json:
         schema:
           $ref: '../components/schemas/LinkingRequestConsentPostRequest.yaml'
+        example:
+          consentRequestId: f6ab43b0-71cc-49f9-b763-2ac3f05ac8c1
+          toParticipantId: dfspa
+          accounts:
+            - accountNickname: SpeXXXXXXXXnt
+              id: dfspa.username.5678
+              currency: USD
+          actions:
+            - 'accounts.transfer'
+          userId: username1234
+          callbackUri: pisp-app://callback
   responses:
     '200':
       $ref: '../components/responses/LinkingRequestConsentResponse.yaml'
-    '400':
+    'default':
       $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/400.yaml'
-    '401':
-      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/401.yaml'
-    '403':
-      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/403.yaml'
-    '404':
-      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/404.yaml'
-    '405':
-      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/405.yaml'
-    '406':
-      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/406.yaml'
-    '501':
-      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/501.yaml'
-    '503':
-      $ref: '../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_1/openapi3/components/responses/503.yaml'
