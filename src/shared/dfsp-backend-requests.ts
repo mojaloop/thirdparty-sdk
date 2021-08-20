@@ -32,7 +32,8 @@ import {
   BackendSendOTPRequest,
   BackendSendOTPResponse,
   BackendStoreScopesRequest,
-  BackendValidateAuthTokenResponse
+  BackendValidateAuthTokenResponse,
+  BackendStoreValidatedConsentRequest
 } from '~/models/inbound/dfspLinking.interface'
 
 export interface IsValidResponse {
@@ -47,6 +48,8 @@ export interface DFSPBackendConfig extends HttpRequestsConfig {
   validateConsentRequestsPath: string
   sendOTPPath: string
   storeConsentRequestsPath: string
+  storeValidatedConsentForAccountIdPath: string
+  getValidatedConsentForAccountIdPath: string
 }
 
 /**
@@ -106,6 +109,14 @@ export class DFSPBackendRequests extends HttpRequests {
   // validate ConsentRequests path getter
   get storeConsentRequestsPath (): string {
     return this.config.storeConsentRequestsPath
+  }
+
+  get storeValidatedConsentForAccountIdPath (): string{
+    return this.config.storeValidatedConsentForAccountIdPath
+  }
+
+  get getValidatedConsentForAccountIdPath (): string{
+    return this.config.getValidatedConsentForAccountIdPath
   }
 
   // REQUESTS
@@ -168,5 +179,28 @@ export class DFSPBackendRequests extends HttpRequests {
     request: fspiopAPI.Schemas.AuthorizationsIDPutResponse
   ): Promise<IsValidResponse | void> {
     return this.post(this.verifyAuthorizationPath, request)
+  }
+
+  async storeValidatedConsentForAccountId(
+    scopes: tpAPI.Schemas.Scope[],
+    consentId: string,
+    registrationChallenge: string
+  ): Promise<void> {
+    for (const scope of scopes as tpAPI.Schemas.Scope[]) {
+      var validatedConsent: BackendStoreValidatedConsentRequest = {
+        accountId: scope.accountId,
+        consentId,
+        registrationChallenge
+      }
+      this.post(this.storeValidatedConsentForAccountIdPath, validatedConsent)
+    }
+    return
+  }
+
+  async getValidatedConsentsForAccountId(
+    accountId: string
+  ): Promise<BackendStoreValidatedConsentRequest[] | void> {
+    const path = this.getValidatedConsentForAccountIdPath.replace('{ID}', accountId)
+    return this.get<BackendStoreValidatedConsentRequest[]>(path)
   }
 }

@@ -81,6 +81,12 @@ export interface BackendGetScopesResponse {
   scopes: tpAPI.Schemas.Scope[]
 }
 
+export interface BackendStoreValidatedConsentRequest {
+  accountId: string
+  consentId: string
+  registrationChallenge: string
+}
+
 export interface DFSPLinkingStateMachine extends ControlledStateMachine {
   validateRequest: Method
   onValidateRequest: Method
@@ -94,6 +100,8 @@ export interface DFSPLinkingStateMachine extends ControlledStateMachine {
   onGrantConsent: Method
   validateWithAuthService: Method
   onValidateWithAuthService: Method
+  storeValidatedConsentWithDFSP: Method
+  onStoreValidatedConsentWithDFSP: Method
   finalizeThirdpartyLinkWithALS: Method
   onFinalizeThirdpartyLinkWithALS: Method
   notifyVerificationToPISP: Method
