@@ -529,9 +529,7 @@ export class DFSPLinkingModel
 
   async onStoreValidatedConsentWithDFSP (): Promise<void> {
     const {
-      consentRequestsPostRequest,
       consentIDPutResponseFromAuthService,
-      toParticipantId,
       consentId,
       consentPostRequestToAuthService
     } = this.data
@@ -544,20 +542,21 @@ export class DFSPLinkingModel
       )
 
     } catch (error) {
-      this.logger.push({ error }).error('consentRegisteredAndValidated -> validatedConsentStoredWithDFSP')
-
       // we send back an account linking error despite the actual error
       const mojaloopError = reformatError(
         Errors.MojaloopApiErrorCodes.TP_ACCOUNT_LINKING_ERROR,
         this.logger
       )
 
-      await this.thirdpartyRequests.putConsentRequestsError(
-        consentRequestsPostRequest.consentRequestId,
+      // if the flow fails to run for any reason notify the PISP that the account
+      // linking process has failed
+      await this.thirdpartyRequests.putConsentsError(
+        this.data.consentId!,
         mojaloopError as unknown as fspiopAPI.Schemas.ErrorInformationObject,
-        toParticipantId
+        this.data.toParticipantId
       )
-      // throw error to stop state machine
+
+      // throw the actual error
       throw error
     }
   }

@@ -186,14 +186,16 @@ export class DFSPBackendRequests extends HttpRequests {
     consentId: string,
     registrationChallenge: string
   ): Promise<void> {
+    const promiseList: Promise<void>[] = []
     for (const scope of scopes as tpAPI.Schemas.Scope[]) {
       var validatedConsent: BackendStoreValidatedConsentRequest = {
         accountId: scope.accountId,
         consentId,
         registrationChallenge
       }
-      this.post(this.storeValidatedConsentForAccountIdPath, validatedConsent)
+      promiseList.push(this.post(this.storeValidatedConsentForAccountIdPath, validatedConsent))
     }
+    await Promise.all(promiseList)
     return
   }
 

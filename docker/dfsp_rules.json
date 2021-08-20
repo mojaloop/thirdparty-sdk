@@ -331,20 +331,80 @@
     }
   },
   {
-    "ruleId": 11,
-    "description": "DFSP responds to /sendOTP request with a HTTP error failure",
+    "ruleId": 12,
+    "description": "DFSP responds to /accountConsentInfo request with a HTTP error failure",
     "conditions": {
       "all": [
         {
           "fact": "body",
           "operator": "equal",
-          "value": "997c89f4-053c-4283-bfec-45a1a0a28fbf",
-          "path": "consentRequestId"
+          "value": "dfspa.username.12345",
+          "path": "accountId"
         },
         {
           "fact": "path",
           "operator": "equal",
-          "value": "/sendOTP"
+          "value": "/accountConsentInfo"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "POST"
+        }
+      ]
+    },
+    "event": {
+      "type": "FIXED_CALLBACK",
+      "params": {
+        "statusCode": 200
+      }
+    }
+  },
+  {
+    "ruleId": 13,
+    "description": "DFSP responds to /accountConsentInfo request with a HTTP error failure",
+    "conditions": {
+      "all": [
+        {
+          "fact": "body",
+          "operator": "equal",
+          "value": "dfspa.username.5678",
+          "path": "accountId"
+        },
+        {
+          "fact": "path",
+          "operator": "equal",
+          "value": "/accountConsentInfo"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "POST"
+        }
+      ]
+    },
+    "event": {
+      "type": "FIXED_CALLBACK",
+      "params": {
+        "statusCode": 200
+      }
+    }
+  },
+  {
+    "ruleId": 14,
+    "description": "DFSP responds to /accountConsentInfo request with a HTTP error failure",
+    "conditions": {
+      "all": [
+        {
+          "fact": "body",
+          "operator": "equal",
+          "value": "dfspa.username.12345",
+          "path": "accountId"
+        },
+        {
+          "fact": "path",
+          "operator": "equal",
+          "value": "/accountConsentInfo"
         },
         {
           "fact": "method",
