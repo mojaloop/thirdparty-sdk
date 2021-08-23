@@ -1202,7 +1202,29 @@ describe('dfspLinkingModel', () => {
             }
           ],
           "00000000-0000-1000-8000-000000000001",
-          "b9c285afee7a671a42b0f9276e6d90f7e21c1e56f4c73a5200fe708850149eea"
+          "b9c285afee7a671a42b0f9276e6d90f7e21c1e56f4c73a5200fe708850149eea",
+          {
+            credentialType: 'FIDO',
+            status: 'VERIFIED',
+            payload: {
+              id: 'credential id: identifier of pair of keys, base64 encoded, min length 59',
+              rawId: 'raw credential id: identifier of pair of keys, base64 encoded, min length 59',
+              response: {
+                clientDataJSON: 'clientDataJSON-must-not-have-fewer-than-121-' +
+                  'characters Lorem ipsum dolor sit amet, consectetur adipiscing ' +
+                  'elit, sed do eiusmod tempor incididunt ut labore et dolore magna ' +
+                  'aliqua.',
+                attestationObject: 'attestationObject-must-not-have-fewer-than-' +
+                  '306-characters Lorem ipsum dolor sit amet, consectetur ' +
+                  'adipiscing elit, sed do eiusmod tempor incididunt ut ' +
+                  'labore et dolore magna aliqua. Ut enim ad minim veniam, ' +
+                  'quis nostrud exercitation ullamco laboris nisi ut aliquip ' +
+                  'ex ea commodo consequat. Duis aute irure dolor in reprehenderit ' +
+                  'in voluptate velit esse cillum dolore eu fugiat nulla pariatur.'
+              },
+              type: 'public-key'
+            }
+          }
         )
     })
 
