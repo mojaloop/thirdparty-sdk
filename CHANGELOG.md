@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+## [11.43.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.42.0...v11.43.0) (2021-08-23)
+
+
+### Features
+
+* add req in account linking so DFSP can store consent details ([#112](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/112)) ([1b0c45d](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/1b0c45dd1bc13475d795c1676e9efa9a86396cb8))
+
 ## [11.42.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.41.1...v11.42.0) (2021-08-05)
 
 
