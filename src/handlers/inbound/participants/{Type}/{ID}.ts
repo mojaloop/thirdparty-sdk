@@ -26,7 +26,7 @@
 
 import { Request, ResponseObject } from '@hapi/hapi'
 import { StateResponseToolkit } from '~/server/plugins/state'
-import { Enum } from '@mojaloop/central-services-shared';
+import { Enum } from '@mojaloop/central-services-shared'
 
 /**
  * Handles an inbound `PUT /participants/{Type}/{ID}` request

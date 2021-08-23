@@ -34,7 +34,7 @@ import { PISPLinkingPhase } from '~/models/outbound/pispLinking.interface'
 import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
 import { DFSPLinkingPhase } from '~/models/inbound/dfspLinking.interface'
 import { DFSPLinkingModel } from '~/models/inbound/dfspLinking.model'
-import { Enum } from '@mojaloop/central-services-shared';
+import { Enum } from '@mojaloop/central-services-shared'
 
 /**
  * Handles an inbound `PATCH /consents/{ID}` request

@@ -96,6 +96,8 @@ export interface ServiceConfig {
     DFSP_BACKEND_VERIFY_CONSENT_PATH: string
     DFSP_BACKEND_VALIDATE_THIRDPARTY_TRANSACTION_REQUEST: string
     DFSP_BACKEND_GET_USER_ACCOUNTS_PATH: string
+    DFSP_BACKEND_STORE_VALIDATED_CONSENT_FOR_ACCOUNT_ID_PATH: string
+    DFSP_BACKEND_GET_TRANSACTION_REQUEST_CONTEXT_FOR_ACCOUNT_ID_PATH: string
     PISP_BACKEND_URI: string
     PISP_BACKEND_HTTP_SCHEME: string
     PISP_BACKEND_SIGN_AUTHORIZATION_PATH: string
@@ -346,6 +348,16 @@ export const ConvictConfig = Convict<ServiceConfig>({
       doc: 'path used by DFSPBackendRequests.validateThirdpartyTransactionRequest',
       format: '*',
       default: 'validate-thirdparty-transaction-request'
+    },
+    DFSP_BACKEND_STORE_VALIDATED_CONSENT_FOR_ACCOUNT_ID_PATH: {
+      doc: 'path use by DFSPBackendRequests.storeValidatedConsentForAccountId',
+      format: '*',
+      default: 'store/consent'
+    },
+    DFSP_BACKEND_GET_TRANSACTION_REQUEST_CONTEXT_FOR_ACCOUNT_ID_PATH: {
+      doc: 'path use by DFSPBackendRequests.getTransactionRequestContextForAccountId',
+      format: '*',
+      default: 'transactionRequestContextForAccountId/{ID}'
     },
     PISP_BACKEND_URI: {
       doc: 'host address of DFSP\'s ',

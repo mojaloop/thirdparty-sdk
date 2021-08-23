@@ -24,7 +24,7 @@
 
 import { StateResponseToolkit } from '~/server/plugins/state'
 import { Request, ResponseObject } from '@hapi/hapi'
-import { Enum } from '@mojaloop/central-services-shared';
+import { Enum } from '@mojaloop/central-services-shared'
 import {
   PISPDiscoveryData,
   PISPDiscoveryModelConfig,

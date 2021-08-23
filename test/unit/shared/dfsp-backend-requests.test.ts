@@ -46,7 +46,9 @@ describe('backendRequests', () => {
     validateThirdpartyTransactionRequestPath: 'validate-third-party-transaction-request',
     validateConsentRequestsPath: 'validateConsentRequests',
     sendOTPPath: 'sendOTP',
-    storeConsentRequestsPath: 'store/consentRequests/{ID}'
+    storeConsentRequestsPath: 'store/consentRequests/{ID}',
+    storeValidatedConsentForAccountIdPath: 'accountConsentInfo',
+    getTransactionRequestContextForAccountIdPath: 'accountConsentInfo/{ID}'
   }
 
   beforeEach(() => {
@@ -69,6 +71,8 @@ describe('backendRequests', () => {
     expect(typeof dfspBackendRequests.validateConsentRequests).toEqual('function')
     expect(typeof dfspBackendRequests.sendOTP).toEqual('function')
     expect(typeof dfspBackendRequests.storeConsentRequests).toEqual('function')
+    expect(typeof dfspBackendRequests.storeValidatedConsentForAccountId).toEqual('function')
+    expect(typeof dfspBackendRequests.getValidatedConsentsForAccountId).toEqual('function')
 
     /**
      * TODO: check for methods
@@ -168,6 +172,7 @@ describe('backendRequests', () => {
       )
     })
   })
+
   describe('validateConsentRequests', () => {
     it('should propagate call to post', async () => {
       const mockData = JSON.parse(JSON.stringify(TestData))
@@ -207,6 +212,120 @@ describe('backendRequests', () => {
       const result = await dfspBackendRequests.storeConsentRequests(request)
       expect(result).toBeUndefined()
       expect(getSpy).toBeCalledWith(`store/consentRequests/${request.consentRequestId}`, { scopes: request.scopes })
+    })
+  })
+
+  describe('storeValidatedConsentForAccountId', () => {
+    it('should propagate call to post', async () => {
+      const postSpy = jest.spyOn(dfspBackendRequests, 'post').mockImplementation(
+        () => Promise.resolve()
+      )
+      const result = await dfspBackendRequests.storeValidatedConsentForAccountId(
+        [
+          {
+            "accountId": "dfspa.username.1234",
+            "actions": [
+              "accounts.transfer",
+              "accounts.getBalance"
+            ]
+          },
+          {
+            "accountId": "dfspa.username.5678",
+            "actions": [
+              "accounts.transfer",
+              "accounts.getBalance"
+            ]
+          }
+        ],
+        'ced49ef2-2393-46e3-a6e5-527d64e61eab',
+        'c4adabb33e9306b038088132affcde556c50d82f603f47711a9510bf3beef6d6',
+        {
+          "credentialType": "FIDO",
+          "status": "VERIFIED",
+          "payload": {
+            "id": "credential id: identifier of pair of keys, base64 encoded, min length 59",
+            "rawId": "raw credential id: identifier of pair of keys, base64 encoded, min length 59",
+            "response": {
+              "clientDataJSON": "clientDataJSON-must-not-have-fewer-" +
+                "than-121-characters Lorem ipsum dolor sit amet, " +
+                "consectetur adipiscing elit, sed do eiusmod tempor " +
+                "incididunt ut labore et dolore magna aliqua.",
+              "attestationObject": "attestationObject-must-not-have-fewer" +
+                "-than-306-characters Lorem ipsum dolor sit amet, " +
+                "consectetur adipiscing elit, sed do eiusmod tempor " +
+                "incididunt ut labore et dolore magna aliqua. Ut enim " +
+                "ad minim veniam, quis nostrud exercitation ullamco " +
+                "laboris nisi ut aliquip ex ea commodo consequat. Duis " +
+                "aute irure dolor in reprehenderit in voluptate velit " +
+                "esse cillum dolore eu fugiat nulla pariatur."
+            },
+            "type": "public-key"
+          }
+        }
+      )
+      expect(result).toBeUndefined()
+      expect(postSpy).toBeCalledWith('accountConsentInfo', {
+        scopes: [
+          {
+            "accountId": "dfspa.username.1234",
+            "actions": [
+              "accounts.transfer",
+              "accounts.getBalance"
+            ]
+          },
+          {
+            "accountId": "dfspa.username.5678",
+            "actions": [
+              "accounts.transfer",
+              "accounts.getBalance"
+            ]
+          }
+        ],
+        consentId: 'ced49ef2-2393-46e3-a6e5-527d64e61eab',
+        registrationChallenge: 'c4adabb33e9306b038088132affcde556c50d82f603f47711a9510bf3beef6d6',
+        credential: {
+          "credentialType": "FIDO",
+          "status": "VERIFIED",
+          "payload": {
+            "id": "credential id: identifier of pair of keys, base64 encoded, min length 59",
+            "rawId": "raw credential id: identifier of pair of keys, base64 encoded, min length 59",
+            "response": {
+              "clientDataJSON": "clientDataJSON-must-not-have-fewer-" +
+                "than-121-characters Lorem ipsum dolor sit amet, " +
+                "consectetur adipiscing elit, sed do eiusmod tempor " +
+                "incididunt ut labore et dolore magna aliqua.",
+              "attestationObject": "attestationObject-must-not-have-fewer" +
+                "-than-306-characters Lorem ipsum dolor sit amet, " +
+                "consectetur adipiscing elit, sed do eiusmod tempor " +
+                "incididunt ut labore et dolore magna aliqua. Ut enim " +
+                "ad minim veniam, quis nostrud exercitation ullamco " +
+                "laboris nisi ut aliquip ex ea commodo consequat. Duis " +
+                "aute irure dolor in reprehenderit in voluptate velit " +
+                "esse cillum dolore eu fugiat nulla pariatur."
+            },
+            "type": "public-key"
+          }
+        }
+      })
+
+    })
+  })
+
+  describe('getValidatedConsentsForAccountId', () => {
+    it('should propagate call to get', async () => {
+      const response = [
+        {
+          accountId: 'dfspa.username.1234',
+          consentId: 'ced49ef2-2393-46e3-a6e5-527d64e61eab',
+          registrationChallenge: 'c4adabb33e9306b038088132affcde556c50d82f603f47711a9510bf3beef6d6'
+        }
+      ]
+      const getSpy = jest.spyOn(dfspBackendRequests, 'get').mockImplementationOnce(
+        () => Promise.resolve(response)
+      )
+      const result = await dfspBackendRequests.getValidatedConsentsForAccountId('dfspa.username.1234')
+      expect(result).toEqual(response)
+      expect(getSpy).toBeCalledWith('accountConsentInfo/dfspa.username.1234')
     })
   })
 })

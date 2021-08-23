@@ -31,7 +31,7 @@ import {
   NotificationCallback,
   PubSub
 } from '~/shared/pub-sub'
-import { ThirdpartyRequests, MojaloopRequests } from '@mojaloop/sdk-standard-components';
+import { ThirdpartyRequests, MojaloopRequests } from '@mojaloop/sdk-standard-components'
 import {
   DFSPLinkingModel,
   create
@@ -52,8 +52,8 @@ import {
 import shouldNotBeExecuted from 'test/unit/shouldNotBeExecuted'
 import TestData from 'test/unit/data/mockData.json'
 import { HTTPResponseError } from '../../../../src/shared/http-response-error'
-import { DFSPLinkingPhase } from '~/models/inbound/dfspLinking.interface';
-import { resetUuid } from '../../__mocks__/uuid';
+import { DFSPLinkingPhase } from '~/models/inbound/dfspLinking.interface'
+import { resetUuid } from '../../__mocks__/uuid'
 
 // mock KVS default exported class
 jest.mock('~/shared/kvs')
@@ -96,7 +96,8 @@ describe('dfspLinkingModel', () => {
         sendOTP: jest.fn(() => Promise.resolve(mockData.consentRequestsPost.otpResponse)),
         validateAuthToken: jest.fn(() => Promise.resolve({
           isValid: true
-        }))
+        })),
+        storeValidatedConsentForAccountId: jest.fn(() => Promise.resolve()),
       } as unknown as DFSPBackendRequests,
       mojaloopRequests: {
         postParticipants: jest.fn(() => Promise.resolve({ statusCode: 202 })),
@@ -156,7 +157,8 @@ describe('dfspLinkingModel', () => {
       'none',
       'notificationSent',
       'requestIsValid',
-      'start'
+      'start',
+      'validatedConsentStoredWithDFSP'
     ])
     expect(sortedArray(dfspLinkingModel.fsm.allTransitions())).toEqual([
       'error',
@@ -166,6 +168,7 @@ describe('dfspLinkingModel', () => {
       'notifyVerificationToPISP',
       'sendLinkingChannelResponse',
       'storeReqAndSendOTP',
+      'storeValidatedConsentWithDFSP',
       'validateAuthToken',
       'validateRequest',
       'validateWithAuthService'
@@ -1085,7 +1088,7 @@ describe('dfspLinkingModel', () => {
     })
   })
 
-  describe('Register THIRD_PARTY_LINKS with als', () => {
+  describe('Store account ID validated consent Backend Phase', () => {
     let validateData: DFSPLinkingData
 
     beforeEach(async () => {
@@ -1094,6 +1097,167 @@ describe('dfspLinkingModel', () => {
         toParticipantId: 'pispa',
         toAuthServiceParticipantId: 'central-auth',
         currentState: 'consentRegisteredAndValidated',
+        consentId: '00000000-0000-1000-8000-000000000001',
+        consentRequestId: 'b51ec534-ee48-4575-b6a9-ead2955b8069',
+        consentRequestsPostRequest: mockData.consentRequestsPost.payload,
+        backendValidateConsentRequestsResponse: mockData.consentRequestsPost.response,
+        consentRequestsIDPatchResponse: mockData.consentRequestsIDPatchRequest.payload,
+        consentIDPutResponseFromAuthService: mockData.inboundPutConsentsIdRequestVerifiedCredential.payload,
+        consentIDPutResponseSignedCredentialFromPISP: mockData.inboundPutConsentsIdRequestSignedCredential.payload,
+        consentPostRequestToAuthService: {
+          consentId: '00000000-0000-1000-8000-000000000001',
+          scopes: [
+            {
+              accountId: 'dfspa.username.1234',
+              actions: [
+                'accounts.transfer',
+                'accounts.getBalance'
+              ]
+            },
+            {
+              accountId: 'dfspa.username.5678',
+              actions: [
+                'accounts.transfer',
+                'accounts.getBalance'
+              ]
+            }
+          ],
+          credential: {
+            credentialType: 'FIDO',
+            status: 'PENDING',
+            payload: {
+              id: 'credential id: identifier of pair of keys, base64 encoded, min length 59',
+              rawId: 'raw credential id: identifier of pair of keys, base64 encoded, min length 59',
+              response: {
+                clientDataJSON: 'clientDataJSON-must-not-have-fewer-than-121-' +
+                  'characters Lorem ipsum dolor sit amet, consectetur adipiscing ' +
+                  'elit, sed do eiusmod tempor incididunt ut labore et dolore magna ' +
+                  'aliqua.',
+                attestationObject: 'attestationObject-must-not-have-fewer-than-' +
+                  '306-characters Lorem ipsum dolor sit amet, consectetur ' +
+                  'adipiscing elit, sed do eiusmod tempor incididunt ut ' +
+                  'labore et dolore magna aliqua. Ut enim ad minim veniam, ' +
+                  'quis nostrud exercitation ullamco laboris nisi ut aliquip ' +
+                  'ex ea commodo consequat. Duis aute irure dolor in reprehenderit ' +
+                  'in voluptate velit esse cillum dolore eu fugiat nulla pariatur.'
+              },
+              type: 'public-key'
+            }
+          }
+        },
+        scopes: [
+          {
+            accountId: 'dfspa.username.1234',
+            actions: [
+              'accounts.transfer',
+              'accounts.getBalance'
+            ]
+          },
+          {
+            accountId: 'dfspa.username.5678',
+            actions: [
+              'accounts.transfer',
+              'accounts.getBalance'
+            ]
+          }
+        ],
+      }
+    })
+
+    it('should be well constructed', async () => {
+      const model = await create(validateData, modelConfig)
+      checkDFSPLinkingModelLayout(model, validateData)
+    })
+    it('storeValidatedConsentWithDFSP: should transition from requestIsValid to consentRequestValidatedAndStored when successful', async () => {
+      const model = await create(validateData, modelConfig)
+
+      mocked(modelConfig.dfspBackendRequests.storeValidatedConsentForAccountId)
+        .mockImplementationOnce(
+          () => Promise.resolve()
+        )
+
+      // start request scopes step
+      await model.fsm.storeValidatedConsentWithDFSP()
+
+      // check that the fsm was able to transition properly
+      expect(model.data.currentState).toEqual('validatedConsentStoredWithDFSP')
+
+      // check we made dfspBackendRequests calls
+      expect(modelConfig.dfspBackendRequests.storeValidatedConsentForAccountId)
+        .toBeCalledWith(
+          [
+            {
+              accountId: 'dfspa.username.1234',
+              actions: [
+                'accounts.transfer',
+                'accounts.getBalance'
+              ]
+            },
+            {
+              accountId: 'dfspa.username.5678',
+              actions: [
+                'accounts.transfer',
+                'accounts.getBalance'
+              ]
+            }
+          ],
+          "00000000-0000-1000-8000-000000000001",
+          "b9c285afee7a671a42b0f9276e6d90f7e21c1e56f4c73a5200fe708850149eea",
+          {
+            credentialType: 'FIDO',
+            status: 'VERIFIED',
+            payload: {
+              id: 'credential id: identifier of pair of keys, base64 encoded, min length 59',
+              rawId: 'raw credential id: identifier of pair of keys, base64 encoded, min length 59',
+              response: {
+                clientDataJSON: 'clientDataJSON-must-not-have-fewer-than-121-' +
+                  'characters Lorem ipsum dolor sit amet, consectetur adipiscing ' +
+                  'elit, sed do eiusmod tempor incididunt ut labore et dolore magna ' +
+                  'aliqua.',
+                attestationObject: 'attestationObject-must-not-have-fewer-than-' +
+                  '306-characters Lorem ipsum dolor sit amet, consectetur ' +
+                  'adipiscing elit, sed do eiusmod tempor incididunt ut ' +
+                  'labore et dolore magna aliqua. Ut enim ad minim veniam, ' +
+                  'quis nostrud exercitation ullamco laboris nisi ut aliquip ' +
+                  'ex ea commodo consequat. Duis aute irure dolor in reprehenderit ' +
+                  'in voluptate velit esse cillum dolore eu fugiat nulla pariatur.'
+              },
+              type: 'public-key'
+            }
+          }
+        )
+    })
+
+    it('should handle exceptions', async () => {
+      mocked(
+        modelConfig.dfspBackendRequests.storeValidatedConsentForAccountId
+      ).mockImplementationOnce(
+        () => {
+          throw new Error('mocked storeValidatedConsentForAccountId exception')
+        }
+      )
+
+      const model = await create(validateData, modelConfig)
+
+      try {
+        // start request scopes step
+        await model.fsm.storeValidatedConsentWithDFSP()
+        shouldNotBeExecuted()
+      } catch (err) {
+        expect(err.message).toEqual('mocked storeValidatedConsentForAccountId exception')
+      }
+    })
+  })
+
+  describe('Register THIRD_PARTY_LINKS with als', () => {
+    let validateData: DFSPLinkingData
+
+    beforeEach(async () => {
+      validateData = {
+        dfspId: 'dfspa',
+        toParticipantId: 'pispa',
+        toAuthServiceParticipantId: 'central-auth',
+        currentState: 'validatedConsentStoredWithDFSP',
         consentId: '00000000-0000-1000-8000-000000000001',
         consentRequestId: 'b51ec534-ee48-4575-b6a9-ead2955b8069',
         consentRequestsPostRequest: mockData.consentRequestsPost.payload,

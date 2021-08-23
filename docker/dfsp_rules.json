@@ -367,5 +367,74 @@
         }
       }
     }
+  },
+  {
+    "ruleId": 12,
+    "description": "DFSP responds to /store/consent request successfully",
+    "conditions": {
+      "all": [
+        {
+          "fact": "body",
+          "operator": "equal",
+          "value": "dfspa.username.1234",
+          "path": "scopes[0].accountId"
+        },
+        {
+          "fact": "path",
+          "operator": "equal",
+          "value": "/store/consent"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "POST"
+        }
+      ]
+    },
+    "event": {
+      "type": "FIXED_CALLBACK",
+      "params": {
+        "statusCode": 200,
+        "body": {}
+      }
+    }
+  },
+  {
+    "ruleId": 13,
+    "description": "DFSP responds to /store/consent request with a HTTP error failure",
+    "conditions": {
+      "all": [
+        {
+          "fact": "body",
+          "operator": "equal",
+          "value": "dfspa.username.12345",
+          "path": "scopes[0].accountId"
+        },
+        {
+          "fact": "path",
+          "operator": "equal",
+          "value": "/store/consent"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "POST"
+        }
+      ]
+    },
+    "event": {
+      "type": "FIXED_CALLBACK",
+      "params": {
+        "statusCode": 500,
+        "errorData": {
+          "res": {
+            "body": {
+              "statusCode": "500",
+              "message": "Internal Server Error"
+            }
+          }
+        }
+      }
+    }
   }
 ]

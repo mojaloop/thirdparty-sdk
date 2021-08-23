@@ -34,7 +34,7 @@ import {
 import config from '~/shared/config'
 import inspect from '~/shared/inspect'
 import * as OutboundAPI from '~/interface/outbound/api_interfaces'
-import { Enum } from '@mojaloop/central-services-shared';
+import { Enum } from '@mojaloop/central-services-shared'
 
 
 /**
