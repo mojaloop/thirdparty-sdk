@@ -111,11 +111,11 @@ export class DFSPBackendRequests extends HttpRequests {
     return this.config.storeConsentRequestsPath
   }
 
-  get storeValidatedConsentForAccountIdPath (): string{
+  get storeValidatedConsentForAccountIdPath (): string {
     return this.config.storeValidatedConsentForAccountIdPath
   }
 
-  get getTransactionRequestContextForAccountIdPath (): string{
+  get getTransactionRequestContextForAccountIdPath (): string {
     return this.config.getTransactionRequestContextForAccountIdPath
   }
 
@@ -181,7 +181,7 @@ export class DFSPBackendRequests extends HttpRequests {
     return this.post(this.verifyAuthorizationPath, request)
   }
 
-  async storeValidatedConsentForAccountId(
+  async storeValidatedConsentForAccountId (
     scopes: tpAPI.Schemas.Scope[],
     consentId: string,
     registrationChallenge: string
@@ -194,7 +194,7 @@ export class DFSPBackendRequests extends HttpRequests {
     return this.post(this.storeValidatedConsentForAccountIdPath, validatedConsent)
   }
 
-  async getValidatedConsentsForAccountId(
+  async getValidatedConsentsForAccountId (
     accountId: string
   ): Promise<BackendStoreValidatedConsentRequest[] | void> {
     const path = this.getTransactionRequestContextForAccountIdPath.replace('{ID}', accountId)
