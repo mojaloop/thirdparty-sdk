@@ -45,8 +45,8 @@ import { v4 as uuidv4 } from 'uuid'
 import { reformatError } from '~/shared/api-error'
 import deferredJob from '~/shared/deferred-job'
 import { Message } from '~/shared/pub-sub'
-import { canonicalize } from 'json-canonicalize';
-import sha256 from 'crypto-js/sha256';
+import { canonicalize } from 'json-canonicalize'
+import sha256 from 'crypto-js/sha256'
 
 // DFSPLinkingModel is the passive inbound handler for inbound
 // POST /consentRequests requests and no response is generated from `model.run()`

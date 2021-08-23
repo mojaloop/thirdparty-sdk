@@ -48,7 +48,7 @@ describe('backendRequests', () => {
     sendOTPPath: 'sendOTP',
     storeConsentRequestsPath: 'store/consentRequests/{ID}',
     storeValidatedConsentForAccountIdPath: 'accountConsentInfo',
-    getValidatedConsentForAccountIdPath: 'accountConsentInfo/{ID}'
+    getTransactionRequestContextForAccountIdPath: 'accountConsentInfo/{ID}'
   }
 
   beforeEach(() => {

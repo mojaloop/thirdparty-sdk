@@ -49,7 +49,7 @@ export interface DFSPBackendConfig extends HttpRequestsConfig {
   sendOTPPath: string
   storeConsentRequestsPath: string
   storeValidatedConsentForAccountIdPath: string
-  getValidatedConsentForAccountIdPath: string
+  getTransactionRequestContextForAccountIdPath: string
 }
 
 /**
@@ -115,8 +115,8 @@ export class DFSPBackendRequests extends HttpRequests {
     return this.config.storeValidatedConsentForAccountIdPath
   }
 
-  get getValidatedConsentForAccountIdPath (): string{
-    return this.config.getValidatedConsentForAccountIdPath
+  get getTransactionRequestContextForAccountIdPath (): string{
+    return this.config.getTransactionRequestContextForAccountIdPath
   }
 
   // REQUESTS
@@ -202,7 +202,7 @@ export class DFSPBackendRequests extends HttpRequests {
   async getValidatedConsentsForAccountId(
     accountId: string
   ): Promise<BackendStoreValidatedConsentRequest[] | void> {
-    const path = this.getValidatedConsentForAccountIdPath.replace('{ID}', accountId)
+    const path = this.getTransactionRequestContextForAccountIdPath.replace('{ID}', accountId)
     return this.get<BackendStoreValidatedConsentRequest[]>(path)
   }
 }

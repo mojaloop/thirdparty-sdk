@@ -31,7 +31,7 @@ import {
   NotificationCallback,
   PubSub
 } from '~/shared/pub-sub'
-import { ThirdpartyRequests, MojaloopRequests } from '@mojaloop/sdk-standard-components';
+import { ThirdpartyRequests, MojaloopRequests } from '@mojaloop/sdk-standard-components'
 import {
   DFSPLinkingModel,
   create
@@ -52,8 +52,8 @@ import {
 import shouldNotBeExecuted from 'test/unit/shouldNotBeExecuted'
 import TestData from 'test/unit/data/mockData.json'
 import { HTTPResponseError } from '../../../../src/shared/http-response-error'
-import { DFSPLinkingPhase } from '~/models/inbound/dfspLinking.interface';
-import { resetUuid } from '../../__mocks__/uuid';
+import { DFSPLinkingPhase } from '~/models/inbound/dfspLinking.interface'
+import { resetUuid } from '../../__mocks__/uuid'
 
 // mock KVS default exported class
 jest.mock('~/shared/kvs')

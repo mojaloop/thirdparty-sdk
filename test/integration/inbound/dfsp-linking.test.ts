@@ -26,7 +26,7 @@
  ******/
 import axios from 'axios'
 import env from '../env'
-import { thirdparty as tpAPI } from '@mojaloop/api-snippets';
+import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
 
 interface MLTestingToolkitRequest {
   timestamp: string

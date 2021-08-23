@@ -29,7 +29,7 @@
 
 import { PISPDiscoveryModel } from '~/models/outbound/pispDiscovery.model'
 import { PISPLinkingModel } from '~/models/outbound/pispLinking.model'
-import { PISPPrelinkingModel } from '~/models/outbound/pispPrelinking.model';
+import { PISPPrelinkingModel } from '~/models/outbound/pispPrelinking.model'
 import {
   v1_1 as fspiopAPI,
   thirdparty as tpAPI

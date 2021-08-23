@@ -33,7 +33,7 @@ import {
 } from '~/models/outbound/pispPrelinking.interface'
 import config from '~/shared/config'
 import inspect from '~/shared/inspect'
-import { Enum } from '@mojaloop/central-services-shared';
+import { Enum } from '@mojaloop/central-services-shared'
 
 /**
  * Handles outbound GET /linking/providers request
