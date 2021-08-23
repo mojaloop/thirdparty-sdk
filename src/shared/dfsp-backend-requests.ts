@@ -184,12 +184,14 @@ export class DFSPBackendRequests extends HttpRequests {
   async storeValidatedConsentForAccountId (
     scopes: tpAPI.Schemas.Scope[],
     consentId: string,
-    registrationChallenge: string
+    registrationChallenge: string,
+    credential: tpAPI.Schemas.VerifiedCredential
   ): Promise<void> {
     const validatedConsent: BackendStoreValidatedConsentRequest = {
       scopes: scopes,
       consentId,
-      registrationChallenge
+      registrationChallenge,
+      credential
     }
     return this.post(this.storeValidatedConsentForAccountIdPath, validatedConsent)
   }

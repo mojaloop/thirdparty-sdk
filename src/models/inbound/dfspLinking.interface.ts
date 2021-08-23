@@ -85,6 +85,7 @@ export interface BackendStoreValidatedConsentRequest {
   scopes: tpAPI.Schemas.Scope[]
   consentId: string
   registrationChallenge: string
+  credential: tpAPI.Schemas.VerifiedCredential
 }
 
 export interface DFSPLinkingStateMachine extends ControlledStateMachine {

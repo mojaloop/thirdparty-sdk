@@ -538,7 +538,8 @@ export class DFSPLinkingModel
       await this.dfspBackendRequests.storeValidatedConsentForAccountId(
         consentIDPutResponseFromAuthService!.scopes,
         consentId!,
-        DFSPLinkingModel.deriveChallenge(consentPostRequestToAuthService!)
+        DFSPLinkingModel.deriveChallenge(consentPostRequestToAuthService!),
+        consentIDPutResponseFromAuthService!.credential
       )
 
     } catch (error) {
