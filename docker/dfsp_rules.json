@@ -394,7 +394,8 @@
     "event": {
       "type": "FIXED_CALLBACK",
       "params": {
-        "statusCode": 200
+        "statusCode": 200,
+        "body": {}
       }
     }
   },
