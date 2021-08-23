@@ -82,7 +82,7 @@ export interface BackendGetScopesResponse {
 }
 
 export interface BackendStoreValidatedConsentRequest {
-  accountId: string
+  scopes: tpAPI.Schemas.Scope[]
   consentId: string
   registrationChallenge: string
 }

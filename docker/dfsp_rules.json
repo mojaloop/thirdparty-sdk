@@ -370,19 +370,19 @@
   },
   {
     "ruleId": 12,
-    "description": "DFSP responds to /accountConsentInfo request with a HTTP error failure",
+    "description": "DFSP responds to /store/consent request successfully",
     "conditions": {
       "all": [
         {
           "fact": "body",
           "operator": "equal",
-          "value": "dfspa.username.12345",
-          "path": "accountId"
+          "value": "dfspa.username.1234",
+          "path": "scopes[0].accountId"
         },
         {
           "fact": "path",
           "operator": "equal",
-          "value": "/accountConsentInfo"
+          "value": "/store/consent"
         },
         {
           "fact": "method",
@@ -400,49 +400,19 @@
   },
   {
     "ruleId": 13,
-    "description": "DFSP responds to /accountConsentInfo request with a HTTP error failure",
-    "conditions": {
-      "all": [
-        {
-          "fact": "body",
-          "operator": "equal",
-          "value": "dfspa.username.5678",
-          "path": "accountId"
-        },
-        {
-          "fact": "path",
-          "operator": "equal",
-          "value": "/accountConsentInfo"
-        },
-        {
-          "fact": "method",
-          "operator": "equal",
-          "value": "POST"
-        }
-      ]
-    },
-    "event": {
-      "type": "FIXED_CALLBACK",
-      "params": {
-        "statusCode": 200
-      }
-    }
-  },
-  {
-    "ruleId": 14,
-    "description": "DFSP responds to /accountConsentInfo request with a HTTP error failure",
+    "description": "DFSP responds to /store/consent request with a HTTP error failure",
     "conditions": {
       "all": [
         {
           "fact": "body",
           "operator": "equal",
           "value": "dfspa.username.12345",
-          "path": "accountId"
+          "path": "scopes[0].accountId"
         },
         {
           "fact": "path",
           "operator": "equal",
-          "value": "/accountConsentInfo"
+          "value": "/store/consent"
         },
         {
           "fact": "method",

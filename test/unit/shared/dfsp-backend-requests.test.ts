@@ -242,15 +242,26 @@ describe('backendRequests', () => {
       )
       expect(result).toBeUndefined()
       expect(postSpy).toBeCalledWith('accountConsentInfo', {
-        accountId: 'dfspa.username.1234',
+        scopes: [
+          {
+            "accountId": "dfspa.username.1234",
+            "actions": [
+              "accounts.transfer",
+              "accounts.getBalance"
+            ]
+          },
+          {
+            "accountId": "dfspa.username.5678",
+            "actions": [
+              "accounts.transfer",
+              "accounts.getBalance"
+            ]
+          }
+        ],
         consentId: 'ced49ef2-2393-46e3-a6e5-527d64e61eab',
         registrationChallenge: 'c4adabb33e9306b038088132affcde556c50d82f603f47711a9510bf3beef6d6'
       })
-      expect(postSpy).toBeCalledWith('accountConsentInfo', {
-        accountId: 'dfspa.username.5678',
-        consentId: 'ced49ef2-2393-46e3-a6e5-527d64e61eab',
-        registrationChallenge: 'c4adabb33e9306b038088132affcde556c50d82f603f47711a9510bf3beef6d6'
-      })
+
     })
   })
 
