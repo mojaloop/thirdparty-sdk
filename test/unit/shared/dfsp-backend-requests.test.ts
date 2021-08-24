@@ -238,6 +238,7 @@ describe('backendRequests', () => {
           }
         ],
         'ced49ef2-2393-46e3-a6e5-527d64e61eab',
+        'b51ec534-ee48-4575-b6a9-ead2955b8069',
         'c4adabb33e9306b038088132affcde556c50d82f603f47711a9510bf3beef6d6',
         {
           "credentialType": "FIDO",
@@ -283,6 +284,7 @@ describe('backendRequests', () => {
         ],
         consentId: 'ced49ef2-2393-46e3-a6e5-527d64e61eab',
         registrationChallenge: 'c4adabb33e9306b038088132affcde556c50d82f603f47711a9510bf3beef6d6',
+        consentRequestId: 'b51ec534-ee48-4575-b6a9-ead2955b8069',
         credential: {
           "credentialType": "FIDO",
           "status": "VERIFIED",
