@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+## [11.44.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.43.0...v11.44.0) (2021-08-24)
+
+
+### Features
+
+* **backend-requests:** store consent request id with consent ([#113](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/113)) ([0393cbe](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/0393cbe24ea5854f32a55bc35eef160998a23cfa))
+
 ## [11.43.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.42.0...v11.43.0) (2021-08-23)
 
 
