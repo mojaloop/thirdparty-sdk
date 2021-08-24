@@ -1202,6 +1202,7 @@ describe('dfspLinkingModel', () => {
             }
           ],
           "00000000-0000-1000-8000-000000000001",
+          "b51ec534-ee48-4575-b6a9-ead2955b8069",
           "b9c285afee7a671a42b0f9276e6d90f7e21c1e56f4c73a5200fe708850149eea",
           {
             credentialType: 'FIDO',

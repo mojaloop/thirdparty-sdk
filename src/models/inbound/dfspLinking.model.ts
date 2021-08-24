@@ -531,6 +531,7 @@ export class DFSPLinkingModel
     const {
       consentIDPutResponseFromAuthService,
       consentId,
+      consentRequestId,
       consentPostRequestToAuthService
     } = this.data
 
@@ -538,6 +539,7 @@ export class DFSPLinkingModel
       await this.dfspBackendRequests.storeValidatedConsentForAccountId(
         consentIDPutResponseFromAuthService!.scopes,
         consentId!,
+        consentRequestId,
         DFSPLinkingModel.deriveChallenge(consentPostRequestToAuthService!),
         consentIDPutResponseFromAuthService!.credential
       )
