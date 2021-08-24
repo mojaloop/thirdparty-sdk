@@ -84,6 +84,7 @@ export interface BackendGetScopesResponse {
 export interface BackendStoreValidatedConsentRequest {
   scopes: tpAPI.Schemas.Scope[]
   consentId: string
+  consentRequestId: string
   registrationChallenge: string
   credential: tpAPI.Schemas.VerifiedCredential
 }
