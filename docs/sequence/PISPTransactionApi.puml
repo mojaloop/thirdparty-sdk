@@ -246,18 +246,14 @@ activate Switch
 Switch --> PISP_TM: 202 Accepted
 rnote right of PISP_TM: state: pendingVerifyAuthorization
 deactivate PISP_TM
-Switch -> DFSP_SDK_IN: PUT /thirdpartyRequests/authorizations/{authorizationRequestId}
-activate DFSP_SDK_IN
-DFSP_SDK_IN --> Switch: 202 Accepted
+Switch -> DFSP_TP_IN: PUT /thirdpartyRequests/authorizations/{authorizationRequestId}
+activate DFSP_TP_IN
+DFSP_TP_IN --> Switch: 202 Accepted
 deactivate Switch
-DFSP_SDK_IN -> DFSP_SDK_OUT: notify about PUT /thirdpartyRequests/authorizations/{authorizationRequestId}
-activate DFSP_SDK_OUT
-DFSP_SDK_OUT -> DFSP_TM: 200: AuthorizationInformation
+DFSP_TP_IN -> DFSP_TM: 200: AuthorizationInformation
 note over DFSP_TM
   From now DFSPTransactionModel is unblocked
 end note
-deactivate DFSP_SDK_IN
-deactivate DFSP_SDK_OUT
 note over DFSP_TM
   TransactionModel checks the received AuthorizationInformation with the auth-service.
 end note
