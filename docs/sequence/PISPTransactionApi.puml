@@ -159,7 +159,7 @@ note over PISP_TM
   
   **PUT /thirdpartyReqeusts/transaction/{id}**
   and
-  **POST /authorization**
+  **POST /thirdpartyRequests/authorizations**
   
   so we are mitigating it by alternative two-step transitions:
 
@@ -188,20 +188,20 @@ DFSP_TM -> DFSP_TM: SDKRequests.requestAuthorization()
 rnote right of DFSP_TM: state: pendingRequestAuthorization\n**transactionRequestState** is **PENDING**
 DFSP_TM -> DFSP_TM: persist transactionRequestState for transactionRequestId
 DFSP_TM -> DFSP_TM: SDKRequests.requestAuthorization(QuoteInformation)
-DFSP_TM -> DFSP_SDK_OUT: SYNC POST /authorization
+DFSP_TM -> DFSP_SDK_OUT: SYNC POST /thirdpartyRequests/authorizations
 note over DFSP_TM
   From now DFSPTransactionModel is blocked
-  on synchronous call to POST /authorizations
+  on synchronous call to POST /thirdpartyRequests/authorizations
   until PISP initiate **Approve Transaction** phase.
   Here timeout scenario should be handled properly
 end note
 activate DFSP_SDK_OUT
-DFSP_SDK_OUT -> Switch: POST /authorizations
+DFSP_SDK_OUT -> Switch: POST /thirdpartyRequests/authorizations
 activate Switch
 Switch --> DFSP_SDK_OUT: 202 Accepted
-DFSP_SDK_OUT -> DFSP_SDK_OUT: waiting on PUT /authorizations/{transactionRequestId}
+DFSP_SDK_OUT -> DFSP_SDK_OUT: waiting on PUT /thirdpartyRequests/authorizations/{authorizationRequestId}
 deactivate DFSP_SDK_OUT
-Switch -> PISP_TP_IN: POST /authorizations
+Switch -> PISP_TP_IN: POST /thirdpartyRequests/authorizations
 activate PISP_TP_IN
 PISP_TP_IN --> Switch: 200 OK
 deactivate Switch
@@ -244,16 +244,16 @@ activate PISP_TM
 rnote right of PISP_TM: state: approvalReceived
 PISP_TM -> PISP_TM: SDKRequests.requestVerifyAuthorization(transactionRequestId, signedChallenge)
 
-PISP_TM -> Switch: PUT /authorizations/{transactionRequestId}
+PISP_TM -> Switch: PUT /thirdpartyRequests/authorizations/{authorizationRequestId}
 activate Switch
 Switch --> PISP_TM: 202 Accepted
 rnote right of PISP_TM: state: pendingVerifyAuthorization
 deactivate PISP_TM
-Switch -> DFSP_SDK_IN: PUT /authorization/{transactionRequestId}
+Switch -> DFSP_SDK_IN: PUT /thirdpartyRequests/authorizations/{authorizationRequestId}
 activate DFSP_SDK_IN
 DFSP_SDK_IN --> Switch: 202 Accept
 deactivate Switch
-DFSP_SDK_IN -> DFSP_SDK_OUT: notify about PUT /authorization/{transactionRequestId}
+DFSP_SDK_IN -> DFSP_SDK_OUT: notify about PUT /thirdpartyRequests/authorizations/{authorizationRequestId}
 activate DFSP_SDK_OUT
 DFSP_SDK_OUT -> DFSP_TM: 200: AuthorizationInformation
 note over DFSP_TM
