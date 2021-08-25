@@ -315,7 +315,7 @@ export const ConvictConfig = Convict<ServiceConfig>({
       default: 'verify-authorization'
     },
     DFSP_BACKEND_VERIFY_CONSENT_PATH: {
-      doc: 'path use by DFSPBackendRequests.verifyConsent',
+      doc: 'deprecated - use DFSP_BACKEND_VALIDATE_THIRDPARTY_TRANSACTION_REQUEST instead. path use by DFSPBackendRequests.verifyConsent',
       format: '*',
       default: 'verify-consent'
     },

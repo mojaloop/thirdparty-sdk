@@ -122,7 +122,7 @@ DFSP_TM -> DFSP_TM: persist transactionRequestState for transactionRequestId
 note over DFSP_TM
   DFSP asks its backend to verify consent for payer via THIRD_PARTY_LINK
 end note
-DFSP_TM -> DFSP_TM: DFSPBackendRequests.verifyConsent(pispId, payer)
+DFSP_TM -> DFSP_TM: DFSPBackendRequests.validateThirdpartyTransactionRequestAndGetContext(transactionRequest)
 note over DFSP_TM
   DFSP is happy with Consent
 end note
