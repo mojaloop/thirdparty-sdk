@@ -109,12 +109,7 @@
       "params": {
         "statusCode": 200,
         "body": {
-          "isValid": true,
-          "consentId": "123456789",
-          "payerPartyIdInfo": {
-            "partyIdType": "MSISDN",
-            "partyIdentifier": "61414414414"
-          }
+          "isValid": true
         }
       }
     }
