@@ -438,7 +438,7 @@ export const ConvictConfig = Convict<ServiceConfig>({
       }
     },
     TEMP_OVERRIDE_QUOTES_PARTY_ID_TYPE: {
-      doc: 'DEPRECATED - No longer in use. ',
+      doc: 'DEPRECATED - No longer in use. Implement the backend request validateThirdpartyTransactionRequestAndGetContext instead.',
       format: '*',
       env: 'TEMP_OVERRIDE_QUOTES_PARTY_ID_TYPE',
       default: undefined
