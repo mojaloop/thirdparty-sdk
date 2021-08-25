@@ -28,7 +28,7 @@ import { Method } from 'javascript-state-machine'
 import { ControlledStateMachine, StateData, PersistentModelConfig } from '~/models/persistent.model'
 import { thirdparty as tpAPI, v1_1 as fspiopAPI } from '@mojaloop/api-snippets'
 import { SDKOutgoingRequests } from '~/shared/sdk-outgoing-requests'
-import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
+import { BackendTransactionRequestContext, DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
 import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
 import { OutboundAPI as SDKOutboundAPI } from '@mojaloop/sdk-scheme-adapter'
 
@@ -78,6 +78,7 @@ export interface DFSPTransactionData extends StateData<DFSPTransactionModelState
   transactionRequestState: tpAPI.Schemas.TransactionRequestState
   transactionId?: string
   transferId?: string
+  transactionRequestContext?: BackendTransactionRequestContext
 
   // id of participant (PISP) which sends ThirdpartyTransactionRequest to DFSP
   // used as target dfspId param for calls to PISP via switch
