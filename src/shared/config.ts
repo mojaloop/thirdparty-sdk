@@ -438,7 +438,7 @@ export const ConvictConfig = Convict<ServiceConfig>({
       }
     },
     TEMP_OVERRIDE_QUOTES_PARTY_ID_TYPE: {
-      doc: 'If set, this will override the PARTY_ID_TYPE in the POST /quotes call after receiving a POST /thirdpartyRequests/transactions call',
+      doc: 'DEPRECATED - No longer in use. ',
       format: '*',
       env: 'TEMP_OVERRIDE_QUOTES_PARTY_ID_TYPE',
       default: undefined
