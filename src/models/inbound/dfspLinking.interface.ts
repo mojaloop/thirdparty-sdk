@@ -32,11 +32,10 @@ import {
 import { Method } from 'javascript-state-machine'
 import { ThirdpartyRequests, MojaloopRequests } from '@mojaloop/sdk-standard-components'
 import {
-  v1_1 as fspiopAPI,
   thirdparty as tpAPI
 } from '@mojaloop/api-snippets'
 import { PubSub } from '~/shared/pub-sub'
-import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
+import { BackendValidateConsentRequestsResponse, DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
 
 export enum DFSPLinkingPhase {
   requestConsent = 'requestConsent',

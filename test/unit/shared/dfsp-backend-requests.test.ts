@@ -67,7 +67,7 @@ describe('backendRequests', () => {
     expect(typeof dfspBackendRequests.post).toEqual('function')
     expect(typeof dfspBackendRequests.put).toEqual('function')
     expect(typeof dfspBackendRequests.getUserAccounts).toEqual('function')
-    expect(typeof dfspBackendRequests.validateThirdpartyTransactionRequest).toEqual('function')
+    expect(typeof dfspBackendRequests.validateThirdpartyTransactionRequestAndGetContext).toEqual('function')
     expect(typeof dfspBackendRequests.validateConsentRequests).toEqual('function')
     expect(typeof dfspBackendRequests.sendOTP).toEqual('function')
     expect(typeof dfspBackendRequests.storeConsentRequests).toEqual('function')
@@ -138,7 +138,7 @@ describe('backendRequests', () => {
       const postSpy = jest.spyOn(dfspBackendRequests, 'post').mockImplementationOnce(
         () => Promise.resolve(response)
       )
-      const result = await dfspBackendRequests.validateThirdpartyTransactionRequest(transactionRequestRequest)
+      const result = await dfspBackendRequests.validateThirdpartyTransactionRequestAndGetContext(transactionRequestRequest)
       expect(result).toEqual(response)
       expect(postSpy).toBeCalledWith(
         dfspBackendRequests.validateThirdpartyTransactionRequestPath,

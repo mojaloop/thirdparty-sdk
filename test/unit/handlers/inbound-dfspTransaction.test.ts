@@ -94,7 +94,7 @@ describe('Inbound DFSP Transaction handler', () => {
     } as unknown as ThirdpartyRequests
 
     dfspBackendRequestsMock = {
-      validateThirdpartyTransactionRequest: jest.fn(() => Promise.resolve({ isValid: true })),
+      validateThirdpartyTransactionRequestAndGetContext: jest.fn(() => Promise.resolve({ isValid: true })),
       verifyAuthorization: jest.fn(() => Promise.resolve({ isValid: true }))
     } as unknown as DFSPBackendRequests
     sdkOutgoingRequestsMock = {
@@ -142,7 +142,7 @@ describe('Inbound DFSP Transaction handler', () => {
       // all these endpoints are used by the flow
       expect(thirdpartyRequestsMock.putThirdpartyRequestsTransactions).toBeCalledTimes(1)
       expect(thirdpartyRequestsMock.patchThirdpartyRequestsTransactions).toBeCalledTimes(1)
-      expect(dfspBackendRequestsMock.validateThirdpartyTransactionRequest).toBeCalledTimes(1)
+      expect(dfspBackendRequestsMock.validateThirdpartyTransactionRequestAndGetContext).toBeCalledTimes(1)
       expect(dfspBackendRequestsMock.verifyAuthorization).toBeCalledTimes(1)
       expect(sdkOutgoingRequestsMock.requestQuote).toBeCalledTimes(1)
       expect(sdkOutgoingRequestsMock.requestAuthorization).toBeCalledTimes(1)
