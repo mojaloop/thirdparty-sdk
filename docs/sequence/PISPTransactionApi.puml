@@ -257,15 +257,24 @@ end note
 note over DFSP_TM
   TransactionModel checks the received AuthorizationInformation with the auth-service.
 end note
-rnote right of DFSP_TM: state: pendingVerifyAuthorization
 DFSP_TM -> DFSP_TM: generate verificationRequestId
-
-DFSP_TM -> DFSP_TM: DFSPBackendRequests.verifyAuthorization(AuthorizationInformation)
+DFSP_TM -> DFSP_TM: SDKRequests.verifyThirdpartyTransactionRequest(verificationRequestId)
+rnote right of DFSP_TM: state: pendingVerifyAuthorization
+DFSP_TM -> Switch: POST /thirdpartyRequests/verifications
+activate Switch
+Switch --> DFSP_TM: 202 Accepted
+Switch -> Switch: Switch asks auth-service to verify the transaction (process not shown here)
 
 note over PISP, DFSP_TM
   ERROR_SCENARIO: DFSP notifies PISP about Authorization error and then ends its workflow here
 end note
-rnote right of DFSP_TM: DFSP is unhappy with Authorization\n**transactionRequestState** is **REJECTED**
+Switch -> DFSP_TP_IN: PUT /thirdpartyRequests/verifications/{verificationRequestId}/error
+DFSP_TP_IN --> Switch: 200 OK
+deactivate Switch
+
+DFSP_TP_IN -> DFSP_TM: Thirdparty Transaction Request Verification failed
+
+rnote right of DFSP_TM: Auth-Service is unhappy with Authorization\n**transactionRequestState** is **REJECTED**
 rnote right of DFSP_TM: state: failureVerifyAuthorization
 DFSP_TM -> DFSP_TM: persist transactionRequestState for transactionRequestId
 DFSP_TM -> DFSP_TM: SDKRequests.notifyThirdpartyAboutRejectedAuthorization(transactionRequestId)
@@ -294,10 +303,16 @@ PISP_TP_OUT -> PISP: 500: authorization is rejected
 
 
 note over PISP, DFSP_TM
-  HAPPY_SCENARIO: **DFSPTransactionModel continues workflow**
+  HAPPY_SCENARIO: **auth-service verifies transfer DFSPTransactionModel continues workflow**
 end note
 
-rnote right of DFSP_TM: DFSP is happy with Authorization\n**transactionRequestState** is **ACCEPTED**
+activate Switch
+Switch -> DFSP_TP_IN: PUT /thirdpartyRequests/verifications/{verificationRequestId}
+DFSP_TP_IN --> Switch: 200 OK
+DFSP_TP_IN -> DFSP_TM: Thirdparty Transaction Request Verification passed
+deactivate Switch
+
+rnote right of DFSP_TM: Auth-Service is happy with Authorization\n**transactionRequestState** is **ACCEPTED**
 DFSP_TM -> DFSP_TM: persist transactionRequestState for transactionRequestId
 
 note over DFSP_TM
