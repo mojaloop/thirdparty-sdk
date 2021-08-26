@@ -99,6 +99,7 @@ describe('DFSP Inbound', (): void => {
           "callbackUri": "pisp-app://callback.com"
         }
 
+        console.log('scenarioUri', scenarioUri)
         const response = await axios.post(scenarioUri, payload, axiosConfig)
 
         // Switch should return Accepted code to DFSP
