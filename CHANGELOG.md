@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+## [11.45.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.44.0...v11.45.0) (2021-08-26)
+
+
+### Features
+
+* **dfsp-transaction:** get consent context ([#114](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/114)) ([29e9d69](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/29e9d693a2b122977892b2988e3dfad3a6172d1d))
+
 ## [11.44.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.43.0...v11.44.0) (2021-08-24)
 
 
