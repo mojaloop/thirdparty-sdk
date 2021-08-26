@@ -99,6 +99,7 @@ describe('DFSP Inbound', (): void => {
           "callbackUri": "pisp-app://callback.com"
         }
 
+        // TODO: remove
         console.log('scenarioUri', scenarioUri)
         const response = await axios.post(scenarioUri, payload, axiosConfig)
 

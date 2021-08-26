@@ -7,17 +7,17 @@
       {
         "method": "put",
         "path": "/parties/{Type}/{ID}",
-        "endpoint": "http://inbound-sdk-scheme-adapter:7000"
+        "endpoint": "http://sdk-scheme-adapter:4000"
       },
       {
         "method": "put",
         "path": "/quotes/{ID}",
-        "endpoint": "http://inbound-sdk-scheme-adapter:7000"
+        "endpoint": "http://sdk-scheme-adapter:4000"
       },
       {
         "method": "put",
         "path": "/authorizations/{ID}",
-        "endpoint": "http://inbound-sdk-scheme-adapter:7000"
+        "endpoint": "http://sdk-scheme-adapter:4000"
       },
       {
         "method": "patch",
@@ -32,7 +32,7 @@
       {
         "method": "put",
         "path": "/transfers/{ID}",
-        "endpoint": "http://inbound-sdk-scheme-adapter:7000"
+        "endpoint": "http://sdk-scheme-adapter:4000"
       }
     ]
   },
