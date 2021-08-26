@@ -97,7 +97,6 @@ export interface ServiceConfig {
     DFSP_BACKEND_VALIDATE_THIRDPARTY_TRANSACTION_REQUEST: string
     DFSP_BACKEND_GET_USER_ACCOUNTS_PATH: string
     DFSP_BACKEND_STORE_VALIDATED_CONSENT_FOR_ACCOUNT_ID_PATH: string
-    DFSP_BACKEND_GET_TRANSACTION_REQUEST_CONTEXT_FOR_ACCOUNT_ID_PATH: string
     PISP_BACKEND_URI: string
     PISP_BACKEND_HTTP_SCHEME: string
     PISP_BACKEND_SIGN_AUTHORIZATION_PATH: string
@@ -354,11 +353,6 @@ export const ConvictConfig = Convict<ServiceConfig>({
       format: '*',
       default: 'store/consent'
     },
-    DFSP_BACKEND_GET_TRANSACTION_REQUEST_CONTEXT_FOR_ACCOUNT_ID_PATH: {
-      doc: 'path use by DFSPBackendRequests.getTransactionRequestContextForAccountId',
-      format: '*',
-      default: 'transactionRequestContextForAccountId/{ID}'
-    },
     PISP_BACKEND_URI: {
       doc: 'host address of DFSP\'s ',
       format: '*',
@@ -438,7 +432,7 @@ export const ConvictConfig = Convict<ServiceConfig>({
       }
     },
     TEMP_OVERRIDE_QUOTES_PARTY_ID_TYPE: {
-      doc: 'If set, this will override the PARTY_ID_TYPE in the POST /quotes call after receiving a POST /thirdpartyRequests/transactions call',
+      doc: 'DEPRECATED - No longer in use. Implement the backend request validateThirdpartyTransactionRequestAndGetContext instead.',
       format: '*',
       env: 'TEMP_OVERRIDE_QUOTES_PARTY_ID_TYPE',
       default: undefined

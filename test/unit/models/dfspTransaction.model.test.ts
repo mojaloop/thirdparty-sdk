@@ -83,10 +83,16 @@ describe('DFSPTransactionModel', () => {
         requestTransfer: jest.fn(() => Promise.resolve(requestTransferResponse))
       } as unknown as SDKOutgoingRequests,
       dfspBackendRequests: {
-        validateThirdpartyTransactionRequest: jest.fn(() => Promise.resolve({ isValid: true })),
+        validateThirdpartyTransactionRequestAndGetContext: jest.fn(() => Promise.resolve({
+          isValid: true,
+          consentId: '123456789',
+          payerPartyIdInfo: {
+            partyIdType: 'MSISDN',
+            partyIdentifier: '61414414414'
+          }
+        })),
         verifyAuthorization: jest.fn(() => Promise.resolve({ isValid: true }))
       } as unknown as DFSPBackendRequests,
-      tempOverrideQuotesPartyIdType: undefined
     }
     transactionRequestId = uuidv4()
     participantId = uuidv4()
@@ -278,7 +284,7 @@ describe('DFSPTransactionModel', () => {
         transactionId: model.data.transactionId,
         transactionRequestState: 'RECEIVED'
       })
-      expect(modelConfig.dfspBackendRequests.validateThirdpartyTransactionRequest)
+      expect(modelConfig.dfspBackendRequests.validateThirdpartyTransactionRequestAndGetContext)
         .toBeCalledWith(transactionRequestRequest)
 
       // onNotifyTransactionRequestIsValid
@@ -324,8 +330,11 @@ describe('DFSPTransactionModel', () => {
       // payee should be the same as received
       expect(rqr.payee).toEqual(tr.payee)
 
-      // payer should be build from received payer.partyIdInfo
-      expect(rqr.payer).toEqual({ partyIdInfo: { ...tr.payer } })
+      // payer should be build from transaction request context
+      expect(rqr.payer).toEqual({ partyIdInfo: { 
+        partyIdType: 'MSISDN',
+        partyIdentifier: '61414414414'
+      }})
 
       // amountType should be the same as received
       expect(rqr.amountType).toEqual(tr.amountType)
@@ -352,9 +361,6 @@ describe('DFSPTransactionModel', () => {
 
       // payee should be the same as received
       expect(rqr.payee).toEqual(tr.payee)
-
-      // payer should be build from received payer.partyIdInfo
-      expect(rqr.payer).toEqual({ partyIdInfo: { ...tr.payer } })
 
       // amountType should be the same as received
       expect(rqr.amountType).toEqual(tr.amountType)
@@ -447,8 +453,15 @@ describe('DFSPTransactionModel', () => {
 
     it('should throw if transactionRequestRequest is not valid', async (done) => {
       mocked(modelConfig.kvs.set).mockImplementationOnce(() => Promise.resolve(true))
-      mocked(modelConfig.dfspBackendRequests.validateThirdpartyTransactionRequest)
-        .mockImplementationOnce(() => Promise.resolve({ isValid: false }))
+      mocked(modelConfig.dfspBackendRequests.validateThirdpartyTransactionRequestAndGetContext)
+        .mockImplementationOnce(() => Promise.resolve({
+          isValid: false,
+          consentId: '123456789',
+          payerPartyIdInfo: {
+            partyIdType: 'MSISDN',
+            partyIdentifier: '61414414414'
+          } 
+        }))
 
       const data: DFSPTransactionData = {
         transactionRequestId,
@@ -477,7 +490,14 @@ describe('DFSPTransactionModel', () => {
         participantId,
         transactionRequestRequest,
         transactionRequestPutUpdate,
-        currentState: 'transactionRequestIsValid'
+        currentState: 'transactionRequestIsValid',
+        transactionRequestContext: {
+          consentId: '123456789',
+          payerPartyIdInfo: {
+            partyIdType: 'MSISDN',
+            partyIdentifier: '61414414414'
+          }
+        }
       }
       const model = await create(data, modelConfig)
       try {
@@ -509,43 +529,6 @@ describe('DFSPTransactionModel', () => {
         expect(err).toEqual(Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_REQUEST_QUOTE_FAILED)
         done()
       }
-    })
-
-    it('should translate the partyIdType in the quote request if tempOverrideQuotesPartyIdType is set', async () => {
-      mocked(modelConfig.kvs.set).mockImplementationOnce(() => Promise.resolve(true))
-      modelConfig.tempOverrideQuotesPartyIdType = 'EMAIL'
-
-      // mocked(modelConfig.thirdpartyRequests.putThirdpartyRequestsTransactions)
-      //   // eslint-disable-next-line prefer-promise-reject-errors
-      //   .mockImplementationOnce(() => Promise.reject({ statusCode: 400 }))
-      const data: DFSPTransactionData = {
-        transactionRequestId,
-        transactionRequestState: 'RECEIVED',
-        participantId,
-        transactionRequestRequest,
-        transactionRequestPutUpdate,
-        currentState: 'transactionRequestIsValid'
-      }
-      const model = await create(data, modelConfig)
-      await model.fsm.notifyTransactionRequestIsValid()
-
-
-      // check properly requestQuoteRequest
-      expect(model.data.requestQuoteRequest).toBeDefined()
-      expect(model.data.requestQuoteRequest).toBeDefined()
-
-      // shortcuts
-      const rq = model.data.requestQuoteRequest!
-      console.log('rq.quotesPostRequest', rq.quotesPostRequest)
-
-      // shortcut
-      const rqr = rq.quotesPostRequest
-
-      // quote id should be allocated
-      expect(rqr.quoteId).toBeDefined()
-
-      // quote.payer.partyIfInfo.partyIdType must match the above
-      expect(rqr.payer.partyIdInfo.partyIdType).toEqual('EMAIL')
     })
 
     it('should throw if requestAuthorization failed', async (done) => {
@@ -756,8 +739,15 @@ describe('DFSPTransactionModel', () => {
 
   it('should propagate error to callback', async () => {
     mocked(modelConfig.kvs.set).mockImplementation(() => Promise.resolve(true))
-    mocked(modelConfig.dfspBackendRequests.validateThirdpartyTransactionRequest)
-      .mockImplementationOnce(() => Promise.resolve({ isValid: false }))
+    mocked(modelConfig.dfspBackendRequests.validateThirdpartyTransactionRequestAndGetContext)
+      .mockImplementationOnce(() => Promise.resolve({
+        isValid: false,
+        consentId: '123456789',
+        payerPartyIdInfo: {
+          partyIdType: 'MSISDN',
+          partyIdentifier: '61414414414'
+        }
+      }))
 
     const data: DFSPTransactionData = {
       transactionRequestId,

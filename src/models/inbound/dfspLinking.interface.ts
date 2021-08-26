@@ -32,11 +32,10 @@ import {
 import { Method } from 'javascript-state-machine'
 import { ThirdpartyRequests, MojaloopRequests } from '@mojaloop/sdk-standard-components'
 import {
-  v1_1 as fspiopAPI,
   thirdparty as tpAPI
 } from '@mojaloop/api-snippets'
 import { PubSub } from '~/shared/pub-sub'
-import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
+import { BackendValidateConsentRequestsResponse, DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
 
 export enum DFSPLinkingPhase {
   requestConsent = 'requestConsent',
@@ -46,47 +45,6 @@ export enum DFSPLinkingPhase {
   waitOnAuthServiceResponse = 'waitOnAuthServiceResponse',
   waitOnThirdpartyLinkRegistrationResponse = 'waitOnThirdpartyLinkRegistrationResponse',
   waitOnVerificationNotification = 'waitOnVerificationNotification'
-}
-
-// TODO: Let keep Backend* interfaces in DFSPBackendRequests
-// https://github.com/mojaloop/thirdparty-scheme-adapter/blob/master/src/shared/dfsp-backend-requests.ts
-export interface BackendValidateConsentRequestsResponse {
-  isValid: boolean
-  data: {
-    authChannels: tpAPI.Schemas.ConsentRequestChannelType[]
-    authUri?: string
-  }
-  errorInformation?: fspiopAPI.Schemas.ErrorInformation
-}
-
-export interface BackendSendOTPRequest {
-  consentRequestId: string
-  username: string
-  message: string
-}
-
-export interface BackendSendOTPResponse {
-  otp: string
-}
-
-export interface BackendStoreScopesRequest {
-  scopes: tpAPI.Schemas.Scope[]
-}
-
-export interface BackendValidateAuthTokenResponse {
-  isValid: boolean
-}
-
-export interface BackendGetScopesResponse {
-  scopes: tpAPI.Schemas.Scope[]
-}
-
-export interface BackendStoreValidatedConsentRequest {
-  scopes: tpAPI.Schemas.Scope[]
-  consentId: string
-  consentRequestId: string
-  registrationChallenge: string
-  credential: tpAPI.Schemas.VerifiedCredential
 }
 
 export interface DFSPLinkingStateMachine extends ControlledStateMachine {

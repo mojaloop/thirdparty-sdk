@@ -39,8 +39,8 @@ import {
   DFSPLinkingStateMachine,
   DFSPLinkingModelConfig
 } from '~/models/inbound/dfspLinking.interface'
-import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
-import { BackendValidateAuthTokenResponse, DFSPLinkingPhase } from './dfspLinking.interface'
+import { BackendValidateAuthTokenResponse, DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
+import { DFSPLinkingPhase } from './dfspLinking.interface'
 import { v4 as uuidv4 } from 'uuid'
 import { reformatError } from '~/shared/api-error'
 import deferredJob from '~/shared/deferred-job'

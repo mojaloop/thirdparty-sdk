@@ -27,14 +27,53 @@
 
 import { HttpRequestsConfig, HttpRequests } from '~/shared/http-requests'
 import { thirdparty as tpAPI, v1_1 as fspiopAPI } from '@mojaloop/api-snippets'
-import {
-  BackendValidateConsentRequestsResponse,
-  BackendSendOTPRequest,
-  BackendSendOTPResponse,
-  BackendStoreScopesRequest,
-  BackendValidateAuthTokenResponse,
-  BackendStoreValidatedConsentRequest
-} from '~/models/inbound/dfspLinking.interface'
+export interface BackendValidateConsentRequestsResponse {
+  isValid: boolean
+  data: {
+    authChannels: tpAPI.Schemas.ConsentRequestChannelType[]
+    authUri?: string
+  }
+  errorInformation?: fspiopAPI.Schemas.ErrorInformation
+}
+
+export interface BackendSendOTPRequest {
+  consentRequestId: string
+  username: string
+  message: string
+}
+
+export interface BackendSendOTPResponse {
+  otp: string
+}
+
+export interface BackendStoreScopesRequest {
+  scopes: tpAPI.Schemas.Scope[]
+}
+
+export interface BackendValidateAuthTokenResponse {
+  isValid: boolean
+}
+
+export interface BackendGetScopesResponse {
+  scopes: tpAPI.Schemas.Scope[]
+}
+
+export interface BackendStoreValidatedConsentRequest {
+  scopes: tpAPI.Schemas.Scope[]
+  consentId: string
+  consentRequestId: string
+  registrationChallenge: string
+  credential: tpAPI.Schemas.VerifiedCredential
+}
+
+export interface BackendTransactionRequestContext {
+  // The FSPIOP-compatible payer.payerPartyIdInfo field
+  payerPartyIdInfo: fspiopAPI.Schemas.PartyIdInfo,
+
+  // The ID of the consent for the transaction request
+  // based on the payer.idValue of the Thirdparty Transaction Request
+  consentId: string
+}
 
 export interface IsValidResponse {
   isValid: boolean
@@ -49,7 +88,6 @@ export interface DFSPBackendConfig extends HttpRequestsConfig {
   sendOTPPath: string
   storeConsentRequestsPath: string
   storeValidatedConsentForAccountIdPath: string
-  getTransactionRequestContextForAccountIdPath: string
 }
 
 /**
@@ -115,10 +153,6 @@ export class DFSPBackendRequests extends HttpRequests {
     return this.config.storeValidatedConsentForAccountIdPath
   }
 
-  get getTransactionRequestContextForAccountIdPath (): string {
-    return this.config.getTransactionRequestContextForAccountIdPath
-  }
-
   // REQUESTS
 
   // request user's accounts details from DFSP Backend
@@ -167,10 +201,10 @@ export class DFSPBackendRequests extends HttpRequests {
     return this.post(this.validateAuthTokenPath, validateRequest)
   }
 
-  // validate ThirdpartyTransactionRequest
-  async validateThirdpartyTransactionRequest (
+  // validate ThirdpartyTransactionRequest and get context we will need to complete the transaction
+  async validateThirdpartyTransactionRequestAndGetContext (
     request: tpAPI.Schemas.ThirdpartyRequestsTransactionsPostRequest
-  ): Promise<IsValidResponse | void> {
+  ): Promise<IsValidResponse & BackendTransactionRequestContext | void> {
     return this.post(this.validateThirdpartyTransactionRequestPath, request)
   }
 
@@ -196,12 +230,5 @@ export class DFSPBackendRequests extends HttpRequests {
       credential
     }
     return this.post(this.storeValidatedConsentForAccountIdPath, validatedConsent)
-  }
-
-  async getValidatedConsentsForAccountId (
-    accountId: string
-  ): Promise<BackendStoreValidatedConsentRequest[] | void> {
-    const path = this.getTransactionRequestContextForAccountIdPath.replace('{ID}', accountId)
-    return this.get<BackendStoreValidatedConsentRequest[]>(path)
   }
 }

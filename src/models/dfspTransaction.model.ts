@@ -124,11 +124,17 @@ export class DFSPTransactionModel
     InvalidDataError.throwIfInvalidProperty(this.data, 'transactionRequestRequest')
 
     // validation of transactionRequestRequest
-    const validationResult = await this.dfspBackendRequests.validateThirdpartyTransactionRequest(
+    const validationResult = await this.dfspBackendRequests.validateThirdpartyTransactionRequestAndGetContext(
       this.data.transactionRequestRequest
     )
     if (!(validationResult && validationResult.isValid)) {
       throw Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_REQUEST_NOT_VALID
+    }
+
+    // store the context for later
+    this.data.transactionRequestContext = {
+      payerPartyIdInfo: validationResult.payerPartyIdInfo,
+      consentId: validationResult.consentId
     }
 
     // allocate new id
@@ -143,6 +149,7 @@ export class DFSPTransactionModel
 
   async onNotifyTransactionRequestIsValid (): Promise<void> {
     InvalidDataError.throwIfInvalidProperty(this.data, 'transactionRequestPutUpdate')
+    InvalidDataError.throwIfInvalidProperty(this.data, 'transactionRequestContext')
 
     // TODO: fspId field for payee.partyIdInfo should be mandatory, now it is optional
     InvalidDataError.throwIfInvalidProperty(
@@ -166,17 +173,6 @@ export class DFSPTransactionModel
     // shortcut
     const tr = this.data.transactionRequestRequest
 
-    // override the PARTY_ID_TYPE of the payer field
-    // TODO: this is a temporary workaround to get e2e tests working
-    // In the future, we should talk to the DFSP backend to get the _real_
-    // party information for a given THIRD_PARTY_LINK party
-    // see #2316 - https://github.com/mojaloop/project/issues/2316 for more information
-    // TEMP_OVERRIDE_QUOTES_PARTY_ID_TYPE
-    const payer: fspiopAPI.Schemas.Party | tpAPI.Schemas.Party = { partyIdInfo: { ...tr.payer } }
-    if (this.config.tempOverrideQuotesPartyIdType) {
-      payer.partyIdInfo.partyIdType = this.config.tempOverrideQuotesPartyIdType
-    }
-
     // prepare request for quote
     this.data.requestQuoteRequest = {
       // TODO: fspId field for payee.partyIdInfo should be mandatory, now it is optional
@@ -191,9 +187,7 @@ export class DFSPTransactionModel
         // copy from request
         transactionRequestId: tr.transactionRequestId,
         payee: { ...tr.payee },
-        // TODO: investigate quotes interface and payer 'THIRD_PARTY_LINK' problem
-        // TODO: repl
-        payer,
+        payer: { partyIdInfo: this.data.transactionRequestContext!.payerPartyIdInfo },
         amountType: tr.amountType,
         amount: { ...tr.amount },
         transactionType: { ...tr.transactionType }
@@ -246,6 +240,7 @@ export class DFSPTransactionModel
     InvalidDataError.throwIfInvalidProperty(this.data, 'requestAuthorizationResponse')
 
     // shortcut
+    // TODO: this should be updated for latest api, to include consentId
     const authorizationInfo = this.data.requestAuthorizationResponse!.authorizations
 
     // different actions on responseType

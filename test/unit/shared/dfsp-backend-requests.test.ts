@@ -47,8 +47,7 @@ describe('backendRequests', () => {
     validateConsentRequestsPath: 'validateConsentRequests',
     sendOTPPath: 'sendOTP',
     storeConsentRequestsPath: 'store/consentRequests/{ID}',
-    storeValidatedConsentForAccountIdPath: 'accountConsentInfo',
-    getTransactionRequestContextForAccountIdPath: 'accountConsentInfo/{ID}'
+    storeValidatedConsentForAccountIdPath: 'accountConsentInfo'
   }
 
   beforeEach(() => {
@@ -67,12 +66,11 @@ describe('backendRequests', () => {
     expect(typeof dfspBackendRequests.post).toEqual('function')
     expect(typeof dfspBackendRequests.put).toEqual('function')
     expect(typeof dfspBackendRequests.getUserAccounts).toEqual('function')
-    expect(typeof dfspBackendRequests.validateThirdpartyTransactionRequest).toEqual('function')
+    expect(typeof dfspBackendRequests.validateThirdpartyTransactionRequestAndGetContext).toEqual('function')
     expect(typeof dfspBackendRequests.validateConsentRequests).toEqual('function')
     expect(typeof dfspBackendRequests.sendOTP).toEqual('function')
     expect(typeof dfspBackendRequests.storeConsentRequests).toEqual('function')
     expect(typeof dfspBackendRequests.storeValidatedConsentForAccountId).toEqual('function')
-    expect(typeof dfspBackendRequests.getValidatedConsentsForAccountId).toEqual('function')
 
     /**
      * TODO: check for methods
@@ -139,7 +137,7 @@ describe('backendRequests', () => {
       const postSpy = jest.spyOn(dfspBackendRequests, 'post').mockImplementationOnce(
         () => Promise.resolve(response)
       )
-      const result = await dfspBackendRequests.validateThirdpartyTransactionRequest(transactionRequestRequest)
+      const result = await dfspBackendRequests.validateThirdpartyTransactionRequestAndGetContext(transactionRequestRequest)
       expect(result).toEqual(response)
       expect(postSpy).toBeCalledWith(
         dfspBackendRequests.validateThirdpartyTransactionRequestPath,
@@ -310,24 +308,6 @@ describe('backendRequests', () => {
         }
       })
 
-    })
-  })
-
-  describe('getValidatedConsentsForAccountId', () => {
-    it('should propagate call to get', async () => {
-      const response = [
-        {
-          accountId: 'dfspa.username.1234',
-          consentId: 'ced49ef2-2393-46e3-a6e5-527d64e61eab',
-          registrationChallenge: 'c4adabb33e9306b038088132affcde556c50d82f603f47711a9510bf3beef6d6'
-        }
-      ]
-      const getSpy = jest.spyOn(dfspBackendRequests, 'get').mockImplementationOnce(
-        () => Promise.resolve(response)
-      )
-      const result = await dfspBackendRequests.getValidatedConsentsForAccountId('dfspa.username.1234')
-      expect(result).toEqual(response)
-      expect(getSpy).toBeCalledWith('accountConsentInfo/dfspa.username.1234')
     })
   })
 })
