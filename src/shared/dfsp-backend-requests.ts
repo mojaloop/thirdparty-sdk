@@ -88,7 +88,6 @@ export interface DFSPBackendConfig extends HttpRequestsConfig {
   sendOTPPath: string
   storeConsentRequestsPath: string
   storeValidatedConsentForAccountIdPath: string
-  getTransactionRequestContextForAccountIdPath: string
 }
 
 /**
@@ -154,9 +153,6 @@ export class DFSPBackendRequests extends HttpRequests {
     return this.config.storeValidatedConsentForAccountIdPath
   }
 
-  get getTransactionRequestContextForAccountIdPath (): string {
-    return this.config.getTransactionRequestContextForAccountIdPath
-  }
 
   // REQUESTS
 

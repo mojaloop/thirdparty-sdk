@@ -354,11 +354,6 @@ export const ConvictConfig = Convict<ServiceConfig>({
       format: '*',
       default: 'store/consent'
     },
-    DFSP_BACKEND_GET_TRANSACTION_REQUEST_CONTEXT_FOR_ACCOUNT_ID_PATH: {
-      doc: 'path use by DFSPBackendRequests.getTransactionRequestContextForAccountId',
-      format: '*',
-      default: 'transactionRequestContextForAccountId/{ID}'
-    },
     PISP_BACKEND_URI: {
       doc: 'host address of DFSP\'s ',
       format: '*',
