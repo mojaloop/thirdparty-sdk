@@ -23,37 +23,12 @@ services:
       - redis
       - ml-testing-toolkit
       - pisp-simulator
-    extra_hosts:
-      - "redis:172.17.0.1"
-      - "ml-testing-toolkit:172.17.0.1"
     healthcheck:
-      test: wget -q http://172.17.0.1:4005/health -O /dev/null || exit 1
+      test: wget -q http://localhost:4005/health -O /dev/null || exit 1
       timeout: 3s
       retries: 10
       start_period: 10s
       interval: 30s
-    extra_hosts:
-      - "central-ledger.local:172.17.0.1"
-      - "central-settlement.local:172.17.0.1"
-      - "ml-api-adapter.local:172.17.0.1"
-      - "account-lookup-service.local:172.17.0.1"
-      - "account-lookup-service-admin.local:172.17.0.1"
-      - "quoting-service.local:172.17.0.1"
-      - "moja-simulator.local:172.17.0.1"
-      - "central-ledger:172.17.0.1"
-      - "central-settlement:172.17.0.1"
-      - "ml-api-adapter:172.17.0.1"
-      - "account-lookup-service:172.17.0.1"
-      - "account-lookup-service-admin:172.17.0.1"
-      - "quoting-service:172.17.0.1"
-      - "simulator:172.17.0.1"
-      - "pisp-simulator:172.17.0.1"
-      - "sdk-scheme-adapter:172.17.0.1"
-      - "host.docker.internal:172.17.0.1"
-      - "simulator.local:172.17.0.1"
-      - "transaction-request-service:172.17.0.1"
-      - "pisp-backend:172.17.0.1"
-      - "ml-testing-toolkit:172.17.0.1"
 
   outbound-thirdparty-scheme-adapter:
     container_name: outbound-thirdparty-scheme-adapter
@@ -73,12 +48,8 @@ services:
       - redis
       - ml-testing-toolkit
       - pisp-simulator
-    extra_hosts:
-      - "redis:172.17.0.1"
-      - "ml-testing-toolkit:172.17.0.1"
-      - "sdk-scheme-adapter:172.17.0.1"
     healthcheck:
-      test: wget -q http://172.17.0.1:4006/health -O /dev/null || exit 1
+      test: wget -q http://localhost:4006/health -O /dev/null || exit 1
       timeout: 3s
       retries: 10
       start_period: 10s
@@ -100,26 +71,6 @@ services:
       - redis
       - ml-testing-toolkit
     restart: always
-    extra_hosts:
-      - "central-ledger.local:172.17.0.1"
-      - "central-settlement.local:172.17.0.1"
-      - "ml-api-adapter.local:172.17.0.1"
-      - "account-lookup-service.local:172.17.0.1"
-      - "account-lookup-service-admin.local:172.17.0.1"
-      - "quoting-service.local:172.17.0.1"
-      - "moja-simulator.local:172.17.0.1"
-      - "central-ledger:172.17.0.1"
-      - "central-settlement:172.17.0.1"
-      - "ml-api-adapter:172.17.0.1"
-      - "account-lookup-service:172.17.0.1"
-      - "account-lookup-service-admin:172.17.0.1"
-      - "quoting-service:172.17.0.1"
-      - "simulator:172.17.0.1"
-      - "host.docker.internal:172.17.0.1"
-      - "simulator.local:172.17.0.1"
-      - "transaction-request-service:172.17.0.1"
-      - "pisp-backend:172.17.0.1"
-      - "ml-testing-toolkit:172.17.0.1"
 
   redis:
     container_name: redis
@@ -144,11 +95,6 @@ services:
       - mojaloop-net
     depends_on:
       - mongo
-    extra_hosts:
-      - "inbound-thirdparty-scheme-adapter:172.17.0.1"
-      - "outbound-thirdparty-scheme-adapter:172.17.0.1"
-      - "inbound-sdk-scheme-adapter:172.17.0.1"
-      - "ml-testing-toolkit:172.17.0.1"
 
   ml-testing-toolkit-ui:
     image: mojaloop/ml-testing-toolkit-ui:v12.0.0
@@ -169,7 +115,7 @@ services:
       - "27017:27017"
 
   pisp-simulator:
-    image: mojaloop/mojaloop-simulator:v11.3.0.9-pisp
+    image: mojaloop/mojaloop-simulator:v11.3.0.10-pisp
     networks:
       - mojaloop-net
     container_name: pisp-simulator
