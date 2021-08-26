@@ -153,7 +153,6 @@ export class DFSPBackendRequests extends HttpRequests {
     return this.config.storeValidatedConsentForAccountIdPath
   }
 
-
   // REQUESTS
 
   // request user's accounts details from DFSP Backend
