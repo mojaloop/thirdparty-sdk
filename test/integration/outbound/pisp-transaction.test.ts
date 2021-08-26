@@ -25,7 +25,7 @@ describe('PISP Transaction', (): void => {
     await kvs.disconnect()
   })
 
-  describe.only('/thirdpartyTransaction: partyLookup->initiate->approve', (): void => {
+  describe('/thirdpartyTransaction: partyLookup->initiate->approve', (): void => {
     it('transactionRequestState should be ACCEPTED', async (): Promise<void> => {
       const lookupRequest = {
         payee: {
