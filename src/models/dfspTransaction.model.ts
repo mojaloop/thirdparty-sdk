@@ -303,7 +303,8 @@ export class DFSPTransactionModel
             return Promise.reject(error)
           }
         })
-        .wait(this.config.requestProcessingTimeoutSeconds)
+        // This requires user input on the PISP side, so this number should be something reasonable, like 1 minute or so
+        .wait(this.config.transactionRequestAuthorizationTimeoutSeconds)
       } catch (error) {
 
         const mojaloopError = reformatError(

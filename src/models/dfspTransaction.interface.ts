@@ -71,7 +71,8 @@ export interface DFSPTransactionModelConfig extends PersistentModelConfig {
   sdkOutgoingRequests: SDKOutgoingRequests
   dfspBackendRequests: DFSPBackendRequests,
   subscriber: PubSub,
-  requestProcessingTimeoutSeconds: number
+  transactionRequestAuthorizationTimeoutSeconds: number,
+  transactionRequestVerificationTimeoutSeconds: number,
 }
 
 export interface DFSPTransactionData extends StateData<DFSPTransactionModelState> {
