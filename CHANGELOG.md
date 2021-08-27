@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+## [11.46.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.45.0...v11.46.0) (2021-08-27)
+
+
+### Features
+
+* **docs:** update e2e sequences ([#115](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/115)) ([e4f6ad6](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/e4f6ad6608ffa7f81a03bc1a6f7e345a16cd06ab))
+
 ## [11.45.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.44.0...v11.45.0) (2021-08-26)
 
 
