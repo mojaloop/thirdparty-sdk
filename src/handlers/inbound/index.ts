@@ -27,6 +27,7 @@
  --------------
  ******/
 import ThirdpartyRequestsTransactions from './thirdpartyRequests/transactions'
+import ThirdpartyRequestsAuthorizations from './thirdpartyRequests/authorizations'
 import InboundAuthorizations from './authorizations'
 import InboundConsents from './consents'
 import InboundConsentsId from './consents/{ID}'
@@ -70,5 +71,7 @@ export default {
   PutParticipantsByID: ParticipantsID.put,
   PutParticipantsByIDAndError:  ParticipantsIDError.put,
   ParticipantsByTypeAndID3: ParticipantsTypeID.put,
-  ParticipantsErrorByTypeAndID: ParticipantsTypeIDError.put
+  ParticipantsErrorByTypeAndID: ParticipantsTypeIDError.put,
+  PutThirdpartyRequestsAuthorizationsById: ThirdpartyRequestsAuthorizations.put,
+  PutThirdpartyRequestsAuthorizationsByIdAndError: ThirdpartyRequestsAuthorizations.put,
 }

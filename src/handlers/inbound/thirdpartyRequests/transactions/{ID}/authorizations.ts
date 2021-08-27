@@ -30,8 +30,10 @@ import {
 } from '@mojaloop/api-snippets'
 import { OutboundThirdpartyAuthorizationsModel } from '~/models/outbound/thirdparty.authorizations.model'
 
+
 /**
- * Handles a inbound PUT /thirdpartyRequests/transactions/{ID} request
+ * Handles a inbound PUT /thirdpartyRequests/transactions/{ID}/authorizations request
+ * DEPRECATED - use PUT /thirdpartyRequests/authorizations/{ID
  */
 async function put (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const transactionRequest = request.payload as tpAPI.Schemas.ThirdpartyRequestsTransactionsIDAuthorizationsPutResponse
