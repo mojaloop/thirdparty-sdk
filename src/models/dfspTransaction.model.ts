@@ -271,10 +271,9 @@ export class DFSPTransactionModel
       await deferredJob(this.subscriber, waitOnAuthResponseFromPISPChannel)
         .init(async channel => {
           // Send the request to the PISP
-          // TODO: implement this on the sdk standard components
+          // TODO: implement this on sdk-standard-components
           // await this.thirdpartyRequests.postThirdpartyRequestsAuthorizations
 
-          // TODO: check the method signature!
           // @ts-ignore - internal function
           const response = await this.thirdpartyRequests._post(
             `thirdpartyRequests/authorizations`,
@@ -306,8 +305,6 @@ export class DFSPTransactionModel
         // This requires user input on the PISP side, so this number should be something reasonable, like 1 minute or so
         .wait(this.config.transactionRequestAuthorizationTimeoutSeconds * 1000)
       } catch (error) {
-        console.log("error is", error)
-
         const mojaloopError = reformatError(
           Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_AUTHORIZATION_UNEXPECTED,
           this.logger
@@ -327,11 +324,36 @@ export class DFSPTransactionModel
 
     // TODO: talk to the auth-service with thirdpartyRequests/verifications!
 
-
     // shortcut
     const authorizationInfo = this.data.requestAuthorizationResponse!
-    console.log('received authorization from PISP!', authorizationInfo)
-    console.log('TODO: talk to the auth service!')
+    // console.log('received authorization from PISP!', authorizationInfo)
+    console.log('TODO: talk to the auth service! POST /thirdpartyRequests/verifications !')
+
+    this.data.transferId = uuidv4()
+
+    const tr = this.data.transactionRequestRequest
+    const quote = this.data.requestQuoteResponse!.quotes
+ 
+    // prepare transfer request
+    this.data.transferRequest = {
+      fspId: this.config.dfspId,
+      transfersPostRequest: {
+        transferId: this.data.transferId!,
+
+        // payee & payer data from /thirdpartyRequests/transaction
+        payeeFsp: tr.payee.partyIdInfo.fspId!,
+        payerFsp: this.config.dfspId,
+
+        // transfer data from quote response
+        amount: { ...quote.transferAmount },
+        ilpPacket: quote.ilpPacket,
+        condition: quote.condition,
+
+        // TODO: investigate recalculation of expiry...
+        expiration: 
+        tr.expiration
+      }
+    }
 
     // different actions on responseType
     // switch (authorizationInfo.responseType) {

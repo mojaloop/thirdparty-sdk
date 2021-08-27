@@ -46,13 +46,12 @@ async function put(
   const authorizationResponse = request.payload
   const publisher = h.getPublisher()
 
-  // TODO: load the DFSPTransactionModel based on the authorizationId
+  // load the DFSPTransactionModel based on the authorizationId
   const channel = DFSPTransactionModel.notificationChannel(
     DFSPTransactionPhase.waitOnAuthResponseFromPISPChannel,
     authorizationRequestId
   )
   publisher.publish(channel, authorizationResponse as Message)
-
 
   return h.response().code(200)
 }
