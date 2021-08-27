@@ -84,7 +84,9 @@ describe('DFSPTransactionModel', () => {
       thirdpartyRequests: {
         putThirdpartyRequestsTransactions: jest.fn(() => Promise.resolve({ statusCode: 200 })),
         patchThirdpartyRequestsTransactions: jest.fn(() => Promise.resolve({ statusCode: 200 })),
-        putThirdpartyRequestsTransactionsError: jest.fn(() => Promise.resolve({ statusCode: 200 }))
+        putThirdpartyRequestsTransactionsError: jest.fn(() => Promise.resolve({ statusCode: 200 })),
+        // @ts-ignore - private function, will be resolved once I fix sdk-standard-components
+        _post: jest.fn(() => Promise.resolve({ statusCode: 202 }))
       } as unknown as ThirdpartyRequests,
       sdkOutgoingRequests: {
         requestQuote: jest.fn(() => Promise.resolve(requestQuoteResponse)),
@@ -263,7 +265,7 @@ describe('DFSPTransactionModel', () => {
   })
 
   describe('workflow', () => {
-    it.only('should do a happy flow', async () => {
+    it('should do a happy flow', async () => {
       mocked(modelConfig.kvs.set).mockImplementation(() => Promise.resolve(true))
       
       // mock async callback(s)
@@ -396,29 +398,13 @@ describe('DFSPTransactionModel', () => {
 
       // onRequestAuthorization
       expect(model.data.requestAuthorizationPostRequest).toBeDefined()
-      expect(model.sdkOutgoingRequests.requestAuthorization).toBeCalledWith(model.data.requestAuthorizationPostRequest)
-
-      // shortcut
-      // const rar = model.data.requestAuthorizationPostRequest!
-
-      // fspId should be set to PISP
-      // TODO: update and fix these based on new types
-      // expect(rar.fspId).toEqual(model.data.participantId)
-      // expect(rar.authorizationsPostRequest).toBeDefined()
-
-      // // only U2F with 1 retry
-      // expect(rar.authorizationsPostRequest.authenticationType).toEqual('U2F')
-      // expect(rar.authorizationsPostRequest.retriesLeft).toEqual('1')
-
-      // // amount should be propagated from ThirdpartyRequestsRequest
-      // expect(rar.authorizationsPostRequest.amount).toEqual(tr.amount)
-
-      // // quotes must be propagated
-      // expect(rar.authorizationsPostRequest.quote).toEqual(model.data.requestQuoteResponse!.quotes)
-
-      // // transactionId must be propagated
-      // expect(rar.authorizationsPostRequest.transactionId).toEqual(model.data.transactionRequestPutUpdate!.transactionId)
-      // expect(rar.authorizationsPostRequest.transactionRequestId).toEqual(model.data.transactionRequestId)
+      // @ts-ignore - will be fixed with sdk-standard-components
+      expect(modelConfig.thirdpartyRequests._post).toBeCalledWith(
+        'thirdpartyRequests/authorizations',
+        'thirdparty',
+        model.data.requestAuthorizationPostRequest,
+        model.data.participantId,
+      )
 
       // validate requestAuthorization response
       expect(model.data.requestAuthorizationResponse).toBeDefined()
@@ -429,6 +415,7 @@ describe('DFSPTransactionModel', () => {
       // onVerifyAuthorization
       // check did we do proper call downstream
       // TODO: remove this in favour of sdk-standard-components call
+      // Will be covered in next PR
       // expect(model.dfspBackendRequests.verifyAuthorization).toHaveBeenCalledWith(
       //   model.data.requestAuthorizationResponse!
       // )
@@ -549,11 +536,24 @@ describe('DFSPTransactionModel', () => {
       }
     })
 
-    it('should throw if requestAuthorization failed', async (done) => {
+    it.only('should throw if requestAuthorization failed', async (done) => {
       mocked(modelConfig.kvs.set).mockImplementationOnce(() => Promise.resolve(true))
-      mocked(modelConfig.sdkOutgoingRequests.requestAuthorization).mockImplementationOnce(
-        () => Promise.resolve({ currentState: 'ERROR_OCCURRED' } as SDKOutboundAPI.Schemas.authorizationsPostResponse)
+      mocked(modelConfig.thirdpartyRequests.putThirdpartyRequestsTransactionsError)
+        .mockImplementationOnce(() => Promise.resolve(undefined))
+
+      // @ts-ignore - private function, will be resolved once I fix sdk-standard-components
+      mocked(modelConfig.thirdpartyRequests._post).mockImplementationOnce(
+        () => Promise.resolve({ statusCode: 202 })
       )
+
+      // mock PUT /thirdpartyRequests/authorizations/{ID}/error callback
+      mockDeferredJobWithCallbackMessage('testAuthChannel', {
+        errorInformation: {
+          errorCode: Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_REQUEST_AUTHORIZATION_FAILED,
+          errorDescription: 'Failed to forward request to PISP'
+        }
+      })
+
       const data: DFSPTransactionData = {
         transactionRequestId,
         transactionRequestState: 'RECEIVED',
@@ -568,12 +568,13 @@ describe('DFSPTransactionModel', () => {
       try {
         await model.fsm.requestAuthorization()
       } catch (err) {
-        expect(err).toEqual(Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_REQUEST_AUTHORIZATION_FAILED)
+        expect(err).toEqual(Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_AUTHORIZATION_UNEXPECTED)
         done()
       }
     })
 
-    it('should throw if verifyAuthorization failed', async (done) => {
+    // TODO: will come back to this in next /verify PR
+    it.skip('should throw if verifyAuthorization failed', async (done) => {
       mocked(modelConfig.kvs.set).mockImplementationOnce(() => Promise.resolve(true))
       mocked(modelConfig.dfspBackendRequests.verifyAuthorization).mockImplementationOnce(
         () => Promise.resolve({ isValid: false })

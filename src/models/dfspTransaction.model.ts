@@ -292,7 +292,7 @@ export class DFSPTransactionModel
 
             if (putResponse.errorInformation) {
               this.data.errorInformation = putResponse.errorInformation as unknown as fspiopAPI.Schemas.ErrorInformation
-              return
+              return Promise.reject(putResponse.errorInformation)
             } 
 
             this.logger.info(`received ${putResponse} from PISP`)
@@ -316,6 +316,8 @@ export class DFSPTransactionModel
           this.data.transactionRequestId, 
           this.data.participantId
         )
+
+        throw Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_AUTHORIZATION_UNEXPECTED
       }
   }
 
@@ -333,6 +335,7 @@ export class DFSPTransactionModel
 
     const tr = this.data.transactionRequestRequest
     const quote = this.data.requestQuoteResponse!.quotes
+    this.data.transactionRequestState = 'ACCEPTED'
  
     // prepare transfer request
     this.data.transferRequest = {
