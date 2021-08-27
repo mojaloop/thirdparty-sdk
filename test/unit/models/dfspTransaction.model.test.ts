@@ -536,7 +536,7 @@ describe('DFSPTransactionModel', () => {
       }
     })
 
-    it.only('should throw if requestAuthorization failed', async (done) => {
+    it('should throw if requestAuthorization failed', async (done) => {
       mocked(modelConfig.kvs.set).mockImplementationOnce(() => Promise.resolve(true))
       mocked(modelConfig.thirdpartyRequests.putThirdpartyRequestsTransactionsError)
         .mockImplementationOnce(() => Promise.resolve(undefined))
