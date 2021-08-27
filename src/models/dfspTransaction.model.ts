@@ -42,6 +42,15 @@ import { SDKOutgoingRequests } from '~/shared/sdk-outgoing-requests'
 import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
 import { ThirdpartyRequests, Errors } from '@mojaloop/sdk-standard-components'
 import { reformatError } from '~/shared/api-error'
+import deferredJob from '~/shared/deferred-job'
+import { Message, PubSub } from '~/shared/pub-sub'
+
+
+// Some constants to use for async jobs
+export enum DFSPTransactionPhase {
+  waitOnAuthResponseFromPISPChannel = 'waitOnAuthResponseFromPISPChannel'
+}
+
 export class DFSPTransactionModel
   extends PersistentModel<DFSPTransactionStateMachine, DFSPTransactionData> {
   protected config: DFSPTransactionModelConfig
@@ -104,6 +113,11 @@ export class DFSPTransactionModel
     this.config = { ...config }
   }
 
+  // getters
+  get subscriber(): PubSub {
+    return this.config.subscriber
+  }
+
   get sdkOutgoingRequests (): SDKOutgoingRequests {
     return this.config.sdkOutgoingRequests
   }
@@ -114,6 +128,14 @@ export class DFSPTransactionModel
 
   get thirdpartyRequests (): ThirdpartyRequests {
     return this.config.thirdpartyRequests
+  }
+
+  static notificationChannel(phase: DFSPTransactionPhase, id: string): string {
+    if (!id) {
+      throw new Error('DFSPTransactionModel.notificationChannel: \'id\' parameter is required')
+    }
+    // channel name
+    return `DFSPLinking_${phase}_${id}`
   }
 
   // transitions handlers
@@ -211,92 +233,158 @@ export class DFSPTransactionModel
   }
 
   async onRequestAuthorization (): Promise<void> {
-    InvalidDataError.throwIfInvalidProperty(this.data, 'requestQuoteResponse')
+    try {
+      InvalidDataError.throwIfInvalidProperty(this.data, 'requestQuoteResponse')
 
-    this.data.requestAuthorizationPostRequest = {
-      fspId: this.data.participantId,
-      authorizationsPostRequest: {
-        authenticationType: 'U2F',
-        retriesLeft: '1',
-        amount: { ...this.data.transactionRequestRequest.amount },
-        quote: { ...this.data.requestQuoteResponse!.quotes },
-        transactionId: this.data.transactionRequestPutUpdate!.transactionId,
-        transactionRequestId: this.data.transactionRequestId
+      const authorizationRequestId = uuidv4()
+      // TODO: derive a valid challenge - leaving for now to keep PR size down
+      const challenge = "12345"
+
+      this.data.requestAuthorizationPostRequest = {
+        authorizationRequestId,
+        transactionRequestId: this.data.transactionRequestId,
+        challenge,
+        // TODO: calculate the fees etc. based on the quotation - leaving for now to keep PR size down
+        // We 
+        transferAmount: this.data.transactionRequestRequest.amount,
+        payeeReceiveAmount: this.data.transactionRequestRequest.amount,
+        fees: {
+          currency: this.data.transactionRequestRequest.amount.currency,
+          amount: this.data.transactionRequestRequest.amount.amount,
+        },
+        payer: this.data.transactionRequestRequest.payer,
+        payee: this.data.transactionRequestRequest.payee,
+        transactionType: this.data.transactionRequestRequest.transactionType,
+        // Note: a DFSP may wish to shorten this time since it could appear
+        // to a PISP that they still have enough time to complete
+        // a transaction, but by the time the DFSP processes the
+        // authorization result and issues the POST /transfers call, the
+        // quote may have expired.
+        expiration: this.data.requestQuoteResponse!.quotes.expiration
       }
-    }
 
-    const resultAuthorization = await this.sdkOutgoingRequests.requestAuthorization(
-      this.data.requestAuthorizationPostRequest
-    )
+      const waitOnAuthResponseFromPISPChannel = DFSPTransactionModel.notificationChannel(
+        DFSPTransactionPhase.waitOnAuthResponseFromPISPChannel,
+        authorizationRequestId
+      )
 
-    if (!(resultAuthorization && resultAuthorization.currentState === 'COMPLETED')) {
-      throw Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_REQUEST_AUTHORIZATION_FAILED
-    }
+      await deferredJob(this.subscriber, waitOnAuthResponseFromPISPChannel)
+        .init(async channel => {
+          // Send the request to the PISP
+          // TODO: implement this on the sdk standard components
+          // await this.thirdpartyRequests.postThirdpartyRequestsAuthorizations
 
-    this.data.requestAuthorizationResponse = resultAuthorization
+          // TODO: check the method signature!
+          // @ts-ignore - internal function
+          const response = await this.thirdpartyRequests._post(
+            `thirdpartyRequests/authorizations`,
+            `thirdparty`,
+            this.data.requestAuthorizationPostRequest,
+            this.data.participantId
+          )
+          this.logger.push({response, channel})
+            .log('ThirdpartyRequests.postThirdpartyRequestsAuthorizations call sent to peer, listening on response')
+        })
+        .job(async (message: Message): Promise<void> => {
+          try {
+            type PutResponse = tpAPI.Schemas.ThirdpartyRequestsAuthorizationsIDPutResponse
+            type PutResponseOrError = PutResponse & fspiopAPI.Schemas.ErrorInformationObject
+            const putResponse = message as unknown as PutResponseOrError
+
+            if (putResponse.errorInformation) {
+              this.data.errorInformation = putResponse.errorInformation as unknown as fspiopAPI.Schemas.ErrorInformation
+              return
+            } 
+
+            this.logger.info(`received ${putResponse} from PISP`)
+            this.data.requestAuthorizationResponse = putResponse
+          } catch (error) {
+            this.logger.push(error).error('ThirdpartyRequests.postThirdpartyRequestsAuthorizations request error')
+            return Promise.reject(error)
+          }
+        })
+        .wait(this.config.requestProcessingTimeoutSeconds)
+      } catch (error) {
+
+        const mojaloopError = reformatError(
+          Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_AUTHORIZATION_UNEXPECTED,
+          this.logger
+        )
+
+        // If something failed here, inform the PISP that the transactionRequest failed
+        await this.thirdpartyRequests.putThirdpartyRequestsTransactionsError(
+          mojaloopError as unknown as fspiopAPI.Schemas.ErrorInformationObject, 
+          this.data.transactionRequestId, 
+          this.data.participantId
+        )
+      }
   }
 
   async onVerifyAuthorization (): Promise<void> {
     InvalidDataError.throwIfInvalidProperty(this.data, 'requestAuthorizationResponse')
 
+    // TODO: talk to the auth-service with thirdpartyRequests/verifications!
+
+
     // shortcut
-    // TODO: this should be updated for latest api, to include consentId
-    const authorizationInfo = this.data.requestAuthorizationResponse!.authorizations
+    const authorizationInfo = this.data.requestAuthorizationResponse!
+    console.log('received authorization from PISP!', authorizationInfo)
+    console.log('TODO: talk to the auth service!')
 
     // different actions on responseType
-    switch (authorizationInfo.responseType) {
-      case 'ENTERED': {
-        // user accepted quote & transfer details
-        // let verify entered signed challenge by DFSP backend
-        const result = await this.dfspBackendRequests.verifyAuthorization(authorizationInfo)
+    // switch (authorizationInfo.responseType) {
+    //   case 'ENTERED': {
+    //     // user accepted quote & transfer details
+    //     // let verify entered signed challenge by DFSP backend
+    //     const result = await this.dfspBackendRequests.verifyAuthorization(authorizationInfo)
 
-        if (!(result && result.isValid)) {
-          throw Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_AUTHORIZATION_NOT_VALID
-        }
+    //     if (!(result && result.isValid)) {
+    //       throw Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_AUTHORIZATION_NOT_VALID
+    //     }
 
-        // user's challenge has been successfully verified
-        this.data.transactionRequestState = 'ACCEPTED'
+    //     // user's challenge has been successfully verified
+    //     this.data.transactionRequestState = 'ACCEPTED'
 
-        // TODO: to have or not to have transferId - what has been passed to quote - investigate!!!
-        this.data.transferId = uuidv4()
+    //     // TODO: to have or not to have transferId - what has been passed to quote - investigate!!!
+    //     this.data.transferId = uuidv4()
 
-        const tr = this.data.transactionRequestRequest
-        const quote = this.data.requestQuoteResponse!.quotes
-        // prepare transfer request
-        this.data.transferRequest = {
-          fspId: this.config.dfspId,
-          transfersPostRequest: {
-            transferId: this.data.transferId!,
+    //     const tr = this.data.transactionRequestRequest
+    //     const quote = this.data.requestQuoteResponse!.quotes
+    //     // prepare transfer request
+    //     this.data.transferRequest = {
+    //       fspId: this.config.dfspId,
+    //       transfersPostRequest: {
+    //         transferId: this.data.transferId!,
 
-            // payee & payer data from /thirdpartyRequests/transaction
-            payeeFsp: tr.payee.partyIdInfo.fspId!,
-            payerFsp: this.config.dfspId,
+    //         // payee & payer data from /thirdpartyRequests/transaction
+    //         payeeFsp: tr.payee.partyIdInfo.fspId!,
+    //         payerFsp: this.config.dfspId,
 
-            // transfer data from quote response
-            amount: { ...quote.transferAmount },
-            ilpPacket: quote.ilpPacket,
-            condition: quote.condition,
+    //         // transfer data from quote response
+    //         amount: { ...quote.transferAmount },
+    //         ilpPacket: quote.ilpPacket,
+    //         condition: quote.condition,
 
-            // TODO: investigate recalculation of expiry...
-            expiration: tr.expiration
-          }
+    //         // TODO: investigate recalculation of expiry...
+    //         expiration: tr.expiration
+    //       }
 
-        }
-        break
-      }
+    //     }
+    //     break
+    //   }
 
-      case 'REJECTED': {
-        // user rejected authorization so transfer is declined, let abort workflow!
-        this.data.transactionRequestState = 'REJECTED'
-        throw Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_AUTHORIZATION_REJECTED_BY_USER
-      }
+    //   case 'REJECTED': {
+    //     // user rejected authorization so transfer is declined, let abort workflow!
+    //     this.data.transactionRequestState = 'REJECTED'
+    //     throw Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_AUTHORIZATION_REJECTED_BY_USER
+    //   }
 
-      default: {
-        // should we setup ??? this.data.transactionRequestState = 'REJECTED'
-        // we received 'RESEND' or something else...
-        throw Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_AUTHORIZATION_UNEXPECTED
-      }
-    }
+    //   default: {
+    //     // should we setup ??? this.data.transactionRequestState = 'REJECTED'
+    //     // we received 'RESEND' or something else...
+    //     throw Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_AUTHORIZATION_UNEXPECTED
+    //   }
+    // }
   }
 
   async onRequestTransfer (): Promise<void> {
