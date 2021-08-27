@@ -11,9 +11,9 @@ import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
 import mockLogger from '../mockLogger'
 import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
 import { SDKOutgoingRequests } from '~/shared/sdk-outgoing-requests'
-import { Message, PubSub } from '~/shared/pub-sub'
-import deferredJob, { JobInitiator, JobListener } from '~/shared/deferred-job'
+import { PubSub } from '~/shared/pub-sub'
 import { DFSPTransactionModel } from '~/models/dfspTransaction.model'
+import { mockDeferredJobWithCallbackMessage } from '../mockDeferredJob'
 
 
 const requestAuthorizationResponse = {
@@ -32,26 +32,6 @@ const requestAuthorizationResponse = {
 
 // Mock deferredJob to inject our async callbacks
 jest.mock('~/shared/deferred-job')
-
-function mockDeferredJobWithCallbackMessage(channel: string, message: Message) {
-  // When deferred job is called, call .job() immedately with the message
-
-  // @ts-ignore
-  deferredJob.mockImplementationOnce(() => ({
-    init: jest.fn((jobInitiator: JobInitiator) => ({
-      job: jest.fn((jobListener: JobListener) => ({
-        wait: jest.fn(async () => {
-          // simulate calling the jobInitiator
-          await jobInitiator(channel, 1234)
-          // simulate calling the jobListener
-          await jobListener(message)
-        })
-      }))
-    })),
-    trigger: jest.fn()
-  }))
-
-}
 
 describe('Inbound DFSP Transaction handler', () => {
   let requestQuoteResponse: SDKOutboundAPI.Schemas.quotesPostResponse

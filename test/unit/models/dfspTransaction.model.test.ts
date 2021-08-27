@@ -44,12 +44,16 @@ import { ThirdpartyRequests, Errors } from '@mojaloop/sdk-standard-components'
 import { OutboundAPI as SDKOutboundAPI } from '@mojaloop/sdk-scheme-adapter'
 import { reformatError } from '~/shared/api-error'
 import { PubSub } from '~/shared/pub-sub'
+import { mockDeferredJobWithCallbackMessage } from '../mockDeferredJob'
 
 // mock KVS default exported class
 jest.mock('~/shared/kvs')
 
 // mock PubSub default exported class
 jest.mock('~/shared/pub-sub')
+
+// Mock deferredJob to inject our async callbacks
+jest.mock('~/shared/deferred-job')
 
 describe('DFSPTransactionModel', () => {
   const connectionConfig: RedisConnectionConfig = {
@@ -259,8 +263,12 @@ describe('DFSPTransactionModel', () => {
   })
 
   describe('workflow', () => {
-    it('should do a happy flow', async () => {
+    it.only('should do a happy flow', async () => {
       mocked(modelConfig.kvs.set).mockImplementation(() => Promise.resolve(true))
+      
+      // mock async callback(s)
+      mockDeferredJobWithCallbackMessage('testAuthChannel', requestAuthorizationResponse)
+
       const data: DFSPTransactionData = {
         transactionRequestId,
         transactionRequestState: 'RECEIVED',
@@ -273,6 +281,7 @@ describe('DFSPTransactionModel', () => {
 
       // ensure state data is correct before starting workflow
       expect(model.data).toEqual(data)
+
 
       // execute workflow
       await model.run()
