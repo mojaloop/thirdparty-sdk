@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+### [11.46.1](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.46.0...v11.46.1) (2021-08-27)
+
+
+### Maintenance
+
+* update api-snippets, regenerate and fix schema ([#116](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/116)) ([b6ece59](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/b6ece593ee9f09539590ef3e2edf1e8663823760))
+
 ## [11.46.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.45.0...v11.46.0) (2021-08-27)
 
 
