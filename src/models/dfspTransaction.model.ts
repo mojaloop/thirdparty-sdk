@@ -304,8 +304,9 @@ export class DFSPTransactionModel
           }
         })
         // This requires user input on the PISP side, so this number should be something reasonable, like 1 minute or so
-        .wait(this.config.transactionRequestAuthorizationTimeoutSeconds)
+        .wait(this.config.transactionRequestAuthorizationTimeoutSeconds * 1000)
       } catch (error) {
+        console.log("error is", error)
 
         const mojaloopError = reformatError(
           Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_AUTHORIZATION_UNEXPECTED,

@@ -1,4 +1,3 @@
-// import { logger } from '~/shared/logger'
 import { OutboundAPI as SDKOutboundAPI } from '@mojaloop/sdk-scheme-adapter'
 import { KVS } from '~/shared/kvs'
 import { v4 as uuidv4 } from 'uuid'
@@ -11,18 +10,21 @@ import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
 import mockLogger from '../mockLogger'
 import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
 import { SDKOutgoingRequests } from '~/shared/sdk-outgoing-requests'
+import { PubSub } from '~/shared/pub-sub'
 
 describe('Inbound DFSP Transaction handler', () => {
   let requestQuoteResponse: SDKOutboundAPI.Schemas.quotesPostResponse
-  let requestAuthorizationResponse: SDKOutboundAPI.Schemas.authorizationsPostResponse
+  let requestAuthorizationResponse: tpAPI.Schemas.ThirdpartyRequestsAuthorizationsIDPutResponse
   let requestTransferResponse: SDKOutboundAPI.Schemas.simpleTransfersPostResponse
   let kvsMock: KVS
+  let pubSubMock: PubSub
   let transactionRequestId: string
   let transactionRequestRequest: tpAPI.Schemas.ThirdpartyRequestsTransactionsPostRequest
   let toolkit: StateResponseToolkit
   let thirdpartyRequestsMock: ThirdpartyRequests
   let dfspBackendRequestsMock: DFSPBackendRequests
   let sdkOutgoingRequestsMock: SDKOutgoingRequests
+
   beforeEach(() => {
     transactionRequestId = uuidv4()
     transactionRequestRequest = {
@@ -61,17 +63,17 @@ describe('Inbound DFSP Transaction handler', () => {
     }
 
     requestAuthorizationResponse = {
-      authorizations: {
-        authenticationInfo: {
-          authentication: 'U2F',
-          authenticationValue: {
-            pinValue: 'some-pin-value',
-            counter: '1'
-          } as string & Partial<{pinValue: string, counter: string}>
+      signedPayloadType: 'FIDO',
+      signedPayload: {
+        id: '45c-TkfkjQovQeAWmOy-RLBHEJ_e4jYzQYgD8VdbkePgM5d98BaAadadNYrknxgH0jQEON8zBydLgh1EqoC9DA',
+        rawId: '45c+TkfkjQovQeAWmOy+RLBHEJ/e4jYzQYgD8VdbkePgM5d98BaAadadNYrknxgH0jQEON8zBydLgh1EqoC9DA==',
+        response: {
+          authenticatorData: 'SZYN5YgOjGh0NBcPZHZgW4/krrmihjLHmVzzuoMdl2MBAAAACA==',
+          clientDataJSON: 'eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiQUFBQUFBQUFBQUFBQUFBQUFBRUNBdyIsIm9yaWdpbiI6Imh0dHA6Ly9sb2NhbGhvc3Q6NDIxODEiLCJjcm9zc09yaWdpbiI6ZmFsc2UsIm90aGVyX2tleXNfY2FuX2JlX2FkZGVkX2hlcmUiOiJkbyBub3QgY29tcGFyZSBjbGllbnREYXRhSlNPTiBhZ2FpbnN0IGEgdGVtcGxhdGUuIFNlZSBodHRwczovL2dvby5nbC95YWJQZXgifQ==',
+          signature: 'MEUCIDcJRBu5aOLJVc/sPyECmYi23w8xF35n3RNhyUNVwQ2nAiEA+Lnd8dBn06OKkEgAq00BVbmH87ybQHfXlf1Y4RJqwQ8='
         },
-        responseType: 'ENTERED'
-      },
-      currentState: 'COMPLETED'
+        type: 'public-key'
+      }
     }
 
     requestTransferResponse = {
@@ -87,10 +89,18 @@ describe('Inbound DFSP Transaction handler', () => {
       set: jest.fn()
     } as unknown as KVS
 
+    pubSubMock = {
+      publish: jest.fn(),
+      subscribe: jest.fn()
+    } as unknown as PubSub
+
     thirdpartyRequestsMock = {
       putThirdpartyRequestsTransactions: jest.fn(() => Promise.resolve({ statusCode: 200 })),
       patchThirdpartyRequestsTransactions: jest.fn(() => Promise.resolve({ statusCode: 200 })),
-      putThirdpartyRequestsTransactionsError: jest.fn(() => Promise.resolve({ statusCode: 200 }))
+      putThirdpartyRequestsTransactionsError: jest.fn(() => Promise.resolve({ statusCode: 200 })),
+      // TODO: change to postThirdpartyRequestsAuthorizations once we've updated sdk-standard-components
+      _post: jest.fn(() => Promise.resolve({ statusCode: 202 }))
+
     } as unknown as ThirdpartyRequests
 
     dfspBackendRequestsMock = {
@@ -99,13 +109,13 @@ describe('Inbound DFSP Transaction handler', () => {
     } as unknown as DFSPBackendRequests
     sdkOutgoingRequestsMock = {
       requestQuote: jest.fn(() => Promise.resolve(requestQuoteResponse)),
-      requestAuthorization: jest.fn(() => Promise.resolve(requestAuthorizationResponse)),
       requestTransfer: jest.fn(() => Promise.resolve(requestTransferResponse))
     } as unknown as SDKOutgoingRequests
     toolkit = {
       getDFSPId: jest.fn(() => 'pisp'),
       getLogger: jest.fn(() => mockLogger()),
       getKVS: jest.fn(() => kvsMock),
+      getSubscriber: jest.fn(() => pubSubMock),
       getThirdpartyRequests: jest.fn(() => thirdpartyRequestsMock),
       getDFSPBackendRequests: jest.fn(() => dfspBackendRequestsMock),
       getSDKOutgoingRequests: jest.fn(() => sdkOutgoingRequestsMock),
@@ -127,12 +137,18 @@ describe('Inbound DFSP Transaction handler', () => {
       },
       payload: transactionRequestRequest
     }
+
+    // Initial call
     const result = await ThirdpartyRequestsTransactions.post(
       {} as unknown as Context,
       request as unknown as Request,
       toolkit as unknown as StateResponseToolkit
     )
     expect(result.statusCode).toBe(202)
+
+    // PISP sends PUT /thirdpartyRequests/authorizations/{ID}
+    // maybe we can just asserts that pubsub got called here
+
 
     // give 100ms for post background job to be done
     setTimeout(async () => {
@@ -145,11 +161,32 @@ describe('Inbound DFSP Transaction handler', () => {
       expect(dfspBackendRequestsMock.validateThirdpartyTransactionRequestAndGetContext).toBeCalledTimes(1)
       expect(dfspBackendRequestsMock.verifyAuthorization).toBeCalledTimes(1)
       expect(sdkOutgoingRequestsMock.requestQuote).toBeCalledTimes(1)
-      expect(sdkOutgoingRequestsMock.requestAuthorization).toBeCalledTimes(1)
       expect(sdkOutgoingRequestsMock.requestTransfer).toBeCalledTimes(1)
+
+      // TODO: update to 2 once we've done more stuff
+      expect(pubSubMock.subscribe).toBeCalledTimes(1)
+
+
+      //TODO: how do we inject the mocked async callbacks from 
+      // PUT /thirdpartyRequests/authorizations/{ID} and
+      // PUT /thirdpartyRequests/verifications/{ID} here?
 
       // we are done!
       done()
     }, 100)
+  })
+
+  it('PUT /thirdpartyRequests/authorizations/{ID}', async () =>{
+    //TODO: init the state machine in some state
+    // call the 'PUT /thirdpartyRequests/authorizations/{ID}' handler
+    // assert that the pubsub got called waiting for /verification
+    console.log('todo')
+  })
+
+  it('PUT /thirdpartyRequests/verifications/{ID}', async () =>{
+    //TODO: init the state machine in some state
+    // call the 'PUT /thirdpartyRequests/authorizations/{ID}' handler
+    // assert that the transfer went through
+    console.log('todo')
   })
 })
