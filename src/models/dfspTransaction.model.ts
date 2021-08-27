@@ -45,7 +45,6 @@ import { reformatError } from '~/shared/api-error'
 import deferredJob from '~/shared/deferred-job'
 import { Message, PubSub } from '~/shared/pub-sub'
 
-
 // Some constants to use for async jobs
 export enum DFSPTransactionPhase {
   waitOnAuthResponseFromPISPChannel = 'waitOnAuthResponseFromPISPChannel'
@@ -114,7 +113,7 @@ export class DFSPTransactionModel
   }
 
   // getters
-  get subscriber(): PubSub {
+  get subscriber (): PubSub {
     return this.config.subscriber
   }
 
@@ -130,7 +129,7 @@ export class DFSPTransactionModel
     return this.config.thirdpartyRequests
   }
 
-  static notificationChannel(phase: DFSPTransactionPhase, id: string): string {
+  static notificationChannel (phase: DFSPTransactionPhase, id: string): string {
     if (!id) {
       throw new Error('DFSPTransactionModel.notificationChannel: \'id\' parameter is required')
     }
@@ -238,19 +237,19 @@ export class DFSPTransactionModel
 
       const authorizationRequestId = uuidv4()
       // TODO: derive a valid challenge - leaving for now to keep PR size down
-      const challenge = "12345"
+      const challenge = '12345'
 
       this.data.requestAuthorizationPostRequest = {
         authorizationRequestId,
         transactionRequestId: this.data.transactionRequestId,
         challenge,
         // TODO: calculate the fees etc. based on the quotation - leaving for now to keep PR size down
-        // We 
+        // We
         transferAmount: this.data.transactionRequestRequest.amount,
         payeeReceiveAmount: this.data.transactionRequestRequest.amount,
         fees: {
           currency: this.data.transactionRequestRequest.amount.currency,
-          amount: this.data.transactionRequestRequest.amount.amount,
+          amount: this.data.transactionRequestRequest.amount.amount
         },
         payer: this.data.transactionRequestRequest.payer,
         payee: this.data.transactionRequestRequest.payee,
@@ -276,12 +275,12 @@ export class DFSPTransactionModel
 
           // @ts-ignore - internal function
           const response = await this.thirdpartyRequests._post(
-            `thirdpartyRequests/authorizations`,
-            `thirdparty`,
+            'thirdpartyRequests/authorizations',
+            'thirdparty',
             this.data.requestAuthorizationPostRequest,
             this.data.participantId
           )
-          this.logger.push({response, channel})
+          this.logger.push({ response, channel })
             .log('ThirdpartyRequests.postThirdpartyRequestsAuthorizations call sent to peer, listening on response')
         })
         .job(async (message: Message): Promise<void> => {
@@ -293,7 +292,7 @@ export class DFSPTransactionModel
             if (putResponse.errorInformation) {
               this.data.errorInformation = putResponse.errorInformation as unknown as fspiopAPI.Schemas.ErrorInformation
               return Promise.reject(putResponse.errorInformation)
-            } 
+            }
 
             this.logger.info(`received ${putResponse} from PISP`)
             this.data.requestAuthorizationResponse = putResponse
@@ -304,21 +303,21 @@ export class DFSPTransactionModel
         })
         // This requires user input on the PISP side, so this number should be something reasonable, like 1 minute or so
         .wait(this.config.transactionRequestAuthorizationTimeoutSeconds * 1000)
-      } catch (error) {
-        const mojaloopError = reformatError(
-          Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_AUTHORIZATION_UNEXPECTED,
-          this.logger
-        )
+    } catch (error) {
+      const mojaloopError = reformatError(
+        Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_AUTHORIZATION_UNEXPECTED,
+        this.logger
+      )
 
-        // If something failed here, inform the PISP that the transactionRequest failed
-        await this.thirdpartyRequests.putThirdpartyRequestsTransactionsError(
-          mojaloopError as unknown as fspiopAPI.Schemas.ErrorInformationObject, 
-          this.data.transactionRequestId, 
-          this.data.participantId
-        )
+      // If something failed here, inform the PISP that the transactionRequest failed
+      await this.thirdpartyRequests.putThirdpartyRequestsTransactionsError(
+        mojaloopError as unknown as fspiopAPI.Schemas.ErrorInformationObject,
+        this.data.transactionRequestId,
+        this.data.participantId
+      )
 
-        throw Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_AUTHORIZATION_UNEXPECTED
-      }
+      throw Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_AUTHORIZATION_UNEXPECTED
+    }
   }
 
   async onVerifyAuthorization (): Promise<void> {
@@ -336,7 +335,7 @@ export class DFSPTransactionModel
     const tr = this.data.transactionRequestRequest
     const quote = this.data.requestQuoteResponse!.quotes
     this.data.transactionRequestState = 'ACCEPTED'
- 
+
     // prepare transfer request
     this.data.transferRequest = {
       fspId: this.config.dfspId,
@@ -353,7 +352,7 @@ export class DFSPTransactionModel
         condition: quote.condition,
 
         // TODO: investigate recalculation of expiry...
-        expiration: 
+        expiration:
         tr.expiration
       }
     }

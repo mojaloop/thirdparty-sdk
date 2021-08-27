@@ -22,6 +22,8 @@ module.exports = {
   },
   rules: {
     indent: 'off',
+    // Temporary on, since we need @ts-ignore until we fix sdk-standard-components
+    '@typescript-eslint/ban-ts-comment': 'warn',
     '@typescript-eslint/indent': ['error', 2],
     '@typescript-eslint/no-explicit-any': 'error',
     '@typescript-eslint/no-var-requires': 'error',
