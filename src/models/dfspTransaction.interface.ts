@@ -26,7 +26,7 @@
  ******/
 import { Method } from 'javascript-state-machine'
 import { ControlledStateMachine, StateData, PersistentModelConfig } from '~/models/persistent.model'
-import { thirdparty as tpAPI, v1_1 as fspiopAPI } from '@mojaloop/api-snippets'
+import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
 import { SDKOutgoingRequests } from '~/shared/sdk-outgoing-requests'
 import { BackendTransactionRequestContext, DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
 import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components'

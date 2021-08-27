@@ -893,6 +893,7 @@ describe('Inbound API routes', (): void => {
           ID: '520f9165-7be6-4a40-9fc8-b30fcf4f62ab'
         },
         headers: {
+          'Accept': 'application/json',
           'Content-Type': 'application/json',
           'FSPIOP-Source': 'switch',
           Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
@@ -939,6 +940,7 @@ describe('Inbound API routes', (): void => {
         method: 'PATCH',
         url: '/consentRequests/520f9165-7be6-4a40-9fc8-b30fcf4f62ab',
         headers: {
+          'Accept': 'application/json',
           'Content-Type': 'application/json',
           'FSPIOP-Source': 'switch',
           Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
@@ -1304,6 +1306,7 @@ describe('Inbound API routes', (): void => {
           ID: '520f9165-7be6-4a40-9fc8-b30fcf4f62ab'
         },
         headers: {
+          'Accept': 'application/json',
           'Content-Type': 'application/json',
           'FSPIOP-Source': 'switch',
           Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
@@ -1343,6 +1346,7 @@ describe('Inbound API routes', (): void => {
         method: 'PATCH',
         url: '/consents/520f9165-7be6-4a40-9fc8-b30fcf4f62ab',
         headers: {
+          'Accept': 'application/json',
           'Content-Type': 'application/json',
           'FSPIOP-Source': 'switch',
           Date: 'Thu, 24 Jan 2019 10:22:12 GMT',

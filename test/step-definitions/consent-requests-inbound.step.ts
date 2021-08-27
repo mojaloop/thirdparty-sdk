@@ -81,6 +81,7 @@ defineFeature(feature, (test): void => {
         method: 'PATCH',
         url: '/consentRequests/123',
         headers: {
+          'Accept': 'application/json',
           'Content-Type': 'application/json',
           'FSPIOP-Source': 'switch',
           Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
