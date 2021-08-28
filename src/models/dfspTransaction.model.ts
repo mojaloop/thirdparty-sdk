@@ -134,7 +134,7 @@ export class DFSPTransactionModel
       throw new Error('DFSPTransactionModel.notificationChannel: \'id\' parameter is required')
     }
     // channel name
-    return `DFSPLinking_${phase}_${id}`
+    return `DFSPTransaction_${phase}_${id}`
   }
 
   // transitions handlers
