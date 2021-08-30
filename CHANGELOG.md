@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+## [11.47.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.46.1...v11.47.0) (2021-08-30)
+
+
+### Features
+
+* **dfsp-tx:** replace sdk-scheme-adapter call with `/tpr/authorizations` ([#117](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/117)) ([f374196](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/f374196b30df75d2b4056519e9824ae2ba472890))
+
 ### [11.46.1](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.46.0...v11.46.1) (2021-08-27)
 
 
