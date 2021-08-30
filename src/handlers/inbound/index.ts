@@ -72,6 +72,7 @@ export default {
   PutParticipantsByIDAndError:  ParticipantsIDError.put,
   ParticipantsByTypeAndID3: ParticipantsTypeID.put,
   ParticipantsErrorByTypeAndID: ParticipantsTypeIDError.put,
+  PostThirdpartyRequestsAuthorizations: ThirdpartyRequestsAuthorizations.post,
   PutThirdpartyRequestsAuthorizationsById: ThirdpartyRequestsAuthorizations.put,
   PutThirdpartyRequestsAuthorizationsByIdAndError: ThirdpartyRequestsAuthorizations.put,
 }

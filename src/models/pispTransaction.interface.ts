@@ -86,7 +86,7 @@ export interface PISPTransactionData extends StateData<PISPTransactionModelState
 
   // initiate
   initiateRequest?: OutboundAPI.Schemas.ThirdpartyTransactionIDInitiateRequest
-  authorizationRequest?: tpAPI.Schemas.AuthorizationsPostRequest
+  authorizationRequest?: tpAPI.Schemas.ThirdpartyRequestsAuthorizationsPostRequest
   initiateResponse?: OutboundAPI.Schemas.ThirdpartyTransactionIDInitiateResponse
 
   // approve
