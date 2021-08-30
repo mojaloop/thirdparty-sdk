@@ -51,6 +51,7 @@ import {
 } from '~/models/outbound/pispLinking.model'
 import { PISPTransactionPhase } from '~/models/pispTransaction.interface'
 import ThirdpartyAuthorizations from '~/handlers/inbound/thirdpartyRequests/transactions/{ID}/authorizations'
+import ThirdpartyRequestsAuthorizations from '~/handlers/inbound/thirdpartyRequests/authorizations'
 import ConsentsHandler from '~/handlers/inbound/consents'
 import ConsentsIdHandler from '~/handlers/inbound/consents/{ID}'
 import ConsentsIdErrorHandler from '~/handlers/inbound/consents/{ID}/error'
@@ -146,6 +147,42 @@ jest.mock('~/models/inbound/authorizations.model', () => ({
   }))
 }))
 
+const thirdpartyRequestsAuthorizationsPostRequest: tpAPI.Schemas.ThirdpartyRequestsAuthorizationsPostRequest = {
+  authorizationRequestId: '5f8ee7f9-290f-4e03-ae1c-1e81ecf398df',
+  transactionRequestId: '2cf08eed-3540-489e-85fa-b2477838a8c5',
+  challenge: '<base64 encoded binary - the encoded challenge>',
+  transferAmount: {
+    amount: '100',
+      currency: 'USD'
+  },
+  payeeReceiveAmount: {
+    amount: '99',
+      currency: 'USD'
+  },
+  fees: {
+    amount: '1',
+      currency: 'USD'
+  },
+  payee: {
+    partyIdInfo: {
+      partyIdType: 'MSISDN',
+        partyIdentifier: '+4412345678',
+          fspId: 'dfspb',
+          }
+  },
+  payer: {
+    partyIdType: 'THIRD_PARTY_LINK',
+      partyIdentifier: 'qwerty-123456',
+        fspId: 'dfspa'
+  },
+  transactionType: {
+    scenario: 'TRANSFER',
+      initiator: 'PAYER',
+        initiatorType: 'CONSUMER'
+  },
+  expiration: '2020-06-15T12:00:00.000Z'
+}
+
 const putResponse: fspiopAPI.Schemas.AuthorizationsIDPutResponse = {
   authenticationInfo: {
     authentication: 'U2F',
@@ -203,6 +240,83 @@ describe('Inbound API routes', (): void => {
     // StatePlugin is waiting on stop event so give it a chance to close the redis connections
     server.events.on('stop', () => setTimeout(done, 100))
     await server.stop()
+  })
+
+  describe('POST /thirdpartyRequests/authorizations', () => {
+    it('triggers the PISP transaction model with the request body', async () => {
+      const request = {
+        params: {},
+        payload: thirdpartyRequestsAuthorizationsPostRequest
+      }
+      const pubSubMock = {
+        publish: jest.fn()
+      }
+      const toolkit = {
+        getPublisher: jest.fn(() => pubSubMock),
+        response: jest.fn(() => ({
+          code: jest.fn((code: number) => ({
+            statusCode: code
+          }))
+        }))
+      }
+
+      const result = await ThirdpartyRequestsAuthorizations.post(
+        {},
+        request as unknown as Request,
+        toolkit as unknown as StateResponseToolkit
+      )
+
+      expect(result.statusCode).toEqual(202)
+      expect(toolkit.getPublisher).toBeCalledTimes(1)
+
+      // check default authorization mode
+      const authChannel = PISPTransactionModel.notificationChannel(
+        PISPTransactionPhase.waitOnAuthorizationPost,
+        thirdpartyRequestsAuthorizationsPostRequest.transactionRequestId!
+      )
+      expect(pubSubMock.publish).toBeCalledWith(authChannel, thirdpartyRequestsAuthorizationsPostRequest)
+    })
+
+    it('accepts a valid request', async () => {
+      const request = {
+        method: 'POST',
+        url: '/thirdpartyRequests/authorizations',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'FSPIOP-Source': 'dfspa',
+          Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
+          'FSPIOP-Destination': 'pispa'
+        },
+        payload: thirdpartyRequestsAuthorizationsPostRequest
+      }
+
+      const response = await server.inject(request)
+      console.log('response', response)
+
+      expect(response.statusCode).toEqual(202)
+    })
+
+    it('rejects an invalid request', async () => {
+      const invalidTPRAuthorizationsPost = JSON.parse(JSON.stringify(thirdpartyRequestsAuthorizationsPostRequest))
+      delete invalidTPRAuthorizationsPost.authorizationRequestId
+      const request = {
+        method: 'POST',
+        url: '/thirdpartyRequests/authorizations',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'FSPIOP-Source': 'dfspa',
+          Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
+          'FSPIOP-Destination': 'pispa'
+        },
+        payload: invalidTPRAuthorizationsPost
+      }
+
+      const response = await server.inject(request)
+
+      expect(response.statusCode).toEqual(400)
+    })
   })
 
   describe('/authorization', () => {

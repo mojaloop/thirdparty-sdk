@@ -258,6 +258,7 @@ export class PISPTransactionModel
 
     return deferredJob(this.subscriber, channel)
       .init(async (): Promise<void> => {
+        // TODO: change to use the thirdpartyRequests/authorizations call
         const res = await this.mojaloopRequests.putAuthorizations(
           this.data.transactionRequestId!,
           // propagate signed challenge

@@ -34,7 +34,6 @@ import { Message } from '~/shared/pub-sub'
 import {
   thirdparty as tpAPI
 } from '@mojaloop/api-snippets'
-import config from '~/shared/config'
 import { PISPTransactionModel } from '~/models/pispTransaction.model'
 import { PISPTransactionPhase } from '~/models/pispTransaction.interface'
 
@@ -46,14 +45,13 @@ async function post(_context: unknown, request: Request, h: StateResponseToolkit
   const payload = request.payload as tpAPI.Schemas.ThirdpartyRequestsAuthorizationsPostRequest
   const publisher = h.getPublisher()
 
-  if (config.INBOUND.PISP_TRANSACTION_MODE) {
-    PISPTransactionModel.triggerWorkflow(
-      PISPTransactionPhase.waitOnAuthorizationPost,
-      payload.transactionRequestId,
-      publisher,
-      payload as unknown as Message
-    )
-  }
+  PISPTransactionModel.triggerWorkflow(
+    PISPTransactionPhase.waitOnAuthorizationPost,
+    payload.transactionRequestId,
+    publisher,
+    payload as unknown as Message
+  )
+
 
   // Note that we will have passed request validation, JWS etc... by this point
   // so it is safe to return 202

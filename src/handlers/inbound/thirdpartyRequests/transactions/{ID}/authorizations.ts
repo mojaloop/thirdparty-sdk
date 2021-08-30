@@ -33,7 +33,7 @@ import { OutboundThirdpartyAuthorizationsModel } from '~/models/outbound/thirdpa
 
 /**
  * Handles a inbound PUT /thirdpartyRequests/transactions/{ID}/authorizations request
- * DEPRECATED - use PUT /thirdpartyRequests/authorizations/{ID
+ * DEPRECATED - use PUT /thirdpartyRequests/authorizations/{ID}
  */
 async function put (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const transactionRequest = request.payload as tpAPI.Schemas.ThirdpartyRequestsTransactionsIDAuthorizationsPutResponse
