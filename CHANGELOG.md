@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+## [11.48.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.47.0...v11.48.0) (2021-08-30)
+
+
+### Features
+
+* **inbound-api:**  handle inbound post tpr authorizations ([#118](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/118)) ([0c828b0](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/0c828b03923e298a5b01dff055bc04b3edb0df09))
+
 ## [11.47.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.46.1...v11.47.0) (2021-08-30)
 
 
