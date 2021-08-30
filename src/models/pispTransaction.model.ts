@@ -226,7 +226,7 @@ export class PISPTransactionModel
       })
       .job(async (message: Message): Promise<void> => {
         // receive auth request from POST /authorization
-        this.data.authorizationRequest = { ...message as unknown as tpAPI.Schemas.AuthorizationsPostRequest }
+        this.data.authorizationRequest = { ...message as unknown as tpAPI.Schemas.ThirdpartyRequestsAuthorizationsPostRequest }
         this.saveToKVS()
       })
       .wait(this.config.initiateTimeoutInSeconds * 1000)
