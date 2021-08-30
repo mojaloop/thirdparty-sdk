@@ -1143,6 +1143,82 @@ paths:
       tags:
         - thirdpartyRequests
         - sampled
+  /thirdpartyRequests/authorizations:
+    parameters:
+      - $ref: '#/components/parameters/Content-Type'
+      - $ref: '#/components/parameters/Date'
+      - $ref: '#/components/parameters/X-Forwarded-For'
+      - $ref: '#/components/parameters/FSPIOP-Source'
+      - $ref: '#/components/parameters/FSPIOP-Destination'
+      - $ref: '#/components/parameters/FSPIOP-Encryption'
+      - $ref: '#/components/parameters/FSPIOP-Signature'
+      - $ref: '#/components/parameters/FSPIOP-URI'
+      - $ref: '#/components/parameters/FSPIOP-HTTP-Method'
+    post:
+      description: >
+        The HTTP request `POST /thirdpartyRequests/authorizations` is used to
+        request the Payer to enter the applicable credentials in the PISP
+        system.
+      operationId: PostThirdpartyRequestsAuthorizations
+      summary: PostThirdpartyRequestsAuthorizations
+      tags:
+        - authorizations
+      parameters:
+        - $ref: '#/components/parameters/Accept'
+        - $ref: '#/components/parameters/Content-Length'
+      requestBody:
+        description: Authorization request details
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ThirdpartyRequestsAuthorizationsPostRequest'
+            example:
+              authorizationRequestId: 33333333-0000-0000-0000-000000000000
+              transactionRequestId: 00000000-0000-0000-0000-000000000000
+              challenge: <base64 encoded binary - the encoded challenge>
+              transferAmount:
+                amount: '100'
+                currency: USD
+              payeeReceiveAmount:
+                amount: '99'
+                currency: USD
+              fees:
+                amount: '1'
+                currency: USD
+              payee:
+                partyIdInfo:
+                  partyIdType: MSISDN
+                  partyIdentifier: +44 1234 5678
+                  fspId: dfspb
+              payer:
+                partyIdType: THIRD_PARTY_LINK
+                partyIdentifier: qwerty-123456
+                fspId: dfspa
+              transactionType:
+                scenario: TRANSFER
+                initiator: PAYER
+                initiatorType: CONSUMER
+              expiration: '2020-06-15T12:00:00.000'
+      responses:
+        '202':
+          $ref: '#/components/responses/202'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '405':
+          $ref: '#/components/responses/405'
+        '406':
+          $ref: '#/components/responses/406'
+        '501':
+          $ref: '#/components/responses/501'
+        '503':
+          $ref: '#/components/responses/503'
   '/thirdpartyRequests/authorizations/{ID}':
     parameters:
       - $ref: '#/components/parameters/ID'
@@ -3535,6 +3611,68 @@ components:
         - amount
         - transactionType
         - expiration
+    ThirdpartyRequestsAuthorizationsPostRequest:
+      title: ThirdpartyRequestsAuthorizationsPostRequest
+      description: POST /thirdpartyRequests/authorizations request object.
+      type: object
+      properties:
+        authorizationRequestId:
+          $ref: '#/components/schemas/CorrelationId'
+        transactionRequestId:
+          $ref: '#/components/schemas/CorrelationId'
+        challenge:
+          type: string
+          description: The challenge that the PISP's client is to sign
+        transferAmount:
+          allOf:
+            - $ref: '#/components/schemas/Money'
+          description: >-
+            The amount that will be debited from the sending customer’s  account
+            as a consequence of the transaction.
+        payeeReceiveAmount:
+          allOf:
+            - $ref: '#/components/schemas/Money'
+          description: >-
+            The amount that will be credited to the receiving customer’s 
+            account as a consequence of the transaction.
+        fees:
+          allOf:
+            - $ref: '#/components/schemas/Money'
+          description: >-
+            The amount of fees that the paying customer will be charged as part
+            of the transaction.
+        payer:
+          allOf:
+            - $ref: '#/components/schemas/PartyIdInfo'
+          description: >-
+            Information about the Payer type, id, sub-type/id, FSP Id in the
+            proposed financial transaction.
+        payee:
+          allOf:
+            - $ref: '#/components/schemas/Party'
+          description: Information about the Payee in the proposed financial transaction.
+        transactionType:
+          $ref: '#/components/schemas/TransactionType'
+        expiration:
+          allOf:
+            - $ref: '#/components/schemas/DateTime'
+          description: >-
+            The time by which the transfer must be completed, set by the payee
+            DFSP.
+        extensionList:
+          $ref: '#/components/schemas/ExtensionList'
+      required:
+        - authorizationRequestId
+        - transactionRequestId
+        - challenge
+        - transferAmount
+        - payeeReceiveAmount
+        - fees
+        - payer
+        - payee
+        - transactionType
+        - expiration
+      additionalProperties: false
     SignedPayloadTypeFIDO:
       title: SignedPayloadTypeFIDO
       type: string
