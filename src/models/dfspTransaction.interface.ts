@@ -31,6 +31,7 @@ import { SDKOutgoingRequests } from '~/shared/sdk-outgoing-requests'
 import { BackendTransactionRequestContext, DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
 import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
 import { OutboundAPI as SDKOutboundAPI } from '@mojaloop/sdk-scheme-adapter'
+import { PubSub } from '~/shared/pub-sub'
 
 export type DFSPTransactionModelState =
   'start' |
@@ -68,7 +69,10 @@ export interface DFSPTransactionModelConfig extends PersistentModelConfig {
   dfspId: string
   thirdpartyRequests: ThirdpartyRequests
   sdkOutgoingRequests: SDKOutgoingRequests
-  dfspBackendRequests: DFSPBackendRequests
+  dfspBackendRequests: DFSPBackendRequests,
+  subscriber: PubSub,
+  transactionRequestAuthorizationTimeoutSeconds: number,
+  transactionRequestVerificationTimeoutSeconds: number,
 }
 
 export interface DFSPTransactionData extends StateData<DFSPTransactionModelState> {
@@ -92,8 +96,8 @@ export interface DFSPTransactionData extends StateData<DFSPTransactionModelState
   requestQuoteResponse?: SDKOutboundAPI.Schemas.quotesPostResponse
 
   // used by requestAuthorization & verifyAuthorization
-  requestAuthorizationPostRequest?: SDKOutboundAPI.Schemas.authorizationsPostRequest
-  requestAuthorizationResponse?: SDKOutboundAPI.Schemas.authorizationsPostResponse
+  requestAuthorizationPostRequest?: tpAPI.Schemas.ThirdpartyRequestsAuthorizationsPostRequest
+  requestAuthorizationResponse?: tpAPI.Schemas.ThirdpartyRequestsAuthorizationsIDPutResponse
 
   // used by requestTransfer
   // TODO: proper type for transferRequest

@@ -33,6 +33,7 @@ import { StateResponseToolkit } from '~/server/plugins/state'
 import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
 import { DFSPTransactionModel, create } from '~/models/dfspTransaction.model'
 import { DFSPTransactionModelConfig, DFSPTransactionData } from '~/models/dfspTransaction.interface'
+import config from '~/shared/config'
 
 /**
  * Handles a DFSP inbound POST /thirdpartyRequests/transaction request
@@ -51,6 +52,9 @@ async function post (
     logger: h.getLogger(),
     kvs: h.getKVS(),
     key: `dfspTransaction-${transactionRequest.transactionRequestId}`,
+    subscriber: h.getSubscriber(),
+    transactionRequestAuthorizationTimeoutSeconds: config.SHARED.DFSP_TRANSACTION_REQUEST_AUTHORIZATION_TIMEOUT_SECONDS,
+    transactionRequestVerificationTimeoutSeconds: config.SHARED.DFSP_TRANSACTION_REQUEST_AUTHORIZATION_TIMEOUT_SECONDS
   }
 
   setImmediate(async () => {

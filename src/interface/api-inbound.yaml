@@ -1143,6 +1143,141 @@ paths:
       tags:
         - thirdpartyRequests
         - sampled
+  '/thirdpartyRequests/authorizations/{ID}':
+    parameters:
+      - $ref: '#/components/parameters/ID'
+      - $ref: '#/components/parameters/Content-Type'
+      - $ref: '#/components/parameters/Date'
+      - $ref: '#/components/parameters/X-Forwarded-For'
+      - $ref: '#/components/parameters/FSPIOP-Source'
+      - $ref: '#/components/parameters/FSPIOP-Destination'
+      - $ref: '#/components/parameters/FSPIOP-Encryption'
+      - $ref: '#/components/parameters/FSPIOP-Signature'
+      - $ref: '#/components/parameters/FSPIOP-URI'
+      - $ref: '#/components/parameters/FSPIOP-HTTP-Method'
+    put:
+      description: >
+        The callback PUT /thirdpartyRequests/authorizations/{ID} is used to
+        inform the client of the
+
+        result of a previously-requested authorization. The ID in the URI should
+
+        contain the one that was used in the POST /authorizations/
+        requestBody.transactionRequestId @ OUTBOUND
+      operationId: PutThirdpartyRequestsAuthorizationsById
+      summary: PutThirdpartyRequestsAuthorizationsById
+      tags:
+        - authorizations
+      parameters:
+        - $ref: '#/components/parameters/Content-Length'
+      requestBody:
+        description: Signed authorization object
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: >-
+                    #/components/schemas/ThirdpartyRequestsAuthorizationsIDPutResponseFIDO
+                - $ref: >-
+                    #/components/schemas/ThirdpartyRequestsAuthorizationsIDPutResponseGeneric
+            example:
+              signedPayloadType: FIDO
+              signedPayload:
+                id: >-
+                  45c-TkfkjQovQeAWmOy-RLBHEJ_e4jYzQYgD8VdbkePgM5d98BaAadadNYrknxgH0jQEON8zBydLgh1EqoC9DA
+                rawId: >-
+                  45c+TkfkjQovQeAWmOy+RLBHEJ/e4jYzQYgD8VdbkePgM5d98BaAadadNYrknxgH0jQEON8zBydLgh1EqoC9DA==
+                response:
+                  authenticatorData: SZYN5YgOjGh0NBcPZHZgW4/krrmihjLHmVzzuoMdl2MBAAAACA==
+                  clientDataJSON: >-
+                    eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiQUFBQUFBQUFBQUFBQUFBQUFBRUNBdyIsIm9yaWdpbiI6Imh0dHA6Ly9sb2NhbGhvc3Q6NDIxODEiLCJjcm9zc09yaWdpbiI6ZmFsc2UsIm90aGVyX2tleXNfY2FuX2JlX2FkZGVkX2hlcmUiOiJkbyBub3QgY29tcGFyZSBjbGllbnREYXRhSlNPTiBhZ2FpbnN0IGEgdGVtcGxhdGUuIFNlZSBodHRwczovL2dvby5nbC95YWJQZXgifQ==
+                  signature: >-
+                    MEUCIDcJRBu5aOLJVc/sPyECmYi23w8xF35n3RNhyUNVwQ2nAiEA+Lnd8dBn06OKkEgAq00BVbmH87ybQHfXlf1Y4RJqwQ8=
+                type: public-key
+      responses:
+        '200':
+          $ref: '#/components/responses/200'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '405':
+          $ref: '#/components/responses/405'
+        '406':
+          $ref: '#/components/responses/406'
+        '501':
+          $ref: '#/components/responses/501'
+        '503':
+          $ref: '#/components/responses/503'
+  '/thirdpartyRequests/authorizations/{ID}/error':
+    parameters:
+      - $ref: '#/components/parameters/ID'
+      - $ref: '#/components/parameters/Content-Type'
+      - $ref: '#/components/parameters/Date'
+      - $ref: '#/components/parameters/X-Forwarded-For'
+      - $ref: '#/components/parameters/FSPIOP-Source'
+      - $ref: '#/components/parameters/FSPIOP-Destination'
+      - $ref: '#/components/parameters/FSPIOP-Encryption'
+      - $ref: '#/components/parameters/FSPIOP-Signature'
+      - $ref: '#/components/parameters/FSPIOP-URI'
+      - $ref: '#/components/parameters/FSPIOP-HTTP-Method'
+    put:
+      tags:
+        - thirdpartyRequests
+        - sampled
+      operationId: PutThirdpartyRequestsAuthorizationsByIdAndError
+      summary: PutThirdpartyRequestsAuthorizationsByIdAndError
+      description: >
+        The HTTP request `PUT /thirdpartyRequests/authorizations/{ID}/error` is
+        used by the DFSP or PISP to inform
+
+        the other party that something went wrong with a Thirdparty Transaction
+        Authorization Request.
+
+
+        The PISP may use this to tell the DFSP that the Thirdparty Transaction
+        Authorization Request is invalid or doesn't
+
+        match a `transactionRequestId`.
+
+
+        The DFSP may use this to tell the PISP that the signed challenge
+        returned in `PUT /thirdpartyRequest/authorizations/{ID}`
+
+        was invalid.
+      parameters:
+        - $ref: '#/components/parameters/Content-Length'
+      requestBody:
+        description: Error information returned.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ErrorInformationObject'
+      responses:
+        '200':
+          $ref: '#/components/responses/200'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '405':
+          $ref: '#/components/responses/405'
+        '406':
+          $ref: '#/components/responses/406'
+        '501':
+          $ref: '#/components/responses/501'
+        '503':
+          $ref: '#/components/responses/503'
   '/thirdpartyRequests/transactions/{ID}/authorizations':
     parameters:
       - $ref: '#/components/parameters/ID'
@@ -3400,6 +3535,32 @@ components:
         - amount
         - transactionType
         - expiration
+    SignedPayloadTypeFIDO:
+      title: SignedPayloadTypeFIDO
+      type: string
+      enum:
+        - FIDO
+      description: Describes a challenge that has been signed with FIDO Attestation flows
+    ThirdpartyRequestsAuthorizationsIDPutResponseFIDO:
+      title: ThirdpartyRequestsAuthorizationsIDPutResponseFIDO
+      type: object
+      description: >-
+        The object sent in the PUT /thirdpartyRequests/authorizations/{ID}
+        callback.
+      properties:
+        signedPayloadType:
+          $ref: '#/components/schemas/SignedPayloadTypeFIDO'
+        signedPayload:
+          $ref: '#/components/schemas/FIDOPublicKeyCredentialAssertion'
+      required:
+        - signedPayloadType
+        - signedPayload
+    SignedPayloadTypeGeneric:
+      title: SignedPayloadTypeGeneric
+      type: string
+      enum:
+        - GENERIC
+      description: Describes a challenge that has been signed with a private key
     BinaryString:
       type: string
       pattern: '^[A-Za-z0-9-_]+[=]{0,2}$'
@@ -3409,6 +3570,20 @@ components:
         ‘=’) is added at the end of the data if needed to ensure that the string
         is a multiple of 4 characters. The length restriction indicates the
         allowed number of characters.
+    ThirdpartyRequestsAuthorizationsIDPutResponseGeneric:
+      title: ThirdpartyRequestsAuthorizationsIDPutResponseGeneric
+      type: object
+      description: >-
+        The object sent in the PUT /thirdpartyRequests/authorizations/{ID}
+        callback.
+      properties:
+        signedPayloadType:
+          $ref: '#/components/schemas/SignedPayloadTypeGeneric'
+        signedPayload:
+          $ref: '#/components/schemas/BinaryString'
+      required:
+        - signedPayloadType
+        - authenticationValue
     ThirdpartyRequestsTransactionsIDAuthorizationsPutResponse:
       title: ThirdpartyRequestsTransactionsIDAuthorizationsPutResponse
       type: object

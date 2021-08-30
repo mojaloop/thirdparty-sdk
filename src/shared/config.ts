@@ -96,7 +96,9 @@ export interface ServiceConfig {
     DFSP_BACKEND_VERIFY_CONSENT_PATH: string
     DFSP_BACKEND_VALIDATE_THIRDPARTY_TRANSACTION_REQUEST: string
     DFSP_BACKEND_GET_USER_ACCOUNTS_PATH: string
-    DFSP_BACKEND_STORE_VALIDATED_CONSENT_FOR_ACCOUNT_ID_PATH: string
+    DFSP_BACKEND_STORE_VALIDATED_CONSENT_FOR_ACCOUNT_ID_PATH: string,
+    DFSP_TRANSACTION_REQUEST_AUTHORIZATION_TIMEOUT_SECONDS: number
+    DFSP_TRANSACTION_REQUEST_VERIFICATION_TIMEOUT_SECONDS: number
     PISP_BACKEND_URI: string
     PISP_BACKEND_HTTP_SCHEME: string
     PISP_BACKEND_SIGN_AUTHORIZATION_PATH: string
@@ -352,6 +354,16 @@ export const ConvictConfig = Convict<ServiceConfig>({
       doc: 'path use by DFSPBackendRequests.storeValidatedConsentForAccountId',
       format: '*',
       default: 'store/consent'
+    },
+    DFSP_TRANSACTION_REQUEST_AUTHORIZATION_TIMEOUT_SECONDS: {
+      doc: 'Timeout for the DFSP waiting on the PISP response to POST /thirdpartyRequests/authorization',
+      format: 'nat',
+      default: 100
+    },
+    DFSP_TRANSACTION_REQUEST_VERIFICATION_TIMEOUT_SECONDS: {
+      doc: 'Timeout for the DFSP waiting on the Auth-Service response to POST /thirdpartyRequests/verifications',
+      format: 'nat',
+      default: 15
     },
     PISP_BACKEND_URI: {
       doc: 'host address of DFSP\'s ',
