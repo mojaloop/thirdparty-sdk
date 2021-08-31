@@ -123,7 +123,6 @@ jest.mock('@mojaloop/sdk-standard-components', () => {
   return {
     MojaloopRequests: jest.fn(() => ({
       getParties: jest.fn(() => Promise.resolve(partyLookupResponse)),
-      putAuthorizations: jest.fn(() => Promise.resolve(approveResponse))
     })),
     ThirdpartyRequests: jest.fn(() => ({
       postAuthorizations: jest.fn(() => Promise.resolve(putResponse)),
@@ -134,6 +133,7 @@ jest.mock('@mojaloop/sdk-standard-components', () => {
       postConsentRequests: jest.fn(() => Promise.resolve(mockData.consentRequestsPut.payload)),
       getServices: jest.fn(() => Promise.resolve(mockData.putServicesByServiceTypeRequest.payload)),
       putConsents: jest.fn(() => Promise.resolve(mockData.inboundConsentsVerifiedPatchRequest.payload)),
+      putThirdpartyRequestsAuthorizations: jest.fn(() => Promise.resolve(approveResponse)),
     })),
     WSO2Auth: jest.fn(),
     Logger: {
@@ -393,14 +393,17 @@ describe('Outbound API routes', (): void => {
       },
       payload: {
         authorizationResponse: {
-          authenticationInfo: {
-            authentication: 'U2F',
-            authenticationValue: {
-              pinValue: 'xxxxxxxxxxx',
-              counter: '1'
-            }
-          },
-          responseType: 'ENTERED'
+          signedPayloadType: 'FIDO',
+          signedPayload: {
+            id: '45c-TkfkjQovQeAWmOy-RLBHEJ_e4jYzQYgD8VdbkePgM5d98BaAadadNYrknxgH0jQEON8zBydLgh1EqoC9DA',
+            rawId: '45c+TkfkjQovQeAWmOy+RLBHEJ/e4jYzQYgD8VdbkePgM5d98BaAadadNYrknxgH0jQEON8zBydLgh1EqoC9DA==',
+            response: {
+              authenticatorData: 'SZYN5YgOjGh0NBcPZHZgW4/krrmihjLHmVzzuoMdl2MBAAAACA==',
+              clientDataJSON: 'eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiQUFBQUFBQUFBQUFBQUFBQUFBRUNBdyIsIm9yaWdpbiI6Imh0dHA6Ly9sb2NhbGhvc3Q6NDIxODEiLCJjcm9zc09yaWdpbiI6ZmFsc2UsIm90aGVyX2tleXNfY2FuX2JlX2FkZGVkX2hlcmUiOiJkbyBub3QgY29tcGFyZSBjbGllbnREYXRhSlNPTiBhZ2FpbnN0IGEgdGVtcGxhdGUuIFNlZSBodHRwczovL2dvby5nbC95YWJQZXgifQ==',
+              signature: 'MEUCIDcJRBu5aOLJVc/sPyECmYi23w8xF35n3RNhyUNVwQ2nAiEA+Lnd8dBn06OKkEgAq00BVbmH87ybQHfXlf1Y4RJqwQ8='
+            },
+            type: 'public-key'
+          }
         }
       }
     }
@@ -415,11 +418,11 @@ describe('Outbound API routes', (): void => {
       approveResponse as unknown as Message
     ), 10)
     const response = await server.inject(request)
-    expect(response.statusCode).toBe(200)
     expect(response.result).toEqual({
       transactionStatus: { ...approveResponse },
       currentState: 'transactionStatusReceived'
     })
+    expect(response.statusCode).toBe(200)
   })
 
   it('/linking/providers - success', async (): Promise<void> => {
