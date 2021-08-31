@@ -80,7 +80,7 @@ describe('pipsTransactionModel', () => {
 
   beforeEach(async () => {
     let subId = 0
-    const handlers: {[key: string]: NotificationCallback } = {}
+    const handlers: { [key: string]: NotificationCallback } = {}
 
     publisher = new PubSub(connectionConfig)
     await publisher.connect()
@@ -128,7 +128,7 @@ describe('pipsTransactionModel', () => {
     await modelConfig.subscriber.disconnect()
   })
 
-  function checkPTMLayout (ptm: PISPTransactionModel, optData?: PISPTransactionData) {
+  function checkPTMLayout(ptm: PISPTransactionModel, optData?: PISPTransactionData) {
     expect(ptm).toBeTruthy()
     expect(ptm.data).toBeDefined()
     expect(ptm.fsm.state).toEqual(optData?.currentState || 'start')
@@ -279,15 +279,15 @@ describe('pipsTransactionModel', () => {
         transferAmount: {
           amount: '100',
           currency: 'USD'
-            },
+        },
         payeeReceiveAmount: {
           amount: '99',
           currency: 'USD'
-            },
+        },
         fees: {
           amount: '1',
           currency: 'USD'
-            },
+        },
         payee: {
           partyIdInfo: {
             partyIdType: 'MSISDN',
@@ -299,14 +299,15 @@ describe('pipsTransactionModel', () => {
           partyIdType: 'THIRD_PARTY_LINK',
           partyIdentifier: 'qwerty-123456',
           fspId: 'dfspa'
-            },
+        },
         transactionType: {
           scenario: 'TRANSFER',
           initiator: 'PAYER',
           initiatorType: 'CONSUMER'
-            },
+        },
         expiration: '2020-06-15T12:00:00.000Z'
-          }
+      }
+      
       const transactionStatus: tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPutResponse = {
         transactionId,
         transactionRequestState: 'RECEIVED'
@@ -447,6 +448,41 @@ describe('pipsTransactionModel', () => {
     describe('Approve Transaction Phase', () => {
       let data: PISPTransactionData
       let channel: string
+      const authorizationRequest: tpAPI.Schemas.ThirdpartyRequestsAuthorizationsPostRequest = {
+        authorizationRequestId: '5f8ee7f9-290f-4e03-ae1c-1e81ecf398df',
+        transactionRequestId: '2cf08eed-3540-489e-85fa-b2477838a8c5',
+        challenge: '<base64 encoded binary - the encoded challenge>',
+        transferAmount: {
+          amount: '100',
+          currency: 'USD'
+        },
+        payeeReceiveAmount: {
+          amount: '99',
+          currency: 'USD'
+        },
+        fees: {
+          amount: '1',
+          currency: 'USD'
+        },
+        payee: {
+          partyIdInfo: {
+            partyIdType: 'MSISDN',
+            partyIdentifier: '+4412345678',
+            fspId: 'dfspb',
+          }
+        },
+        payer: {
+          partyIdType: 'THIRD_PARTY_LINK',
+          partyIdentifier: 'qwerty-123456',
+          fspId: 'dfspa'
+        },
+        transactionType: {
+          scenario: 'TRANSFER',
+          initiator: 'PAYER',
+          initiatorType: 'CONSUMER'
+        },
+        expiration: '2020-06-15T12:00:00.000Z'
+      }
 
       const authorizationResponse: tpAPI.Schemas.ThirdpartyRequestsAuthorizationsIDPutResponseFIDO = {
         signedPayloadType: 'FIDO',
@@ -502,6 +538,7 @@ describe('pipsTransactionModel', () => {
             },
             expiration: 'expiration'
           },
+          authorizationRequest,
           approveRequest: {
             authorizationResponse
           }
@@ -554,8 +591,8 @@ describe('pipsTransactionModel', () => {
 
         // check we made a call to thirdpartyRequests.putThirdpartyRequestsAuthorizations
         expect(modelConfig.thirdpartyRequests.putThirdpartyRequestsAuthorizations).toBeCalledWith(
-          data.transactionRequestId,
           authorizationResponse,
+          data.authorizationRequest?.authorizationRequestId,
           data.initiateRequest?.payer.fspId
         )
       })
