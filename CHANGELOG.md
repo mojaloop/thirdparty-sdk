@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+## [11.49.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.48.0...v11.49.0) (2021-08-31)
+
+
+### Features
+
+* **pisp-transaction:** handle outbound put authorization ([#119](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/119)) ([7d6e6d8](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/7d6e6d89b9066e25acfd7ed68e2b9ab754189ef6))
+
 ## [11.48.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.47.0...v11.48.0) (2021-08-30)
 
 
