@@ -146,7 +146,7 @@
   {
     "ruleId": 4,
     "priority": 1,
-    "description": "put /authorizations/{ID}",
+    "description": "put /thirdpartyRequests/authorizations/{ID}",
     "apiVersion": {
       "minorVersion": 1,
       "majorVersion": 0,
@@ -158,7 +158,7 @@
         {
           "fact": "operationPath",
           "operator": "equal",
-          "value": "/authorizations/{ID}"
+          "value": "/thirdpartyRequests/authorizations/{ID}"
         },
         {
           "fact": "method",
@@ -178,9 +178,7 @@
             "",
             "const userConfig = JSON.parse(pm.globals.get('userConfig'))",
             "const curDate = (new Date()).toUTCString();",
-            "const transactionRequestId = pm.request.url.path[1]",
-            "console.log('transactionRequestId:'+transactionRequestId)",
-            "const url = 'http://inbound-thirdparty-scheme-adapter:4005/thirdpartyRequests/transactions/' + transactionRequestId",
+            "const url = 'http://inbound-thirdparty-scheme-adapter:4005/thirdpartyRequests/transactions/b51ec534-ee48-4575-b6a9-ead2955b8069'",
             "console.log('url:'+ url)",
             "const patchThirdpartyRequestIDTransactionReq = {",
             "  url,",

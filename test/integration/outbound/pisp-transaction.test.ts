@@ -32,7 +32,7 @@ describe('PISP Transaction', (): void => {
           partyIdType: 'MSISDN',
           partyIdentifier: '4412345678'
         },
-        transactionRequestId: transactionRequestId
+        transactionRequestId
       }
       // be sure we disable guard
       await kvs.del(transactionRequestId)
@@ -78,21 +78,30 @@ describe('PISP Transaction', (): void => {
       const approveURI = `${env.outbound.baseUri}/thirdpartyTransaction/${transactionRequestId}/approve`
       const approveRequest = {
         authorizationResponse: {
-          authenticationInfo: {
-            authentication: 'U2F',
-            authenticationValue: {
-              pinValue: 'xxxxxxxxxxx',
-              counter: '1'
-            }
-          },
-          responseType: 'ENTERED'
+          signedPayloadType: 'FIDO',
+          signedPayload: {
+            id: '45c-TkfkjQovQeAWmOy-RLBHEJ_e4jYzQYgD8VdbkePgM5d98BaAadadNYrknxgH0jQEON8zBydLgh1EqoC9DA',
+            rawId: '45c+TkfkjQovQeAWmOy+RLBHEJ/e4jYzQYgD8VdbkePgM5d98BaAadadNYrknxgH0jQEON8zBydLgh1EqoC9DA==',
+            response: {
+              authenticatorData: 'SZYN5YgOjGh0NBcPZHZgW4/krrmihjLHmVzzuoMdl2MBAAAACA==',
+              clientDataJSON: 'eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiQUFBQUFBQUFBQUFBQUFBQUFBRUNBdyIsIm9yaWdpbiI6Imh0dHA6Ly9sb2NhbGhvc3Q6NDIxODEiLCJjcm9zc09yaWdpbiI6ZmFsc2UsIm90aGVyX2tleXNfY2FuX2JlX2FkZGVkX2hlcmUiOiJkbyBub3QgY29tcGFyZSBjbGllbnREYXRhSlNPTiBhZ2FpbnN0IGEgdGVtcGxhdGUuIFNlZSBodHRwczovL2dvby5nbC95YWJQZXgifQ==',
+              signature: 'MEUCIDcJRBu5aOLJVc/sPyECmYi23w8xF35n3RNhyUNVwQ2nAiEA+Lnd8dBn06OKkEgAq00BVbmH87ybQHfXlf1Y4RJqwQ8='
+            },
+            type: 'public-key'
+          }
         }
       }
+    
       // send approve with signed authorization and wait for transfer to complete
-      const approveResponse = await axios.post(approveURI, approveRequest)
-      expect(approveResponse.status).toEqual(200)
-      expect(approveResponse.data.currentState).toEqual('transactionStatusReceived')
-      expect(approveResponse.data.transactionStatus.transactionRequestState).toEqual('ACCEPTED')
+      try {
+        const approveResponse = await axios.post(approveURI, approveRequest)
+
+        expect(approveResponse.status).toEqual(200)
+        expect(approveResponse.data.currentState).toEqual('transactionStatusReceived')
+        expect(approveResponse.data.transactionStatus.transactionRequestState).toEqual('ACCEPTED')
+      } catch (err) {
+        console.log('err', err.response)
+      }
     })
   })
 })

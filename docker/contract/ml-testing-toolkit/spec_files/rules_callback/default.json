@@ -125,7 +125,7 @@
     },
     "event": {
       "method": "post",
-      "path": "/authorizations",
+      "path": "/thirdpartyRequests/authorizations",
       "params": {
         "headers": {
           "Accept": "application/vnd.interoperability.authorizations+json;version=1.0",
@@ -134,47 +134,39 @@
           "FSPIOP-Source": "DFSPA"
         },
         "body": {
-          "authenticationType": "U2F",
-          "retriesLeft": "1",
-          "amount": {
-            "currency": "USD",
-            "amount": "124.45"
+          "authorizationRequestId": "5f8ee7f9-290f-4e03-ae1c-1e81ecf398df",
+          "transactionRequestId": "b51ec534-ee48-4575-b6a9-ead2955b8069",
+          "challenge": "<base64 encoded binary - the encoded challenge>",
+          "transferAmount": {
+            "amount": "100",
+            "currency": "USD"
           },
-          "transactionId": "2f169631-ef99-4cb1-96dc-91e8fc08f539",
-          "transactionRequestId": "{$request.body.transactionRequestId}",
-          "quote": {
-            "transferAmount": {
-              "currency": "USD",
-              "amount": "124.45"
-            },
-            "payeeReceiveAmount": {
-              "currency": "USD",
-              "amount": "123.45"
-            },
-            "payeeFspFee": {
-              "currency": "USD",
-              "amount": "1"
-            },
-            "payeeFspCommission": {
-              "currency": "USD",
-              "amount": "0"
-            },
-            "expiration": "2020-08-24T08:38:08.699-04:00",
-            "geoCode": {
-              "latitude": "+45.4215",
-              "longitude": "+75.6972"
-            },
-            "ilpPacket": "AYIBgQAAAAAAAASwNGxldmVsb25lLmRmc3AxLm1lci45T2RTOF81MDdqUUZ",
-            "condition": "f5sqb7tBTWPd5Y8BDFdMm9BJR_MNI4isf8p8n4D5pHA",
-            "extensionList": {
-              "extension": [
-                {
-                  "key": "errorDescription",
-                  "value": "This is a more detailed error description"
-                }
-              ]
+          "payeeReceiveAmount": {
+            "amount": "99",
+            "currency": "USD"
+          },
+          "fees": {
+            "amount": "1",
+            "currency": "USD"
+          },
+          "payee": {
+            "partyIdInfo": {
+              "partyIdType": "MSISDN",
+              "partyIdentifier": "+4412345678",
+              "fspId": "dfspb"
             }
-          }
+          },
+          "payer": {
+            "partyIdType": "THIRD_PARTY_LINK",
+            "partyIdentifier": "qwerty-123456",
+            "fspId": "dfspa"
+          },
+          "transactionType": {
+            "scenario": "TRANSFER",
+            "initiator": "PAYER",
+            "initiatorType": "CONSUMER"
+          },
+          "expiration": "2020-06-15T12:00:00.000Z"
         },
         "scripts": {
           "exec": [
