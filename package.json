@@ -40,7 +40,7 @@
     "test:bdd": "jest --config './jest.bdd.config.js' --runInBand --testMatch '**/test/step-definitions/**/*.step.ts'",
     "test:coverage": "jest --coverage  --testMatch '**/test/unit/**/*.(test|spec).ts'",
     "test:coverage-check": "jest -w 1 --coverage --testMatch '**/test/unit/**/*.(test|spec).ts'",
-    "test:integration": "jest --config './jest.integration.config.js' --testMatch '**/test/integration/**/*.(test|spec).ts'",
+    "test:integration": "jest --config './jest.integration.config.js' --testMatch '**/test/integration/**/*.(test|spec).ts' --runInBand",
     "test:unit": "jest -w 1 --coverageThreshold='{}' --testMatch '**/test/unit/**/*.(test|spec).ts'",
     "updates:check": "npm-check-updates",
     "updates:update": "npm-check-updates -u && npm install",
