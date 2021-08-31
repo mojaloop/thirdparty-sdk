@@ -95,11 +95,11 @@ describe('pipsTransactionModel', () => {
       subscriber: new PubSub(connectionConfig),
       logger: connectionConfig.logger,
       thirdpartyRequests: {
-        postThirdpartyRequestsTransactions: jest.fn(() => Promise.resolve({ statusCode: 202 }))
+        postThirdpartyRequestsTransactions: jest.fn(() => Promise.resolve({ statusCode: 202 })),
+        putThirdpartyRequestsAuthorizations: jest.fn(() => Promise.resolve({ statusCode: 202 }))
       } as unknown as ThirdpartyRequests,
       mojaloopRequests: {
         getParties: jest.fn(() => Promise.resolve({ statusCode: 202 })),
-        putAuthorizations: jest.fn(() => Promise.resolve({ statusCode: 202 }))
       } as unknown as MojaloopRequests,
       sdkOutgoingRequests: {
         requestPartiesInformation: jest.fn(() => Promise.resolve({
@@ -272,25 +272,41 @@ describe('pipsTransactionModel', () => {
       let channelAuthPost: string
       const transactionRequestId = v4()
       const transactionId = v4()
-      const authorizationRequest: tpAPI.Schemas.AuthorizationsPostRequest = {
-        transactionRequestId,
-        transactionId: transactionId,
-        authenticationType: 'U2F',
-        retriesLeft: '1',
-        amount: {
-          amount: '123.00',
+      const authorizationRequest: tpAPI.Schemas.ThirdpartyRequestsAuthorizationsPostRequest = {
+        authorizationRequestId: '5f8ee7f9-290f-4e03-ae1c-1e81ecf398df',
+        transactionRequestId: '2cf08eed-3540-489e-85fa-b2477838a8c5',
+        challenge: '<base64 encoded binary - the encoded challenge>',
+        transferAmount: {
+          amount: '100',
           currency: 'USD'
+            },
+        payeeReceiveAmount: {
+          amount: '99',
+          currency: 'USD'
+            },
+        fees: {
+          amount: '1',
+          currency: 'USD'
+            },
+        payee: {
+          partyIdInfo: {
+            partyIdType: 'MSISDN',
+            partyIdentifier: '+4412345678',
+            fspId: 'dfspb',
+          }
         },
-        quote: {
-          transferAmount: {
-            amount: '123.00',
-            currency: 'USD'
-          },
-          expiration: 'quote-expiration',
-          ilpPacket: 'quote-ilp-packet',
-          condition: 'quote-condition'
-        }
-      }
+        payer: {
+          partyIdType: 'THIRD_PARTY_LINK',
+          partyIdentifier: 'qwerty-123456',
+          fspId: 'dfspa'
+            },
+        transactionType: {
+          scenario: 'TRANSFER',
+          initiator: 'PAYER',
+          initiatorType: 'CONSUMER'
+            },
+        expiration: '2020-06-15T12:00:00.000Z'
+          }
       const transactionStatus: tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPutResponse = {
         transactionId,
         transactionRequestState: 'RECEIVED'
@@ -328,7 +344,7 @@ describe('pipsTransactionModel', () => {
               initiatorType: 'BUSINESS'
             },
             expiration: 'expiration'
-          }
+          },
         }
         channelTransPut = PISPTransactionModel.notificationChannel(
           PISPTransactionPhase.waitOnTransactionPut,
@@ -432,15 +448,18 @@ describe('pipsTransactionModel', () => {
       let data: PISPTransactionData
       let channel: string
 
-      const authorizationResponse: tpAPI.Schemas.AuthorizationsIDPutResponse = {
-        authenticationInfo: {
-          authentication: 'U2F',
-          authenticationValue: {
-            pinValue: 'pin-value',
-            counter: '1'
-          } as fspiopAPI.Schemas.AuthenticationValue
-        },
-        responseType: 'ENTERED'
+      const authorizationResponse: tpAPI.Schemas.ThirdpartyRequestsAuthorizationsIDPutResponseFIDO = {
+        signedPayloadType: 'FIDO',
+        signedPayload: {
+          id: '45c-TkfkjQovQeAWmOy-RLBHEJ_e4jYzQYgD8VdbkePgM5d98BaAadadNYrknxgH0jQEON8zBydLgh1EqoC9DA',
+          rawId: '45c+TkfkjQovQeAWmOy+RLBHEJ/e4jYzQYgD8VdbkePgM5d98BaAadadNYrknxgH0jQEON8zBydLgh1EqoC9DA==',
+          response: {
+            authenticatorData: 'SZYN5YgOjGh0NBcPZHZgW4/krrmihjLHmVzzuoMdl2MBAAAACA==',
+            clientDataJSON: 'eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiQUFBQUFBQUFBQUFBQUFBQUFBRUNBdyIsIm9yaWdpbiI6Imh0dHA6Ly9sb2NhbGhvc3Q6NDIxODEiLCJjcm9zc09yaWdpbiI6ZmFsc2UsIm90aGVyX2tleXNfY2FuX2JlX2FkZGVkX2hlcmUiOiJkbyBub3QgY29tcGFyZSBjbGllbnREYXRhSlNPTiBhZ2FpbnN0IGEgdGVtcGxhdGUuIFNlZSBodHRwczovL2dvby5nbC95YWJQZXgifQ==',
+            signature: 'MEUCIDcJRBu5aOLJVc/sPyECmYi23w8xF35n3RNhyUNVwQ2nAiEA+Lnd8dBn06OKkEgAq00BVbmH87ybQHfXlf1Y4RJqwQ8='
+          },
+          type: 'public-key'
+        }
       }
 
       const transactionStatus: tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPatchResponse = {
@@ -533,8 +552,8 @@ describe('pipsTransactionModel', () => {
           currentState: 'transactionStatusReceived'
         })
 
-        // check we made a call to mojaloopRequest.putAuthorizations
-        expect(modelConfig.mojaloopRequests.putAuthorizations).toBeCalledWith(
+        // check we made a call to thirdpartyRequests.putThirdpartyRequestsAuthorizations
+        expect(modelConfig.thirdpartyRequests.putThirdpartyRequestsAuthorizations).toBeCalledWith(
           data.transactionRequestId,
           authorizationResponse,
           data.initiateRequest?.payer.fspId
@@ -542,9 +561,9 @@ describe('pipsTransactionModel', () => {
       })
 
       it('should handle error', async () => {
-        mocked(modelConfig.mojaloopRequests.putAuthorizations).mockImplementationOnce(
+        mocked(modelConfig.thirdpartyRequests.putThirdpartyRequestsAuthorizations).mockImplementationOnce(
           () => {
-            throw new Error('mocked putAuthorization exception')
+            throw new Error('mocked putThirdpartyRequestsAuthorizations exception')
           }
         )
         const model = await create(data, modelConfig)
@@ -553,7 +572,7 @@ describe('pipsTransactionModel', () => {
           await model.run()
           shouldNotBeExecuted()
         } catch (err) {
-          expect(err.message).toEqual('mocked putAuthorization exception')
+          expect(err.message).toEqual('mocked putThirdpartyRequestsAuthorizations exception')
         }
 
         // check that correct subscription has been done
