@@ -93,7 +93,7 @@
     "@mojaloop/central-services-health": "^13.0.0",
     "@mojaloop/central-services-shared": "^13.0.5",
     "@mojaloop/sdk-scheme-adapter": "^11.16.2",
-    "@mojaloop/sdk-standard-components": "^15.11.0",
+    "@mojaloop/sdk-standard-components": "^15.13.0",
     "@types/axios": "^0.14.0",
     "@types/convict": "^5.2.2",
     "@types/crypto-js": "^4.0.1",

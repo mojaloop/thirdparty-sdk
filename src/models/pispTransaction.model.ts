@@ -248,6 +248,7 @@ export class PISPTransactionModel
     InvalidDataError.throwIfInvalidProperty(this.data, 'payeeRequest')
     InvalidDataError.throwIfInvalidProperty(this.data, 'initiateRequest')
     InvalidDataError.throwIfInvalidProperty(this.data, 'approveRequest')
+    InvalidDataError.throwIfInvalidProperty(this.data, 'authorizationRequest')
 
     const channel = PISPTransactionModel.notificationChannel(
       PISPTransactionPhase.approval,
@@ -258,14 +259,13 @@ export class PISPTransactionModel
 
     return deferredJob(this.subscriber, channel)
       .init(async (): Promise<void> => {
-        // TODO: change to use the thirdpartyRequests/authorizations call
-        const res = await this.mojaloopRequests.putAuthorizations(
-          this.data.transactionRequestId!,
-          // propagate signed challenge
+        const res = await this.thirdpartyRequests.putThirdpartyRequestsAuthorizations(
           this.data.approveRequest!.authorizationResponse,
+          // propagate signed challenge
+          this.data.authorizationRequest!.authorizationRequestId,
           this.data.initiateRequest!.payer.fspId!
         )
-        this.logger.push({ res }).info('ThirdpartyRequests.postThirdpartyRequestsTransactions request sent to peer')
+        this.logger.push({ res }).info('ThirdpartyRequests.putThirdpartyRequestsAuthorizations request sent to peer')
       })
       .job(async (message: Message): Promise<void> => {
         this.data.transactionStatusPatch = {
