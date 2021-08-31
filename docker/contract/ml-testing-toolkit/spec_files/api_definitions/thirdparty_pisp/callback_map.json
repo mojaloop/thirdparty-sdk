@@ -4,8 +4,8 @@
       "fspid": "{$request.headers.fspiop-source}",
       "successCallback": {
         "method": "post",
-        "path": "/authorizations",
-        "pathPattern": "/authorizations",
+        "path": "/thirdpartyRequests/authorizations",
+        "pathPattern": "/thirdpartyRequests/authorizations",
         "headerOverride": {
           "FSPIOP-Source": "{$config.FSPID}",
           "FSPIOP-Destination": "{$request.headers.fspiop-source}",
@@ -15,8 +15,8 @@
       },
       "errorCallback": {
         "method": "post",
-        "path": "/authorizations",
-        "pathPattern": "/authorizations",
+        "path": "/thirdpartyRequests/authorizations",
+        "pathPattern": "/thirdpartyRequests/authorizations",
         "headerOverride": {
           "FSPIOP-Source": "{$config.FSPID}",
           "FSPIOP-Destination": "{$request.headers.fspiop-source}",
@@ -80,7 +80,7 @@
       }
     }
   },
-  "/authorizations/{ID}": {
+  "/thirdpartyRequests/authorizations/{ID}": {
     "put": {
       "fspid": "{$request.headers.fspiop-source}",
       "successCallback": {

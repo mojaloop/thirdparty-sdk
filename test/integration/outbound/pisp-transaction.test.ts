@@ -32,7 +32,7 @@ describe('PISP Transaction', (): void => {
           partyIdType: 'MSISDN',
           partyIdentifier: '4412345678'
         },
-        transactionRequestId: transactionRequestId
+        transactionRequestId
       }
       // be sure we disable guard
       await kvs.del(transactionRequestId)
