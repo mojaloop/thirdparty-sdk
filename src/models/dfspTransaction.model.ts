@@ -318,6 +318,7 @@ export class DFSPTransactionModel
   async onVerifyAuthorization(): Promise<void> {
     try {
       InvalidDataError.throwIfInvalidProperty(this.data, 'requestAuthorizationResponse')
+      InvalidDataError.throwIfInvalidProperty(this.data.requestAuthorizationResponse!, 'signedPayload')
       InvalidDataError.throwIfInvalidProperty(this.data, 'transactionRequestContext')
 
       // TODO: talk to the auth-service with thirdpartyRequests/verifications!
@@ -332,6 +333,7 @@ export class DFSPTransactionModel
       )
 
       const signedPayloadType = this.data.requestAuthorizationResponse!.signedPayloadType
+      // help typescript to figure out what to do
       switch (signedPayloadType) {
         case 'FIDO': {
           const rar = this.data.requestAuthorizationResponse! as tpAPI.Schemas.ThirdpartyRequestsAuthorizationsIDPutResponseFIDO
@@ -349,7 +351,7 @@ export class DFSPTransactionModel
           this.data.requestVerificationPostRequest = {
             verificationRequestId,
             consentId: this.data.transactionRequestContext!.consentId,
-            signedPayload: rar.signedPayload,
+            signedPayload: rar.signedPayload!,
             signedPayloadType: 'GENERIC',
             challenge: '12345'
           }
@@ -382,6 +384,33 @@ export class DFSPTransactionModel
 
             this.logger.info(`received ${putResponse} from PISP`)
             this.data.requestVerificationResponse = putResponse
+
+            this.data.transferId = uuidv4()
+
+            // AuthService has approved, prepare transfer request
+            const tr = this.data.transactionRequestRequest
+            const quote = this.data.requestQuoteResponse!.quotes
+            this.data.transactionRequestState = 'ACCEPTED'
+
+            this.data.transferRequest = {
+              fspId: this.config.dfspId,
+              transfersPostRequest: {
+                transferId: this.data.transferId!,
+
+                // payee & payer data from /thirdpartyRequests/transaction
+                payeeFsp: tr.payee.partyIdInfo.fspId!,
+                payerFsp: this.config.dfspId,
+
+                // transfer data from quote response
+                amount: { ...quote.transferAmount },
+                ilpPacket: quote.ilpPacket,
+                condition: quote.condition,
+
+                // TODO: investigate recalculation of expiry...
+                expiration:
+                  tr.expiration
+              }
+            }
           } catch (error) {
             this.logger.push(error).error('ThirdpartyRequests.postThirdpartyRequestsVerifications request error')
             return Promise.reject(error)
@@ -404,93 +433,6 @@ export class DFSPTransactionModel
 
       throw Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_AUTHORIZATION_UNEXPECTED
     }
-
-
-
-
-
-
-    this.data.transferId = uuidv4()
-
-    const tr = this.data.transactionRequestRequest
-    const quote = this.data.requestQuoteResponse!.quotes
-    this.data.transactionRequestState = 'ACCEPTED'
-
-    // prepare transfer request
-    this.data.transferRequest = {
-      fspId: this.config.dfspId,
-      transfersPostRequest: {
-        transferId: this.data.transferId!,
-
-        // payee & payer data from /thirdpartyRequests/transaction
-        payeeFsp: tr.payee.partyIdInfo.fspId!,
-        payerFsp: this.config.dfspId,
-
-        // transfer data from quote response
-        amount: { ...quote.transferAmount },
-        ilpPacket: quote.ilpPacket,
-        condition: quote.condition,
-
-        // TODO: investigate recalculation of expiry...
-        expiration:
-          tr.expiration
-      }
-    }
-
-    // different actions on responseType
-    // switch (authorizationInfo.responseType) {
-    //   case 'ENTERED': {
-    //     // user accepted quote & transfer details
-    //     // let verify entered signed challenge by DFSP backend
-    //     const result = await this.dfspBackendRequests.verifyAuthorization(authorizationInfo)
-
-    //     if (!(result && result.isValid)) {
-    //       throw Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_AUTHORIZATION_NOT_VALID
-    //     }
-
-    //     // user's challenge has been successfully verified
-    //     this.data.transactionRequestState = 'ACCEPTED'
-
-    //     // TODO: to have or not to have transferId - what has been passed to quote - investigate!!!
-    //     this.data.transferId = uuidv4()
-
-    //     const tr = this.data.transactionRequestRequest
-    //     const quote = this.data.requestQuoteResponse!.quotes
-    //     // prepare transfer request
-    //     this.data.transferRequest = {
-    //       fspId: this.config.dfspId,
-    //       transfersPostRequest: {
-    //         transferId: this.data.transferId!,
-
-    //         // payee & payer data from /thirdpartyRequests/transaction
-    //         payeeFsp: tr.payee.partyIdInfo.fspId!,
-    //         payerFsp: this.config.dfspId,
-
-    //         // transfer data from quote response
-    //         amount: { ...quote.transferAmount },
-    //         ilpPacket: quote.ilpPacket,
-    //         condition: quote.condition,
-
-    //         // TODO: investigate recalculation of expiry...
-    //         expiration: tr.expiration
-    //       }
-
-    //     }
-    //     break
-    //   }
-
-    //   case 'REJECTED': {
-    //     // user rejected authorization so transfer is declined, let abort workflow!
-    //     this.data.transactionRequestState = 'REJECTED'
-    //     throw Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_AUTHORIZATION_REJECTED_BY_USER
-    //   }
-
-    //   default: {
-    //     // should we setup ??? this.data.transactionRequestState = 'REJECTED'
-    //     // we received 'RESEND' or something else...
-    //     throw Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_AUTHORIZATION_UNEXPECTED
-    //   }
-    // }
   }
 
   async onRequestTransfer(): Promise<void> {
