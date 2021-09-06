@@ -70,9 +70,11 @@ describe('DFSPTransactionModel', () => {
   let requestQuoteRequest: SDKOutboundAPI.Schemas.quotesPostRequest
   let requestQuoteResponse: SDKOutboundAPI.Schemas.quotesPostResponse
   let requestAuthorizationResponse: tpAPI.Schemas.ThirdpartyRequestsAuthorizationsIDPutResponse
+  let requestVerificationResponse: tpAPI.Schemas.ThirdpartyRequestsVerificationsIDPutResponse
   let requestTransferResponse: SDKOutboundAPI.Schemas.simpleTransfersPostResponse
   let transferRequest: SDKOutboundAPI.Schemas.simpleTransfersPostRequest
   let transferId: string
+
 
   beforeEach(async () => {
     modelConfig = {
@@ -85,8 +87,8 @@ describe('DFSPTransactionModel', () => {
         putThirdpartyRequestsTransactions: jest.fn(() => Promise.resolve({ statusCode: 200 })),
         patchThirdpartyRequestsTransactions: jest.fn(() => Promise.resolve({ statusCode: 200 })),
         putThirdpartyRequestsTransactionsError: jest.fn(() => Promise.resolve({ statusCode: 200 })),
-        // @ts-ignore - private function, will be resolved once I fix sdk-standard-components
-        _post: jest.fn(() => Promise.resolve({ statusCode: 202 }))
+        postThirdpartyRequestsAuthorizations: jest.fn(() => Promise.resolve({ statusCode: 200 })),
+        postThirdpartyRequestsVerifications: jest.fn(() => Promise.resolve({ statusCode: 200 })),
       } as unknown as ThirdpartyRequests,
       sdkOutgoingRequests: {
         requestQuote: jest.fn(() => Promise.resolve(requestQuoteResponse)),
@@ -161,6 +163,10 @@ describe('DFSPTransactionModel', () => {
         expiration: (new Date()).toISOString()
       },
       currentState: 'COMPLETED'
+    }
+
+    requestVerificationResponse = {
+      authenticationResponse: 'VERIFIED'
     }
 
     requestAuthorizationResponse = {
@@ -270,6 +276,7 @@ describe('DFSPTransactionModel', () => {
       
       // mock async callback(s)
       mockDeferredJobWithCallbackMessage('testAuthChannel', requestAuthorizationResponse)
+      mockDeferredJobWithCallbackMessage('testVerifyChannel', requestVerificationResponse)
 
       const data: DFSPTransactionData = {
         transactionRequestId,
@@ -398,10 +405,7 @@ describe('DFSPTransactionModel', () => {
 
       // onRequestAuthorization
       expect(model.data.requestAuthorizationPostRequest).toBeDefined()
-      // @ts-ignore - will be fixed with sdk-standard-components
-      expect(modelConfig.thirdpartyRequests._post).toBeCalledWith(
-        'thirdpartyRequests/authorizations',
-        'thirdparty',
+      expect(modelConfig.thirdpartyRequests.postThirdpartyRequestsAuthorizations).toBeCalledWith(
         model.data.requestAuthorizationPostRequest,
         model.data.participantId,
       )
@@ -413,12 +417,11 @@ describe('DFSPTransactionModel', () => {
       expect(model.data.requestAuthorizationResponse).toEqual(requestAuthorizationResponse)
 
       // onVerifyAuthorization
-      // check did we do proper call downstream
-      // TODO: remove this in favour of sdk-standard-components call
-      // Will be covered in next PR
-      // expect(model.dfspBackendRequests.verifyAuthorization).toHaveBeenCalledWith(
-      //   model.data.requestAuthorizationResponse!
-      // )
+      // check did we do proper call back to Switch
+      expect(modelConfig.thirdpartyRequests.postThirdpartyRequestsVerifications).toBeCalledWith(
+        model.data.requestVerificationPostRequest,
+        model.data.participantId,
+      )
 
       // check the setup of transferRequest
       expect(model.data.transferRequest).toBeDefined()
@@ -540,10 +543,8 @@ describe('DFSPTransactionModel', () => {
       mocked(modelConfig.kvs.set).mockImplementationOnce(() => Promise.resolve(true))
       mocked(modelConfig.thirdpartyRequests.putThirdpartyRequestsTransactionsError)
         .mockImplementationOnce(() => Promise.resolve(undefined))
-
-      // @ts-ignore - private function, will be resolved once I fix sdk-standard-components
-      mocked(modelConfig.thirdpartyRequests._post).mockImplementationOnce(
-        () => Promise.resolve({ statusCode: 202 })
+      mocked(modelConfig.thirdpartyRequests.postThirdpartyRequestsAuthorizations).mockImplementationOnce(
+        () => Promise.resolve(undefined)
       )
 
       // mock PUT /thirdpartyRequests/authorizations/{ID}/error callback

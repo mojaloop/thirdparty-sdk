@@ -31,7 +31,7 @@ const requestAuthorizationResponse = {
 }
 
 const requestVerificationResponse = {
-  authenticationResponse: 'verified'
+  authenticationResponse: 'VERIFIED'
 }
 
 // Mock deferredJob to inject our async callbacks
