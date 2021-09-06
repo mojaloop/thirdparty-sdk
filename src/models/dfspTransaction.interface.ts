@@ -100,7 +100,7 @@ export interface DFSPTransactionData extends StateData<DFSPTransactionModelState
   requestAuthorizationResponse?: tpAPI.Schemas.ThirdpartyRequestsAuthorizationsIDPutResponse
 
   // used by verifyAuthorization
-  requestVerificationPostRequest?: tpAPI.Schemas.ThirdpartyRequestsVerificationsPostRequest
+  requestVerificationPostRequest?: tpAPI.Schemas.ThirdpartyRequestsAuthorizationsIDPutResponse
   requestVerificationResponse?: tpAPI.Schemas.ThirdpartyRequestsVerificationsIDPutResponse
 
   // used by requestTransfer
