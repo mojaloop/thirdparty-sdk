@@ -500,17 +500,17 @@ workflows:
             tags:
               only: /.*/
 
-      # - audit-licenses:
-      #     context: org-global
-      #     requires:
-      #       - setup
-      #     filters:
-      #       tags:
-      #         only: /.*/
-      #       branches:
-      #         ignore:
-      #           - /feature*/
-      #           - /bugfix*/
+      - audit-licenses:
+          context: org-global
+          requires:
+            - setup
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              ignore:
+                - /feature*/
+                - /bugfix*/
 
       - test-integration:
           context: org-global
@@ -570,7 +570,7 @@ workflows:
             - test-coverage
             - test-integration
             - test-bdd
-            # - audit-licenses
+            - audit-licenses
             - linting-check
             - vulnerability-check
             # - image-scan
