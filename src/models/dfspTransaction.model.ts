@@ -47,7 +47,8 @@ import { Message, PubSub } from '~/shared/pub-sub'
 
 // Some constants to use for async jobs
 export enum DFSPTransactionPhase {
-  waitOnAuthResponseFromPISPChannel = 'waitOnAuthResponseFromPISPChannel'
+  waitOnAuthResponseFromPISPChannel = 'waitOnAuthResponseFromPISPChannel',
+  waitOnVerificationResponseFromSwitchChannel = 'waitOnVerificationResponseFromSwitchChannel'
 }
 
 export class DFSPTransactionModel
@@ -270,14 +271,8 @@ export class DFSPTransactionModel
       await deferredJob(this.subscriber, waitOnAuthResponseFromPISPChannel)
         .init(async channel => {
           // Send the request to the PISP
-          // TODO: implement this on sdk-standard-components
-          // await this.thirdpartyRequests.postThirdpartyRequestsAuthorizations
-
-          // @ts-ignore - internal function
-          const response = await this.thirdpartyRequests._post(
-            'thirdpartyRequests/authorizations',
-            'thirdparty',
-            this.data.requestAuthorizationPostRequest,
+          const response = await this.thirdpartyRequests.postThirdpartyRequestsAuthorizations(
+            this.data.requestAuthorizationPostRequest!,
             this.data.participantId
           )
           this.logger.push({ response, channel })
@@ -329,6 +324,15 @@ export class DFSPTransactionModel
     const authorizationInfo = this.data.requestAuthorizationResponse!
     // console.log('received authorization from PISP!', authorizationInfo)
     console.log('TODO: talk to the auth service! POST /thirdpartyRequests/verifications !')
+
+    const verificationRequestId = uuidv4()
+    const waitOnVerificationResponseFromSwitchChannel = DFSPTransactionModel.notificationChannel(
+      DFSPTransactionPhase.waitOnVerificationResponseFromSwitchChannel, 
+      verificationRequestId
+    )
+    
+    
+
 
     this.data.transferId = uuidv4()
 
