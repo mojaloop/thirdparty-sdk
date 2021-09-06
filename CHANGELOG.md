@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+## [11.50.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.49.0...v11.50.0) (2021-09-06)
+
+
+### Features
+
+* **puml:** update the PISP Transaction sequence to use `/tpr/verifications` calls ([#120](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/120)) ([e1fec7f](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/e1fec7f35e059d79b1cbd4697eb535b43eac0553))
+
 ## [11.49.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.48.0...v11.49.0) (2021-08-31)
 
 
