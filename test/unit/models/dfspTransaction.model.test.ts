@@ -574,7 +574,7 @@ describe('DFSPTransactionModel', () => {
       }
     })
 
-    it.only('should throw if verifyAuthorization failed', async (done) => {
+    it('should throw if verifyAuthorization failed', async (done) => {
       mocked(modelConfig.kvs.set).mockImplementationOnce(() => Promise.resolve(true))
       mocked(modelConfig.thirdpartyRequests.postThirdpartyRequestsVerifications).mockImplementationOnce(
         () => Promise.resolve(undefined)
