@@ -55,7 +55,7 @@ export class DFSPTransactionModel
   extends PersistentModel<DFSPTransactionStateMachine, DFSPTransactionData> {
   protected config: DFSPTransactionModelConfig
 
-  constructor(
+  constructor (
     data: DFSPTransactionData,
     config: DFSPTransactionModelConfig
   ) {
@@ -114,23 +114,23 @@ export class DFSPTransactionModel
   }
 
   // getters
-  get subscriber(): PubSub {
+  get subscriber (): PubSub {
     return this.config.subscriber
   }
 
-  get sdkOutgoingRequests(): SDKOutgoingRequests {
+  get sdkOutgoingRequests (): SDKOutgoingRequests {
     return this.config.sdkOutgoingRequests
   }
 
-  get dfspBackendRequests(): DFSPBackendRequests {
+  get dfspBackendRequests (): DFSPBackendRequests {
     return this.config.dfspBackendRequests
   }
 
-  get thirdpartyRequests(): ThirdpartyRequests {
+  get thirdpartyRequests (): ThirdpartyRequests {
     return this.config.thirdpartyRequests
   }
 
-  static notificationChannel(phase: DFSPTransactionPhase, id: string): string {
+  static notificationChannel (phase: DFSPTransactionPhase, id: string): string {
     if (!id) {
       throw new Error('DFSPTransactionModel.notificationChannel: \'id\' parameter is required')
     }
@@ -139,7 +139,7 @@ export class DFSPTransactionModel
   }
 
   // transitions handlers
-  async onValidateTransactionRequest(): Promise<void> {
+  async onValidateTransactionRequest (): Promise<void> {
     InvalidDataError.throwIfInvalidProperty(this.data, 'transactionRequestId')
     InvalidDataError.throwIfInvalidProperty(this.data, 'transactionRequestState')
     InvalidDataError.throwIfInvalidProperty(this.data, 'participantId')
@@ -169,7 +169,7 @@ export class DFSPTransactionModel
     }
   }
 
-  async onNotifyTransactionRequestIsValid(): Promise<void> {
+  async onNotifyTransactionRequestIsValid (): Promise<void> {
     InvalidDataError.throwIfInvalidProperty(this.data, 'transactionRequestPutUpdate')
     InvalidDataError.throwIfInvalidProperty(this.data, 'transactionRequestContext')
 
@@ -217,7 +217,7 @@ export class DFSPTransactionModel
     }
   }
 
-  async onRequestQuote(): Promise<void> {
+  async onRequestQuote (): Promise<void> {
     InvalidDataError.throwIfInvalidProperty(this.data, 'requestQuoteRequest')
 
     // request quote via sync interface on sdk-scheme-adapter
@@ -232,7 +232,7 @@ export class DFSPTransactionModel
     this.data.requestQuoteResponse = resultQuote
   }
 
-  async onRequestAuthorization(): Promise<void> {
+  async onRequestAuthorization (): Promise<void> {
     try {
       InvalidDataError.throwIfInvalidProperty(this.data, 'requestQuoteResponse')
 
@@ -315,7 +315,7 @@ export class DFSPTransactionModel
     }
   }
 
-  async onVerifyAuthorization(): Promise<void> {
+  async onVerifyAuthorization (): Promise<void> {
     try {
       InvalidDataError.throwIfInvalidProperty(this.data, 'requestAuthorizationResponse')
       InvalidDataError.throwIfInvalidProperty(this.data.requestAuthorizationResponse!, 'signedPayload')
@@ -344,7 +344,7 @@ export class DFSPTransactionModel
             signedPayloadType: 'FIDO',
             challenge: '12345'
           }
-          break;
+          break
         }
         case 'GENERIC': {
           const rar = this.data.requestAuthorizationResponse! as tpAPI.Schemas.ThirdpartyRequestsAuthorizationsIDPutResponseGeneric
@@ -355,7 +355,7 @@ export class DFSPTransactionModel
             signedPayloadType: 'GENERIC',
             challenge: '12345'
           }
-          break;
+          break
         }
         default:
           throw new Error(`unhandled signedPayloadType: ${signedPayloadType}`)
@@ -435,7 +435,7 @@ export class DFSPTransactionModel
     }
   }
 
-  async onRequestTransfer(): Promise<void> {
+  async onRequestTransfer (): Promise<void> {
     InvalidDataError.throwIfInvalidProperty(this.data, 'transferRequest')
 
     // make a call to switch via sync sdk api
@@ -461,7 +461,7 @@ export class DFSPTransactionModel
     }
   }
 
-  async onNotifyTransferIsDone(): Promise<void> {
+  async onNotifyTransferIsDone (): Promise<void> {
     InvalidDataError.throwIfInvalidProperty(this.data, 'transactionRequestPatchUpdate')
 
     try {
@@ -477,7 +477,7 @@ export class DFSPTransactionModel
   }
 
   // workflow
-  async run(): Promise<void> {
+  async run (): Promise<void> {
     try {
       switch (this.data.currentState) {
         case 'start':
@@ -531,7 +531,7 @@ export class DFSPTransactionModel
   }
 }
 
-export async function create(
+export async function create (
   data: DFSPTransactionData,
   config: DFSPTransactionModelConfig
 ): Promise<DFSPTransactionModel> {
@@ -544,7 +544,7 @@ export async function create(
 }
 
 // loads PersistentModel from KVS storage using given `config` and `spec`
-export async function loadFromKVS(
+export async function loadFromKVS (
   config: DFSPTransactionModelConfig
 ): Promise<DFSPTransactionModel> {
   try {
