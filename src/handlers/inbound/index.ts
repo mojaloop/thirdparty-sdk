@@ -28,6 +28,7 @@
  ******/
 import ThirdpartyRequestsTransactions from './thirdpartyRequests/transactions'
 import ThirdpartyRequestsAuthorizations from './thirdpartyRequests/authorizations'
+import ThirdpartyRequestsVerifications from './thirdpartyRequests/verifications'
 import InboundAuthorizations from './authorizations'
 import InboundConsents from './consents'
 import InboundConsentsId from './consents/{ID}'
@@ -75,4 +76,6 @@ export default {
   PostThirdpartyRequestsAuthorizations: ThirdpartyRequestsAuthorizations.post,
   PutThirdpartyRequestsAuthorizationsById: ThirdpartyRequestsAuthorizations.put,
   PutThirdpartyRequestsAuthorizationsByIdAndError: ThirdpartyRequestsAuthorizations.put,
+  PutThirdpartyRequestsVerificationsById: ThirdpartyRequestsVerifications.put,
+  PutThirdpartyRequestsVerificationsByIdAndError: ThirdpartyRequestsVerifications.put,
 }
