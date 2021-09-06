@@ -299,7 +299,6 @@ export class DFSPTransactionModel
         // This requires user input on the PISP side, so this number should be something reasonable, like 1 minute or so
         .wait(this.config.transactionRequestAuthorizationTimeoutSeconds * 1000)
     } catch (error) {
-      console.log('some error 1', error)
       const mojaloopError = reformatError(
         Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_AUTHORIZATION_UNEXPECTED,
         this.logger
@@ -321,11 +320,6 @@ export class DFSPTransactionModel
       InvalidDataError.throwIfInvalidProperty(this.data, 'requestAuthorizationResponse')
       InvalidDataError.throwIfInvalidProperty(this.data.requestAuthorizationResponse!, 'signedPayload')
       InvalidDataError.throwIfInvalidProperty(this.data, 'transactionRequestContext')
-
-      // TODO: talk to the auth-service with thirdpartyRequests/verifications!
-
-      // shortcut
-      const authorizationInfo = this.data.requestAuthorizationResponse!
 
       const verificationRequestId = uuidv4()
       const channel = DFSPTransactionModel.notificationChannel(
@@ -413,8 +407,6 @@ export class DFSPTransactionModel
               }
             }
           } catch (error) {
-            console.log("some error", error)
-
             this.logger.push(error).error('ThirdpartyRequests.postThirdpartyRequestsVerifications request error')
             return Promise.reject(error)
           }
@@ -422,9 +414,8 @@ export class DFSPTransactionModel
         // This requires user input on the PISP side, so this number should be something reasonable, like 1 minute or so
         .wait(this.config.transactionRequestVerificationTimeoutSeconds * 1000)
     } catch (error) {
-      console.log("some bigger errror", error)
       const mojaloopError = reformatError(
-        Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_AUTHORIZATION_UNEXPECTED,
+        Errors.MojaloopApiErrorCodes.TP_AUTH_SERVICE_ERROR,
         this.logger
       )
 
@@ -435,7 +426,7 @@ export class DFSPTransactionModel
         this.data.participantId
       )
 
-      throw Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_AUTHORIZATION_UNEXPECTED
+      throw Errors.MojaloopApiErrorCodes.TP_AUTH_SERVICE_ERROR
     }
   }
 

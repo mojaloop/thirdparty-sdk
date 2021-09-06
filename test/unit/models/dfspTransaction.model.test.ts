@@ -574,12 +574,20 @@ describe('DFSPTransactionModel', () => {
       }
     })
 
-    // TODO: will come back to this in next /verify PR
-    it.skip('should throw if verifyAuthorization failed', async (done) => {
+    it.only('should throw if verifyAuthorization failed', async (done) => {
       mocked(modelConfig.kvs.set).mockImplementationOnce(() => Promise.resolve(true))
-      mocked(modelConfig.dfspBackendRequests.verifyAuthorization).mockImplementationOnce(
-        () => Promise.resolve({ isValid: false })
+      mocked(modelConfig.thirdpartyRequests.postThirdpartyRequestsVerifications).mockImplementationOnce(
+        () => Promise.resolve(undefined)
       )
+
+      // mock PUT /thirdpartyRequests/verifications/{ID}/error callback
+      mockDeferredJobWithCallbackMessage('testAuthChannel', {
+        errorInformation: {
+          errorCode: Errors.MojaloopApiErrorCodes.TP_AUTH_SERVICE_ERROR,
+          errorDescription: 'Invalid signed challenge'
+        }
+      })
+
       const data: DFSPTransactionData = {
         transactionRequestId,
         transactionRequestState: 'RECEIVED',
@@ -595,7 +603,7 @@ describe('DFSPTransactionModel', () => {
       try {
         await model.fsm.verifyAuthorization()
       } catch (err) {
-        expect(err).toEqual(Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_AUTHORIZATION_NOT_VALID)
+        expect(err).toEqual(Errors.MojaloopApiErrorCodes.TP_AUTH_SERVICE_ERROR)
         done()
       }
     })
@@ -629,39 +637,6 @@ describe('DFSPTransactionModel', () => {
       } catch (err) {
         expect(model.data.transactionRequestState).toEqual('REJECTED')
         expect(err).toEqual(Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_AUTHORIZATION_REJECTED_BY_USER)
-        done()
-      }
-    })
-
-    // TODO: I think we can remove this - it's no longer valid
-    it.skip('should throw if unexpected responseType received', async (done) => {
-      mocked(modelConfig.kvs.set).mockImplementationOnce(() => Promise.resolve(true))
-      mocked(modelConfig.dfspBackendRequests.verifyAuthorization).mockImplementationOnce(
-        () => Promise.resolve({ isValid: false })
-      )
-      const data: DFSPTransactionData = {
-        transactionRequestId,
-        transactionRequestState: 'RECEIVED',
-        participantId,
-        transactionRequestRequest,
-        transactionRequestPutUpdate,
-        requestQuoteRequest,
-        requestQuoteResponse,
-        requestAuthorizationResponse: {
-          ...requestAuthorizationResponse,
-          // TODO: remove me!
-          // authorizations: {
-          //   ...requestAuthorizationResponse.authorizations,
-          //   responseType: 'RESEND'
-          // }
-        },
-        currentState: 'authorizationReceived'
-      }
-      const model = await create(data, modelConfig)
-      try {
-        await model.fsm.verifyAuthorization()
-      } catch (err) {
-        expect(err).toEqual(Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_AUTHORIZATION_UNEXPECTED)
         done()
       }
     })
