@@ -35,12 +35,11 @@ defaults_awsCliDependencies: &defaults_awsCliDependencies |
           mailcap
   pip3 install --upgrade pip awscli==1.14.5 s3cmd==2.0.1 python-magic
 
-# temporarily disabled as api-snippets is not compatible with existing license policy
-# defaults_license_scanner: &defaults_license_scanner
-#   name: Install and set up license-scanner
-#   command: |
-#     git clone https://github.com/mojaloop/license-scanner /tmp/license-scanner
-#     cd /tmp/license-scanner && make build default-files set-up
+defaults_license_scanner: &defaults_license_scanner
+  name: Install and set up license-scanner
+  command: |
+    git clone https://github.com/mojaloop/license-scanner /tmp/license-scanner
+    cd /tmp/license-scanner && make build default-files set-up
 
 ##
 # Executors
@@ -247,26 +246,25 @@ jobs:
       - store_artifacts:
           path: ./audit/results
 
-  # temporarily disabled as api-snippets is not compatible with existing license policy 
-  # audit-licenses:
-  #   executor: default-docker
-  #   steps:
-  #     - run:
-  #         name: Install general dependencies
-  #         command: *defaults_Dependencies
-  #     - checkout
-  #     - run:
-  #         <<: *defaults_license_scanner
-  #     - restore_cache:
-  #         key: dependency-cache-{{ checksum "package-lock.json" }}
-  #     - run:
-  #         name: Prune non-production packages before running license-scanner
-  #         command: npm ci --production
-  #     - run:
-  #         name: Run the license-scanner
-  #         command: cd /tmp/license-scanner && pathToRepo=$CIRCLE_WORKING_DIRECTORY make run
-  #     - store_artifacts:
-  #         path: /tmp/license-scanner/results
+  audit-licenses:
+    executor: default-docker
+    steps:
+      - run:
+          name: Install general dependencies
+          command: *defaults_Dependencies
+      - checkout
+      - run:
+          <<: *defaults_license_scanner
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package-lock.json" }}
+      - run:
+          name: Prune non-production packages before running license-scanner
+          command: npm ci --production
+      - run:
+          name: Run the license-scanner
+          command: cd /tmp/license-scanner && pathToRepo=$CIRCLE_WORKING_DIRECTORY make run
+      - store_artifacts:
+          path: /tmp/license-scanner/results
 
   build-local:
     executor: default-machine
@@ -384,7 +382,7 @@ jobs:
             docker push $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:${CIRCLE_TAG}
       - slack/status:
           fail_only: true
-          webhook: "$SLACK_WEBHOOK_ANNOUNCMENT_CI_CD"
+          webhook: "$SLACK_WEBHOOK_ANNOUNCEMENT_CI_CD"
           failure_message: 'Publishing docker image failed for: \`"${DOCKER_ORG}/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_TAG}"\`'
   
 # temporarily disabled as api-snippets is not compatible with existing license policy 
@@ -502,17 +500,17 @@ workflows:
             tags:
               only: /.*/
 
-      # - audit-licenses:
-      #     context: org-global
-      #     requires:
-      #       - setup
-      #     filters:
-      #       tags:
-      #         only: /.*/
-      #       branches:
-      #         ignore:
-      #           - /feature*/
-      #           - /bugfix*/
+      - audit-licenses:
+          context: org-global
+          requires:
+            - setup
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              ignore:
+                - /feature*/
+                - /bugfix*/
 
       - test-integration:
           context: org-global
@@ -572,7 +570,7 @@ workflows:
             - test-coverage
             - test-integration
             - test-bdd
-            # - audit-licenses
+            - audit-licenses
             - linting-check
             - vulnerability-check
             # - image-scan

@@ -15,6 +15,7 @@ box "PISP sdk-scheme-adapter"
 end box
 box "Mojaloop"
     participant Switch
+    participant AuthService
 end box
 box "DFSP sdk-scheme-adapter"
   participant "inbound-server" as DFSP_SDK_IN
@@ -215,7 +216,6 @@ PISP_TM -> PISP_TP_OUT: QuoteInformation, transactionId
 deactivate PISP_TM
 deactivate PISP_TP_IN
 
-'TODO: add authorization details
 PISP_TP_OUT --> PISP: 200 OK
 deactivate PISP_TP_OUT
 deactivate PISP
@@ -239,9 +239,9 @@ activate PISP_TP_OUT
 PISP_TP_OUT -> PISP_TM: approve()
 activate PISP_TM
 rnote right of PISP_TM: state: approvalReceived
-PISP_TM -> PISP_TM: SDKRequests.requestVerifyAuthorization(transactionRequestId, signedChallenge)
+PISP_TM -> PISP_TM: SDKRequests.requestVerifyAuthorization(authorizationRequestId, signedChallenge)
 
-PISP_TM -> Switch: PUT /authorizations/{transactionRequestId}
+PISP_TM -> Switch: PUT /thirdpartyRequests/authorizations/{authorizationRequestId}
 activate Switch
 Switch --> PISP_TM: 202 Accepted
 rnote right of PISP_TM: state: pendingVerifyAuthorization
@@ -260,11 +260,33 @@ end note
 rnote right of DFSP_TM: state: pendingVerifyAuthorization
 DFSP_TM -> DFSP_TM: generate verificationRequestId
 
-DFSP_TM -> DFSP_TM: DFSPBackendRequests.verifyAuthorization(AuthorizationInformation)
+DFSP_TM -> DFSP_TM: ThirdpartyRequests.verifyAuthorization(AuthorizationInformation)
+
+DFSP_TM -> Switch: POST /thirdpartyRequests/verifications
+activate Switch
+Switch --> DFSP_TM: 202 Accepted
+
+Switch -> AuthService: POST /thirdpartyRequests/verifications
+activate AuthService
+AuthService --> Switch: 202 Accepted
+deactivate Switch
+
+AuthService -> AuthService: Lookup Consent for payload.consentId
+AuthService -> AuthService: Verify verification
 
 note over PISP, DFSP_TM
-  ERROR_SCENARIO: DFSP notifies PISP about Authorization error and then ends its workflow here
+  ERROR_SCENARIO: Challenge was signed by wrong private key, AuthService rejects the Verification request
 end note
+
+AuthService -> Switch: PUT /thirdpartyRequests/verifications/{verificationRequestId}/error
+activate Switch
+Switch --> AuthService: 200 OK
+Switch -> DFSP_TP_IN: PUT /thirdpartyRequests/verifications/{verificationRequestId}/error
+DFSP_TP_IN --> Switch: 200 OK
+deactivate Switch
+
+DFSP_TP_IN -> DFSP_TM: VerificationResponseInformation
+
 rnote right of DFSP_TM: DFSP is unhappy with Authorization\n**transactionRequestState** is **REJECTED**
 rnote right of DFSP_TM: state: failureVerifyAuthorization
 DFSP_TM -> DFSP_TM: persist transactionRequestState for transactionRequestId
@@ -297,7 +319,19 @@ note over PISP, DFSP_TM
   HAPPY_SCENARIO: **DFSPTransactionModel continues workflow**
 end note
 
-rnote right of DFSP_TM: DFSP is happy with Authorization\n**transactionRequestState** is **ACCEPTED**
+AuthService -> AuthService: Authorization is valid, challenge signed with correct private key
+
+AuthService -> Switch: PUT /thirdpartyRequests/verifications/{verificationRequestId}
+activate Switch
+Switch --> AuthService: 200 OK
+Switch -> DFSP_TP_IN: PUT /thirdpartyRequests/verifications/{verificationRequestId}
+DFSP_TP_IN --> Switch: 200 OK
+deactivate Switch
+
+DFSP_TP_IN -> DFSP_TM: VerificationResponseInformation
+
+
+rnote right of DFSP_TM: The Auth Service is happy with Authorization\n**transactionRequestState** is **ACCEPTED**
 DFSP_TM -> DFSP_TM: persist transactionRequestState for transactionRequestId
 
 note over DFSP_TM
