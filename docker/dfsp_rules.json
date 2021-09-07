@@ -25,7 +25,7 @@
     }
   },
   {
-    "ruleId": 2,
+    "ruleId": 2, 
     "description": "Returns list of user Accounts",
     "conditions": {
       "all": [
@@ -109,7 +109,13 @@
       "params": {
         "statusCode": 200,
         "body": {
-          "isValid": true
+          "isValid": true,
+          "payerPartyIdInfo": {
+            "partyIdType": "MSISDN",
+            "partyIdentifier": "0912341234",
+            "fspId": "dfspa"
+          },
+          "consentId": "21ba1e4f-5b03-43e7-b027-d8cbcf45be20"
         }
       }
     }

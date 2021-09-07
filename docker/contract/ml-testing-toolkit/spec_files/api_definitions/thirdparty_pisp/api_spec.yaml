@@ -1668,6 +1668,189 @@ paths:
           $ref: '#/components/responses/501'
         '503':
           $ref: '#/components/responses/503'
+  /thirdpartyRequests/verifications:
+    parameters:
+      - $ref: '#/components/parameters/Content-Type'
+      - $ref: '#/components/parameters/Date'
+      - $ref: '#/components/parameters/X-Forwarded-For'
+      - $ref: '#/components/parameters/FSPIOP-Source'
+      - $ref: '#/components/parameters/FSPIOP-Destination'
+      - $ref: '#/components/parameters/FSPIOP-Encryption'
+      - $ref: '#/components/parameters/FSPIOP-Signature'
+      - $ref: '#/components/parameters/FSPIOP-URI'
+      - $ref: '#/components/parameters/FSPIOP-HTTP-Method'
+    post:
+      tags:
+        - thirdpartyRequests
+        - sampled
+      operationId: PostThirdpartyRequestsVerifications
+      summary: PostThirdpartyRequestsVerifications
+      description: >
+        The HTTP request `POST /thirdpartyRequests/verifications` is used by the
+        DFSP to verify a third party authorization.
+      parameters:
+        - $ref: '#/components/parameters/Accept'
+        - $ref: '#/components/parameters/Content-Length'
+      requestBody:
+        description: The thirdparty authorization details to verify
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: >-
+                    #/components/schemas/ThirdpartyRequestsVerificationsPostRequestFIDO
+                - $ref: >-
+                    #/components/schemas/ThirdpartyRequestsVerificationsPostRequestGeneric
+            example:
+              verificationRequestId: 44444444-0000-0000-0000-000000000000
+              challenge: <base64 encoded binary - the encoded challenge>
+              consentId: 8d34f91d-d078-4077-8263-2c0498dhbjr
+              signedPayloadType: FIDO
+              signedPayload:
+                id: >-
+                  45c-TkfkjQovQeAWmOy-RLBHEJ_e4jYzQYgD8VdbkePgM5d98BaAadadNYrknxgH0jQEON8zBydLgh1EqoC9DA
+                rawId: >-
+                  45c+TkfkjQovQeAWmOy+RLBHEJ/e4jYzQYgD8VdbkePgM5d98BaAadadNYrknxgH0jQEON8zBydLgh1EqoC9DA==
+                response:
+                  authenticatorData: SZYN5YgOjGh0NBcPZHZgW4/krrmihjLHmVzzuoMdl2MBAAAACA==
+                  clientDataJSON: >-
+                    eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiQUFBQUFBQUFBQUFBQUFBQUFBRUNBdyIsIm9yaWdpbiI6Imh0dHA6Ly9sb2NhbGhvc3Q6NDIxODEiLCJjcm9zc09yaWdpbiI6ZmFsc2UsIm90aGVyX2tleXNfY2FuX2JlX2FkZGVkX2hlcmUiOiJkbyBub3QgY29tcGFyZSBjbGllbnREYXRhSlNPTiBhZ2FpbnN0IGEgdGVtcGxhdGUuIFNlZSBodHRwczovL2dvby5nbC95YWJQZXgifQ==
+                  signature: >-
+                    MEUCIDcJRBu5aOLJVc/sPyECmYi23w8xF35n3RNhyUNVwQ2nAiEA+Lnd8dBn06OKkEgAq00BVbmH87ybQHfXlf1Y4RJqwQ8=
+                type: public-key
+      responses:
+        '202':
+          $ref: '#/components/responses/202'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '405':
+          $ref: '#/components/responses/405'
+        '406':
+          $ref: '#/components/responses/406'
+        '501':
+          $ref: '#/components/responses/501'
+        '503':
+          $ref: '#/components/responses/503'
+  '/thirdpartyRequests/verifications/{ID}':
+    parameters:
+      - $ref: '#/components/parameters/ID'
+      - $ref: '#/components/parameters/Content-Type'
+      - $ref: '#/components/parameters/Date'
+      - $ref: '#/components/parameters/X-Forwarded-For'
+      - $ref: '#/components/parameters/FSPIOP-Source'
+      - $ref: '#/components/parameters/FSPIOP-Destination'
+      - $ref: '#/components/parameters/FSPIOP-Encryption'
+      - $ref: '#/components/parameters/FSPIOP-Signature'
+      - $ref: '#/components/parameters/FSPIOP-URI'
+      - $ref: '#/components/parameters/FSPIOP-HTTP-Method'
+    put:
+      tags:
+        - thirdpartyRequests
+        - sampled
+      operationId: PutThirdpartyRequestsVerificationsById
+      summary: PutThirdpartyRequestsVerificationsById
+      description: >
+        The HTTP request `PUT /thirdpartyRequests/verifications/{ID}` is used by
+        the Auth-Service to inform
+
+        the DFSP of a successful result in validating the verification of a
+        Thirdparty Transaction Request.
+
+
+        If the validation fails, The Auth-Service MUST use `PUT
+        /thirdpartyRequests/verifications/{ID}/error`
+
+        instead.
+      parameters:
+        - $ref: '#/components/parameters/Content-Length'
+      requestBody:
+        description: The result of validating the Thirdparty Transaction Request
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: >-
+                #/components/schemas/ThirdpartyRequestsVerificationsIDPutResponse
+            example:
+              authenticationResponse: VERIFIED
+      responses:
+        '200':
+          $ref: '#/components/responses/200'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '405':
+          $ref: '#/components/responses/405'
+        '406':
+          $ref: '#/components/responses/406'
+        '501':
+          $ref: '#/components/responses/501'
+        '503':
+          $ref: '#/components/responses/503'
+  '/thirdpartyRequests/verifications/{ID}/error':
+    parameters:
+      - $ref: '#/components/parameters/ID'
+      - $ref: '#/components/parameters/Content-Type'
+      - $ref: '#/components/parameters/Date'
+      - $ref: '#/components/parameters/X-Forwarded-For'
+      - $ref: '#/components/parameters/FSPIOP-Source'
+      - $ref: '#/components/parameters/FSPIOP-Destination'
+      - $ref: '#/components/parameters/FSPIOP-Encryption'
+      - $ref: '#/components/parameters/FSPIOP-Signature'
+      - $ref: '#/components/parameters/FSPIOP-URI'
+      - $ref: '#/components/parameters/FSPIOP-HTTP-Method'
+    put:
+      tags:
+        - thirdpartyRequests
+        - sampled
+      operationId: PutThirdpartyRequestsVerificationsByIdAndError
+      summary: PutThirdpartyRequestsVerificationsByIdAndError
+      description: >
+        The HTTP request `PUT /thirdpartyRequests/verifications/{ID}/error` is
+        used by the Auth-Service to inform
+
+        the DFSP of a failure in validating or looking up the verification of a
+        Thirdparty Transaction Request.
+      parameters:
+        - $ref: '#/components/parameters/Content-Length'
+      requestBody:
+        description: Error information returned.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ErrorInformationObject'
+      responses:
+        '200':
+          $ref: '#/components/responses/200'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '405':
+          $ref: '#/components/responses/405'
+        '406':
+          $ref: '#/components/responses/406'
+        '501':
+          $ref: '#/components/responses/501'
+        '503':
+          $ref: '#/components/responses/503'
 components:
   schemas:
     OutboundAuthorizationsPostRequest:
@@ -3421,6 +3604,78 @@ components:
       required:
         - signedPayloadType
         - authenticationValue
+    ThirdpartyRequestsVerificationsPostRequestFIDO:
+      title: ThirdpartyRequestsVerificationsPostRequestFIDO
+      type: object
+      description: The object sent in the POST /thirdpartyRequests/verifications request.
+      properties:
+        verificationRequestId:
+          allOf:
+            - $ref: '#/components/schemas/CorrelationId'
+        challenge:
+          type: string
+          description: Base64 encoded bytes - The challenge generated by the DFSP.
+        consentId:
+          allOf:
+            - $ref: '#/components/schemas/CorrelationId'
+          description: >
+            The id of the stored consent object that contains the credential
+            with which to verify
+
+            the signed challenge against.
+        signedPayloadType:
+          $ref: '#/components/schemas/SignedPayloadTypeFIDO'
+        signedPayload:
+          $ref: '#/components/schemas/FIDOPublicKeyCredentialAssertion'
+      required:
+        - verificationRequestId
+        - challenge
+        - consentId
+        - signedPayloadType
+        - signedPayload
+    ThirdpartyRequestsVerificationsPostRequestGeneric:
+      title: ThirdpartyRequestsVerificationsPostRequestGeneric
+      type: object
+      description: The object sent in the POST /thirdpartyRequests/verifications request.
+      properties:
+        verificationRequestId:
+          allOf:
+            - $ref: '#/components/schemas/CorrelationId'
+        challenge:
+          type: string
+          description: Base64 encoded bytes - The challenge generated by the DFSP.
+        consentId:
+          allOf:
+            - $ref: '#/components/schemas/CorrelationId'
+          description: >
+            The id of the stored consent object that contains the credential
+            with which to verify
+
+            the signed challenge against.
+        signedPayloadType:
+          $ref: '#/components/schemas/SignedPayloadTypeGeneric'
+        signedPayload:
+          $ref: '#/components/schemas/BinaryString'
+      required:
+        - verificationRequestId
+        - challenge
+        - consentId
+        - signedPayloadType
+        - signedPayload
+    ThirdpartyRequestsVerificationsIDPutResponse:
+      title: ThirdpartyRequestsVerificationsIDPutResponse
+      type: object
+      description: >-
+        The object sent in the PUT /thirdpartyRequests/verifications/{ID}
+        request.
+      properties:
+        authenticationResponse:
+          type: string
+          enum:
+            - VERIFIED
+          description: The verification passed
+      required:
+        - authenticationResponse
   parameters:
     ID:
       name: ID

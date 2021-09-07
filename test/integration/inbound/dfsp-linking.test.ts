@@ -27,8 +27,9 @@
 import axios from 'axios'
 import env from '../env'
 import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
+import { TTKHistory } from '../ttkHistory'
 
-interface MLTestingToolkitRequest {
+export interface MLTestingToolkitRequest {
   timestamp: string
   method: string
   path: string
@@ -36,12 +37,12 @@ interface MLTestingToolkitRequest {
   body: Record<string, unknown>
 }
 
-describe('DFSP Inbound', (): void => {
-  const ttkRequestsHistoryUri = `http://localhost:5050/api/history/requests`
+// helper to lookup ttk history calls
+const ttkHistory = new TTKHistory('http://localhost:5050')
 
+describe('DFSP Inbound', (): void => {
   beforeEach(async(): Promise<void> => {
-    // clear the request history in TTK between tests.
-    await axios.delete(ttkRequestsHistoryUri, {})
+    await ttkHistory.clear()
   })
 
   describe('Happy Path WEB', (): void => {
@@ -104,14 +105,8 @@ describe('DFSP Inbound', (): void => {
         // Switch should return Accepted code to DFSP
         expect(response.status).toEqual(202)
 
-        // wait a bit for the DFSP adapter to process the request
-        await new Promise(resolve => setTimeout(resolve, 200));
-
         // check that the DFSP has sent a PUT /consentRequests/{ID} to the PISP
-        const requestsHistory: MLTestingToolkitRequest[] = (await axios.get(ttkRequestsHistoryUri, axiosConfig)).data
-        var putConsentRequestsToPISP = requestsHistory.filter(req => {
-          return req.method === 'put' && req.path === '/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fba'
-        })
+        const putConsentRequestsToPISP = await ttkHistory.getAndFilterWithRetries(2, 'put', '/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fba')
         expect(putConsentRequestsToPISP.length).toEqual(1)
 
         const historyPayload = putConsentRequestsToPISP[0].body as tpAPI.Schemas.ConsentRequestsIDPutResponseOTP
@@ -149,14 +144,8 @@ describe('DFSP Inbound', (): void => {
         const responseToPatchConsentRequests = await axios.patch(patchScenarioUri, patchConsentRequestsPayload, axiosConfig)
         expect(responseToPatchConsentRequests.status).toEqual(202)
 
-        // wait a bit for the DFSP adapter to process the request
-        await new Promise(resolve => setTimeout(resolve, 200));
-
         // check that the DFSP has sent a POST /consents to the PISP
-        const requestsHistory: MLTestingToolkitRequest[] = (await axios.get(ttkRequestsHistoryUri, axiosConfig)).data
-        const postConsentsToPISP = requestsHistory.filter(req => {
-          return req.method === 'post' && req.path === '/consents'
-        })
+        const postConsentsToPISP = await ttkHistory.getAndFilterWithRetries(2, 'post', '/consents')
         expect(postConsentsToPISP.length).toEqual(1)
         const historyPayload = postConsentsToPISP[0].body as tpAPI.Schemas.ConsentsPostRequestPISP
 
@@ -222,13 +211,8 @@ describe('DFSP Inbound', (): void => {
         const responseToPutConsents = await axios.put(putScenarioUri, putConsentsIDSignedCredentialPayload, axiosConfig)
         expect(responseToPutConsents.status).toEqual(202)
 
-        await new Promise(resolve => setTimeout(resolve, 200));
-
         // check that the DFSP has sent a POST /consents to the auth-service
-        const requestsHistory: MLTestingToolkitRequest[] = (await axios.get(ttkRequestsHistoryUri, axiosConfig)).data
-        const postConsentsToAuthService = requestsHistory.filter(req => {
-          return req.method === 'post' && req.path === '/consents'
-        })
+        const postConsentsToAuthService = await ttkHistory.getAndFilterWithRetries(2, 'post', '/consents')
         expect(postConsentsToAuthService.length).toEqual(1)
         const historyPayload = postConsentsToAuthService[0].body as tpAPI.Schemas.ConsentsPostRequestAUTH
 
@@ -291,15 +275,10 @@ describe('DFSP Inbound', (): void => {
           const responseToPutConsents = await axios.put(putScenarioUri, putConsentsIDVerifiedCredentialPayload, axiosConfig)
           expect(responseToPutConsents.status).toEqual(200)
 
-          await new Promise(resolve => setTimeout(resolve, 200));
-
         // check that the DFSP has sent a PATCH /consents/{ID} to the PISP
-        const requestsHistory: MLTestingToolkitRequest[] = (await axios.get(ttkRequestsHistoryUri, axiosConfig)).data
-        const postConsentsToAuthService = requestsHistory.filter(req => {
-          return req.method === 'patch' && req.path === '/consents/' + consentId
-        })
-        expect(postConsentsToAuthService.length).toEqual(1)
-        const historyPayload = postConsentsToAuthService[0].body as tpAPI.Schemas.ConsentsIDPatchResponseVerified
+        const patchConsentsToAuthService = await ttkHistory.getAndFilterWithRetries(2, 'patch', `/consents/${consentId}`)
+        expect(patchConsentsToAuthService.length).toEqual(1)
+        const historyPayload = patchConsentsToAuthService[0].body as tpAPI.Schemas.ConsentsIDPatchResponseVerified
 
         expect(historyPayload).toEqual(
           expect.objectContaining({
@@ -371,17 +350,11 @@ describe('DFSP Inbound', (): void => {
         // Switch should return Accepted code to DFSP
         expect(response.status).toEqual(202)
 
-        // wait a bit for the DFSP adapter to process the request
-        await new Promise(resolve => setTimeout(resolve, 200));
-
         // check that the DFSP has sent a PUT /consentRequests/{ID} to the PISP
-        const requestsHistory: MLTestingToolkitRequest[] = (await axios.get(ttkRequestsHistoryUri, axiosConfig)).data
-        var putConsentRequestsToPISP = requestsHistory.filter(req => {
-          return req.method === 'put' && req.path === '/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fbb'
-        })
-        expect(putConsentRequestsToPISP.length).toEqual(1)
+        const history = await ttkHistory.getAndFilterWithRetries(2, 'put', '/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fbb')
+        expect(history.length).toEqual(1)
 
-        const historyPayload = putConsentRequestsToPISP[0].body as tpAPI.Schemas.ConsentRequestsIDPutResponseOTP
+        const historyPayload = history[0].body as tpAPI.Schemas.ConsentRequestsIDPutResponseOTP
         expect(historyPayload).toEqual({
           "consentRequestId":"997c89f4-053c-4283-bfec-45a1a0a28fbb",
           "scopes":[
@@ -415,16 +388,11 @@ describe('DFSP Inbound', (): void => {
         const responseToPatchConsentRequests = await axios.patch(patchScenarioUri, patchConsentRequestsPayload, axiosConfig)
         expect(responseToPatchConsentRequests.status).toEqual(202)
 
-        // wait a bit for the DFSP adapter to process the request
-        await new Promise(resolve => setTimeout(resolve, 200));
 
         // check that the DFSP has sent a POST /consents to the PISP
-        const requestsHistory: MLTestingToolkitRequest[] = (await axios.get(ttkRequestsHistoryUri, axiosConfig)).data
-        const postConsentsToPISP = requestsHistory.filter(req => {
-          return req.method === 'post' && req.path === '/consents'
-        })
-        expect(postConsentsToPISP.length).toEqual(1)
-        const historyPayload = postConsentsToPISP[0].body as tpAPI.Schemas.ConsentsPostRequestPISP
+        const history = await ttkHistory.getAndFilterWithRetries(2, 'post', '/consents')
+        expect(history.length).toEqual(1)
+        const historyPayload = history[0].body as tpAPI.Schemas.ConsentsPostRequestPISP
 
         expect(historyPayload).toEqual(
           expect.objectContaining({
@@ -488,15 +456,10 @@ describe('DFSP Inbound', (): void => {
         const responseToPutConsents = await axios.put(putScenarioUri, putConsentsIDSignedCredentialPayload, axiosConfig)
         expect(responseToPutConsents.status).toEqual(202)
 
-        await new Promise(resolve => setTimeout(resolve, 200));
-
         // check that the DFSP has sent a POST /consents to the auth-service
-        const requestsHistory: MLTestingToolkitRequest[] = (await axios.get(ttkRequestsHistoryUri, axiosConfig)).data
-        const postConsentsToAuthService = requestsHistory.filter(req => {
-          return req.method === 'post' && req.path === '/consents'
-        })
-        expect(postConsentsToAuthService.length).toEqual(1)
-        const historyPayload = postConsentsToAuthService[0].body as tpAPI.Schemas.ConsentsPostRequestAUTH
+        const history = await ttkHistory.getAndFilterWithRetries(2, 'post', '/consents')
+        expect(history.length).toEqual(1)
+        const historyPayload = history[0].body as tpAPI.Schemas.ConsentsPostRequestAUTH
 
         expect(historyPayload).toEqual(
           expect.objectContaining({
@@ -557,15 +520,10 @@ describe('DFSP Inbound', (): void => {
         const responseToPutConsents = await axios.put(putScenarioUri, putConsentsIDVerifiedCredentialPayload, axiosConfig)
         expect(responseToPutConsents.status).toEqual(200)
 
-        await new Promise(resolve => setTimeout(resolve, 200));
-
         // check that the DFSP has sent a PATCH /consents/{ID} to the PISP
-        const requestsHistory: MLTestingToolkitRequest[] = (await axios.get(ttkRequestsHistoryUri, axiosConfig)).data
-        const postConsentsToAuthService = requestsHistory.filter(req => {
-          return req.method === 'patch' && req.path === '/consents/' + consentId
-        })
-        expect(postConsentsToAuthService.length).toEqual(1)
-        const historyPayload = postConsentsToAuthService[0].body as tpAPI.Schemas.ConsentsIDPatchResponseVerified
+        const history = await ttkHistory.getAndFilterWithRetries(2, 'patch', '/consents/' + consentId)
+        expect(history.length).toEqual(1)
+        const historyPayload = history[0].body as tpAPI.Schemas.ConsentsIDPatchResponseVerified
 
         expect(historyPayload).toEqual(
           expect.objectContaining({
@@ -638,16 +596,10 @@ describe('DFSP Inbound', (): void => {
         // Switch should return Accepted code to DFSP
         expect(response.status).toEqual(202)
 
-        // wait a bit for the DFSP adapter to process the request
-        await new Promise(resolve => setTimeout(resolve, 200));
-
         // check that the DFSP has sent a PUT /consentRequests/{ID}/error to the PISP
-        const requestsHistory: MLTestingToolkitRequest[] = (await axios.get(ttkRequestsHistoryUri, axiosConfig)).data
-        var putConsentRequestsErrorToPISP = requestsHistory.filter(req => {
-          return req.method === 'put' && req.path === '/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fbc/error'
-        })
-        expect(putConsentRequestsErrorToPISP.length).toEqual(1)
-        expect(putConsentRequestsErrorToPISP[0].body.errorInformation).toEqual({
+        const history = await ttkHistory.getAndFilterWithRetries(2, 'put', '/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fbc/error')
+        expect(history.length).toEqual(1)
+        expect(history[0].body.errorInformation).toEqual({
           errorCode: '7200',
           errorDescription:  'Generic Thirdparty account linking error'
         })
@@ -714,16 +666,10 @@ describe('DFSP Inbound', (): void => {
         // Switch should return Accepted code to DFSP
         expect(response.status).toEqual(202)
 
-        // wait a bit for the DFSP adapter to process the request
-        await new Promise(resolve => setTimeout(resolve, 200));
-
         // check that the DFSP has sent a PUT /consentRequests/{ID}/error to the PISP
-        const requestsHistory: MLTestingToolkitRequest[] = (await axios.get(ttkRequestsHistoryUri, axiosConfig)).data
-        var putConsentRequestsErrorToPISP = requestsHistory.filter(req => {
-          return req.method === 'put' && req.path === '/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fbd/error'
-        })
-        expect(putConsentRequestsErrorToPISP.length).toEqual(1)
-        expect(putConsentRequestsErrorToPISP[0].body.errorInformation).toEqual({
+        const history = await ttkHistory.getAndFilterWithRetries(2, 'put', '/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fbd/error')
+        expect(history.length).toEqual(1)
+        expect(history[0].body.errorInformation).toEqual({
           errorCode: '7209',
           errorDescription:  'FSP does not find scopes suitable'
         })
@@ -792,16 +738,10 @@ describe('DFSP Inbound', (): void => {
         // Switch should return Accepted code to DFSP
         expect(response.status).toEqual(202)
 
-        // wait a bit for the DFSP adapter to process the request
-        await new Promise(resolve => setTimeout(resolve, 200));
-
         // check that the DFSP has sent a PUT /consentRequests/{ID}/error to the PISP
-        const requestsHistory: MLTestingToolkitRequest[] = (await axios.get(ttkRequestsHistoryUri, axiosConfig)).data
-        var putConsentRequestsErrorToPISP = requestsHistory.filter(req => {
-          return req.method === 'put' && req.path === '/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fbe/error'
-        })
-        expect(putConsentRequestsErrorToPISP.length).toEqual(1)
-        expect(putConsentRequestsErrorToPISP[0].body.errorInformation).toEqual({
+        const history = await ttkHistory.getAndFilterWithRetries(2, 'put', '/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fbe/error')
+        expect(history.length).toEqual(1)
+        expect(history[0].body.errorInformation).toEqual({
           errorCode: '7200',
           errorDescription:  'Generic Thirdparty account linking error'
         })
@@ -870,16 +810,10 @@ describe('DFSP Inbound', (): void => {
         // Switch should return Accepted code to DFSP
         expect(response.status).toEqual(202)
 
-        // wait a bit for the DFSP adapter to process the request
-        await new Promise(resolve => setTimeout(resolve, 200));
-
         // check that the DFSP has sent a PUT /consentRequests/{ID}/error to the PISP
-        const requestsHistory: MLTestingToolkitRequest[] = (await axios.get(ttkRequestsHistoryUri, axiosConfig)).data
-        var putConsentRequestsErrorToPISP = requestsHistory.filter(req => {
-          return req.method === 'put' && req.path === '/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fbf/error'
-        })
-        expect(putConsentRequestsErrorToPISP.length).toEqual(1)
-        expect(putConsentRequestsErrorToPISP[0].body.errorInformation).toEqual({
+        const history = await ttkHistory.getAndFilterWithRetries(2, 'put', '/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fbf/error')
+        expect(history.length).toEqual(1)
+        expect(history[0].body.errorInformation).toEqual({
           errorCode: '7200',
           errorDescription:  'Generic Thirdparty account linking error'
         })
@@ -947,17 +881,11 @@ describe('DFSP Inbound', (): void => {
         // Switch should return Accepted code to DFSP
         expect(response.status).toEqual(202)
 
-        // wait a bit for the DFSP adapter to process the request
-        await new Promise(resolve => setTimeout(resolve, 200));
-
         // check that the DFSP has sent a PUT /consentRequests/{ID} to the PISP
-        const requestsHistory: MLTestingToolkitRequest[] = (await axios.get(ttkRequestsHistoryUri, axiosConfig)).data
-        var putConsentRequestsToPISP = requestsHistory.filter(req => {
-          return req.method === 'put' && req.path === '/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fba'
-        })
-        expect(putConsentRequestsToPISP.length).toEqual(1)
+        const history = await ttkHistory.getAndFilterWithRetries(2, 'put', '/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fba')
+        expect(history.length).toEqual(1)
 
-        const historyPayload = putConsentRequestsToPISP[0].body as tpAPI.Schemas.ConsentRequestsIDPutResponseOTP
+        const historyPayload = history[0].body as tpAPI.Schemas.ConsentRequestsIDPutResponseOTP
         expect(historyPayload).toEqual({
           "consentRequestId":"997c89f4-053c-4283-bfec-45a1a0a28fba",
           "scopes":[
@@ -992,16 +920,10 @@ describe('DFSP Inbound', (): void => {
         const responseToPatchConsentRequests = await axios.patch(patchScenarioUri, patchConsentRequestsPayload, axiosConfig)
         expect(responseToPatchConsentRequests.status).toEqual(202)
 
-        // wait a bit for the DFSP adapter to process the request
-        await new Promise(resolve => setTimeout(resolve, 200));
-
         // check that the DFSP has sent a POST /consents to the PISP
-        const requestsHistory: MLTestingToolkitRequest[] = (await axios.get(ttkRequestsHistoryUri, axiosConfig)).data
-        const postConsentsToPISP = requestsHistory.filter(req => {
-          return req.method === 'post' && req.path === '/consents'
-        })
-        expect(postConsentsToPISP.length).toEqual(1)
-        const historyPayload = postConsentsToPISP[0].body as tpAPI.Schemas.ConsentsPostRequestPISP
+        const history = await ttkHistory.getAndFilterWithRetries(2, 'post', '/consents')
+        expect(history.length).toEqual(1)
+        const historyPayload = history[0].body as tpAPI.Schemas.ConsentsPostRequestPISP
 
         expect(historyPayload).toEqual(
           expect.objectContaining({
@@ -1065,15 +987,10 @@ describe('DFSP Inbound', (): void => {
         const responseToPutConsents = await axios.put(putScenarioUri, putConsentsIDSignedCredentialPayload, axiosConfig)
         expect(responseToPutConsents.status).toEqual(202)
 
-        await new Promise(resolve => setTimeout(resolve, 200));
-
         // check that the DFSP has sent a POST /consents to the auth-service
-        const requestsHistory: MLTestingToolkitRequest[] = (await axios.get(ttkRequestsHistoryUri, axiosConfig)).data
-        const postConsentsToAuthService = requestsHistory.filter(req => {
-          return req.method === 'post' && req.path === '/consents'
-        })
-        expect(postConsentsToAuthService.length).toEqual(1)
-        const historyPayload = postConsentsToAuthService[0].body as tpAPI.Schemas.ConsentsPostRequestAUTH
+        const history = await ttkHistory.getAndFilterWithRetries(2, 'post', '/consents')
+        expect(history.length).toEqual(1)
+        const historyPayload = history[0].body as tpAPI.Schemas.ConsentsPostRequestAUTH
 
         expect(historyPayload).toEqual(
           expect.objectContaining({
@@ -1134,15 +1051,11 @@ describe('DFSP Inbound', (): void => {
         const responseToPutConsents = await axios.put(putScenarioUri, putConsentsIDVerifiedCredentialPayload, axiosConfig)
         expect(responseToPutConsents.status).toEqual(200)
 
-        await new Promise(resolve => setTimeout(resolve, 200));
-
         // check that the DFSP has sent a PUT /consents/{ID}/error to the PISP
-        const requestsHistory: MLTestingToolkitRequest[] = (await axios.get(ttkRequestsHistoryUri, axiosConfig)).data
-        var putConsentRequestsErrorToPISP = requestsHistory.filter(req => {
-          return req.method === 'put' && req.path === `/consents/${consentId}/error`
-        })
-        expect(putConsentRequestsErrorToPISP.length).toEqual(1)
-        expect(putConsentRequestsErrorToPISP[0].body.errorInformation).toEqual({
+        const history = await ttkHistory.getAndFilterWithRetries(2, 'put', `/consents/${consentId}/error`)
+        expect(history.length).toEqual(1)
+        expect(history.length).toEqual(1)
+        expect(history[0].body.errorInformation).toEqual({
           errorCode: '7200',
           errorDescription:  'Generic Thirdparty account linking error'
         })
@@ -1209,17 +1122,11 @@ describe('DFSP Inbound', (): void => {
         // Switch should return Accepted code to DFSP
         expect(response.status).toEqual(202)
 
-        // wait a bit for the DFSP adapter to process the request
-        await new Promise(resolve => setTimeout(resolve, 200));
-
         // check that the DFSP has sent a PUT /consentRequests/{ID} to the PISP
-        const requestsHistory: MLTestingToolkitRequest[] = (await axios.get(ttkRequestsHistoryUri, axiosConfig)).data
-        var putConsentRequestsToPISP = requestsHistory.filter(req => {
-          return req.method === 'put' && req.path === '/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fbb'
-        })
-        expect(putConsentRequestsToPISP.length).toEqual(1)
+        const history = await ttkHistory.getAndFilterWithRetries(2, 'put', '/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fbb')
+        expect(history.length).toEqual(1)
 
-        const historyPayload = putConsentRequestsToPISP[0].body as tpAPI.Schemas.ConsentRequestsIDPutResponseOTP
+        const historyPayload = history[0].body as tpAPI.Schemas.ConsentRequestsIDPutResponseOTP
         expect(historyPayload).toEqual({
           "consentRequestId":"997c89f4-053c-4283-bfec-45a1a0a28fbb",
           "scopes":[
@@ -1253,16 +1160,10 @@ describe('DFSP Inbound', (): void => {
         const responseToPatchConsentRequests = await axios.patch(patchScenarioUri, patchConsentRequestsPayload, axiosConfig)
         expect(responseToPatchConsentRequests.status).toEqual(202)
 
-        // wait a bit for the DFSP adapter to process the request
-        await new Promise(resolve => setTimeout(resolve, 200));
-
         // check that the DFSP has sent a POST /consents to the PISP
-        const requestsHistory: MLTestingToolkitRequest[] = (await axios.get(ttkRequestsHistoryUri, axiosConfig)).data
-        const postConsentsToPISP = requestsHistory.filter(req => {
-          return req.method === 'post' && req.path === '/consents'
-        })
-        expect(postConsentsToPISP.length).toEqual(1)
-        const historyPayload = postConsentsToPISP[0].body as tpAPI.Schemas.ConsentsPostRequestPISP
+        const history = await ttkHistory.getAndFilterWithRetries(2, 'post', '/consents')
+        expect(history.length).toEqual(1)
+        const historyPayload = history[0].body as tpAPI.Schemas.ConsentsPostRequestPISP
 
         expect(historyPayload).toEqual(
           expect.objectContaining({
@@ -1326,15 +1227,10 @@ describe('DFSP Inbound', (): void => {
         const responseToPutConsents = await axios.put(putScenarioUri, putConsentsIDSignedCredentialPayload, axiosConfig)
         expect(responseToPutConsents.status).toEqual(202)
 
-        await new Promise(resolve => setTimeout(resolve, 200));
-
         // check that the DFSP has sent a POST /consents to the auth-service
-        const requestsHistory: MLTestingToolkitRequest[] = (await axios.get(ttkRequestsHistoryUri, axiosConfig)).data
-        const postConsentsToAuthService = requestsHistory.filter(req => {
-          return req.method === 'post' && req.path === '/consents'
-        })
-        expect(postConsentsToAuthService.length).toEqual(1)
-        const historyPayload = postConsentsToAuthService[0].body as tpAPI.Schemas.ConsentsPostRequestAUTH
+        const history = await ttkHistory.getAndFilterWithRetries(2, 'post', '/consents')
+        expect(history.length).toEqual(1)
+        const historyPayload = history[0].body as tpAPI.Schemas.ConsentsPostRequestAUTH
 
         expect(historyPayload).toEqual(
           expect.objectContaining({
@@ -1360,15 +1256,10 @@ describe('DFSP Inbound', (): void => {
         const responseToPutConsents = await axios.put(putScenarioUri, putConsentsIDErrorPayload, axiosConfig)
         expect(responseToPutConsents.status).toEqual(200)
 
-        await new Promise(resolve => setTimeout(resolve, 200));
-
         // check that the DFSP has sent a PUT /consents/{ID}/error to the PISP
-        const requestsHistory: MLTestingToolkitRequest[] = (await axios.get(ttkRequestsHistoryUri, axiosConfig)).data
-        const putConsentsErrorToPISP = requestsHistory.filter(req => {
-          return req.method === 'put' && req.path === `/consents/${consentId}/error`
-        })
-        expect(putConsentsErrorToPISP.length).toEqual(1)
-        const historyPayload = putConsentsErrorToPISP[0].body as tpAPI.Schemas.ErrorInformation
+        const history = await ttkHistory.getAndFilterWithRetries(2, 'put', `/consents/${consentId}/error`)
+        expect(history.length).toEqual(1)
+        const historyPayload = history[0].body as tpAPI.Schemas.ErrorInformation
 
         expect(historyPayload).toEqual(
           {
