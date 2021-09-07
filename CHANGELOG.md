@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+## [11.51.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.50.0...v11.51.0) (2021-09-07)
+
+
+### Features
+
+* **dfsp-tx:** use auth-service to verify a transaction ([#121](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/121)) ([f69f226](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/f69f226b84f7d3d33bb141560db0fd711e9e3545))
+
 ## [11.50.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.49.0...v11.50.0) (2021-09-06)
 
 
