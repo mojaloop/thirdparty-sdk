@@ -5,6 +5,7 @@ import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
 import { StateResponseToolkit } from '~/server/plugins/state'
 import ThirdpartyRequestsTransactions from '~/handlers/inbound/thirdpartyRequests/transactions'
 import ThirdpartyRequestsAuthorizations from '~/handlers/inbound/thirdpartyRequests/authorizations'
+import ThirdpartyRequestsVerifications from '~/handlers/inbound/thirdpartyRequests/verifications'
 import { Request } from '@hapi/hapi'
 import { Context } from 'openapi-backend'
 import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
@@ -14,7 +15,6 @@ import { SDKOutgoingRequests } from '~/shared/sdk-outgoing-requests'
 import { PubSub } from '~/shared/pub-sub'
 import { DFSPTransactionModel } from '~/models/dfspTransaction.model'
 import { mockDeferredJobWithCallbackMessage } from '../mockDeferredJob'
-
 
 const requestAuthorizationResponse = {
   signedPayloadType: 'FIDO',
@@ -28,6 +28,10 @@ const requestAuthorizationResponse = {
     },
     type: 'public-key'
   }
+}
+
+const requestVerificationResponse = {
+  authenticationResponse: 'VERIFIED'
 }
 
 // Mock deferredJob to inject our async callbacks
@@ -107,9 +111,8 @@ describe('Inbound DFSP Transaction handler', () => {
       putThirdpartyRequestsTransactions: jest.fn(() => Promise.resolve({ statusCode: 200 })),
       patchThirdpartyRequestsTransactions: jest.fn(() => Promise.resolve({ statusCode: 200 })),
       putThirdpartyRequestsTransactionsError: jest.fn(() => Promise.resolve({ statusCode: 200 })),
-      // TODO: change to postThirdpartyRequestsAuthorizations once we've updated sdk-standard-components
-      _post: jest.fn(() => Promise.resolve({ statusCode: 202 }))
-
+      postThirdpartyRequestsAuthorizations: jest.fn(() => Promise.resolve({ statusCode: 200 })),
+      postThirdpartyRequestsVerifications: jest.fn(() => Promise.resolve({ statusCode: 200 })),
     } as unknown as ThirdpartyRequests
 
     dfspBackendRequestsMock = {
@@ -149,6 +152,7 @@ describe('Inbound DFSP Transaction handler', () => {
 
     // Initial call
     mockDeferredJobWithCallbackMessage('testAuthChannel', requestAuthorizationResponse)
+    mockDeferredJobWithCallbackMessage('testVerifyChannel', requestVerificationResponse)
     const result = await ThirdpartyRequestsTransactions.post(
       {} as unknown as Context,
       request as unknown as Request,
@@ -156,17 +160,14 @@ describe('Inbound DFSP Transaction handler', () => {
     )
     expect(result.statusCode).toBe(202)
 
-    // PISP sends PUT /thirdpartyRequests/authorizations/{ID}
-    // maybe we can just asserts that pubsub got called here
-
     // give 100ms for post background job to be done
     setTimeout(async () => {
       // it is the happy flow so no error callback should be called
       expect(thirdpartyRequestsMock.putThirdpartyRequestsTransactionsError).not.toBeCalled()
 
       // all these endpoints are used by the flow
-      // @ts-ignore - will be fixed by updating sdk-standard-components and changing to proper method
-      expect(thirdpartyRequestsMock._post).toBeCalledTimes(1)
+      expect(thirdpartyRequestsMock.postThirdpartyRequestsAuthorizations).toBeCalledTimes(1)
+      expect(thirdpartyRequestsMock.postThirdpartyRequestsVerifications).toBeCalledTimes(1)
       expect(thirdpartyRequestsMock.putThirdpartyRequestsTransactions).toBeCalledTimes(1)
       expect(thirdpartyRequestsMock.patchThirdpartyRequestsTransactions).toBeCalledTimes(1)
       expect(dfspBackendRequestsMock.validateThirdpartyTransactionRequestAndGetContext).toBeCalledTimes(1)
@@ -218,6 +219,43 @@ describe('Inbound DFSP Transaction handler', () => {
     expect(publishMock).toHaveBeenCalledWith(...expectedPublishMock)
   })
 
-  // TODO: next PR
-  it.todo('PUT /thirdpartyRequests/verifications/{ID}')
+  it('PUT /thirdpartyRequests/verifications/{ID}', async () => {
+    // Arrange
+    jest.spyOn(DFSPTransactionModel, 'notificationChannel')
+      .mockReturnValueOnce('channel1234')
+    const verificationRequestId = uuidv4()
+    const request = {
+      method: 'PUT',
+      url: `/thirdpartyRequests/verifications/${verificationRequestId}`,
+      headers: {
+        'Content-Type': 'application/json',
+        'fspiop-source': 'sourceDfspId'
+      },
+      params: {
+        ID: verificationRequestId
+      },
+      payload: requestVerificationResponse
+    }
+    const expectedNotificationChannel: unknown[] = [
+      'waitOnVerificationResponseFromSwitchChannel',
+      verificationRequestId
+    ]
+    const expectedPublishMock: unknown[] = [
+      'channel1234',
+      requestVerificationResponse
+    ]
+
+
+    // Act
+    const result = await ThirdpartyRequestsVerifications.put(
+      {} as unknown as Context,
+      request as unknown as Request,
+      toolkit as unknown as StateResponseToolkit
+    )
+
+    // Assert
+    expect(result.statusCode).toBe(200)
+  expect(DFSPTransactionModel.notificationChannel).toHaveBeenCalledWith(...expectedNotificationChannel)
+  expect(publishMock).toHaveBeenCalledWith(...expectedPublishMock)
+  })
 })

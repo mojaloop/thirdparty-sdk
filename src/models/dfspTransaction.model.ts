@@ -47,7 +47,8 @@ import { Message, PubSub } from '~/shared/pub-sub'
 
 // Some constants to use for async jobs
 export enum DFSPTransactionPhase {
-  waitOnAuthResponseFromPISPChannel = 'waitOnAuthResponseFromPISPChannel'
+  waitOnAuthResponseFromPISPChannel = 'waitOnAuthResponseFromPISPChannel',
+  waitOnVerificationResponseFromSwitchChannel = 'waitOnVerificationResponseFromSwitchChannel'
 }
 
 export class DFSPTransactionModel
@@ -270,14 +271,8 @@ export class DFSPTransactionModel
       await deferredJob(this.subscriber, waitOnAuthResponseFromPISPChannel)
         .init(async channel => {
           // Send the request to the PISP
-          // TODO: implement this on sdk-standard-components
-          // await this.thirdpartyRequests.postThirdpartyRequestsAuthorizations
-
-          // @ts-ignore - internal function
-          const response = await this.thirdpartyRequests._post(
-            'thirdpartyRequests/authorizations',
-            'thirdparty',
-            this.data.requestAuthorizationPostRequest,
+          const response = await this.thirdpartyRequests.postThirdpartyRequestsAuthorizations(
+            this.data.requestAuthorizationPostRequest!,
             this.data.participantId
           )
           this.logger.push({ response, channel })
@@ -321,96 +316,118 @@ export class DFSPTransactionModel
   }
 
   async onVerifyAuthorization (): Promise<void> {
-    InvalidDataError.throwIfInvalidProperty(this.data, 'requestAuthorizationResponse')
+    try {
+      InvalidDataError.throwIfInvalidProperty(this.data, 'requestAuthorizationResponse')
+      InvalidDataError.throwIfInvalidProperty(this.data.requestAuthorizationResponse!, 'signedPayload')
+      InvalidDataError.throwIfInvalidProperty(this.data, 'transactionRequestContext')
 
-    // TODO: talk to the auth-service with thirdpartyRequests/verifications!
+      const verificationRequestId = uuidv4()
+      const channel = DFSPTransactionModel.notificationChannel(
+        DFSPTransactionPhase.waitOnVerificationResponseFromSwitchChannel,
+        verificationRequestId
+      )
 
-    // shortcut
-    const authorizationInfo = this.data.requestAuthorizationResponse!
-    // console.log('received authorization from PISP!', authorizationInfo)
-    console.log('TODO: talk to the auth service! POST /thirdpartyRequests/verifications !')
-
-    this.data.transferId = uuidv4()
-
-    const tr = this.data.transactionRequestRequest
-    const quote = this.data.requestQuoteResponse!.quotes
-    this.data.transactionRequestState = 'ACCEPTED'
-
-    // prepare transfer request
-    this.data.transferRequest = {
-      fspId: this.config.dfspId,
-      transfersPostRequest: {
-        transferId: this.data.transferId!,
-
-        // payee & payer data from /thirdpartyRequests/transaction
-        payeeFsp: tr.payee.partyIdInfo.fspId!,
-        payerFsp: this.config.dfspId,
-
-        // transfer data from quote response
-        amount: { ...quote.transferAmount },
-        ilpPacket: quote.ilpPacket,
-        condition: quote.condition,
-
-        // TODO: investigate recalculation of expiry...
-        expiration:
-        tr.expiration
+      const signedPayloadType = this.data.requestAuthorizationResponse!.signedPayloadType
+      // help typescript to figure out what to do
+      switch (signedPayloadType) {
+        case 'FIDO': {
+          const rar = this.data.requestAuthorizationResponse! as tpAPI.Schemas.ThirdpartyRequestsAuthorizationsIDPutResponseFIDO
+          this.data.requestVerificationPostRequest = {
+            verificationRequestId,
+            consentId: this.data.transactionRequestContext!.consentId,
+            signedPayload: rar.signedPayload,
+            signedPayloadType: 'FIDO',
+            challenge: '12345'
+          }
+          break
+        }
+        case 'GENERIC': {
+          const rar = this.data.requestAuthorizationResponse! as tpAPI.Schemas.ThirdpartyRequestsAuthorizationsIDPutResponseGeneric
+          this.data.requestVerificationPostRequest = {
+            verificationRequestId,
+            consentId: this.data.transactionRequestContext!.consentId,
+            signedPayload: rar.signedPayload!,
+            signedPayloadType: 'GENERIC',
+            challenge: '12345'
+          }
+          break
+        }
+        default:
+          throw new Error(`unhandled signedPayloadType: ${signedPayloadType}`)
       }
+
+      await deferredJob(this.subscriber, channel)
+        .init(async channel => {
+          // Send the request to the PISP
+          const response = await this.thirdpartyRequests.postThirdpartyRequestsVerifications(
+            this.data.requestVerificationPostRequest!,
+            this.data.participantId
+          )
+          this.logger.push({ response, channel })
+            .log('ThirdpartyRequests.postThirdpartyRequestsVerifications call sent to peer, listening on response')
+        })
+        .job(async (message: Message): Promise<void> => {
+          try {
+            type PutResponse = tpAPI.Schemas.ThirdpartyRequestsVerificationsIDPutResponse
+            type PutResponseOrError = PutResponse & fspiopAPI.Schemas.ErrorInformationObject
+            const putResponse = message as unknown as PutResponseOrError
+
+            if (putResponse.errorInformation) {
+              this.data.errorInformation = putResponse.errorInformation as unknown as fspiopAPI.Schemas.ErrorInformation
+              return Promise.reject(putResponse.errorInformation)
+            }
+
+            this.logger.info(`received ${putResponse} from PISP`)
+            this.data.requestVerificationResponse = putResponse
+
+            this.data.transferId = uuidv4()
+
+            // AuthService has approved, prepare transfer request
+            const tr = this.data.transactionRequestRequest
+            const quote = this.data.requestQuoteResponse!.quotes
+            this.data.transactionRequestState = 'ACCEPTED'
+
+            this.data.transferRequest = {
+              fspId: this.config.dfspId,
+              transfersPostRequest: {
+                transferId: this.data.transferId!,
+
+                // payee & payer data from /thirdpartyRequests/transaction
+                payeeFsp: tr.payee.partyIdInfo.fspId!,
+                payerFsp: this.config.dfspId,
+
+                // transfer data from quote response
+                amount: { ...quote.transferAmount },
+                ilpPacket: quote.ilpPacket,
+                condition: quote.condition,
+
+                // TODO: investigate recalculation of expiry...
+                expiration:
+                  tr.expiration
+              }
+            }
+          } catch (error) {
+            this.logger.push(error).error('ThirdpartyRequests.postThirdpartyRequestsVerifications request error')
+            return Promise.reject(error)
+          }
+        })
+        // This requires user input on the PISP side, so this number should be something reasonable, like 1 minute or so
+        .wait(this.config.transactionRequestVerificationTimeoutSeconds * 1000)
+    } catch (error) {
+      const mojaloopError = reformatError(
+        Errors.MojaloopApiErrorCodes.TP_AUTH_SERVICE_ERROR,
+        this.logger
+      )
+
+      // If something failed here, inform the PISP that the transactionRequest failed
+      await this.thirdpartyRequests.putThirdpartyRequestsTransactionsError(
+        mojaloopError as unknown as fspiopAPI.Schemas.ErrorInformationObject,
+        this.data.transactionRequestId,
+        this.data.participantId
+      )
+
+      throw Errors.MojaloopApiErrorCodes.TP_AUTH_SERVICE_ERROR
     }
-
-    // different actions on responseType
-    // switch (authorizationInfo.responseType) {
-    //   case 'ENTERED': {
-    //     // user accepted quote & transfer details
-    //     // let verify entered signed challenge by DFSP backend
-    //     const result = await this.dfspBackendRequests.verifyAuthorization(authorizationInfo)
-
-    //     if (!(result && result.isValid)) {
-    //       throw Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_AUTHORIZATION_NOT_VALID
-    //     }
-
-    //     // user's challenge has been successfully verified
-    //     this.data.transactionRequestState = 'ACCEPTED'
-
-    //     // TODO: to have or not to have transferId - what has been passed to quote - investigate!!!
-    //     this.data.transferId = uuidv4()
-
-    //     const tr = this.data.transactionRequestRequest
-    //     const quote = this.data.requestQuoteResponse!.quotes
-    //     // prepare transfer request
-    //     this.data.transferRequest = {
-    //       fspId: this.config.dfspId,
-    //       transfersPostRequest: {
-    //         transferId: this.data.transferId!,
-
-    //         // payee & payer data from /thirdpartyRequests/transaction
-    //         payeeFsp: tr.payee.partyIdInfo.fspId!,
-    //         payerFsp: this.config.dfspId,
-
-    //         // transfer data from quote response
-    //         amount: { ...quote.transferAmount },
-    //         ilpPacket: quote.ilpPacket,
-    //         condition: quote.condition,
-
-    //         // TODO: investigate recalculation of expiry...
-    //         expiration: tr.expiration
-    //       }
-
-    //     }
-    //     break
-    //   }
-
-    //   case 'REJECTED': {
-    //     // user rejected authorization so transfer is declined, let abort workflow!
-    //     this.data.transactionRequestState = 'REJECTED'
-    //     throw Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_AUTHORIZATION_REJECTED_BY_USER
-    //   }
-
-    //   default: {
-    //     // should we setup ??? this.data.transactionRequestState = 'REJECTED'
-    //     // we received 'RESEND' or something else...
-    //     throw Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_AUTHORIZATION_UNEXPECTED
-    //   }
-    // }
   }
 
   async onRequestTransfer (): Promise<void> {

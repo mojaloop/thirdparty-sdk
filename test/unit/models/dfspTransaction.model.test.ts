@@ -70,9 +70,11 @@ describe('DFSPTransactionModel', () => {
   let requestQuoteRequest: SDKOutboundAPI.Schemas.quotesPostRequest
   let requestQuoteResponse: SDKOutboundAPI.Schemas.quotesPostResponse
   let requestAuthorizationResponse: tpAPI.Schemas.ThirdpartyRequestsAuthorizationsIDPutResponse
+  let requestVerificationResponse: tpAPI.Schemas.ThirdpartyRequestsVerificationsIDPutResponse
   let requestTransferResponse: SDKOutboundAPI.Schemas.simpleTransfersPostResponse
   let transferRequest: SDKOutboundAPI.Schemas.simpleTransfersPostRequest
   let transferId: string
+
 
   beforeEach(async () => {
     modelConfig = {
@@ -85,8 +87,8 @@ describe('DFSPTransactionModel', () => {
         putThirdpartyRequestsTransactions: jest.fn(() => Promise.resolve({ statusCode: 200 })),
         patchThirdpartyRequestsTransactions: jest.fn(() => Promise.resolve({ statusCode: 200 })),
         putThirdpartyRequestsTransactionsError: jest.fn(() => Promise.resolve({ statusCode: 200 })),
-        // @ts-ignore - private function, will be resolved once I fix sdk-standard-components
-        _post: jest.fn(() => Promise.resolve({ statusCode: 202 }))
+        postThirdpartyRequestsAuthorizations: jest.fn(() => Promise.resolve({ statusCode: 200 })),
+        postThirdpartyRequestsVerifications: jest.fn(() => Promise.resolve({ statusCode: 200 })),
       } as unknown as ThirdpartyRequests,
       sdkOutgoingRequests: {
         requestQuote: jest.fn(() => Promise.resolve(requestQuoteResponse)),
@@ -161,6 +163,10 @@ describe('DFSPTransactionModel', () => {
         expiration: (new Date()).toISOString()
       },
       currentState: 'COMPLETED'
+    }
+
+    requestVerificationResponse = {
+      authenticationResponse: 'VERIFIED'
     }
 
     requestAuthorizationResponse = {
@@ -270,6 +276,7 @@ describe('DFSPTransactionModel', () => {
       
       // mock async callback(s)
       mockDeferredJobWithCallbackMessage('testAuthChannel', requestAuthorizationResponse)
+      mockDeferredJobWithCallbackMessage('testVerifyChannel', requestVerificationResponse)
 
       const data: DFSPTransactionData = {
         transactionRequestId,
@@ -398,10 +405,7 @@ describe('DFSPTransactionModel', () => {
 
       // onRequestAuthorization
       expect(model.data.requestAuthorizationPostRequest).toBeDefined()
-      // @ts-ignore - will be fixed with sdk-standard-components
-      expect(modelConfig.thirdpartyRequests._post).toBeCalledWith(
-        'thirdpartyRequests/authorizations',
-        'thirdparty',
+      expect(modelConfig.thirdpartyRequests.postThirdpartyRequestsAuthorizations).toBeCalledWith(
         model.data.requestAuthorizationPostRequest,
         model.data.participantId,
       )
@@ -413,12 +417,11 @@ describe('DFSPTransactionModel', () => {
       expect(model.data.requestAuthorizationResponse).toEqual(requestAuthorizationResponse)
 
       // onVerifyAuthorization
-      // check did we do proper call downstream
-      // TODO: remove this in favour of sdk-standard-components call
-      // Will be covered in next PR
-      // expect(model.dfspBackendRequests.verifyAuthorization).toHaveBeenCalledWith(
-      //   model.data.requestAuthorizationResponse!
-      // )
+      // check did we do proper call back to Switch
+      expect(modelConfig.thirdpartyRequests.postThirdpartyRequestsVerifications).toBeCalledWith(
+        model.data.requestVerificationPostRequest,
+        model.data.participantId,
+      )
 
       // check the setup of transferRequest
       expect(model.data.transferRequest).toBeDefined()
@@ -540,10 +543,8 @@ describe('DFSPTransactionModel', () => {
       mocked(modelConfig.kvs.set).mockImplementationOnce(() => Promise.resolve(true))
       mocked(modelConfig.thirdpartyRequests.putThirdpartyRequestsTransactionsError)
         .mockImplementationOnce(() => Promise.resolve(undefined))
-
-      // @ts-ignore - private function, will be resolved once I fix sdk-standard-components
-      mocked(modelConfig.thirdpartyRequests._post).mockImplementationOnce(
-        () => Promise.resolve({ statusCode: 202 })
+      mocked(modelConfig.thirdpartyRequests.postThirdpartyRequestsAuthorizations).mockImplementationOnce(
+        () => Promise.resolve(undefined)
       )
 
       // mock PUT /thirdpartyRequests/authorizations/{ID}/error callback
@@ -573,12 +574,20 @@ describe('DFSPTransactionModel', () => {
       }
     })
 
-    // TODO: will come back to this in next /verify PR
-    it.skip('should throw if verifyAuthorization failed', async (done) => {
+    it('should throw if verifyAuthorization failed', async (done) => {
       mocked(modelConfig.kvs.set).mockImplementationOnce(() => Promise.resolve(true))
-      mocked(modelConfig.dfspBackendRequests.verifyAuthorization).mockImplementationOnce(
-        () => Promise.resolve({ isValid: false })
+      mocked(modelConfig.thirdpartyRequests.postThirdpartyRequestsVerifications).mockImplementationOnce(
+        () => Promise.resolve(undefined)
       )
+
+      // mock PUT /thirdpartyRequests/verifications/{ID}/error callback
+      mockDeferredJobWithCallbackMessage('testAuthChannel', {
+        errorInformation: {
+          errorCode: Errors.MojaloopApiErrorCodes.TP_AUTH_SERVICE_ERROR,
+          errorDescription: 'Invalid signed challenge'
+        }
+      })
+
       const data: DFSPTransactionData = {
         transactionRequestId,
         transactionRequestState: 'RECEIVED',
@@ -594,7 +603,7 @@ describe('DFSPTransactionModel', () => {
       try {
         await model.fsm.verifyAuthorization()
       } catch (err) {
-        expect(err).toEqual(Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_AUTHORIZATION_NOT_VALID)
+        expect(err).toEqual(Errors.MojaloopApiErrorCodes.TP_AUTH_SERVICE_ERROR)
         done()
       }
     })
@@ -628,39 +637,6 @@ describe('DFSPTransactionModel', () => {
       } catch (err) {
         expect(model.data.transactionRequestState).toEqual('REJECTED')
         expect(err).toEqual(Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_AUTHORIZATION_REJECTED_BY_USER)
-        done()
-      }
-    })
-
-    // TODO: I think we can remove this - it's no longer valid
-    it.skip('should throw if unexpected responseType received', async (done) => {
-      mocked(modelConfig.kvs.set).mockImplementationOnce(() => Promise.resolve(true))
-      mocked(modelConfig.dfspBackendRequests.verifyAuthorization).mockImplementationOnce(
-        () => Promise.resolve({ isValid: false })
-      )
-      const data: DFSPTransactionData = {
-        transactionRequestId,
-        transactionRequestState: 'RECEIVED',
-        participantId,
-        transactionRequestRequest,
-        transactionRequestPutUpdate,
-        requestQuoteRequest,
-        requestQuoteResponse,
-        requestAuthorizationResponse: {
-          ...requestAuthorizationResponse,
-          // TODO: remove me!
-          // authorizations: {
-          //   ...requestAuthorizationResponse.authorizations,
-          //   responseType: 'RESEND'
-          // }
-        },
-        currentState: 'authorizationReceived'
-      }
-      const model = await create(data, modelConfig)
-      try {
-        await model.fsm.verifyAuthorization()
-      } catch (err) {
-        expect(err).toEqual(Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_AUTHORIZATION_UNEXPECTED)
         done()
       }
     })

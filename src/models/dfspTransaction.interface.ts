@@ -95,12 +95,15 @@ export interface DFSPTransactionData extends StateData<DFSPTransactionModelState
   requestQuoteRequest?: SDKOutboundAPI.Schemas.quotesPostRequest
   requestQuoteResponse?: SDKOutboundAPI.Schemas.quotesPostResponse
 
-  // used by requestAuthorization & verifyAuthorization
+  // used by requestAuthorization
   requestAuthorizationPostRequest?: tpAPI.Schemas.ThirdpartyRequestsAuthorizationsPostRequest
   requestAuthorizationResponse?: tpAPI.Schemas.ThirdpartyRequestsAuthorizationsIDPutResponse
 
+  // used by verifyAuthorization
+  requestVerificationPostRequest?: tpAPI.Schemas.ThirdpartyRequestsVerificationsPostRequest
+  requestVerificationResponse?: tpAPI.Schemas.ThirdpartyRequestsVerificationsIDPutResponse
+
   // used by requestTransfer
-  // TODO: proper type for transferRequest
   transferRequest?: SDKOutboundAPI.Schemas.simpleTransfersPostRequest
   transferResponse?: SDKOutboundAPI.Schemas.simpleTransfersPostResponse
   transactionRequestPatchUpdate?: tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPatchResponse
