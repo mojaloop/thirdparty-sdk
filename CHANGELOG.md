@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+## [11.52.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.51.0...v11.52.0) (2021-09-07)
+
+
+### Features
+
+* **integration:** add small helper library to look up historical requests from the ttk ([a9db17e](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/a9db17e3ab74e37d729d4cb6c4262320e466e370))
+
 ## [11.51.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.50.0...v11.51.0) (2021-09-07)
 
 
