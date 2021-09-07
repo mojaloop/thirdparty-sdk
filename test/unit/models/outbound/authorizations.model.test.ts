@@ -220,7 +220,7 @@ describe('OutboundAuthorizationsModel', () => {
         // defer publication to notification channel
         setImmediate(() => publisher.publish(
           channel,
-          putResponse as unknown as Message // TODO: think about generic Message so casting will not be necessary
+          putResponse as unknown as Message
         ))
 
         const result = await model.run()

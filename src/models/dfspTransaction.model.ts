@@ -44,6 +44,8 @@ import { ThirdpartyRequests, Errors } from '@mojaloop/sdk-standard-components'
 import { reformatError } from '~/shared/api-error'
 import deferredJob from '~/shared/deferred-job'
 import { Message, PubSub } from '~/shared/pub-sub'
+import { AuthRequestPartial, deriveTransactionChallenge } from '~/shared/challenge'
+import { feeForTransferAndPayeeReceiveAmount } from '~/shared/feeCalculator'
 
 // Some constants to use for async jobs
 export enum DFSPTransactionPhase {
@@ -236,31 +238,62 @@ export class DFSPTransactionModel
     try {
       InvalidDataError.throwIfInvalidProperty(this.data, 'requestQuoteResponse')
 
-      const authorizationRequestId = uuidv4()
-      // TODO: derive a valid challenge - leaving for now to keep PR size down
-      const challenge = '12345'
+      // shortcut
+      const quote = this.data.requestQuoteResponse!.quotes
+      const trr = this.data.transactionRequestRequest
+      let transferAmount: fspiopAPI.Schemas.Money
+      let payeeReceiveAmount: fspiopAPI.Schemas.Money
+      let fees: fspiopAPI.Schemas.Money
 
-      this.data.requestAuthorizationPostRequest = {
+      // Calculate the amounts based on the quotation, and whether or not
+      // the PISP wanted to SEND a certain amount of funds, or they wanted
+      // the payee to RECEIVE a certain amount
+      switch (trr.amountType) {
+        case 'SEND':  {
+          // If it is SEND, that is the total amount the user wants to send
+          transferAmount = trr.amount
+          if (!quote.payeeReceiveAmount) {
+            // if the amountType is SEND, the Payee DFSP MUST inform us of
+            // what amount will reach the
+            throw Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_REQUEST_QUOTE_FAILED
+          }
+          payeeReceiveAmount = quote.payeeReceiveAmount
+          break;
+        }
+        case 'RECEIVE': {
+          // If it is RECEIVE, the amount in the 3rd Party Transaction request
+          // is what will reach the user
+          transferAmount = quote.transferAmount
+          payeeReceiveAmount = trr.amount
+          break;
+        }
+        default: { 
+          throw new Error(`unhandled amountType: ${trr.amountType}`) 
+        }
+      }
+
+      // fees are calulated on the basic difference between transfer amount 
+      // and receive amount. This doesn't take into consideration any fees 
+      // the Payer DFSP might want to add, or any commission they receive
+      fees = feeForTransferAndPayeeReceiveAmount(transferAmount, payeeReceiveAmount)
+
+      const authorizationRequestId = uuidv4()
+      const authRequestPartial: AuthRequestPartial = {
         authorizationRequestId,
         transactionRequestId: this.data.transactionRequestId,
-        challenge,
-        // TODO: calculate the fees etc. based on the quotation - leaving for now to keep PR size down
-        // We
-        transferAmount: this.data.transactionRequestRequest.amount,
-        payeeReceiveAmount: this.data.transactionRequestRequest.amount,
-        fees: {
-          currency: this.data.transactionRequestRequest.amount.currency,
-          amount: this.data.transactionRequestRequest.amount.amount
-        },
+        transferAmount,
+        payeeReceiveAmount,
+        fees,
         payer: this.data.transactionRequestRequest.payer,
         payee: this.data.transactionRequestRequest.payee,
         transactionType: this.data.transactionRequestRequest.transactionType,
-        // Note: a DFSP may wish to shorten this time since it could appear
-        // to a PISP that they still have enough time to complete
-        // a transaction, but by the time the DFSP processes the
-        // authorization result and issues the POST /transfers call, the
-        // quote may have expired.
         expiration: this.data.requestQuoteResponse!.quotes.expiration
+      }
+      const challenge = deriveTransactionChallenge(authRequestPartial)
+
+      this.data.requestAuthorizationPostRequest = {
+       ...authRequestPartial,
+       challenge
       }
 
       const waitOnAuthResponseFromPISPChannel = DFSPTransactionModel.notificationChannel(
