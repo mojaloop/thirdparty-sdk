@@ -104,7 +104,7 @@ describe('DFSP Transaction', (): void => {
       })
 
       // check that the DFSP has sent a POST /thirdpartyRequests/authorizations
-      const historyAuth = await ttkHistory.getAndFilterWithRetries(2, 'post', `/thirdpartyRequests/authorizations`)
+      const historyAuth = await ttkHistory.getAndFilterWithRetries(3, 'post', `/thirdpartyRequests/authorizations`)
       expect(historyAuth.length).toEqual(1)
       const historyAuthPayload = historyAuth[0].body as tpAPI.Schemas.ThirdpartyRequestsAuthorizationsPostRequest
       authorizationRequestId = historyAuthPayload.authorizationRequestId
@@ -112,10 +112,10 @@ describe('DFSP Transaction', (): void => {
       expect(historyAuthPayload).toStrictEqual({
         authorizationRequestId: expect.stringMatching('.*'),
         transactionRequestId,
-        challenge: '12345',
-        transferAmount: { currency: 'USD', amount: '100' },
-        payeeReceiveAmount: { currency: 'USD', amount: '100' },
-        fees: { currency: 'USD', amount: '100' },
+        challenge: expect.stringMatching('.*'),
+        transferAmount: { currency: 'USD', amount: '200' },
+        payeeReceiveAmount: { currency: 'USD', amount: '198' },
+        fees: { currency: 'USD', amount: '2' },
         payer: { partyIdType: 'THIRD_PARTY_LINK', partyIdentifier: 'qwerty-1234' },
         payee: {
           partyIdInfo: {
@@ -167,8 +167,8 @@ describe('DFSP Transaction', (): void => {
       const result = await axios.put(uri, requestVerificationResponse, axiosConfig)
       expect(result.status).toBe(200)
 
-      // check that the DFSP has sent a POST /thirdpartyRequests/verifications to the auth service
-      const history = await ttkHistory.getAndFilterWithRetries(2, 'patch', `/thirdpartyRequests/transactions/${transactionRequestId}`)
+      // check that the DFSP has sent a patch /thirdpartyRequests/transactions/{ID} to the pisp
+      const history = await ttkHistory.getAndFilterWithRetries(3, 'patch', `/thirdpartyRequests/transactions/${transactionRequestId}`)
       expect(history.length).toEqual(1)
       const payload = history[0].body as tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPatchResponse
 

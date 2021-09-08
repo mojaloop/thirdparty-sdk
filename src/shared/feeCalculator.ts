@@ -11,9 +11,10 @@ export function payeeReceiveAmountForQuoteAndFees (
   }
 
   const taValue = Number(transferAmount.amount)
-  const feeAmount = 0
+  let feeAmount = 0
   let commissionAmount = 0
   if (payeeFspFee) {
+    feeAmount = Number(payeeFspFee.amount)
     if (payeeFspFee.currency !== transferAmount.currency) {
       throw new Error('Currency mismatch. Cannot calculate fees across currencies.')
     }
@@ -34,7 +35,8 @@ export function payeeReceiveAmountForQuoteAndFees (
   // Payee Receive Amount = Transfer Amount - Payee FSP Fee + Payee FSP Commission
   // ref: https://docs.mojaloop.io/mojaloop-specification/documents/API%20Definition%20v1.0.html#5141-payee-receive-amount-relation-to-transfer-amount
   const receiveAmount = taValue - feeAmount + commissionAmount
-  const receiveAmountStr = receiveAmount.toFixed(2)
+  // 3P API doesn't allow for trailing zeroes for integer amounts
+  const receiveAmountStr = receiveAmount.toFixed(2).replace('.00', '')
   return {
     amount: receiveAmountStr,
     currency: transferAmount.currency
@@ -65,18 +67,11 @@ export function feeForTransferAndPayeeReceiveAmount (
 
   const feeValue = taValue - raValue
   if (feeValue < 0) {
-    throw new Error('Expected transferAmount to be greater than receive amount')
+    throw new Error(`Expected transferAmount: ${taValue} to be greater than receive amount: ${raValue}`)
   }
 
-  // 3P API doesn't allow for trailing zeroes for a zero
-  if (feeValue === 0) {
-    return {
-      amount: '0',
-      currency: transferAmount.currency
-    }
-  }
-
-  const feeAmountStr = feeValue.toFixed(2)
+  // 3P API doesn't allow for trailing zeroes for integer amounts
+  const feeAmountStr = feeValue.toFixed(2).replace('.00', '')
   return {
     amount: feeAmountStr,
     currency: transferAmount.currency
