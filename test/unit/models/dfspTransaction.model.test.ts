@@ -160,7 +160,8 @@ describe('DFSPTransactionModel', () => {
         transferAmount: { ...transactionRequestRequest.amount },
         ilpPacket: 'abcd...',
         condition: 'xyz....',
-        expiration: (new Date()).toISOString()
+        expiration: (new Date()).toISOString(),
+        payeeReceiveAmount: { ...transactionRequestRequest.amount }
       },
       currentState: 'COMPLETED'
     }

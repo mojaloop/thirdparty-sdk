@@ -546,6 +546,7 @@ export class DFSPTransactionModel
           this.logger.info('State machine in errored state')
       }
     } catch (error) {
+      console.log('some error', error)
       const mojaloopError = reformatError(error, this.logger)
       this.logger.push({ error, mojaloopError }).info(`Sending error response to ${this.data.participantId}`)
       this.data.currentState = 'errored'
