@@ -11,7 +11,7 @@ export function payeeReceiveAmountForQuoteAndFees (
   }
 
   const taValue = Number(transferAmount.amount)
-  
+
   let feeAmount = 0
   let commissionAmount = 0
   if (payeeFspFee) {
