@@ -11,6 +11,7 @@ export function payeeReceiveAmountForQuoteAndFees (
   }
 
   const taValue = Number(transferAmount.amount)
+  
   let feeAmount = 0
   let commissionAmount = 0
   if (payeeFspFee) {
@@ -26,6 +27,8 @@ export function payeeReceiveAmountForQuoteAndFees (
       throw new Error('Currency mismatch. Cannot calculate fees across currencies.')
     }
   }
+
+  console.log('taValue', taValue)
 
   if (isNaN(taValue) || isNaN(feeAmount) || isNaN(commissionAmount)) {
     throw new Error('Invalid amount input. Expected valid number')
