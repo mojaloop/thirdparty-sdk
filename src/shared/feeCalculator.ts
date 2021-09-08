@@ -3,16 +3,15 @@ import { v1_1 as fspiopAPI } from '@mojaloop/api-snippets'
 export function payeeReceiveAmountForQuoteAndFees (
   transferAmount: fspiopAPI.Schemas.Money,
   payeeFspFee?: fspiopAPI.Schemas.Money,
-  payeeFspCommission?: fspiopAPI.Schemas.Money,
+  payeeFspCommission?: fspiopAPI.Schemas.Money
 ): fspiopAPI.Schemas.Money {
-
   if (!payeeFspFee && !payeeFspCommission) {
     // no fees or commission, payee will recieve the transfer amount
     return transferAmount
   }
 
   const taValue = Number(transferAmount.amount)
-  let feeAmount = 0
+  const feeAmount = 0
   let commissionAmount = 0
   if (payeeFspFee) {
     if (payeeFspFee.currency !== transferAmount.currency) {
@@ -68,7 +67,7 @@ export function feeForTransferAndPayeeReceiveAmount (
   if (feeValue < 0) {
     throw new Error('Expected transferAmount to be greater than receive amount')
   }
-  
+
   // 3P API doesn't allow for trailing zeroes for a zero
   if (feeValue === 0) {
     return {
@@ -76,7 +75,7 @@ export function feeForTransferAndPayeeReceiveAmount (
       currency: transferAmount.currency
     }
   }
-  
+
   const feeAmountStr = feeValue.toFixed(2)
   return {
     amount: feeAmountStr,
