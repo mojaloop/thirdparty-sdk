@@ -243,7 +243,6 @@ export class DFSPTransactionModel
       const trr = this.data.transactionRequestRequest
       let transferAmount: fspiopAPI.Schemas.Money
       let payeeReceiveAmount: fspiopAPI.Schemas.Money
-      let fees: fspiopAPI.Schemas.Money
 
       // Calculate the amounts based on the quotation, and whether or not
       // the PISP wanted to SEND a certain amount of funds, or they wanted
@@ -275,7 +274,7 @@ export class DFSPTransactionModel
       // fees are calulated on the basic difference between transfer amount 
       // and receive amount. This doesn't take into consideration any fees 
       // the Payer DFSP might want to add, or any commission they receive
-      fees = feeForTransferAndPayeeReceiveAmount(transferAmount, payeeReceiveAmount)
+      const fees = feeForTransferAndPayeeReceiveAmount(transferAmount, payeeReceiveAmount)
 
       const authorizationRequestId = uuidv4()
       const authRequestPartial: AuthRequestPartial = {
@@ -546,7 +545,6 @@ export class DFSPTransactionModel
           this.logger.info('State machine in errored state')
       }
     } catch (error) {
-      console.log('some error', error)
       const mojaloopError = reformatError(error, this.logger)
       this.logger.push({ error, mojaloopError }).info(`Sending error response to ${this.data.participantId}`)
       this.data.currentState = 'errored'
