@@ -30,14 +30,14 @@ import { canonicalize } from 'json-canonicalize'
 import sha256 from 'crypto-js/sha256'
 
 
-// redefine the ThirdpartyRequestsAuthorizationsPostRequest, without extensions or challenge
+// copy of ThirdpartyRequestsAuthorizationsPostRequest, without extensions or challenge
 export interface AuthRequestPartial {
   authorizationRequestId: string,
   transactionRequestId: string,
   transferAmount: tpAPI.Schemas.Money
   payeeReceiveAmount: tpAPI.Schemas.Money
   fees: tpAPI.Schemas.Money
-  payer:  tpAPI.Schemas.PartyIdInfo
+  payer:  tpAPI.Schemas.PartyIdInfo  
   payee: tpAPI.Schemas.Party
   transactionType: tpAPI.Schemas.TransactionType
   expiration: string
@@ -55,6 +55,5 @@ export interface AuthRequestPartial {
 export function deriveTransactionChallenge(authRequestPartial: AuthRequestPartial): string {
   const cJSONRequest = canonicalize(authRequestPartial)
   const hash = sha256(cJSONRequest)
-
   return hash.toString()
 }
