@@ -248,7 +248,7 @@ export class DFSPTransactionModel
       // the PISP wanted to SEND a certain amount of funds, or they wanted
       // the payee to RECEIVE a certain amount
       switch (trr.amountType) {
-        case 'SEND':  {
+        case 'SEND': {
           // If it is SEND, that is the total amount the user wants to send
           transferAmount = trr.amount
           if (!quote.payeeReceiveAmount) {
@@ -257,22 +257,22 @@ export class DFSPTransactionModel
             throw Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_REQUEST_QUOTE_FAILED
           }
           payeeReceiveAmount = quote.payeeReceiveAmount
-          break;
+          break
         }
         case 'RECEIVE': {
           // If it is RECEIVE, the amount in the 3rd Party Transaction request
           // is what will reach the user
           transferAmount = quote.transferAmount
           payeeReceiveAmount = trr.amount
-          break;
+          break
         }
-        default: { 
-          throw new Error(`unhandled amountType: ${trr.amountType}`) 
+        default: {
+          throw new Error(`unhandled amountType: ${trr.amountType}`)
         }
       }
 
-      // fees are calulated on the basic difference between transfer amount 
-      // and receive amount. This doesn't take into consideration any fees 
+      // fees are calulated on the basic difference between transfer amount
+      // and receive amount. This doesn't take into consideration any fees
       // the Payer DFSP might want to add, or any commission they receive
       const fees = feeForTransferAndPayeeReceiveAmount(transferAmount, payeeReceiveAmount)
 
@@ -291,8 +291,8 @@ export class DFSPTransactionModel
       const challenge = deriveTransactionChallenge(authRequestPartial)
 
       this.data.requestAuthorizationPostRequest = {
-       ...authRequestPartial,
-       challenge
+        ...authRequestPartial,
+        challenge
       }
 
       const waitOnAuthResponseFromPISPChannel = DFSPTransactionModel.notificationChannel(

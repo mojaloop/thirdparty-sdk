@@ -29,7 +29,6 @@ import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
 import { canonicalize } from 'json-canonicalize'
 import sha256 from 'crypto-js/sha256'
 
-
 // copy of ThirdpartyRequestsAuthorizationsPostRequest, without extensions or challenge
 export interface AuthRequestPartial {
   authorizationRequestId: string,
@@ -37,7 +36,7 @@ export interface AuthRequestPartial {
   transferAmount: tpAPI.Schemas.Money
   payeeReceiveAmount: tpAPI.Schemas.Money
   fees: tpAPI.Schemas.Money
-  payer:  tpAPI.Schemas.PartyIdInfo  
+  payer: tpAPI.Schemas.PartyIdInfo
   payee: tpAPI.Schemas.Party
   transactionType: tpAPI.Schemas.TransactionType
   expiration: string
@@ -45,14 +44,14 @@ export interface AuthRequestPartial {
 
 /**
  * @function deriveTransactionChallenge
- * @description Derive a 'meaningful' challenge based on the 
+ * @description Derive a 'meaningful' challenge based on the
  *  authorization object. The DFSP can decide how to do this
- *  
+ *
  *  We recommend to use a SHA256(canonicalJSON(AuthRequestPartial)),
  *  where AuthRequestPartial is the payload of POST /thirdpartyRequests/authorizations
  *  without the extensions or challenge fields
  */
-export function deriveTransactionChallenge(authRequestPartial: AuthRequestPartial): string {
+export function deriveTransactionChallenge (authRequestPartial: AuthRequestPartial): string {
   const cJSONRequest = canonicalize(authRequestPartial)
   const hash = sha256(cJSONRequest)
   return hash.toString()

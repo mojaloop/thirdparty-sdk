@@ -3,15 +3,14 @@ import { v1_1 as fspiopAPI } from '@mojaloop/api-snippets'
 /**
  * @function feeForTransferAndPayeeReceiveAmount
  * @description The fee
- * @param transferAmount 
- * @param receiveAmount 
- * @returns 
+ * @param transferAmount
+ * @param receiveAmount
+ * @returns
  */
-export function feeForTransferAndPayeeReceiveAmount(
+export function feeForTransferAndPayeeReceiveAmount (
   transferAmount: fspiopAPI.Schemas.Money,
   receiveAmount: fspiopAPI.Schemas.Money
 ): fspiopAPI.Schemas.Money {
-
   if (transferAmount.currency !== receiveAmount.currency) {
     throw new Error('Currency mismatch. Cannot calculate fees across currencies.')
   }
