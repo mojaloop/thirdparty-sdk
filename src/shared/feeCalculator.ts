@@ -15,8 +15,13 @@ export function feeForTransferAndPayeeReceiveAmount(
   if (transferAmount.currency !== receiveAmount.currency) {
     throw new Error('Currency mismatch. Cannot calculate fees across currencies.')
   }
-  const taValue = parseFloat(transferAmount.amount)
-  const raValue = parseFloat(receiveAmount.amount)
+
+  // We expect the FSPIOP to have handled any really nasty input until now
+  const taValue = Number(transferAmount.amount)
+  const raValue = Number(receiveAmount.amount)
+  if (isNaN(taValue) || isNaN(raValue)) {
+    throw new Error('Invalid amount input. Expected valid number')
+  }
 
   const feeValue = taValue - raValue
   if (feeValue < 0) {
