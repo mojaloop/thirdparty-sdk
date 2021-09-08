@@ -85,5 +85,24 @@ describe('feeCalculator', () => {
         amount: '0.01'
       })
     })
+
+    it.only('adds on additional decimal places', () => {
+      // Arrange
+      const transferAmount: fspiopAPI.Schemas.Money = {
+        currency: 'AUD',
+        amount: '200',
+      }
+      const receiveAmount: fspiopAPI.Schemas.Money = {
+        currency: 'AUD',
+        amount: '199',
+      }
+
+      // Act
+      const result = feeForTransferAndPayeeReceiveAmount(transferAmount, receiveAmount)
+      expect(result).toStrictEqual({
+        currency: 'AUD',
+        amount: '1.00'
+      })
+    })
   })
 })

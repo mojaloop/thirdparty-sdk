@@ -42,10 +42,10 @@ describe('DFSP Transaction', (): void => {
       partyIdType: 'THIRD_PARTY_LINK',
       partyIdentifier: 'qwerty-1234'
     },
-    amountType: 'SEND',
+    amountType: 'RECEIVE',
     amount: {
       currency: 'USD',
-      amount: '100'
+      amount: '200'
     },
     transactionType: {
       scenario: 'TRANSFER',

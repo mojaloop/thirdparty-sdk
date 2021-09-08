@@ -45,7 +45,7 @@ import { reformatError } from '~/shared/api-error'
 import deferredJob from '~/shared/deferred-job'
 import { Message, PubSub } from '~/shared/pub-sub'
 import { AuthRequestPartial, deriveTransactionChallenge } from '~/shared/challenge'
-import { feeForTransferAndPayeeReceiveAmount } from '~/shared/feeCalculator'
+import { feeForTransferAndPayeeReceiveAmount, payeeReceiveAmountForQuoteAndFees } from '~/shared/feeCalculator'
 
 // Some constants to use for async jobs
 export enum DFSPTransactionPhase {
@@ -240,36 +240,8 @@ export class DFSPTransactionModel
 
       // shortcut
       const quote = this.data.requestQuoteResponse!.quotes
-      const trr = this.data.transactionRequestRequest
-      let transferAmount: fspiopAPI.Schemas.Money
-      let payeeReceiveAmount: fspiopAPI.Schemas.Money
-
-      // Calculate the amounts based on the quotation, and whether or not
-      // the PISP wanted to SEND a certain amount of funds, or they wanted
-      // the payee to RECEIVE a certain amount
-      switch (trr.amountType) {
-        case 'SEND': {
-          // If it is SEND, that is the total amount the user wants to send
-          transferAmount = trr.amount
-          if (!quote.payeeReceiveAmount) {
-            // if the amountType is SEND, the Payee DFSP MUST inform us of
-            // what amount will reach the
-            throw Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_REQUEST_QUOTE_FAILED
-          }
-          payeeReceiveAmount = quote.payeeReceiveAmount
-          break
-        }
-        case 'RECEIVE': {
-          // If it is RECEIVE, the amount in the 3rd Party Transaction request
-          // is what will reach the user
-          transferAmount = quote.transferAmount
-          payeeReceiveAmount = trr.amount
-          break
-        }
-        default: {
-          throw new Error(`unhandled amountType: ${trr.amountType}`)
-        }
-      }
+      const transferAmount: fspiopAPI.Schemas.Money = quote.transferAmount
+      const payeeReceiveAmount = payeeReceiveAmountForQuoteAndFees(transferAmount, quote.payeeFspFee, quote.payeeFspCommission)
 
       // fees are calulated on the basic difference between transfer amount
       // and receive amount. This doesn't take into consideration any fees
@@ -331,6 +303,7 @@ export class DFSPTransactionModel
         // This requires user input on the PISP side, so this number should be something reasonable, like 1 minute or so
         .wait(this.config.transactionRequestAuthorizationTimeoutSeconds * 1000)
     } catch (error) {
+      this.logger.info(error)
       const mojaloopError = reformatError(
         Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_AUTHORIZATION_UNEXPECTED,
         this.logger
@@ -446,6 +419,8 @@ export class DFSPTransactionModel
         // This requires user input on the PISP side, so this number should be something reasonable, like 1 minute or so
         .wait(this.config.transactionRequestVerificationTimeoutSeconds * 1000)
     } catch (error) {
+      this.logger.info(error)
+
       const mojaloopError = reformatError(
         Errors.MojaloopApiErrorCodes.TP_AUTH_SERVICE_ERROR,
         this.logger

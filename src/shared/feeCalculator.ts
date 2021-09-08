@@ -1,8 +1,50 @@
 import { v1_1 as fspiopAPI } from '@mojaloop/api-snippets'
 
+export function payeeReceiveAmountForQuoteAndFees (
+  transferAmount: fspiopAPI.Schemas.Money,
+  payeeFspFee?: fspiopAPI.Schemas.Money,
+  payeeFspCommission?: fspiopAPI.Schemas.Money,
+): fspiopAPI.Schemas.Money {
+
+  if (!payeeFspFee && !payeeFspCommission) {
+    // no fees or commission, payee will recieve the transfer amount
+    return transferAmount
+  }
+
+  const taValue = Number(transferAmount.amount)
+  let feeAmount = 0
+  let commissionAmount = 0
+  if (payeeFspFee) {
+    if (payeeFspFee.currency !== transferAmount.currency) {
+      throw new Error('Currency mismatch. Cannot calculate fees across currencies.')
+    }
+  }
+
+  if (payeeFspCommission) {
+    commissionAmount = Number(payeeFspCommission.amount)
+    if (payeeFspCommission.currency !== transferAmount.currency) {
+      throw new Error('Currency mismatch. Cannot calculate fees across currencies.')
+    }
+  }
+
+  if (isNaN(taValue) || isNaN(feeAmount) || isNaN(commissionAmount)) {
+    throw new Error('Invalid amount input. Expected valid number')
+  }
+
+  // 5.1.4.1 - Calculating Payee Receive Amount
+  // Payee Receive Amount = Transfer Amount - Payee FSP Fee + Payee FSP Commission
+  // ref: https://docs.mojaloop.io/mojaloop-specification/documents/API%20Definition%20v1.0.html#5141-payee-receive-amount-relation-to-transfer-amount
+  const receiveAmount = taValue - feeAmount + commissionAmount
+  const receiveAmountStr = receiveAmount.toFixed(2)
+  return {
+    amount: receiveAmountStr,
+    currency: transferAmount.currency
+  }
+}
+
 /**
  * @function feeForTransferAndPayeeReceiveAmount
- * @description The fee
+ * @description Calculate the total fee for the transfer and payee receive amount
  * @param transferAmount
  * @param receiveAmount
  * @returns
@@ -26,6 +68,15 @@ export function feeForTransferAndPayeeReceiveAmount (
   if (feeValue < 0) {
     throw new Error('Expected transferAmount to be greater than receive amount')
   }
+  
+  // 3P API doesn't allow for trailing zeroes for a zero
+  if (feeValue === 0) {
+    return {
+      amount: '0',
+      currency: transferAmount.currency
+    }
+  }
+  
   const feeAmountStr = feeValue.toFixed(2)
   return {
     amount: feeAmountStr,
