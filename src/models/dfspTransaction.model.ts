@@ -44,6 +44,8 @@ import { ThirdpartyRequests, Errors } from '@mojaloop/sdk-standard-components'
 import { reformatError } from '~/shared/api-error'
 import deferredJob from '~/shared/deferred-job'
 import { Message, PubSub } from '~/shared/pub-sub'
+import { AuthRequestPartial, deriveTransactionChallenge } from '~/shared/challenge'
+import { feeForTransferAndPayeeReceiveAmount, payeeReceiveAmountForQuoteAndFees } from '~/shared/feeCalculator'
 
 // Some constants to use for async jobs
 export enum DFSPTransactionPhase {
@@ -236,31 +238,33 @@ export class DFSPTransactionModel
     try {
       InvalidDataError.throwIfInvalidProperty(this.data, 'requestQuoteResponse')
 
-      const authorizationRequestId = uuidv4()
-      // TODO: derive a valid challenge - leaving for now to keep PR size down
-      const challenge = '12345'
+      // shortcut
+      const quote = this.data.requestQuoteResponse!.quotes
+      const transferAmount: fspiopAPI.Schemas.Money = quote.transferAmount
+      const payeeReceiveAmount = payeeReceiveAmountForQuoteAndFees(transferAmount, quote.payeeFspFee, quote.payeeFspCommission)
 
-      this.data.requestAuthorizationPostRequest = {
+      // fees are calulated on the basic difference between transfer amount
+      // and receive amount. This doesn't take into consideration any fees
+      // the Payer DFSP might want to add, or any commission they receive
+      const fees = feeForTransferAndPayeeReceiveAmount(transferAmount, payeeReceiveAmount)
+
+      const authorizationRequestId = uuidv4()
+      const authRequestPartial: AuthRequestPartial = {
         authorizationRequestId,
         transactionRequestId: this.data.transactionRequestId,
-        challenge,
-        // TODO: calculate the fees etc. based on the quotation - leaving for now to keep PR size down
-        // We
-        transferAmount: this.data.transactionRequestRequest.amount,
-        payeeReceiveAmount: this.data.transactionRequestRequest.amount,
-        fees: {
-          currency: this.data.transactionRequestRequest.amount.currency,
-          amount: this.data.transactionRequestRequest.amount.amount
-        },
+        transferAmount,
+        payeeReceiveAmount,
+        fees,
         payer: this.data.transactionRequestRequest.payer,
         payee: this.data.transactionRequestRequest.payee,
         transactionType: this.data.transactionRequestRequest.transactionType,
-        // Note: a DFSP may wish to shorten this time since it could appear
-        // to a PISP that they still have enough time to complete
-        // a transaction, but by the time the DFSP processes the
-        // authorization result and issues the POST /transfers call, the
-        // quote may have expired.
         expiration: this.data.requestQuoteResponse!.quotes.expiration
+      }
+      const challenge = deriveTransactionChallenge(authRequestPartial)
+
+      this.data.requestAuthorizationPostRequest = {
+        ...authRequestPartial,
+        challenge
       }
 
       const waitOnAuthResponseFromPISPChannel = DFSPTransactionModel.notificationChannel(
@@ -299,6 +303,7 @@ export class DFSPTransactionModel
         // This requires user input on the PISP side, so this number should be something reasonable, like 1 minute or so
         .wait(this.config.transactionRequestAuthorizationTimeoutSeconds * 1000)
     } catch (error) {
+      this.logger.info(error)
       const mojaloopError = reformatError(
         Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_AUTHORIZATION_UNEXPECTED,
         this.logger
@@ -414,6 +419,8 @@ export class DFSPTransactionModel
         // This requires user input on the PISP side, so this number should be something reasonable, like 1 minute or so
         .wait(this.config.transactionRequestVerificationTimeoutSeconds * 1000)
     } catch (error) {
+      this.logger.info(error)
+
       const mojaloopError = reformatError(
         Errors.MojaloopApiErrorCodes.TP_AUTH_SERVICE_ERROR,
         this.logger

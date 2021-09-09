@@ -75,7 +75,6 @@ describe('SDKOutgoingRequests', () => {
           },
           payer: {
             partyIdInfo: {
-              // TODO: investigate quotes interface and payer 'THIRD_PARTY_LINK' problem
               partyIdType: 'MSISDN',
               partyIdentifier: '+44 5678 1234'
             }
