@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+## [11.53.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.52.0...v11.53.0) (2021-09-09)
+
+
+### Features
+
+* **dfsp-transaction:** add challenge deriviation, fee summarizing functions ([#122](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/122)) ([7becdfe](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/7becdfefa0cae7a9c52cba93c0a261810f118a29))
+
 ## [11.52.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.51.0...v11.52.0) (2021-09-07)
 
 
