@@ -422,7 +422,7 @@ describe('DFSPTransactionModel', () => {
       // check did we do proper call back to Switch
       expect(modelConfig.thirdpartyRequests.postThirdpartyRequestsVerifications).toBeCalledWith(
         model.data.requestVerificationPostRequest,
-        model.data.participantId,
+        'centralAuth',
       )
 
       // check the setup of transferRequest

@@ -369,7 +369,7 @@ export class DFSPTransactionModel
           // Send the request to the PISP
           const response = await this.thirdpartyRequests.postThirdpartyRequestsVerifications(
             this.data.requestVerificationPostRequest!,
-            this.config.authServiceParticipantId,
+            this.config.authServiceParticipantId
           )
           this.logger.push({ response, channel })
             .log('ThirdpartyRequests.postThirdpartyRequestsVerifications call sent to peer, listening on response')
