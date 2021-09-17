@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+## [11.55.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.54.0...v11.55.0) (2021-09-17)
+
+
+### Features
+
+* **test:** deterministic challenge ([#124](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/124)) ([ea594bf](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/ea594bfb74437eb83e1ea28ef77b091745e5388b))
+
 ## [11.54.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.53.0...v11.54.0) (2021-09-17)
 
 
