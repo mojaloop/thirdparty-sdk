@@ -107,7 +107,8 @@ describe('DFSPTransactionModel', () => {
         verifyAuthorization: jest.fn(() => Promise.resolve({ isValid: true }))
       } as unknown as DFSPBackendRequests,
       transactionRequestAuthorizationTimeoutSeconds: 100,
-      transactionRequestVerificationTimeoutSeconds: 15
+      transactionRequestVerificationTimeoutSeconds: 15,
+      authServiceParticipantId: 'centralAuth'
     }
     transactionRequestId = uuidv4()
     participantId = uuidv4()
@@ -421,7 +422,7 @@ describe('DFSPTransactionModel', () => {
       // check did we do proper call back to Switch
       expect(modelConfig.thirdpartyRequests.postThirdpartyRequestsVerifications).toBeCalledWith(
         model.data.requestVerificationPostRequest,
-        model.data.participantId,
+        'centralAuth',
       )
 
       // check the setup of transferRequest

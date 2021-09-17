@@ -122,7 +122,8 @@ export interface ServiceConfig {
     TEMP_OVERRIDE_QUOTES_PARTY_ID_TYPE?: fspiopAPI.Schemas.PartyIdType
     TEST_OVERRIDE_CONSENT_ID?: string,
     TEST_SHOULD_OVERRIDE_CONSENT_ID: boolean,
-    TEST_CONSENT_REQUEST_TO_CONSENT_MAP: Record<string, string>
+    TEST_CONSENT_REQUEST_TO_CONSENT_MAP: Record<string, string>,
+    TEST_OVERRIDE_TRANSACTION_CHALLENGE?: string,
   }
 }
 
@@ -469,6 +470,11 @@ it will fallback to default behaviour (random consentId)`,
       doc: 'A map of consentIds to use for a given consentRequestId. This allows automated tests to know in advance the consentId.',
       format: '*',
       default: {}
+    },
+    TEST_OVERRIDE_TRANSACTION_CHALLENGE: {
+      doc: 'If set to a non empty string, the derived challenge will be replaced with this value. This allows automated tests to use pre-signed transaction payloads.',
+      format: '*',
+      default: undefined
     }
   }
 })

@@ -73,6 +73,7 @@ export interface DFSPTransactionModelConfig extends PersistentModelConfig {
   subscriber: PubSub,
   transactionRequestAuthorizationTimeoutSeconds: number,
   transactionRequestVerificationTimeoutSeconds: number,
+  authServiceParticipantId: string,
 }
 
 export interface DFSPTransactionData extends StateData<DFSPTransactionModelState> {

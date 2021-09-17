@@ -54,7 +54,8 @@ async function post (
     key: `dfspTransaction-${transactionRequest.transactionRequestId}`,
     subscriber: h.getSubscriber(),
     transactionRequestAuthorizationTimeoutSeconds: config.SHARED.DFSP_TRANSACTION_REQUEST_AUTHORIZATION_TIMEOUT_SECONDS,
-    transactionRequestVerificationTimeoutSeconds: config.SHARED.DFSP_TRANSACTION_REQUEST_AUTHORIZATION_TIMEOUT_SECONDS
+    transactionRequestVerificationTimeoutSeconds: config.SHARED.DFSP_TRANSACTION_REQUEST_AUTHORIZATION_TIMEOUT_SECONDS,
+    authServiceParticipantId: config.SHARED.AUTH_SERVICE_PARTICIPANT_ID
   }
 
   setImmediate(async () => {
