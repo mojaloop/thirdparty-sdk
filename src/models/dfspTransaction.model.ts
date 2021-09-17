@@ -325,6 +325,7 @@ export class DFSPTransactionModel
       InvalidDataError.throwIfInvalidProperty(this.data, 'requestAuthorizationResponse')
       InvalidDataError.throwIfInvalidProperty(this.data.requestAuthorizationResponse!, 'signedPayload')
       InvalidDataError.throwIfInvalidProperty(this.data, 'transactionRequestContext')
+      InvalidDataError.throwIfInvalidProperty(this.data, 'requestAuthorizationPostRequest')
 
       const verificationRequestId = uuidv4()
       const channel = DFSPTransactionModel.notificationChannel(
@@ -342,7 +343,7 @@ export class DFSPTransactionModel
             consentId: this.data.transactionRequestContext!.consentId,
             signedPayload: rar.signedPayload,
             signedPayloadType: 'FIDO',
-            challenge: '12345'
+            challenge: this.data.requestAuthorizationPostRequest!.challenge
           }
           break
         }
@@ -353,13 +354,15 @@ export class DFSPTransactionModel
             consentId: this.data.transactionRequestContext!.consentId,
             signedPayload: rar.signedPayload!,
             signedPayloadType: 'GENERIC',
-            challenge: '12345'
+            challenge: this.data.requestAuthorizationPostRequest!.challenge
           }
           break
         }
         default:
           throw new Error(`unhandled signedPayloadType: ${signedPayloadType}`)
       }
+
+      console.log('onVerifyAuthorization - challenge is', this.data.requestAuthorizationPostRequest!.challenge)
 
       await deferredJob(this.subscriber, channel)
         .init(async channel => {
