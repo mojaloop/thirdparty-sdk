@@ -154,7 +154,7 @@ describe('DFSP Transaction', (): void => {
         consentId: expect.stringMatching('.*'),
         signedPayload: requestAuthorizationResponse.signedPayload,
         signedPayloadType: requestAuthorizationResponse.signedPayloadType,
-        challenge: '98ef37d2cdf14ea6474da7989e5d13f80a0b99d67c92e486f1c890705dcb1ec5'
+        challenge: expect.stringMatching('.*')
       })
     })
   })
