@@ -74,7 +74,9 @@ export interface DFSPLinkingModelConfig extends PersistentModelConfig {
   mojaloopRequests: MojaloopRequests
   dfspBackendRequests: DFSPBackendRequests
   requestProcessingTimeoutSeconds: number
-  testOverrideConsentID?: string | undefined
+  deprecatedTestOverrideConsentId?: string | undefined
+  testShouldOverrideConsentId: boolean
+  testConsentRequestToConsentMap: Record<string, string>
 }
 export interface DFSPLinkingData extends StateData {
   dfspId: string

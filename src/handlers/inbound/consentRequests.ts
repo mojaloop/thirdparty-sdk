@@ -70,7 +70,9 @@ async function post (_context: unknown, request: Request, h: StateResponseToolki
     thirdpartyRequests: h.getThirdpartyRequests(),
     mojaloopRequests: h.getMojaloopRequests(),
     requestProcessingTimeoutSeconds: config.REQUEST_PROCESSING_TIMEOUT_SECONDS,
-    testOverrideConsentID: config.SHARED.TEST_OVERRIDE_CONSENT_ID
+    deprecatedTestOverrideConsentId: config.SHARED.TEST_OVERRIDE_CONSENT_ID,
+    testShouldOverrideConsentId: config.SHARED.TEST_SHOULD_OVERRIDE_CONSENT_ID,
+    testConsentRequestToConsentMap: config.SHARED.TEST_CONSENT_REQUEST_TO_CONSENT_MAP
   }
 
   // postpone model execution to next event loop cycle so we can return response ASAP
