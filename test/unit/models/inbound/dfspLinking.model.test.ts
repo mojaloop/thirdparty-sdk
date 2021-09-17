@@ -102,7 +102,9 @@ describe('dfspLinkingModel', () => {
       mojaloopRequests: {
         postParticipants: jest.fn(() => Promise.resolve({ statusCode: 202 })),
       } as unknown as MojaloopRequests,
-      requestProcessingTimeoutSeconds: 3
+      requestProcessingTimeoutSeconds: 3,
+      testShouldOverrideConsentId: false,
+      testConsentRequestToConsentMap: {}
     }
     mocked(modelConfig.subscriber.subscribe).mockImplementation(
       (channel: string, cb: NotificationCallback) => {
@@ -1570,13 +1572,13 @@ describe('dfspLinkingModel', () => {
     })
 
     it('should be well constructed', async () => {
-      modelConfig.testOverrideConsentID = '12340000-0000-1000-8000-000000000001'
+      modelConfig.deprecatedTestOverrideConsentId = '12340000-0000-1000-8000-000000000001'
       const model = await create(validateData, modelConfig)
       checkDFSPLinkingModelLayout(model, validateData)
     })
 
     it('grantConsent() should transition from auth token validated to sent consent when successful with consentId override', async () => {
-      modelConfig.testOverrideConsentID = '12340000-0000-1000-8000-000000000001'
+      modelConfig.deprecatedTestOverrideConsentId = '12340000-0000-1000-8000-000000000001'
       const model = await create(validateData, modelConfig)
 
       setImmediate(() => {
@@ -1623,7 +1625,7 @@ describe('dfspLinkingModel', () => {
     })
 
     it('should handle exceptions and send PUT /consents/{ID}/error response with consentId override', async () => {
-      modelConfig.testOverrideConsentID = '12340000-0000-1000-8000-000000000001'
+      modelConfig.deprecatedTestOverrideConsentId = '12340000-0000-1000-8000-000000000001'
       mocked(modelConfig.thirdpartyRequests.postConsents).mockImplementationOnce(
         () => {
           throw new Error('mocked postConsents exception')

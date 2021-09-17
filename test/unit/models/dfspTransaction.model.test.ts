@@ -272,7 +272,7 @@ describe('DFSPTransactionModel', () => {
   })
 
   describe('workflow', () => {
-    it.only('should do a happy flow', async () => {
+    it('should do a happy flow', async () => {
       mocked(modelConfig.kvs.set).mockImplementation(() => Promise.resolve(true))
       
       // mock async callback(s)

@@ -367,9 +367,19 @@ export class DFSPLinkingModel
   async onGrantConsent (): Promise<void> {
     const { consentRequestId, toParticipantId, scopes } = this.data
     let consentId = uuidv4()
-    if (this.config.testOverrideConsentID) {
-      this.logger.warn('TEST_OVERRIDE_CONSENT_ID is set in config. This variable is NOT to be set/used in production')
-      consentId = this.config.testOverrideConsentID
+
+    if (this.config.testShouldOverrideConsentId) {
+      this.logger.warn('TEST_SHOULD_OVERRIDE_CONSENT_ID is TRUE - Not for production use.')
+      const consentIdForConsentRequestId = this.config.testConsentRequestToConsentMap[consentRequestId]
+      if (consentIdForConsentRequestId) {
+        consentId = consentIdForConsentRequestId
+        this.logger.warn(`onGrantConsent - generated deterministic consentRequestId -> consentId: ${consentRequestId} --> ${consentId}`)
+      } else {
+        this.logger.warn(`TEST_CONSENT_REQUEST_TO_CONSENT_MAP no entry found for consentRequestId: ${consentRequestId}. Defaulting to a random consentId`)
+      }
+    } else if (this.config.deprecatedTestOverrideConsentId) {
+      this.logger.warn('deprecated TEST_OVERRIDE_CONSENT_ID is set in config. Use TEST_SHOULD_OVERRIDE_CONSENT_ID and TEST_CONSENT_REQUEST_TO_CONSENT_MAP instead')
+      consentId = this.config.deprecatedTestOverrideConsentId
     }
     // save consentId for later
     this.data.consentId = consentId
