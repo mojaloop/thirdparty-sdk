@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+## [11.54.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.53.0...v11.54.0) (2021-09-17)
+
+
+### Features
+
+* **linkingModel:** deterministic test consentids ([#123](https://github.com/mojaloop/thirdparty-scheme-adapter/issues/123)) ([4be2f72](https://github.com/mojaloop/thirdparty-scheme-adapter/commit/4be2f727c4271796a853317aece46ead54785bdf))
+
 ## [11.53.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.52.0...v11.53.0) (2021-09-09)
 
 

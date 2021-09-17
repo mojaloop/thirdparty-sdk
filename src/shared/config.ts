@@ -123,7 +123,7 @@ export interface ServiceConfig {
     TEST_OVERRIDE_CONSENT_ID?: string,
     TEST_SHOULD_OVERRIDE_CONSENT_ID: boolean,
     TEST_CONSENT_REQUEST_TO_CONSENT_MAP: Record<string, string>,
-    TEST_OVERRIDE_TRANSACTION_CHALLENGE?: string
+    TEST_OVERRIDE_TRANSACTION_CHALLENGE?: string,
   }
 }
 
