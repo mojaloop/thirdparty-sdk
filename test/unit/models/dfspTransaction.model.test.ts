@@ -107,7 +107,8 @@ describe('DFSPTransactionModel', () => {
         verifyAuthorization: jest.fn(() => Promise.resolve({ isValid: true }))
       } as unknown as DFSPBackendRequests,
       transactionRequestAuthorizationTimeoutSeconds: 100,
-      transactionRequestVerificationTimeoutSeconds: 15
+      transactionRequestVerificationTimeoutSeconds: 15,
+      authServiceParticipantId: 'centralAuth'
     }
     transactionRequestId = uuidv4()
     participantId = uuidv4()
