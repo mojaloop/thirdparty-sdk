@@ -28,6 +28,8 @@
 import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
 import { canonicalize } from 'json-canonicalize'
 import sha256 from 'crypto-js/sha256'
+import config from './config'
+import { logger } from './logger'
 
 // copy of ThirdpartyRequestsAuthorizationsPostRequest, without extensions or challenge
 export interface AuthRequestPartial {
@@ -52,6 +54,11 @@ export interface AuthRequestPartial {
  *  without the extensions or challenge fields
  */
 export function deriveTransactionChallenge (authRequestPartial: AuthRequestPartial): string {
+  if (config.SHARED.TEST_OVERRIDE_TRANSACTION_CHALLENGE && config.SHARED.TEST_OVERRIDE_TRANSACTION_CHALLENGE !== '') {
+    logger.warn('TEST_OVERRIDE_TRANSACTION_CHALLENGE is configured - for testing purposes only')
+    return config.SHARED.TEST_OVERRIDE_TRANSACTION_CHALLENGE
+  }
+
   const cJSONRequest = canonicalize(authRequestPartial)
   const hash = sha256(cJSONRequest)
   return hash.toString()
