@@ -1,7 +1,7 @@
 # Mojaloop Thirdparty Scheme Adapter
-[![Git Commit](https://img.shields.io/github/last-commit/mojaloop/thirdparty-scheme-adapter.svg?style=flat)](https://github.com/mojaloop/thirdparty-scheme-adapter/commits/master)
-[![Git Releases](https://img.shields.io/github/release/mojaloop/thirdparty-scheme-adapter.svg?style=flat)](https://github.com/mojaloop/thirdparty-scheme-adapter/releases)
-[![CircleCI](https://circleci.com/gh/mojaloop/thirdparty-scheme-adapter.svg?style=svg)](https://circleci.com/gh/mojaloop/thirdparty-scheme-adapter)
+[![Git Commit](https://img.shields.io/github/last-commit/mojaloop/thirdparty-sdk.svg?style=flat)](https://github.com/mojaloop/thirdparty-sdk/commits/master)
+[![Git Releases](https://img.shields.io/github/release/mojaloop/thirdparty-sdk.svg?style=flat)](https://github.com/mojaloop/thirdparty-sdk/releases)
+[![CircleCI](https://circleci.com/gh/mojaloop/thirdparty-sdk.svg?style=svg)](https://circleci.com/gh/mojaloop/thirdparty-sdk)
 
 > This package provides a Thirdparty (PISP) scheme adapter that interfaces between a Mojaloop API compliant switch and a Thirdparty backend platform that does not natively implement the Mojaloop API.
 
@@ -15,7 +15,7 @@ This package exemplifies the use of the Mojaloop SDK Standard Components for TLS
 
 1. Clone repo
    ```bash
-   git clone git@github.com:mojaloop/thirdparty-api-adapter.git
+   git clone git@github.com:mojaloop/thirdparty-sdk.git
    ```
 2. Install dependencies
    ```bash

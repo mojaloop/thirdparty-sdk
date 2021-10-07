@@ -1,5 +1,5 @@
 module.exports = {
-  header: '# Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)',
+  header: '# Changelog: [mojaloop/thirdparty-sdk](https://github.com/mojaloop/thirdparty-sdk)',
   types: [
     { type: 'feat', section: 'Features' },
     { type: 'fix', section: 'Bug Fixes' },

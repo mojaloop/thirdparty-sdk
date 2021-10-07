@@ -1,5 +1,5 @@
 {
-  "name": "@mojaloop/thirdparty-scheme-adapter",
+  "name": "@mojaloop/thirdparty-sdk",
   "version": "11.55.0",
   "description": "Thirdparty Scheme Adapter ",
   "main": "dist/index.js",
@@ -24,9 +24,9 @@
     "build:ttk-fspiop:api": "openapi bundle --output ./docker/contract/ml-testing-toolkit/spec_files/api_definitions/fspiop_1.0/api_spec.yaml --ext yaml ./docker/contract/ml-testing-toolkit/spec_files/api_definitions/fspiop_1.0/api-template.yaml",
     "build:ttk-3p:api": "openapi bundle --output ./docker/contract/ml-testing-toolkit/spec_files/api_definitions/thirdparty_pisp/api_spec.yaml --ext yaml ./docker/contract/ml-testing-toolkit/spec_files/api_definitions/thirdparty_pisp/thirdparty-pisp-api-template.yaml",
     "validate:api:ttk": "swagger-cli validate ./docker/contract/ml-testing-toolkit/spec_files/api_definitions/fspiop_1.0/api_spec.yaml; swagger-cli validate ./docker/contract/ml-testing-toolkit/spec_files/api_definitions/thirdparty_pisp/thirdparty-pisp-api-template.yaml",
-    "docker:build": "docker build -t thirdparty-scheme-adapter:local -f ./docker/Dockerfile ./",
-    "docker:run:inbound": "docker run -p 4005:4005 thirdparty-scheme-adapter:local npm run start:inbound",
-    "docker:run:outbound": "docker run -p 4006:4006 thirdparty-scheme-adapter:local npm run start:outbound",
+    "docker:build": "docker build -t thirdparty-sdk:local -f ./docker/Dockerfile ./",
+    "docker:run:inbound": "docker run -p 4005:4005 thirdparty-sdk:local npm run start:inbound",
+    "docker:run:outbound": "docker run -p 4006:4006 thirdparty-sdk:local npm run start:outbound",
     "lint": "eslint ./src/**/*.ts *.js",
     "lint:fix": "eslint --fix ./src/**/*.ts *.js",
     "pretest": "echo \"pretest - TODO...\"",
@@ -59,7 +59,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mojaloop/thirdparty-scheme-adapter.git"
+    "url": "git+https://github.com/mojaloop/thirdparty-sdk.git"
   },
   "keywords": [
     "metrics",
@@ -74,7 +74,7 @@
   ],
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/mojaloop/thirdparty-scheme-adapter/issues"
+    "url": "https://github.com/mojaloop/thirdparty-sdk/issues"
   },
   "homepage": "https://github.com/mojaloop/thirdpartyscheme-adapter#readme",
   "dependencies": {

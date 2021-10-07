@@ -1,4 +1,4 @@
-# thirdparty-scheme-adapter/src/server
+# thirdparty-sdk/src/server
 [@hapi](https://hapi.dev/) server setup
 
 

@@ -1,4 +1,4 @@
-# thirdparty-scheme-adapter/src/shared
+# thirdparty-sdk/src/shared
 
 Helper modules shared across all source code.
 

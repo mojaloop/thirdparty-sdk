@@ -1,6 +1,6 @@
 {
   "VERSION": 1,
-  "CALLBACK_ENDPOINT": "http://inbound-thirdparty-scheme-adapter:4005",
+  "CALLBACK_ENDPOINT": "http://inbound-thirdparty-sdk:4005",
   "CALLBACK_RESOURCE_ENDPOINTS": {
     "enabled": true,
     "endpoints": [
@@ -22,12 +22,12 @@
       {
         "method": "patch",
         "path": "/thirdpartyRequests/transactions/{ID}",
-        "endpoint": "http://inbound-thirdparty-scheme-adapter:4005"
+        "endpoint": "http://inbound-thirdparty-sdk:4005"
       },
       {
         "method": "put",
         "path": "/thirdpartyRequests/transactions/{ID}/error",
-        "endpoint": "http://inbound-thirdparty-scheme-adapter:4005"
+        "endpoint": "http://inbound-thirdparty-sdk:4005"
       },
       {
         "method": "put",

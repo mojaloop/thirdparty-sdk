@@ -206,8 +206,8 @@ Actual schema is defined in [src/shared/config.ts](./src/shared/config.ts)
 ```
 
 ## CI/CD
-[![CircleCI](https://circleci.com/gh/mojaloop/thirdparty-scheme-adapter.svg?style=svg)](https://circleci.com/gh/mojaloop/thirdparty-scheme-adapter)
+[![CircleCI](https://circleci.com/gh/mojaloop/thirdparty-sdk.svg?style=svg)](https://circleci.com/gh/mojaloop/thirdparty-sdk)
 
-CircleCI pipeline: [https://app.circleci.com/pipelines/github/mojaloop/thirdparty-scheme-adapter](https://app.circleci.com/pipelines/github/mojaloop/thirdparty-scheme-adapter)
+CircleCI pipeline: [https://app.circleci.com/pipelines/github/mojaloop/thirdparty-sdk](https://app.circleci.com/pipelines/github/mojaloop/thirdparty-sdk)
 
 

@@ -26,7 +26,7 @@
     "COLOR": true
   },
   "SHARED": {
-    "PEER_ENDPOINT": "inbound-thirdparty-scheme-adapter-a:4055",
+    "PEER_ENDPOINT": "inbound-thirdparty-sdk-a:4055",
     "ALS_ENDPOINT": "0.0.0.0:4002",
     "QUOTES_ENDPOINT": "0.0.0.0:3002",
     "TRANSFERS_ENDPOINT": "0.0.0.0:3000",
