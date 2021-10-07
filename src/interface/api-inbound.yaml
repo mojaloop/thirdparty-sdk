@@ -1,8 +1,8 @@
 openapi: 3.0.1
 info:
-  title: Mojaloop Thirdparty Inbound Scheme Adapter
+  title: Mojaloop Thirdparty Inbound SDK
   description: >
-    Specification for the Thirdparty Inbound Scheme Adapter API
+    Specification for the Thirdparty Inbound SDK API
 
     Please see other documentation on
     https://github.com/mojaloop/thirdparty-sdk for more information.

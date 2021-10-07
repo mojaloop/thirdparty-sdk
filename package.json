@@ -1,7 +1,7 @@
 {
   "name": "@mojaloop/thirdparty-sdk",
   "version": "11.55.0",
-  "description": "Thirdparty Scheme Adapter ",
+  "description": "Thirdparty SDK",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "files": [

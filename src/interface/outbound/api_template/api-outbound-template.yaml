@@ -4,9 +4,9 @@
 # Doing do makes the swagger doc much more readable, especially when rendered
 openapi: 3.0.1
 info:
-  title: Mojaloop Thirdparty Outbound Scheme Adapter
+  title: Mojaloop Thirdparty Outbound SDK
   description: >
-    Specification for the Thirdparty Outbound Scheme Adapter API.
+    Specification for the Thirdparty Outbound SDK API.
 
     This API is a synchronous API which makes integrating with the Mojaloop 3rd Party API easier. 
 

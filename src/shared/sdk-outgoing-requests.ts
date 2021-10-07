@@ -42,7 +42,7 @@ export interface SDKOutgoingRequestsConfig extends HttpRequestsConfig {
 
 /**
  * @class SDKOutgoingRequest
- * @description tiny wrapper dedicated to make requests to SDK scheme adapter Outgoing
+ * @description tiny wrapper dedicated to make requests to Mojaloop SDK Outgoing
  *
  */
 export class SDKOutgoingRequests extends HttpRequests {
