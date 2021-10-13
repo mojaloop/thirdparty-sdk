@@ -51,9 +51,6 @@ describe('GET /linking/accounts/{fspId}/{userId}', (): void => {
     // Assert
     expect(response.status).toBe(200)
     expect(response.data).toEqual(expectedResp)
-
-    // Assert state machine state
-    expect(response.data.currentState).toEqual('COMPLETED')
   })
 
   it('PISP requests DFSP: Expect ID not found', async (): Promise<void> => {
