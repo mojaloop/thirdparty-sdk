@@ -185,7 +185,7 @@ jobs:
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             mkdir -p ./test/results
       - run:
-          name: Spin up core thirdparty-scheme-adapter with redis
+          name: Spin up core thirdparty-sdk with redis
           command: |
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             docker-compose build
@@ -549,7 +549,7 @@ workflows:
 
       # TODO: redis related vulnerabilities found
       # they are related to external dependency so there is a need for proper action, more info here:
-      # https://app.circleci.com/pipelines/github/mojaloop/thirdparty-scheme-adapter/85/workflows/32f38148-42ba-41fe-a9f3-ece5de28df63/jobs/617
+      # https://app.circleci.com/pipelines/github/mojaloop/thirdparty-sdk/85/workflows/32f38148-42ba-41fe-a9f3-ece5de28df63/jobs/617
       # 
       # - image-scan:
       #     context: org-global

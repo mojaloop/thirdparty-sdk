@@ -189,7 +189,7 @@ deactivate Switch
 deactivate DFSP_TP_IN
 DFSP_LM -> DFSP_LM: Check signed consent.
 rnote right of DFSP_LM #LightBlue
-Does this need a backend request or can the scheme adapter check the consent.
+Does this need a backend request or can the SDK check the consent.
 end note
 rnote right of DFSP_LM: state: signedConsentChecked
 DFSP_LM-> DFSP_LM: model.validateWithAuthService()

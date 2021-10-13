@@ -1,4 +1,4 @@
-# thirdparty-scheme-adapter/src #
+# thirdparty-sdk/src #
 > all tests are located in [/test](../test/README.md) folder
 
 ## Source Code layout ##
@@ -19,7 +19,7 @@
 ## sdk-pisp-schema-adapter command line interface CLI
 
 ### Separation of concerns
-The purpose of creating `/src/cli.ts` is the separation of thirdparty-scheme-adapter management from @hapi server setup. 
+The purpose of creating `/src/cli.ts` is the separation of thirdparty-sdk management from @hapi server setup. 
 
 
 ### Parameters
@@ -41,4 +41,4 @@ there is a need to specify module declarations.
 
 The perfect solution would be to request a dependency module maintainers to deliver `.d.ts` declaration files. 
 
-Instead, to unlock the use of these dependencies, we have the special `/ambient.d.ts` file where we can keep temporary module declarations. This file intentionally is kept outside the main source code folder, so we don't pollute _thirdparty-scheme-adapter_ source code with this temporary workaround.
+Instead, to unlock the use of these dependencies, we have the special `/ambient.d.ts` file where we can keep temporary module declarations. This file intentionally is kept outside the main source code folder, so we don't pollute _thirdparty-sdk_ source code with this temporary workaround.

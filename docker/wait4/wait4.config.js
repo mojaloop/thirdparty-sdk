@@ -54,7 +54,7 @@ module.exports = {
       ]
     },
     {
-      name: 'inbound-thirdparty-scheme-adapter',
+      name: 'inbound-thirdparty-sdk',
 
       // list of services to wait for
       wait4: [
@@ -66,7 +66,7 @@ module.exports = {
       ]
     },
     {
-      name: 'outbound-thirdparty-scheme-adapter',
+      name: 'outbound-thirdparty-sdk',
 
       // list of services to wait for
       wait4: [

@@ -5,14 +5,14 @@ networks:
     name: mojaloop-net
 
 services:
-  inbound-thirdparty-scheme-adapter:
-    container_name: inbound-thirdparty-scheme-adapter
+  inbound-thirdparty-sdk:
+    container_name: inbound-thirdparty-sdk
     build:
       context: ./
       dockerfile: ./docker/Dockerfile
-    command: sh -c "/opt/thirdparty-scheme-adapter/wait4/wait4.js inbound-thirdparty-scheme-adapter && NODE_ENV=integration npm run start:inbound"
+    command: sh -c "/opt/thirdparty-sdk/wait4/wait4.js inbound-thirdparty-sdk && NODE_ENV=integration npm run start:inbound"
     volumes:
-      - ./docker/wait4:/opt/thirdparty-scheme-adapter/wait4
+      - ./docker/wait4:/opt/thirdparty-sdk/wait4
     environment:
       - NODE_ENV=integration
     networks:
@@ -30,14 +30,14 @@ services:
       start_period: 10s
       interval: 30s
 
-  outbound-thirdparty-scheme-adapter:
-    container_name: outbound-thirdparty-scheme-adapter
+  outbound-thirdparty-sdk:
+    container_name: outbound-thirdparty-sdk
     build:
       context: ./
       dockerfile: ./docker/Dockerfile
-    command: sh -c "/opt/thirdparty-scheme-adapter/wait4/wait4.js outbound-thirdparty-scheme-adapter && NODE_ENV=integration npm run start:outbound"
+    command: sh -c "/opt/thirdparty-sdk/wait4/wait4.js outbound-thirdparty-sdk && NODE_ENV=integration npm run start:outbound"
     volumes:
-      - ./docker/wait4:/opt/thirdparty-scheme-adapter/wait4
+      - ./docker/wait4:/opt/thirdparty-sdk/wait4
     environment:
       - NODE_ENV=integration
     networks:

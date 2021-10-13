@@ -342,7 +342,7 @@ deactivate Switch
 deactivate DFSP_TP_IN
 DFSP_LM -> DFSP_LM: Check signed consent.
 rnote right of DFSP_LM #LightBlue
-Does this need a backend request or can the scheme adapter check the consent.
+Does this need a backend request or can the SDK check the consent.
 
 Yes and No. We're keeping it as this for now (default to just talking to the
 auth service), but ideally we would open up a config option that would allow a

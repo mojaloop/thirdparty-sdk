@@ -72,7 +72,7 @@ const startOutboundAPI = mkStartAPI(ServerAPI.outbound, Handlers.Outbound)
 // setup cli program
 program
   .version(PACKAGE.version)
-  .description('thirdparty-scheme-adapter')
+  .description('thirdparty-sdk')
   .option('-p, --port <number>', 'listen on port')
   .option('-H, --host <string>', 'listen on host')
 

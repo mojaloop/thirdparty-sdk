@@ -723,7 +723,7 @@ export class DFSPLinkingModel
           return
       }
     } catch (err) {
-      // TOOD: reformatError: https://github.com/mojaloop/thirdparty-scheme-adapter/blob/master/src/models/dfspTransaction.model.ts#L378
+      // TOOD: reformatError: https://github.com/mojaloop/thirdparty-sdk/blob/master/src/models/dfspTransaction.model.ts#L378
       this.logger.info(`Error running DFSPLinkingModel : ${inspect(err)}`)
 
       // as this function is recursive, we don't want to error the state machine multiple times
