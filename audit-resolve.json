@@ -1294,6 +1294,111 @@
     "1781|npm-check-updates>pacote>tar": {
       "decision": "fix",
       "madeAt": 1630898906194
+    },
+    "1002477|@mojaloop/central-services-shared>axios": {
+      "decision": "fix",
+      "madeAt": 1634103360907
+    },
+    "1002401|@mojaloop/event-sdk>@grpc/proto-loader>yargs>string-width>strip-ansi>ansi-regex": {
+      "decision": "fix",
+      "madeAt": 1634104374536
+    },
+    "1002401|@mojaloop/event-sdk>@grpc/proto-loader>yargs>cliui>string-width>strip-ansi>ansi-regex": {
+      "decision": "fix",
+      "madeAt": 1634104374536
+    },
+    "1002401|@mojaloop/event-sdk>@grpc/proto-loader>yargs>cliui>wrap-ansi>strip-ansi>ansi-regex": {
+      "decision": "fix",
+      "madeAt": 1634104374536
+    },
+    "1002401|@mojaloop/event-sdk>@grpc/proto-loader>yargs>cliui>wrap-ansi>string-width>strip-ansi>ansi-regex": {
+      "decision": "fix",
+      "madeAt": 1634104374536
+    },
+    "1002401|@mojaloop/central-services-shared>widdershins>oas-resolver>yargs>cliui>wrap-ansi>string-width>strip-ansi>ansi-regex": {
+      "decision": "fix",
+      "madeAt": 1634104374536
+    },
+    "1002401|@mojaloop/central-services-shared>widdershins>swagger2openapi>oas-resolver>yargs>cliui>wrap-ansi>string-width>strip-ansi>ansi-regex": {
+      "decision": "fix",
+      "madeAt": 1634104374536
+    },
+    "1002401|@mojaloop/central-services-shared>widdershins>swagger2openapi>oas-validator>oas-resolver>yargs>cliui>wrap-ansi>string-width>strip-ansi>ansi-regex": {
+      "decision": "fix",
+      "madeAt": 1634104374536
+    },
+    "1002401|@mojaloop/central-services-shared>widdershins>oas-resolver>yargs>string-width>strip-ansi>ansi-regex": {
+      "decision": "fix",
+      "madeAt": 1634103425414
+    },
+    "1002401|@mojaloop/central-services-shared>widdershins>oas-resolver>yargs>cliui>string-width>strip-ansi>ansi-regex": {
+      "decision": "fix",
+      "madeAt": 1634103425414
+    },
+    "1002401|@mojaloop/central-services-shared>widdershins>swagger2openapi>oas-resolver>yargs>cliui>string-width>strip-ansi>ansi-regex": {
+      "decision": "fix",
+      "madeAt": 1634103425414
+    },
+    "1002401|@mojaloop/central-services-shared>widdershins>swagger2openapi>oas-validator>oas-resolver>yargs>cliui>string-width>strip-ansi>ansi-regex": {
+      "decision": "fix",
+      "madeAt": 1634103425414
+    },
+    "1002401|@mojaloop/central-services-shared>widdershins>swagger2openapi>yargs>string-width>strip-ansi>ansi-regex": {
+      "decision": "fix",
+      "madeAt": 1634103425414
+    },
+    "1002401|@mojaloop/central-services-shared>widdershins>swagger2openapi>yargs>cliui>string-width>strip-ansi>ansi-regex": {
+      "decision": "fix",
+      "madeAt": 1634103425414
+    },
+    "1002401|@mojaloop/central-services-shared>widdershins>swagger2openapi>yargs>cliui>wrap-ansi>string-width>strip-ansi>ansi-regex": {
+      "decision": "fix",
+      "madeAt": 1634103425414
+    },
+    "1002401|@types/jest>pretty-format>ansi-regex": {
+      "decision": "fix",
+      "madeAt": 1634104374536
+    },
+    "1002401|@types/jest>jest-diff>pretty-format>ansi-regex": {
+      "decision": "fix",
+      "madeAt": 1634104374536
+    },
+    "1002401|blipp>easy-table>ansi-regex": {
+      "decision": "fix",
+      "madeAt": 1634104227796
+    },
+    "1002423|@mojaloop/central-services-shared>shins>cheerio>cheerio-select>css-select>nth-check": {
+      "decision": "fix",
+      "madeAt": 1634104250358
+    },
+    "1002477|axios": {
+      "decision": "fix",
+      "madeAt": 1634104263380
+    },
+    "1002401|@mojaloop/central-services-shared>widdershins>yargs>string-width>strip-ansi>ansi-regex": {
+      "decision": "ignore",
+      "madeAt": 1634104274386,
+      "expiresAt": 1636695318032
+    },
+    "1002401|@mojaloop/central-services-shared>widdershins>yargs>cliui>string-width>strip-ansi>ansi-regex": {
+      "decision": "ignore",
+      "madeAt": 1634104274386,
+      "expiresAt": 1636695318032
+    },
+    "1002865|@mojaloop/central-services-shared>shins>sanitize-html": {
+      "decision": "ignore",
+      "madeAt": 1634104277536,
+      "expiresAt": 1636695318032
+    },
+    "1002866|@mojaloop/central-services-shared>shins>sanitize-html": {
+      "decision": "ignore",
+      "madeAt": 1634104277536,
+      "expiresAt": 1636695318032
+    },
+    "1003019|@mojaloop/central-services-shared>widdershins>yargs>yargs-parser": {
+      "decision": "ignore",
+      "madeAt": 1634104280720,
+      "expiresAt": 1636695318032
     }
   },
   "rules": {},
