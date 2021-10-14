@@ -1,4 +1,16 @@
-# Changelog: [mojaloop/thirdparty-scheme-adapter](https://github.com/mojaloop/thirdparty-scheme-adapter)
+# Changelog: [mojaloop/thirdparty-sdk](https://github.com/mojaloop/thirdparty-sdk)
+### [11.55.1](https://github.com/mojaloop/thirdparty-sdk/compare/v11.55.0...v11.55.1) (2021-10-14)
+
+
+### Bug Fixes
+
+* **vulns:** run npm audit, fix and ignore unfixable low and a moderate for 1 month ([#126](https://github.com/mojaloop/thirdparty-sdk/issues/126)) ([49f2479](https://github.com/mojaloop/thirdparty-sdk/commit/49f247955bd3b81351954bf440d4f8a11612629e))
+
+
+### Code Refactor
+
+* rename thirdparty-scheme-adapter to thirdparty-sdk ([#125](https://github.com/mojaloop/thirdparty-sdk/issues/125)) ([3a5eec9](https://github.com/mojaloop/thirdparty-sdk/commit/3a5eec92d74f8ca292889a325f1e12fe08d58226))
+
 ## [11.55.0](https://github.com/mojaloop/thirdparty-scheme-adapter/compare/v11.54.0...v11.55.0) (2021-09-17)
 
 
