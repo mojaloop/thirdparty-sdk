@@ -32,7 +32,7 @@ export class TTKHistory {
   public async getAndFilter(method?: string, path?: string): Promise<Array<MLTestingToolkitRequest>> {
     let requestHistory: MLTestingToolkitRequest[]
     try {
-      requestHistory = (await axios.get(this.uri, this.requestConfig)).data
+      requestHistory = (await axios.get(this.uri, this.requestConfig)).data as unknown as MLTestingToolkitRequest[]
     } catch (err) {
       console.log(err)
       return []

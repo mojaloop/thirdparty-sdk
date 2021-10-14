@@ -90,7 +90,7 @@ describe('PISP requests DFSP to validate user consentRequests for linking', (): 
         }
         ]
       }
-      const consentRequestsResponse = await axios.patch(linkingRequestConsentAuthenticateURI, linkingRequestConsentAuthenticateRequest)
+      const consentRequestsResponse = await axios.patch<any>(linkingRequestConsentAuthenticateURI, linkingRequestConsentAuthenticateRequest)
       expect(consentRequestsResponse.status).toEqual(200)
       expect(consentRequestsResponse.data.currentState).toEqual('consentReceivedAwaitingCredential')
       expect(consentRequestsResponse.data.consent).toEqual(expectedResponse)
@@ -129,7 +129,7 @@ describe('PISP requests DFSP to validate user consentRequests for linking', (): 
         },
         currentState: 'accountsLinked'
       }
-      const consentRequestsResponse = await axios.post(linkingRequestConsentPassCredentialURI, linkingRequestConsentPassCredentialRequest)
+      const consentRequestsResponse = await axios.post<any>(linkingRequestConsentPassCredentialURI, linkingRequestConsentPassCredentialRequest)
       expect(consentRequestsResponse.status).toEqual(200)
       expect(consentRequestsResponse.data.currentState).toEqual('accountsLinked')
       expect(consentRequestsResponse.data).toEqual(expectedResponse)
@@ -173,7 +173,7 @@ describe('PISP requests DFSP to validate user consentRequests for linking', (): 
         }
         ]
       }
-      const consentRequestsResponse = await axios.patch(linkingRequestConsentAuthenticateURI, linkingRequestConsentAuthenticateRequest)
+      const consentRequestsResponse = await axios.patch<any>(linkingRequestConsentAuthenticateURI, linkingRequestConsentAuthenticateRequest)
       expect(consentRequestsResponse.status).toEqual(200)
       expect(consentRequestsResponse.data.currentState).toEqual('consentReceivedAwaitingCredential')
       expect(consentRequestsResponse.data.consent).toEqual(expectedResponse)
@@ -212,7 +212,7 @@ describe('PISP requests DFSP to validate user consentRequests for linking', (): 
         },
         currentState: 'accountsLinked'
       }
-      const consentRequestsResponse = await axios.post(linkingRequestConsentPassCredentialURI, linkingRequestConsentPassCredentialRequest)
+      const consentRequestsResponse = await axios.post<any>(linkingRequestConsentPassCredentialURI, linkingRequestConsentPassCredentialRequest)
       expect(consentRequestsResponse.status).toEqual(200)
       expect(consentRequestsResponse.data.currentState).toEqual('accountsLinked')
       expect(consentRequestsResponse.data).toEqual(expectedResponse)
@@ -322,7 +322,7 @@ describe('PISP requests DFSP to validate user consentRequests for linking', (): 
         ]
       }
 
-      const consentRequestsResponse = await axios.patch(linkingRequestConsentAuthenticateURI, linkingRequestConsentAuthenticateRequest)
+      const consentRequestsResponse = await axios.patch<any>(linkingRequestConsentAuthenticateURI, linkingRequestConsentAuthenticateRequest)
       expect(consentRequestsResponse.status).toEqual(200)
       expect(consentRequestsResponse.data.currentState).toEqual('consentReceivedAwaitingCredential')
       expect(consentRequestsResponse.data.consent).toEqual(expectedResponse)

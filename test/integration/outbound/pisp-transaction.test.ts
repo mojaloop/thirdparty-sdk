@@ -38,7 +38,7 @@ describe('PISP Transaction', (): void => {
       await kvs.del(transactionRequestId)
 
       // lookup and resolve payee
-      const lookupResponse = await axios.post(lookupURI, lookupRequest)
+      const lookupResponse = await axios.post<any>(lookupURI, lookupRequest)
       expect(lookupResponse.status).toEqual(200)
       expect(lookupResponse.data.currentState).toEqual('partyLookupSuccess')
 
@@ -71,7 +71,7 @@ describe('PISP Transaction', (): void => {
 
       // TTK allows to setup only one callback by standard simulate
       // initiate - receive authorization to sign
-      const initiateresponse = await axios.post(initiateURI, initiateRequest)
+      const initiateresponse = await axios.post<any>(initiateURI, initiateRequest)
       expect(initiateresponse.status).toEqual(200)
       expect(initiateresponse.data.currentState).toEqual('authorizationReceived')
 
@@ -93,15 +93,11 @@ describe('PISP Transaction', (): void => {
       }
     
       // send approve with signed authorization and wait for transfer to complete
-      try {
-        const approveResponse = await axios.post(approveURI, approveRequest)
+      const approveResponse = await axios.post<any>(approveURI, approveRequest)
 
-        expect(approveResponse.status).toEqual(200)
-        expect(approveResponse.data.currentState).toEqual('transactionStatusReceived')
-        expect(approveResponse.data.transactionStatus.transactionRequestState).toEqual('ACCEPTED')
-      } catch (err) {
-        console.log('err', err.response)
-      }
+      expect(approveResponse.status).toEqual(200)
+      expect(approveResponse.data.currentState).toEqual('transactionStatusReceived')
+      expect(approveResponse.data.transactionStatus.transactionRequestState).toEqual('ACCEPTED')
     })
   })
 })

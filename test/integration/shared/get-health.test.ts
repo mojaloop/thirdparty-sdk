@@ -6,7 +6,7 @@ describe('GET /health', (): void => {
     const scenarioUri = `${env.inbound.baseUri}/health`
     it('should give health status', async (): Promise<void> => {
       // Act
-      const response = await axios.get(scenarioUri)
+      const response = await axios.get<any>(scenarioUri)
 
       // Assert
       expect(response.status).toEqual(200)
@@ -24,7 +24,7 @@ describe('GET /health', (): void => {
     const scenarioUri = `${env.outbound.baseUri}/health`
     it('should give health status', async (): Promise<void> => {
       // Act
-      const response = await axios.get(scenarioUri)
+      const response = await axios.get<any>(scenarioUri)
 
       // Assert
       expect(response.status).toEqual(200)
