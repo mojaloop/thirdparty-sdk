@@ -8,11 +8,14 @@ RUN apk update \
     && npm config set unsafe-perm true \
     && npm install -g node-gyp 
 
-COPY package.json package-lock.json* /opt/thirdparty-sdk/
+COPY package.json package-lock.json* ./
 RUN npm ci
+
+COPY ./ ./
+RUN npm run build
+RUN rm -rf src secrets test docs
 RUN npm prune --production
 
-COPY . /opt/thirdparty-sdk
 
 FROM node:14.15-alpine
 WORKDIR /opt/thirdparty-sdk
@@ -21,9 +24,9 @@ WORKDIR /opt/thirdparty-sdk
 RUN mkdir ./logs && touch ./logs/combined.log
 RUN ln -sf /dev/stdout ./logs/combined.log
 
-# Create a non-root user: thirdparty-sdk-user 
-RUN adduser -D thirdparty-sdk-user 
-USER thirdparty-sdk-user 
-COPY --chown=thirdparty-sdk-user --from=builder /opt/thirdparty-sdk .
+# Create a non-root user: ml-user
+RUN adduser -D ml-user
+USER ml-user
+COPY --chown=ml-user --from=builder /opt/thirdparty-sdk ./
 
 EXPOSE 4005 4006

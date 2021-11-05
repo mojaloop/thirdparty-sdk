@@ -487,21 +487,25 @@ ConvictConfig.loadFile(path.join(__dirname, `/../../config/${env}.json`))
 ConvictConfig.validate({ allowed: 'strict' })
 
 // Load file contents for keys and secrets
-ConvictConfig.set('SHARED.JWS_SIGNING_KEY', getFileContent(ConvictConfig.get('SHARED').JWS_SIGNING_KEY))
+if (ConvictConfig.get('SHARED.JWS_SIGN')) {
+  ConvictConfig.set('SHARED.JWS_SIGNING_KEY', getFileContent(ConvictConfig.get('SHARED').JWS_SIGNING_KEY))
+}
 
 // Note: Have not seen these be comma separated value strings. mimicking sdk-scheme-adapter for now
-ConvictConfig.set(
-  'SHARED.TLS.creds.ca',
-  getFileListContent(<string>ConvictConfig.get('SHARED').TLS.creds.ca)
-)
-ConvictConfig.set(
-  'SHARED.TLS.creds.cert',
-  getFileListContent(<string>ConvictConfig.get('SHARED').TLS.creds.cert)
-)
-ConvictConfig.set(
-  'SHARED.TLS.creds.key',
-  getFileListContent(<string>ConvictConfig.get('SHARED').TLS.creds.key)
-)
+if (ConvictConfig.get('SHARED.TLS.mutualTLS.enabled')) {
+  ConvictConfig.set(
+    'SHARED.TLS.creds.ca',
+    getFileListContent(<string>ConvictConfig.get('SHARED').TLS.creds.ca)
+  )
+  ConvictConfig.set(
+    'SHARED.TLS.creds.cert',
+    getFileListContent(<string>ConvictConfig.get('SHARED').TLS.creds.cert)
+  )
+  ConvictConfig.set(
+    'SHARED.TLS.creds.key',
+    getFileListContent(<string>ConvictConfig.get('SHARED').TLS.creds.key)
+  )
+}
 
 // extract simplified config from Convict object
 const config: ServiceConfig = {
