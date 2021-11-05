@@ -25,6 +25,11 @@
  - Paweł Marzec <pawel.marzec@modusbox.com>
  --------------
  ******/
+
+// This is required so that once we compile to js
+// the js `require()` can resolve the '~' paths
+require('module-alias/register')
+
 import { ConvictConfig, PACKAGE } from '~/shared/config'
 import { ServerAPI, ServerConfig } from '~/server'
 import { Command } from 'commander'
