@@ -28,7 +28,7 @@
 import { DFSPBackendConfig, DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
 import { Scheme } from '~/shared/http-scheme'
 import mockLogger from '../mockLogger'
-import TestData from 'test/unit/data/mockData.json'
+import * as mockData from 'test/unit/data/mockData'
 import { v4 as uuidv4 } from 'uuid'
 import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
 
@@ -80,7 +80,6 @@ describe('backendRequests', () => {
 
   describe('getUserAccounts', () => {
     it('should propagate call to get', async () => {
-      const mockData = JSON.parse(JSON.stringify(TestData))
       const userId = mockData.accountsRequest.params.ID
       const response = mockData.accountsRequest.payload
       const getSpy = jest.spyOn(dfspBackendRequests, 'get').mockImplementationOnce(
@@ -146,34 +145,8 @@ describe('backendRequests', () => {
     })
   })
 
-  describe('verifyAuthorization', () => {
-    it('should propagate the call to post', async () => {
-      const response = { isValid: true }
-      const authorizationResponse: tpAPI.Schemas.AuthorizationsIDPutResponse = {
-        authenticationInfo: {
-          authentication: 'U2F',
-          authenticationValue: {
-            pinValue: 'some-pin-value',
-            counter: '1'
-          } as string & Partial<{pinValue: string, counter: string}>
-        },
-        responseType: 'ENTERED'
-      }
-      const postSpy = jest.spyOn(dfspBackendRequests, 'post').mockImplementationOnce(
-        () => Promise.resolve(response)
-      )
-      const result = await dfspBackendRequests.verifyAuthorization(authorizationResponse)
-      expect(result).toEqual(response)
-      expect(postSpy).toBeCalledWith(
-        dfspBackendRequests.verifyAuthorizationPath,
-        authorizationResponse
-      )
-    })
-  })
-
   describe('validateConsentRequests', () => {
     it('should propagate call to post', async () => {
-      const mockData = JSON.parse(JSON.stringify(TestData))
       const request = mockData.consentRequestsPost.payload
       const response = mockData.consentRequestsPost.response
       const getSpy = jest.spyOn(dfspBackendRequests, 'post').mockImplementationOnce(
@@ -187,7 +160,6 @@ describe('backendRequests', () => {
 
   describe('sendOTP', () => {
     it('should propagate call to post', async () => {
-      const mockData = JSON.parse(JSON.stringify(TestData))
       const request = mockData.consentRequestsPost.payload
       const otpRequest = mockData.consentRequestsPost.otpRequest
       const response = mockData.consentRequestsPost.otpResponse
@@ -202,7 +174,6 @@ describe('backendRequests', () => {
 
   describe('storeConsentRequests', () => {
     it('should propagate call to post', async () => {
-      const mockData = JSON.parse(JSON.stringify(TestData))
       const request = mockData.consentRequestsPost.payload
       const getSpy = jest.spyOn(dfspBackendRequests, 'post').mockImplementationOnce(
         () => Promise.resolve()
@@ -221,17 +192,17 @@ describe('backendRequests', () => {
       const result = await dfspBackendRequests.storeValidatedConsentForAccountId(
         [
           {
-            "accountId": "dfspa.username.1234",
-            "actions": [
-              "accounts.transfer",
-              "accounts.getBalance"
+            address: 'dfspa.username.1234',
+            actions: [
+              'ACCOUNTS_TRANSFER',
+              'ACCOUNTS_GET_BALANCE'
             ]
           },
           {
-            "accountId": "dfspa.username.5678",
-            "actions": [
-              "accounts.transfer",
-              "accounts.getBalance"
+            address: 'dfspa.username.5678',
+            actions: [
+              'ACCOUNTS_TRANSFER',
+              'ACCOUNTS_GET_BALANCE'
             ]
           }
         ],
@@ -239,26 +210,26 @@ describe('backendRequests', () => {
         'b51ec534-ee48-4575-b6a9-ead2955b8069',
         'c4adabb33e9306b038088132affcde556c50d82f603f47711a9510bf3beef6d6',
         {
-          "credentialType": "FIDO",
-          "status": "VERIFIED",
-          "payload": {
-            "id": "credential id: identifier of pair of keys, base64 encoded, min length 59",
-            "rawId": "raw credential id: identifier of pair of keys, base64 encoded, min length 59",
-            "response": {
-              "clientDataJSON": "clientDataJSON-must-not-have-fewer-" +
-                "than-121-characters Lorem ipsum dolor sit amet, " +
-                "consectetur adipiscing elit, sed do eiusmod tempor " +
-                "incididunt ut labore et dolore magna aliqua.",
-              "attestationObject": "attestationObject-must-not-have-fewer" +
-                "-than-306-characters Lorem ipsum dolor sit amet, " +
-                "consectetur adipiscing elit, sed do eiusmod tempor " +
-                "incididunt ut labore et dolore magna aliqua. Ut enim " +
-                "ad minim veniam, quis nostrud exercitation ullamco " +
-                "laboris nisi ut aliquip ex ea commodo consequat. Duis " +
-                "aute irure dolor in reprehenderit in voluptate velit " +
-                "esse cillum dolore eu fugiat nulla pariatur."
+          credentialType: 'FIDO',
+          status: 'VERIFIED',
+          fidoPayload: {
+            id: 'credential id: identifier of pair of keys, base64 encoded, min length 59',
+            rawId: 'raw credential id: identifier of pair of keys, base64 encoded, min length 59',
+            response: {
+              clientDataJSON: 'clientDataJSON-must-not-have-fewer-' +
+                'than-121-characters Lorem ipsum dolor sit amet, ' +
+                'consectetur adipiscing elit, sed do eiusmod tempor ' +
+                'incididunt ut labore et dolore magna aliqua.',
+              attestationObject: 'attestationObject-must-not-have-fewer' +
+                '-than-306-characters Lorem ipsum dolor sit amet, ' +
+                'consectetur adipiscing elit, sed do eiusmod tempor ' +
+                'incididunt ut labore et dolore magna aliqua. Ut enim ' +
+                'ad minim veniam, quis nostrud exercitation ullamco ' +
+                'laboris nisi ut aliquip ex ea commodo consequat. Duis ' +
+                'aute irure dolor in reprehenderit in voluptate velit ' +
+                'esse cillum dolore eu fugiat nulla pariatur.'
             },
-            "type": "public-key"
+            type: 'public-key'
           }
         }
       )
@@ -266,17 +237,17 @@ describe('backendRequests', () => {
       expect(postSpy).toBeCalledWith('accountConsentInfo', {
         scopes: [
           {
-            "accountId": "dfspa.username.1234",
-            "actions": [
-              "accounts.transfer",
-              "accounts.getBalance"
+            address: 'dfspa.username.1234',
+            actions: [
+              'ACCOUNTS_TRANSFER',
+              'ACCOUNTS_GET_BALANCE'
             ]
           },
           {
-            "accountId": "dfspa.username.5678",
-            "actions": [
-              "accounts.transfer",
-              "accounts.getBalance"
+            address: 'dfspa.username.5678',
+            actions: [
+              'ACCOUNTS_TRANSFER',
+              'ACCOUNTS_GET_BALANCE'
             ]
           }
         ],
@@ -284,30 +255,29 @@ describe('backendRequests', () => {
         registrationChallenge: 'c4adabb33e9306b038088132affcde556c50d82f603f47711a9510bf3beef6d6',
         consentRequestId: 'b51ec534-ee48-4575-b6a9-ead2955b8069',
         credential: {
-          "credentialType": "FIDO",
-          "status": "VERIFIED",
-          "payload": {
-            "id": "credential id: identifier of pair of keys, base64 encoded, min length 59",
-            "rawId": "raw credential id: identifier of pair of keys, base64 encoded, min length 59",
-            "response": {
-              "clientDataJSON": "clientDataJSON-must-not-have-fewer-" +
-                "than-121-characters Lorem ipsum dolor sit amet, " +
-                "consectetur adipiscing elit, sed do eiusmod tempor " +
-                "incididunt ut labore et dolore magna aliqua.",
-              "attestationObject": "attestationObject-must-not-have-fewer" +
-                "-than-306-characters Lorem ipsum dolor sit amet, " +
-                "consectetur adipiscing elit, sed do eiusmod tempor " +
-                "incididunt ut labore et dolore magna aliqua. Ut enim " +
-                "ad minim veniam, quis nostrud exercitation ullamco " +
-                "laboris nisi ut aliquip ex ea commodo consequat. Duis " +
-                "aute irure dolor in reprehenderit in voluptate velit " +
-                "esse cillum dolore eu fugiat nulla pariatur."
+          credentialType: 'FIDO',
+          status: 'VERIFIED',
+          fidoPayload: {
+            id: 'credential id: identifier of pair of keys, base64 encoded, min length 59',
+            rawId: 'raw credential id: identifier of pair of keys, base64 encoded, min length 59',
+            response: {
+              clientDataJSON: 'clientDataJSON-must-not-have-fewer-' +
+                'than-121-characters Lorem ipsum dolor sit amet, ' +
+                'consectetur adipiscing elit, sed do eiusmod tempor ' +
+                'incididunt ut labore et dolore magna aliqua.',
+              attestationObject: 'attestationObject-must-not-have-fewer' +
+                '-than-306-characters Lorem ipsum dolor sit amet, ' +
+                'consectetur adipiscing elit, sed do eiusmod tempor ' +
+                'incididunt ut labore et dolore magna aliqua. Ut enim ' +
+                'ad minim veniam, quis nostrud exercitation ullamco ' +
+                'laboris nisi ut aliquip ex ea commodo consequat. Duis ' +
+                'aute irure dolor in reprehenderit in voluptate velit ' +
+                'esse cillum dolore eu fugiat nulla pariatur.'
             },
-            "type": "public-key"
+            type: 'public-key'
           }
         }
       })
-
     })
   })
 })

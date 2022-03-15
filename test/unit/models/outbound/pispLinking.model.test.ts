@@ -30,7 +30,7 @@ import { Message, NotificationCallback, PubSub } from '~/shared/pub-sub'
 import {
   PISPLinkingData,
   PISPLinkingModelConfig,
-  PISPLinkingPhase,
+  PISPLinkingPhase
 } from '~/models/outbound/pispLinking.interface'
 import {
   v1_1 as fspiopAPI,
@@ -45,7 +45,7 @@ import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
 import { RedisConnectionConfig } from '~/shared/redis-connection'
 import { mocked } from 'ts-jest/utils'
 
-import TestData from 'test/unit/data/mockData.json'
+import * as mockData from 'test/unit/data/mockData'
 import mockLogger from 'test/unit/mockLogger'
 import shouldNotBeExecuted from 'test/unit/shouldNotBeExecuted'
 import sortedArray from 'test/unit/sortedArray'
@@ -55,7 +55,6 @@ jest.mock('~/shared/kvs')
 
 // mock PubSub default exported class
 jest.mock('~/shared/pub-sub')
-const mockData = JSON.parse(JSON.stringify(TestData))
 
 describe('PISPLinkingModel', () => {
   const connectionConfig: RedisConnectionConfig = {
@@ -68,7 +67,7 @@ describe('PISPLinkingModel', () => {
 
   const expectedResp = {
     channelResponse: { ...mockData.consentRequestsPut.payload },
-    currentState: 'WebAuthenticationChannelResponseRecieved'
+    currentState: 'WebAuthenticationChannelResponseReceived'
   }
 
   const expectedErrorResp = {
@@ -120,7 +119,7 @@ describe('PISPLinkingModel', () => {
 
     expect(sortedArray(am.fsm.allStates())).toEqual([
       'OTPAuthenticationChannelResponseRecieved',
-      'WebAuthenticationChannelResponseRecieved',
+      'WebAuthenticationChannelResponseReceived',
       'accountsLinked',
       'channelResponseReceived',
       'consentReceivedAwaitingCredential',
@@ -171,7 +170,7 @@ describe('PISPLinkingModel', () => {
     type PutResponse =
       tpAPI.Schemas.ConsentRequestsIDPutResponseWeb |
       tpAPI.Schemas.ConsentRequestsIDPutResponseOTP
-    type PutResponseOrError = PutResponse & fspiopAPI.Schemas.ErrorInformationObject
+    type PutResponseOrError = PutResponse | fspiopAPI.Schemas.ErrorInformationObject
     let putResponse: PutResponseOrError
 
     beforeEach(() => {
@@ -291,7 +290,7 @@ describe('PISPLinkingModel', () => {
         expect(mocked(modelConfig.subscriber.unsubscribe)).toBeCalledWith(requestConsentChannel, subId)
         expect(mocked(publisher.publish)).toBeCalledWith(requestConsentChannel, putResponse)
         mocked(modelConfig.logger.info).mockReset()
-        expect(model.data.currentState).toEqual('WebAuthenticationChannelResponseRecieved')
+        expect(model.data.currentState).toEqual('WebAuthenticationChannelResponseReceived')
       })
 
       it('errored', async () => {
@@ -332,16 +331,17 @@ describe('PISPLinkingModel', () => {
         consentRequestId: mockData.linkingRequestConsentPostRequest.payload.consentRequestId,
         linkingRequestConsentPostRequest: mockData.linkingRequestConsentPostRequest.payload,
         linkingRequestConsentIDAuthenticatePatchRequest: mockData.linkingRequestConsentIDAuthenticatePatchRequest.payload,
-        currentState: 'WebAuthenticationChannelResponseRecieved'
+        currentState: 'WebAuthenticationChannelResponseReceived'
       }
       const consentPostResponse: tpAPI.Schemas.ConsentsPostRequestPISP = {
         consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
         consentRequestId: consentRequestId,
+        status: 'ISSUED',
         scopes: [{
-          accountId: 'some-id',
+          address: 'some-id',
           actions: [
-            'accounts.getBalance',
-            'accounts.transfer'
+            'ACCOUNTS_GET_BALANCE',
+            'ACCOUNTS_TRANSFER'
           ]
         }
         ]
@@ -380,11 +380,12 @@ describe('PISPLinkingModel', () => {
         const expectedConsent: tpAPI.Schemas.ConsentsPostRequestPISP = {
           consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
           consentRequestId,
+          status: 'ISSUED',
           scopes: [{
-            accountId: 'some-id',
+            address: 'some-id',
             actions: [
-              'accounts.getBalance',
-              'accounts.transfer'
+              'ACCOUNTS_GET_BALANCE',
+              'ACCOUNTS_TRANSFER'
             ]
           }
           ]
@@ -420,11 +421,12 @@ describe('PISPLinkingModel', () => {
       const consentPostResponse: tpAPI.Schemas.ConsentsPostRequestPISP = {
         consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
         consentRequestId: consentRequestId,
+        status: 'ISSUED',
         scopes: [{
-          accountId: 'some-id',
+          address: 'some-id',
           actions: [
-            'accounts.getBalance',
-            'accounts.transfer'
+            'ACCOUNTS_GET_BALANCE',
+            'ACCOUNTS_TRANSFER'
           ]
         }]
       }
@@ -481,7 +483,7 @@ describe('PISPLinkingModel', () => {
           {
             credential: {
               credentialType: 'FIDO',
-              payload: {
+              fidoPayload: {
                 id: 'credential id: identifier of pair of keys, base64 encoded, min length 59',
                 rawId: 'raw credential id: identifier of pair of keys, base64 encoded, min length 59',
                 response: {
@@ -499,15 +501,16 @@ describe('PISPLinkingModel', () => {
                 },
                 type: 'public-key'
               },
-              status: 'PENDING',
+              status: 'PENDING'
             },
             scopes: [{
-              accountId: 'some-id',
+              address: 'some-id',
               actions: [
-                'accounts.getBalance',
-                'accounts.transfer'
+                'ACCOUNTS_GET_BALANCE',
+                'ACCOUNTS_TRANSFER'
               ]
-            }]
+            }],
+            status: 'ISSUED'
           },
           'dfspA'
         )

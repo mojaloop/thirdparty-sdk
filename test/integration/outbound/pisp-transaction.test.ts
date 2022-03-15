@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from 'axios'
 import env from '../env'
 import { KVS } from '~/shared/kvs'
@@ -78,6 +79,7 @@ describe('PISP Transaction', (): void => {
       const approveURI = `${env.outbound.baseUri}/thirdpartyTransaction/${transactionRequestId}/approve`
       const approveRequest = {
         authorizationResponse: {
+          responseType: 'ACCEPTED',
           signedPayloadType: 'FIDO',
           signedPayload: {
             id: '45c-TkfkjQovQeAWmOy-RLBHEJ_e4jYzQYgD8VdbkePgM5d98BaAadadNYrknxgH0jQEON8zBydLgh1EqoC9DA',
@@ -91,7 +93,7 @@ describe('PISP Transaction', (): void => {
           }
         }
       }
-    
+
       // send approve with signed authorization and wait for transfer to complete
       const approveResponse = await axios.post<any>(approveURI, approveRequest)
 

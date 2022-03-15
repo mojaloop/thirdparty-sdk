@@ -30,9 +30,9 @@ import { KVS } from '~/shared/kvs'
 import { RedisConnectionConfig } from '~/shared/redis-connection'
 import Config from '~/shared/config'
 import mockLogger from '../../unit/mockLogger'
-import TestData from 'test/unit/data/mockData.json'
+import * as mockData from 'test/unit/data/mockData'
 
-const mockData = JSON.parse(JSON.stringify(TestData))
+
 
 describe('PISP requests DFSP to validate user consentRequests for linking', (): void => {
   const config: RedisConnectionConfig = {
@@ -63,7 +63,7 @@ describe('PISP requests DFSP to validate user consentRequests for linking', (): 
       }
       const expectedResponse = {
         channelResponse: { ...mockData.consentRequestsPut.payload },
-        currentState: 'WebAuthenticationChannelResponseRecieved'
+        currentState: 'WebAuthenticationChannelResponseReceived'
       }
       const consentRequestsResponse = await axios.post(linkingRequestConsentURI, linkingRequestConsentRequest)
       expect(consentRequestsResponse.status).toEqual(200)
@@ -82,10 +82,10 @@ describe('PISP requests DFSP to validate user consentRequests for linking', (): 
         consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
         consentRequestId: consentRequestId,
         scopes: [{
-          accountId: 'some-id',
+          address: 'some-id',
           actions: [
-            'accounts.getBalance',
-            'accounts.transfer'
+            'ACCOUNTS_GET_BALANCE',
+            'ACCOUNTS_TRANSFER'
           ]
         }
         ]
@@ -165,10 +165,10 @@ describe('PISP requests DFSP to validate user consentRequests for linking', (): 
         consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
         consentRequestId: consentRequestId,
         scopes: [{
-          accountId: 'some-id',
+          address: 'some-id',
           actions: [
-            'accounts.getBalance',
-            'accounts.transfer'
+            'ACCOUNTS_GET_BALANCE',
+            'ACCOUNTS_TRANSFER'
           ]
         }
         ]
@@ -252,7 +252,7 @@ describe('PISP requests DFSP to validate user consentRequests for linking', (): 
       }
       const expectedResponse = {
         channelResponse: { ...mockData.consentRequestsPut.payload },
-        currentState: 'WebAuthenticationChannelResponseRecieved'
+        currentState: 'WebAuthenticationChannelResponseReceived'
       }
       const consentRequestsResponse = await axios.post(linkingRequestConsentURI, linkingRequestConsentRequest)
       expect(consentRequestsResponse.status).toEqual(200)
@@ -294,7 +294,7 @@ describe('PISP requests DFSP to validate user consentRequests for linking', (): 
       }
       const expectedResponse = {
         channelResponse: { ...mockData.consentRequestsPut.payload },
-        currentState: 'WebAuthenticationChannelResponseRecieved'
+        currentState: 'WebAuthenticationChannelResponseReceived'
       }
       const consentRequestsResponse = await axios.post(linkingRequestConsentURI, linkingRequestConsentRequest)
       expect(consentRequestsResponse.status).toEqual(200)
@@ -313,10 +313,10 @@ describe('PISP requests DFSP to validate user consentRequests for linking', (): 
         consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
         consentRequestId: consentRequestId,
         scopes: [{
-          accountId: 'some-id',
+          address: 'some-id',
           actions: [
-            'accounts.getBalance',
-            'accounts.transfer'
+            'ACCOUNTS_GET_BALANCE',
+            'ACCOUNTS_TRANSFER'
           ]
         }
         ]

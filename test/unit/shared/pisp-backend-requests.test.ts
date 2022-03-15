@@ -32,39 +32,14 @@ import { PISPBackendConfig, PISPBackendRequests } from '~/shared/pisp-backend-re
 import { Scheme } from '~/shared/http-scheme'
 import mockLogger from '../mockLogger'
 
-describe('PISPBckendRequests', () => {
+describe('PISPBackendRequests', () => {
   let pispBackendRequests: PISPBackendRequests
 
   const config: PISPBackendConfig = {
     logger: mockLogger(),
     scheme: Scheme.http,
     uri: 'backend-uri',
-    signAuthorizationPath: 'singchallenge'
-  }
-
-  const authenticationValue = {
-    pinValue: 'the-mocked-pin-value',
-    counter: '1'
-  }
-
-  const authorizationsPostRequest: tpAPI.Schemas.AuthorizationsPostRequest = {
-    authenticationType: 'U2F',
-    retriesLeft: '1',
-    amount: {
-      currency: 'USD',
-      amount: '100'
-    },
-    transactionId: 'c87e9f61-e0d1-4a1c-a992-002718daf402',
-    transactionRequestId: 'aca279be-60c6-42ff-aab5-901d61b5e35c',
-    quote: {
-      transferAmount: {
-        currency: 'USD',
-        amount: '105'
-      },
-      expiration: '2020-07-15T09:48:54.961Z',
-      ilpPacket: 'ilp-packet-value',
-      condition: 'condition-000000000-111111111-222222222-abc'
-    }
+    signAuthorizationPath: 'signchallenge'
   }
 
   beforeEach(() => {
@@ -82,17 +57,5 @@ describe('PISPBckendRequests', () => {
     expect(typeof pispBackendRequests.patch).toEqual('function')
     expect(typeof pispBackendRequests.post).toEqual('function')
     expect(typeof pispBackendRequests.put).toEqual('function')
-    expect(typeof pispBackendRequests.signAuthorization).toEqual('function')
-  })
-
-  describe('signAuthorizationRequest', () => {
-    it('should propagate call to post', async () => {
-      const postSpy = jest.spyOn(pispBackendRequests, 'post').mockImplementationOnce(
-        () => Promise.resolve(authenticationValue)
-      )
-      const result = await pispBackendRequests.signAuthorization(authorizationsPostRequest)
-      expect(result).toEqual(authenticationValue)
-      expect(postSpy).toBeCalledWith(config.signAuthorizationPath, authorizationsPostRequest)
-    })
   })
 })

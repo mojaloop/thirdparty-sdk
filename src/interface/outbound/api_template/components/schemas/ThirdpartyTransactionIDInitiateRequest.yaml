@@ -3,15 +3,15 @@
   description: The object sent in the POST `/thirdpartyTransaction/{ID}/initiate` request.
   properties:
     payee:
-      $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/Party.yaml'
+      $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/v1_0/openapi3/components/schemas/Party.yaml'
     payer:
-      $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/PartyIdInfoTPLink.yaml'
+      $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/v1_0/openapi3/components/schemas/PartyIdInfoTPLink.yaml'
     amountType:
-      $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/AmountType.yaml'
+      $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/v1_0/openapi3/components/schemas/AmountType.yaml'
     amount:
-      $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/Money.yaml'
+      $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/v1_0/openapi3/components/schemas/Money.yaml'
     transactionType:
-      $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/TransactionType.yaml'
+      $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/v1_0/openapi3/components/schemas/TransactionType.yaml'
     expiration:
       type: string
       example: '2016-05-24T08:38:08.699-04:00'

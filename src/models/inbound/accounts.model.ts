@@ -71,7 +71,8 @@ export class InboundAccountsModel {
       }
 
       await this.thirdpartyRequests.putAccounts(userId, userAccounts, srcDfspId)
-    } catch (err) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
       this.logger.push({ err }).error('Error in getUserAccounts @ Inbound')
       const mojaloopError = this.reformatError(err)
       this.logger.push({ mojaloopError }).info(`Sending error response to ${srcDfspId}`)

@@ -31,7 +31,7 @@ import {
 } from '~/models/inbound/accounts.model'
 import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
 import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
-import TestData from 'test/unit/data/mockData.json'
+import * as mockData from 'test/unit/data/mockData'
 
 import mockLogger from '../../mockLogger'
 import { mocked } from 'ts-jest/utils'
@@ -39,7 +39,7 @@ import { HTTPResponseError } from '../../../../src/shared/http-response-error'
 
 describe('InboundAccountsModel', () => {
   const logger = mockLogger()
-  const mockData = JSON.parse(JSON.stringify(TestData))
+
   describe('accounts', () => {
     let model: InboundAccountsModel
     let config: InboundAccountsModelConfig

@@ -113,7 +113,6 @@ export class InboundThridpartyTransactionsModel {
 
     // notifyThirdpartyAboutTransfer via PATCH
     const transactionStatus: tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPatchResponse = {
-      transactionId: inRequest.transactionRequestId,
       transactionRequestState: 'ACCEPTED',
       transactionState: 'COMPLETED'
     }

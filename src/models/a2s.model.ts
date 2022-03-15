@@ -203,7 +203,8 @@ export class A2SModel<Args, A2SActionResponse extends StateData>
           this.logger.log('State machine in errored state')
           return
       }
-    } catch (err) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
       this.logger.log(`Error running ${this.modelName} model: ${util.inspect(err)}`)
 
       // as this function is recursive, we don't want to error the state machine multiple times

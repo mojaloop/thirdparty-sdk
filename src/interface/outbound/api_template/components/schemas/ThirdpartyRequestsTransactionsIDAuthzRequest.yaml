@@ -1,4 +1,4 @@
-$ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/ThirdpartyRequestsTransactionsIDAuthorizationsPostRequest.yaml'
+$ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/v1_0/openapi3/components/schemas/ThirdpartyRequestsTransactionsIDAuthorizationsPostRequest.yaml'
 example:
 challenge: '<QuoteResponse object>'
 value: '<base64 encoded binary - the signed quote response object>'

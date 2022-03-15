@@ -108,7 +108,7 @@ export class PISPDiscoveryModel
 
           // store response which will be returned by 'getResponse' method in workflow 'run'
           this.data.response = {
-            accounts: putResponse.errorInformation ? [] : putResponse.accounts,
+            accounts: putResponse.errorInformation ? [] : putResponse.accounts!,
             currentState: PISPDiscoveryModelState[
               this.data.currentState as keyof typeof PISPDiscoveryModelState
             ]
@@ -164,7 +164,8 @@ export class PISPDiscoveryModel
           this.logger.info('State machine in errored state')
           return
       }
-    } catch (err) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
       this.logger.info(`Error running PISPDiscoveryModel : ${inspect(err)}`)
 
       // as this function is recursive, we don't want to error the state machine multiple times

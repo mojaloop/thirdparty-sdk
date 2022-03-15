@@ -3,7 +3,7 @@ type: object
 properties:
   authorizationResponse:
     oneOf:
-      - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/ThirdpartyRequestsAuthorizationsIDPutResponseGeneric.yaml'
-      - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/ThirdpartyRequestsAuthorizationsIDPutResponseFIDO.yaml'
-required: 
+      - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/v1_0/openapi3/components/schemas/ThirdpartyRequestsAuthorizationsIDPutResponseGeneric.yaml'
+      - $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/v1_0/openapi3/components/schemas/ThirdpartyRequestsAuthorizationsIDPutResponseFIDO.yaml'
+required:
   - authorizationResponse

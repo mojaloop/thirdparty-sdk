@@ -134,10 +134,10 @@ defineFeature(feature, (test): void => {
       consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
       consentRequestId: '997c89f4-053c-4283-bfec-45a1a0a28fba',
       scopes: [{
-        accountId: 'some-id',
+        address: 'some-id',
         actions: [
-          'accounts.getBalance',
-          'accounts.transfer'
+          'ACCOUNTS_GET_BALANCE',
+          'ACCOUNTS_TRANSFER'
         ]
       }]
     }
@@ -157,17 +157,17 @@ defineFeature(feature, (test): void => {
         "consentRequestId": "b51ec534-ee48-4575-b6a9-ead2955b8069",
         "scopes": [
           {
-            "accountId": "dfspa.username.1234",
+            "address": "dfspa.username.1234",
             "actions": [
-              "accounts.transfer",
-              "accounts.getBalance"
+              "ACCOUNTS_TRANSFER",
+              "ACCOUNTS_GET_BALANCE"
             ]
           },
           {
-            "accountId": "dfspa.username.5678",
+            "address": "dfspa.username.5678",
             "actions": [
-              "accounts.transfer",
-              "accounts.getBalance"
+              "ACCOUNTS_TRANSFER",
+              "ACCOUNTS_GET_BALANCE"
             ]
           }
         ],
@@ -189,10 +189,10 @@ defineFeature(feature, (test): void => {
           consentRequestId: "bbce3ce8-c247-4153-aab1-f89768c93b18",
           toParticipantId: "dfspA",
           accounts: [
-            { "accountNickname": "XXXXXXnt", "id": "dfspa.username.1234", "currency": "ZAR" },
-            { "accountNickname": "SpeXXXXXXXXnt", "id": "dfspa.username.5678", "currency": "USD" }
+            { "accountNickname": "XXXXXXnt", "address": "dfspa.username.1234", "currency": "ZAR" },
+            { "accountNickname": "SpeXXXXXXXXnt", "address": "dfspa.username.5678", "currency": "USD" }
           ],
-          actions: ["accounts.getBalance", "accounts.transfer"],
+          actions: ["ACCOUNTS_GET_BALANCE", "ACCOUNTS_TRANSFER"],
           userId: "username1234",
           callbackUri: "pisp-app://callback.com"
         }

@@ -25,20 +25,24 @@
 
  --------------
  ******/
-import { ThirdpartyTransactionRequest, QuoteRequest } from '../../interface/types'
 import { v4 as uuidv4 } from 'uuid'
 import SDK from '@mojaloop/sdk-standard-components'
 import {
-  v1_1 as fspiopAPI
+  v1_1 as fspiopAPI,
+  thirdparty as tpAPI
 } from '@mojaloop/api-snippets'
 
-export function buildPayeeQuoteRequestFromTptRequest (request: ThirdpartyTransactionRequest): QuoteRequest {
+export function buildPayeeQuoteRequestFromTptRequest (
+  request: tpAPI.Schemas.ThirdpartyRequestsTransactionsPostRequest
+): tpAPI.Schemas.QuotesIDPostRequest {
   const quoteRequest = {
     quoteId: uuidv4(),
     transactionId: uuidv4(),
     transactionRequestId: request.transactionRequestId,
     payee: request.payee,
-    payer: request.payer,
+    payer: {
+      partyIdInfo: request.payer
+    },
     amountType: request.amountType,
     amount: request.amount,
     transactionType: request.transactionType
@@ -48,7 +52,7 @@ export function buildPayeeQuoteRequestFromTptRequest (request: ThirdpartyTransac
 }
 
 export async function forwardPostQuoteRequestToPayee (
-  request: ThirdpartyTransactionRequest,
+  request: tpAPI.Schemas.ThirdpartyRequestsTransactionsPostRequest,
   mojaloopRequests: SDK.MojaloopRequests
 ): Promise<void> {
   const quote = buildPayeeQuoteRequestFromTptRequest(request)

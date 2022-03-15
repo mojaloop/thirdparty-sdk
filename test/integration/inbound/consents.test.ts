@@ -45,10 +45,10 @@ describe('PISP Inbound', (): void => {
         consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
         consentRequestId: '997c89f4-053c-4283-bfec-45a1a0a28fbb',
         scopes: [{
-          accountId: 'some-id',
+          address: 'some-id',
           actions: [
-            'accounts.getBalance',
-            'accounts.transfer'
+            'ACCOUNTS_GET_BALANCE',
+            'ACCOUNTS_TRANSFER'
           ]
         }
         ]
@@ -100,10 +100,10 @@ describe('DFSP Inbound', (): void => {
     describe('Inbound API', (): void => {
       const signedCredentialPayload = {
         scopes: [{
-          accountId: 'some-id',
+          address: 'some-id',
           actions: [
-            'accounts.getBalance',
-            'accounts.transfer'
+            'ACCOUNTS_GET_BALANCE',
+            'ACCOUNTS_TRANSFER'
           ]
         }],
         credential: {
@@ -161,10 +161,10 @@ describe('DFSP Inbound', (): void => {
       }
       const verifiedCredentialPayload = {
         scopes: [{
-          accountId: 'some-id',
+          address: 'some-id',
           actions: [
-            'accounts.getBalance',
-            'accounts.transfer'
+            'ACCOUNTS_GET_BALANCE',
+            'ACCOUNTS_TRANSFER'
           ]
         }],
         credential: {

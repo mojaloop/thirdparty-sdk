@@ -79,17 +79,17 @@ describe('DFSP Inbound', (): void => {
           "userId": "dfspa.username",
           "scopes": [
             {
-              "accountId": "dfspa.username.1234",
+              "address": "dfspa.username.1234",
               "actions": [
-                "accounts.transfer",
-                "accounts.getBalance"
+                "ACCOUNTS_TRANSFER",
+                "ACCOUNTS_GET_BALANCE"
               ]
             },
             {
-              "accountId": "dfspa.username.5678",
+              "address": "dfspa.username.5678",
               "actions": [
-                "accounts.transfer",
-                "accounts.getBalance"
+                "ACCOUNTS_TRANSFER",
+                "ACCOUNTS_GET_BALANCE"
               ]
             }
           ],
@@ -114,17 +114,17 @@ describe('DFSP Inbound', (): void => {
           "consentRequestId":"997c89f4-053c-4283-bfec-45a1a0a28fba",
           "scopes":[
             {
-              "accountId":"dfspa.username.1234",
+              "address":"dfspa.username.1234",
               "actions":[
-                "accounts.transfer",
-                "accounts.getBalance"
+                "ACCOUNTS_TRANSFER",
+                "ACCOUNTS_GET_BALANCE"
               ]
             },
             {
-              "accountId":"dfspa.username.5678",
+              "address":"dfspa.username.5678",
               "actions":[
-                "accounts.transfer",
-                "accounts.getBalance"
+                "ACCOUNTS_TRANSFER",
+                "ACCOUNTS_GET_BALANCE"
               ]
             }],
           "callbackUri":"pisp-app://callback.com",
@@ -168,17 +168,17 @@ describe('DFSP Inbound', (): void => {
         const putConsentsIDSignedCredentialPayload = {
           "scopes": [
             {
-              "accountId": "dfspa.username.1234",
+              "address": "dfspa.username.1234",
               "actions": [
-                "accounts.transfer",
-                "accounts.getBalance"
+                "ACCOUNTS_TRANSFER",
+                "ACCOUNTS_GET_BALANCE"
               ]
             },
             {
-              "accountId": "dfspa.username.5678",
+              "address": "dfspa.username.5678",
               "actions": [
-                "accounts.transfer",
-                "accounts.getBalance"
+                "ACCOUNTS_TRANSFER",
+                "ACCOUNTS_GET_BALANCE"
               ]
             }
           ],
@@ -232,17 +232,17 @@ describe('DFSP Inbound', (): void => {
           const putConsentsIDVerifiedCredentialPayload = {
             "scopes": [
               {
-                "accountId": "dfspa.username.1234",
+                "address": "dfspa.username.1234",
                 "actions": [
-                  "accounts.transfer",
-                  "accounts.getBalance"
+                  "ACCOUNTS_TRANSFER",
+                  "ACCOUNTS_GET_BALANCE"
                 ]
               },
               {
-                "accountId": "dfspa.username.5678",
+                "address": "dfspa.username.5678",
                 "actions": [
-                  "accounts.transfer",
-                  "accounts.getBalance"
+                  "ACCOUNTS_TRANSFER",
+                  "ACCOUNTS_GET_BALANCE"
                 ]
               }
             ],
@@ -324,17 +324,17 @@ describe('DFSP Inbound', (): void => {
           "userId": "dfspa.username",
           "scopes": [
             {
-              "accountId": "dfspa.username.1234",
+              "address": "dfspa.username.1234",
               "actions": [
-                "accounts.transfer",
-                "accounts.getBalance"
+                "ACCOUNTS_TRANSFER",
+                "ACCOUNTS_GET_BALANCE"
               ]
             },
             {
-              "accountId": "dfspa.username.5678",
+              "address": "dfspa.username.5678",
               "actions": [
-                "accounts.transfer",
-                "accounts.getBalance"
+                "ACCOUNTS_TRANSFER",
+                "ACCOUNTS_GET_BALANCE"
               ]
             }
           ],
@@ -359,17 +359,17 @@ describe('DFSP Inbound', (): void => {
           "consentRequestId":"997c89f4-053c-4283-bfec-45a1a0a28fbb",
           "scopes":[
             {
-              "accountId":"dfspa.username.1234",
+              "address":"dfspa.username.1234",
               "actions":[
-                "accounts.transfer",
-                "accounts.getBalance"
+                "ACCOUNTS_TRANSFER",
+                "ACCOUNTS_GET_BALANCE"
               ]
             },
             {
-              "accountId":"dfspa.username.5678",
+              "address":"dfspa.username.5678",
               "actions":[
-                "accounts.transfer",
-                "accounts.getBalance"
+                "ACCOUNTS_TRANSFER",
+                "ACCOUNTS_GET_BALANCE"
               ]
             }],
           "callbackUri":"pisp-app://callback.com",
@@ -413,17 +413,17 @@ describe('DFSP Inbound', (): void => {
         const putConsentsIDSignedCredentialPayload = {
           "scopes": [
             {
-              "accountId": "dfspa.username.1234",
+              "address": "dfspa.username.1234",
               "actions": [
-                "accounts.transfer",
-                "accounts.getBalance"
+                "ACCOUNTS_TRANSFER",
+                "ACCOUNTS_GET_BALANCE"
               ]
             },
             {
-              "accountId": "dfspa.username.5678",
+              "address": "dfspa.username.5678",
               "actions": [
-                "accounts.transfer",
-                "accounts.getBalance"
+                "ACCOUNTS_TRANSFER",
+                "ACCOUNTS_GET_BALANCE"
               ]
             }
           ],
@@ -477,17 +477,17 @@ describe('DFSP Inbound', (): void => {
         const putConsentsIDVerifiedCredentialPayload = {
           "scopes": [
             {
-              "accountId": "dfspa.username.1234",
+              "address": "dfspa.username.1234",
               "actions": [
-                "accounts.transfer",
-                "accounts.getBalance"
+                "ACCOUNTS_TRANSFER",
+                "ACCOUNTS_GET_BALANCE"
               ]
             },
             {
-              "accountId": "dfspa.username.5678",
+              "address": "dfspa.username.5678",
               "actions": [
-                "accounts.transfer",
-                "accounts.getBalance"
+                "ACCOUNTS_TRANSFER",
+                "ACCOUNTS_GET_BALANCE"
               ]
             }
           ],
@@ -562,17 +562,17 @@ describe('DFSP Inbound', (): void => {
           "userId": "dfspa.username",
           "scopes": [
             {
-              "accountId": "dfspa.username.1234",
+              "address": "dfspa.username.1234",
               "actions": [
-                "accounts.transfer",
-                "accounts.getBalance"
+                "ACCOUNTS_TRANSFER",
+                "ACCOUNTS_GET_BALANCE"
               ]
             },
             {
-              "accountId": "dfspa.username.5678",
+              "address": "dfspa.username.5678",
               "actions": [
-                "accounts.transfer",
-                "accounts.getBalance"
+                "ACCOUNTS_TRANSFER",
+                "ACCOUNTS_GET_BALANCE"
               ]
             }
           ],
@@ -631,17 +631,17 @@ describe('DFSP Inbound', (): void => {
           "userId": "dfspa.username",
           "scopes": [
             {
-              "accountId": "dfspa.username.1234",
+              "address": "dfspa.username.1234",
               "actions": [
-                "accounts.transfer",
-                "accounts.getBalance"
+                "ACCOUNTS_TRANSFER",
+                "ACCOUNTS_GET_BALANCE"
               ]
             },
             {
-              "accountId": "dfspa.username.5678",
+              "address": "dfspa.username.5678",
               "actions": [
-                "accounts.transfer",
-                "accounts.getBalance"
+                "ACCOUNTS_TRANSFER",
+                "ACCOUNTS_GET_BALANCE"
               ]
             }
           ],
@@ -703,17 +703,17 @@ describe('DFSP Inbound', (): void => {
           "userId": "dfspa.username",
           "scopes": [
             {
-              "accountId": "dfspa.username.1234",
+              "address": "dfspa.username.1234",
               "actions": [
-                "accounts.transfer",
-                "accounts.getBalance"
+                "ACCOUNTS_TRANSFER",
+                "ACCOUNTS_GET_BALANCE"
               ]
             },
             {
-              "accountId": "dfspa.username.5678",
+              "address": "dfspa.username.5678",
               "actions": [
-                "accounts.transfer",
-                "accounts.getBalance"
+                "ACCOUNTS_TRANSFER",
+                "ACCOUNTS_GET_BALANCE"
               ]
             }
           ],
@@ -775,17 +775,17 @@ describe('DFSP Inbound', (): void => {
           "userId": "dfspa.username",
           "scopes": [
             {
-              "accountId": "dfspa.username.1234",
+              "address": "dfspa.username.1234",
               "actions": [
-                "accounts.transfer",
-                "accounts.getBalance"
+                "ACCOUNTS_TRANSFER",
+                "ACCOUNTS_GET_BALANCE"
               ]
             },
             {
-              "accountId": "dfspa.username.5678",
+              "address": "dfspa.username.5678",
               "actions": [
-                "accounts.transfer",
-                "accounts.getBalance"
+                "ACCOUNTS_TRANSFER",
+                "ACCOUNTS_GET_BALANCE"
               ]
             }
           ],
@@ -855,17 +855,17 @@ describe('DFSP Inbound', (): void => {
           "userId": "dfspa.username",
           "scopes": [
             {
-              "accountId": "dfspa.username.12345",
+              "address": "dfspa.username.12345",
               "actions": [
-                "accounts.transfer",
-                "accounts.getBalance"
+                "ACCOUNTS_TRANSFER",
+                "ACCOUNTS_GET_BALANCE"
               ]
             },
             {
-              "accountId": "dfspa.username.5678",
+              "address": "dfspa.username.5678",
               "actions": [
-                "accounts.transfer",
-                "accounts.getBalance"
+                "ACCOUNTS_TRANSFER",
+                "ACCOUNTS_GET_BALANCE"
               ]
             }
           ],
@@ -890,17 +890,17 @@ describe('DFSP Inbound', (): void => {
           "consentRequestId":"997c89f4-053c-4283-bfec-45a1a0a28fba",
           "scopes":[
             {
-              "accountId":"dfspa.username.12345",
+              "address":"dfspa.username.12345",
               "actions":[
-                "accounts.transfer",
-                "accounts.getBalance"
+                "ACCOUNTS_TRANSFER",
+                "ACCOUNTS_GET_BALANCE"
               ]
             },
             {
-              "accountId":"dfspa.username.5678",
+              "address":"dfspa.username.5678",
               "actions":[
-                "accounts.transfer",
-                "accounts.getBalance"
+                "ACCOUNTS_TRANSFER",
+                "ACCOUNTS_GET_BALANCE"
               ]
             }],
           "callbackUri":"pisp-app://callback.com",
@@ -944,17 +944,17 @@ describe('DFSP Inbound', (): void => {
         const putConsentsIDSignedCredentialPayload = {
           "scopes": [
             {
-              "accountId": "dfspa.username.12345",
+              "address": "dfspa.username.12345",
               "actions": [
-                "accounts.transfer",
-                "accounts.getBalance"
+                "ACCOUNTS_TRANSFER",
+                "ACCOUNTS_GET_BALANCE"
               ]
             },
             {
-              "accountId": "dfspa.username.5678",
+              "address": "dfspa.username.5678",
               "actions": [
-                "accounts.transfer",
-                "accounts.getBalance"
+                "ACCOUNTS_TRANSFER",
+                "ACCOUNTS_GET_BALANCE"
               ]
             }
           ],
@@ -1008,17 +1008,17 @@ describe('DFSP Inbound', (): void => {
         const putConsentsIDVerifiedCredentialPayload = {
           "scopes": [
             {
-              "accountId": "dfspa.username.12345",
+              "address": "dfspa.username.12345",
               "actions": [
-                "accounts.transfer",
-                "accounts.getBalance"
+                "ACCOUNTS_TRANSFER",
+                "ACCOUNTS_GET_BALANCE"
               ]
             },
             {
-              "accountId": "dfspa.username.5678",
+              "address": "dfspa.username.5678",
               "actions": [
-                "accounts.transfer",
-                "accounts.getBalance"
+                "ACCOUNTS_TRANSFER",
+                "ACCOUNTS_GET_BALANCE"
               ]
             }
           ],
@@ -1096,17 +1096,17 @@ describe('DFSP Inbound', (): void => {
           "userId": "dfspa.username",
           "scopes": [
             {
-              "accountId": "dfspa.username.1234",
+              "address": "dfspa.username.1234",
               "actions": [
-                "accounts.transfer",
-                "accounts.getBalance"
+                "ACCOUNTS_TRANSFER",
+                "ACCOUNTS_GET_BALANCE"
               ]
             },
             {
-              "accountId": "dfspa.username.5678",
+              "address": "dfspa.username.5678",
               "actions": [
-                "accounts.transfer",
-                "accounts.getBalance"
+                "ACCOUNTS_TRANSFER",
+                "ACCOUNTS_GET_BALANCE"
               ]
             }
           ],
@@ -1131,17 +1131,17 @@ describe('DFSP Inbound', (): void => {
           "consentRequestId":"997c89f4-053c-4283-bfec-45a1a0a28fbb",
           "scopes":[
             {
-              "accountId":"dfspa.username.1234",
+              "address":"dfspa.username.1234",
               "actions":[
-                "accounts.transfer",
-                "accounts.getBalance"
+                "ACCOUNTS_TRANSFER",
+                "ACCOUNTS_GET_BALANCE"
               ]
             },
             {
-              "accountId":"dfspa.username.5678",
+              "address":"dfspa.username.5678",
               "actions":[
-                "accounts.transfer",
-                "accounts.getBalance"
+                "ACCOUNTS_TRANSFER",
+                "ACCOUNTS_GET_BALANCE"
               ]
             }],
           "callbackUri":"pisp-app://callback.com",
@@ -1184,17 +1184,17 @@ describe('DFSP Inbound', (): void => {
         const putConsentsIDSignedCredentialPayload = {
           "scopes": [
             {
-              "accountId": "dfspa.username.1234",
+              "address": "dfspa.username.1234",
               "actions": [
-                "accounts.transfer",
-                "accounts.getBalance"
+                "ACCOUNTS_TRANSFER",
+                "ACCOUNTS_GET_BALANCE"
               ]
             },
             {
-              "accountId": "dfspa.username.5678",
+              "address": "dfspa.username.5678",
               "actions": [
-                "accounts.transfer",
-                "accounts.getBalance"
+                "ACCOUNTS_TRANSFER",
+                "ACCOUNTS_GET_BALANCE"
               ]
             }
           ],

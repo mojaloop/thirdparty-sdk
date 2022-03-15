@@ -91,10 +91,10 @@ defineFeature(feature, (test): void => {
           consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
           consentRequestId: '997c89f4-053c-4283-bfec-45a1a0a28fba',
           scopes: [{
-            accountId: 'some-id',
+            address: 'some-id',
             actions: [
-              'accounts.getBalance',
-              'accounts.transfer'
+              'ACCOUNTS_GET_BALANCE',
+              'ACCOUNTS_TRANSFER'
             ]
           }
           ]
@@ -129,10 +129,10 @@ defineFeature(feature, (test): void => {
         },
         payload: {
           scopes: [{
-            accountId: 'some-id',
+            address: 'some-id',
             actions: [
-              'accounts.getBalance',
-              'accounts.transfer'
+              'ACCOUNTS_GET_BALANCE',
+              'ACCOUNTS_TRANSFER'
             ]
           }],
           credential: {
@@ -188,10 +188,10 @@ defineFeature(feature, (test): void => {
         },
         payload: {
           scopes: [{
-            accountId: 'some-id',
+            address: 'some-id',
             actions: [
-              'accounts.getBalance',
-              'accounts.transfer'
+              'ACCOUNTS_GET_BALANCE',
+              'ACCOUNTS_TRANSFER'
             ]
           }],
           credential: {

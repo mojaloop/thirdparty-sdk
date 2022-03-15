@@ -25,7 +25,7 @@
  --------------
  ******/
 
-import { PubSub } from '~/shared/pub-sub'
+import { PubSub, Message } from '~/shared/pub-sub'
 import { PersistentModel } from '~/models/persistent.model'
 import { StateMachineConfig } from 'javascript-state-machine'
 import { ThirdpartyRequests, Errors, MojaloopRequests } from '@mojaloop/sdk-standard-components'
@@ -38,13 +38,14 @@ import {
   DFSPLinkingData,
   DFSPLinkingStateMachine,
   DFSPLinkingModelConfig
+  , DFSPLinkingPhase
 } from '~/models/inbound/dfspLinking.interface'
 import { BackendValidateAuthTokenResponse, DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
-import { DFSPLinkingPhase } from './dfspLinking.interface'
+
 import { v4 as uuidv4 } from 'uuid'
 import { reformatError } from '~/shared/api-error'
 import deferredJob from '~/shared/deferred-job'
-import { Message } from '~/shared/pub-sub'
+
 import { canonicalize } from 'json-canonicalize'
 import sha256 from 'crypto-js/sha256'
 
@@ -63,13 +64,21 @@ export class DFSPLinkingModel
       transitions: [
         { name: 'validateRequest', from: 'start', to: 'requestIsValid' },
         { name: 'storeReqAndSendOTP', from: 'requestIsValid', to: 'consentRequestValidatedAndStored' },
-        { name: 'sendLinkingChannelResponse', from: 'consentRequestValidatedAndStored', to: 'authTokenReceived'},
+        { name: 'sendLinkingChannelResponse', from: 'consentRequestValidatedAndStored', to: 'authTokenReceived' },
         { name: 'validateAuthToken', from: 'authTokenReceived', to: 'authTokenValidated' },
         { name: 'grantConsent', from: 'authTokenValidated', to: 'consentGranted' },
         { name: 'validateWithAuthService', from: 'consentGranted', to: 'consentRegisteredAndValidated' },
-        { name: 'storeValidatedConsentWithDFSP', from: 'consentRegisteredAndValidated',  to: 'validatedConsentStoredWithDFSP'},
-        { name: 'finalizeThirdpartyLinkWithALS', from: 'validatedConsentStoredWithDFSP', to: 'PISPDFSPLinkEstablished' },
-        { name: 'notifyVerificationToPISP', from: 'PISPDFSPLinkEstablished', to: 'notificationSent' },
+        {
+          name: 'storeValidatedConsentWithDFSP',
+          from: 'consentRegisteredAndValidated',
+          to: 'validatedConsentStoredWithDFSP'
+        },
+        {
+          name: 'finalizeThirdpartyLinkWithALS',
+          from: 'validatedConsentStoredWithDFSP',
+          to: 'PISPDFSPLinkEstablished'
+        },
+        { name: 'notifyVerificationToPISP', from: 'PISPDFSPLinkEstablished', to: 'notificationSent' }
       ],
       methods: {
         // specific transitions handlers methods
@@ -131,7 +140,7 @@ export class DFSPLinkingModel
     }
   }
 
-  static deriveChallenge(consentsPostRequest: tpAPI.Schemas.ConsentsPostRequestAUTH): string {
+  static deriveChallenge (consentsPostRequest: tpAPI.Schemas.ConsentsPostRequestAUTH): string {
     if (!consentsPostRequest) {
       throw new Error('DFSPLinkingModel.deriveChallenge: \'consentsPostRequest\' parameter is required')
     }
@@ -167,25 +176,21 @@ export class DFSPLinkingModel
 
       this.data.backendValidateConsentRequestsResponse = response
 
-
       let consentRequestsIDPutRequest
-      if (response.data.authChannels[0] == "WEB") {
+      if (response.data.authChannels[0] === 'WEB') {
         consentRequestsIDPutRequest = {
-          consentRequestId: consentRequestsPostRequest.consentRequestId,
           scopes: consentRequestsPostRequest.scopes,
           callbackUri: consentRequestsPostRequest.callbackUri,
           authChannels: response.data.authChannels,
-          authUri: response.data.authUri,
+          authUri: response.data.authUri
         } as tpAPI.Schemas.ConsentRequestsIDPutResponseWeb
       } else {
         consentRequestsIDPutRequest = {
-          consentRequestId: consentRequestsPostRequest.consentRequestId,
           scopes: consentRequestsPostRequest.scopes,
           callbackUri: consentRequestsPostRequest.callbackUri,
           authChannels: response.data.authChannels
         } as tpAPI.Schemas.ConsentRequestsIDPutResponseOTP
       }
-
 
       // save this for a later stage, not ready to send the response yet.
       this.data.consentRequestsIDPutRequest = consentRequestsIDPutRequest
@@ -195,7 +200,7 @@ export class DFSPLinkingModel
       let mojaloopError
       // if error is planned and is a MojaloopApiErrorCode we send back that code
       if ((error as Errors.MojaloopApiErrorCode).code) {
-        mojaloopError = reformatError(error, this.logger)
+        mojaloopError = reformatError(error as Errors.MojaloopApiErrorCode, this.logger)
       } else {
         // if error is not planned send back a generalized error
         mojaloopError = reformatError(
@@ -216,7 +221,7 @@ export class DFSPLinkingModel
   }
 
   async onStoreReqAndSendOTP (): Promise<void> {
-    const { consentRequestsPostRequest, backendValidateConsentRequestsResponse, toParticipantId} = this.data
+    const { consentRequestsPostRequest, backendValidateConsentRequestsResponse, toParticipantId } = this.data
 
     // store scopes in model for future requests
     this.data.scopes = consentRequestsPostRequest.scopes
@@ -236,7 +241,6 @@ export class DFSPLinkingModel
           throw new Error(`Invalid authChannel ${channel}`)
         }
       }
-
     } catch (error) {
       this.logger.push({ error }).error('requestIsValid -> consentRequestValidatedAndStored')
 
@@ -257,15 +261,14 @@ export class DFSPLinkingModel
   }
 
   async onSendLinkingChannelResponse (): Promise<void> {
-    const { consentRequestsPostRequest, consentRequestsIDPutRequest, toParticipantId} = this.data
+    const { consentRequestsPostRequest, consentRequestsIDPutRequest, toParticipantId } = this.data
 
     // catch any unplanned errors and notify PISP
     try {
-
       if (!consentRequestsIDPutRequest) {
         throw new Error('consentRequestsIDPutRequest is null or undefined')
       }
-
+      console.log(consentRequestsIDPutRequest);
       const waitOnAuthTokenFromPISPResponseChannel = DFSPLinkingModel.notificationChannel(
         DFSPLinkingPhase.waitOnAuthTokenFromPISPResponse,
         consentRequestsPostRequest.consentRequestId
@@ -295,7 +298,6 @@ export class DFSPLinkingModel
               // need to be in an errored state
               // store the error so we can transition to an errored state
               this.data.errorInformation = patchResponse.errorInformation as unknown as fspiopAPI.Schemas.ErrorInformation
-
             } else {
               this.logger.info(
                 `received ${patchResponse}, from PISP`
@@ -347,9 +349,8 @@ export class DFSPLinkingModel
       if (!isValidOTP.isValid) {
         throw Errors.MojaloopApiErrorCodes.TP_OTP_VALIDATION_ERROR
       }
-
     } catch (error) {
-      const mojaloopError = reformatError(error, this.logger)
+      const mojaloopError = reformatError(error as Errors.MojaloopApiErrorCode, this.logger)
 
       this.logger.push({ error }).error('consentRequestValidatedAndStored -> authTokenValidated')
       this.logger.push({ mojaloopError }).info(`Sending error response to ${toParticipantId}`)
@@ -385,6 +386,7 @@ export class DFSPLinkingModel
     this.data.consentId = consentId
 
     const postConsentPayload: tpAPI.Schemas.ConsentsPostRequestPISP = {
+      status: 'ISSUED',
       consentId,
       consentRequestId: consentRequestId!,
       scopes: scopes || []
@@ -395,7 +397,6 @@ export class DFSPLinkingModel
 
     // catch any unplanned errors and notify PISP
     try {
-
       const waitOnSignedCredentialChannel = DFSPLinkingModel.notificationChannel(
         DFSPLinkingPhase.waitOnSignedCredentialFromPISPResponse,
         consentId!
@@ -423,7 +424,6 @@ export class DFSPLinkingModel
               // need to be in an errored state
               // store the error so we can transition to an errored state
               this.data.errorInformation = putResponse.errorInformation as unknown as fspiopAPI.Schemas.ErrorInformation
-
             } else {
               this.data.consentIDPutResponseSignedCredentialFromPISP = { ...message as unknown as PutResponse }
             }
@@ -460,6 +460,7 @@ export class DFSPLinkingModel
     const { consentIDPutResponseSignedCredentialFromPISP, consentId } = this.data
 
     const consentPostRequestToAuthService: tpAPI.Schemas.ConsentsPostRequestAUTH = {
+      status: 'ISSUED',
       consentId: consentId!,
       scopes: this.data.scopes!,
       credential: consentIDPutResponseSignedCredentialFromPISP!.credential
@@ -553,7 +554,6 @@ export class DFSPLinkingModel
         DFSPLinkingModel.deriveChallenge(consentPostRequestToAuthService!),
         consentIDPutResponseFromAuthService!.credential
       )
-
     } catch (error) {
       // we send back an account linking error despite the actual error
       const mojaloopError = reformatError(
@@ -686,7 +686,7 @@ export class DFSPLinkingModel
             `validateAuthToken requested for ${data.consentRequestId},  currentState: ${data.currentState}`
           )
           await this.fsm.validateAuthToken()
-          return this.run();
+          return this.run()
 
         case 'authTokenValidated':
           this.logger.info(
@@ -722,7 +722,8 @@ export class DFSPLinkingModel
           this.logger.info('State machine in errored state')
           return
       }
-    } catch (err) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
       // TOOD: reformatError: https://github.com/mojaloop/thirdparty-sdk/blob/master/src/models/dfspTransaction.model.ts#L378
       this.logger.info(`Error running DFSPLinkingModel : ${inspect(err)}`)
 

@@ -8,7 +8,7 @@ info:
   description: >
     Specification for the Thirdparty Outbound SDK API.
 
-    This API is a synchronous API which makes integrating with the Mojaloop 3rd Party API easier. 
+    This API is a synchronous API which makes integrating with the Mojaloop 3rd Party API easier.
 
     Please see other documentation on
     https://github.com/mojaloop/thirdparty-sdk for more information.
@@ -22,9 +22,9 @@ servers:
     description: A locally running TTK instance
 paths:
   /health:
-    $ref: '../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/paths/health.yaml'
+    $ref: '../../../../node_modules/@mojaloop/api-snippets/thirdparty/v1_0/openapi3/paths/health.yaml'
   /metrics:
-    $ref: '../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/paths/metrics.yaml'
+    $ref: '../../../../node_modules/@mojaloop/api-snippets/thirdparty/v1_0/openapi3/paths/metrics.yaml'
   /thirdpartyTransaction/partyLookup:
     $ref: paths/thirdpartyTransaction_partyLookup.yaml
   /thirdpartyTransaction/{ID}/initiate:

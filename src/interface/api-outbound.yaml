@@ -5,10 +5,10 @@ info:
     Specification for the Thirdparty Outbound SDK API.
 
     This API is a synchronous API which makes integrating with the Mojaloop 3rd
-    Party API easier. 
+    Party API easier.
 
-    Please see other documentation on
-    https://github.com/mojaloop/thirdparty-sdk for more information.
+    Please see other documentation on https://github.com/mojaloop/thirdparty-sdk
+    for more information.
   license:
     name: Apache 2.0
   version: 0.1.1
@@ -208,7 +208,7 @@ paths:
           in: path
           required: true
           schema:
-            $ref: '#/components/schemas/AccountId'
+            $ref: '#/components/schemas/AccountAddress'
       responses:
         '200':
           $ref: '#/components/responses/AccountsByUserIdResponse'
@@ -487,7 +487,7 @@ components:
             currentState: providersLookupSuccess
     AccountsByUserIdResponse:
       description: >
-        response body of GET /accounts/{ID} 
+        response body of GET /accounts/{ID}
 
         derived from UpdateAccountsByUserId by Inbound Service via Pub/Sub
         channel
@@ -668,11 +668,6 @@ components:
         - CONSENT
         - THIRD_PARTY_LINK
       description: >
-        This is a variant based on FSPIOP `PartyIdType` specification.
-
-        Main difference being the CONSENT and THIRD_PARTY_LINK enums.
-
-
         Below are the allowed values for the enumeration.
 
         - MSISDN - An MSISDN (Mobile Station International Subscriber Directory
@@ -703,7 +698,7 @@ components:
         certificate
 
         number, and national registration number. The identifier number is added
-        in
+        in 
 
         the PartyIdentifier element. The personal identifier type is added in
         the
@@ -760,9 +755,27 @@ components:
 
         by the PartyIdentifier.
 
-        - CONSENT - TBD
+        - CONSENT - A Consent represents an agreement between a PISP, a Customer
+        and
 
-        - THIRD_PARTY_LINK - TBD
+        a DFSP which allows the PISP permission to perform actions on behalf of
+        the 
+
+        customer. A Consent has an authoritative source: either the DFSP who
+        issued 
+
+        the Consent, or an Auth Service which administers the Consent.
+
+        - THIRD_PARTY_LINK - A Third Party Link represents an agreement between
+        a PISP,
+
+        a DFSP, and a specific Customer's account at the DFSP. The content of
+        the link 
+
+        is created by the DFSP at the time when it gives permission to the PISP
+        for 
+
+        specific access to a given account.
       example: PERSONAL_ID
     PartyIdentifier:
       title: PartyIdentifier
@@ -963,11 +976,6 @@ components:
       enum:
         - THIRD_PARTY_LINK
       description: >
-        This is a variant based on FSPIOP `PartyIdType` specification.
-
-        This validation interface should be use by `POST
-        /thirdpartyRequests/transactions`
-
         - THIRD_PARTY_LINK - is the DFSP's internal reference which allows DFSP
         to find out the corresponding consent
       example: PERSONAL_ID
@@ -1173,6 +1181,8 @@ components:
         - XDR
         - XOF
         - XPF
+        - XTS
+        - XXX
         - YER
         - ZAR
         - ZMW
@@ -1387,7 +1397,21 @@ components:
       example: '2016-05-24T08:38:08.699-04:00'
     ThirdpartyRequestsAuthorizationsPostRequest:
       title: ThirdpartyRequestsAuthorizationsPostRequest
-      description: POST /thirdpartyRequests/authorizations request object.
+      description: >-
+        Used by: DFSP
+
+        The HTTP request POST /thirdpartyRequests/authorizations is used to
+        request the validation by a customer for the transfer described in the
+        request.
+
+        Callback and data model information for POST
+        /thirdpartyRequests/authorizations:
+
+        Callback - PUT /thirdpartyRequests/authorizations/{ID} Error Callback -
+        PUT /thirdpartyRequests/authorizations/{ID}/error Data Model - See below
+        url
+
+        https://github.com/mojaloop/documentation/blob/master/website/versioned_docs/v1.0.1/api/thirdparty/data-models.md#31612-post-thirdpartyrequestsauthorizations
       type: object
       properties:
         authorizationRequestId:
@@ -1401,14 +1425,14 @@ components:
           allOf:
             - $ref: '#/components/schemas/Money'
           description: >-
-            The amount that will be debited from the sending customer’s  account
+            The amount that will be debited from the sending customer's account
             as a consequence of the transaction.
         payeeReceiveAmount:
           allOf:
             - $ref: '#/components/schemas/Money'
           description: >-
-            The amount that will be credited to the receiving customer’s 
-            account as a consequence of the transaction.
+            The amount that will be credited to the receiving customer's account
+            as a consequence of the transaction.
         fees:
           allOf:
             - $ref: '#/components/schemas/Money'
@@ -1462,6 +1486,13 @@ components:
       oneOf:
         - $ref: '#/components/schemas/ThirdpartyTransactionIDInitiateResponseError'
         - $ref: '#/components/schemas/ThirdpartyTransactionIDInitiateResponseSuccess'
+    AuthorizationResponseTypeAccepted:
+      title: AuthorizationResponseType
+      description: |
+        The customer accepted the terms of the transfer
+      type: string
+      enum:
+        - ACCEPTED
     SignedPayloadTypeGeneric:
       title: SignedPayloadTypeGeneric
       type: string
@@ -1477,6 +1508,18 @@ components:
         ‘=’) is added at the end of the data if needed to ensure that the string
         is a multiple of 4 characters. The length restriction indicates the
         allowed number of characters.
+    SignedPayloadGeneric:
+      title: SignedPayloadGeneric
+      type: object
+      properties:
+        signedPayloadType:
+          $ref: '#/components/schemas/SignedPayloadTypeGeneric'
+        genericSignedPayload:
+          $ref: '#/components/schemas/BinaryString'
+      required:
+        - signedPayloadType
+        - genericSignedPayload
+      additionalProperties: false
     ThirdpartyRequestsAuthorizationsIDPutResponseGeneric:
       title: ThirdpartyRequestsAuthorizationsIDPutResponseGeneric
       type: object
@@ -1484,13 +1527,16 @@ components:
         The object sent in the PUT /thirdpartyRequests/authorizations/{ID}
         callback.
       properties:
-        signedPayloadType:
-          $ref: '#/components/schemas/SignedPayloadTypeGeneric'
+        responseType:
+          $ref: '#/components/schemas/AuthorizationResponseTypeAccepted'
         signedPayload:
-          $ref: '#/components/schemas/BinaryString'
+          $ref: '#/components/schemas/SignedPayloadGeneric'
+        extensionList:
+          $ref: '#/components/schemas/ExtensionList'
       required:
-        - signedPayloadType
-        - authenticationValue
+        - responseType
+        - signedPayload
+      additionalProperties: false
     SignedPayloadTypeFIDO:
       title: SignedPayloadTypeFIDO
       type: string
@@ -1501,12 +1547,20 @@ components:
       title: FIDOPublicKeyCredentialAssertion
       type: object
       description: >
-        An object sent in a `PUT /thirdpartyRequests/authorization/{ID}`
-        request.
+        A data model representing a FIDO Assertion result.
 
-        based mostly on: https://webauthn.guide/#authentication
+        Derived from PublicKeyCredential Interface in WebAuthN.
 
-        AuthenticatorAssertionResponse
+
+        The PublicKeyCredential interface represents the below fields with a
+        Type of
+
+        Javascript ArrayBuffer.
+
+        For this API, we represent ArrayBuffers as base64 encoded utf-8 strings.
+
+
+        https://github.com/mojaloop/documentation/blob/master/website/versioned_docs/v1.0.1/api/thirdparty/data-models.md#32128-fidopublickeycredentialassertion
       properties:
         id:
           type: string
@@ -1568,6 +1622,18 @@ components:
         - response
         - type
       additionalProperties: false
+    SignedPayloadFIDO:
+      title: SignedPayloadFIDO
+      type: object
+      properties:
+        signedPayloadType:
+          $ref: '#/components/schemas/SignedPayloadTypeFIDO'
+        fidoSignedPayload:
+          $ref: '#/components/schemas/FIDOPublicKeyCredentialAssertion'
+      required:
+        - signedPayloadType
+        - fidoSignedPayload
+      additionalProperties: false
     ThirdpartyRequestsAuthorizationsIDPutResponseFIDO:
       title: ThirdpartyRequestsAuthorizationsIDPutResponseFIDO
       type: object
@@ -1575,13 +1641,16 @@ components:
         The object sent in the PUT /thirdpartyRequests/authorizations/{ID}
         callback.
       properties:
-        signedPayloadType:
-          $ref: '#/components/schemas/SignedPayloadTypeFIDO'
+        responseType:
+          $ref: '#/components/schemas/AuthorizationResponseTypeAccepted'
         signedPayload:
-          $ref: '#/components/schemas/FIDOPublicKeyCredentialAssertion'
+          $ref: '#/components/schemas/SignedPayloadFIDO'
+        extensionList:
+          $ref: '#/components/schemas/ExtensionList'
       required:
-        - signedPayloadType
+        - responseType
         - signedPayload
+      additionalProperties: false
     ThirdpartyTransactionIDApproveRequest:
       title: ThirdpartyTransactionIDApproveRequest
       type: object
@@ -1634,7 +1703,7 @@ components:
         transactionStatus:
           type: object
           properties:
-            transactionId:
+            transactionRequestId:
               $ref: '#/components/schemas/CorrelationId'
             transactionRequestState:
               $ref: '#/components/schemas/TransactionRequestState'
@@ -1686,16 +1755,30 @@ components:
       oneOf:
         - $ref: '#/components/schemas/LinkingProvidersResponseError'
         - $ref: '#/components/schemas/LinkingProvidersResponseSuccess'
-    AccountId:
-      title: AccountId
+    AccountAddress:
+      title: AccountAddress
       type: string
-      description: >
-        A long-lived unique account identifier provided by the DFSP. This MUST
-        NOT
+      description: >-
+        The AccountAddress data type is a variable length string with a maximum
+        size of 1023 characters and consists of:
 
-        be Bank Account Number or anything that may expose a User's private bank
+        Alphanumeric characters, upper or lower case. (Addresses are
+        case-sensitive so that they can contain data encoded in formats such as
+        base64url.)
 
-        account information.
+        - Underscore (_) - Tilde (~) - Hyphen (-) - Period (.) Addresses MUST
+        NOT end in a period (.) character
+
+        An entity providing accounts to parties (i.e. a participant) can provide
+        any value for an AccountAddress that is meaningful to that entity. It
+        does not need to provide an address that makes the account identifiable
+        outside the entity's domain.
+
+        IMPORTANT: The policy for defining addresses and the life-cycle of these
+        is at the discretion of the address space owner (the payer DFSP in this
+        case).
+
+        https://github.com/mojaloop/documentation/blob/master/website/versioned_docs/v1.0.1/api/thirdparty/data-models.md#3212-accountaddress
       pattern: '^([0-9A-Za-z_~\-\.]+[0-9A-Za-z_~\-])$'
       minLength: 1
       maxLength: 1023
@@ -1721,39 +1804,77 @@ components:
     Account:
       title: Account
       type: object
-      description: Data model for the complex type Account.
+      description: >-
+        Data model for the complex type Account.
+
+        https://github.com/mojaloop/documentation/blob/master/website/versioned_docs/v1.0.1/api/thirdparty/data-models.md#3211-account
       properties:
         accountNickname:
           $ref: '#/components/schemas/Name'
-        id:
-          $ref: '#/components/schemas/AccountId'
+        address:
+          $ref: '#/components/schemas/AccountAddress'
         currency:
           $ref: '#/components/schemas/Currency'
       required:
         - accountNickname
-        - id
+        - address
         - currency
+    AccountList:
+      title: AccountList
+      type: array
+      description: >-
+        The AccountList data model is used to hold information about the
+        accounts that a party controls.
+
+        https://github.com/mojaloop/documentation/blob/master/website/versioned_docs/v1.0.1/api/thirdparty/data-models.md#3213-accountlist
+      items:
+        $ref: '#/components/schemas/Account'
+      minItems: 1
+      maxItems: 256
     AccountsIDPutResponse:
       title: AccountsIDPutResponse
       type: object
-      description: 'The object sent in a `PUT /accounts/{ID}` request.'
+      description: >-
+        Callback and data model information for GET /accounts/{ID}:
+
+        Callback - PUT /accounts/{ID} Error Callback - PUT /accounts/{ID}/error
+        Data Model - Empty body
+
+        The PUT /accounts/{ID} response is used to inform the requester of the
+        result of a request for accounts information. The identifier ID given in
+        the call are the values given in the original request.
+
+        https://github.com/mojaloop/documentation/blob/master/website/versioned_docs/v1.0.1/api/thirdparty/data-models.md#31121--put-accountsid
       properties:
         accounts:
-          type: array
-          items:
-            $ref: '#/components/schemas/Account'
+          $ref: '#/components/schemas/AccountList'
+        extensionList:
+          $ref: '#/components/schemas/ExtensionList'
       required:
         - accounts
-    ConsentScopeType:
-      title: ConsentScopeType
+    ScopeAction:
+      title: ScopeAction
       type: string
+      description: >
+        The ScopeAction element contains an access type which a PISP can request
+
+        from a DFSP, or which a DFSP can grant to a PISP.
+
+        It must be a member of the appropriate enumeration.
+
+
+        - ACCOUNTS_GET_BALANCE: PISP can request a balance for the linked
+        account
+
+        - ACCOUNTS_TRANSFER: PISP can request a transfer of funds from the
+        linked account in the DFSP
+
+        - ACCOUNTS_STATEMENT: PISP can request a statement of individual
+        transactions on a user's account
       enum:
-        - accounts.getBalance
-        - accounts.transfer
-      description: |
-        The scopes requested for a ConsentRequest.
-        - "accounts.getBalance" - Get the balance of a given account.
-        - "accounts.transfer" - Initiate a transfer from an account.
+        - ACCOUNTS_GET_BALANCE
+        - ACCOUNTS_TRANSFER
+        - ACCOUNTS_STATEMENT
     LinkingRequestConsentPostRequest:
       title: LinkingRequestConsentPostRequest
       type: object
@@ -1770,7 +1891,7 @@ components:
         actions:
           type: array
           items:
-            $ref: '#/components/schemas/ConsentScopeType'
+            $ref: '#/components/schemas/ScopeAction'
         userId:
           type: string
           description: ID used to associate request with GET /accounts request.
@@ -1795,7 +1916,7 @@ components:
         - errored
         - success
         - OTPAuthenticationChannelResponseRecieved
-        - WebAuthenticationChannelResponseRecieved
+        - WebAuthenticationChannelResponseReceived
     LinkingRequestConsentResponseError:
       title: LinkingRequestConsentResponseError
       type: object
@@ -1810,21 +1931,23 @@ components:
     Scope:
       title: Scope
       type: object
-      description: Scope + Account Identifier mapping for a Consent.
-      example: |
-        {
-          accountId: "dfsp.username.5678",
-          actions: [ "accounts.transfer", "accounts.getBalance" ]
-        }
+      description: >-
+        The Scope element contains an identifier defining, in the terms of a
+        DFSP, an account on which access types can be requested or granted. It
+        also defines the access types which are requested or granted.
+
+        https://github.com/mojaloop/documentation/blob/master/website/versioned_docs/v1.0.1/api/thirdparty/data-models.md#32121-scope
       properties:
-        accountId:
-          $ref: '#/components/schemas/AccountId'
+        address:
+          $ref: '#/components/schemas/AccountAddress'
         actions:
           type: array
+          minItems: 1
+          maxItems: 32
           items:
-            $ref: '#/components/schemas/ConsentScopeType'
+            $ref: '#/components/schemas/ScopeAction'
       required:
-        - accountId
+        - address
         - actions
     ConsentRequestChannelTypeWeb:
       title: ConsentRequestChannelTypeWeb
@@ -1832,7 +1955,16 @@ components:
       enum:
         - WEB
       description: |
-        The web auth channel being used for PUT consentRequest/{ID} request.
+        The web auth channel being used for `PUT /consentRequest/{ID}` request.
+    Uri:
+      title: Uri
+      type: string
+      pattern: '^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?'
+      minLength: 1
+      maxLength: 512
+      description: >
+        The API data type Uri is a JSON string in a canonical format that is
+        restricted by a regular expression for interoperability reasons.
     ConsentRequestsIDPutResponseWeb:
       title: ConsentRequestsIDPutResponseWeb
       type: object
@@ -1849,28 +1981,25 @@ components:
 
         the user can prove their identity (e.g., by logging in).
       properties:
-        consentRequestId:
-          $ref: '#/components/schemas/CorrelationId'
         scopes:
           type: array
+          minLength: 1
+          maxLength: 256
           items:
             $ref: '#/components/schemas/Scope'
         authChannels:
           type: array
+          minLength: 1
+          maxLength: 1
           items:
             $ref: '#/components/schemas/ConsentRequestChannelTypeWeb'
         callbackUri:
-          type: string
-          description: >-
-            The callback uri that the user will be redirected to after
-            completing the WEB auth channel.
+          $ref: '#/components/schemas/Uri'
         authUri:
-          type: string
-          description: >-
-            The callback uri that the pisp app redirects to for user to complete
-            their login.
+          $ref: '#/components/schemas/Uri'
+        extensionList:
+          $ref: '#/components/schemas/ExtensionList'
       required:
-        - consentRequestId
         - scopes
         - authChannels
         - callbackUri
@@ -1882,7 +2011,7 @@ components:
       enum:
         - OTP
       description: |
-        The OTP auth channel being used for PUT consentRequest/{ID} request.
+        The OTP auth channel being used for `PUT /consentRequests/{ID}` request.
     ConsentRequestsIDPutResponseOTP:
       title: ConsentRequestsIDPutResponseOTP
       type: object
@@ -1893,26 +2022,25 @@ components:
         Schema used in the request consent phase of the account linking OTP/SMS
         flow.
       properties:
-        consentRequestId:
-          $ref: '#/components/schemas/CorrelationId'
         scopes:
           type: array
+          minLength: 1
+          maxLength: 256
           items:
             $ref: '#/components/schemas/Scope'
         authChannels:
           type: array
+          minLength: 1
+          maxLength: 1
           items:
             $ref: '#/components/schemas/ConsentRequestChannelTypeOTP'
         callbackUri:
-          type: string
-          description: >-
-            The callback uri that the user will be redirected to after
-            completing the WEB auth channel.
+          $ref: '#/components/schemas/Uri'
+        extensionList:
+          $ref: '#/components/schemas/ExtensionList'
       required:
-        - consentRequestId
         - scopes
         - authChannels
-        - callbackUri
       additionalProperties: false
     LinkingRequestConsentResponseSuccess:
       title: LinkingRequestConsentResponseSuccess
@@ -1959,34 +2087,54 @@ components:
       required:
         - errorInformation
         - currentState
+    ConsentStatus:
+      title: ConsentStatus
+      type: string
+      enum:
+        - ISSUED
+        - REVOKED
+      description: |-
+        Allowed values for the enumeration ConsentStatus
+        - ISSUED - The consent has been issued by the DFSP
+        - REVOKED - The consent has been revoked
     ConsentsPostRequestPISP:
       title: ConsentPostRequestPISP
       type: object
-      description: >-
-        The object sent in a `POST /consents` request to PISP by DFSP to ask for
-        delivering the credential object.
+      description: |
+        The provisional Consent object sent by the DFSP in `POST /consents`.
       properties:
         consentId:
           allOf:
             - $ref: '#/components/schemas/CorrelationId'
-          description: |
-            Common ID between the PISP and FSP for the Consent object
-            decided by the DFSP who creates the Consent
-            This field is REQUIRED for POST /consent.
+          description: >
+            Common ID between the PISP and the Payer DFSP for the consent
+            object. The ID
+
+            should be reused for re-sends of the same consent. A new ID should
+            be generated
+
+            for each new consent.
         consentRequestId:
           allOf:
             - $ref: '#/components/schemas/CorrelationId'
-          description: |
-            The id of the ConsentRequest that was used to initiate the
-            creation of this Consent.
+          description: >
+            The ID given to the original consent request on which this consent
+            is based.
         scopes:
           type: array
+          minLength: 1
+          maxLength: 256
           items:
             $ref: '#/components/schemas/Scope'
+        status:
+          $ref: '#/components/schemas/ConsentStatus'
+        extensionList:
+          $ref: '#/components/schemas/ExtensionList'
       required:
         - consentId
-        - scopes
         - consentRequestId
+        - scopes
+        - status
     LinkingRequestConsentIDAuthenticateResponseSuccess:
       title: LinkingRequestConsentIDAuthenticateResponse
       type: object
@@ -2011,15 +2159,18 @@ components:
       title: FIDOPublicKeyCredentialAttestation
       type: object
       description: >
-        An object sent in a `PUT /consents/{ID}` request.
+        A data model representing a FIDO Attestation result. Derived from 
 
-        Based on https://w3c.github.io/webauthn/#iface-pkcredential
+        [`PublicKeyCredential`
+        Interface](https://w3c.github.io/webauthn/#iface-pkcredential).
 
-        and mostly on: https://webauthn.guide/#registration
 
-        AuthenticatorAttestationResponse
+        The `PublicKeyCredential` interface represents the below fields with
 
-        https://w3c.github.io/webauthn/#dom-authenticatorattestationresponse-attestationobject
+        a Type of Javascript
+        [ArrayBuffer](https://heycam.github.io/webidl/#idl-ArrayBuffer).
+
+        For this API, we represent ArrayBuffers as base64 encoded utf-8 strings.
       properties:
         id:
           type: string
@@ -2062,7 +2213,6 @@ components:
             - public-key
       required:
         - id
-        - rawId
         - response
         - type
       additionalProperties: false
@@ -2099,14 +2249,14 @@ components:
       required:
         - errorInformation
         - currentState
-    ConsentStatusTypeVerified:
-      title: ConsentStatusType
+    CredentialStatusVerified:
+      title: CredentialStatusVerified
       type: string
       enum:
         - VERIFIED
       description: |
-        The status of the Consent.
-        - "VERIFIED" - The Consent is valid and verified.
+        The status of the Credential.
+        - "VERIFIED" - The Credential is valid and verified.
     LinkingRequestConsentIDPassCredentialResponseSuccess:
       title: LinkingRequestConsentIDPassCredentialResponseSuccess
       type: object
@@ -2115,7 +2265,7 @@ components:
           type: object
           properties:
             status:
-              $ref: '#/components/schemas/ConsentStatusTypeVerified'
+              $ref: '#/components/schemas/CredentialStatusVerified'
           required:
             - status
         currentState:

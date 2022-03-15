@@ -132,12 +132,12 @@ defineFeature(feature, (test): void => {
       "accounts": [
         {
           "accountNickname": "dfspa.user.nickname1",
-          "id": "dfspa.username.1234",
+          "address": "dfspa.username.1234",
           "currency": "ZAR"
         },
         {
           "accountNickname": "dfspa.user.nickname2",
-          "id": "dfspa.username.5678",
+          "address": "dfspa.username.5678",
           "currency": "USD"
         }
       ]

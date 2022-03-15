@@ -30,9 +30,9 @@ import Config from '~/shared/config'
 import axios from 'axios'
 import env from '../env'
 import mockLogger from 'test/unit/mockLogger'
-import TestData from 'test/unit/data/mockData.json'
+import * as mockData from 'test/unit/data/mockData'
 
-const mockData = JSON.parse(JSON.stringify(TestData))
+
 
 describe('DFSP Inbound', (): void => {
   // these must be run in sequence since am inbound POST /consentRequests
@@ -45,17 +45,17 @@ describe('DFSP Inbound', (): void => {
         "userId": "dfspa.username",
         "scopes": [
           {
-            "accountId": "dfspa.username.1234",
+            "address": "dfspa.username.1234",
             "actions": [
-              "accounts.transfer",
-              "accounts.getBalance"
+              "ACCOUNTS_TRANSFER",
+              "ACCOUNTS_GET_BALANCE"
             ]
           },
           {
-            "accountId": "dfspa.username.5678",
+            "address": "dfspa.username.5678",
             "actions": [
-              "accounts.transfer",
-              "accounts.getBalance"
+              "ACCOUNTS_TRANSFER",
+              "ACCOUNTS_GET_BALANCE"
             ]
           }
         ],

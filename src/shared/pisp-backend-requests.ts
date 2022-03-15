@@ -25,10 +25,6 @@
  --------------
  ******/
 
-import {
-  v1_1 as fspiopAPI,
-  thirdparty as tpAPI
-} from '@mojaloop/api-snippets'
 import { HttpRequestsConfig, HttpRequests } from '~/shared/http-requests'
 
 export interface PISPBackendConfig extends HttpRequestsConfig {
@@ -57,17 +53,5 @@ export class PISPBackendRequests extends HttpRequests {
 
   get signAuthorizationPath (): string {
     return this.config.signAuthorizationPath
-  }
-
-  // used by handler in POST /authorizations @ Ingoing
-  // requests signing of Authorization Request
-  // PISP Backend will ask the User to sign AuthorizationRequest
-  // and in response delivers the cryptographic proof of signing in AuthenticationValue.pinValue
-  async signAuthorization (
-    inRequest: tpAPI.Schemas.AuthorizationsPostRequest
-  ): Promise<fspiopAPI.Schemas.AuthenticationValue | void> {
-    return this.post<tpAPI.Schemas.AuthorizationsPostRequest, fspiopAPI.Schemas.AuthenticationValue>(
-      this.signAuthorizationPath, inRequest
-    )
   }
 }

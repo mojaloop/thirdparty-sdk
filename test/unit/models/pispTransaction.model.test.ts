@@ -99,7 +99,7 @@ describe('pipsTransactionModel', () => {
         putThirdpartyRequestsAuthorizations: jest.fn(() => Promise.resolve({ statusCode: 202 }))
       } as unknown as ThirdpartyRequests,
       mojaloopRequests: {
-        getParties: jest.fn(() => Promise.resolve({ statusCode: 202 })),
+        getParties: jest.fn(() => Promise.resolve({ statusCode: 202 }))
       } as unknown as MojaloopRequests,
       sdkOutgoingRequests: {
         requestPartiesInformation: jest.fn(() => Promise.resolve({
@@ -128,7 +128,7 @@ describe('pipsTransactionModel', () => {
     await modelConfig.subscriber.disconnect()
   })
 
-  function checkPTMLayout(ptm: PISPTransactionModel, optData?: PISPTransactionData) {
+  function checkPTMLayout (ptm: PISPTransactionModel, optData?: PISPTransactionData) {
     expect(ptm).toBeTruthy()
     expect(ptm.data).toBeDefined()
     expect(ptm.fsm.state).toEqual(optData?.currentState || 'start')
@@ -292,7 +292,7 @@ describe('pipsTransactionModel', () => {
           partyIdInfo: {
             partyIdType: 'MSISDN',
             partyIdentifier: '+4412345678',
-            fspId: 'dfspb',
+            fspId: 'dfspb'
           }
         },
         payer: {
@@ -307,7 +307,7 @@ describe('pipsTransactionModel', () => {
         },
         expiration: '2020-06-15T12:00:00.000Z'
       }
-      
+
       const transactionStatus: tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPutResponse = {
         transactionId,
         transactionRequestState: 'RECEIVED'
@@ -345,7 +345,7 @@ describe('pipsTransactionModel', () => {
               initiatorType: 'BUSINESS'
             },
             expiration: 'expiration'
-          },
+          }
         }
         channelTransPut = PISPTransactionModel.notificationChannel(
           PISPTransactionPhase.waitOnTransactionPut,
@@ -432,7 +432,8 @@ describe('pipsTransactionModel', () => {
         try {
           await model.run()
           shouldNotBeExecuted()
-        } catch (err) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (err: any) {
           expect(err.message).toEqual('mocked postThirdpartyRequestsTransactions exception')
 
           // check that correct subscription has been done
@@ -468,7 +469,7 @@ describe('pipsTransactionModel', () => {
           partyIdInfo: {
             partyIdType: 'MSISDN',
             partyIdentifier: '+4412345678',
-            fspId: 'dfspb',
+            fspId: 'dfspb'
           }
         },
         payer: {
@@ -485,21 +486,23 @@ describe('pipsTransactionModel', () => {
       }
 
       const authorizationResponse: tpAPI.Schemas.ThirdpartyRequestsAuthorizationsIDPutResponseFIDO = {
-        signedPayloadType: 'FIDO',
+        responseType: 'ACCEPTED',
         signedPayload: {
-          id: '45c-TkfkjQovQeAWmOy-RLBHEJ_e4jYzQYgD8VdbkePgM5d98BaAadadNYrknxgH0jQEON8zBydLgh1EqoC9DA',
-          rawId: '45c+TkfkjQovQeAWmOy+RLBHEJ/e4jYzQYgD8VdbkePgM5d98BaAadadNYrknxgH0jQEON8zBydLgh1EqoC9DA==',
-          response: {
-            authenticatorData: 'SZYN5YgOjGh0NBcPZHZgW4/krrmihjLHmVzzuoMdl2MBAAAACA==',
-            clientDataJSON: 'eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiQUFBQUFBQUFBQUFBQUFBQUFBRUNBdyIsIm9yaWdpbiI6Imh0dHA6Ly9sb2NhbGhvc3Q6NDIxODEiLCJjcm9zc09yaWdpbiI6ZmFsc2UsIm90aGVyX2tleXNfY2FuX2JlX2FkZGVkX2hlcmUiOiJkbyBub3QgY29tcGFyZSBjbGllbnREYXRhSlNPTiBhZ2FpbnN0IGEgdGVtcGxhdGUuIFNlZSBodHRwczovL2dvby5nbC95YWJQZXgifQ==',
-            signature: 'MEUCIDcJRBu5aOLJVc/sPyECmYi23w8xF35n3RNhyUNVwQ2nAiEA+Lnd8dBn06OKkEgAq00BVbmH87ybQHfXlf1Y4RJqwQ8='
-          },
-          type: 'public-key'
+          signedPayloadType: 'FIDO',
+          fidoSignedPayload: {
+            id: '45c-TkfkjQovQeAWmOy-RLBHEJ_e4jYzQYgD8VdbkePgM5d98BaAadadNYrknxgH0jQEON8zBydLgh1EqoC9DA',
+            rawId: '45c+TkfkjQovQeAWmOy+RLBHEJ/e4jYzQYgD8VdbkePgM5d98BaAadadNYrknxgH0jQEON8zBydLgh1EqoC9DA==',
+            response: {
+              authenticatorData: 'SZYN5YgOjGh0NBcPZHZgW4/krrmihjLHmVzzuoMdl2MBAAAACA==',
+              clientDataJSON: 'eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiQUFBQUFBQUFBQUFBQUFBQUFBRUNBdyIsIm9yaWdpbiI6Imh0dHA6Ly9sb2NhbGhvc3Q6NDIxODEiLCJjcm9zc09yaWdpbiI6ZmFsc2UsIm90aGVyX2tleXNfY2FuX2JlX2FkZGVkX2hlcmUiOiJkbyBub3QgY29tcGFyZSBjbGllbnREYXRhSlNPTiBhZ2FpbnN0IGEgdGVtcGxhdGUuIFNlZSBodHRwczovL2dvby5nbC95YWJQZXgifQ==',
+              signature: 'MEUCIDcJRBu5aOLJVc/sPyECmYi23w8xF35n3RNhyUNVwQ2nAiEA+Lnd8dBn06OKkEgAq00BVbmH87ybQHfXlf1Y4RJqwQ8='
+            },
+            type: 'public-key'
+          }
         }
       }
 
       const transactionStatus: tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPatchResponse = {
-        transactionId: '5678-5678',
         transactionRequestState: 'ACCEPTED',
         transactionState: 'COMPLETED'
       }
@@ -608,7 +611,8 @@ describe('pipsTransactionModel', () => {
         try {
           await model.run()
           shouldNotBeExecuted()
-        } catch (err) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (err: any) {
           expect(err.message).toEqual('mocked putThirdpartyRequestsAuthorizations exception')
         }
 
@@ -719,8 +723,9 @@ describe('pipsTransactionModel', () => {
       try {
         await loadFromKVS(modelConfig)
         shouldNotBeExecuted()
-      } catch (error) {
-        expect(error.message).toEqual(`No data found in KVS for: ${modelConfig.key}`)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (err: any) {
+        expect(err.message).toEqual(`No data found in KVS for: ${modelConfig.key}`)
       }
     })
 

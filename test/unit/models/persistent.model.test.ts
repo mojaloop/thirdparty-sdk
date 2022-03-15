@@ -249,8 +249,9 @@ describe('PersistentModel', () => {
       try {
         await loadFromKVS<TestStateMachine, TestData>(modelConfig, smConfig)
         shouldNotBeExecuted()
-      } catch (error) {
-        expect(error.message).toEqual(`No data found in KVS for: ${modelConfig.key}`)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (err: any) {
+        expect(err.message).toEqual(`No data found in KVS for: ${modelConfig.key}`)
       }
     })
 

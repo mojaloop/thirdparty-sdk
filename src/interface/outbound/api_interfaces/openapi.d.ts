@@ -90,9 +90,6 @@ export interface components {
       errorInformation?: components['schemas']['ErrorInformation'];
     };
     /**
-     * This is a variant based on FSPIOP `PartyIdType` specification.
-     * Main difference being the CONSENT and THIRD_PARTY_LINK enums.
-     *
      * Below are the allowed values for the enumeration.
      * - MSISDN - An MSISDN (Mobile Station International Subscriber Directory
      * Number, that is, the phone number) is used as reference to a participant.
@@ -128,8 +125,14 @@ export interface components {
      * The ALIAS identifier can be in any format. It is also possible to use the
      * PartySubIdOrType element for identifying an account under an Alias defined
      * by the PartyIdentifier.
-     * - CONSENT - TBD
-     * - THIRD_PARTY_LINK - TBD
+     * - CONSENT - A Consent represents an agreement between a PISP, a Customer and
+     * a DFSP which allows the PISP permission to perform actions on behalf of the
+     * customer. A Consent has an authoritative source: either the DFSP who issued
+     * the Consent, or an Auth Service which administers the Consent.
+     * - THIRD_PARTY_LINK - A Third Party Link represents an agreement between a PISP,
+     * a DFSP, and a specific Customer's account at the DFSP. The content of the link
+     * is created by the DFSP at the time when it gives permission to the PISP for
+     * specific access to a given account.
      */
     PartyIdType:
     | 'MSISDN'
@@ -215,11 +218,7 @@ export interface components {
       name?: components['schemas']['PartyName'];
       personalInfo?: components['schemas']['PartyPersonalInfo'];
     };
-    /**
-     * This is a variant based on FSPIOP `PartyIdType` specification.
-     * This validation interface should be use by `POST /thirdpartyRequests/transactions`
-     * - THIRD_PARTY_LINK - is the DFSP's internal reference which allows DFSP to find out the corresponding consent
-     */
+    /** - THIRD_PARTY_LINK - is the DFSP's internal reference which allows DFSP to find out the corresponding consent */
     PartyIdTypeTPLink: 'THIRD_PARTY_LINK';
     /** Data model for the complex type PartyIdInfo. */
     PartyIdInfoTPLink: {
@@ -395,6 +394,8 @@ export interface components {
     | 'XDR'
     | 'XOF'
     | 'XPF'
+    | 'XTS'
+    | 'XXX'
     | 'YER'
     | 'ZAR'
     | 'ZMW'
@@ -474,15 +475,21 @@ export interface components {
     };
     /** The API data type DateTime is a JSON String in a lexical format that is restricted by a regular expression for interoperability reasons. The format is according to [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html), expressed in a combined date, time and time zone format. A more readable version of the format is yyyy-MM-ddTHH:mm:ss.SSS[-HH:MM]. Examples are "2016-05-24T08:38:08.699-04:00", "2016-05-24T08:38:08.699Z" (where Z indicates Zulu time zone, same as UTC). */
     DateTime: string;
-    /** POST /thirdpartyRequests/authorizations request object. */
+    /**
+     * Used by: DFSP
+     * The HTTP request POST /thirdpartyRequests/authorizations is used to request the validation by a customer for the transfer described in the request.
+     * Callback and data model information for POST /thirdpartyRequests/authorizations:
+     * Callback - PUT /thirdpartyRequests/authorizations/{ID} Error Callback - PUT /thirdpartyRequests/authorizations/{ID}/error Data Model - See below url
+     * https://github.com/mojaloop/documentation/blob/master/website/versioned_docs/v1.0.1/api/thirdparty/data-models.md#31612-post-thirdpartyrequestsauthorizations
+     */
     ThirdpartyRequestsAuthorizationsPostRequest: {
       authorizationRequestId: components['schemas']['CorrelationId'];
       transactionRequestId: components['schemas']['CorrelationId'];
       /** The challenge that the PISP's client is to sign */
       challenge: string;
-      /** The amount that will be debited from the sending customer’s  account as a consequence of the transaction. */
+      /** The amount that will be debited from the sending customer's account as a consequence of the transaction. */
       transferAmount: components['schemas']['Money'];
-      /** The amount that will be credited to the receiving customer’s  account as a consequence of the transaction. */
+      /** The amount that will be credited to the receiving customer's account as a consequence of the transaction. */
       payeeReceiveAmount: components['schemas']['Money'];
       /** The amount of fees that the paying customer will be charged as part of the transaction. */
       fees: components['schemas']['Money'];
@@ -502,21 +509,33 @@ export interface components {
     ThirdpartyTransactionIDInitiateResponse:
     | components['schemas']['ThirdpartyTransactionIDInitiateResponseError']
     | components['schemas']['ThirdpartyTransactionIDInitiateResponseSuccess'];
+    /** The customer accepted the terms of the transfer */
+    AuthorizationResponseTypeAccepted: 'ACCEPTED';
     /** Describes a challenge that has been signed with a private key */
     SignedPayloadTypeGeneric: 'GENERIC';
     /** The API data type BinaryString is a JSON String. The string is a base64url  encoding of a string of raw bytes, where padding (character ‘=’) is added at the end of the data if needed to ensure that the string is a multiple of 4 characters. The length restriction indicates the allowed number of characters. */
     BinaryString: string;
+    SignedPayloadGeneric: {
+      signedPayloadType: components['schemas']['SignedPayloadTypeGeneric'];
+      genericSignedPayload: components['schemas']['BinaryString'];
+    };
     /** The object sent in the PUT /thirdpartyRequests/authorizations/{ID} callback. */
     ThirdpartyRequestsAuthorizationsIDPutResponseGeneric: {
-      signedPayloadType: components['schemas']['SignedPayloadTypeGeneric'];
-      signedPayload?: components['schemas']['BinaryString'];
+      responseType: components['schemas']['AuthorizationResponseTypeAccepted'];
+      signedPayload: components['schemas']['SignedPayloadGeneric'];
+      extensionList?: components['schemas']['ExtensionList'];
     };
     /** Describes a challenge that has been signed with FIDO Attestation flows */
     SignedPayloadTypeFIDO: 'FIDO';
     /**
-     * An object sent in a `PUT /thirdpartyRequests/authorization/{ID}` request.
-     * based mostly on: https://webauthn.guide/#authentication
-     * AuthenticatorAssertionResponse
+     * A data model representing a FIDO Assertion result.
+     * Derived from PublicKeyCredential Interface in WebAuthN.
+     *
+     * The PublicKeyCredential interface represents the below fields with a Type of
+     * Javascript ArrayBuffer.
+     * For this API, we represent ArrayBuffers as base64 encoded utf-8 strings.
+     *
+     * https://github.com/mojaloop/documentation/blob/master/website/versioned_docs/v1.0.1/api/thirdparty/data-models.md#32128-fidopublickeycredentialassertion
      */
     FIDOPublicKeyCredentialAssertion: {
       /**
@@ -543,10 +562,15 @@ export interface components {
       /** response type, we need only the type of public-key */
       type: 'public-key';
     };
+    SignedPayloadFIDO: {
+      signedPayloadType: components['schemas']['SignedPayloadTypeFIDO'];
+      fidoSignedPayload: components['schemas']['FIDOPublicKeyCredentialAssertion'];
+    };
     /** The object sent in the PUT /thirdpartyRequests/authorizations/{ID} callback. */
     ThirdpartyRequestsAuthorizationsIDPutResponseFIDO: {
-      signedPayloadType: components['schemas']['SignedPayloadTypeFIDO'];
-      signedPayload: components['schemas']['FIDOPublicKeyCredentialAssertion'];
+      responseType: components['schemas']['AuthorizationResponseTypeAccepted'];
+      signedPayload: components['schemas']['SignedPayloadFIDO'];
+      extensionList?: components['schemas']['ExtensionList'];
     };
     ThirdpartyTransactionIDApproveRequest: {
       authorizationResponse:
@@ -572,7 +596,7 @@ export interface components {
     TransactionRequestState: 'RECEIVED' | 'PENDING' | 'ACCEPTED' | 'REJECTED';
     ThirdpartyTransactionIDApproveResponseSuccess: {
       transactionStatus: {
-        transactionId: components['schemas']['CorrelationId'];
+        transactionRequestId?: components['schemas']['CorrelationId'];
         transactionRequestState: components['schemas']['TransactionRequestState'];
       };
       currentState: components['schemas']['ThirdpartyTransactionIDApproveState'];
@@ -594,11 +618,14 @@ export interface components {
     | components['schemas']['LinkingProvidersResponseError']
     | components['schemas']['LinkingProvidersResponseSuccess'];
     /**
-     * A long-lived unique account identifier provided by the DFSP. This MUST NOT
-     * be Bank Account Number or anything that may expose a User's private bank
-     * account information.
+     * The AccountAddress data type is a variable length string with a maximum size of 1023 characters and consists of:
+     * Alphanumeric characters, upper or lower case. (Addresses are case-sensitive so that they can contain data encoded in formats such as base64url.)
+     * - Underscore (_) - Tilde (~) - Hyphen (-) - Period (.) Addresses MUST NOT end in a period (.) character
+     * An entity providing accounts to parties (i.e. a participant) can provide any value for an AccountAddress that is meaningful to that entity. It does not need to provide an address that makes the account identifiable outside the entity's domain.
+     * IMPORTANT: The policy for defining addresses and the life-cycle of these is at the discretion of the address space owner (the payer DFSP in this case).
+     * https://github.com/mojaloop/documentation/blob/master/website/versioned_docs/v1.0.1/api/thirdparty/data-models.md#3212-accountaddress
      */
-    AccountId: string;
+    AccountAddress: string;
     /**
      * The API data type Name is a JSON String, restricted by a regular expression to avoid characters which are generally not used in a name.
      *
@@ -607,28 +634,49 @@ export interface components {
      * **Note:** In some programming languages, Unicode support must be specifically enabled. For example, if Java is used, the flag UNICODE_CHARACTER_CLASS must be enabled to allow Unicode characters.
      */
     Name: string;
-    /** Data model for the complex type Account. */
+    /**
+     * Data model for the complex type Account.
+     * https://github.com/mojaloop/documentation/blob/master/website/versioned_docs/v1.0.1/api/thirdparty/data-models.md#3211-account
+     */
     Account: {
       accountNickname: components['schemas']['Name'];
-      id: components['schemas']['AccountId'];
+      address: components['schemas']['AccountAddress'];
       currency: components['schemas']['Currency'];
     };
-    /** The object sent in a `PUT /accounts/{ID}` request. */
+    /**
+     * The AccountList data model is used to hold information about the accounts that a party controls.
+     * https://github.com/mojaloop/documentation/blob/master/website/versioned_docs/v1.0.1/api/thirdparty/data-models.md#3213-accountlist
+     */
+    AccountList: components['schemas']['Account'][];
+    /**
+     * Callback and data model information for GET /accounts/{ID}:
+     * Callback - PUT /accounts/{ID} Error Callback - PUT /accounts/{ID}/error Data Model - Empty body
+     * The PUT /accounts/{ID} response is used to inform the requester of the result of a request for accounts information. The identifier ID given in the call are the values given in the original request.
+     * https://github.com/mojaloop/documentation/blob/master/website/versioned_docs/v1.0.1/api/thirdparty/data-models.md#31121--put-accountsid
+     */
     AccountsIDPutResponse: {
-      accounts: components['schemas']['Account'][];
+      accounts: components['schemas']['AccountList'];
+      extensionList?: components['schemas']['ExtensionList'];
     };
     /**
-     * The scopes requested for a ConsentRequest.
-     * - "accounts.getBalance" - Get the balance of a given account.
-     * - "accounts.transfer" - Initiate a transfer from an account.
+     * The ScopeAction element contains an access type which a PISP can request
+     * from a DFSP, or which a DFSP can grant to a PISP.
+     * It must be a member of the appropriate enumeration.
+     *
+     * - ACCOUNTS_GET_BALANCE: PISP can request a balance for the linked account
+     * - ACCOUNTS_TRANSFER: PISP can request a transfer of funds from the linked account in the DFSP
+     * - ACCOUNTS_STATEMENT: PISP can request a statement of individual transactions on a user's account
      */
-    ConsentScopeType: 'accounts.getBalance' | 'accounts.transfer';
+    ScopeAction:
+    | 'ACCOUNTS_GET_BALANCE'
+    | 'ACCOUNTS_TRANSFER'
+    | 'ACCOUNTS_STATEMENT';
     /** The object sent in a `POST /linking/request-consent` request. */
     LinkingRequestConsentPostRequest: {
       toParticipantId: string;
       consentRequestId: components['schemas']['CorrelationId'];
       accounts: components['schemas']['Account'][];
-      actions: components['schemas']['ConsentScopeType'][];
+      actions: components['schemas']['ScopeAction'][];
       /** ID used to associate request with GET /accounts request. */
       userId: string;
       /** The callback uri that the user will be redirected to after completing the WEB auth channel. */
@@ -640,18 +688,23 @@ export interface components {
     | 'errored'
     | 'success'
     | 'OTPAuthenticationChannelResponseRecieved'
-    | 'WebAuthenticationChannelResponseRecieved';
+    | 'WebAuthenticationChannelResponseReceived';
     LinkingRequestConsentResponseError: {
       errorInformation: components['schemas']['ErrorInformation'];
       currentState: components['schemas']['LinkingRequestConsentState'];
     };
-    /** Scope + Account Identifier mapping for a Consent. */
+    /**
+     * The Scope element contains an identifier defining, in the terms of a DFSP, an account on which access types can be requested or granted. It also defines the access types which are requested or granted.
+     * https://github.com/mojaloop/documentation/blob/master/website/versioned_docs/v1.0.1/api/thirdparty/data-models.md#32121-scope
+     */
     Scope: {
-      accountId: components['schemas']['AccountId'];
-      actions: components['schemas']['ConsentScopeType'][];
+      address: components['schemas']['AccountAddress'];
+      actions: components['schemas']['ScopeAction'][];
     };
-    /** The web auth channel being used for PUT consentRequest/{ID} request. */
+    /** The web auth channel being used for `PUT /consentRequest/{ID}` request. */
     ConsentRequestChannelTypeWeb: 'WEB';
+    /** The API data type Uri is a JSON string in a canonical format that is restricted by a regular expression for interoperability reasons. */
+    Uri: string;
     /**
      * The object sent in a `PUT /consentRequests/{ID}` request.
      *
@@ -661,15 +714,13 @@ export interface components {
      * the user can prove their identity (e.g., by logging in).
      */
     ConsentRequestsIDPutResponseWeb: {
-      consentRequestId: components['schemas']['CorrelationId'];
       scopes: components['schemas']['Scope'][];
       authChannels: components['schemas']['ConsentRequestChannelTypeWeb'][];
-      /** The callback uri that the user will be redirected to after completing the WEB auth channel. */
-      callbackUri: string;
-      /** The callback uri that the pisp app redirects to for user to complete their login. */
-      authUri: string;
+      callbackUri: components['schemas']['Uri'];
+      authUri: components['schemas']['Uri'];
+      extensionList?: components['schemas']['ExtensionList'];
     };
-    /** The OTP auth channel being used for PUT consentRequest/{ID} request. */
+    /** The OTP auth channel being used for `PUT /consentRequests/{ID}` request. */
     ConsentRequestChannelTypeOTP: 'OTP';
     /**
      * The object sent in a `PUT /consentRequests/{ID}` request.
@@ -677,11 +728,10 @@ export interface components {
      * Schema used in the request consent phase of the account linking OTP/SMS flow.
      */
     ConsentRequestsIDPutResponseOTP: {
-      consentRequestId: components['schemas']['CorrelationId'];
       scopes: components['schemas']['Scope'][];
       authChannels: components['schemas']['ConsentRequestChannelTypeOTP'][];
-      /** The callback uri that the user will be redirected to after completing the WEB auth channel. */
-      callbackUri: string;
+      callbackUri?: components['schemas']['Uri'];
+      extensionList?: components['schemas']['ExtensionList'];
     };
     LinkingRequestConsentResponseSuccess: {
       channelResponse:
@@ -704,20 +754,25 @@ export interface components {
       errorInformation: components['schemas']['ErrorInformation'];
       currentState: components['schemas']['LinkingRequestConsentIDAuthenticateState'];
     };
-    /** The object sent in a `POST /consents` request to PISP by DFSP to ask for delivering the credential object. */
+    /**
+     * Allowed values for the enumeration ConsentStatus
+     * - ISSUED - The consent has been issued by the DFSP
+     * - REVOKED - The consent has been revoked
+     */
+    ConsentStatus: 'ISSUED' | 'REVOKED';
+    /** The provisional Consent object sent by the DFSP in `POST /consents`. */
     ConsentsPostRequestPISP: {
       /**
-       * Common ID between the PISP and FSP for the Consent object
-       * decided by the DFSP who creates the Consent
-       * This field is REQUIRED for POST /consent.
+       * Common ID between the PISP and the Payer DFSP for the consent object. The ID
+       * should be reused for re-sends of the same consent. A new ID should be generated
+       * for each new consent.
        */
       consentId: components['schemas']['CorrelationId'];
-      /**
-       * The id of the ConsentRequest that was used to initiate the
-       * creation of this Consent.
-       */
+      /** The ID given to the original consent request on which this consent is based. */
       consentRequestId: components['schemas']['CorrelationId'];
       scopes: components['schemas']['Scope'][];
+      status: components['schemas']['ConsentStatus'];
+      extensionList?: components['schemas']['ExtensionList'];
     };
     LinkingRequestConsentIDAuthenticateResponseSuccess: {
       consent: components['schemas']['ConsentsPostRequestPISP'];
@@ -728,11 +783,12 @@ export interface components {
     | components['schemas']['LinkingRequestConsentIDAuthenticateResponseError']
     | components['schemas']['LinkingRequestConsentIDAuthenticateResponseSuccess'];
     /**
-     * An object sent in a `PUT /consents/{ID}` request.
-     * Based on https://w3c.github.io/webauthn/#iface-pkcredential
-     * and mostly on: https://webauthn.guide/#registration
-     * AuthenticatorAttestationResponse
-     * https://w3c.github.io/webauthn/#dom-authenticatorattestationresponse-attestationobject
+     * A data model representing a FIDO Attestation result. Derived from
+     * [`PublicKeyCredential` Interface](https://w3c.github.io/webauthn/#iface-pkcredential).
+     *
+     * The `PublicKeyCredential` interface represents the below fields with
+     * a Type of Javascript [ArrayBuffer](https://heycam.github.io/webidl/#idl-ArrayBuffer).
+     * For this API, we represent ArrayBuffers as base64 encoded utf-8 strings.
      */
     FIDOPublicKeyCredentialAttestation: {
       /**
@@ -741,7 +797,7 @@ export interface components {
        */
       id: string;
       /** raw credential id: identifier of pair of keys, base64 encoded */
-      rawId: string;
+      rawId?: string;
       /** AuthenticatorAttestationResponse */
       response: {
         /** JSON string with client data */
@@ -765,13 +821,13 @@ export interface components {
       currentState: components['schemas']['LinkingRequestConsentIDPassCredentialState'];
     };
     /**
-     * The status of the Consent.
-     * - "VERIFIED" - The Consent is valid and verified.
+     * The status of the Credential.
+     * - "VERIFIED" - The Credential is valid and verified.
      */
-    ConsentStatusTypeVerified: 'VERIFIED';
+    CredentialStatusVerified: 'VERIFIED';
     LinkingRequestConsentIDPassCredentialResponseSuccess: {
       credential: {
-        status: components['schemas']['ConsentStatusTypeVerified'];
+        status: components['schemas']['CredentialStatusVerified'];
       };
       currentState: components['schemas']['LinkingRequestConsentIDPassCredentialState'];
     };
@@ -998,7 +1054,7 @@ export interface operations {
     parameters: {
       path: {
         fspId: components['schemas']['FspId'];
-        userId: components['schemas']['AccountId'];
+        userId: components['schemas']['AccountAddress'];
       };
     };
     responses: {

@@ -345,14 +345,14 @@
           "consentRequestId": "b51ec534-ee48-4575-b6a9-ead2955b8069",
           "scopes": [
             {
-              "accountId": "dfspa.username.1234",
+              "address": "dfspa.username.1234",
               "actions": [
                 "accounts.transfer",
                 "accounts.getBalance"
               ]
             },
             {
-              "accountId": "dfspa.username.5678",
+              "address": "dfspa.username.5678",
               "actions": [
                 "accounts.transfer",
                 "accounts.getBalance"
@@ -416,14 +416,14 @@
           "consentRequestId": "b51ec534-ee48-4575-b6a9-ead2955b8069",
           "scopes": [
             {
-              "accountId": "dfspa.username.1234",
+              "address": "dfspa.username.1234",
               "actions": [
                 "accounts.transfer",
                 "accounts.getBalance"
               ]
             },
             {
-              "accountId": "dfspa.username.5678",
+              "address": "dfspa.username.5678",
               "actions": [
                 "accounts.transfer",
                 "accounts.getBalance"

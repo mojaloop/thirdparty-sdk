@@ -30,7 +30,7 @@ import Config from '~/shared/config'
 import axios from 'axios'
 import env from '../env'
 import mockLogger from '../../unit/mockLogger'
-import TestData from 'test/unit/data/mockData.json'
+import * as mockData from 'test/unit/data/mockData'
 
 describe('PUT /accounts/{ID}', (): void => {
   const scenarioUri = `${env.inbound.baseUri}/accounts/username1234`
@@ -41,7 +41,7 @@ describe('PUT /accounts/{ID}', (): void => {
       logger: mockLogger(),
       timeout: Config.REDIS.TIMEOUT
     }
-    const mockData = JSON.parse(JSON.stringify(TestData))
+
     const payload = mockData.accountsRequest.payload
     const headers = {
       headers: {

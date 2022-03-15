@@ -4,7 +4,7 @@
     currentState:
       $ref: './ThirdpartyTransactionIDInitiateState.yaml'
     authorization:
-      $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/ThirdpartyRequestsAuthorizationsPostRequest.yaml'
+      $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/v1_0/openapi3/components/schemas/ThirdpartyRequestsAuthorizationsPostRequest.yaml'
   required:
     - currentState
     - authorization

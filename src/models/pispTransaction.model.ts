@@ -210,7 +210,7 @@ export class PISPTransactionModel
       })
       .wait(this.config.initiateTimeoutInSeconds * 1000)
 
-    // waiting on POST /authorizations callback
+    // waiting on PUT /thirdpartyRequests/authorizations/{ID} callback
     // second channel
     const channelWaitOnAuthPost = PISPTransactionModel.notificationChannel(
       PISPTransactionPhase.waitOnAuthorizationPost,
@@ -225,8 +225,10 @@ export class PISPTransactionModel
         return Promise.resolve()
       })
       .job(async (message: Message): Promise<void> => {
-        // receive auth request from POST /authorization
-        this.data.authorizationRequest = { ...message as unknown as tpAPI.Schemas.ThirdpartyRequestsAuthorizationsPostRequest }
+        // receive auth request from POST /thirdpartyRequests/authorizations
+        this.data.authorizationRequest = {
+          ...message as unknown as tpAPI.Schemas.ThirdpartyRequestsAuthorizationsPostRequest
+        }
         this.saveToKVS()
       })
       .wait(this.config.initiateTimeoutInSeconds * 1000)
@@ -272,7 +274,9 @@ export class PISPTransactionModel
           ...message as unknown as tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPatchResponse
         }
         this.data.approveResponse = {
-          transactionStatus: { ...this.data.transactionStatusPatch },
+          transactionStatus: {
+            ...this.data.transactionStatusPatch
+          },
           currentState: this.data.currentState as OutboundAPI.Schemas.ThirdpartyTransactionIDApproveState
         }
       })
@@ -360,7 +364,8 @@ export class PISPTransactionModel
           this.logger.info('State machine in errored state')
           return this.getResponse()
       }
-    } catch (err) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
       this.logger.info(`Error running PISPTransactionModel : ${inspect(err)}`)
 
       // as this function is recursive, we don't want to error the state machine multiple times

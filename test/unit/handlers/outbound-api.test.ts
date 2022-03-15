@@ -34,7 +34,6 @@ import {
   v1_1 as fspiopAPI,
   thirdparty as tpAPI
 } from '@mojaloop/api-snippets'
-import { OutboundAPI } from '@mojaloop/sdk-scheme-adapter'
 import { HealthResponse } from '~/interface/types'
 import { NotificationCallback, Message, PubSub } from '~/shared/pub-sub'
 import {
@@ -49,13 +48,14 @@ import { Server } from '@hapi/hapi'
 import { ServerAPI, ServerConfig } from '~/server'
 import Config from '~/shared/config'
 import Handlers from '~/handlers'
-import TestData from 'test/unit/data/mockData.json'
+import * as mockData from 'test/unit/data/mockData'
 import index from '~/index'
 import path from 'path'
 import SDK from '@mojaloop/sdk-standard-components'
 import { PISPLinkingPhase } from '~/models/outbound/pispLinking.interface'
+import * as OutboundAPI from '~/interface/outbound/api_interfaces'
+import { OutboundAPI as SDKOutboundAPI } from '@mojaloop/sdk-scheme-adapter'
 
-const mockData = JSON.parse(JSON.stringify(TestData))
 const putResponse: fspiopAPI.Schemas.AuthorizationsIDPutResponse = {
   authenticationInfo: {
     authentication: 'U2F',
@@ -66,14 +66,8 @@ const putResponse: fspiopAPI.Schemas.AuthorizationsIDPutResponse = {
   },
   responseType: 'ENTERED'
 }
-const putThirdpartyAuthResponse: tpAPI.Schemas.ThirdpartyRequestsTransactionsIDAuthorizationsPutResponse = {
-  challenge: 'challenge',
-  consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
-  sourceAccountId: 'dfspa.alice.1234',
-  status: 'VERIFIED',
-  value: 'value'
-}
-const partyLookupResponse: OutboundAPI.Schemas.partiesByIdResponse = {
+
+const partyLookupResponse: SDKOutboundAPI.Schemas.partiesByIdResponse = {
   party: {
     partyIdInfo: {
       partyIdType: 'MSISDN',
@@ -93,27 +87,8 @@ const partyLookupResponse: OutboundAPI.Schemas.partiesByIdResponse = {
   },
   currentState: RequestPartiesInformationState.COMPLETED
 }
-const initiateResponse: tpAPI.Schemas.AuthorizationsPostRequest = {
-  authenticationType: 'U2F',
-  retriesLeft: '1',
-  amount: {
-    currency: 'USD',
-    amount: '124.45'
-  },
-  transactionId: '2f169631-ef99-4cb1-96dc-91e8fc08f539',
-  transactionRequestId: 'b51ec534-ee48-4575-b6a9-ead2955b8069',
-  quote: {
-    transferAmount: {
-      currency: 'USD',
-      amount: '124.45'
-    },
-    expiration: '2020-08-24T08:38:08.699-04:00',
-    ilpPacket: 'AYIBgQAAAAAAAASwNGxldmVsb25lLmRmc3AxLm1lci45T2RTOF81MDdqUUZ',
-    condition: 'f5sqb7tBTWPd5Y8BDFdMm9BJR_MNI4isf8p8n4D5pHA'
-  }
-}
+
 const approveResponse: tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPatchResponse = {
-  transactionId: 'b51ec534-ee48-4575-b6a9-ead2955b8069',
   transactionRequestState: 'ACCEPTED',
   transactionState: 'COMPLETED'
 }
@@ -122,18 +97,17 @@ jest.mock('redis')
 jest.mock('@mojaloop/sdk-standard-components', () => {
   return {
     MojaloopRequests: jest.fn(() => ({
-      getParties: jest.fn(() => Promise.resolve(partyLookupResponse)),
+      getParties: jest.fn(() => Promise.resolve(partyLookupResponse))
     })),
     ThirdpartyRequests: jest.fn(() => ({
       postAuthorizations: jest.fn(() => Promise.resolve(putResponse)),
-      postThirdpartyRequestsTransactionsAuthorizations: jest.fn(() => Promise.resolve(putThirdpartyAuthResponse)),
-      postThirdpartyRequestsTransactions: jest.fn(() => Promise.resolve(initiateResponse)),
       getAccounts: jest.fn(() => Promise.resolve(mockData.accountsRequest.payload)),
       patchConsentRequests: jest.fn(() => Promise.resolve(mockData.inboundConsentsPostRequest)),
       postConsentRequests: jest.fn(() => Promise.resolve(mockData.consentRequestsPut.payload)),
       getServices: jest.fn(() => Promise.resolve(mockData.putServicesByServiceTypeRequest.payload)),
       putConsents: jest.fn(() => Promise.resolve(mockData.inboundConsentsVerifiedPatchRequest.payload)),
       putThirdpartyRequestsAuthorizations: jest.fn(() => Promise.resolve(approveResponse)),
+      postThirdpartyRequestsTransactions: jest.fn(() => Promise.resolve())
     })),
     WSO2Auth: jest.fn(),
     Logger: {
@@ -330,27 +304,43 @@ describe('Outbound API routes', (): void => {
       }
     }
 
-    const authorizationRequest: tpAPI.Schemas.AuthorizationsPostRequest = {
-      transactionRequestId,
-      transactionId: transactionId,
-      authenticationType: 'U2F',
-      retriesLeft: '1',
-      amount: {
-        amount: '123.00',
+    const thirdpartyAuthorizationRequest: tpAPI.Schemas.ThirdpartyRequestsAuthorizationsPostRequest = {
+      authorizationRequestId: '5f8ee7f9-290f-4e03-ae1c-1e81ecf398df',
+      transactionRequestId: '2cf08eed-3540-489e-85fa-b2477838a8c5',
+      challenge: '<base64 encoded binary - the encoded challenge>',
+      transferAmount: {
+        amount: '100',
         currency: 'USD'
       },
-      quote: {
-        transferAmount: {
-          amount: '123.00',
-          currency: 'USD'
-        },
-        expiration: 'quote-expiration',
-        ilpPacket: 'quote-ilp-packet',
-        condition: 'quote-condition'
-      }
+      payeeReceiveAmount: {
+        amount: '99',
+        currency: 'USD'
+      },
+      fees: {
+        amount: '1',
+        currency: 'USD'
+      },
+      payee: {
+        partyIdInfo: {
+          partyIdType: 'MSISDN',
+          partyIdentifier: '+4412345678',
+          fspId: 'dfspb'
+        }
+      },
+      payer: {
+        partyIdType: 'THIRD_PARTY_LINK',
+        partyIdentifier: 'qwerty-123456',
+        fspId: 'dfspa'
+      },
+      transactionType: {
+        scenario: 'TRANSFER',
+        initiator: 'PAYER',
+        initiatorType: 'CONSUMER'
+      },
+      expiration: '2020-06-15T12:00:00.000Z'
     }
+
     const transactionStatus: tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPutResponse = {
-      transactionId,
       transactionRequestState: 'RECEIVED'
     }
     const channelTransPut = PISPTransactionModel.notificationChannel(
@@ -367,8 +357,9 @@ describe('Outbound API routes', (): void => {
       // publish authorization request
       pubSub.publish(
         channelAuthPost,
-        authorizationRequest as unknown as Message
+        thirdpartyAuthorizationRequest as unknown as Message
       )
+
       // publish transaction status update
       pubSub.publish(
         channelTransPut,
@@ -376,6 +367,7 @@ describe('Outbound API routes', (): void => {
       )
     }, 100)
     const response = await server.inject(request)
+    console.log(response)
     expect(response.statusCode).toBe(200)
     expect(response.result).toEqual({
       authorization: expect.anything(),
@@ -393,19 +385,22 @@ describe('Outbound API routes', (): void => {
       },
       payload: {
         authorizationResponse: {
-          signedPayloadType: 'FIDO',
+          responseType: 'ACCEPTED',
           signedPayload: {
-            id: '45c-TkfkjQovQeAWmOy-RLBHEJ_e4jYzQYgD8VdbkePgM5d98BaAadadNYrknxgH0jQEON8zBydLgh1EqoC9DA',
-            rawId: '45c+TkfkjQovQeAWmOy+RLBHEJ/e4jYzQYgD8VdbkePgM5d98BaAadadNYrknxgH0jQEON8zBydLgh1EqoC9DA==',
-            response: {
-              authenticatorData: 'SZYN5YgOjGh0NBcPZHZgW4/krrmihjLHmVzzuoMdl2MBAAAACA==',
-              clientDataJSON: 'eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiQUFBQUFBQUFBQUFBQUFBQUFBRUNBdyIsIm9yaWdpbiI6Imh0dHA6Ly9sb2NhbGhvc3Q6NDIxODEiLCJjcm9zc09yaWdpbiI6ZmFsc2UsIm90aGVyX2tleXNfY2FuX2JlX2FkZGVkX2hlcmUiOiJkbyBub3QgY29tcGFyZSBjbGllbnREYXRhSlNPTiBhZ2FpbnN0IGEgdGVtcGxhdGUuIFNlZSBodHRwczovL2dvby5nbC95YWJQZXgifQ==',
-              signature: 'MEUCIDcJRBu5aOLJVc/sPyECmYi23w8xF35n3RNhyUNVwQ2nAiEA+Lnd8dBn06OKkEgAq00BVbmH87ybQHfXlf1Y4RJqwQ8='
-            },
-            type: 'public-key'
+            signedPayloadType: 'FIDO',
+            fidoSignedPayload: {
+              id: '45c-TkfkjQovQeAWmOy-RLBHEJ_e4jYzQYgD8VdbkePgM5d98BaAadadNYrknxgH0jQEON8zBydLgh1EqoC9DA',
+              rawId: '45c+TkfkjQovQeAWmOy+RLBHEJ/e4jYzQYgD8VdbkePgM5d98BaAadadNYrknxgH0jQEON8zBydLgh1EqoC9DA==',
+              response: {
+                authenticatorData: 'SZYN5YgOjGh0NBcPZHZgW4/krrmihjLHmVzzuoMdl2MBAAAACA==',
+                clientDataJSON: 'eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiQUFBQUFBQUFBQUFBQUFBQUFBRUNBdyIsIm9yaWdpbiI6Imh0dHA6Ly9sb2NhbGhvc3Q6NDIxODEiLCJjcm9zc09yaWdpbiI6ZmFsc2UsIm90aGVyX2tleXNfY2FuX2JlX2FkZGVkX2hlcmUiOiJkbyBub3QgY29tcGFyZSBjbGllbnREYXRhSlNPTiBhZ2FpbnN0IGEgdGVtcGxhdGUuIFNlZSBodHRwczovL2dvby5nbC95YWJQZXgifQ==',
+                signature: 'MEUCIDcJRBu5aOLJVc/sPyECmYi23w8xF35n3RNhyUNVwQ2nAiEA+Lnd8dBn06OKkEgAq00BVbmH87ybQHfXlf1Y4RJqwQ8='
+              },
+              type: 'public-key'
+            }
           }
         }
-      }
+      } as OutboundAPI.Schemas.ThirdpartyTransactionIDApproveRequest
     }
     const pubSub = new PubSub({} as RedisConnectionConfig)
     const channelApprove = PISPTransactionModel.notificationChannel(
@@ -418,6 +413,7 @@ describe('Outbound API routes', (): void => {
       approveResponse as unknown as Message
     ), 10)
     const response = await server.inject(request)
+    console.log(response)
     expect(response.result).toEqual({
       transactionStatus: { ...approveResponse },
       currentState: 'transactionStatusReceived'
@@ -428,7 +424,7 @@ describe('Outbound API routes', (): void => {
   it('/linking/providers - success', async (): Promise<void> => {
     const request = {
       method: 'GET',
-      url: `/linking/providers`,
+      url: '/linking/providers'
     }
     const pubSub = new PubSub({} as RedisConnectionConfig)
 
@@ -450,7 +446,7 @@ describe('Outbound API routes', (): void => {
   it('/linking/providers - error', async (): Promise<void> => {
     const request = {
       method: 'GET',
-      url: `/linking/providers`,
+      url: '/linking/providers'
     }
 
     const errorResponse = {
@@ -495,12 +491,12 @@ describe('Outbound API routes', (): void => {
       accounts: [
         {
           accountNickname: 'dfspa.user.nickname1',
-          id: 'dfspa.username.1234',
+          address: 'dfspa.username.1234',
           currency: 'ZAR'
         },
         {
           accountNickname: 'dfspa.user.nickname2',
-          id: 'dfspa.username.5678',
+          address: 'dfspa.username.5678',
           currency: 'USD'
         }
       ],
@@ -563,7 +559,7 @@ describe('Outbound API routes', (): void => {
     expect(response.statusCode).toBe(200)
     const expectedResp = {
       channelResponse: { ...mockData.consentRequestsPut.payload },
-      currentState: 'WebAuthenticationChannelResponseRecieved'
+      currentState: 'WebAuthenticationChannelResponseReceived'
     }
     expect(response.result).toEqual(expectedResp)
   })
@@ -592,11 +588,12 @@ describe('Outbound API routes', (): void => {
     const expectedConsent: tpAPI.Schemas.ConsentsPostRequestPISP = {
       consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
       consentRequestId,
+      status: 'ISSUED',
       scopes: [{
-        accountId: 'some-id',
+        address: 'some-id',
         actions: [
-          'accounts.getBalance',
-          'accounts.transfer'
+          'ACCOUNTS_GET_BALANCE',
+          'ACCOUNTS_TRANSFER'
         ]
       }
       ]
@@ -634,7 +631,7 @@ describe('Outbound API routes', (): void => {
                 'in voluptate velit esse cillum dolore eu fugiat nulla pariatur.'
             },
             type: 'public-key'
-          },
+          }
         }
       }
     }
@@ -706,7 +703,6 @@ describe('Outbound API routes', (): void => {
     }
     expect(response.result).toEqual(expectedResp)
   })
-
 
   it('/linking/request-consent/{ID}/authenticate - error', async (): Promise<void> => {
     const consentRequestId = 'bbce3ce8-c247-4153-aab1-f89768c93b18'

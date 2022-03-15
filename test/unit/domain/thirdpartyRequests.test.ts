@@ -22,18 +22,15 @@
  --------------
  ******/
 import {
-  buildPayeeQuoteRequestFromTptRequest,
-  forwardPostQuoteRequestToPayee,
   verifyConsentId,
   verifySourceAccountId,
   verifyPispId,
   validateGrantedConsent
 } from '~/domain/thirdpartyRequests/transactions'
-import TestData from 'test/unit/data/mockData.json'
+import * as mockData from 'test/unit/data/mockData'
 import { resetUuid } from 'test/unit/__mocks__/uuid'
 import { MojaloopRequests, BaseRequestConfigType } from '@mojaloop/sdk-standard-components'
 
-const mockData = JSON.parse(JSON.stringify(TestData))
 const postThirdpartyRequestsTransactionRequest = mockData.postThirdpartyRequestsTransactionRequest
 const postQuoteRequest = mockData.postQuotesRequest
 const __postQuotes = jest.fn(() => Promise.resolve())
@@ -53,40 +50,6 @@ describe('thirdpartyRequests/transactions', (): void => {
   beforeEach((): void => {
     jest.clearAllMocks()
     resetUuid()
-  })
-
-  it('buildPayeeQuoteRequestFromTptRequest should construct a proper quote request from tptRequest', (): void => {
-    const expectMockQuoteRequest = expect(buildPayeeQuoteRequestFromTptRequest(
-      postThirdpartyRequestsTransactionRequest.payload
-    ))
-
-    expectMockQuoteRequest.toEqual(expect.objectContaining({
-      quoteId: '00000000-0000-1000-8000-000000000001',
-      transactionId: '00000000-0000-1000-8000-000000000002'
-    }))
-    expectMockQuoteRequest.toEqual(expect.objectContaining({
-      payee: postQuoteRequest.payload.payee,
-      payer: postQuoteRequest.payload.payer,
-      amount: postQuoteRequest.payload.amount,
-      amountType: postQuoteRequest.payload.amountType,
-      transactionType: postQuoteRequest.payload.transactionType
-    }))
-  })
-
-  it('forwardPostQuoteRequestToPayee should forward a quote request and forward it to a payee', (): void => {
-    // build expected quote request
-    const quoteRequest = buildPayeeQuoteRequestFromTptRequest(
-      postThirdpartyRequestsTransactionRequest.payload
-    )
-
-    resetUuid()
-
-    forwardPostQuoteRequestToPayee(
-      postThirdpartyRequestsTransactionRequest.payload,
-      new MojaloopRequests({} as unknown as BaseRequestConfigType)
-    )
-
-    expect(__postQuotes).toBeCalledWith(quoteRequest, quoteRequest.payee.partyIdInfo.fspId)
   })
 
   it('verifyConsentId should resolve', async (): Promise<void> => {

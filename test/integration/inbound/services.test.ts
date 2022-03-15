@@ -30,9 +30,9 @@ import Config from '~/shared/config'
 import axios from 'axios'
 import env from '../env'
 import mockLogger from 'test/unit/mockLogger'
-import TestData from 'test/unit/data/mockData.json'
+import * as mockData from 'test/unit/data/mockData'
 
-const mockData = JSON.parse(JSON.stringify(TestData))
+
 
 describe('PUT /services/{ServiceType}', (): void => {
   const scenarioUri = `${env.inbound.baseUri}/services/THIRD_PARTY_DFSP`
