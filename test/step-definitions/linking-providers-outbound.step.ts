@@ -40,7 +40,7 @@ const feature = loadFeature(featurePath)
 
 jest.mock('@mojaloop/sdk-standard-components', () => {
   return {
-  MojaloopRequests: jest.fn(),
+    MojaloopRequests: jest.fn(),
     ThirdpartyRequests: jest.fn(() => ({
       getServices: jest.fn(() => Promise.resolve())
     })),
@@ -119,7 +119,7 @@ defineFeature(feature, (test): void => {
 
   afterAll(async (done): Promise<void> => {
     server.events.on('stop', done)
-    server.stop({ timeout:0 })
+    server.stop({ timeout: 0 })
   })
 
   afterEach((): void => {

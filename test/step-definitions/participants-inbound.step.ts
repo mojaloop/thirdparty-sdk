@@ -59,7 +59,7 @@ defineFeature(feature, (test): void => {
 
   afterAll(async (done): Promise<void> => {
     server.events.on('stop', done)
-    server.stop({ timeout:0 })
+    server.stop({ timeout: 0 })
   })
 
   afterEach((): void => {
@@ -81,7 +81,7 @@ defineFeature(feature, (test): void => {
         headers: {
           'Content-Type': 'application/json',
           'FSPIOP-Source': 'switch',
-          'Accept': 'application/json',
+          Accept: 'application/json',
           Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
           'FSPIOP-Destination': 'dfspA'
         },
@@ -112,13 +112,13 @@ defineFeature(feature, (test): void => {
         headers: {
           'Content-Type': 'application/json',
           'FSPIOP-Source': 'switch',
-          'Accept': 'application/json',
+          Accept: 'application/json',
           Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
           'FSPIOP-Destination': 'dfspA'
         },
         payload: {
           errorInformation: {
-            errorCode: "3000",
+            errorCode: '3000',
             errorDescription: 'This is an error description.',
             extensionList: {
               extension: [
@@ -140,7 +140,6 @@ defineFeature(feature, (test): void => {
     })
   })
 
-
   test('PutParticipantsByID', ({ given, when, then }): void => {
     given('Inbound API server', async (): Promise<void> => {
       // do nothing
@@ -155,7 +154,7 @@ defineFeature(feature, (test): void => {
         headers: {
           'Content-Type': 'application/json',
           'FSPIOP-Source': 'switch',
-          'Accept': 'application/json',
+          Accept: 'application/json',
           Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
           'FSPIOP-Destination': 'dfspA'
         },
@@ -193,13 +192,13 @@ defineFeature(feature, (test): void => {
         headers: {
           'Content-Type': 'application/json',
           'FSPIOP-Source': 'switch',
-          'Accept': 'application/json',
+          Accept: 'application/json',
           Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
           'FSPIOP-Destination': 'dfspA'
         },
         payload: {
           errorInformation: {
-            errorCode: "3000",
+            errorCode: '3000',
             errorDescription: 'This is an error description.',
             extensionList: {
               extension: [
@@ -220,5 +219,4 @@ defineFeature(feature, (test): void => {
       expect(response.statusCode).toBe(200)
     })
   })
-
 })

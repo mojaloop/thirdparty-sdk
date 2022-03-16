@@ -47,7 +47,7 @@ import ParticipantsTypeID from './participants/{Type}/{ID}'
 import ParticipantsTypeIDError from './participants/{Type}/{ID}/error'
 
 export default {
-  CreateThirdpartyTransactionRequests: ThirdpartyRequestsTransactions.post,
+  ThirdpartyRequestsTransactionsPost: ThirdpartyRequestsTransactions.post,
   NotifyThirdpartyTransactionRequests: NotifyThirdpartyTransactionRequests.patch,
   UpdateThirdPartyTransactionRequests: NotifyThirdpartyTransactionRequests.put,
   ThirdpartyTransactionRequestsError: ThirdpartyTransactionRequestsError.put,
@@ -65,7 +65,7 @@ export default {
   PutConsentByID: InboundConsentsId.put,
   NotifyErrorConsents: InboundConsentsIdError.put,
   PutParticipantsByID: ParticipantsID.put,
-  PutParticipantsByIDAndError:  ParticipantsIDError.put,
+  PutParticipantsByIDAndError: ParticipantsIDError.put,
   ParticipantsByTypeAndID3: ParticipantsTypeID.put,
   ParticipantsErrorByTypeAndID: ParticipantsTypeIDError.put,
   PostThirdpartyRequestsAuthorizations: ThirdpartyRequestsAuthorizations.post,

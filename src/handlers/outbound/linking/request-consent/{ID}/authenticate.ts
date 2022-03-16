@@ -28,13 +28,12 @@ import { StateResponseToolkit } from '~/server/plugins/state'
 import { Request, ResponseObject } from '@hapi/hapi'
 import { PISPLinkingModel, loadFromKVS } from '~/models/outbound/pispLinking.model'
 import {
-  PISPLinkingModelConfig,
+  PISPLinkingModelConfig
 } from '~/models/outbound/pispLinking.interface'
 import config from '~/shared/config'
 import inspect from '~/shared/inspect'
 import * as OutboundAPI from '~/interface/outbound/api_interfaces'
 import { Enum } from '@mojaloop/central-services-shared'
-
 
 /**
  * Handles outbound PATCH /linking/request-consent/{ID}/authenticate request
@@ -63,9 +62,9 @@ async function patch (_context: any, request: Request, h: StateResponseToolkit):
       return h.response({}).code(Enum.Http.ReturnCodes.INTERNALSERVERERRROR.CODE)
     }
 
-    const statusCode = (result.currentState == 'errored') ? 500 : 200
+    const statusCode = (result.currentState === 'errored') ? 500 : 200
     return h.response(result).code(statusCode)
-  } catch(error) {
+  } catch (error) {
     // todo: PUT /consentsRequest/{ID}/error to DFSP if PISP is unable to handle
     //       the previous PUT /consentRequests/{ID} request
     //       The handler doesn't know the DFSP's ID due to it being stored in the model

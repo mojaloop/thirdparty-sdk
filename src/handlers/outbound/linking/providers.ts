@@ -64,9 +64,9 @@ async function get (_context: unknown, _request: Request, h: StateResponseToolki
       return h.response({}).code(Enum.Http.ReturnCodes.INTERNALSERVERERRROR.CODE)
     }
 
-    const statusCode = (result.currentState == 'errored') ? 500 : 200
+    const statusCode = (result.currentState === 'errored') ? 500 : 200
     return h.response(result).code(statusCode)
-  } catch(error) {
+  } catch (error) {
     h.getLogger().info(`Error running PISPPrelinkingModel : ${inspect(error)}`)
     return h.response({}).code(Enum.Http.ReturnCodes.INTERNALSERVERERRROR.CODE)
   }

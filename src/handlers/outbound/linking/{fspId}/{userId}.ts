@@ -60,9 +60,9 @@ async function get (_context: any, request: Request, h: StateResponseToolkit): P
 
   const model: PISPDiscoveryModel = await create(data, config)
   const result = (await model.run()) as PISPDiscoveryGetResponse
-  const statusCode = (result.errorInformation) ?
-    Enum.Http.ReturnCodes.INTERNALSERVERERRROR.CODE :
-    Enum.Http.ReturnCodes.OK.CODE
+  const statusCode = (result.errorInformation)
+    ? Enum.Http.ReturnCodes.INTERNALSERVERERRROR.CODE
+    : Enum.Http.ReturnCodes.OK.CODE
   return h.response(result).code(statusCode)
 }
 

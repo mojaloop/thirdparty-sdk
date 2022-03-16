@@ -60,7 +60,7 @@ defineFeature(feature, (test): void => {
 
   afterAll(async (done): Promise<void> => {
     server.events.on('stop', done)
-    server.stop({ timeout:0 })
+    server.stop({ timeout: 0 })
   })
 
   afterEach((): void => {

@@ -65,9 +65,9 @@ async function post (_context: any, request: Request, h: StateResponseToolkit): 
     return h.response({}).code(Enum.Http.ReturnCodes.INTERNALSERVERERRROR.CODE)
   }
 
-  const statusCode = (result.currentState == 'errored') ?
-    Enum.Http.ReturnCodes.INTERNALSERVERERRROR.CODE :
-    Enum.Http.ReturnCodes.OK.CODE
+  const statusCode = (result.currentState === 'errored')
+    ? Enum.Http.ReturnCodes.INTERNALSERVERERRROR.CODE
+    : Enum.Http.ReturnCodes.OK.CODE
   return h.response(result).code(statusCode)
 }
 

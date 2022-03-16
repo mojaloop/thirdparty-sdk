@@ -121,7 +121,7 @@ defineFeature(feature, (test): void => {
 
   afterAll(async (done): Promise<void> => {
     server.events.on('stop', done)
-    server.stop({ timeout:0 })
+    server.stop({ timeout: 0 })
   })
 
   afterEach((): void => {
@@ -133,6 +133,7 @@ defineFeature(feature, (test): void => {
     const postConsentsIDPatchResponse: tpAPI.Schemas.ConsentsPostRequestPISP = {
       consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
       consentRequestId: '997c89f4-053c-4283-bfec-45a1a0a28fba',
+      status: 'ISSUED',
       scopes: [{
         address: 'some-id',
         actions: [
@@ -154,27 +155,26 @@ defineFeature(feature, (test): void => {
       // linking flow requires a sequence of outgoing requests
       // we initiate the flow with POST /linking/request-consent
       const consentRequestsIDPutResponseWeb: tpAPI.Schemas.ConsentRequestsIDPutResponseWeb = {
-        "consentRequestId": "b51ec534-ee48-4575-b6a9-ead2955b8069",
-        "scopes": [
+        scopes: [
           {
-            "address": "dfspa.username.1234",
-            "actions": [
-              "ACCOUNTS_TRANSFER",
-              "ACCOUNTS_GET_BALANCE"
+            address: 'dfspa.username.1234',
+            actions: [
+              'ACCOUNTS_TRANSFER',
+              'ACCOUNTS_GET_BALANCE'
             ]
           },
           {
-            "address": "dfspa.username.5678",
-            "actions": [
-              "ACCOUNTS_TRANSFER",
-              "ACCOUNTS_GET_BALANCE"
+            address: 'dfspa.username.5678',
+            actions: [
+              'ACCOUNTS_TRANSFER',
+              'ACCOUNTS_GET_BALANCE'
             ]
           }
         ],
-        "callbackUri": "pisp-app://callback.com",
-        "authUri": "dfspa.com/authorize?consentRequestId=456",
-        "authChannels": [
-          "WEB"
+        callbackUri: 'pisp-app://callback.com',
+        authUri: 'dfspa.com/authorize?consentRequestId=456',
+        authChannels: [
+          'WEB'
         ]
       }
 
@@ -183,18 +183,18 @@ defineFeature(feature, (test): void => {
         url: '/linking/request-consent',
         headers: {
           'Content-Type': 'application/json',
-          Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
+          Date: 'Thu, 24 Jan 2019 10:22:12 GMT'
         },
         payload: {
-          consentRequestId: "bbce3ce8-c247-4153-aab1-f89768c93b18",
-          toParticipantId: "dfspA",
+          consentRequestId: 'bbce3ce8-c247-4153-aab1-f89768c93b18',
+          toParticipantId: 'dfspA',
           accounts: [
-            { "accountNickname": "XXXXXXnt", "address": "dfspa.username.1234", "currency": "ZAR" },
-            { "accountNickname": "SpeXXXXXXXXnt", "address": "dfspa.username.5678", "currency": "USD" }
+            { accountNickname: 'XXXXXXnt', address: 'dfspa.username.1234', currency: 'ZAR' },
+            { accountNickname: 'SpeXXXXXXXXnt', address: 'dfspa.username.5678', currency: 'USD' }
           ],
-          actions: ["ACCOUNTS_GET_BALANCE", "ACCOUNTS_TRANSFER"],
-          userId: "username1234",
-          callbackUri: "pisp-app://callback.com"
+          actions: ['ACCOUNTS_GET_BALANCE', 'ACCOUNTS_TRANSFER'],
+          userId: 'username1234',
+          callbackUri: 'pisp-app://callback.com'
         }
       }
 
@@ -212,7 +212,7 @@ defineFeature(feature, (test): void => {
         url: '/linking/request-consent/bbce3ce8-c247-4153-aab1-f89768c93b18/authenticate',
         headers: {
           'Content-Type': 'application/json',
-          Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
+          Date: 'Thu, 24 Jan 2019 10:22:12 GMT'
         },
         payload: {
           authToken: '123456'

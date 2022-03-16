@@ -133,17 +133,6 @@ export class SDKOutgoingRequests extends HttpRequests {
   }
 
   /**
-   * @method requestAuthorization
-   * @param {OutboundAPI.Schemas.authorizationsPostRequest} request - authorization request
-   * @returns {Promise<OutboundAPI.Schemas.authorizationsPostResponse | void>}
-   */
-  async requestAuthorization (
-    request: OutboundAPI.Schemas.authorizationsPostRequest
-  ): Promise<OutboundAPI.Schemas.authorizationsPostResponse | void> {
-    return this.post(this.requestAuthorizationPath, request)
-  }
-
-  /**
    * @method requestTransfer
    * @param {OutboundAPI.Schemas.simpleTransfersPostRequest} request - transfer request
    * @returns {Promise<OutboundAPI.Schemas.simpleTransfersPostResponse | void>}

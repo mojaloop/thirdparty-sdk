@@ -119,7 +119,7 @@ defineFeature(feature, (test): void => {
 
   afterAll(async (done): Promise<void> => {
     server.events.on('stop', done)
-    server.stop({ timeout:0 })
+    server.stop({ timeout: 0 })
   })
 
   afterEach((): void => {
@@ -129,16 +129,16 @@ defineFeature(feature, (test): void => {
 
   test('GetLinkingAccountsByUserId', ({ given, when, then }): void => {
     const accountsIDPutResponse: tpAPI.Schemas.AccountsIDPutResponse = {
-      "accounts": [
+      accounts: [
         {
-          "accountNickname": "dfspa.user.nickname1",
-          "address": "dfspa.username.1234",
-          "currency": "ZAR"
+          accountNickname: 'dfspa.user.nickname1',
+          address: 'dfspa.username.1234',
+          currency: 'ZAR'
         },
         {
-          "accountNickname": "dfspa.user.nickname2",
-          "address": "dfspa.username.5678",
-          "currency": "USD"
+          accountNickname: 'dfspa.user.nickname2',
+          address: 'dfspa.username.5678',
+          currency: 'USD'
         }
       ]
     }
