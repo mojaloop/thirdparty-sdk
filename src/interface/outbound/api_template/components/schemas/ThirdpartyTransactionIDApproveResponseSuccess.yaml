@@ -9,7 +9,6 @@ properties:
       transactionRequestState:
         $ref: '../../../../../../node_modules/@mojaloop/api-snippets/fspiop/v1_0/openapi3/components/schemas/TransactionRequestState.yaml'
     required:
-      - transactionId
       - transactionRequestState
   currentState:
     $ref: './ThirdpartyTransactionIDApproveState.yaml'

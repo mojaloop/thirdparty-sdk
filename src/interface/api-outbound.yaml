@@ -1708,7 +1708,6 @@ components:
             transactionRequestState:
               $ref: '#/components/schemas/TransactionRequestState'
           required:
-            - transactionId
             - transactionRequestState
         currentState:
           $ref: '#/components/schemas/ThirdpartyTransactionIDApproveState'

@@ -762,8 +762,6 @@ export interface components {
       transactionStatus: {
         transactionRequestId?: components['schemas']['CorrelationId'];
         transactionRequestState: components['schemas']['TransactionRequestState'];
-      } & {
-        transactionId: unknown;
       };
       currentState: components['schemas']['ThirdpartyTransactionIDApproveState'];
     };
