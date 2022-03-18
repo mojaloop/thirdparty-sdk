@@ -13,9 +13,9 @@ info:
     name: Apache 2.0
   version: 0.1.1
 servers:
-  - url: 'http://sandbox.mojaloop.io/switch-ttk-backend'
+  - url: http://sandbox.mojaloop.io/switch-ttk-backend
     description: The mock 3p-scheme-adapter server running in the Mojaloop Sandbox
-  - url: 'http://localhost:15000'
+  - url: http://localhost:15000
     description: A locally running TTK instance
 paths:
   /health:
@@ -99,7 +99,7 @@ paths:
           $ref: '#/components/responses/ThirdpartyTransactionPartyLookupResponse'
         default:
           $ref: '#/components/responses/400'
-  '/thirdpartyTransaction/{ID}/initiate':
+  /thirdpartyTransaction/{ID}/initiate:
     post:
       operationId: ThirdpartyTransactionIDInitiate
       summary: Initiates a third party transaction.
@@ -142,7 +142,7 @@ paths:
           $ref: '#/components/responses/ThirdpartyTransactionIDInitiateResponse'
         default:
           $ref: '#/components/responses/400'
-  '/thirdpartyTransaction/{ID}/approve':
+  /thirdpartyTransaction/{ID}/approve:
     post:
       operationId: ThirdpartyTransactionIDApprove
       summary: Approve a third party transaction.
@@ -189,7 +189,7 @@ paths:
           $ref: '#/components/responses/LinkingProvidersResponse'
         default:
           $ref: '#/components/responses/400'
-  '/linking/accounts/{fspId}/{userId}':
+  /linking/accounts/{fspId}/{userId}:
     get:
       operationId: GetLinkingAccountsByUserId
       summary: GetLinkingAccountsByUserId
@@ -248,18 +248,18 @@ paths:
                   id: dfspa.username.5678
                   currency: USD
               actions:
-                - accounts.transfer
+                - ACCOUNTS_TRANSFER
               userId: username1234
-              callbackUri: 'pisp-app://callback'
+              callbackUri: pisp-app://callback
       responses:
         '200':
           $ref: '#/components/responses/LinkingRequestConsentResponse'
         default:
           $ref: '#/components/responses/400'
-  '/linking/request-consent/{ID}/authenticate':
+  /linking/request-consent/{ID}/authenticate:
     patch:
       operationId: PatchLinkingRequestConsentIDAuthenticate
-      summary: 'Outbound PATCH /linking/request-consent/{ID}/authenticate endpoint'
+      summary: Outbound PATCH /linking/request-consent/{ID}/authenticate endpoint
       description: >
         Used in the authentication phase of account linking.
 
@@ -287,10 +287,10 @@ paths:
           $ref: '#/components/responses/LinkingRequestConsentIDAuthenticateResponse'
         default:
           $ref: '#/components/responses/400'
-  '/linking/request-consent/{ID}/pass-credential':
+  /linking/request-consent/{ID}/pass-credential:
     post:
       operationId: PostLinkingRequestConsentIDPassCredential
-      summary: 'Outbound POST /linking/request-consent/{ID}/pass-credential endpoint'
+      summary: Outbound POST /linking/request-consent/{ID}/pass-credential endpoint
       description: >
         Used in the credential registration phase of account linking.
 
@@ -513,17 +513,17 @@ components:
             channelResponse:
               consentRequestId: f6ab43b0-71cc-49f9-b763-2ac3f05ac8c1
               scopes:
-                - accountId: dfspa.username.1234
+                - address: dfspa.username.1234
                   actions:
-                    - accounts.getBalance
-                    - accounts.transfer
-                - accountId: dfspa.username.5678
+                    - ACCOUNTS_GET_BALANCE
+                    - ACCOUNTS_TRANSFER
+                - address: dfspa.username.5678
                   actions:
-                    - accounts.getBalance
-                    - accounts.transfer
+                    - ACCOUNTS_GET_BALANCE
+                    - ACCOUNTS_TRANSFER
               authChannels:
                 - OTP
-              callbackUri: 'pisp-app://callback...'
+              callbackUri: pisp-app://callback...
             currentState: OTPAuthenticationChannelResponseReceived
     LinkingRequestConsentIDAuthenticateResponse:
       description: Linking request consent authenticate response
@@ -536,9 +536,9 @@ components:
               consentId: 76059a0a-684f-4002-a880-b01159afe119
               consentRequestId: f6ab43b0-71cc-49f9-b763-2ac3f05ac8c1
               scopes:
-                - accountId: dfspa.username.5678
+                - address: dfspa.username.5678
                   actions:
-                    - accounts.transfer
+                    - ACCOUNTS_TRANSFER
             challenge: c4adabb33e9306b038088132affcde556c50d82f603f47711a9510bf3beef6d6
             currentState: consentReceivedAwaitingCredential
     LinkingRequestConsentIDPassCredentialResponse:
@@ -574,7 +574,7 @@ components:
     ErrorCode:
       title: ErrorCode
       type: string
-      pattern: '^[1-9]\d{3}$'
+      pattern: ^[1-9]\d{3}$
       description: >-
         The API data type ErrorCode is a JSON String of four characters,
         consisting of digits only. Negative numbers are not allowed. A leading
@@ -863,7 +863,7 @@ components:
     MerchantClassificationCode:
       title: MerchantClassificationCode
       type: string
-      pattern: '^[\d]{1,4}$'
+      pattern: ^[\d]{1,4}$
       description: >-
         A limited set of pre-defined numbers. This list would be a limited set
         of numbers identifying a set of popular merchant types like School Fees,
@@ -1190,7 +1190,7 @@ components:
     Amount:
       title: Amount
       type: string
-      pattern: '^([0]|([1-9][0-9]{0,17}))([.][0-9]{0,3}[1-9])?$'
+      pattern: ^([0]|([1-9][0-9]{0,17}))([.][0-9]{0,3}[1-9])?$
       description: >-
         The API data type Amount is a JSON String in a canonical format that is
         restricted by a regular expression for interoperability reasons. This
@@ -1247,7 +1247,7 @@ components:
     TransactionSubScenario:
       title: TransactionSubScenario
       type: string
-      pattern: '^[A-Z_]{1,32}$'
+      pattern: ^[A-Z_]{1,32}$
       description: >-
         Possible sub-scenario, defined locally within the scheme (UndefinedEnum
         Type).
@@ -1306,7 +1306,7 @@ components:
     BalanceOfPayments:
       title: BalanceOfPayments
       type: string
-      pattern: '^[1-9]\d{2}$'
+      pattern: ^[1-9]\d{2}$
       description: >-
         (BopCode) The API data type
         [BopCode](https://www.imf.org/external/np/sta/bopcode/) is a JSON String
@@ -1501,7 +1501,7 @@ components:
       description: Describes a challenge that has been signed with a private key
     BinaryString:
       type: string
-      pattern: '^[A-Za-z0-9-_]+[=]{0,2}$'
+      pattern: ^[A-Za-z0-9-_]+[=]{0,2}$
       description: >-
         The API data type BinaryString is a JSON String. The string is a
         base64url  encoding of a string of raw bytes, where padding (character
@@ -1613,7 +1613,7 @@ components:
           additionalProperties: false
         type:
           type: string
-          description: 'response type, we need only the type of public-key'
+          description: response type, we need only the type of public-key
           enum:
             - public-key
       required:
@@ -1779,13 +1779,13 @@ components:
         case).
 
         https://github.com/mojaloop/documentation/blob/master/website/versioned_docs/v1.0.1/api/thirdparty/data-models.md#3212-accountaddress
-      pattern: '^([0-9A-Za-z_~\-\.]+[0-9A-Za-z_~\-])$'
+      pattern: ^([0-9A-Za-z_~\-\.]+[0-9A-Za-z_~\-])$
       minLength: 1
       maxLength: 1023
     Name:
       title: Name
       type: string
-      pattern: '^(?!\s*$)[\w .,''-]{1,128}$'
+      pattern: ^(?!\s*$)[\w .,'-]{1,128}$
       description: >-
         The API data type Name is a JSON String, restricted by a regular
         expression to avoid characters which are generally not used in a name.
@@ -1959,7 +1959,7 @@ components:
     Uri:
       title: Uri
       type: string
-      pattern: '^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?'
+      pattern: ^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?
       minLength: 1
       maxLength: 512
       description: >
@@ -2061,7 +2061,7 @@ components:
         - $ref: '#/components/schemas/LinkingRequestConsentResponseSuccess'
     LinkingRequestConsentIDAuthenticateRequest:
       title: LinkingRequestConsentIDAuthenticateRequest
-      description: 'PATCH /linking/request-consent/{ID}/authenticate Request object'
+      description: PATCH /linking/request-consent/{ID}/authenticate Request object
       type: object
       properties:
         authToken:
@@ -2208,7 +2208,7 @@ components:
           additionalProperties: false
         type:
           type: string
-          description: 'response type, we need only the type of public-key'
+          description: response type, we need only the type of public-key
           enum:
             - public-key
       required:
@@ -2218,7 +2218,7 @@ components:
       additionalProperties: false
     LinkingRequestConsentIDPassCredentialRequest:
       title: LinkingRequestConsentIDPassCredentialRequest
-      description: 'POST /linking/request-consent/{ID}/pass-credential request object'
+      description: POST /linking/request-consent/{ID}/pass-credential request object
       type: object
       properties:
         credential:

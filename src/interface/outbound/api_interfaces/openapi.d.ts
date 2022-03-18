@@ -61,36 +61,62 @@ export interface paths {
 
 export interface components {
   schemas: {
-    /** The API data type ErrorCode is a JSON String of four characters, consisting of digits only. Negative numbers are not allowed. A leading zero is not allowed. Each error code in the API is a four-digit number, for example, 1234, where the first number (1 in the example) represents the high-level error category, the second number (2 in the example) represents the low-level error category, and the last two numbers (34 in the example) represent the specific error. */
+    /**
+     * ErrorCode
+     * @description The API data type ErrorCode is a JSON String of four characters, consisting of digits only. Negative numbers are not allowed. A leading zero is not allowed. Each error code in the API is a four-digit number, for example, 1234, where the first number (1 in the example) represents the high-level error category, the second number (2 in the example) represents the low-level error category, and the last two numbers (34 in the example) represent the specific error.
+     * @example 5100
+     */
     ErrorCode: string;
-    /** Error description string. */
+    /**
+     * ErrorDescription
+     * @description Error description string.
+     */
     ErrorDescription: string;
-    /** Extension key. */
+    /**
+     * ExtensionKey
+     * @description Extension key.
+     */
     ExtensionKey: string;
-    /** Extension value. */
+    /**
+     * ExtensionValue
+     * @description Extension value.
+     */
     ExtensionValue: string;
-    /** Data model for the complex type Extension. */
+    /**
+     * Extension
+     * @description Data model for the complex type Extension.
+     */
     Extension: {
       key: components['schemas']['ExtensionKey'];
       value: components['schemas']['ExtensionValue'];
     };
-    /** Data model for the complex type ExtensionList. An optional list of extensions, specific to deployment. */
+    /**
+     * ExtensionList
+     * @description Data model for the complex type ExtensionList. An optional list of extensions, specific to deployment.
+     */
     ExtensionList: {
-      /** Number of Extension elements. */
+      /** @description Number of Extension elements. */
       extension: components['schemas']['Extension'][];
     };
-    /** Data model for the complex type ErrorInformation. */
+    /**
+     * ErrorInformation
+     * @description Data model for the complex type ErrorInformation.
+     */
     ErrorInformation: {
       errorCode: components['schemas']['ErrorCode'];
       errorDescription: components['schemas']['ErrorDescription'];
       extensionList?: components['schemas']['ExtensionList'];
     };
-    /** Data model for the complex type object that contains an optional element ErrorInformation used along with 4xx and 5xx responses. */
+    /**
+     * ErrorInformationResponse
+     * @description Data model for the complex type object that contains an optional element ErrorInformation used along with 4xx and 5xx responses.
+     */
     ErrorInformationResponse: {
       errorInformation?: components['schemas']['ErrorInformation'];
     };
     /**
-     * Below are the allowed values for the enumeration.
+     * PartyIdType
+     * @description Below are the allowed values for the enumeration.
      * - MSISDN - An MSISDN (Mobile Station International Subscriber Directory
      * Number, that is, the phone number) is used as reference to a participant.
      * The MSISDN identifier should be in international format according to the
@@ -133,6 +159,8 @@ export interface components {
      * a DFSP, and a specific Customer's account at the DFSP. The content of the link
      * is created by the DFSP at the time when it gives permission to the PISP for
      * specific access to a given account.
+     *
+     * @example PERSONAL_ID
      */
     PartyIdType:
     | 'MSISDN'
@@ -145,13 +173,26 @@ export interface components {
     | 'ALIAS'
     | 'CONSENT'
     | 'THIRD_PARTY_LINK';
-    /** Identifier of the Party. */
+    /**
+     * PartyIdentifier
+     * @description Identifier of the Party.
+     * @example 16135551212
+     */
     PartyIdentifier: string;
-    /** Either a sub-identifier of a PartyIdentifier, or a sub-type of the PartyIdType, normally a PersonalIdentifierType. */
+    /**
+     * PartySubIdOrType
+     * @description Either a sub-identifier of a PartyIdentifier, or a sub-type of the PartyIdType, normally a PersonalIdentifierType.
+     */
     PartySubIdOrType: string;
-    /** FSP identifier. */
+    /**
+     * FspId
+     * @description FSP identifier.
+     */
     FspId: string;
-    /** Data model for the complex type PartyIdInfo. */
+    /**
+     * PartyIdInfo
+     * @description Data model for the complex type PartyIdInfo.
+     */
     PartyIdInfo: {
       partyIdType: components['schemas']['PartyIdType'];
       partyIdentifier: components['schemas']['PartyIdentifier'];
@@ -159,46 +200,83 @@ export interface components {
       fspId?: components['schemas']['FspId'];
       extensionList?: components['schemas']['ExtensionList'];
     };
-    /** Identifier that correlates all messages of the same sequence. The API data type UUID (Universally Unique Identifier) is a JSON String in canonical format, conforming to [RFC 4122](https://tools.ietf.org/html/rfc4122), that is restricted by a regular expression for interoperability reasons. A UUID is always 36 characters long, 32 hexadecimal symbols and 4 dashes (‘-‘). */
+    /**
+     * CorrelationId
+     * @description Identifier that correlates all messages of the same sequence. The API data type UUID (Universally Unique Identifier) is a JSON String in canonical format, conforming to [RFC 4122](https://tools.ietf.org/html/rfc4122), that is restricted by a regular expression for interoperability reasons. A UUID is always 36 characters long, 32 hexadecimal symbols and 4 dashes (‘-‘).
+     * @example b51ec534-ee48-4575-b6a9-ead2955b8069
+     */
     CorrelationId: string;
-    /** ThirdpartyTransaction partyLookup request */
+    /** @description ThirdpartyTransaction partyLookup request */
     ThirdpartyTransactionPartyLookupRequest: {
       payee: components['schemas']['PartyIdInfo'];
       transactionRequestId: components['schemas']['CorrelationId'];
     };
-    /** state of thirdparty transaction partyLookup phase */
+    /**
+     * ThirdpartyTransactionPartyLookupState
+     * @description state of thirdparty transaction partyLookup phase
+     */
     ThirdpartyTransactionPartyLookupState:
     | 'start'
     | 'partyLookupSuccess'
     | 'partyLookupFailure'
     | 'errored';
+    /** ThirdpartyTransactionPartyLookupResponseError */
     ThirdpartyTransactionPartyLookupResponseError: {
       currentState: components['schemas']['ThirdpartyTransactionPartyLookupState'];
       errorInformation: components['schemas']['ErrorInformation'];
     };
-    /** A limited set of pre-defined numbers. This list would be a limited set of numbers identifying a set of popular merchant types like School Fees, Pubs and Restaurants, Groceries, etc. */
+    /**
+     * MerchantClassificationCode
+     * @description A limited set of pre-defined numbers. This list would be a limited set of numbers identifying a set of popular merchant types like School Fees, Pubs and Restaurants, Groceries, etc.
+     */
     MerchantClassificationCode: string;
-    /** Name of the Party. Could be a real name or a nickname. */
+    /**
+     * PartyName
+     * @description Name of the Party. Could be a real name or a nickname.
+     */
     PartyName: string;
-    /** First name of the Party (Name Type). */
+    /**
+     * FirstName
+     * @description First name of the Party (Name Type).
+     * @example Henrik
+     */
     FirstName: string;
-    /** Middle name of the Party (Name Type). */
+    /**
+     * MiddleName
+     * @description Middle name of the Party (Name Type).
+     * @example Johannes
+     */
     MiddleName: string;
-    /** Last name of the Party (Name Type). */
+    /**
+     * LastName
+     * @description Last name of the Party (Name Type).
+     * @example Karlsson
+     */
     LastName: string;
-    /** Data model for the complex type PartyComplexName. */
+    /**
+     * PartyComplexName
+     * @description Data model for the complex type PartyComplexName.
+     */
     PartyComplexName: {
       firstName?: components['schemas']['FirstName'];
       middleName?: components['schemas']['MiddleName'];
       lastName?: components['schemas']['LastName'];
     };
-    /** Date of Birth of the Party. */
+    /**
+     * DateofBirth (type Date)
+     * @description Date of Birth of the Party.
+     * @example 1966-06-16
+     */
     DateOfBirth: string;
-    /** Data model for the complex type PartyPersonalInfo. */
+    /**
+     * PartyPersonalInfo
+     * @description Data model for the complex type PartyPersonalInfo.
+     */
     PartyPersonalInfo: {
       complexName?: components['schemas']['PartyComplexName'];
       dateOfBirth?: components['schemas']['DateOfBirth'];
     };
+    /** ThirdpartyTransactionPartyLookupResponseSuccess */
     ThirdpartyTransactionPartyLookupResponseSuccess: {
       currentState: components['schemas']['ThirdpartyTransactionPartyLookupState'];
       party: {
@@ -211,16 +289,27 @@ export interface components {
     ThirdpartyTransactionPartyLookupResponse:
     | components['schemas']['ThirdpartyTransactionPartyLookupResponseError']
     | components['schemas']['ThirdpartyTransactionPartyLookupResponseSuccess'];
-    /** Data model for the complex type Party. */
+    /**
+     * Party
+     * @description Data model for the complex type Party.
+     */
     Party: {
       partyIdInfo: components['schemas']['PartyIdInfo'];
       merchantClassificationCode?: components['schemas']['MerchantClassificationCode'];
       name?: components['schemas']['PartyName'];
       personalInfo?: components['schemas']['PartyPersonalInfo'];
     };
-    /** - THIRD_PARTY_LINK - is the DFSP's internal reference which allows DFSP to find out the corresponding consent */
+    /**
+     * PartyIdTypeTPLink
+     * @description - THIRD_PARTY_LINK - is the DFSP's internal reference which allows DFSP to find out the corresponding consent
+     *
+     * @example PERSONAL_ID
+     */
     PartyIdTypeTPLink: 'THIRD_PARTY_LINK';
-    /** Data model for the complex type PartyIdInfo. */
+    /**
+     * PartyIdInfo
+     * @description Data model for the complex type PartyIdInfo.
+     */
     PartyIdInfoTPLink: {
       partyIdType: components['schemas']['PartyIdTypeTPLink'];
       partyIdentifier: components['schemas']['PartyIdentifier'];
@@ -229,12 +318,17 @@ export interface components {
       extensionList?: components['schemas']['ExtensionList'];
     };
     /**
-     * Below are the allowed values for the enumeration AmountType.
+     * AmountType
+     * @description Below are the allowed values for the enumeration AmountType.
      * - SEND - Amount the Payer would like to send, that is, the amount that should be withdrawn from the Payer account including any fees.
      * - RECEIVE - Amount the Payer would like the Payee to receive, that is, the amount that should be sent to the receiver exclusive of any fees.
+     * @example RECEIVE
      */
     AmountType: 'SEND' | 'RECEIVE';
-    /** The currency codes defined in [ISO 4217](https://www.iso.org/iso-4217-currency-codes.html) as three-letter alphabetic codes are used as the standard naming representation for currencies. */
+    /**
+     * Currency
+     * @description The currency codes defined in [ISO 4217](https://www.iso.org/iso-4217-currency-codes.html) as three-letter alphabetic codes are used as the standard naming representation for currencies.
+     */
     Currency:
     | 'AED'
     | 'AFN'
@@ -400,20 +494,29 @@ export interface components {
     | 'ZAR'
     | 'ZMW'
     | 'ZWD';
-    /** The API data type Amount is a JSON String in a canonical format that is restricted by a regular expression for interoperability reasons. This pattern does not allow any trailing zeroes at all, but allows an amount without a minor currency unit. It also only allows four digits in the minor currency unit; a negative value is not allowed. Using more than 18 digits in the major currency unit is not allowed. */
+    /**
+     * Amount
+     * @description The API data type Amount is a JSON String in a canonical format that is restricted by a regular expression for interoperability reasons. This pattern does not allow any trailing zeroes at all, but allows an amount without a minor currency unit. It also only allows four digits in the minor currency unit; a negative value is not allowed. Using more than 18 digits in the major currency unit is not allowed.
+     * @example 123.45
+     */
     Amount: string;
-    /** Data model for the complex type Money. */
+    /**
+     * Money
+     * @description Data model for the complex type Money.
+     */
     Money: {
       currency: components['schemas']['Currency'];
       amount: components['schemas']['Amount'];
     };
     /**
-     * Below are the allowed values for the enumeration.
+     * TransactionScenario
+     * @description Below are the allowed values for the enumeration.
      * - DEPOSIT - Used for performing a Cash-In (deposit) transaction. In a normal scenario, electronic funds are transferred from a Business account to a Consumer account, and physical cash is given from the Consumer to the Business User.
      * - WITHDRAWAL - Used for performing a Cash-Out (withdrawal) transaction. In a normal scenario, electronic funds are transferred from a Consumer’s account to a Business account, and physical cash is given from the Business User to the Consumer.
      * - TRANSFER - Used for performing a P2P (Peer to Peer, or Consumer to Consumer) transaction.
      * - PAYMENT - Usually used for performing a transaction from a Consumer to a Merchant or Organization, but could also be for a B2B (Business to Business) payment. The transaction could be online for a purchase in an Internet store, in a physical store where both the Consumer and Business User are present, a bill payment, a donation, and so on.
      * - REFUND - Used for performing a refund of transaction.
+     * @example DEPOSIT
      */
     TransactionScenario:
     | 'DEPOSIT'
@@ -421,32 +524,54 @@ export interface components {
     | 'TRANSFER'
     | 'PAYMENT'
     | 'REFUND';
-    /** Possible sub-scenario, defined locally within the scheme (UndefinedEnum Type). */
+    /**
+     * TransactionSubScenario
+     * @description Possible sub-scenario, defined locally within the scheme (UndefinedEnum Type).
+     * @example LOCALLY_DEFINED_SUBSCENARIO
+     */
     TransactionSubScenario: string;
     /**
-     * Below are the allowed values for the enumeration.
+     * TransactionInitiator
+     * @description Below are the allowed values for the enumeration.
      * - PAYER - Sender of funds is initiating the transaction. The account to send from is either owned by the Payer or is connected to the Payer in some way.
      * - PAYEE - Recipient of the funds is initiating the transaction by sending a transaction request. The Payer must approve the transaction, either automatically by a pre-generated OTP or by pre-approval of the Payee, or by manually approving in his or her own Device.
+     * @example PAYEE
      */
     TransactionInitiator: 'PAYER' | 'PAYEE';
     /**
-     * Below are the allowed values for the enumeration.
+     * TransactionInitiatorType
+     * @description Below are the allowed values for the enumeration.
      * - CONSUMER - Consumer is the initiator of the transaction.
      * - AGENT - Agent is the initiator of the transaction.
      * - BUSINESS - Business is the initiator of the transaction.
      * - DEVICE - Device is the initiator of the transaction.
+     * @example CONSUMER
      */
     TransactionInitiatorType: 'CONSUMER' | 'AGENT' | 'BUSINESS' | 'DEVICE';
-    /** Reason for the refund. */
+    /**
+     * RefundReason
+     * @description Reason for the refund.
+     * @example Free text indicating reason for the refund.
+     */
     RefundReason: string;
-    /** Data model for the complex type Refund. */
+    /**
+     * Refund
+     * @description Data model for the complex type Refund.
+     */
     Refund: {
       originalTransactionId: components['schemas']['CorrelationId'];
       refundReason?: components['schemas']['RefundReason'];
     };
-    /** (BopCode) The API data type [BopCode](https://www.imf.org/external/np/sta/bopcode/) is a JSON String of 3 characters, consisting of digits only. Negative numbers are not allowed. A leading zero is not allowed. */
+    /**
+     * BalanceOfPayments
+     * @description (BopCode) The API data type [BopCode](https://www.imf.org/external/np/sta/bopcode/) is a JSON String of 3 characters, consisting of digits only. Negative numbers are not allowed. A leading zero is not allowed.
+     * @example 123
+     */
     BalanceOfPayments: string;
-    /** Data model for the complex type TransactionType. */
+    /**
+     * TransactionType
+     * @description Data model for the complex type TransactionType.
+     */
     TransactionType: {
       scenario: components['schemas']['TransactionScenario'];
       subScenario?: components['schemas']['TransactionSubScenario'];
@@ -455,28 +580,41 @@ export interface components {
       refundInfo?: components['schemas']['Refund'];
       balanceOfPayments?: components['schemas']['BalanceOfPayments'];
     };
-    /** The object sent in the POST `/thirdpartyTransaction/{ID}/initiate` request. */
+    /**
+     * ThirdpartyTransactionIDInitiateRequest
+     * @description The object sent in the POST `/thirdpartyTransaction/{ID}/initiate` request.
+     */
     ThirdpartyTransactionIDInitiateRequest: {
       payee: components['schemas']['Party'];
       payer: components['schemas']['PartyIdInfoTPLink'];
       amountType: components['schemas']['AmountType'];
       amount: components['schemas']['Money'];
       transactionType: components['schemas']['TransactionType'];
+      /** @example 2016-05-24T08:38:08.699-04:00 */
       expiration: string;
     };
-    /** state of thirdparty transaction for initiate phase */
+    /**
+     * ThirdpartyTransactionIDInitiateState
+     * @description state of thirdparty transaction for initiate phase
+     */
     ThirdpartyTransactionIDInitiateState:
     | 'partyLookupSuccess'
     | 'authorizationReceived'
     | 'errored';
+    /** ThirdpartyTransactionIDInitateResponseError */
     ThirdpartyTransactionIDInitiateResponseError: {
       currentState: components['schemas']['ThirdpartyTransactionIDInitiateState'];
       errorInformation: components['schemas']['ErrorInformation'];
     };
-    /** The API data type DateTime is a JSON String in a lexical format that is restricted by a regular expression for interoperability reasons. The format is according to [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html), expressed in a combined date, time and time zone format. A more readable version of the format is yyyy-MM-ddTHH:mm:ss.SSS[-HH:MM]. Examples are "2016-05-24T08:38:08.699-04:00", "2016-05-24T08:38:08.699Z" (where Z indicates Zulu time zone, same as UTC). */
+    /**
+     * DateTime
+     * @description The API data type DateTime is a JSON String in a lexical format that is restricted by a regular expression for interoperability reasons. The format is according to [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html), expressed in a combined date, time and time zone format. A more readable version of the format is yyyy-MM-ddTHH:mm:ss.SSS[-HH:MM]. Examples are "2016-05-24T08:38:08.699-04:00", "2016-05-24T08:38:08.699Z" (where Z indicates Zulu time zone, same as UTC).
+     * @example 2016-05-24T08:38:08.699-04:00
+     */
     DateTime: string;
     /**
-     * Used by: DFSP
+     * ThirdpartyRequestsAuthorizationsPostRequest
+     * @description Used by: DFSP
      * The HTTP request POST /thirdpartyRequests/authorizations is used to request the validation by a customer for the transfer described in the request.
      * Callback and data model information for POST /thirdpartyRequests/authorizations:
      * Callback - PUT /thirdpartyRequests/authorizations/{ID} Error Callback - PUT /thirdpartyRequests/authorizations/{ID}/error Data Model - See below url
@@ -485,23 +623,24 @@ export interface components {
     ThirdpartyRequestsAuthorizationsPostRequest: {
       authorizationRequestId: components['schemas']['CorrelationId'];
       transactionRequestId: components['schemas']['CorrelationId'];
-      /** The challenge that the PISP's client is to sign */
+      /** @description The challenge that the PISP's client is to sign */
       challenge: string;
-      /** The amount that will be debited from the sending customer's account as a consequence of the transaction. */
+      /** @description The amount that will be debited from the sending customer's account as a consequence of the transaction. */
       transferAmount: components['schemas']['Money'];
-      /** The amount that will be credited to the receiving customer's account as a consequence of the transaction. */
+      /** @description The amount that will be credited to the receiving customer's account as a consequence of the transaction. */
       payeeReceiveAmount: components['schemas']['Money'];
-      /** The amount of fees that the paying customer will be charged as part of the transaction. */
+      /** @description The amount of fees that the paying customer will be charged as part of the transaction. */
       fees: components['schemas']['Money'];
-      /** Information about the Payer type, id, sub-type/id, FSP Id in the proposed financial transaction. */
+      /** @description Information about the Payer type, id, sub-type/id, FSP Id in the proposed financial transaction. */
       payer: components['schemas']['PartyIdInfo'];
-      /** Information about the Payee in the proposed financial transaction. */
+      /** @description Information about the Payee in the proposed financial transaction. */
       payee: components['schemas']['Party'];
       transactionType: components['schemas']['TransactionType'];
-      /** The time by which the transfer must be completed, set by the payee DFSP. */
+      /** @description The time by which the transfer must be completed, set by the payee DFSP. */
       expiration: components['schemas']['DateTime'];
       extensionList?: components['schemas']['ExtensionList'];
     };
+    /** ThirdpartyTransactionIDInitateResponseSuccess */
     ThirdpartyTransactionIDInitiateResponseSuccess: {
       currentState: components['schemas']['ThirdpartyTransactionIDInitiateState'];
       authorization: components['schemas']['ThirdpartyRequestsAuthorizationsPostRequest'];
@@ -509,26 +648,40 @@ export interface components {
     ThirdpartyTransactionIDInitiateResponse:
     | components['schemas']['ThirdpartyTransactionIDInitiateResponseError']
     | components['schemas']['ThirdpartyTransactionIDInitiateResponseSuccess'];
-    /** The customer accepted the terms of the transfer */
+    /**
+     * AuthorizationResponseType
+     * @description The customer accepted the terms of the transfer
+     */
     AuthorizationResponseTypeAccepted: 'ACCEPTED';
-    /** Describes a challenge that has been signed with a private key */
+    /**
+     * SignedPayloadTypeGeneric
+     * @description Describes a challenge that has been signed with a private key
+     */
     SignedPayloadTypeGeneric: 'GENERIC';
-    /** The API data type BinaryString is a JSON String. The string is a base64url  encoding of a string of raw bytes, where padding (character ‘=’) is added at the end of the data if needed to ensure that the string is a multiple of 4 characters. The length restriction indicates the allowed number of characters. */
+    /** @description The API data type BinaryString is a JSON String. The string is a base64url  encoding of a string of raw bytes, where padding (character ‘=’) is added at the end of the data if needed to ensure that the string is a multiple of 4 characters. The length restriction indicates the allowed number of characters. */
     BinaryString: string;
+    /** SignedPayloadGeneric */
     SignedPayloadGeneric: {
       signedPayloadType: components['schemas']['SignedPayloadTypeGeneric'];
       genericSignedPayload: components['schemas']['BinaryString'];
     };
-    /** The object sent in the PUT /thirdpartyRequests/authorizations/{ID} callback. */
+    /**
+     * ThirdpartyRequestsAuthorizationsIDPutResponseGeneric
+     * @description The object sent in the PUT /thirdpartyRequests/authorizations/{ID} callback.
+     */
     ThirdpartyRequestsAuthorizationsIDPutResponseGeneric: {
       responseType: components['schemas']['AuthorizationResponseTypeAccepted'];
       signedPayload: components['schemas']['SignedPayloadGeneric'];
       extensionList?: components['schemas']['ExtensionList'];
     };
-    /** Describes a challenge that has been signed with FIDO Attestation flows */
+    /**
+     * SignedPayloadTypeFIDO
+     * @description Describes a challenge that has been signed with FIDO Attestation flows
+     */
     SignedPayloadTypeFIDO: 'FIDO';
     /**
-     * A data model representing a FIDO Assertion result.
+     * FIDOPublicKeyCredentialAssertion
+     * @description A data model representing a FIDO Assertion result.
      * Derived from PublicKeyCredential Interface in WebAuthN.
      *
      * The PublicKeyCredential interface represents the below fields with a Type of
@@ -539,77 +692,95 @@ export interface components {
      */
     FIDOPublicKeyCredentialAssertion: {
       /**
-       * credential id: identifier of pair of keys, base64 encoded
+       * @description credential id: identifier of pair of keys, base64 encoded
        * https://w3c.github.io/webauthn/#ref-for-dom-credential-id
        */
       id: string;
-      /** raw credential id: identifier of pair of keys, base64 encoded. */
+      /** @description raw credential id: identifier of pair of keys, base64 encoded. */
       rawId: string;
-      /** AuthenticatorAssertionResponse */
+      /** @description AuthenticatorAssertionResponse */
       response: {
-        /** Authenticator data object. */
+        /** @description Authenticator data object. */
         authenticatorData: string;
-        /** JSON string with client data. */
+        /** @description JSON string with client data. */
         clientDataJSON: string;
-        /** The signature generated by the private key associated with this credential. */
+        /** @description The signature generated by the private key associated with this credential. */
         signature: string;
         /**
-         * This field is optionally provided by the authenticator, and
+         * @description This field is optionally provided by the authenticator, and
          * represents the user.id that was supplied during registration.
          */
         userHandle?: string;
       };
-      /** response type, we need only the type of public-key */
+      /** @description response type, we need only the type of public-key */
       type: 'public-key';
     };
+    /** SignedPayloadFIDO */
     SignedPayloadFIDO: {
       signedPayloadType: components['schemas']['SignedPayloadTypeFIDO'];
       fidoSignedPayload: components['schemas']['FIDOPublicKeyCredentialAssertion'];
     };
-    /** The object sent in the PUT /thirdpartyRequests/authorizations/{ID} callback. */
+    /**
+     * ThirdpartyRequestsAuthorizationsIDPutResponseFIDO
+     * @description The object sent in the PUT /thirdpartyRequests/authorizations/{ID} callback.
+     */
     ThirdpartyRequestsAuthorizationsIDPutResponseFIDO: {
       responseType: components['schemas']['AuthorizationResponseTypeAccepted'];
       signedPayload: components['schemas']['SignedPayloadFIDO'];
       extensionList?: components['schemas']['ExtensionList'];
     };
+    /** ThirdpartyTransactionIDApproveRequest */
     ThirdpartyTransactionIDApproveRequest: {
       authorizationResponse:
       | components['schemas']['ThirdpartyRequestsAuthorizationsIDPutResponseGeneric']
       | components['schemas']['ThirdpartyRequestsAuthorizationsIDPutResponseFIDO'];
     };
-    /** state of thirdparty transaction */
+    /**
+     * ThirdpartyTransactionIDApproveState
+     * @description state of thirdparty transaction
+     */
     ThirdpartyTransactionIDApproveState:
     | 'authorizationReceived'
     | 'transactionStatusReceived'
     | 'errored';
+    /** ThirdpartyTransactionIDApproveResponseError */
     ThirdpartyTransactionIDApproveResponseError: {
       currentState: components['schemas']['ThirdpartyTransactionIDApproveState'];
       errorInformation: components['schemas']['ErrorInformation'];
     };
     /**
-     * Below are the allowed values for the enumeration.
+     * TransactionRequestState
+     * @description Below are the allowed values for the enumeration.
      * - RECEIVED - Payer FSP has received the transaction from the Payee FSP.
      * - PENDING - Payer FSP has sent the transaction request to the Payer.
      * - ACCEPTED - Payer has approved the transaction.
      * - REJECTED - Payer has rejected the transaction.
      */
     TransactionRequestState: 'RECEIVED' | 'PENDING' | 'ACCEPTED' | 'REJECTED';
+    /** ThirdpartyTransactionIDApproveResponseSuccess */
     ThirdpartyTransactionIDApproveResponseSuccess: {
       transactionStatus: {
         transactionRequestId?: components['schemas']['CorrelationId'];
         transactionRequestState: components['schemas']['TransactionRequestState'];
+      } & {
+        transactionId: unknown;
       };
       currentState: components['schemas']['ThirdpartyTransactionIDApproveState'];
     };
     ThirdpartyTransactionIDApproveResponse:
     | components['schemas']['ThirdpartyTransactionIDApproveResponseError']
     | components['schemas']['ThirdpartyTransactionIDApproveResponseSuccess'];
-    /** State of GET /linking/providers request */
+    /**
+     * LinkingProvidersState
+     * @description State of GET /linking/providers request
+     */
     LinkingProvidersState: 'start' | 'errored' | 'providersLookupSuccess';
+    /** LinkingProvidersResponseError */
     LinkingProvidersResponseError: {
       errorInformation: components['schemas']['ErrorInformation'];
       currentState: components['schemas']['LinkingProvidersState'];
     };
+    /** LinkingProvidersResponseSuccess */
     LinkingProvidersResponseSuccess: {
       providers: components['schemas']['FspId'][];
       currentState: components['schemas']['LinkingProvidersState'];
@@ -618,7 +789,8 @@ export interface components {
     | components['schemas']['LinkingProvidersResponseError']
     | components['schemas']['LinkingProvidersResponseSuccess'];
     /**
-     * The AccountAddress data type is a variable length string with a maximum size of 1023 characters and consists of:
+     * AccountAddress
+     * @description The AccountAddress data type is a variable length string with a maximum size of 1023 characters and consists of:
      * Alphanumeric characters, upper or lower case. (Addresses are case-sensitive so that they can contain data encoded in formats such as base64url.)
      * - Underscore (_) - Tilde (~) - Hyphen (-) - Period (.) Addresses MUST NOT end in a period (.) character
      * An entity providing accounts to parties (i.e. a participant) can provide any value for an AccountAddress that is meaningful to that entity. It does not need to provide an address that makes the account identifiable outside the entity's domain.
@@ -627,7 +799,8 @@ export interface components {
      */
     AccountAddress: string;
     /**
-     * The API data type Name is a JSON String, restricted by a regular expression to avoid characters which are generally not used in a name.
+     * Name
+     * @description The API data type Name is a JSON String, restricted by a regular expression to avoid characters which are generally not used in a name.
      *
      * Regular Expression - The regular expression for restricting the Name type is "^(?!\s*$)[\w .,'-]{1,128}$". The restriction does not allow a string consisting of whitespace only, all Unicode characters are allowed, as well as the period (.) (apostrophe (‘), dash (-), comma (,) and space characters ( ).
      *
@@ -635,7 +808,8 @@ export interface components {
      */
     Name: string;
     /**
-     * Data model for the complex type Account.
+     * Account
+     * @description Data model for the complex type Account.
      * https://github.com/mojaloop/documentation/blob/master/website/versioned_docs/v1.0.1/api/thirdparty/data-models.md#3211-account
      */
     Account: {
@@ -644,12 +818,14 @@ export interface components {
       currency: components['schemas']['Currency'];
     };
     /**
-     * The AccountList data model is used to hold information about the accounts that a party controls.
+     * AccountList
+     * @description The AccountList data model is used to hold information about the accounts that a party controls.
      * https://github.com/mojaloop/documentation/blob/master/website/versioned_docs/v1.0.1/api/thirdparty/data-models.md#3213-accountlist
      */
     AccountList: components['schemas']['Account'][];
     /**
-     * Callback and data model information for GET /accounts/{ID}:
+     * AccountsIDPutResponse
+     * @description Callback and data model information for GET /accounts/{ID}:
      * Callback - PUT /accounts/{ID} Error Callback - PUT /accounts/{ID}/error Data Model - Empty body
      * The PUT /accounts/{ID} response is used to inform the requester of the result of a request for accounts information. The identifier ID given in the call are the values given in the original request.
      * https://github.com/mojaloop/documentation/blob/master/website/versioned_docs/v1.0.1/api/thirdparty/data-models.md#31121--put-accountsid
@@ -659,7 +835,8 @@ export interface components {
       extensionList?: components['schemas']['ExtensionList'];
     };
     /**
-     * The ScopeAction element contains an access type which a PISP can request
+     * ScopeAction
+     * @description The ScopeAction element contains an access type which a PISP can request
      * from a DFSP, or which a DFSP can grant to a PISP.
      * It must be a member of the appropriate enumeration.
      *
@@ -671,42 +848,57 @@ export interface components {
     | 'ACCOUNTS_GET_BALANCE'
     | 'ACCOUNTS_TRANSFER'
     | 'ACCOUNTS_STATEMENT';
-    /** The object sent in a `POST /linking/request-consent` request. */
+    /**
+     * LinkingRequestConsentPostRequest
+     * @description The object sent in a `POST /linking/request-consent` request.
+     */
     LinkingRequestConsentPostRequest: {
       toParticipantId: string;
       consentRequestId: components['schemas']['CorrelationId'];
       accounts: components['schemas']['Account'][];
       actions: components['schemas']['ScopeAction'][];
-      /** ID used to associate request with GET /accounts request. */
+      /** @description ID used to associate request with GET /accounts request. */
       userId: string;
-      /** The callback uri that the user will be redirected to after completing the WEB auth channel. */
+      /** @description The callback uri that the user will be redirected to after completing the WEB auth channel. */
       callbackUri: string;
     };
-    /** State of `POST /linking/request-consent` request */
+    /**
+     * LinkingRequestConsentState
+     * @description State of `POST /linking/request-consent` request
+     */
     LinkingRequestConsentState:
     | 'start'
     | 'errored'
     | 'success'
     | 'OTPAuthenticationChannelResponseRecieved'
     | 'WebAuthenticationChannelResponseReceived';
+    /** LinkingRequestConsentResponseError */
     LinkingRequestConsentResponseError: {
       errorInformation: components['schemas']['ErrorInformation'];
       currentState: components['schemas']['LinkingRequestConsentState'];
     };
     /**
-     * The Scope element contains an identifier defining, in the terms of a DFSP, an account on which access types can be requested or granted. It also defines the access types which are requested or granted.
+     * Scope
+     * @description The Scope element contains an identifier defining, in the terms of a DFSP, an account on which access types can be requested or granted. It also defines the access types which are requested or granted.
      * https://github.com/mojaloop/documentation/blob/master/website/versioned_docs/v1.0.1/api/thirdparty/data-models.md#32121-scope
      */
     Scope: {
       address: components['schemas']['AccountAddress'];
       actions: components['schemas']['ScopeAction'][];
     };
-    /** The web auth channel being used for `PUT /consentRequest/{ID}` request. */
+    /**
+     * ConsentRequestChannelTypeWeb
+     * @description The web auth channel being used for `PUT /consentRequest/{ID}` request.
+     */
     ConsentRequestChannelTypeWeb: 'WEB';
-    /** The API data type Uri is a JSON string in a canonical format that is restricted by a regular expression for interoperability reasons. */
+    /**
+     * Uri
+     * @description The API data type Uri is a JSON string in a canonical format that is restricted by a regular expression for interoperability reasons.
+     */
     Uri: string;
     /**
-     * The object sent in a `PUT /consentRequests/{ID}` request.
+     * ConsentRequestsIDPutResponseWeb
+     * @description The object sent in a `PUT /consentRequests/{ID}` request.
      *
      * Schema used in the request consent phase of the account linking web flow,
      * the result is the PISP being instructed on a specific URL where this
@@ -720,10 +912,14 @@ export interface components {
       authUri: components['schemas']['Uri'];
       extensionList?: components['schemas']['ExtensionList'];
     };
-    /** The OTP auth channel being used for `PUT /consentRequests/{ID}` request. */
+    /**
+     * ConsentRequestChannelTypeOTP
+     * @description The OTP auth channel being used for `PUT /consentRequests/{ID}` request.
+     */
     ConsentRequestChannelTypeOTP: 'OTP';
     /**
-     * The object sent in a `PUT /consentRequests/{ID}` request.
+     * ConsentRequestsIDPutResponseOTP
+     * @description The object sent in a `PUT /consentRequests/{ID}` request.
      *
      * Schema used in the request consent phase of the account linking OTP/SMS flow.
      */
@@ -733,6 +929,7 @@ export interface components {
       callbackUri?: components['schemas']['Uri'];
       extensionList?: components['schemas']['ExtensionList'];
     };
+    /** LinkingRequestConsentResponseSuccess */
     LinkingRequestConsentResponseSuccess: {
       channelResponse:
       | components['schemas']['ConsentRequestsIDPutResponseWeb']
@@ -742,38 +939,50 @@ export interface components {
     LinkingRequestConsentResponse:
     | components['schemas']['LinkingRequestConsentResponseError']
     | components['schemas']['LinkingRequestConsentResponseSuccess'];
-    /** PATCH /linking/request-consent/{ID}/authenticate Request object */
+    /**
+     * LinkingRequestConsentIDAuthenticateRequest
+     * @description PATCH /linking/request-consent/{ID}/authenticate Request object
+     */
     LinkingRequestConsentIDAuthenticateRequest: {
       authToken: string;
     };
-    /** State of PATCH linking request consent Authenticate */
+    /**
+     * LinkingRequestConsentIDAuthenticateState
+     * @description State of PATCH linking request consent Authenticate
+     */
     LinkingRequestConsentIDAuthenticateState:
     | 'errored'
     | 'consentReceivedAwaitingCredential';
+    /** LinkingRequestConsentIDAuthenticateResponseError */
     LinkingRequestConsentIDAuthenticateResponseError: {
       errorInformation: components['schemas']['ErrorInformation'];
       currentState: components['schemas']['LinkingRequestConsentIDAuthenticateState'];
     };
     /**
-     * Allowed values for the enumeration ConsentStatus
+     * ConsentStatus
+     * @description Allowed values for the enumeration ConsentStatus
      * - ISSUED - The consent has been issued by the DFSP
      * - REVOKED - The consent has been revoked
      */
     ConsentStatus: 'ISSUED' | 'REVOKED';
-    /** The provisional Consent object sent by the DFSP in `POST /consents`. */
+    /**
+     * ConsentPostRequestPISP
+     * @description The provisional Consent object sent by the DFSP in `POST /consents`.
+     */
     ConsentsPostRequestPISP: {
       /**
-       * Common ID between the PISP and the Payer DFSP for the consent object. The ID
+       * @description Common ID between the PISP and the Payer DFSP for the consent object. The ID
        * should be reused for re-sends of the same consent. A new ID should be generated
        * for each new consent.
        */
       consentId: components['schemas']['CorrelationId'];
-      /** The ID given to the original consent request on which this consent is based. */
+      /** @description The ID given to the original consent request on which this consent is based. */
       consentRequestId: components['schemas']['CorrelationId'];
       scopes: components['schemas']['Scope'][];
       status: components['schemas']['ConsentStatus'];
       extensionList?: components['schemas']['ExtensionList'];
     };
+    /** LinkingRequestConsentIDAuthenticateResponse */
     LinkingRequestConsentIDAuthenticateResponseSuccess: {
       consent: components['schemas']['ConsentsPostRequestPISP'];
       challenge: string;
@@ -783,7 +992,8 @@ export interface components {
     | components['schemas']['LinkingRequestConsentIDAuthenticateResponseError']
     | components['schemas']['LinkingRequestConsentIDAuthenticateResponseSuccess'];
     /**
-     * A data model representing a FIDO Attestation result. Derived from
+     * FIDOPublicKeyCredentialAttestation
+     * @description A data model representing a FIDO Attestation result. Derived from
      * [`PublicKeyCredential` Interface](https://w3c.github.io/webauthn/#iface-pkcredential).
      *
      * The `PublicKeyCredential` interface represents the below fields with
@@ -792,39 +1002,48 @@ export interface components {
      */
     FIDOPublicKeyCredentialAttestation: {
       /**
-       * credential id: identifier of pair of keys, base64 encoded
+       * @description credential id: identifier of pair of keys, base64 encoded
        * https://w3c.github.io/webauthn/#ref-for-dom-credential-id
        */
       id: string;
-      /** raw credential id: identifier of pair of keys, base64 encoded */
+      /** @description raw credential id: identifier of pair of keys, base64 encoded */
       rawId?: string;
-      /** AuthenticatorAttestationResponse */
+      /** @description AuthenticatorAttestationResponse */
       response: {
-        /** JSON string with client data */
+        /** @description JSON string with client data */
         clientDataJSON: string;
-        /** CBOR.encoded attestation object */
+        /** @description CBOR.encoded attestation object */
         attestationObject: string;
       };
-      /** response type, we need only the type of public-key */
+      /** @description response type, we need only the type of public-key */
       type: 'public-key';
     };
-    /** POST /linking/request-consent/{ID}/pass-credential request object */
+    /**
+     * LinkingRequestConsentIDPassCredentialRequest
+     * @description POST /linking/request-consent/{ID}/pass-credential request object
+     */
     LinkingRequestConsentIDPassCredentialRequest: {
       credential: {
         payload: components['schemas']['FIDOPublicKeyCredentialAttestation'];
       };
     };
-    /** State of post linking request consent pass credential */
+    /**
+     * LinkingRequestConsentIDPassCredentialState
+     * @description State of post linking request consent pass credential
+     */
     LinkingRequestConsentIDPassCredentialState: 'errored' | 'accountsLinked';
+    /** LinkingRequestConsentIDPassCredentialResponseError */
     LinkingRequestConsentIDPassCredentialResponseError: {
       errorInformation: components['schemas']['ErrorInformation'];
       currentState: components['schemas']['LinkingRequestConsentIDPassCredentialState'];
     };
     /**
-     * The status of the Credential.
+     * CredentialStatusVerified
+     * @description The status of the Credential.
      * - "VERIFIED" - The Credential is valid and verified.
      */
     CredentialStatusVerified: 'VERIFIED';
+    /** LinkingRequestConsentIDPassCredentialResponseSuccess */
     LinkingRequestConsentIDPassCredentialResponseSuccess: {
       credential: {
         status: components['schemas']['CredentialStatusVerified'];
@@ -947,7 +1166,7 @@ export interface components {
     };
   };
   parameters: {
-    /** The identifier value. */
+    /** @description The identifier value. */
     ID: string;
   };
   headers: {

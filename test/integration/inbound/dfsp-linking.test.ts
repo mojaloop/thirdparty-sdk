@@ -41,7 +41,7 @@ export interface MLTestingToolkitRequest {
 const ttkHistory = new TTKHistory('http://localhost:5050')
 
 describe('DFSP Inbound', (): void => {
-  beforeEach(async(): Promise<void> => {
+  beforeEach(async (): Promise<void> => {
     await ttkHistory.clear()
   })
 
@@ -74,30 +74,30 @@ describe('DFSP Inbound', (): void => {
           }
         }
         */
-        const payload = {
-          "consentRequestId": "997c89f4-053c-4283-bfec-45a1a0a28fba",
-          "userId": "dfspa.username",
-          "scopes": [
+        const payload: tpAPI.Schemas.ConsentRequestsPostRequest = {
+          consentRequestId: '997c89f4-053c-4283-bfec-45a1a0a28fba',
+          userId: 'dfspa.username',
+          scopes: [
             {
-              "address": "dfspa.username.1234",
-              "actions": [
-                "ACCOUNTS_TRANSFER",
-                "ACCOUNTS_GET_BALANCE"
+              address: 'dfspa.username.1234',
+              actions: [
+                'ACCOUNTS_TRANSFER',
+                'ACCOUNTS_GET_BALANCE'
               ]
             },
             {
-              "address": "dfspa.username.5678",
-              "actions": [
-                "ACCOUNTS_TRANSFER",
-                "ACCOUNTS_GET_BALANCE"
+              address: 'dfspa.username.5678',
+              actions: [
+                'ACCOUNTS_TRANSFER',
+                'ACCOUNTS_GET_BALANCE'
               ]
             }
           ],
-          "authChannels": [
-            "WEB",
-            "OTP"
+          authChannels: [
+            'WEB',
+            'OTP'
           ],
-          "callbackUri": "pisp-app://callback.com"
+          callbackUri: 'pisp-app://callback.com'
         }
 
         const response = await axios.post(scenarioUri, payload, axiosConfig)
@@ -109,34 +109,33 @@ describe('DFSP Inbound', (): void => {
         const putConsentRequestsToPISP = await ttkHistory.getAndFilterWithRetries(2, 'put', '/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fba')
         expect(putConsentRequestsToPISP.length).toEqual(1)
 
-        const historyPayload = putConsentRequestsToPISP[0].body as tpAPI.Schemas.ConsentRequestsIDPutResponseOTP
+        const historyPayload = putConsentRequestsToPISP[0].body as tpAPI.Schemas.ConsentRequestsIDPutResponseWeb
         expect(historyPayload).toEqual({
-          "consentRequestId":"997c89f4-053c-4283-bfec-45a1a0a28fba",
-          "scopes":[
+          scopes: [
             {
-              "address":"dfspa.username.1234",
-              "actions":[
-                "ACCOUNTS_TRANSFER",
-                "ACCOUNTS_GET_BALANCE"
+              address: 'dfspa.username.1234',
+              actions: [
+                'ACCOUNTS_TRANSFER',
+                'ACCOUNTS_GET_BALANCE'
               ]
             },
             {
-              "address":"dfspa.username.5678",
-              "actions":[
-                "ACCOUNTS_TRANSFER",
-                "ACCOUNTS_GET_BALANCE"
+              address: 'dfspa.username.5678',
+              actions: [
+                'ACCOUNTS_TRANSFER',
+                'ACCOUNTS_GET_BALANCE'
               ]
             }],
-          "callbackUri":"pisp-app://callback.com",
-          "authChannels":["WEB"],
-          "authUri":"dfspa.com/authorize?consentRequestId=997c89f4-053c-4283-bfec-45a1a0a28fba"
+          callbackUri: 'pisp-app://callback.com',
+          authChannels: ['WEB'],
+          authUri: 'dfspa.com/authorize?consentRequestId=997c89f4-053c-4283-bfec-45a1a0a28fba'
         })
       })
     })
 
     describe('Inbound PATCH /consentRequests/{ID} from PISP', (): void => {
       it('should send back POST /consents to PISP', async (): Promise<void> => {
-        const patchConsentRequestsPayload = {
+        const patchConsentRequestsPayload: tpAPI.Schemas.ConsentRequestsIDPatchRequest = {
           authToken: '123456'
         }
         const patchScenarioUri = `${env.inbound.baseUri}/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fba`
@@ -165,44 +164,44 @@ describe('DFSP Inbound', (): void => {
     describe('Inbound PUT /consents/{ID} signed credential from PISP', (): void => {
       it('should send back POST /consents to Auth Service', async (): Promise<void> => {
         // the PISP now sends back a PUT /consents/{ID} signed credential request to the DFSP
-        const putConsentsIDSignedCredentialPayload = {
-          "scopes": [
+        const putConsentsIDSignedCredentialPayload: tpAPI.Schemas.ConsentsIDPutResponseSigned = {
+          scopes: [
             {
-              "address": "dfspa.username.1234",
-              "actions": [
-                "ACCOUNTS_TRANSFER",
-                "ACCOUNTS_GET_BALANCE"
+              address: 'dfspa.username.1234',
+              actions: [
+                'ACCOUNTS_TRANSFER',
+                'ACCOUNTS_GET_BALANCE'
               ]
             },
             {
-              "address": "dfspa.username.5678",
-              "actions": [
-                "ACCOUNTS_TRANSFER",
-                "ACCOUNTS_GET_BALANCE"
+              address: 'dfspa.username.5678',
+              actions: [
+                'ACCOUNTS_TRANSFER',
+                'ACCOUNTS_GET_BALANCE'
               ]
             }
           ],
-          "credential": {
-            "credentialType": "FIDO",
-            "status": "PENDING",
-            "payload": {
-              "id": "credential id: identifier of pair of keys, base64 encoded, min length 59",
-              "rawId": "raw credential id: identifier of pair of keys, base64 encoded, min length 59",
-              "response": {
-                "clientDataJSON": "clientDataJSON-must-not-have-fewer-" +
-                  "than-121-characters Lorem ipsum dolor sit amet, " +
-                  "consectetur adipiscing elit, sed do eiusmod tempor " +
-                  "incididunt ut labore et dolore magna aliqua.",
-                "attestationObject": "attestationObject-must-not-have-fewer" +
-                  "-than-306-characters Lorem ipsum dolor sit amet, " +
-                  "consectetur adipiscing elit, sed do eiusmod tempor " +
-                  "incididunt ut labore et dolore magna aliqua. Ut enim " +
-                  "ad minim veniam, quis nostrud exercitation ullamco " +
-                  "laboris nisi ut aliquip ex ea commodo consequat. Duis " +
-                  "aute irure dolor in reprehenderit in voluptate velit " +
-                  "esse cillum dolore eu fugiat nulla pariatur."
+          credential: {
+            credentialType: 'FIDO',
+            status: 'PENDING',
+            fidoPayload: {
+              id: 'credential id: identifier of pair of keys, base64 encoded, min length 59',
+              rawId: 'raw credential id: identifier of pair of keys, base64 encoded, min length 59',
+              response: {
+                clientDataJSON: 'clientDataJSON-must-not-have-fewer-' +
+                  'than-121-characters Lorem ipsum dolor sit amet, ' +
+                  'consectetur adipiscing elit, sed do eiusmod tempor ' +
+                  'incididunt ut labore et dolore magna aliqua.',
+                attestationObject: 'attestationObject-must-not-have-fewer' +
+                  '-than-306-characters Lorem ipsum dolor sit amet, ' +
+                  'consectetur adipiscing elit, sed do eiusmod tempor ' +
+                  'incididunt ut labore et dolore magna aliqua. Ut enim ' +
+                  'ad minim veniam, quis nostrud exercitation ullamco ' +
+                  'laboris nisi ut aliquip ex ea commodo consequat. Duis ' +
+                  'aute irure dolor in reprehenderit in voluptate velit ' +
+                  'esse cillum dolore eu fugiat nulla pariatur.'
               },
-              "type": "public-key"
+              type: 'public-key'
             }
           }
         }
@@ -228,52 +227,52 @@ describe('DFSP Inbound', (): void => {
 
     describe('Inbound PUT /consents/{ID} verified credential from auth-service', (): void => {
       it('should send back PATCH /consents/{ID} to PISP', async (): Promise<void> => {
-          // the auth-service now sends back a PUT /consents/{ID} confirming verification
-          const putConsentsIDVerifiedCredentialPayload = {
-            "scopes": [
-              {
-                "address": "dfspa.username.1234",
-                "actions": [
-                  "ACCOUNTS_TRANSFER",
-                  "ACCOUNTS_GET_BALANCE"
-                ]
+        // the auth-service now sends back a PUT /consents/{ID} confirming verification
+        const putConsentsIDVerifiedCredentialPayload: tpAPI.Schemas.ConsentsIDPutResponseVerified = {
+          scopes: [
+            {
+              address: 'dfspa.username.1234',
+              actions: [
+                'ACCOUNTS_TRANSFER',
+                'ACCOUNTS_GET_BALANCE'
+              ]
+            },
+            {
+              address: 'dfspa.username.5678',
+              actions: [
+                'ACCOUNTS_TRANSFER',
+                'ACCOUNTS_GET_BALANCE'
+              ]
+            }
+          ],
+          credential: {
+            credentialType: 'FIDO',
+            status: 'VERIFIED',
+            fidoPayload: {
+              id: 'credential id: identifier of pair of keys, base64 encoded, min length 59',
+              rawId: 'raw credential id: identifier of pair of keys, base64 encoded, min length 59',
+              response: {
+                clientDataJSON: 'clientDataJSON-must-not-have-fewer-' +
+                    'than-121-characters Lorem ipsum dolor sit amet, ' +
+                    'consectetur adipiscing elit, sed do eiusmod tempor ' +
+                    'incididunt ut labore et dolore magna aliqua.',
+                attestationObject: 'attestationObject-must-not-have-fewer' +
+                    '-than-306-characters Lorem ipsum dolor sit amet, ' +
+                    'consectetur adipiscing elit, sed do eiusmod tempor ' +
+                    'incididunt ut labore et dolore magna aliqua. Ut enim ' +
+                    'ad minim veniam, quis nostrud exercitation ullamco ' +
+                    'laboris nisi ut aliquip ex ea commodo consequat. Duis ' +
+                    'aute irure dolor in reprehenderit in voluptate velit ' +
+                    'esse cillum dolore eu fugiat nulla pariatur.'
               },
-              {
-                "address": "dfspa.username.5678",
-                "actions": [
-                  "ACCOUNTS_TRANSFER",
-                  "ACCOUNTS_GET_BALANCE"
-                ]
-              }
-            ],
-            "credential": {
-              "credentialType": "FIDO",
-              "status": "VERIFIED",
-              "payload": {
-                "id": "credential id: identifier of pair of keys, base64 encoded, min length 59",
-                "rawId": "raw credential id: identifier of pair of keys, base64 encoded, min length 59",
-                "response": {
-                  "clientDataJSON": "clientDataJSON-must-not-have-fewer-" +
-                    "than-121-characters Lorem ipsum dolor sit amet, " +
-                    "consectetur adipiscing elit, sed do eiusmod tempor " +
-                    "incididunt ut labore et dolore magna aliqua.",
-                  "attestationObject": "attestationObject-must-not-have-fewer" +
-                    "-than-306-characters Lorem ipsum dolor sit amet, " +
-                    "consectetur adipiscing elit, sed do eiusmod tempor " +
-                    "incididunt ut labore et dolore magna aliqua. Ut enim " +
-                    "ad minim veniam, quis nostrud exercitation ullamco " +
-                    "laboris nisi ut aliquip ex ea commodo consequat. Duis " +
-                    "aute irure dolor in reprehenderit in voluptate velit " +
-                    "esse cillum dolore eu fugiat nulla pariatur."
-                },
-                "type": "public-key"
-              }
+              type: 'public-key'
             }
           }
+        }
 
-          const putScenarioUri = `${env.inbound.baseUri}/consents/${consentId}`
-          const responseToPutConsents = await axios.put(putScenarioUri, putConsentsIDVerifiedCredentialPayload, axiosConfig)
-          expect(responseToPutConsents.status).toEqual(200)
+        const putScenarioUri = `${env.inbound.baseUri}/consents/${consentId}`
+        const responseToPutConsents = await axios.put(putScenarioUri, putConsentsIDVerifiedCredentialPayload, axiosConfig)
+        expect(responseToPutConsents.status).toEqual(200)
 
         // check that the DFSP has sent a PATCH /consents/{ID} to the PISP
         const patchConsentsToAuthService = await ttkHistory.getAndFilterWithRetries(2, 'patch', `/consents/${consentId}`)
@@ -283,7 +282,7 @@ describe('DFSP Inbound', (): void => {
         expect(historyPayload).toEqual(
           expect.objectContaining({
             credential: {
-              status: "VERIFIED"
+              status: 'VERIFIED'
             }
           })
         )
@@ -319,30 +318,30 @@ describe('DFSP Inbound', (): void => {
           }
         }
         */
-        const payload = {
-          "consentRequestId": "997c89f4-053c-4283-bfec-45a1a0a28fbb",
-          "userId": "dfspa.username",
-          "scopes": [
+        const payload: tpAPI.Schemas.ConsentRequestsPostRequest = {
+          consentRequestId: '997c89f4-053c-4283-bfec-45a1a0a28fbb',
+          userId: 'dfspa.username',
+          scopes: [
             {
-              "address": "dfspa.username.1234",
-              "actions": [
-                "ACCOUNTS_TRANSFER",
-                "ACCOUNTS_GET_BALANCE"
+              address: 'dfspa.username.1234',
+              actions: [
+                'ACCOUNTS_TRANSFER',
+                'ACCOUNTS_GET_BALANCE'
               ]
             },
             {
-              "address": "dfspa.username.5678",
-              "actions": [
-                "ACCOUNTS_TRANSFER",
-                "ACCOUNTS_GET_BALANCE"
+              address: 'dfspa.username.5678',
+              actions: [
+                'ACCOUNTS_TRANSFER',
+                'ACCOUNTS_GET_BALANCE'
               ]
             }
           ],
-          "authChannels": [
-            "WEB",
-            "OTP"
+          authChannels: [
+            'WEB',
+            'OTP'
           ],
-          "callbackUri": "pisp-app://callback.com"
+          callbackUri: 'pisp-app://callback.com'
         }
 
         const response = await axios.post(scenarioUri, payload, axiosConfig)
@@ -356,38 +355,36 @@ describe('DFSP Inbound', (): void => {
 
         const historyPayload = history[0].body as tpAPI.Schemas.ConsentRequestsIDPutResponseOTP
         expect(historyPayload).toEqual({
-          "consentRequestId":"997c89f4-053c-4283-bfec-45a1a0a28fbb",
-          "scopes":[
+          scopes: [
             {
-              "address":"dfspa.username.1234",
-              "actions":[
-                "ACCOUNTS_TRANSFER",
-                "ACCOUNTS_GET_BALANCE"
+              address: 'dfspa.username.1234',
+              actions: [
+                'ACCOUNTS_TRANSFER',
+                'ACCOUNTS_GET_BALANCE'
               ]
             },
             {
-              "address":"dfspa.username.5678",
-              "actions":[
-                "ACCOUNTS_TRANSFER",
-                "ACCOUNTS_GET_BALANCE"
+              address: 'dfspa.username.5678',
+              actions: [
+                'ACCOUNTS_TRANSFER',
+                'ACCOUNTS_GET_BALANCE'
               ]
             }],
-          "callbackUri":"pisp-app://callback.com",
-          "authChannels":["OTP"]
+          callbackUri: 'pisp-app://callback.com',
+          authChannels: ['OTP']
         })
       })
     })
 
     describe('Inbound PATCH /consentRequests/{ID} from PISP', (): void => {
       it('should send back POST /consents to PISP', async (): Promise<void> => {
-        const patchConsentRequestsPayload = {
+        const patchConsentRequestsPayload: tpAPI.Schemas.ConsentRequestsIDPatchRequest = {
           authToken: '123456'
         }
         const patchScenarioUri = `${env.inbound.baseUri}/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fbb`
 
         const responseToPatchConsentRequests = await axios.patch(patchScenarioUri, patchConsentRequestsPayload, axiosConfig)
         expect(responseToPatchConsentRequests.status).toEqual(202)
-
 
         // check that the DFSP has sent a POST /consents to the PISP
         const history = await ttkHistory.getAndFilterWithRetries(2, 'post', '/consents')
@@ -410,44 +407,44 @@ describe('DFSP Inbound', (): void => {
     describe('Inbound PUT /consents/{ID} signed credential from PISP', (): void => {
       it('should send back POST /consents to Auth Service', async (): Promise<void> => {
         // the PISP now sends back a PUT /consents/{ID} signed credential request to the DFSP
-        const putConsentsIDSignedCredentialPayload = {
-          "scopes": [
+        const putConsentsIDSignedCredentialPayload: tpAPI.Schemas.ConsentsIDPutResponseSigned = {
+          scopes: [
             {
-              "address": "dfspa.username.1234",
-              "actions": [
-                "ACCOUNTS_TRANSFER",
-                "ACCOUNTS_GET_BALANCE"
+              address: 'dfspa.username.1234',
+              actions: [
+                'ACCOUNTS_TRANSFER',
+                'ACCOUNTS_GET_BALANCE'
               ]
             },
             {
-              "address": "dfspa.username.5678",
-              "actions": [
-                "ACCOUNTS_TRANSFER",
-                "ACCOUNTS_GET_BALANCE"
+              address: 'dfspa.username.5678',
+              actions: [
+                'ACCOUNTS_TRANSFER',
+                'ACCOUNTS_GET_BALANCE'
               ]
             }
           ],
-          "credential": {
-            "credentialType": "FIDO",
-            "status": "PENDING",
-            "payload": {
-              "id": "credential id: identifier of pair of keys, base64 encoded, min length 59",
-              "rawId": "raw credential id: identifier of pair of keys, base64 encoded, min length 59",
-              "response": {
-                "clientDataJSON": "clientDataJSON-must-not-have-fewer-" +
-                  "than-121-characters Lorem ipsum dolor sit amet, " +
-                  "consectetur adipiscing elit, sed do eiusmod tempor " +
-                  "incididunt ut labore et dolore magna aliqua.",
-                "attestationObject": "attestationObject-must-not-have-fewer" +
-                  "-than-306-characters Lorem ipsum dolor sit amet, " +
-                  "consectetur adipiscing elit, sed do eiusmod tempor " +
-                  "incididunt ut labore et dolore magna aliqua. Ut enim " +
-                  "ad minim veniam, quis nostrud exercitation ullamco " +
-                  "laboris nisi ut aliquip ex ea commodo consequat. Duis " +
-                  "aute irure dolor in reprehenderit in voluptate velit " +
-                  "esse cillum dolore eu fugiat nulla pariatur."
+          credential: {
+            credentialType: 'FIDO',
+            status: 'PENDING',
+            fidoPayload: {
+              id: 'credential id: identifier of pair of keys, base64 encoded, min length 59',
+              rawId: 'raw credential id: identifier of pair of keys, base64 encoded, min length 59',
+              response: {
+                clientDataJSON: 'clientDataJSON-must-not-have-fewer-' +
+                  'than-121-characters Lorem ipsum dolor sit amet, ' +
+                  'consectetur adipiscing elit, sed do eiusmod tempor ' +
+                  'incididunt ut labore et dolore magna aliqua.',
+                attestationObject: 'attestationObject-must-not-have-fewer' +
+                  '-than-306-characters Lorem ipsum dolor sit amet, ' +
+                  'consectetur adipiscing elit, sed do eiusmod tempor ' +
+                  'incididunt ut labore et dolore magna aliqua. Ut enim ' +
+                  'ad minim veniam, quis nostrud exercitation ullamco ' +
+                  'laboris nisi ut aliquip ex ea commodo consequat. Duis ' +
+                  'aute irure dolor in reprehenderit in voluptate velit ' +
+                  'esse cillum dolore eu fugiat nulla pariatur.'
               },
-              "type": "public-key"
+              type: 'public-key'
             }
           }
         }
@@ -474,44 +471,44 @@ describe('DFSP Inbound', (): void => {
     describe('Inbound PUT /consents/{ID} verified credential from auth-service', (): void => {
       it('should send back PATCH /consents/{ID} to PISP', async (): Promise<void> => {
         // the auth-service now sends back a PUT /consents/{ID} confirming verification
-        const putConsentsIDVerifiedCredentialPayload = {
-          "scopes": [
+        const putConsentsIDVerifiedCredentialPayload: tpAPI.Schemas.ConsentsIDPutResponseVerified = {
+          scopes: [
             {
-              "address": "dfspa.username.1234",
-              "actions": [
-                "ACCOUNTS_TRANSFER",
-                "ACCOUNTS_GET_BALANCE"
+              address: 'dfspa.username.1234',
+              actions: [
+                'ACCOUNTS_TRANSFER',
+                'ACCOUNTS_GET_BALANCE'
               ]
             },
             {
-              "address": "dfspa.username.5678",
-              "actions": [
-                "ACCOUNTS_TRANSFER",
-                "ACCOUNTS_GET_BALANCE"
+              address: 'dfspa.username.5678',
+              actions: [
+                'ACCOUNTS_TRANSFER',
+                'ACCOUNTS_GET_BALANCE'
               ]
             }
           ],
-          "credential": {
-            "credentialType": "FIDO",
-            "status": "VERIFIED",
-            "payload": {
-              "id": "credential id: identifier of pair of keys, base64 encoded, min length 59",
-              "rawId": "raw credential id: identifier of pair of keys, base64 encoded, min length 59",
-              "response": {
-                "clientDataJSON": "clientDataJSON-must-not-have-fewer-" +
-                  "than-121-characters Lorem ipsum dolor sit amet, " +
-                  "consectetur adipiscing elit, sed do eiusmod tempor " +
-                  "incididunt ut labore et dolore magna aliqua.",
-                "attestationObject": "attestationObject-must-not-have-fewer" +
-                  "-than-306-characters Lorem ipsum dolor sit amet, " +
-                  "consectetur adipiscing elit, sed do eiusmod tempor " +
-                  "incididunt ut labore et dolore magna aliqua. Ut enim " +
-                  "ad minim veniam, quis nostrud exercitation ullamco " +
-                  "laboris nisi ut aliquip ex ea commodo consequat. Duis " +
-                  "aute irure dolor in reprehenderit in voluptate velit " +
-                  "esse cillum dolore eu fugiat nulla pariatur."
+          credential: {
+            credentialType: 'FIDO',
+            status: 'VERIFIED',
+            fidoPayload: {
+              id: 'credential id: identifier of pair of keys, base64 encoded, min length 59',
+              rawId: 'raw credential id: identifier of pair of keys, base64 encoded, min length 59',
+              response: {
+                clientDataJSON: 'clientDataJSON-must-not-have-fewer-' +
+                  'than-121-characters Lorem ipsum dolor sit amet, ' +
+                  'consectetur adipiscing elit, sed do eiusmod tempor ' +
+                  'incididunt ut labore et dolore magna aliqua.',
+                attestationObject: 'attestationObject-must-not-have-fewer' +
+                  '-than-306-characters Lorem ipsum dolor sit amet, ' +
+                  'consectetur adipiscing elit, sed do eiusmod tempor ' +
+                  'incididunt ut labore et dolore magna aliqua. Ut enim ' +
+                  'ad minim veniam, quis nostrud exercitation ullamco ' +
+                  'laboris nisi ut aliquip ex ea commodo consequat. Duis ' +
+                  'aute irure dolor in reprehenderit in voluptate velit ' +
+                  'esse cillum dolore eu fugiat nulla pariatur.'
               },
-              "type": "public-key"
+              type: 'public-key'
             }
           }
         }
@@ -528,7 +525,7 @@ describe('DFSP Inbound', (): void => {
         expect(historyPayload).toEqual(
           expect.objectContaining({
             credential: {
-              status: "VERIFIED"
+              status: 'VERIFIED'
             }
           })
         )
@@ -557,30 +554,30 @@ describe('DFSP Inbound', (): void => {
         }
         */
         const scenarioUri = `${env.inbound.baseUri}/consentRequests`
-        const payload = {
-          "consentRequestId": "997c89f4-053c-4283-bfec-45a1a0a28fbc",
-          "userId": "dfspa.username",
-          "scopes": [
+        const payload: tpAPI.Schemas.ConsentRequestsPostRequest = {
+          consentRequestId: '997c89f4-053c-4283-bfec-45a1a0a28fbc',
+          userId: 'dfspa.username',
+          scopes: [
             {
-              "address": "dfspa.username.1234",
-              "actions": [
-                "ACCOUNTS_TRANSFER",
-                "ACCOUNTS_GET_BALANCE"
+              address: 'dfspa.username.1234',
+              actions: [
+                'ACCOUNTS_TRANSFER',
+                'ACCOUNTS_GET_BALANCE'
               ]
             },
             {
-              "address": "dfspa.username.5678",
-              "actions": [
-                "ACCOUNTS_TRANSFER",
-                "ACCOUNTS_GET_BALANCE"
+              address: 'dfspa.username.5678',
+              actions: [
+                'ACCOUNTS_TRANSFER',
+                'ACCOUNTS_GET_BALANCE'
               ]
             }
           ],
-          "authChannels": [
-            "WEB",
-            "OTP"
+          authChannels: [
+            'WEB',
+            'OTP'
           ],
-          "callbackUri": "pisp-app://callback.com"
+          callbackUri: 'pisp-app://callback.com'
         }
 
         const axiosConfig = {
@@ -601,13 +598,14 @@ describe('DFSP Inbound', (): void => {
         expect(history.length).toEqual(1)
         expect(history[0].body.errorInformation).toEqual({
           errorCode: '7200',
-          errorDescription:  'Generic Thirdparty account linking error'
+          errorDescription: 'Generic Thirdparty account linking error'
         })
       })
     })
   })
 
-  describe('DFSP dfspBackendRequests.validateConsentRequests returns sucessfully but does not pass DFSP validation', (): void => {
+  describe(`DFSP dfspBackendRequests.validateConsentRequests returns
+            sucessfully but does not pass DFSP validation`, (): void => {
     describe('POST /consentRequests should create DFSP Linking and start the workflow', (): void => {
       it('should send a PUT /consentRequests/{ID}/error to PISP', async (): Promise<void> => {
         /*
@@ -626,30 +624,30 @@ describe('DFSP Inbound', (): void => {
         }
         */
         const scenarioUri = `${env.inbound.baseUri}/consentRequests`
-        const payload = {
-          "consentRequestId": "997c89f4-053c-4283-bfec-45a1a0a28fbd",
-          "userId": "dfspa.username",
-          "scopes": [
+        const payload: tpAPI.Schemas.ConsentRequestsPostRequest = {
+          consentRequestId: '997c89f4-053c-4283-bfec-45a1a0a28fbd',
+          userId: 'dfspa.username',
+          scopes: [
             {
-              "address": "dfspa.username.1234",
-              "actions": [
-                "ACCOUNTS_TRANSFER",
-                "ACCOUNTS_GET_BALANCE"
+              address: 'dfspa.username.1234',
+              actions: [
+                'ACCOUNTS_TRANSFER',
+                'ACCOUNTS_GET_BALANCE'
               ]
             },
             {
-              "address": "dfspa.username.5678",
-              "actions": [
-                "ACCOUNTS_TRANSFER",
-                "ACCOUNTS_GET_BALANCE"
+              address: 'dfspa.username.5678',
+              actions: [
+                'ACCOUNTS_TRANSFER',
+                'ACCOUNTS_GET_BALANCE'
               ]
             }
           ],
-          "authChannels": [
-            "WEB",
-            "OTP"
+          authChannels: [
+            'WEB',
+            'OTP'
           ],
-          "callbackUri": "pisp-app://callback.com"
+          callbackUri: 'pisp-app://callback.com'
         }
 
         const axiosConfig = {
@@ -671,7 +669,7 @@ describe('DFSP Inbound', (): void => {
         expect(history.length).toEqual(1)
         expect(history[0].body.errorInformation).toEqual({
           errorCode: '7209',
-          errorDescription:  'FSP does not find scopes suitable'
+          errorDescription: 'FSP does not find scopes suitable'
         })
       })
     })
@@ -699,29 +697,29 @@ describe('DFSP Inbound', (): void => {
         */
         const scenarioUri = `${env.inbound.baseUri}/consentRequests`
         const payload = {
-          "consentRequestId": "997c89f4-053c-4283-bfec-45a1a0a28fbe",
-          "userId": "dfspa.username",
-          "scopes": [
+          consentRequestId: '997c89f4-053c-4283-bfec-45a1a0a28fbe',
+          userId: 'dfspa.username',
+          scopes: [
             {
-              "address": "dfspa.username.1234",
-              "actions": [
-                "ACCOUNTS_TRANSFER",
-                "ACCOUNTS_GET_BALANCE"
+              address: 'dfspa.username.1234',
+              actions: [
+                'ACCOUNTS_TRANSFER',
+                'ACCOUNTS_GET_BALANCE'
               ]
             },
             {
-              "address": "dfspa.username.5678",
-              "actions": [
-                "ACCOUNTS_TRANSFER",
-                "ACCOUNTS_GET_BALANCE"
+              address: 'dfspa.username.5678',
+              actions: [
+                'ACCOUNTS_TRANSFER',
+                'ACCOUNTS_GET_BALANCE'
               ]
             }
           ],
-          "authChannels": [
-            "WEB",
-            "OTP"
+          authChannels: [
+            'WEB',
+            'OTP'
           ],
-          "callbackUri": "pisp-app://callback.com"
+          callbackUri: 'pisp-app://callback.com'
         }
 
         const axiosConfig = {
@@ -743,7 +741,7 @@ describe('DFSP Inbound', (): void => {
         expect(history.length).toEqual(1)
         expect(history[0].body.errorInformation).toEqual({
           errorCode: '7200',
-          errorDescription:  'Generic Thirdparty account linking error'
+          errorDescription: 'Generic Thirdparty account linking error'
         })
       })
     })
@@ -770,30 +768,30 @@ describe('DFSP Inbound', (): void => {
         }
         */
         const scenarioUri = `${env.inbound.baseUri}/consentRequests`
-        const payload = {
-          "consentRequestId": "997c89f4-053c-4283-bfec-45a1a0a28fbf",
-          "userId": "dfspa.username",
-          "scopes": [
+        const payload: tpAPI.Schemas.ConsentRequestsPostRequest = {
+          consentRequestId: '997c89f4-053c-4283-bfec-45a1a0a28fbf',
+          userId: 'dfspa.username',
+          scopes: [
             {
-              "address": "dfspa.username.1234",
-              "actions": [
-                "ACCOUNTS_TRANSFER",
-                "ACCOUNTS_GET_BALANCE"
+              address: 'dfspa.username.1234',
+              actions: [
+                'ACCOUNTS_TRANSFER',
+                'ACCOUNTS_GET_BALANCE'
               ]
             },
             {
-              "address": "dfspa.username.5678",
-              "actions": [
-                "ACCOUNTS_TRANSFER",
-                "ACCOUNTS_GET_BALANCE"
+              address: 'dfspa.username.5678',
+              actions: [
+                'ACCOUNTS_TRANSFER',
+                'ACCOUNTS_GET_BALANCE'
               ]
             }
           ],
-          "authChannels": [
-            "WEB",
-            "OTP"
+          authChannels: [
+            'WEB',
+            'OTP'
           ],
-          "callbackUri": "pisp-app://callback.com"
+          callbackUri: 'pisp-app://callback.com'
         }
 
         const axiosConfig = {
@@ -815,7 +813,7 @@ describe('DFSP Inbound', (): void => {
         expect(history.length).toEqual(1)
         expect(history[0].body.errorInformation).toEqual({
           errorCode: '7200',
-          errorDescription:  'Generic Thirdparty account linking error'
+          errorDescription: 'Generic Thirdparty account linking error'
         })
       })
     })
@@ -850,30 +848,30 @@ describe('DFSP Inbound', (): void => {
           }
         }
         */
-        const payload = {
-          "consentRequestId": "997c89f4-053c-4283-bfec-45a1a0a28fba",
-          "userId": "dfspa.username",
-          "scopes": [
+        const payload: tpAPI.Schemas.ConsentRequestsPostRequest = {
+          consentRequestId: '997c89f4-053c-4283-bfec-45a1a0a28fba',
+          userId: 'dfspa.username',
+          scopes: [
             {
-              "address": "dfspa.username.12345",
-              "actions": [
-                "ACCOUNTS_TRANSFER",
-                "ACCOUNTS_GET_BALANCE"
+              address: 'dfspa.username.12345',
+              actions: [
+                'ACCOUNTS_TRANSFER',
+                'ACCOUNTS_GET_BALANCE'
               ]
             },
             {
-              "address": "dfspa.username.5678",
-              "actions": [
-                "ACCOUNTS_TRANSFER",
-                "ACCOUNTS_GET_BALANCE"
+              address: 'dfspa.username.5678',
+              actions: [
+                'ACCOUNTS_TRANSFER',
+                'ACCOUNTS_GET_BALANCE'
               ]
             }
           ],
-          "authChannels": [
-            "WEB",
-            "OTP"
+          authChannels: [
+            'WEB',
+            'OTP'
           ],
-          "callbackUri": "pisp-app://callback.com"
+          callbackUri: 'pisp-app://callback.com'
         }
 
         const response = await axios.post(scenarioUri, payload, axiosConfig)
@@ -887,32 +885,31 @@ describe('DFSP Inbound', (): void => {
 
         const historyPayload = history[0].body as tpAPI.Schemas.ConsentRequestsIDPutResponseOTP
         expect(historyPayload).toEqual({
-          "consentRequestId":"997c89f4-053c-4283-bfec-45a1a0a28fba",
-          "scopes":[
+          scopes: [
             {
-              "address":"dfspa.username.12345",
-              "actions":[
-                "ACCOUNTS_TRANSFER",
-                "ACCOUNTS_GET_BALANCE"
+              address: 'dfspa.username.12345',
+              actions: [
+                'ACCOUNTS_TRANSFER',
+                'ACCOUNTS_GET_BALANCE'
               ]
             },
             {
-              "address":"dfspa.username.5678",
-              "actions":[
-                "ACCOUNTS_TRANSFER",
-                "ACCOUNTS_GET_BALANCE"
+              address: 'dfspa.username.5678',
+              actions: [
+                'ACCOUNTS_TRANSFER',
+                'ACCOUNTS_GET_BALANCE'
               ]
             }],
-          "callbackUri":"pisp-app://callback.com",
-          "authChannels":["WEB"],
-          "authUri":"dfspa.com/authorize?consentRequestId=997c89f4-053c-4283-bfec-45a1a0a28fba"
+          callbackUri: 'pisp-app://callback.com',
+          authChannels: ['WEB'],
+          authUri: 'dfspa.com/authorize?consentRequestId=997c89f4-053c-4283-bfec-45a1a0a28fba'
         })
       })
     })
 
     describe('Inbound PATCH /consentRequests/{ID} from PISP', (): void => {
       it('should send back POST /consents to PISP', async (): Promise<void> => {
-        const patchConsentRequestsPayload = {
+        const patchConsentRequestsPayload: tpAPI.Schemas.ConsentRequestsIDPatchRequest = {
           authToken: '123456'
         }
         const patchScenarioUri = `${env.inbound.baseUri}/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fba`
@@ -941,44 +938,44 @@ describe('DFSP Inbound', (): void => {
     describe('Inbound PUT /consents/{ID} signed credential from PISP', (): void => {
       it('should send back POST /consents to Auth Service', async (): Promise<void> => {
         // the PISP now sends back a PUT /consents/{ID} signed credential request to the DFSP
-        const putConsentsIDSignedCredentialPayload = {
-          "scopes": [
+        const putConsentsIDSignedCredentialPayload: tpAPI.Schemas.ConsentsIDPutResponseSigned = {
+          scopes: [
             {
-              "address": "dfspa.username.12345",
-              "actions": [
-                "ACCOUNTS_TRANSFER",
-                "ACCOUNTS_GET_BALANCE"
+              address: 'dfspa.username.12345',
+              actions: [
+                'ACCOUNTS_TRANSFER',
+                'ACCOUNTS_GET_BALANCE'
               ]
             },
             {
-              "address": "dfspa.username.5678",
-              "actions": [
-                "ACCOUNTS_TRANSFER",
-                "ACCOUNTS_GET_BALANCE"
+              address: 'dfspa.username.5678',
+              actions: [
+                'ACCOUNTS_TRANSFER',
+                'ACCOUNTS_GET_BALANCE'
               ]
             }
           ],
-          "credential": {
-            "credentialType": "FIDO",
-            "status": "PENDING",
-            "payload": {
-              "id": "credential id: identifier of pair of keys, base64 encoded, min length 59",
-              "rawId": "raw credential id: identifier of pair of keys, base64 encoded, min length 59",
-              "response": {
-                "clientDataJSON": "clientDataJSON-must-not-have-fewer-" +
-                  "than-121-characters Lorem ipsum dolor sit amet, " +
-                  "consectetur adipiscing elit, sed do eiusmod tempor " +
-                  "incididunt ut labore et dolore magna aliqua.",
-                "attestationObject": "attestationObject-must-not-have-fewer" +
-                  "-than-306-characters Lorem ipsum dolor sit amet, " +
-                  "consectetur adipiscing elit, sed do eiusmod tempor " +
-                  "incididunt ut labore et dolore magna aliqua. Ut enim " +
-                  "ad minim veniam, quis nostrud exercitation ullamco " +
-                  "laboris nisi ut aliquip ex ea commodo consequat. Duis " +
-                  "aute irure dolor in reprehenderit in voluptate velit " +
-                  "esse cillum dolore eu fugiat nulla pariatur."
+          credential: {
+            credentialType: 'FIDO',
+            status: 'PENDING',
+            fidoPayload: {
+              id: 'credential id: identifier of pair of keys, base64 encoded, min length 59',
+              rawId: 'raw credential id: identifier of pair of keys, base64 encoded, min length 59',
+              response: {
+                clientDataJSON: 'clientDataJSON-must-not-have-fewer-' +
+                  'than-121-characters Lorem ipsum dolor sit amet, ' +
+                  'consectetur adipiscing elit, sed do eiusmod tempor ' +
+                  'incididunt ut labore et dolore magna aliqua.',
+                attestationObject: 'attestationObject-must-not-have-fewer' +
+                  '-than-306-characters Lorem ipsum dolor sit amet, ' +
+                  'consectetur adipiscing elit, sed do eiusmod tempor ' +
+                  'incididunt ut labore et dolore magna aliqua. Ut enim ' +
+                  'ad minim veniam, quis nostrud exercitation ullamco ' +
+                  'laboris nisi ut aliquip ex ea commodo consequat. Duis ' +
+                  'aute irure dolor in reprehenderit in voluptate velit ' +
+                  'esse cillum dolore eu fugiat nulla pariatur.'
               },
-              "type": "public-key"
+              type: 'public-key'
             }
           }
         }
@@ -1005,44 +1002,44 @@ describe('DFSP Inbound', (): void => {
     describe('Inbound PUT /consents/{ID} verified credential from auth-service', (): void => {
       it('should send back PATCH /consents/{ID} to PISP', async (): Promise<void> => {
         // the auth-service now sends back a PUT /consents/{ID} confirming verification
-        const putConsentsIDVerifiedCredentialPayload = {
-          "scopes": [
+        const putConsentsIDVerifiedCredentialPayload: tpAPI.Schemas.ConsentsIDPutResponseVerified = {
+          scopes: [
             {
-              "address": "dfspa.username.12345",
-              "actions": [
-                "ACCOUNTS_TRANSFER",
-                "ACCOUNTS_GET_BALANCE"
+              address: 'dfspa.username.12345',
+              actions: [
+                'ACCOUNTS_TRANSFER',
+                'ACCOUNTS_GET_BALANCE'
               ]
             },
             {
-              "address": "dfspa.username.5678",
-              "actions": [
-                "ACCOUNTS_TRANSFER",
-                "ACCOUNTS_GET_BALANCE"
+              address: 'dfspa.username.5678',
+              actions: [
+                'ACCOUNTS_TRANSFER',
+                'ACCOUNTS_GET_BALANCE'
               ]
             }
           ],
-          "credential": {
-            "credentialType": "FIDO",
-            "status": "VERIFIED",
-            "payload": {
-              "id": "credential id: identifier of pair of keys, base64 encoded, min length 59",
-              "rawId": "raw credential id: identifier of pair of keys, base64 encoded, min length 59",
-              "response": {
-                "clientDataJSON": "clientDataJSON-must-not-have-fewer-" +
-                  "than-121-characters Lorem ipsum dolor sit amet, " +
-                  "consectetur adipiscing elit, sed do eiusmod tempor " +
-                  "incididunt ut labore et dolore magna aliqua.",
-                "attestationObject": "attestationObject-must-not-have-fewer" +
-                  "-than-306-characters Lorem ipsum dolor sit amet, " +
-                  "consectetur adipiscing elit, sed do eiusmod tempor " +
-                  "incididunt ut labore et dolore magna aliqua. Ut enim " +
-                  "ad minim veniam, quis nostrud exercitation ullamco " +
-                  "laboris nisi ut aliquip ex ea commodo consequat. Duis " +
-                  "aute irure dolor in reprehenderit in voluptate velit " +
-                  "esse cillum dolore eu fugiat nulla pariatur."
+          credential: {
+            credentialType: 'FIDO',
+            status: 'VERIFIED',
+            fidoPayload: {
+              id: 'credential id: identifier of pair of keys, base64 encoded, min length 59',
+              rawId: 'raw credential id: identifier of pair of keys, base64 encoded, min length 59',
+              response: {
+                clientDataJSON: 'clientDataJSON-must-not-have-fewer-' +
+                  'than-121-characters Lorem ipsum dolor sit amet, ' +
+                  'consectetur adipiscing elit, sed do eiusmod tempor ' +
+                  'incididunt ut labore et dolore magna aliqua.',
+                attestationObject: 'attestationObject-must-not-have-fewer' +
+                  '-than-306-characters Lorem ipsum dolor sit amet, ' +
+                  'consectetur adipiscing elit, sed do eiusmod tempor ' +
+                  'incididunt ut labore et dolore magna aliqua. Ut enim ' +
+                  'ad minim veniam, quis nostrud exercitation ullamco ' +
+                  'laboris nisi ut aliquip ex ea commodo consequat. Duis ' +
+                  'aute irure dolor in reprehenderit in voluptate velit ' +
+                  'esse cillum dolore eu fugiat nulla pariatur.'
               },
-              "type": "public-key"
+              type: 'public-key'
             }
           }
         }
@@ -1057,7 +1054,7 @@ describe('DFSP Inbound', (): void => {
         expect(history.length).toEqual(1)
         expect(history[0].body.errorInformation).toEqual({
           errorCode: '7200',
-          errorDescription:  'Generic Thirdparty account linking error'
+          errorDescription: 'Generic Thirdparty account linking error'
         })
       })
     })
@@ -1091,30 +1088,30 @@ describe('DFSP Inbound', (): void => {
           }
         }
         */
-        const payload = {
-          "consentRequestId": "997c89f4-053c-4283-bfec-45a1a0a28fbb",
-          "userId": "dfspa.username",
-          "scopes": [
+        const payload: tpAPI.Schemas.ConsentRequestsPostRequest = {
+          consentRequestId: '997c89f4-053c-4283-bfec-45a1a0a28fbb',
+          userId: 'dfspa.username',
+          scopes: [
             {
-              "address": "dfspa.username.1234",
-              "actions": [
-                "ACCOUNTS_TRANSFER",
-                "ACCOUNTS_GET_BALANCE"
+              address: 'dfspa.username.1234',
+              actions: [
+                'ACCOUNTS_TRANSFER',
+                'ACCOUNTS_GET_BALANCE'
               ]
             },
             {
-              "address": "dfspa.username.5678",
-              "actions": [
-                "ACCOUNTS_TRANSFER",
-                "ACCOUNTS_GET_BALANCE"
+              address: 'dfspa.username.5678',
+              actions: [
+                'ACCOUNTS_TRANSFER',
+                'ACCOUNTS_GET_BALANCE'
               ]
             }
           ],
-          "authChannels": [
-            "WEB",
-            "OTP"
+          authChannels: [
+            'WEB',
+            'OTP'
           ],
-          "callbackUri": "pisp-app://callback.com"
+          callbackUri: 'pisp-app://callback.com'
         }
 
         const response = await axios.post(scenarioUri, payload, axiosConfig)
@@ -1128,31 +1125,30 @@ describe('DFSP Inbound', (): void => {
 
         const historyPayload = history[0].body as tpAPI.Schemas.ConsentRequestsIDPutResponseOTP
         expect(historyPayload).toEqual({
-          "consentRequestId":"997c89f4-053c-4283-bfec-45a1a0a28fbb",
-          "scopes":[
+          scopes: [
             {
-              "address":"dfspa.username.1234",
-              "actions":[
-                "ACCOUNTS_TRANSFER",
-                "ACCOUNTS_GET_BALANCE"
+              address: 'dfspa.username.1234',
+              actions: [
+                'ACCOUNTS_TRANSFER',
+                'ACCOUNTS_GET_BALANCE'
               ]
             },
             {
-              "address":"dfspa.username.5678",
-              "actions":[
-                "ACCOUNTS_TRANSFER",
-                "ACCOUNTS_GET_BALANCE"
+              address: 'dfspa.username.5678',
+              actions: [
+                'ACCOUNTS_TRANSFER',
+                'ACCOUNTS_GET_BALANCE'
               ]
             }],
-          "callbackUri":"pisp-app://callback.com",
-          "authChannels":["OTP"]
+          callbackUri: 'pisp-app://callback.com',
+          authChannels: ['OTP']
         })
       })
     })
 
     describe('Inbound PATCH /consentRequests/{ID} from PISP', (): void => {
       it('should send back POST /consents to PISP', async (): Promise<void> => {
-        const patchConsentRequestsPayload = {
+        const patchConsentRequestsPayload: tpAPI.Schemas.ConsentRequestsIDPatchRequest = {
           authToken: '123456'
         }
         const patchScenarioUri = `${env.inbound.baseUri}/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fbb`
@@ -1181,44 +1177,44 @@ describe('DFSP Inbound', (): void => {
     describe('Inbound PUT /consents/{ID} signed credential from PISP', (): void => {
       it('should send back POST /consents to Auth Service', async (): Promise<void> => {
         // the PISP now sends back a PUT /consents/{ID} signed credential request to the DFSP
-        const putConsentsIDSignedCredentialPayload = {
-          "scopes": [
+        const putConsentsIDSignedCredentialPayload: tpAPI.Schemas.ConsentsIDPutResponseSigned  = {
+          scopes: [
             {
-              "address": "dfspa.username.1234",
-              "actions": [
-                "ACCOUNTS_TRANSFER",
-                "ACCOUNTS_GET_BALANCE"
+              address: 'dfspa.username.1234',
+              actions: [
+                'ACCOUNTS_TRANSFER',
+                'ACCOUNTS_GET_BALANCE'
               ]
             },
             {
-              "address": "dfspa.username.5678",
-              "actions": [
-                "ACCOUNTS_TRANSFER",
-                "ACCOUNTS_GET_BALANCE"
+              address: 'dfspa.username.5678',
+              actions: [
+                'ACCOUNTS_TRANSFER',
+                'ACCOUNTS_GET_BALANCE'
               ]
             }
           ],
-          "credential": {
-            "credentialType": "FIDO",
-            "status": "PENDING",
-            "payload": {
-              "id": "credential id: identifier of pair of keys, base64 encoded, min length 59",
-              "rawId": "raw credential id: identifier of pair of keys, base64 encoded, min length 59",
-              "response": {
-                "clientDataJSON": "clientDataJSON-must-not-have-fewer-" +
-                  "than-121-characters Lorem ipsum dolor sit amet, " +
-                  "consectetur adipiscing elit, sed do eiusmod tempor " +
-                  "incididunt ut labore et dolore magna aliqua.",
-                "attestationObject": "attestationObject-must-not-have-fewer" +
-                  "-than-306-characters Lorem ipsum dolor sit amet, " +
-                  "consectetur adipiscing elit, sed do eiusmod tempor " +
-                  "incididunt ut labore et dolore magna aliqua. Ut enim " +
-                  "ad minim veniam, quis nostrud exercitation ullamco " +
-                  "laboris nisi ut aliquip ex ea commodo consequat. Duis " +
-                  "aute irure dolor in reprehenderit in voluptate velit " +
-                  "esse cillum dolore eu fugiat nulla pariatur."
+          credential: {
+            credentialType: 'FIDO',
+            status: 'PENDING',
+            fidoPayload: {
+              id: 'credential id: identifier of pair of keys, base64 encoded, min length 59',
+              rawId: 'raw credential id: identifier of pair of keys, base64 encoded, min length 59',
+              response: {
+                clientDataJSON: 'clientDataJSON-must-not-have-fewer-' +
+                  'than-121-characters Lorem ipsum dolor sit amet, ' +
+                  'consectetur adipiscing elit, sed do eiusmod tempor ' +
+                  'incididunt ut labore et dolore magna aliqua.',
+                attestationObject: 'attestationObject-must-not-have-fewer' +
+                  '-than-306-characters Lorem ipsum dolor sit amet, ' +
+                  'consectetur adipiscing elit, sed do eiusmod tempor ' +
+                  'incididunt ut labore et dolore magna aliqua. Ut enim ' +
+                  'ad minim veniam, quis nostrud exercitation ullamco ' +
+                  'laboris nisi ut aliquip ex ea commodo consequat. Duis ' +
+                  'aute irure dolor in reprehenderit in voluptate velit ' +
+                  'esse cillum dolore eu fugiat nulla pariatur.'
               },
-              "type": "public-key"
+              type: 'public-key'
             }
           }
         }
@@ -1247,8 +1243,8 @@ describe('DFSP Inbound', (): void => {
         // the auth-service now sends back a PUT /consents/{ID} confirming verification
         const putConsentsIDErrorPayload = {
           errorInformation: {
-            errorCode: "7213",
-            errorDescription: "Consent is invalid"
+            errorCode: '7213',
+            errorDescription: 'Consent is invalid'
           }
         }
 
@@ -1264,8 +1260,8 @@ describe('DFSP Inbound', (): void => {
         expect(historyPayload).toEqual(
           {
             errorInformation: {
-              errorCode: "7213",
-              errorDescription: "Consent is invalid"
+              errorCode: '7213',
+              errorDescription: 'Consent is invalid'
             }
           }
         )
@@ -1273,4 +1269,3 @@ describe('DFSP Inbound', (): void => {
     })
   })
 })
-

@@ -44,7 +44,7 @@
     "SDK_OUTGOING_URI": "0.0.0.0:7002",
     "SDK_OUTGOING_HTTP_SCHEME": "http",
     "SDK_OUTGOING_PARTIES_INFORMATION_PATH": "parties/{Type}/{ID}/{SubId}",
-    "SDK_NOTIFY_ABOUT_TRANSFER_URI": "0.0.0.0:9000/thridpartyRequests/transactions/{ID}",
+    "SDK_NOTIFY_ABOUT_TRANSFER_URI": "0.0.0.0:9000/thirdpartyRequests/transactions/{ID}",
     "JWS_SIGN": false,
     "JWS_SIGNING_KEY": "./secrets/jwsSigningKey.key",
     "TLS": {

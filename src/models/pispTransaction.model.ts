@@ -275,6 +275,7 @@ export class PISPTransactionModel
         }
         this.data.approveResponse = {
           transactionStatus: {
+            transactionId: 1,
             ...this.data.transactionStatusPatch
           },
           currentState: this.data.currentState as OutboundAPI.Schemas.ThirdpartyTransactionIDApproveState

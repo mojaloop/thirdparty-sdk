@@ -285,7 +285,7 @@ describe('SDKOutgoingRequests', () => {
       expect(result).toBeUndefined()
       expect(loggedRequestSpy).toHaveBeenCalledWith({
         method: 'POST',
-        // uri: 'http://localhost:9000/thridpartyRequests/transactions/mocked-transaction-request-id',
+        // uri: 'http://localhost:9000/thirdpartyRequests/transactions/mocked-transaction-request-id',
         uri: `${config.scheme}://${config.uri}/${config.requestToPayTransferPath}`,
         body: JSON.stringify(requestToPayTransfer),
         agent: expect.anything(),

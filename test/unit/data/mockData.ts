@@ -265,7 +265,6 @@ export const consentRequestsPutOTP = {
     ID: 'b51ec534-ee48-4575-b6a9-ead2955b8069'
   },
   payload: {
-    consentRequestId: 'b51ec534-ee48-4575-b6a9-ead2955b8069',
     scopes: [
       {
         address: 'dfspa.username.1234',

@@ -210,14 +210,14 @@ paths:
               initiatorId: 'pispA'
               authChannels: ['WEB', 'OTP']
               scopes:
-                - accountId: dfspa.username.1234
+                - address: dfspa.username.1234
                   actions:
-                    - accounts.transfer
-                    - accounts.getBalance
-                - accountId: dfspa.username.5678
+                    - ACCOUNTS_TRANSFER
+                    - ACCOUNTS_GET_BALANCE
+                - address: dfspa.username.5678
                   actions:
-                    - accounts.transfer
-                    - accounts.getBalance
+                    - ACCOUNTS_TRANSFER
+                    - ACCOUNTS_GET_BALANCE
               callbackUri: 'pisp-app://callback.com'
       responses:
         202:

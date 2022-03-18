@@ -15,7 +15,7 @@ info:
     url: TBD
   version: 0.1.0
 paths:
-  '/accounts/{ID}':
+  /accounts/{ID}:
     parameters:
       - $ref: '#/components/parameters/ID'
       - $ref: '#/components/parameters/Content-Type'
@@ -100,7 +100,7 @@ paths:
           $ref: '#/components/responses/501'
         '503':
           $ref: '#/components/responses/503'
-  '/accounts/{ID}/error':
+  /accounts/{ID}/error:
     parameters:
       - $ref: '#/components/parameters/ID'
       - $ref: '#/components/parameters/Content-Type'
@@ -201,7 +201,7 @@ paths:
           $ref: '#/components/responses/501'
         '503':
           $ref: '#/components/responses/503'
-  '/consentRequests/{ID}':
+  /consentRequests/{ID}:
     parameters:
       - $ref: '#/components/parameters/ID'
       - $ref: '#/components/parameters/Content-Type'
@@ -344,7 +344,7 @@ paths:
           $ref: '#/components/responses/501'
         '503':
           $ref: '#/components/responses/503'
-  '/consentRequests/{ID}/error':
+  /consentRequests/{ID}/error:
     parameters:
       - $ref: '#/components/parameters/ID'
       - $ref: '#/components/parameters/Content-Type'
@@ -443,7 +443,7 @@ paths:
           $ref: '#/components/responses/501'
         '503':
           $ref: '#/components/responses/503'
-  '/consents/{ID}':
+  /consents/{ID}:
     parameters:
       - $ref: '#/components/parameters/ID'
       - $ref: '#/components/parameters/Content-Type'
@@ -622,7 +622,7 @@ paths:
           $ref: '#/components/responses/501'
         '503':
           $ref: '#/components/responses/503'
-  '/consents/{ID}/error':
+  /consents/{ID}/error:
     parameters:
       - $ref: '#/components/parameters/ID'
       - $ref: '#/components/parameters/Content-Type'
@@ -724,7 +724,7 @@ paths:
       operationId: MetricsGet
       summary: Prometheus metrics endpoint
       description: The HTTP request GET /metrics is used to return metrics for the API.
-  '/participants/{ID}':
+  /participants/{ID}:
     parameters:
       - $ref: '#/components/parameters/ID'
       - $ref: '#/components/parameters/Content-Type'
@@ -773,7 +773,7 @@ paths:
           $ref: '#/components/responses/501'
         '503':
           $ref: '#/components/responses/503'
-  '/participants/{ID}/error':
+  /participants/{ID}/error:
     parameters:
       - $ref: '#/components/parameters/ID'
       - $ref: '#/components/parameters/Content-Type'
@@ -824,7 +824,7 @@ paths:
           $ref: '#/components/responses/501'
         '503':
           $ref: '#/components/responses/503'
-  '/participants/{Type}/{ID}':
+  /participants/{Type}/{ID}:
     parameters:
       - $ref: '#/components/parameters/Type'
       - $ref: '#/components/parameters/ID'
@@ -993,7 +993,7 @@ paths:
           $ref: '#/components/responses/501'
         '503':
           $ref: '#/components/responses/503'
-  '/participants/{Type}/{ID}/error':
+  /participants/{Type}/{ID}/error:
     parameters:
       - $ref: '#/components/parameters/Type'
       - $ref: '#/components/parameters/ID'
@@ -1141,7 +1141,7 @@ paths:
           $ref: '#/components/responses/501'
         '503':
           $ref: '#/components/responses/503'
-  '/thirdpartyRequests/authorizations/{ID}':
+  /thirdpartyRequests/authorizations/{ID}:
     parameters:
       - $ref: '#/components/parameters/ID'
       - $ref: '#/components/parameters/Content-Type'
@@ -1239,7 +1239,7 @@ paths:
           $ref: '#/components/responses/501'
         '503':
           $ref: '#/components/responses/503'
-  '/thirdpartyRequests/authorizations/{ID}/error':
+  /thirdpartyRequests/authorizations/{ID}/error:
     parameters:
       - $ref: '#/components/parameters/ID'
       - $ref: '#/components/parameters/Content-Type'
@@ -1303,7 +1303,7 @@ paths:
           $ref: '#/components/responses/501'
         '503':
           $ref: '#/components/responses/503'
-  '/thirdpartyRequests/verifications/{ID}':
+  /thirdpartyRequests/verifications/{ID}:
     parameters:
       - $ref: '#/components/parameters/ID'
       - $ref: '#/components/parameters/Content-Type'
@@ -1397,7 +1397,7 @@ paths:
           $ref: '#/components/responses/501'
         '503':
           $ref: '#/components/responses/503'
-  '/thirdpartyRequests/verifications/{ID}/error':
+  /thirdpartyRequests/verifications/{ID}/error:
     parameters:
       - $ref: '#/components/parameters/ID'
       - $ref: '#/components/parameters/Content-Type'
@@ -1449,7 +1449,7 @@ paths:
           $ref: '#/components/responses/501'
         '503':
           $ref: '#/components/responses/503'
-  '/thirdpartyRequests/transactions/{ID}':
+  /thirdpartyRequests/transactions/{ID}:
     parameters:
       - $ref: '#/components/parameters/ID'
       - $ref: '#/components/parameters/Content-Type'
@@ -1581,7 +1581,7 @@ paths:
           $ref: '#/components/responses/501'
         '503':
           $ref: '#/components/responses/503'
-  '/thirdpartyRequests/transactions/{ID}/error':
+  /thirdpartyRequests/transactions/{ID}/error:
     parameters:
       - $ref: '#/components/parameters/ID'
       - $ref: '#/components/parameters/Content-Type'
@@ -1638,7 +1638,7 @@ paths:
           $ref: '#/components/responses/501'
         '503':
           $ref: '#/components/responses/503'
-  '/services/{ServiceType}':
+  /services/{ServiceType}:
     parameters:
       - $ref: '#/components/parameters/ServiceType'
       - $ref: '#/components/parameters/Content-Type'
@@ -1720,7 +1720,7 @@ paths:
           $ref: '#/components/responses/501'
         '503':
           $ref: '#/components/responses/503'
-  '/services/{ServiceType}/error':
+  /services/{ServiceType}/error:
     parameters:
       - $ref: '#/components/parameters/ServiceType'
       - $ref: '#/components/parameters/Content-Type'
@@ -1907,14 +1907,14 @@ components:
       required: true
       schema:
         type: string
-      description: 'The type of the party identifier. For example, `MSISDN`, `PERSONAL_ID`.'
+      description: The type of the party identifier. For example, `MSISDN`, `PERSONAL_ID`.
     ServiceType:
       name: ServiceType
       in: path
       required: true
       schema:
         type: string
-      description: 'The type of the service identifier. For example, `THIRD_PARTY_DFSP`'
+      description: The type of the service identifier. For example, `THIRD_PARTY_DFSP`
   responses:
     '200':
       description: OK
@@ -2031,7 +2031,7 @@ components:
     ErrorCode:
       title: ErrorCode
       type: string
-      pattern: '^[1-9]\d{3}$'
+      pattern: ^[1-9]\d{3}$
       description: >-
         The API data type ErrorCode is a JSON String of four characters,
         consisting of digits only. Negative numbers are not allowed. A leading
@@ -2113,7 +2113,7 @@ components:
     Name:
       title: Name
       type: string
-      pattern: '^(?!\s*$)[\w .,''-]{1,128}$'
+      pattern: ^(?!\s*$)[\w .,'-]{1,128}$
       description: >-
         The API data type Name is a JSON String, restricted by a regular
         expression to avoid characters which are generally not used in a name.
@@ -2153,7 +2153,7 @@ components:
         case).
 
         https://github.com/mojaloop/documentation/blob/master/website/versioned_docs/v1.0.1/api/thirdparty/data-models.md#3212-accountaddress
-      pattern: '^([0-9A-Za-z_~\-\.]+[0-9A-Za-z_~\-])$'
+      pattern: ^([0-9A-Za-z_~\-\.]+[0-9A-Za-z_~\-])$
       minLength: 1
       maxLength: 1023
     Currency:
@@ -2461,7 +2461,7 @@ components:
     Uri:
       title: Uri
       type: string
-      pattern: '^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?'
+      pattern: ^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?
       minLength: 1
       maxLength: 512
       description: >
@@ -2601,7 +2601,7 @@ components:
       additionalProperties: false
     BinaryString:
       type: string
-      pattern: '^[A-Za-z0-9-_]+[=]{0,2}$'
+      pattern: ^[A-Za-z0-9-_]+[=]{0,2}$
       description: >-
         The API data type BinaryString is a JSON String. The string is a
         base64url  encoding of a string of raw bytes, where padding (character
@@ -2715,7 +2715,7 @@ components:
           additionalProperties: false
         type:
           type: string
-          description: 'response type, we need only the type of public-key'
+          description: response type, we need only the type of public-key
           enum:
             - public-key
       required:
@@ -3165,7 +3165,7 @@ components:
     ParticipantsIDPutResponse:
       title: ParticipantsIDPutResponse
       type: object
-      description: 'The object sent in the PUT /participants/{ID} callback.'
+      description: The object sent in the PUT /participants/{ID} callback.
       properties:
         partyList:
           type: array
@@ -3208,7 +3208,7 @@ components:
     MerchantClassificationCode:
       title: MerchantClassificationCode
       type: string
-      pattern: '^[\d]{1,4}$'
+      pattern: ^[\d]{1,4}$
       description: >-
         A limited set of pre-defined numbers. This list would be a limited set
         of numbers identifying a set of popular merchant types like School Fees,
@@ -3309,7 +3309,7 @@ components:
     Amount:
       title: Amount
       type: string
-      pattern: '^([0]|([1-9][0-9]{0,17}))([.][0-9]{0,3}[1-9])?$'
+      pattern: ^([0]|([1-9][0-9]{0,17}))([.][0-9]{0,3}[1-9])?$
       description: >-
         The API data type Amount is a JSON String in a canonical format that is
         restricted by a regular expression for interoperability reasons. This
@@ -3366,7 +3366,7 @@ components:
     TransactionSubScenario:
       title: TransactionSubScenario
       type: string
-      pattern: '^[A-Z_]{1,32}$'
+      pattern: ^[A-Z_]{1,32}$
       description: >-
         Possible sub-scenario, defined locally within the scheme (UndefinedEnum
         Type).
@@ -3425,7 +3425,7 @@ components:
     BalanceOfPayments:
       title: BalanceOfPayments
       type: string
-      pattern: '^[1-9]\d{2}$'
+      pattern: ^[1-9]\d{2}$
       description: >-
         (BopCode) The API data type
         [BopCode](https://www.imf.org/external/np/sta/bopcode/) is a JSON String
@@ -3491,7 +3491,7 @@ components:
         amountType:
           allOf:
             - $ref: '#/components/schemas/AmountType'
-          description: 'SEND for sendAmount, RECEIVE for receiveAmount.'
+          description: SEND for sendAmount, RECEIVE for receiveAmount.
         amount:
           allOf:
             - $ref: '#/components/schemas/Money'
@@ -3701,7 +3701,7 @@ components:
           additionalProperties: false
         type:
           type: string
-          description: 'response type, we need only the type of public-key'
+          description: response type, we need only the type of public-key
           enum:
             - public-key
       required:

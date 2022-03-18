@@ -50,13 +50,14 @@
             "  body: {",
             "    mode: 'raw',",
             "    raw: JSON.stringify({",
+            "      \"status\": \"ISSUED\",",
             "      \"consentId\": \"8e34f91d-d078-4077-8263-2c047876fcf6\",",
             "      \"consentRequestId\": consentRequestId,",
             "      \"scopes\": [{",
-            "          \"accountId\": \"some-id\",",
+            "          \"address\": \"some-id\",",
             "          \"actions\": [",
-            "            \"accounts.getBalance\",",
-            "            \"accounts.transfer\"",
+            "            \"ACCOUNTS_GET_BALANCE\",",
+            "            \"ACCOUNTS_TRANSFER\"",
             "          ]",
             "        }",
             "      ]",
@@ -200,7 +201,7 @@
             "}",
             "  ",
             "pm.sendRequest(patchThirdpartyRequestIDTransactionReq, function (err, resp) {",
-            "  console.error('PATCH /thridpartyRequests/transactions/{ID} response')",
+            "  console.error('PATCH /thirdpartyRequests/transactions/{ID} response')",
             "  console.error(resp.json())",
             "  console.error(err)",
             "})"
@@ -271,7 +272,7 @@
           "fact": "body",
           "operator": "equal",
           "value": "credential id: identifier of pair of keys, base64 encoded, min length 59",
-          "path": "credential.payload.id"
+          "path": "credential.fidoPayload.id"
         },
         {
           "fact": "operationPath",
@@ -348,7 +349,7 @@
           "fact": "body",
           "operator": "equal",
           "value": "credential id error: identifier of pair of keys, base64 encoded, min length 59",
-          "path": "credential.payload.id"
+          "path": "credential.fidoPayload.id"
         },
         {
           "fact": "operationPath",

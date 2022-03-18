@@ -31,8 +31,7 @@ import axios from 'axios'
 import env from '../env'
 import mockLogger from 'test/unit/mockLogger'
 import * as mockData from 'test/unit/data/mockData'
-
-
+import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
 
 describe('DFSP Inbound', (): void => {
   // these must be run in sequence since am inbound POST /consentRequests
@@ -40,30 +39,30 @@ describe('DFSP Inbound', (): void => {
   describe('POST /consentRequests', (): void => {
     const scenarioUri = `${env.inbound.baseUri}/consentRequests`
     describe('Inbound API', (): void => {
-      const payload = {
-        "consentRequestId": "997c89f4-053c-4283-bfec-45a1a0a28fba",
-        "userId": "dfspa.username",
-        "scopes": [
+      const payload: tpAPI.Schemas.ConsentRequestsPostRequest = {
+        consentRequestId: '997c89f4-053c-4283-bfec-45a1a0a28fba',
+        userId: 'dfspa.username',
+        scopes: [
           {
-            "address": "dfspa.username.1234",
-            "actions": [
-              "ACCOUNTS_TRANSFER",
-              "ACCOUNTS_GET_BALANCE"
+            address: 'dfspa.username.1234',
+            actions: [
+              'ACCOUNTS_TRANSFER',
+              'ACCOUNTS_GET_BALANCE'
             ]
           },
           {
-            "address": "dfspa.username.5678",
-            "actions": [
-              "ACCOUNTS_TRANSFER",
-              "ACCOUNTS_GET_BALANCE"
+            address: 'dfspa.username.5678',
+            actions: [
+              'ACCOUNTS_TRANSFER',
+              'ACCOUNTS_GET_BALANCE'
             ]
           }
         ],
-        "authChannels": [
-          "WEB",
-          "OTP"
+        authChannels: [
+          'WEB',
+          'OTP'
         ],
-        "callbackUri": "pisp-app://callback.com"
+        callbackUri: 'pisp-app://callback.com'
       }
 
       const axiosConfig = {
@@ -88,7 +87,7 @@ describe('DFSP Inbound', (): void => {
   describe('PATCH /consentRequests/{ID}', (): void => {
     const scenarioUri = `${env.inbound.baseUri}/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fba`
     describe('Inbound API', (): void => {
-      const payload = {
+      const payload: tpAPI.Schemas.ConsentRequestsIDPatchRequest = {
         authToken: '123456'
       }
 
@@ -111,7 +110,6 @@ describe('DFSP Inbound', (): void => {
     })
   })
 })
-
 
 describe('PISP Inbound', (): void => {
   describe('PUT /consentRequests/{ID}/error', (): void => {
@@ -226,5 +224,4 @@ describe('PISP Inbound', (): void => {
       })
     })
   })
-
 })

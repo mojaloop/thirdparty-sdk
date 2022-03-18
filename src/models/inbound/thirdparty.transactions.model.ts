@@ -38,7 +38,7 @@ import {
 } from '../thirdparty.transactions.interface'
 import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
 
-export interface InboundThridpartyTransactionsModelConfig {
+export interface InboundThirdpartyTransactionsModelConfig {
   logger: SDKLogger.Logger
   sdkOutgoingRequests: SDKOutgoingRequests
   mojaloopRequests: MojaloopRequests
@@ -46,10 +46,10 @@ export interface InboundThridpartyTransactionsModelConfig {
 }
 
 // TODO: replace this model by DFSPTransactionModel as described in docs/sequence/PISPTransactionApi.puml
-export class InboundThridpartyTransactionsModel {
-  protected config: InboundThridpartyTransactionsModelConfig
+export class InboundThirdpartyTransactionsModel {
+  protected config: InboundThirdpartyTransactionsModelConfig
 
-  constructor (config: InboundThridpartyTransactionsModelConfig) {
+  constructor (config: InboundThirdpartyTransactionsModelConfig) {
     this.config = config
   }
 

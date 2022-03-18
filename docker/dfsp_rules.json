@@ -25,7 +25,7 @@
     }
   },
   {
-    "ruleId": 2, 
+    "ruleId": 2,
     "description": "Returns list of user Accounts",
     "conditions": {
       "all": [
@@ -48,12 +48,12 @@
         "body": [
           {
             "accountNickname": "dfspa.user.nickname1",
-            "id": "dfspa.username.1234",
+            "address": "dfspa.username.1234",
             "currency": "ZAR"
           },
           {
             "accountNickname": "dfspa.user.nickname2",
-            "id": "dfspa.username.5678",
+            "address": "dfspa.username.5678",
             "currency": "USD"
           }
         ]
@@ -383,7 +383,7 @@
           "fact": "body",
           "operator": "equal",
           "value": "dfspa.username.1234",
-          "path": "scopes[0].accountId"
+          "path": "scopes[0].address"
         },
         {
           "fact": "path",
@@ -414,7 +414,7 @@
           "fact": "body",
           "operator": "equal",
           "value": "dfspa.username.12345",
-          "path": "scopes[0].accountId"
+          "path": "scopes[0].address"
         },
         {
           "fact": "path",
