@@ -166,54 +166,6 @@ describe('SDKOutgoingRequests', () => {
     })
   })
 
-  describe('requestAuthorization', () => {
-    it('should propagate the call to post', async () => {
-      const request: OutboundAPI.Schemas.authorizationsPostRequest = {
-        fspId: uuidv4().substr(0, 32), // fspid has limited length
-        authorizationsPostRequest: {
-          transactionId: uuidv4(),
-          transactionRequestId: uuidv4(),
-          authenticationType: 'U2F',
-          retriesLeft: '1',
-          amount: {
-            currency: 'USD',
-            amount: '100'
-          },
-          quote: {
-            transferAmount: {
-              currency: 'USD',
-              amount: '100'
-            },
-            expiration: (new Date()).toISOString(),
-            ilpPacket: '...abc',
-            condition: 'xyz...'
-          }
-        }
-      }
-
-      const response: OutboundAPI.Schemas.authorizationsPostResponse = {
-        authorizations: {
-          authenticationInfo: {
-            authentication: 'U2F',
-            authenticationValue: {
-              pinValue: 'abc...xyz',
-              counter: '1'
-            } as string & Partial<{ pinValue: string, counter: string }>
-          },
-          responseType: 'ENTERED'
-        },
-        currentState: 'COMPLETED'
-      }
-
-      const postSpy = jest.spyOn(sdkRequest, 'post').mockImplementationOnce(
-        () => Promise.resolve(response)
-      )
-      const result = await sdkRequest.requestAuthorization(request)
-      expect(result).toEqual(response)
-      expect(postSpy).toHaveBeenCalledWith(sdkRequest.requestAuthorizationPath, request)
-    })
-  })
-
   describe('requestTransfer', () => {
     it('should propagate the call to post', async () => {
       const transferId = uuidv4()
