@@ -1,4 +1,20 @@
 # Changelog: [mojaloop/thirdparty-sdk](https://github.com/mojaloop/thirdparty-sdk)
+## [12.0.0](https://github.com/mojaloop/thirdparty-sdk/compare/v11.55.1...v12.0.0) (2022-03-23)
+
+
+### ⚠ BREAKING CHANGES
+
+* update sdk to use thirdparty api v1.0 (#135)
+
+### Features
+
+* **mojaloop/project#1814:** compile ts to js for production ([#127](https://github.com/mojaloop/thirdparty-sdk/issues/127)) ([e0f3488](https://github.com/mojaloop/thirdparty-sdk/commit/e0f3488381e50f102216ba030712da7d8f062629)), closes [mojaloop/project#1814](https://github.com/mojaloop/project/issues/1814)
+
+
+### Code Refactor
+
+* update sdk to use thirdparty api v1.0 ([#135](https://github.com/mojaloop/thirdparty-sdk/issues/135)) ([f09d1f9](https://github.com/mojaloop/thirdparty-sdk/commit/f09d1f9e4fd0b7611be304ae46c1558dc2b56461))
+
 ### [11.55.1](https://github.com/mojaloop/thirdparty-sdk/compare/v11.55.0...v11.55.1) (2021-10-14)
 
 
