@@ -57,10 +57,10 @@ FSIOP-Destination: dfspa
   consentRequestId: 6789
   userId: "username1234",
   scopes: [{
-    accountId: 'dfspa.username.1234',
-    actions: ['accounts.getBalance', 'accounts.transfer'],
-    accountId: 'dfspa.username.5678',
-    actions: ['accounts.getBalance', 'accounts.transfer'],
+    address: 'dfspa.username.1234',
+    actions: ['ACCOUNTS_GET_BALANCE', 'ACCOUNTS_TRANSFER'],
+    address: 'dfspa.username.5678',
+    actions: ['ACCOUNTS_GET_BALANCE', 'ACCOUNTS_TRANSFER'],
   }],
   // model will add `authChannels`
   authChannels: ["WEB", "OTP"],

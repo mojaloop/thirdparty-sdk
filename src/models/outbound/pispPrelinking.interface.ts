@@ -24,7 +24,7 @@
  - Kevin Leyow - kevin.leyow@modusbox.com
  --------------
  ******/
- import {
+import {
   ControlledStateMachine,
   PersistentModelConfig, StateData
 } from '~/models/persistent.model'

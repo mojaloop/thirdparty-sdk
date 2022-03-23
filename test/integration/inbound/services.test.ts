@@ -30,9 +30,7 @@ import Config from '~/shared/config'
 import axios from 'axios'
 import env from '../env'
 import mockLogger from 'test/unit/mockLogger'
-import TestData from 'test/unit/data/mockData.json'
-
-const mockData = JSON.parse(JSON.stringify(TestData))
+import * as mockData from 'test/unit/data/mockData'
 
 describe('PUT /services/{ServiceType}', (): void => {
   const scenarioUri = `${env.inbound.baseUri}/services/THIRD_PARTY_DFSP`
@@ -75,7 +73,6 @@ describe('PUT /services/{ServiceType}', (): void => {
     })
   })
 })
-
 
 describe('PUT /services/{ServiceType}/error', (): void => {
   const scenarioUri = `${env.inbound.baseUri}/services/THIRD_PARTY_DFSP/error`
@@ -136,5 +133,3 @@ describe('PUT /services/{ServiceType}/error', (): void => {
     })
   })
 })
-
-

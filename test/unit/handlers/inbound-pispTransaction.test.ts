@@ -26,7 +26,6 @@ describe('Inbound PISP transaction handlers', (): void => {
   }
 
   const approveResponse: tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPatchResponse = {
-    transactionId: 'x42ec534-ae48-6575-g6a9-tad2955b8065',
     transactionRequestState: 'ACCEPTED',
     transactionState: 'COMPLETED'
   }

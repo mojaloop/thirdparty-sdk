@@ -36,7 +36,6 @@ import {
 import { PubSub } from '~/shared/pub-sub'
 import * as OutboundAPI from '~/interface/outbound/api_interfaces'
 
-
 export enum PISPLinkingPhase {
   requestConsent = 'requestConsent',
   requestConsentAuthenticate = 'requestConsentAuthenticate',
@@ -75,8 +74,8 @@ export interface PISPLinkingData extends StateData<PISPLinkingModelState> {
   // request consent phase
   linkingRequestConsentPostRequest: OutboundAPI.Schemas.LinkingRequestConsentPostRequest
   linkingRequestConsentInboundChannelResponse?:
-    tpAPI.Schemas.ConsentRequestsIDPutResponseWeb |
-    tpAPI.Schemas.ConsentRequestsIDPutResponseOTP
+  tpAPI.Schemas.ConsentRequestsIDPutResponseWeb |
+  tpAPI.Schemas.ConsentRequestsIDPutResponseOTP
   linkingRequestConsentPostResponse?: OutboundAPI.Schemas.LinkingRequestConsentResponse
 
   // authentication phase

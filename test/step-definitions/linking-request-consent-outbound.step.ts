@@ -119,7 +119,7 @@ defineFeature(feature, (test): void => {
 
   afterAll(async (done): Promise<void> => {
     server.events.on('stop', done)
-    server.stop({ timeout:0 })
+    server.stop({ timeout: 0 })
   })
 
   afterEach((): void => {
@@ -129,27 +129,26 @@ defineFeature(feature, (test): void => {
 
   test('PostLinkingRequestConsent', ({ given, when, then }): void => {
     const consentRequestsIDPutResponseWeb: tpAPI.Schemas.ConsentRequestsIDPutResponseWeb = {
-      "consentRequestId": "b51ec534-ee48-4575-b6a9-ead2955b8069",
-      "scopes": [
+      scopes: [
         {
-          "accountId": "dfspa.username.1234",
-          "actions": [
-            "accounts.transfer",
-            "accounts.getBalance"
+          address: 'dfspa.username.1234',
+          actions: [
+            'ACCOUNTS_TRANSFER',
+            'ACCOUNTS_GET_BALANCE'
           ]
         },
         {
-          "accountId": "dfspa.username.5678",
-          "actions": [
-            "accounts.transfer",
-            "accounts.getBalance"
+          address: 'dfspa.username.5678',
+          actions: [
+            'ACCOUNTS_TRANSFER',
+            'ACCOUNTS_GET_BALANCE'
           ]
         }
       ],
-      "callbackUri": "pisp-app://callback.com",
-      "authUri": "dfspa.com/authorize?consentRequestId=456",
-      "authChannels": [
-        "WEB"
+      callbackUri: 'pisp-app://callback.com',
+      authUri: 'dfspa.com/authorize?consentRequestId=456',
+      authChannels: [
+        'WEB'
       ]
     }
 
@@ -165,18 +164,18 @@ defineFeature(feature, (test): void => {
         url: '/linking/request-consent',
         headers: {
           'Content-Type': 'application/json',
-          Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
+          Date: 'Thu, 24 Jan 2019 10:22:12 GMT'
         },
         payload: {
-          consentRequestId: "bbce3ce8-c247-4153-aab1-f89768c93b18",
-          toParticipantId: "dfspA",
+          consentRequestId: 'bbce3ce8-c247-4153-aab1-f89768c93b18',
+          toParticipantId: 'dfspA',
           accounts: [
-            { "accountNickname": "XXXXXXnt", "id": "dfspa.username.1234", "currency": "ZAR" },
-            { "accountNickname": "SpeXXXXXXXXnt", "id": "dfspa.username.5678", "currency": "USD" }
+            { accountNickname: 'XXXXXXnt', address: 'dfspa.username.1234', currency: 'ZAR' },
+            { accountNickname: 'SpeXXXXXXXXnt', address: 'dfspa.username.5678', currency: 'USD' }
           ],
-          actions: ["accounts.getBalance", "accounts.transfer"],
-          userId: "username1234",
-          callbackUri: "pisp-app://callback.com"
+          actions: ['ACCOUNTS_GET_BALANCE', 'ACCOUNTS_TRANSFER'],
+          userId: 'username1234',
+          callbackUri: 'pisp-app://callback.com'
         }
       }
       const pubSub = new PubSub({} as RedisConnectionConfig)

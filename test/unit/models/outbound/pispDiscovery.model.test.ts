@@ -45,7 +45,7 @@ import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
 import { RedisConnectionConfig } from '~/shared/redis-connection'
 import { mocked } from 'ts-jest/utils'
 
-import TestData from 'test/unit/data/mockData.json'
+import * as mockData from 'test/unit/data/mockData'
 import mockLogger from 'test/unit/mockLogger'
 import shouldNotBeExecuted from 'test/unit/shouldNotBeExecuted'
 import sortedArray from 'test/unit/sortedArray'
@@ -68,12 +68,12 @@ describe('PISPDiscoveryModel', () => {
     accounts: [
       {
         accountNickname: 'dfspa.user.nickname1',
-        id: 'dfspa.username.1234',
+        address: 'dfspa.username.1234',
         currency: 'ZAR'
       },
       {
         accountNickname: 'dfspa.user.nickname2',
-        id: 'dfspa.username.5678',
+        address: 'dfspa.username.5678',
         currency: 'USD'
       }
     ],
@@ -154,10 +154,9 @@ describe('PISPDiscoveryModel', () => {
     let channel: string
     let handler: NotificationCallback
     let data: PISPDiscoveryData
-    type PutResponseOrError = tpAPI.Schemas.AccountsIDPutResponse & fspiopAPI.Schemas.ErrorInformationObject
+    type PutResponseOrError = tpAPI.Schemas.AccountsIDPutResponse | fspiopAPI.Schemas.ErrorInformationObject
     let putResponse: PutResponseOrError
 
-    const mockData = JSON.parse(JSON.stringify(TestData))
     beforeEach(() => {
       mocked(modelConfig.subscriber.subscribe).mockImplementationOnce(
         (_channel: string, cb: NotificationCallback) => {

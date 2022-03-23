@@ -30,6 +30,7 @@ import Config from '~/shared/config'
 import axios from 'axios'
 import env from '../env'
 import mockLogger from '../../unit/mockLogger'
+import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
 
 describe('PISP Inbound', (): void => {
   describe('POST /consents', (): void => {
@@ -41,17 +42,18 @@ describe('PISP Inbound', (): void => {
         logger: mockLogger(),
         timeout: Config.REDIS.TIMEOUT
       }
-      const payload = {
+      const payload: tpAPI.Schemas.ConsentsPostRequestPISP = {
         consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
         consentRequestId: '997c89f4-053c-4283-bfec-45a1a0a28fbb',
         scopes: [{
-          accountId: 'some-id',
+          address: 'some-id',
           actions: [
-            'accounts.getBalance',
-            'accounts.transfer'
+            'ACCOUNTS_GET_BALANCE',
+            'ACCOUNTS_TRANSFER'
           ]
         }
-        ]
+        ],
+        status: 'ISSUED'
       }
 
       const axiosConfig = {
@@ -98,18 +100,18 @@ describe('DFSP Inbound', (): void => {
     const scenarioUri = `${env.inbound.baseUri}/consents/8e34f91d-d078-4077-8263-2c047876fcf6`
 
     describe('Inbound API', (): void => {
-      const signedCredentialPayload = {
+      const signedCredentialPayload: tpAPI.Schemas.ConsentsIDPutResponseSigned = {
         scopes: [{
-          accountId: 'some-id',
+          address: 'some-id',
           actions: [
-            'accounts.getBalance',
-            'accounts.transfer'
+            'ACCOUNTS_GET_BALANCE',
+            'ACCOUNTS_TRANSFER'
           ]
         }],
         credential: {
           credentialType: 'FIDO',
           status: 'PENDING',
-          payload: {
+          fidoPayload: {
             id: 'credential id: identifier of pair of keys, base64 encoded, min length 59',
             rawId: 'raw credential id: identifier of pair of keys, base64 encoded, min length 59',
             response: {
@@ -126,7 +128,7 @@ describe('DFSP Inbound', (): void => {
                 'in voluptate velit esse cillum dolore eu fugiat nulla pariatur.'
             },
             type: 'public-key'
-          },
+          }
         }
       }
 
@@ -159,18 +161,18 @@ describe('DFSP Inbound', (): void => {
         logger: mockLogger(),
         timeout: Config.REDIS.TIMEOUT
       }
-      const verifiedCredentialPayload = {
+      const verifiedCredentialPayload: tpAPI.Schemas.ConsentsIDPutResponseVerified = {
         scopes: [{
-          accountId: 'some-id',
+          address: 'some-id',
           actions: [
-            'accounts.getBalance',
-            'accounts.transfer'
+            'ACCOUNTS_GET_BALANCE',
+            'ACCOUNTS_TRANSFER'
           ]
         }],
         credential: {
           credentialType: 'FIDO',
           status: 'VERIFIED',
-          payload: {
+          fidoPayload: {
             id: 'credential id: identifier of pair of keys, base64 encoded, min length 59',
             rawId: 'raw credential id: identifier of pair of keys, base64 encoded, min length 59',
             response: {
@@ -187,7 +189,7 @@ describe('DFSP Inbound', (): void => {
                 'in voluptate velit esse cillum dolore eu fugiat nulla pariatur.'
             },
             type: 'public-key'
-          },
+          }
         }
       }
 
@@ -207,7 +209,6 @@ describe('DFSP Inbound', (): void => {
         // Assert
         expect(response.status).toEqual(200)
       })
-
 
       it('should propagate message via Redis PUB/SUB', async (done): Promise<void> => {
         const subscriber = new PubSub(config)
@@ -233,7 +234,6 @@ describe('DFSP Inbound', (): void => {
       })
     })
   })
-
 
   it.todo('PUT /consents/{ID}/error response from PISP')
 
@@ -279,7 +279,6 @@ describe('DFSP Inbound', (): void => {
         expect(response.status).toEqual(200)
       })
 
-
       it('should propagate message via Redis PUB/SUB', async (done): Promise<void> => {
         const subscriber = new PubSub(config)
         await subscriber.connect()
@@ -305,4 +304,3 @@ describe('DFSP Inbound', (): void => {
     })
   })
 })
-

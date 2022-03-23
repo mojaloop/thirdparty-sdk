@@ -4,7 +4,7 @@ properties:
   providers:
     type: array
     items:
-      $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/FspId.yaml'
+      $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/v1_0/openapi3/components/schemas/FspId.yaml'
   currentState:
     $ref: '../../components/schemas/LinkingProvidersState.yaml'
 required:

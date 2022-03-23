@@ -25,7 +25,7 @@
  --------------
  ******/
 
-import { PubSub } from '~/shared/pub-sub'
+import { PubSub, Message } from '~/shared/pub-sub'
 import { PersistentModel } from '~/models/persistent.model'
 import { StateMachineConfig } from 'javascript-state-machine'
 import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
@@ -36,7 +36,7 @@ import {
   PISPPrelinkingStateMachine,
   PISPPrelinkingModelConfig
 } from './pispPrelinking.interface'
-import { Message } from '~/shared/pub-sub'
+
 import deferredJob from '~/shared/deferred-job'
 import * as OutboundAPI from '~/interface/outbound/api_interfaces'
 
@@ -51,11 +51,11 @@ export class PISPPrelinkingModel
     const spec: StateMachineConfig = {
       init: 'start',
       transitions: [
-        { name: 'getProviders', from: 'start', to: 'providersLookupSuccess' },
+        { name: 'getProviders', from: 'start', to: 'providersLookupSuccess' }
       ],
       methods: {
         // specific transitions handlers methods
-        onGetProviders: () => this.onGetProviders(),
+        onGetProviders: () => this.onGetProviders()
       }
     }
     super(data, config, spec)
@@ -94,16 +94,16 @@ export class PISPPrelinkingModel
     this.logger.push({ channel }).info('onGetProviders - subscribe to channel')
 
     return deferredJob(this.subscriber, channel)
-    .init(async (channel) => {
-      const res = await this.thirdpartyRequests.getServices(
-        serviceType
-      )
+      .init(async (channel) => {
+        const res = await this.thirdpartyRequests.getServices(
+          serviceType
+        )
 
-      this.logger.push({ res, channel })
-        .log('ThirdpartyRequests.getServices request call sent to peer, listening on response')
-    })
-    .job(async (message: Message): Promise<void> => {
-      try {
+        this.logger.push({ res, channel })
+          .log('ThirdpartyRequests.getServices request call sent to peer, listening on response')
+      })
+      .job(async (message: Message): Promise<void> => {
+        try {
         type PutResponseOrError = tpAPI.Schemas.ServicesServiceTypePutResponse & fspiopAPI.Schemas.ErrorInformationObject
         const putResponse = message as unknown as PutResponseOrError
         if (putResponse.errorInformation) {
@@ -112,13 +112,12 @@ export class PISPPrelinkingModel
           const response = message as unknown as tpAPI.Schemas.ServicesServiceTypePutResponse
           this.data.providers = response.providers
         }
-
-      } catch (error) {
-        this.logger.push(error).error('ThirdpartyRequests.getServices request error')
-        return Promise.reject(error)
-      }
-    })
-    .wait(this.config.requestProcessingTimeoutSeconds * 1000)
+        } catch (error) {
+          this.logger.push(error).error('ThirdpartyRequests.getServices request error')
+          return Promise.reject(error)
+        }
+      })
+      .wait(this.config.requestProcessingTimeoutSeconds * 1000)
   }
 
   getResponse ():
@@ -141,7 +140,7 @@ export class PISPPrelinkingModel
 
   // utility function to check if an error after a transition which
   // pub/subs for a response that can return a mojaloop error
-  async checkModelDataForErrorInformation(): Promise<void> {
+  async checkModelDataForErrorInformation (): Promise<void> {
     if (this.data.errorInformation) {
       await this.fsm.error(this.data.errorInformation)
     }
@@ -169,7 +168,8 @@ export class PISPPrelinkingModel
           this.logger.info('State machine in errored state')
           return
       }
-    } catch (err) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
       this.logger.info(`Error running PISPPrelinkingModel : ${inspect(err)}`)
 
       // as this function is recursive, we don't want to error the state machine multiple times
@@ -201,8 +201,7 @@ export async function create (
   return model
 }
 
-
 export default {
   PISPPrelinkingModel,
-  create,
+  create
 }

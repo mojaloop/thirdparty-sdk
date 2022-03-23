@@ -26,14 +26,15 @@
  ******/
 import axios from 'axios'
 import env from '../env'
+import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
 
 describe.skip('DFSP Inbound', (): void => {
   describe('PUT /participants/CONSENT/{ID}/ response from account lookup service', (): void => {
     const scenarioUri = `${env.inbound.baseUri}/participants/CONSENT/8e34f91d-d078-4077-8263-2c047876fcf6`
 
     describe('Inbound API', (): void => {
-      const participantPayload = {
-        'fspId': 'dfspa'
+      const participantPayload: tpAPI.Schemas.ParticipantsTypeIDPutResponse = {
+        fspId: 'dfspa'
       }
 
       const axiosConfig = {
@@ -55,9 +56,8 @@ describe.skip('DFSP Inbound', (): void => {
     })
   })
 
-
   describe('PUT /participants/CONSENT/{ID}/error response from account lookup service', (): void => {
-  const scenarioUri = `${env.inbound.baseUri}/participants/CONSENT/8e34f91d-d078-4077-8263-2c047876fcf6/error`
+    const scenarioUri = `${env.inbound.baseUri}/participants/CONSENT/8e34f91d-d078-4077-8263-2c047876fcf6/error`
 
     describe('Inbound API', (): void => {
       const errorPayload = {
@@ -94,4 +94,3 @@ describe.skip('DFSP Inbound', (): void => {
     })
   })
 })
-

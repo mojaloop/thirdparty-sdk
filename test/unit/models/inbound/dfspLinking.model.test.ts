@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /*****
  License
  --------------
@@ -45,14 +46,15 @@ import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
 import {
   DFSPLinkingModelConfig,
   DFSPLinkingData
+  , DFSPLinkingPhase
 } from '~/models/inbound/dfspLinking.interface'
 import {
   thirdparty as tpAPI
 } from '@mojaloop/api-snippets'
 import shouldNotBeExecuted from 'test/unit/shouldNotBeExecuted'
-import TestData from 'test/unit/data/mockData.json'
+import * as mockData from 'test/unit/data/mockData'
 import { HTTPResponseError } from '../../../../src/shared/http-response-error'
-import { DFSPLinkingPhase } from '~/models/inbound/dfspLinking.interface'
+
 import { resetUuid } from '../../__mocks__/uuid'
 
 // mock KVS default exported class
@@ -60,7 +62,6 @@ jest.mock('~/shared/kvs')
 
 // mock PubSub default exported class
 jest.mock('~/shared/pub-sub')
-const mockData = JSON.parse(JSON.stringify(TestData))
 
 describe('dfspLinkingModel', () => {
   const connectionConfig: RedisConnectionConfig = {
@@ -88,7 +89,7 @@ describe('dfspLinkingModel', () => {
         putConsentRequestsError: jest.fn(() => Promise.resolve({ statusCode: 202 })),
         postConsents: jest.fn(() => Promise.resolve({ statusCode: 202 })),
         patchConsents: jest.fn(() => Promise.resolve({ statusCode: 200 })),
-        putConsentsError: jest.fn(() => Promise.resolve({ statusCode: 200 })),
+        putConsentsError: jest.fn(() => Promise.resolve({ statusCode: 200 }))
       } as unknown as ThirdpartyRequests,
       dfspBackendRequests: {
         validateConsentRequests: jest.fn(() => Promise.resolve(mockData.consentRequestsPost.response)),
@@ -97,10 +98,10 @@ describe('dfspLinkingModel', () => {
         validateAuthToken: jest.fn(() => Promise.resolve({
           isValid: true
         })),
-        storeValidatedConsentForAccountId: jest.fn(() => Promise.resolve()),
+        storeValidatedConsentForAccountId: jest.fn(() => Promise.resolve())
       } as unknown as DFSPBackendRequests,
       mojaloopRequests: {
-        postParticipants: jest.fn(() => Promise.resolve({ statusCode: 202 })),
+        postParticipants: jest.fn(() => Promise.resolve({ statusCode: 202 }))
       } as unknown as MojaloopRequests,
       requestProcessingTimeoutSeconds: 3,
       testShouldOverrideConsentId: false,
@@ -185,15 +186,13 @@ describe('dfspLinkingModel', () => {
   describe('Validate Consent Request with Backend Phase', () => {
     let validateData: DFSPLinkingData
     const expectedWebConsentRequestResponse: tpAPI.Schemas.ConsentRequestsIDPutResponseWeb = {
-      consentRequestId: mockData.consentRequestsPost.payload.consentRequestId,
       scopes: mockData.consentRequestsPost.payload.scopes,
       authChannels: ['WEB'],
       callbackUri: mockData.consentRequestsPost.payload.callbackUri,
-      authUri: "dfspa.com/authorize?consentRequestId=456"
+      authUri: 'dfspa.com/authorize?consentRequestId=456'
     }
 
     const expectedOTPConsentRequestResponse: tpAPI.Schemas.ConsentRequestsIDPutResponseOTP = {
-      consentRequestId: mockData.consentRequestsPost.payload.consentRequestId,
       scopes: mockData.consentRequestsPost.payload.scopes,
       authChannels: ['OTP'],
       callbackUri: mockData.consentRequestsPost.payload.callbackUri
@@ -206,7 +205,7 @@ describe('dfspLinkingModel', () => {
         toAuthServiceParticipantId: 'central-auth',
         consentRequestsPostRequest: mockData.consentRequestsPost.payload,
         currentState: 'start',
-        consentRequestId: mockData.consentRequestsPost.payload.consentRequestId,
+        consentRequestId: mockData.consentRequestsPost.payload.consentRequestId
       }
     })
 
@@ -218,7 +217,8 @@ describe('dfspLinkingModel', () => {
     it('validateRequest() : WEB should transition start  to requestIsValid when successful', async () => {
       const model = await create(validateData, modelConfig)
 
-      mocked(modelConfig.dfspBackendRequests.validateConsentRequests).mockImplementationOnce(() => Promise.resolve(mockData.consentRequestsPost.response))
+      mocked(modelConfig.dfspBackendRequests.validateConsentRequests)
+        .mockImplementationOnce(() => Promise.resolve(mockData.consentRequestsPost.response))
 
       // start validation step
       await model.fsm.validateRequest()
@@ -268,7 +268,7 @@ describe('dfspLinkingModel', () => {
         // start validation step
         await model.fsm.validateRequest()
         shouldNotBeExecuted()
-      } catch (err) {
+      } catch (err: any) {
         expect(err.code).toEqual('7204')
       }
 
@@ -290,7 +290,7 @@ describe('dfspLinkingModel', () => {
         // start validation step
         await model.fsm.validateRequest()
         shouldNotBeExecuted()
-      } catch (err) {
+      } catch (err: any) {
         expect(err.code).toEqual('7208')
       }
 
@@ -321,7 +321,7 @@ describe('dfspLinkingModel', () => {
         // start validation step
         await model.fsm.validateRequest()
         shouldNotBeExecuted()
-      } catch (err) {
+      } catch (err: any) {
         expect(err.message).toEqual('mocked validateConsentRequests exception')
       }
 
@@ -357,7 +357,7 @@ describe('dfspLinkingModel', () => {
         // start validation step
         await model.fsm.validateRequest()
         shouldNotBeExecuted()
-      } catch (err) {
+      } catch (err: any) {
         expect(err.message).toEqual('mocked-error')
       }
       expect(modelConfig.thirdpartyRequests.putConsentRequestsError).toBeCalledWith(
@@ -391,7 +391,7 @@ describe('dfspLinkingModel', () => {
         // start validation step
         await model.fsm.validateRequest()
         shouldNotBeExecuted()
-      } catch (err) {
+      } catch (err: any) {
         expect(err.message).toEqual('mocked-error')
       }
       expect(modelConfig.thirdpartyRequests.putConsentRequestsError).toBeCalledWith(
@@ -420,7 +420,7 @@ describe('dfspLinkingModel', () => {
         // start validation step
         await model.fsm.validateRequest()
         shouldNotBeExecuted()
-      } catch (err) {
+      } catch (err: any) {
         expect(err.message).toEqual('generic-error')
       }
       expect(modelConfig.thirdpartyRequests.putConsentRequestsError).toBeCalledWith(
@@ -497,7 +497,7 @@ describe('dfspLinkingModel', () => {
     it('storeReqAndSendOTP()-InvalidAuthChannel:  should transition from requestIsValid to errored', async () => {
       validateData = {
         ...validateData,
-        backendValidateConsentRequestsResponse: mockData.consentRequestsPost.responseErrorAuthChannel
+        backendValidateConsentRequestsResponse: mockData.consentRequestsPost.responseErrorAuthChannel as any
       }
       const model = await create(validateData, modelConfig)
 
@@ -505,7 +505,7 @@ describe('dfspLinkingModel', () => {
         // start request scopes step
         await model.fsm.storeReqAndSendOTP()
         shouldNotBeExecuted()
-      } catch (err) {
+      } catch (err: any) {
         expect(err.message).toEqual('Invalid authChannel TEST')
       }
     })
@@ -525,7 +525,7 @@ describe('dfspLinkingModel', () => {
         // start request scopes step
         await model.fsm.storeReqAndSendOTP()
         shouldNotBeExecuted()
-      } catch (err) {
+      } catch (err: any) {
         expect(err.message).toEqual('mocked storeConsentRequests exception')
       }
     })
@@ -534,11 +534,10 @@ describe('dfspLinkingModel', () => {
   describe('SendLinkingChannelResponse Phase', () => {
     let validateData: DFSPLinkingData
     const expectedWebConsentRequestResponse: tpAPI.Schemas.ConsentRequestsIDPutResponseWeb = {
-      consentRequestId: mockData.consentRequestsPost.payload.consentRequestId,
       scopes: mockData.consentRequestsPost.payload.scopes,
       authChannels: ['WEB'],
       callbackUri: mockData.consentRequestsPost.payload.callbackUri,
-      authUri: "dfspa.com/authorize?consentRequestId=456"
+      authUri: 'dfspa.com/authorize?consentRequestId=456'
     }
     const waitOnAuthTokenFromPISPResponseChannel = DFSPLinkingModel.notificationChannel(
       DFSPLinkingPhase.waitOnAuthTokenFromPISPResponse,
@@ -608,7 +607,7 @@ describe('dfspLinkingModel', () => {
         // start send consent step
         await model.fsm.sendLinkingChannelResponse()
         shouldNotBeExecuted()
-      } catch (err) {
+      } catch (err: any) {
         expect(err.message).toEqual('mocked putConsentRequests exception')
       }
 
@@ -677,7 +676,7 @@ describe('dfspLinkingModel', () => {
         // start validation step
         await model.fsm.validateAuthToken()
         shouldNotBeExecuted()
-      } catch (err) {
+      } catch (err: any) {
         expect(err.code).toEqual('7205')
       }
 
@@ -705,7 +704,7 @@ describe('dfspLinkingModel', () => {
         // start validation step
         await model.fsm.validateAuthToken()
         shouldNotBeExecuted()
-      } catch (err) {
+      } catch (err: any) {
         expect(err.code).toEqual('7206')
       }
 
@@ -737,7 +736,7 @@ describe('dfspLinkingModel', () => {
         // start validation step
         await model.fsm.validateAuthToken()
         shouldNotBeExecuted()
-      } catch (err) {
+      } catch (err: any) {
         expect(err.message).toEqual('mocked validateAuthToken exception')
       }
 
@@ -774,17 +773,17 @@ describe('dfspLinkingModel', () => {
         consentRequestsIDPatchResponse: mockData.consentRequestsIDPatchRequest.payload,
         scopes: [
           {
-            accountId: 'dfspa.username.1234',
+            address: 'dfspa.username.1234',
             actions: [
-              'accounts.transfer',
-              'accounts.getBalance'
+              'ACCOUNTS_TRANSFER',
+              'ACCOUNTS_GET_BALANCE'
             ]
           },
           {
-            accountId: 'dfspa.username.5678',
+            address: 'dfspa.username.5678',
             actions: [
-              'accounts.transfer',
-              'accounts.getBalance'
+              'ACCOUNTS_TRANSFER',
+              'ACCOUNTS_GET_BALANCE'
             ]
           }
         ]
@@ -823,20 +822,21 @@ describe('dfspLinkingModel', () => {
           consentRequestId: 'b51ec534-ee48-4575-b6a9-ead2955b8069',
           scopes: [
             {
-              accountId: 'dfspa.username.1234',
+              address: 'dfspa.username.1234',
               actions: [
-                'accounts.transfer',
-                'accounts.getBalance'
+                'ACCOUNTS_TRANSFER',
+                'ACCOUNTS_GET_BALANCE'
               ]
             },
             {
-              accountId: 'dfspa.username.5678',
+              address: 'dfspa.username.5678',
               actions: [
-                'accounts.transfer',
-                'accounts.getBalance'
+                'ACCOUNTS_TRANSFER',
+                'ACCOUNTS_GET_BALANCE'
               ]
             }
-          ]
+          ],
+          status: 'ISSUED'
         },
         'pispa'
       )
@@ -854,7 +854,7 @@ describe('dfspLinkingModel', () => {
         // start send consent step
         await model.fsm.grantConsent()
         shouldNotBeExecuted()
-      } catch (err) {
+      } catch (err: any) {
         expect(err.message).toEqual('mocked postConsents exception')
       }
 
@@ -878,24 +878,24 @@ describe('dfspLinkingModel', () => {
     const consentsIDPutResponseVerified: tpAPI.Schemas.ConsentsIDPutResponseVerified = {
       scopes: [
         {
-          accountId: 'dfspa.username.1234',
+          address: 'dfspa.username.1234',
           actions: [
-            'accounts.transfer',
-            'accounts.getBalance'
+            'ACCOUNTS_TRANSFER',
+            'ACCOUNTS_GET_BALANCE'
           ]
         },
         {
-          accountId: 'dfspa.username.5678',
+          address: 'dfspa.username.5678',
           actions: [
-            'accounts.transfer',
-            'accounts.getBalance'
+            'ACCOUNTS_TRANSFER',
+            'ACCOUNTS_GET_BALANCE'
           ]
         }
       ],
       credential: {
         credentialType: 'FIDO',
         status: 'VERIFIED',
-        payload: {
+        fidoPayload: {
           id: 'credential id: identifier of pair of keys, base64 encoded, min length 59',
           rawId: 'raw credential id: identifier of pair of keys, base64 encoded, min length 59',
           response: {
@@ -930,20 +930,20 @@ describe('dfspLinkingModel', () => {
         consentIDPutResponseSignedCredentialFromPISP: mockData.inboundPutConsentsIdRequestSignedCredential.payload,
         scopes: [
           {
-            accountId: 'dfspa.username.1234',
+            address: 'dfspa.username.1234',
             actions: [
-              'accounts.transfer',
-              'accounts.getBalance'
+              'ACCOUNTS_TRANSFER',
+              'ACCOUNTS_GET_BALANCE'
             ]
           },
           {
-            accountId: 'dfspa.username.5678',
+            address: 'dfspa.username.5678',
             actions: [
-              'accounts.transfer',
-              'accounts.getBalance'
+              'ACCOUNTS_TRANSFER',
+              'ACCOUNTS_GET_BALANCE'
             ]
           }
-        ],
+        ]
       }
     })
 
@@ -979,24 +979,25 @@ describe('dfspLinkingModel', () => {
           consentId: '00000000-0000-1000-8000-000000000001',
           scopes: [
             {
-              accountId: 'dfspa.username.1234',
+              address: 'dfspa.username.1234',
               actions: [
-                'accounts.transfer',
-                'accounts.getBalance'
+                'ACCOUNTS_TRANSFER',
+                'ACCOUNTS_GET_BALANCE'
               ]
             },
             {
-              accountId: 'dfspa.username.5678',
+              address: 'dfspa.username.5678',
               actions: [
-                'accounts.transfer',
-                'accounts.getBalance'
+                'ACCOUNTS_TRANSFER',
+                'ACCOUNTS_GET_BALANCE'
               ]
             }
           ],
+          status: 'ISSUED',
           credential: {
             credentialType: 'FIDO',
             status: 'PENDING',
-            payload: {
+            fidoPayload: {
               id: 'credential id: identifier of pair of keys, base64 encoded, min length 59',
               rawId: 'raw credential id: identifier of pair of keys, base64 encoded, min length 59',
               response: {
@@ -1072,7 +1073,7 @@ describe('dfspLinkingModel', () => {
         // start send consent step
         await model.fsm.validateWithAuthService()
         shouldNotBeExecuted()
-      } catch (err) {
+      } catch (err: any) {
         expect(err.message).toEqual('mocked postConsents exception')
       }
 
@@ -1108,26 +1109,27 @@ describe('dfspLinkingModel', () => {
         consentIDPutResponseSignedCredentialFromPISP: mockData.inboundPutConsentsIdRequestSignedCredential.payload,
         consentPostRequestToAuthService: {
           consentId: '00000000-0000-1000-8000-000000000001',
+          status: 'ISSUED',
           scopes: [
             {
-              accountId: 'dfspa.username.1234',
+              address: 'dfspa.username.1234',
               actions: [
-                'accounts.transfer',
-                'accounts.getBalance'
+                'ACCOUNTS_TRANSFER',
+                'ACCOUNTS_GET_BALANCE'
               ]
             },
             {
-              accountId: 'dfspa.username.5678',
+              address: 'dfspa.username.5678',
               actions: [
-                'accounts.transfer',
-                'accounts.getBalance'
+                'ACCOUNTS_TRANSFER',
+                'ACCOUNTS_GET_BALANCE'
               ]
             }
           ],
           credential: {
             credentialType: 'FIDO',
             status: 'PENDING',
-            payload: {
+            fidoPayload: {
               id: 'credential id: identifier of pair of keys, base64 encoded, min length 59',
               rawId: 'raw credential id: identifier of pair of keys, base64 encoded, min length 59',
               response: {
@@ -1149,20 +1151,20 @@ describe('dfspLinkingModel', () => {
         },
         scopes: [
           {
-            accountId: 'dfspa.username.1234',
+            address: 'dfspa.username.1234',
             actions: [
-              'accounts.transfer',
-              'accounts.getBalance'
+              'ACCOUNTS_TRANSFER',
+              'ACCOUNTS_GET_BALANCE'
             ]
           },
           {
-            accountId: 'dfspa.username.5678',
+            address: 'dfspa.username.5678',
             actions: [
-              'accounts.transfer',
-              'accounts.getBalance'
+              'ACCOUNTS_TRANSFER',
+              'ACCOUNTS_GET_BALANCE'
             ]
           }
-        ],
+        ]
       }
     })
 
@@ -1189,27 +1191,27 @@ describe('dfspLinkingModel', () => {
         .toBeCalledWith(
           [
             {
-              accountId: 'dfspa.username.1234',
+              address: 'dfspa.username.1234',
               actions: [
-                'accounts.transfer',
-                'accounts.getBalance'
+                'ACCOUNTS_TRANSFER',
+                'ACCOUNTS_GET_BALANCE'
               ]
             },
             {
-              accountId: 'dfspa.username.5678',
+              address: 'dfspa.username.5678',
               actions: [
-                'accounts.transfer',
-                'accounts.getBalance'
+                'ACCOUNTS_TRANSFER',
+                'ACCOUNTS_GET_BALANCE'
               ]
             }
           ],
-          "00000000-0000-1000-8000-000000000001",
-          "b51ec534-ee48-4575-b6a9-ead2955b8069",
-          "b9c285afee7a671a42b0f9276e6d90f7e21c1e56f4c73a5200fe708850149eea",
+          '00000000-0000-1000-8000-000000000001',
+          'b51ec534-ee48-4575-b6a9-ead2955b8069',
+          '2357b3e1c14cdafd8eb71a97788c9c71c7f12ce6f4d43bec3f118a90f2a33af8',
           {
             credentialType: 'FIDO',
             status: 'VERIFIED',
-            payload: {
+            fidoPayload: {
               id: 'credential id: identifier of pair of keys, base64 encoded, min length 59',
               rawId: 'raw credential id: identifier of pair of keys, base64 encoded, min length 59',
               response: {
@@ -1246,7 +1248,7 @@ describe('dfspLinkingModel', () => {
         // start request scopes step
         await model.fsm.storeValidatedConsentWithDFSP()
         shouldNotBeExecuted()
-      } catch (err) {
+      } catch (err: any) {
         expect(err.message).toEqual('mocked storeValidatedConsentForAccountId exception')
       }
     })
@@ -1270,20 +1272,20 @@ describe('dfspLinkingModel', () => {
         consentIDPutResponseFromAuthService: mockData.inboundPutConsentsIdRequestVerifiedCredential.payload,
         scopes: [
           {
-            accountId: 'dfspa.username.1234',
+            address: 'dfspa.username.1234',
             actions: [
-              'accounts.transfer',
-              'accounts.getBalance'
+              'ACCOUNTS_TRANSFER',
+              'ACCOUNTS_GET_BALANCE'
             ]
           },
           {
-            accountId: 'dfspa.username.5678',
+            address: 'dfspa.username.5678',
             actions: [
-              'accounts.transfer',
-              'accounts.getBalance'
+              'ACCOUNTS_TRANSFER',
+              'ACCOUNTS_GET_BALANCE'
             ]
           }
-        ],
+        ]
       }
     })
 
@@ -1320,20 +1322,20 @@ describe('dfspLinkingModel', () => {
         consentIDPutResponseFromAuthService: mockData.inboundPutConsentsIdRequestVerifiedCredential.payload,
         scopes: [
           {
-            accountId: 'dfspa.username.1234',
+            address: 'dfspa.username.1234',
             actions: [
-              'accounts.transfer',
-              'accounts.getBalance'
+              'ACCOUNTS_TRANSFER',
+              'ACCOUNTS_GET_BALANCE'
             ]
           },
           {
-            accountId: 'dfspa.username.5678',
+            address: 'dfspa.username.5678',
             actions: [
-              'accounts.transfer',
-              'accounts.getBalance'
+              'ACCOUNTS_TRANSFER',
+              'ACCOUNTS_GET_BALANCE'
             ]
           }
-        ],
+        ]
       }
     })
 
@@ -1374,7 +1376,7 @@ describe('dfspLinkingModel', () => {
         // start send consent step
         await model.fsm.notifyVerificationToPISP()
         shouldNotBeExecuted()
-      } catch (err) {
+      } catch (err: any) {
         expect(err.message).toEqual('mocked patchConsents exception')
       }
 
@@ -1399,24 +1401,24 @@ describe('dfspLinkingModel', () => {
     const consentsIDPutResponseVerified: tpAPI.Schemas.ConsentsIDPutResponseVerified = {
       scopes: [
         {
-          accountId: 'dfspa.username.1234',
+          address: 'dfspa.username.1234',
           actions: [
-            'accounts.transfer',
-            'accounts.getBalance'
+            'ACCOUNTS_TRANSFER',
+            'ACCOUNTS_GET_BALANCE'
           ]
         },
         {
-          accountId: 'dfspa.username.5678',
+          address: 'dfspa.username.5678',
           actions: [
-            'accounts.transfer',
-            'accounts.getBalance'
+            'ACCOUNTS_TRANSFER',
+            'ACCOUNTS_GET_BALANCE'
           ]
         }
       ],
       credential: {
         credentialType: 'FIDO',
         status: 'VERIFIED',
-        payload: {
+        fidoPayload: {
           id: 'credential id: identifier of pair of keys, base64 encoded, min length 59',
           rawId: 'raw credential id: identifier of pair of keys, base64 encoded, min length 59',
           response: {
@@ -1444,7 +1446,7 @@ describe('dfspLinkingModel', () => {
         toAuthServiceParticipantId: 'central-auth',
         consentRequestsPostRequest: mockData.consentRequestsPost.payload,
         currentState: 'start',
-        consentRequestId: mockData.consentRequestsPost.payload.consentRequestId,
+        consentRequestId: mockData.consentRequestsPost.payload.consentRequestId
       }
     })
 
@@ -1497,7 +1499,6 @@ describe('dfspLinkingModel', () => {
       expect(model.data.currentState).toEqual('notificationSent')
 
       mocked(modelConfig.logger.info).mockReset()
-
     })
 
     it('errored', async () => {
@@ -1554,17 +1555,17 @@ describe('dfspLinkingModel', () => {
         consentRequestsIDPatchResponse: mockData.consentRequestsIDPatchRequest.payload,
         scopes: [
           {
-            accountId: 'dfspa.username.1234',
+            address: 'dfspa.username.1234',
             actions: [
-              'accounts.transfer',
-              'accounts.getBalance'
+              'ACCOUNTS_TRANSFER',
+              'ACCOUNTS_GET_BALANCE'
             ]
           },
           {
-            accountId: 'dfspa.username.5678',
+            address: 'dfspa.username.5678',
             actions: [
-              'accounts.transfer',
-              'accounts.getBalance'
+              'ACCOUNTS_TRANSFER',
+              'ACCOUNTS_GET_BALANCE'
             ]
           }
         ]
@@ -1605,20 +1606,21 @@ describe('dfspLinkingModel', () => {
           consentRequestId: 'b51ec534-ee48-4575-b6a9-ead2955b8069',
           scopes: [
             {
-              accountId: 'dfspa.username.1234',
+              address: 'dfspa.username.1234',
               actions: [
-                'accounts.transfer',
-                'accounts.getBalance'
+                'ACCOUNTS_TRANSFER',
+                'ACCOUNTS_GET_BALANCE'
               ]
             },
             {
-              accountId: 'dfspa.username.5678',
+              address: 'dfspa.username.5678',
               actions: [
-                'accounts.transfer',
-                'accounts.getBalance'
+                'ACCOUNTS_TRANSFER',
+                'ACCOUNTS_GET_BALANCE'
               ]
             }
-          ]
+          ],
+          status: 'ISSUED'
         },
         'pispa'
       )
@@ -1637,7 +1639,7 @@ describe('dfspLinkingModel', () => {
         // start send consent step
         await model.fsm.grantConsent()
         shouldNotBeExecuted()
-      } catch (err) {
+      } catch (err: any) {
         expect(err.message).toEqual('mocked postConsents exception')
       }
 

@@ -158,6 +158,7 @@ export class DFSPTransactionModel
     // store the context for later
     this.data.transactionRequestContext = {
       payerPartyIdInfo: validationResult.payerPartyIdInfo,
+      payerPersonalInfo: validationResult.payerPersonalInfo,
       consentId: validationResult.consentId
     }
 
@@ -206,12 +207,15 @@ export class DFSPTransactionModel
         quoteId: uuidv4(),
 
         // copy from previously allocated
-        transactionId: this.data.transactionRequestPutUpdate!.transactionId,
+        transactionId: this.data.transactionId!,
 
         // copy from request
         transactionRequestId: tr.transactionRequestId,
         payee: { ...tr.payee },
-        payer: { partyIdInfo: this.data.transactionRequestContext!.payerPartyIdInfo },
+        payer: {
+          partyIdInfo: this.data.transactionRequestContext!.payerPartyIdInfo,
+          personalInfo: this.data.transactionRequestContext!.payerPersonalInfo
+        },
         amountType: tr.amountType,
         amount: { ...tr.amount },
         transactionType: { ...tr.transactionType }
@@ -241,9 +245,13 @@ export class DFSPTransactionModel
       // shortcut
       const quote = this.data.requestQuoteResponse!.quotes
       const transferAmount: fspiopAPI.Schemas.Money = quote.transferAmount
-      const payeeReceiveAmount = payeeReceiveAmountForQuoteAndFees(transferAmount, quote.payeeFspFee, quote.payeeFspCommission)
+      const payeeReceiveAmount = payeeReceiveAmountForQuoteAndFees(
+        transferAmount,
+        quote.payeeFspFee,
+        quote.payeeFspCommission
+      )
 
-      // fees are calulated on the basic difference between transfer amount
+      // fees are calculated on the basic difference between transfer amount
       // and receive amount. This doesn't take into consideration any fees
       // the Payer DFSP might want to add, or any commission they receive
       const fees = feeForTransferAndPayeeReceiveAmount(transferAmount, payeeReceiveAmount)
@@ -332,30 +340,40 @@ export class DFSPTransactionModel
         DFSPTransactionPhase.waitOnVerificationResponseFromSwitchChannel,
         verificationRequestId
       )
+      // TODO: Need to handle rejection case
+      if (this.data.requestAuthorizationResponse?.responseType &&
+        this.data.requestAuthorizationResponse?.responseType === 'REJECTED') {
+        throw new Error('PISP end user rejection not supported')
+      }
 
-      const signedPayloadType = this.data.requestAuthorizationResponse!.signedPayloadType
-      // help typescript to figure out what to do
+      const authResponse = this.data.requestAuthorizationResponse as
+        tpAPI.Schemas.ThirdpartyRequestsAuthorizationsIDPutResponseFIDO |
+        tpAPI.Schemas.ThirdpartyRequestsAuthorizationsIDPutResponseGeneric
+      const signedPayloadType = authResponse.signedPayload.signedPayloadType
+
       switch (signedPayloadType) {
         case 'FIDO': {
-          const rar = this.data.requestAuthorizationResponse! as tpAPI.Schemas.ThirdpartyRequestsAuthorizationsIDPutResponseFIDO
+          const rar = this.data.requestAuthorizationResponse! as
+            tpAPI.Schemas.ThirdpartyRequestsAuthorizationsIDPutResponseFIDO
           this.data.requestVerificationPostRequest = {
             verificationRequestId,
             consentId: this.data.transactionRequestContext!.consentId,
-            signedPayload: rar.signedPayload,
+            fidoSignedPayload: rar.signedPayload.fidoSignedPayload,
             signedPayloadType: 'FIDO',
             challenge: this.data.requestAuthorizationPostRequest!.challenge
-          }
+          } as tpAPI.Schemas.ThirdpartyRequestsVerificationsPostRequestFIDO
           break
         }
         case 'GENERIC': {
-          const rar = this.data.requestAuthorizationResponse! as tpAPI.Schemas.ThirdpartyRequestsAuthorizationsIDPutResponseGeneric
+          const rar = this.data.requestAuthorizationResponse! as
+            tpAPI.Schemas.ThirdpartyRequestsAuthorizationsIDPutResponseGeneric
           this.data.requestVerificationPostRequest = {
             verificationRequestId,
             consentId: this.data.transactionRequestContext!.consentId,
-            signedPayload: rar.signedPayload!,
+            genericSignedPayload: rar.signedPayload!.genericSignedPayload,
             signedPayloadType: 'GENERIC',
             challenge: this.data.requestAuthorizationPostRequest!.challenge
-          }
+          } as tpAPI.Schemas.ThirdpartyRequestsVerificationsPostRequestGeneric
           break
         }
         default:
@@ -366,7 +384,7 @@ export class DFSPTransactionModel
 
       await deferredJob(this.subscriber, channel)
         .init(async channel => {
-          // Send the request to the PISP
+          // Send the request to the auth service for verification.
           const response = await this.thirdpartyRequests.postThirdpartyRequestsVerifications(
             this.data.requestVerificationPostRequest!,
             this.config.authServiceParticipantId
@@ -460,7 +478,6 @@ export class DFSPTransactionModel
 
     this.data.transferResponse = transferResult
     this.data.transactionRequestPatchUpdate = {
-      transactionId: this.data.transactionId!,
       transactionRequestState: this.data.transactionRequestState,
       transactionState: 'COMPLETED'
     }
@@ -522,7 +539,8 @@ export class DFSPTransactionModel
           // stopped in errored state
           this.logger.info('State machine in errored state')
       }
-    } catch (error) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
       const mojaloopError = reformatError(error, this.logger)
       this.logger.push({ error, mojaloopError }).info(`Sending error response to ${this.data.participantId}`)
       this.data.currentState = 'errored'

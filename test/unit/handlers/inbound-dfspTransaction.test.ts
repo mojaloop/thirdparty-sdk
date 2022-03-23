@@ -16,17 +16,20 @@ import { PubSub } from '~/shared/pub-sub'
 import { DFSPTransactionModel } from '~/models/dfspTransaction.model'
 import { mockDeferredJobWithCallbackMessage } from '../mockDeferredJob'
 
-const requestAuthorizationResponse = {
-  signedPayloadType: 'FIDO',
+const requestAuthorizationResponse: tpAPI.Schemas.ThirdpartyRequestsAuthorizationsIDPutResponseFIDO = {
+  responseType: 'ACCEPTED',
   signedPayload: {
-    id: '45c-TkfkjQovQeAWmOy-RLBHEJ_e4jYzQYgD8VdbkePgM5d98BaAadadNYrknxgH0jQEON8zBydLgh1EqoC9DA',
-    rawId: '45c+TkfkjQovQeAWmOy+RLBHEJ/e4jYzQYgD8VdbkePgM5d98BaAadadNYrknxgH0jQEON8zBydLgh1EqoC9DA==',
-    response: {
-      authenticatorData: 'SZYN5YgOjGh0NBcPZHZgW4/krrmihjLHmVzzuoMdl2MBAAAACA==',
-      clientDataJSON: 'eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiQUFBQUFBQUFBQUFBQUFBQUFBRUNBdyIsIm9yaWdpbiI6Imh0dHA6Ly9sb2NhbGhvc3Q6NDIxODEiLCJjcm9zc09yaWdpbiI6ZmFsc2UsIm90aGVyX2tleXNfY2FuX2JlX2FkZGVkX2hlcmUiOiJkbyBub3QgY29tcGFyZSBjbGllbnREYXRhSlNPTiBhZ2FpbnN0IGEgdGVtcGxhdGUuIFNlZSBodHRwczovL2dvby5nbC95YWJQZXgifQ==',
-      signature: 'MEUCIDcJRBu5aOLJVc/sPyECmYi23w8xF35n3RNhyUNVwQ2nAiEA+Lnd8dBn06OKkEgAq00BVbmH87ybQHfXlf1Y4RJqwQ8='
-    },
-    type: 'public-key'
+    signedPayloadType: 'FIDO',
+    fidoSignedPayload: {
+      id: '45c-TkfkjQovQeAWmOy-RLBHEJ_e4jYzQYgD8VdbkePgM5d98BaAadadNYrknxgH0jQEON8zBydLgh1EqoC9DA',
+      rawId: '45c+TkfkjQovQeAWmOy+RLBHEJ/e4jYzQYgD8VdbkePgM5d98BaAadadNYrknxgH0jQEON8zBydLgh1EqoC9DA==',
+      response: {
+        authenticatorData: 'SZYN5YgOjGh0NBcPZHZgW4/krrmihjLHmVzzuoMdl2MBAAAACA==',
+        clientDataJSON: 'eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiQUFBQUFBQUFBQUFBQUFBQUFBRUNBdyIsIm9yaWdpbiI6Imh0dHA6Ly9sb2NhbGhvc3Q6NDIxODEiLCJjcm9zc09yaWdpbiI6ZmFsc2UsIm90aGVyX2tleXNfY2FuX2JlX2FkZGVkX2hlcmUiOiJkbyBub3QgY29tcGFyZSBjbGllbnREYXRhSlNPTiBhZ2FpbnN0IGEgdGVtcGxhdGUuIFNlZSBodHRwczovL2dvby5nbC95YWJQZXgifQ==',
+        signature: 'MEUCIDcJRBu5aOLJVc/sPyECmYi23w8xF35n3RNhyUNVwQ2nAiEA+Lnd8dBn06OKkEgAq00BVbmH87ybQHfXlf1Y4RJqwQ8='
+      },
+      type: 'public-key'
+    }
   }
 }
 
@@ -85,7 +88,7 @@ describe('Inbound DFSP Transaction handler', () => {
         ilpPacket: 'abcd...',
         condition: 'xyz....',
         expiration: (new Date()).toISOString(),
-        payeeReceiveAmount: { ...transactionRequestRequest.amount },
+        payeeReceiveAmount: { ...transactionRequestRequest.amount }
       },
       currentState: 'COMPLETED'
     }
@@ -113,18 +116,18 @@ describe('Inbound DFSP Transaction handler', () => {
       patchThirdpartyRequestsTransactions: jest.fn(() => Promise.resolve({ statusCode: 200 })),
       putThirdpartyRequestsTransactionsError: jest.fn(() => Promise.resolve({ statusCode: 200 })),
       postThirdpartyRequestsAuthorizations: jest.fn(() => Promise.resolve({ statusCode: 200 })),
-      postThirdpartyRequestsVerifications: jest.fn(() => Promise.resolve({ statusCode: 200 })),
+      postThirdpartyRequestsVerifications: jest.fn(() => Promise.resolve({ statusCode: 200 }))
     } as unknown as ThirdpartyRequests
 
     dfspBackendRequestsMock = {
-      validateThirdpartyTransactionRequestAndGetContext: jest.fn(() => Promise.resolve({ isValid: true })),
+      validateThirdpartyTransactionRequestAndGetContext: jest.fn(() => Promise.resolve({ isValid: true }))
     } as unknown as DFSPBackendRequests
     sdkOutgoingRequestsMock = {
       requestQuote: jest.fn(() => Promise.resolve(requestQuoteResponse)),
       requestTransfer: jest.fn(() => Promise.resolve(requestTransferResponse))
     } as unknown as SDKOutgoingRequests
     toolkit = {
-      getPublisher: jest.fn(() => ({publish: publishMock})),
+      getPublisher: jest.fn(() => ({ publish: publishMock })),
       getDFSPId: jest.fn(() => 'pisp'),
       getLogger: jest.fn(() => mockLogger()),
       getKVS: jest.fn(() => kvsMock),
@@ -180,7 +183,7 @@ describe('Inbound DFSP Transaction handler', () => {
     }, 100)
   })
 
-  it('PUT /thirdpartyRequests/authorizations/{ID}', async () =>{
+  it('PUT /thirdpartyRequests/authorizations/{ID}', async () => {
     // Arrange
     jest.spyOn(DFSPTransactionModel, 'notificationChannel')
       .mockReturnValueOnce('channel1234')
@@ -206,14 +209,13 @@ describe('Inbound DFSP Transaction handler', () => {
       requestAuthorizationResponse
     ]
 
-    
     // Act
     const result = await ThirdpartyRequestsAuthorizations.put(
       {} as unknown as Context,
       request as unknown as Request,
       toolkit as unknown as StateResponseToolkit
     )
-    
+
     // Assert
     expect(result.statusCode).toBe(200)
     expect(DFSPTransactionModel.notificationChannel).toHaveBeenCalledWith(...expectedNotificationChannel)
@@ -246,7 +248,6 @@ describe('Inbound DFSP Transaction handler', () => {
       requestVerificationResponse
     ]
 
-
     // Act
     const result = await ThirdpartyRequestsVerifications.put(
       {} as unknown as Context,
@@ -256,7 +257,7 @@ describe('Inbound DFSP Transaction handler', () => {
 
     // Assert
     expect(result.statusCode).toBe(200)
-  expect(DFSPTransactionModel.notificationChannel).toHaveBeenCalledWith(...expectedNotificationChannel)
-  expect(publishMock).toHaveBeenCalledWith(...expectedPublishMock)
+    expect(DFSPTransactionModel.notificationChannel).toHaveBeenCalledWith(...expectedNotificationChannel)
+    expect(publishMock).toHaveBeenCalledWith(...expectedPublishMock)
   })
 })

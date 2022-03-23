@@ -31,6 +31,7 @@ import Config from '~/shared/config'
 import Handlers from '~/handlers'
 import index from '~/index'
 import path from 'path'
+import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
 
 const apiPath = path.resolve(__dirname, '../../src/interface/api-inbound.yaml')
 const featurePath = path.resolve(__dirname, '../features/consents-inbound.feature')
@@ -61,7 +62,7 @@ defineFeature(feature, (test): void => {
 
   afterAll(async (done): Promise<void> => {
     server.events.on('stop', done)
-    server.stop({ timeout:0 })
+    server.stop({ timeout: 0 })
   })
 
   afterEach((): void => {
@@ -77,28 +78,30 @@ defineFeature(feature, (test): void => {
     when('I receive a \'PostConsents\' request', async (): Promise<ServerInjectResponse> => {
       jest.mock('~/shared/kvs')
       jest.mock('~/shared/pub-sub')
+      const payload: tpAPI.Schemas.ConsentsPostRequestPISP = {
+        consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
+        consentRequestId: '997c89f4-053c-4283-bfec-45a1a0a28fba',
+        status: 'ISSUED',
+        scopes: [{
+          address: 'some-id',
+          actions: [
+            'ACCOUNTS_GET_BALANCE',
+            'ACCOUNTS_TRANSFER'
+          ]
+        }
+        ]
+      }
       const request = {
         method: 'POST',
         url: '/consents',
         headers: {
           'Content-Type': 'application/json',
           'FSPIOP-Source': 'switch',
-          'Accept': 'application/json',
+          Accept: 'application/json',
           Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
           'FSPIOP-Destination': 'dfspA'
         },
-        payload: {
-          consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
-          consentRequestId: '997c89f4-053c-4283-bfec-45a1a0a28fba',
-          scopes: [{
-            accountId: 'some-id',
-            actions: [
-              'accounts.getBalance',
-              'accounts.transfer'
-            ]
-          }
-          ]
-        }
+        payload
       }
       response = await server.inject(request)
       return response
@@ -117,47 +120,48 @@ defineFeature(feature, (test): void => {
     when('I receive a \'PutConsentByID\' request', async (): Promise<ServerInjectResponse> => {
       jest.mock('~/shared/kvs')
       jest.mock('~/shared/pub-sub')
+      const payload: tpAPI.Schemas.ConsentsIDPutResponseSigned = {
+        scopes: [{
+          address: 'some-id',
+          actions: [
+            'ACCOUNTS_GET_BALANCE',
+            'ACCOUNTS_TRANSFER'
+          ]
+        }],
+        credential: {
+          credentialType: 'FIDO',
+          status: 'PENDING',
+          fidoPayload: {
+            id: 'credential id: identifier of pair of keys, base64 encoded, min length 59',
+            rawId: 'raw credential id: identifier of pair of keys, base64 encoded, min length 59',
+            response: {
+              clientDataJSON: 'clientDataJSON-must-not-have-fewer-than-121-' +
+                'characters Lorem ipsum dolor sit amet, consectetur adipiscing ' +
+                'elit, sed do eiusmod tempor incididunt ut labore et dolore magna ' +
+                'aliqua.',
+              attestationObject: 'attestationObject-must-not-have-fewer-than-' +
+                '306-characters Lorem ipsum dolor sit amet, consectetur ' +
+                'adipiscing elit, sed do eiusmod tempor incididunt ut ' +
+                'labore et dolore magna aliqua. Ut enim ad minim veniam, ' +
+                'quis nostrud exercitation ullamco laboris nisi ut aliquip ' +
+                'ex ea commodo consequat. Duis aute irure dolor in reprehenderit ' +
+                'in voluptate velit esse cillum dolore eu fugiat nulla pariatur.'
+            },
+            type: 'public-key'
+          }
+        }
+      }
       const request = {
         method: 'PUT',
         url: '/consents/8e34f91d-d078-4077-8263-2c047876fcf6',
         headers: {
           'Content-Type': 'application/json',
           'FSPIOP-Source': 'switch',
-          'Accept': 'application/json',
+          Accept: 'application/json',
           Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
           'FSPIOP-Destination': 'dfspA'
         },
-        payload: {
-          scopes: [{
-            accountId: 'some-id',
-            actions: [
-              'accounts.getBalance',
-              'accounts.transfer'
-            ]
-          }],
-          credential: {
-            credentialType: 'FIDO',
-            status: 'PENDING',
-            payload: {
-              id: 'credential id: identifier of pair of keys, base64 encoded, min length 59',
-              rawId: 'raw credential id: identifier of pair of keys, base64 encoded, min length 59',
-              response: {
-                clientDataJSON: 'clientDataJSON-must-not-have-fewer-than-121-' +
-                  'characters Lorem ipsum dolor sit amet, consectetur adipiscing ' +
-                  'elit, sed do eiusmod tempor incididunt ut labore et dolore magna ' +
-                  'aliqua.',
-                attestationObject: 'attestationObject-must-not-have-fewer-than-' +
-                  '306-characters Lorem ipsum dolor sit amet, consectetur ' +
-                  'adipiscing elit, sed do eiusmod tempor incididunt ut ' +
-                  'labore et dolore magna aliqua. Ut enim ad minim veniam, ' +
-                  'quis nostrud exercitation ullamco laboris nisi ut aliquip ' +
-                  'ex ea commodo consequat. Duis aute irure dolor in reprehenderit ' +
-                  'in voluptate velit esse cillum dolore eu fugiat nulla pariatur.'
-              },
-              type: 'public-key'
-            }
-          }
-        }
+        payload
       }
       response = await server.inject(request)
       return response
@@ -176,47 +180,48 @@ defineFeature(feature, (test): void => {
     when('I receive a \'PutConsentByID\' request', async (): Promise<ServerInjectResponse> => {
       jest.mock('~/shared/kvs')
       jest.mock('~/shared/pub-sub')
+      const payload: tpAPI.Schemas.ConsentsIDPutResponseVerified = {
+        scopes: [{
+          address: 'some-id',
+          actions: [
+            'ACCOUNTS_GET_BALANCE',
+            'ACCOUNTS_TRANSFER'
+          ]
+        }],
+        credential: {
+          credentialType: 'FIDO',
+          status: 'VERIFIED',
+          fidoPayload: {
+            id: 'credential id: identifier of pair of keys, base64 encoded, min length 59',
+            rawId: 'raw credential id: identifier of pair of keys, base64 encoded, min length 59',
+            response: {
+              clientDataJSON: 'clientDataJSON-must-not-have-fewer-than-121-' +
+                'characters Lorem ipsum dolor sit amet, consectetur adipiscing ' +
+                'elit, sed do eiusmod tempor incididunt ut labore et dolore magna ' +
+                'aliqua.',
+              attestationObject: 'attestationObject-must-not-have-fewer-than-' +
+                '306-characters Lorem ipsum dolor sit amet, consectetur ' +
+                'adipiscing elit, sed do eiusmod tempor incididunt ut ' +
+                'labore et dolore magna aliqua. Ut enim ad minim veniam, ' +
+                'quis nostrud exercitation ullamco laboris nisi ut aliquip ' +
+                'ex ea commodo consequat. Duis aute irure dolor in reprehenderit ' +
+                'in voluptate velit esse cillum dolore eu fugiat nulla pariatur.'
+            },
+            type: 'public-key'
+          }
+        }
+      }
       const request = {
         method: 'PUT',
         url: '/consents/8e34f91d-d078-4077-8263-2c047876fcf6',
         headers: {
           'Content-Type': 'application/json',
           'FSPIOP-Source': 'switch',
-          'Accept': 'application/json',
+          Accept: 'application/json',
           Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
           'FSPIOP-Destination': 'dfspA'
         },
-        payload: {
-          scopes: [{
-            accountId: 'some-id',
-            actions: [
-              'accounts.getBalance',
-              'accounts.transfer'
-            ]
-          }],
-          credential: {
-            credentialType: 'FIDO',
-            status: 'VERIFIED',
-            payload: {
-              id: 'credential id: identifier of pair of keys, base64 encoded, min length 59',
-              rawId: 'raw credential id: identifier of pair of keys, base64 encoded, min length 59',
-              response: {
-                clientDataJSON: 'clientDataJSON-must-not-have-fewer-than-121-' +
-                  'characters Lorem ipsum dolor sit amet, consectetur adipiscing ' +
-                  'elit, sed do eiusmod tempor incididunt ut labore et dolore magna ' +
-                  'aliqua.',
-                attestationObject: 'attestationObject-must-not-have-fewer-than-' +
-                  '306-characters Lorem ipsum dolor sit amet, consectetur ' +
-                  'adipiscing elit, sed do eiusmod tempor incididunt ut ' +
-                  'labore et dolore magna aliqua. Ut enim ad minim veniam, ' +
-                  'quis nostrud exercitation ullamco laboris nisi ut aliquip ' +
-                  'ex ea commodo consequat. Duis aute irure dolor in reprehenderit ' +
-                  'in voluptate velit esse cillum dolore eu fugiat nulla pariatur.'
-              },
-              type: 'public-key'
-            }
-          }
-        }
+        payload
       }
       response = await server.inject(request)
       return response

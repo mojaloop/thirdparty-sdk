@@ -29,14 +29,12 @@
 import ThirdpartyRequestsTransactions from './thirdpartyRequests/transactions'
 import ThirdpartyRequestsAuthorizations from './thirdpartyRequests/authorizations'
 import ThirdpartyRequestsVerifications from './thirdpartyRequests/verifications'
-import InboundAuthorizations from './authorizations'
 import InboundConsents from './consents'
 import InboundConsentsId from './consents/{ID}'
 import InboundConsentsIdError from './consents/{ID}/error'
 import InboundConsentRequests from './consentRequests'
 import InboundConsentRequestsId from './consentRequests/{ID}'
 import InboundConsentRequestsIdError from './consentRequests/{ID}/error'
-import ThirdpartyAuthorizations from './thirdpartyRequests/transactions/{ID}/authorizations'
 import NotifyThirdpartyTransactionRequests from './thirdpartyRequests/transactions/{ID}'
 import ThirdpartyTransactionRequestsError from './thirdpartyRequests/transactions/{ID}/error'
 import InboundAccounts from './accounts/{ID}'
@@ -49,10 +47,7 @@ import ParticipantsTypeID from './participants/{Type}/{ID}'
 import ParticipantsTypeIDError from './participants/{Type}/{ID}/error'
 
 export default {
-  CreateThirdpartyTransactionRequests: ThirdpartyRequestsTransactions.post,
-  AuthorizationsPostRequest: InboundAuthorizations.post,
-  InboundAuthorizationsIDPutResponse: InboundAuthorizations.put,
-  UpdateThirdpartyAuthorization: ThirdpartyAuthorizations.put,
+  ThirdpartyRequestsTransactionsPost: ThirdpartyRequestsTransactions.post,
   NotifyThirdpartyTransactionRequests: NotifyThirdpartyTransactionRequests.patch,
   UpdateThirdPartyTransactionRequests: NotifyThirdpartyTransactionRequests.put,
   ThirdpartyTransactionRequestsError: ThirdpartyTransactionRequestsError.put,
@@ -70,7 +65,7 @@ export default {
   PutConsentByID: InboundConsentsId.put,
   NotifyErrorConsents: InboundConsentsIdError.put,
   PutParticipantsByID: ParticipantsID.put,
-  PutParticipantsByIDAndError:  ParticipantsIDError.put,
+  PutParticipantsByIDAndError: ParticipantsIDError.put,
   ParticipantsByTypeAndID3: ParticipantsTypeID.put,
   ParticipantsErrorByTypeAndID: ParticipantsTypeIDError.put,
   PostThirdpartyRequestsAuthorizations: ThirdpartyRequestsAuthorizations.post,

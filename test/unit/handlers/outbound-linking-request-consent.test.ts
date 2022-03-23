@@ -28,9 +28,8 @@ import { Request } from '@hapi/hapi'
 import { StateResponseToolkit } from '~/server/plugins/state'
 import LinkingRequestConsent from '~/handlers/outbound/linking/request-consent'
 import mockLogger from '../mockLogger'
-import TestData from 'test/unit/data/mockData.json'
+import * as mockData from 'test/unit/data/mockData'
 
-const mockData = JSON.parse(JSON.stringify(TestData))
 // mock KVS default exported class
 jest.mock('~/shared/kvs')
 

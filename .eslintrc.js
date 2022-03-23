@@ -29,6 +29,7 @@ module.exports = {
     '@typescript-eslint/no-var-requires': 'error',
     // Sometimes openapi generator emits empty interfaces
     '@typescript-eslint/no-empty-interface': 'warn',
+    '@typescript-eslint/no-non-null-assertion': 'off',
     'no-console': 'off',
     quotes: ['error', 'single'],
     'linebreak-style': ['error', 'unix'],

@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from 'axios'
 import env from '../env'
 import { KVS } from '~/shared/kvs'
 import { RedisConnectionConfig } from '~/shared/redis-connection'
 import Config from '~/shared/config'
 import mockLogger from '../../unit/mockLogger'
+import * as OutboundAPI from '~/interface/outbound/api_interfaces'
 
 describe('PISP Transaction', (): void => {
   const config: RedisConnectionConfig = {
@@ -27,7 +29,7 @@ describe('PISP Transaction', (): void => {
 
   describe('/thirdpartyTransaction: partyLookup->initiate->approve', (): void => {
     it('transactionRequestState should be ACCEPTED', async (): Promise<void> => {
-      const lookupRequest = {
+      const lookupRequest: OutboundAPI.Schemas.ThirdpartyTransactionPartyLookupRequest = {
         payee: {
           partyIdType: 'MSISDN',
           partyIdentifier: '4412345678'
@@ -43,7 +45,7 @@ describe('PISP Transaction', (): void => {
       expect(lookupResponse.data.currentState).toEqual('partyLookupSuccess')
 
       const initiateURI = `${env.outbound.baseUri}/thirdpartyTransaction/${transactionRequestId}/initiate`
-      const initiateRequest = {
+      const initiateRequest: OutboundAPI.Schemas.ThirdpartyTransactionIDInitiateRequest = {
         payee: {
           partyIdInfo: {
             partyIdType: 'MSISDN',
@@ -76,22 +78,25 @@ describe('PISP Transaction', (): void => {
       expect(initiateresponse.data.currentState).toEqual('authorizationReceived')
 
       const approveURI = `${env.outbound.baseUri}/thirdpartyTransaction/${transactionRequestId}/approve`
-      const approveRequest = {
+      const approveRequest: OutboundAPI.Schemas.ThirdpartyTransactionIDApproveRequest = {
         authorizationResponse: {
-          signedPayloadType: 'FIDO',
+          responseType: 'ACCEPTED',
           signedPayload: {
-            id: '45c-TkfkjQovQeAWmOy-RLBHEJ_e4jYzQYgD8VdbkePgM5d98BaAadadNYrknxgH0jQEON8zBydLgh1EqoC9DA',
-            rawId: '45c+TkfkjQovQeAWmOy+RLBHEJ/e4jYzQYgD8VdbkePgM5d98BaAadadNYrknxgH0jQEON8zBydLgh1EqoC9DA==',
-            response: {
-              authenticatorData: 'SZYN5YgOjGh0NBcPZHZgW4/krrmihjLHmVzzuoMdl2MBAAAACA==',
-              clientDataJSON: 'eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiQUFBQUFBQUFBQUFBQUFBQUFBRUNBdyIsIm9yaWdpbiI6Imh0dHA6Ly9sb2NhbGhvc3Q6NDIxODEiLCJjcm9zc09yaWdpbiI6ZmFsc2UsIm90aGVyX2tleXNfY2FuX2JlX2FkZGVkX2hlcmUiOiJkbyBub3QgY29tcGFyZSBjbGllbnREYXRhSlNPTiBhZ2FpbnN0IGEgdGVtcGxhdGUuIFNlZSBodHRwczovL2dvby5nbC95YWJQZXgifQ==',
-              signature: 'MEUCIDcJRBu5aOLJVc/sPyECmYi23w8xF35n3RNhyUNVwQ2nAiEA+Lnd8dBn06OKkEgAq00BVbmH87ybQHfXlf1Y4RJqwQ8='
-            },
-            type: 'public-key'
+            signedPayloadType: 'FIDO',
+            fidoSignedPayload: {
+              id: '45c-TkfkjQovQeAWmOy-RLBHEJ_e4jYzQYgD8VdbkePgM5d98BaAadadNYrknxgH0jQEON8zBydLgh1EqoC9DA',
+              rawId: '45c+TkfkjQovQeAWmOy+RLBHEJ/e4jYzQYgD8VdbkePgM5d98BaAadadNYrknxgH0jQEON8zBydLgh1EqoC9DA==',
+              response: {
+                authenticatorData: 'SZYN5YgOjGh0NBcPZHZgW4/krrmihjLHmVzzuoMdl2MBAAAACA==',
+                clientDataJSON: 'eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiQUFBQUFBQUFBQUFBQUFBQUFBRUNBdyIsIm9yaWdpbiI6Imh0dHA6Ly9sb2NhbGhvc3Q6NDIxODEiLCJjcm9zc09yaWdpbiI6ZmFsc2UsIm90aGVyX2tleXNfY2FuX2JlX2FkZGVkX2hlcmUiOiJkbyBub3QgY29tcGFyZSBjbGllbnREYXRhSlNPTiBhZ2FpbnN0IGEgdGVtcGxhdGUuIFNlZSBodHRwczovL2dvby5nbC95YWJQZXgifQ==',
+                signature: 'MEUCIDcJRBu5aOLJVc/sPyECmYi23w8xF35n3RNhyUNVwQ2nAiEA+Lnd8dBn06OKkEgAq00BVbmH87ybQHfXlf1Y4RJqwQ8='
+              },
+              type: 'public-key'
+            }
           }
         }
       }
-    
+
       // send approve with signed authorization and wait for transfer to complete
       const approveResponse = await axios.post<any>(approveURI, approveRequest)
 

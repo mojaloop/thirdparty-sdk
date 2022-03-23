@@ -69,7 +69,7 @@ export interface BackendStoreValidatedConsentRequest {
 export interface BackendTransactionRequestContext {
   // The FSPIOP-compatible payer.payerPartyIdInfo field
   payerPartyIdInfo: fspiopAPI.Schemas.PartyIdInfo,
-
+  payerPersonalInfo: fspiopAPI.Schemas.PartyPersonalInfo,
   // The ID of the consent for the transaction request
   // based on the payer.idValue of the Thirdparty Transaction Request
   consentId: string

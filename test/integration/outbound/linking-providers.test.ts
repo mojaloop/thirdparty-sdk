@@ -24,12 +24,13 @@
  - Kevin Leyow - kevin.leyow@modusbox.com
  --------------
  ******/
- import axios from 'axios'
- import env from '../env'
- import { KVS } from '~/shared/kvs'
- import { RedisConnectionConfig } from '~/shared/redis-connection'
- import Config from '~/shared/config'
- import mockLogger from '../../unit/mockLogger'
+import axios from 'axios'
+import env from '../env'
+import { KVS } from '~/shared/kvs'
+import { RedisConnectionConfig } from '~/shared/redis-connection'
+import Config from '~/shared/config'
+import mockLogger from '../../unit/mockLogger'
+import * as OutboundAPI from '~/interface/outbound/api_interfaces'
 
 describe('PISP Pre-Linking', (): void => {
   const config: RedisConnectionConfig = {
@@ -52,10 +53,11 @@ describe('PISP Pre-Linking', (): void => {
 
   describe('/linking/providers: start->providersLookupSuccess', (): void => {
     it('PrelinkingState should be providersLookupSuccess', async (): Promise<void> => {
-      const expectedResponse = {
+      const expectedResponse: OutboundAPI.Schemas.LinkingProvidersResponse = {
         providers: ['dfspA', 'dfspB'],
         currentState: 'providersLookupSuccess'
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const linkingProvidersResponse = await axios.get<any>(linkingProvidersURI)
       expect(linkingProvidersResponse.status).toEqual(200)
       expect(linkingProvidersResponse.data.currentState).toEqual('providersLookupSuccess')

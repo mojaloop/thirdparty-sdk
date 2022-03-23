@@ -75,7 +75,6 @@ describe('DFSPTransactionModel', () => {
   let transferRequest: SDKOutboundAPI.Schemas.simpleTransfersPostRequest
   let transferId: string
 
-
   beforeEach(async () => {
     modelConfig = {
       dfspId: 'dfsp_a',
@@ -88,7 +87,7 @@ describe('DFSPTransactionModel', () => {
         patchThirdpartyRequestsTransactions: jest.fn(() => Promise.resolve({ statusCode: 200 })),
         putThirdpartyRequestsTransactionsError: jest.fn(() => Promise.resolve({ statusCode: 200 })),
         postThirdpartyRequestsAuthorizations: jest.fn(() => Promise.resolve({ statusCode: 200 })),
-        postThirdpartyRequestsVerifications: jest.fn(() => Promise.resolve({ statusCode: 200 })),
+        postThirdpartyRequestsVerifications: jest.fn(() => Promise.resolve({ statusCode: 200 }))
       } as unknown as ThirdpartyRequests,
       sdkOutgoingRequests: {
         requestQuote: jest.fn(() => Promise.resolve(requestQuoteResponse)),
@@ -146,7 +145,7 @@ describe('DFSPTransactionModel', () => {
       fspId: transactionRequestRequest.payee.partyIdInfo.fspId!,
       quotesPostRequest: {
         quoteId: uuidv4(),
-        transactionId: transactionRequestPutUpdate.transactionId,
+        transactionId: transactionRequestPutUpdate.transactionId!,
         transactionRequestId,
         payee: { ...transactionRequestRequest.payee },
         payer: { partyIdInfo: { ...transactionRequestRequest.payer } },
@@ -172,18 +171,21 @@ describe('DFSPTransactionModel', () => {
     }
 
     requestAuthorizationResponse = {
-      signedPayloadType: 'FIDO',
+      responseType: 'ACCEPTED',
       signedPayload: {
-        id: '45c-TkfkjQovQeAWmOy-RLBHEJ_e4jYzQYgD8VdbkePgM5d98BaAadadNYrknxgH0jQEON8zBydLgh1EqoC9DA',
-        rawId: '45c+TkfkjQovQeAWmOy+RLBHEJ/e4jYzQYgD8VdbkePgM5d98BaAadadNYrknxgH0jQEON8zBydLgh1EqoC9DA==',
-        response: {
-          authenticatorData: 'SZYN5YgOjGh0NBcPZHZgW4/krrmihjLHmVzzuoMdl2MBAAAACA==',
-          clientDataJSON: 'eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiQUFBQUFBQUFBQUFBQUFBQUFBRUNBdyIsIm9yaWdpbiI6Imh0dHA6Ly9sb2NhbGhvc3Q6NDIxODEiLCJjcm9zc09yaWdpbiI6ZmFsc2UsIm90aGVyX2tleXNfY2FuX2JlX2FkZGVkX2hlcmUiOiJkbyBub3QgY29tcGFyZSBjbGllbnREYXRhSlNPTiBhZ2FpbnN0IGEgdGVtcGxhdGUuIFNlZSBodHRwczovL2dvby5nbC95YWJQZXgifQ==',
-          signature: 'MEUCIDcJRBu5aOLJVc/sPyECmYi23w8xF35n3RNhyUNVwQ2nAiEA+Lnd8dBn06OKkEgAq00BVbmH87ybQHfXlf1Y4RJqwQ8='
-        },
-        type: 'public-key'
+        signedPayloadType: 'FIDO',
+        fidoSignedPayload: {
+          id: '45c-TkfkjQovQeAWmOy-RLBHEJ_e4jYzQYgD8VdbkePgM5d98BaAadadNYrknxgH0jQEON8zBydLgh1EqoC9DA',
+          rawId: '45c+TkfkjQovQeAWmOy+RLBHEJ/e4jYzQYgD8VdbkePgM5d98BaAadadNYrknxgH0jQEON8zBydLgh1EqoC9DA==',
+          response: {
+            authenticatorData: 'SZYN5YgOjGh0NBcPZHZgW4/krrmihjLHmVzzuoMdl2MBAAAACA==',
+            clientDataJSON: 'eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiQUFBQUFBQUFBQUFBQUFBQUFBRUNBdyIsIm9yaWdpbiI6Imh0dHA6Ly9sb2NhbGhvc3Q6NDIxODEiLCJjcm9zc09yaWdpbiI6ZmFsc2UsIm90aGVyX2tleXNfY2FuX2JlX2FkZGVkX2hlcmUiOiJkbyBub3QgY29tcGFyZSBjbGllbnREYXRhSlNPTiBhZ2FpbnN0IGEgdGVtcGxhdGUuIFNlZSBodHRwczovL2dvby5nbC95YWJQZXgifQ==',
+            signature: 'MEUCIDcJRBu5aOLJVc/sPyECmYi23w8xF35n3RNhyUNVwQ2nAiEA+Lnd8dBn06OKkEgAq00BVbmH87ybQHfXlf1Y4RJqwQ8='
+          },
+          type: 'public-key'
+        }
       }
-    }
+    } as tpAPI.Schemas.ThirdpartyRequestsAuthorizationsIDPutResponseFIDO
 
     transferRequest = {
       fspId: transactionRequestRequest.payer.fspId!,
@@ -275,7 +277,7 @@ describe('DFSPTransactionModel', () => {
   describe('workflow', () => {
     it('should do a happy flow', async () => {
       mocked(modelConfig.kvs.set).mockImplementation(() => Promise.resolve(true))
-      
+
       // mock async callback(s)
       mockDeferredJobWithCallbackMessage('testAuthChannel', requestAuthorizationResponse)
       mockDeferredJobWithCallbackMessage('testVerifyChannel', requestVerificationResponse)
@@ -292,7 +294,6 @@ describe('DFSPTransactionModel', () => {
 
       // ensure state data is correct before starting workflow
       expect(model.data).toEqual(data)
-
 
       // execute workflow
       await model.run()
@@ -358,10 +359,12 @@ describe('DFSPTransactionModel', () => {
       expect(rqr.payee).toEqual(tr.payee)
 
       // payer should be build from transaction request context
-      expect(rqr.payer).toEqual({ partyIdInfo: { 
-        partyIdType: 'MSISDN',
-        partyIdentifier: '61414414414'
-      }})
+      expect(rqr.payer).toEqual({
+        partyIdInfo: {
+          partyIdType: 'MSISDN',
+          partyIdentifier: '61414414414'
+        }
+      })
 
       // amountType should be the same as received
       expect(rqr.amountType).toEqual(tr.amountType)
@@ -409,7 +412,7 @@ describe('DFSPTransactionModel', () => {
       expect(model.data.requestAuthorizationPostRequest).toBeDefined()
       expect(modelConfig.thirdpartyRequests.postThirdpartyRequestsAuthorizations).toBeCalledWith(
         model.data.requestAuthorizationPostRequest,
-        model.data.participantId,
+        model.data.participantId
       )
 
       // validate requestAuthorization response
@@ -422,7 +425,7 @@ describe('DFSPTransactionModel', () => {
       // check did we do proper call back to Switch
       expect(modelConfig.thirdpartyRequests.postThirdpartyRequestsVerifications).toBeCalledWith(
         model.data.requestVerificationPostRequest,
-        'centralAuth',
+        'centralAuth'
       )
 
       // check the setup of transferRequest
@@ -448,7 +451,6 @@ describe('DFSPTransactionModel', () => {
 
       expect(model.data.transactionRequestPatchUpdate).toBeDefined()
       expect(model.data.transactionRequestPatchUpdate).toEqual({
-        transactionId: model.data.transactionId!,
         transactionRequestState: model.data.transactionRequestState,
         transactionState: 'COMPLETED'
       })
@@ -470,7 +472,13 @@ describe('DFSPTransactionModel', () => {
           payerPartyIdInfo: {
             partyIdType: 'MSISDN',
             partyIdentifier: '61414414414'
-          } 
+          },
+          payerPersonalInfo: {
+            complexName: {
+              firstName: 'Alice',
+              lastName: 'K'
+            }
+          }
         }))
 
       const data: DFSPTransactionData = {
@@ -506,6 +514,12 @@ describe('DFSPTransactionModel', () => {
           payerPartyIdInfo: {
             partyIdType: 'MSISDN',
             partyIdentifier: '61414414414'
+          },
+          payerPersonalInfo: {
+            complexName: {
+              firstName: 'Alice',
+              lastName: 'K'
+            }
           }
         }
       }
@@ -625,7 +639,7 @@ describe('DFSPTransactionModel', () => {
         requestQuoteRequest,
         requestQuoteResponse,
         requestAuthorizationResponse: {
-          ...requestAuthorizationResponse,
+          ...requestAuthorizationResponse
           // authorizations: {
           //   ...requestAuthorizationResponse.authorizations,
           //   responseType: 'REJECTED'
@@ -658,7 +672,7 @@ describe('DFSPTransactionModel', () => {
         requestQuoteRequest,
         requestQuoteResponse,
         requestAuthorizationResponse: {
-          ...requestAuthorizationResponse,
+          ...requestAuthorizationResponse
           // TODO: remove me?
           // authorizations: {
           //   ...requestAuthorizationResponse.authorizations,
@@ -691,7 +705,7 @@ describe('DFSPTransactionModel', () => {
         requestQuoteRequest,
         requestQuoteResponse,
         requestAuthorizationResponse: {
-          ...requestAuthorizationResponse,
+          ...requestAuthorizationResponse
           // TODO: remove me?
           // authorizations: {
           //   ...requestAuthorizationResponse.authorizations,
@@ -700,7 +714,6 @@ describe('DFSPTransactionModel', () => {
         },
         transferRequest,
         transactionRequestPatchUpdate: {
-          transactionId: transactionRequestPutUpdate.transactionId,
           transactionRequestState: 'ACCEPTED',
           transactionState: 'COMPLETED'
         },
@@ -749,6 +762,12 @@ describe('DFSPTransactionModel', () => {
         payerPartyIdInfo: {
           partyIdType: 'MSISDN',
           partyIdentifier: '61414414414'
+        },
+        payerPersonalInfo: {
+          complexName: {
+            firstName: 'Alice',
+            lastName: 'K'
+          }
         }
       }))
 
@@ -806,7 +825,8 @@ describe('DFSPTransactionModel', () => {
       try {
         await loadFromKVS(modelConfig)
         shouldNotBeExecuted()
-      } catch (error) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (error: any) {
         expect(error.message).toEqual(`No data found in KVS for: ${modelConfig.key}`)
       }
     })

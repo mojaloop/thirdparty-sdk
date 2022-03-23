@@ -31,6 +31,7 @@ import Config from '~/shared/config'
 import Handlers from '~/handlers'
 import index from '~/index'
 import path from 'path'
+import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
 
 const apiPath = path.resolve(__dirname, '../../src/interface/api-inbound.yaml')
 const featurePath = path.resolve(__dirname, '../features/consent-requests-inbound.feature')
@@ -61,7 +62,7 @@ defineFeature(feature, (test): void => {
 
   afterAll(async (done): Promise<void> => {
     server.events.on('stop', done)
-    server.stop({ timeout:0 })
+    server.stop({ timeout: 0 })
   })
 
   afterEach((): void => {
@@ -77,19 +78,20 @@ defineFeature(feature, (test): void => {
     when('I receive a \'PatchConsentRequest\' request', async (): Promise<ServerInjectResponse> => {
       jest.mock('~/shared/kvs')
       jest.mock('~/shared/pub-sub')
+      const payload: tpAPI.Schemas.ConsentRequestsIDPatchRequest = {
+        authToken: '123456'
+      }
       const request = {
         method: 'PATCH',
         url: '/consentRequests/123',
         headers: {
-          'Accept': 'application/json',
+          Accept: 'application/json',
           'Content-Type': 'application/json',
           'FSPIOP-Source': 'switch',
           Date: 'Thu, 24 Jan 2019 10:22:12 GMT',
           'FSPIOP-Destination': 'dfspA'
         },
-        payload: {
-          authToken: '123456'
-        }
+        payload
       }
       response = await server.inject(request)
       return response
@@ -119,7 +121,7 @@ defineFeature(feature, (test): void => {
         },
         payload: {
           errorInformation: {
-            errorCode: "5100",
+            errorCode: '5100',
             errorDescription: 'This is an error description.',
             extensionList: {
               extension: [

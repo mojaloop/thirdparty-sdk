@@ -104,52 +104,6 @@ describe('SDKOutgoingRequests', () => {
       }
     })
   })
-
-  describe('requestAuthorization', () => {
-    it('should return received authorization information', async () => {
-      const request: OutboundAPI.Schemas.authorizationsPostRequest = {
-        fspId: 'pisp',
-        authorizationsPostRequest: {
-          transactionId: uuidv4(),
-          transactionRequestId: uuidv4(),
-          authenticationType: 'U2F',
-          retriesLeft: '1',
-          amount: {
-            currency: 'USD',
-            amount: '100'
-          },
-          quote: {
-            transferAmount: {
-              currency: 'USD',
-              amount: '100'
-            },
-            expiration: (new Date()).toISOString(),
-            ilpPacket: 'abc',
-            condition: '0123456789012345678901234567890123456789012'
-          }
-        }
-      }
-
-      // Act
-      const result = await sdkOutRequest.requestAuthorization(request)
-
-      // Assert
-      expect(result).toBeDefined()
-      // result could be void, so Typescript enforce code branching
-      if (result) {
-        expect(result.authorizations.authenticationInfo).toEqual({
-          authentication: 'U2F',
-          authenticationValue: {
-            pinValue: expect.anything(),
-            counter: '1'
-          }
-        })
-        expect(result.authorizations.responseType).toBeDefined()
-        expect(result.currentState).toEqual('COMPLETED')
-      }
-    })
-  })
-
   describe('requestTransfer', () => {
     it('should return transfer details', async () => {
       const transferId = uuidv4()

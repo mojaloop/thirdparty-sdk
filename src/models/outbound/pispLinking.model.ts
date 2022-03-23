@@ -37,12 +37,12 @@ import {
   PISPLinkingData,
   PISPLinkingModelConfig,
   PISPLinkingStateMachine
+  , PISPLinkingPhase
 } from '~/models/outbound/pispLinking.interface'
 import { PersistentModel } from '~/models/persistent.model'
 import deferredJob from '~/shared/deferred-job'
 import inspect from '~/shared/inspect'
 import { Message, PubSub } from '~/shared/pub-sub'
-import { PISPLinkingPhase } from './pispLinking.interface'
 
 export class PISPLinkingModel
   extends PersistentModel<PISPLinkingStateMachine, PISPLinkingData> {
@@ -57,9 +57,9 @@ export class PISPLinkingModel
       transitions: [
         { name: 'requestConsent', from: 'start', to: 'channelResponseReceived' },
         { name: 'changeToOTPAuthentication', from: 'channelResponseReceived', to: 'OTPAuthenticationChannelResponseRecieved' },
-        { name: 'changeToWebAuthentication', from: 'channelResponseReceived', to: 'WebAuthenticationChannelResponseRecieved' },
+        { name: 'changeToWebAuthentication', from: 'channelResponseReceived', to: 'WebAuthenticationChannelResponseReceived' },
         { name: 'authenticate', from: 'OTPAuthenticationChannelResponseRecieved', to: 'consentReceivedAwaitingCredential' },
-        { name: 'authenticate', from: 'WebAuthenticationChannelResponseRecieved', to: 'consentReceivedAwaitingCredential' },
+        { name: 'authenticate', from: 'WebAuthenticationChannelResponseReceived', to: 'consentReceivedAwaitingCredential' },
         { name: 'registerCredential', from: 'consentReceivedAwaitingCredential', to: 'accountsLinked' }
       ],
       methods: {
@@ -100,14 +100,13 @@ export class PISPLinkingModel
     return deferredJob(pubSub, channel).trigger(message)
   }
 
-
-  linkingRequestConsentPostRequestToConsentRequestsPostRequest(): tpAPI.Schemas.ConsentRequestsPostRequest {
+  linkingRequestConsentPostRequestToConsentRequestsPostRequest (): tpAPI.Schemas.ConsentRequestsPostRequest {
     const { linkingRequestConsentPostRequest, consentRequestId } = this.data
 
     const scopes: tpAPI.Schemas.Scope[] = []
     for (const account of linkingRequestConsentPostRequest.accounts as unknown as tpAPI.Schemas.Account[]) {
       scopes.push({
-        accountId: account.id!,
+        address: account.address!,
         actions: linkingRequestConsentPostRequest.actions
       })
     }
@@ -116,13 +115,13 @@ export class PISPLinkingModel
       consentRequestId,
       scopes,
       userId: linkingRequestConsentPostRequest.userId,
-      authChannels: ["OTP", "WEB"],
+      authChannels: ['OTP', 'WEB'],
       callbackUri: linkingRequestConsentPostRequest.callbackUri
     }
     return postConsentRequest
   }
 
-  static deriveChallenge(consentsPostRequest: tpAPI.Schemas.ConsentsPostRequestPISP): string {
+  static deriveChallenge (consentsPostRequest: tpAPI.Schemas.ConsentsPostRequestPISP): string {
     if (!consentsPostRequest) {
       throw new Error('PISPLinkingModel.deriveChallenge: \'consentRequestsPostRequest\' parameter is required')
     }
@@ -192,18 +191,18 @@ export class PISPLinkingModel
     this.logger.push({ channel }).info('onAuthenticate - subscribe to channel')
 
     return deferredJob(this.subscriber, channel)
-    .init(async (channel) => {
-      const res = await this.thirdpartyRequests.patchConsentRequests(
-        consentRequestId,
-        { authToken: linkingRequestConsentIDAuthenticatePatchRequest!.authToken },
-        this.data.toParticipantId!
-      )
+      .init(async (channel) => {
+        const res = await this.thirdpartyRequests.patchConsentRequests(
+          consentRequestId,
+          { authToken: linkingRequestConsentIDAuthenticatePatchRequest!.authToken },
+          this.data.toParticipantId!
+        )
 
-      this.logger.push({ res, channel })
-        .log('ThirdpartyRequests.patchConsentRequests request call sent to peer, listening on response')
-    })
-    .job(async (message: Message): Promise<void> => {
-      try {
+        this.logger.push({ res, channel })
+          .log('ThirdpartyRequests.patchConsentRequests request call sent to peer, listening on response')
+      })
+      .job(async (message: Message): Promise<void> => {
+        try {
         type PutResponseOrError = tpAPI.Schemas.ConsentsPostRequestPISP & fspiopAPI.Schemas.ErrorInformationObject
         const putResponse = message as unknown as PutResponseOrError
 
@@ -214,19 +213,18 @@ export class PISPLinkingModel
             ...message as unknown as tpAPI.Schemas.ConsentsPostRequestPISP
           }
         }
-
-      } catch (error) {
-        this.logger.push(error).error('ThirdpartyRequests.patchConsentRequests request error')
-        return Promise.reject(error)
-      }
-    })
-    .wait(this.config.requestProcessingTimeoutSeconds * 1000)
+        } catch (error) {
+          this.logger.push(error).error('ThirdpartyRequests.patchConsentRequests request error')
+          return Promise.reject(error)
+        }
+      })
+      .wait(this.config.requestProcessingTimeoutSeconds * 1000)
   }
 
   async onRegisterCredential (): Promise<void> {
     const {
       linkingRequestConsentIDAuthenticateInboundConsentResponse,
-      linkingRequestConsentIDPassCredentialPostRequest,
+      linkingRequestConsentIDPassCredentialPostRequest
     } = this.data
 
     // pull consentId from previous step
@@ -242,27 +240,29 @@ export class PISPLinkingModel
     this.logger.push({ channel }).info('onRegisterCredential - subscribe to channel')
 
     return deferredJob(this.subscriber, channel)
-    .init(async (channel) => {
+      .init(async (channel) => {
       // todo: need credential type distinguishing logic once we support more
       //       credential types
-      const res = await this.thirdpartyRequests.putConsents(
-        consentId,
-        {
-          scopes: this.data.linkingRequestConsentIDAuthenticateInboundConsentResponse!.scopes,
-          credential: {
-            credentialType: 'FIDO',
-            status: 'PENDING',
-            payload: linkingRequestConsentIDPassCredentialPostRequest!.credential.payload
-          }
-        },
-        this.data.toParticipantId!
-      )
+      // todo: support generic credential
+        const res = await this.thirdpartyRequests.putConsents(
+          consentId,
+          {
+            scopes: this.data.linkingRequestConsentIDAuthenticateInboundConsentResponse!.scopes,
+            status: 'ISSUED',
+            credential: {
+              credentialType: 'FIDO',
+              status: 'PENDING',
+              fidoPayload: linkingRequestConsentIDPassCredentialPostRequest!.credential.payload
+            }
+          },
+          this.data.toParticipantId!
+        )
 
-      this.logger.push({ res, channel })
-        .log('ThirdpartyRequests.putConsents request call sent to peer, listening on response')
-    })
-    .job(async (message: Message): Promise<void> => {
-      try {
+        this.logger.push({ res, channel })
+          .log('ThirdpartyRequests.putConsents request call sent to peer, listening on response')
+      })
+      .job(async (message: Message): Promise<void> => {
+        try {
         type PutResponseOrError = tpAPI.Schemas.ConsentsIDPatchResponseVerified & fspiopAPI.Schemas.ErrorInformationObject
         const putResponse = message as unknown as PutResponseOrError
 
@@ -273,27 +273,26 @@ export class PISPLinkingModel
             ...message as unknown as tpAPI.Schemas.ConsentsIDPatchResponseVerified
           }
         }
-
-      } catch (error) {
-        this.logger.push(error).error('ThirdpartyRequests.putConsents request error')
-        return Promise.reject(error)
-      }
-    })
-    .wait(this.config.requestProcessingTimeoutSeconds * 1000)
+        } catch (error) {
+          this.logger.push(error).error('ThirdpartyRequests.putConsents request error')
+          return Promise.reject(error)
+        }
+      })
+      .wait(this.config.requestProcessingTimeoutSeconds * 1000)
   }
 
   getResponse ():
-    OutboundAPI.Schemas.LinkingRequestConsentResponse |
-    OutboundAPI.Schemas.LinkingRequestConsentIDAuthenticateResponse |
-    OutboundAPI.Schemas.LinkingRequestConsentIDPassCredentialResponse |
-    void {
+  OutboundAPI.Schemas.LinkingRequestConsentResponse |
+  OutboundAPI.Schemas.LinkingRequestConsentIDAuthenticateResponse |
+  OutboundAPI.Schemas.LinkingRequestConsentIDPassCredentialResponse |
+  void {
     switch (this.data.currentState) {
       case 'OTPAuthenticationChannelResponseRecieved':
         return {
           channelResponse: this.data.linkingRequestConsentInboundChannelResponse,
           currentState: this.data.currentState
         } as OutboundAPI.Schemas.LinkingRequestConsentResponse
-      case 'WebAuthenticationChannelResponseRecieved':
+      case 'WebAuthenticationChannelResponseReceived':
         return {
           channelResponse: this.data.linkingRequestConsentInboundChannelResponse,
           currentState: this.data.currentState
@@ -301,7 +300,9 @@ export class PISPLinkingModel
       case 'consentReceivedAwaitingCredential':
         return {
           consent: this.data.linkingRequestConsentIDAuthenticateInboundConsentResponse,
-          challenge: PISPLinkingModel.deriveChallenge(this.data.linkingRequestConsentIDAuthenticateInboundConsentResponse!),
+          challenge: PISPLinkingModel.deriveChallenge(
+            this.data.linkingRequestConsentIDAuthenticateInboundConsentResponse!
+          ),
           currentState: this.data.currentState
         } as OutboundAPI.Schemas.LinkingRequestConsentIDAuthenticateResponse
       case 'accountsLinked':
@@ -333,9 +334,9 @@ export class PISPLinkingModel
       return
     }
 
-    if (this.data.linkingRequestConsentInboundChannelResponse.authChannels[0] == "WEB") {
+    if (this.data.linkingRequestConsentInboundChannelResponse.authChannels[0] === 'WEB') {
       await this.fsm.changeToWebAuthentication()
-    } else if (this.data.linkingRequestConsentInboundChannelResponse.authChannels[0] == "OTP"){
+    } else if (this.data.linkingRequestConsentInboundChannelResponse.authChannels[0] === 'OTP') {
       await this.fsm.changeToOTPAuthentication()
     } else {
       await this.fsm.error()
@@ -346,10 +347,10 @@ export class PISPLinkingModel
    * runs the workflow
    */
   async run (): Promise<
-    OutboundAPI.Schemas.LinkingRequestConsentResponse |
-    OutboundAPI.Schemas.LinkingRequestConsentIDAuthenticateResponse |
-    OutboundAPI.Schemas.LinkingRequestConsentIDPassCredentialResponse |
-    void> {
+  OutboundAPI.Schemas.LinkingRequestConsentResponse |
+  OutboundAPI.Schemas.LinkingRequestConsentIDAuthenticateResponse |
+  OutboundAPI.Schemas.LinkingRequestConsentIDPassCredentialResponse |
+  void> {
     const data = this.data
     try {
       // run transitions based on incoming state
@@ -374,7 +375,7 @@ export class PISPLinkingModel
           await this.saveToKVS()
           return this.getResponse()
 
-        case 'WebAuthenticationChannelResponseRecieved':
+        case 'WebAuthenticationChannelResponseReceived':
           this.logger.info(
             `validateRequest for ${data.consentRequestId},  currentState: ${data.currentState}`
           )
@@ -396,7 +397,8 @@ export class PISPLinkingModel
           this.logger.info('State machine in errored state')
           return
       }
-    } catch (err) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
       this.logger.info(`Error running PISPLinkingModel : ${inspect(err)}`)
 
       // as this function is recursive, we don't want to error the state machine multiple times
@@ -447,5 +449,5 @@ export async function create (
 
 export default {
   PISPLinkingModel,
-  create,
+  create
 }

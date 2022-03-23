@@ -7,13 +7,13 @@ properties:
     type: object
     properties:
       partyIdInfo:
-        $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/PartyIdInfo.yaml'
+        $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/v1_0/openapi3/components/schemas/PartyIdInfo.yaml'
       merchantClassificationCode:
-        $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/MerchantClassificationCode.yaml'
+        $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/v1_0/openapi3/components/schemas/MerchantClassificationCode.yaml'
       name:
-        $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/PartyName.yaml'
+        $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/v1_0/openapi3/components/schemas/PartyName.yaml'
       personalInfo:
-        $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/PartyPersonalInfo.yaml'
+        $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/v1_0/openapi3/components/schemas/PartyPersonalInfo.yaml'
 required:
   - party
   - currentState

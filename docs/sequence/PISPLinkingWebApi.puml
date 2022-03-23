@@ -60,10 +60,10 @@ FSIOP-Destination: dfspa
   consentRequestId: 'f6ab43b0-71cc-49f9-b763-2ac3f05ac8c1',
   userId: 'username1234',
   scopes: [{
-    accountId: 'dfspa.username.1234',
-    actions: ['accounts.getBalance', 'accounts.transfer'],
-    accountId: 'dfspa.username.5678',
-    actions: ['accounts.getBalance', 'accounts.transfer'],
+    address: 'dfspa.username.1234',
+    actions: ['ACCOUNTS_GET_BALANCE', 'ACCOUNTS_TRANSFER'],
+    address: 'dfspa.username.5678',
+    actions: ['ACCOUNTS_GET_BALANCE', 'ACCOUNTS_TRANSFER'],
   }],
   // model will add `authChannels`
   authChannels: ["WEB", "OTP"],
@@ -94,10 +94,10 @@ FSIOP-Destination: auth-sim
 {
   consentRequestId: 'f6ab43b0-71cc-49f9-b763-2ac3f05ac8c1',
   scopes: [{
-    accountId: 'dfspa.username.1234',
-    actions: ['accounts.getBalance', 'accounts.transfer'],
-    accountId: 'dfspa.username.5678',
-    actions: ['accounts.getBalance', 'accounts.transfer'],
+    address: 'dfspa.username.1234',
+    actions: ['ACCOUNTS_GET_BALANCE', 'ACCOUNTS_TRANSFER'],
+    address: 'dfspa.username.5678',
+    actions: ['ACCOUNTS_GET_BALANCE', 'ACCOUNTS_TRANSFER'],
   }],
   // model will add `authChannels`
   authChannels: ["WEB", "OTP"],
@@ -119,10 +119,10 @@ FSIOP-Destination: dfspa
 {
   consentRequestId: 'f6ab43b0-71cc-49f9-b763-2ac3f05ac8c1',
   scopes: [{
-    accountId: 'dfspa.username.1234',
-    actions: ['accounts.getBalance', 'accounts.transfer'],
-    accountId: 'dfspa.username.5678',
-    actions: ['accounts.getBalance', 'accounts.transfer'],
+    address: 'dfspa.username.1234',
+    actions: ['ACCOUNTS_GET_BALANCE', 'ACCOUNTS_TRANSFER'],
+    address: 'dfspa.username.5678',
+    actions: ['ACCOUNTS_GET_BALANCE', 'ACCOUNTS_TRANSFER'],
   }],
   authChannels: ["WEB"], // updated with the channel in use
   callbackUri: 'pisp-app://callback...',
@@ -149,10 +149,10 @@ rnote left of PISP_TP_OUT #LightBlue
   channelResponse: {
     consentRequestId: 'f6ab43b0-71cc-49f9-b763-2ac3f05ac8c1',
     scopes: [{
-      accountId: 'dfspa.username.1234',
-      actions: ['accounts.getBalance', 'accounts.transfer'],
-      accountId: 'dfspa.username.5678',
-      actions: ['accounts.getBalance', 'accounts.transfer'],
+      address: 'dfspa.username.1234',
+      actions: ['ACCOUNTS_GET_BALANCE', 'ACCOUNTS_TRANSFER'],
+      address: 'dfspa.username.5678',
+      actions: ['ACCOUNTS_GET_BALANCE', 'ACCOUNTS_TRANSFER'],
     }],
     authChannels: ["WEB"],
     callbackUri: 'pisp-app://callback...',
@@ -314,10 +314,10 @@ FSIOP-Source: pispa
 FSIOP-Destination: dfspa
 {
   scopes: [{
-    accountId: 'dfspa.username.1234',
-    actions: ['accounts.getBalance', 'accounts.transfer'],
-    accountId: 'dfspa.username.5678',
-    actions: ['accounts.getBalance', 'accounts.transfer'],
+    address: 'dfspa.username.1234',
+    actions: ['ACCOUNTS_GET_BALANCE', 'ACCOUNTS_TRANSFER'],
+    address: 'dfspa.username.5678',
+    actions: ['ACCOUNTS_GET_BALANCE', 'ACCOUNTS_TRANSFER'],
   }],
   credential: {
     credentialType: "FIDO",
@@ -360,10 +360,10 @@ FSIOP-Source: dfspa
 FSIOP-Destination: central-auth
 {
   scopes: [{
-    accountId: 'dfspa.username.1234',
-    actions: ['accounts.getBalance', 'accounts.transfer'],
-    accountId: 'dfspa.username.5678',
-    actions: ['accounts.getBalance', 'accounts.transfer'],
+    address: 'dfspa.username.1234',
+    actions: ['ACCOUNTS_GET_BALANCE', 'ACCOUNTS_TRANSFER'],
+    address: 'dfspa.username.5678',
+    actions: ['ACCOUNTS_GET_BALANCE', 'ACCOUNTS_TRANSFER'],
   }],
   credential: {
     credentialType: "FIDO",
@@ -388,10 +388,10 @@ FSIOP-Source: central-auth
 FSIOP-Destination: dfspa
 {
   scopes: [{
-    accountId: 'dfspa.username.1234',
-    actions: ['accounts.getBalance', 'accounts.transfer'],
-    accountId: 'dfspa.username.5678',
-    actions: ['accounts.getBalance', 'accounts.transfer'],
+    address: 'dfspa.username.1234',
+    actions: ['ACCOUNTS_GET_BALANCE', 'ACCOUNTS_TRANSFER'],
+    address: 'dfspa.username.5678',
+    actions: ['ACCOUNTS_GET_BALANCE', 'ACCOUNTS_TRANSFER'],
   }],
   credential: {
     credentialType: "FIDO",

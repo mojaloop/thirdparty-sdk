@@ -4,7 +4,7 @@ properties:
   currentState:
     $ref: './ThirdpartyTransactionIDApproveState.yaml'
   errorInformation:
-      $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/ErrorInformation.yaml'
-required: 
+      $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/v1_0/openapi3/components/schemas/ErrorInformation.yaml'
+required:
   - currentState
   - errorInformation

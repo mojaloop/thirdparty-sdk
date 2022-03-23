@@ -161,10 +161,10 @@ FSIOP-Source: pispa
 FSIOP-Destination: dfspa
 {
   scopes: [{
-    accountId: 'dfspa.username.1234',
-    actions: ['accounts.getBalance', 'accounts.transfer'],
-    accountId: 'dfspa.username.5678',
-    actions: ['accounts.getBalance', 'accounts.transfer'],
+    address: 'dfspa.username.1234',
+    actions: ['ACCOUNTS_GET_BALANCE', 'ACCOUNTS_TRANSFER'],
+    address: 'dfspa.username.5678',
+    actions: ['ACCOUNTS_GET_BALANCE', 'ACCOUNTS_TRANSFER'],
   }],
   credential: {
     credentialType: "FIDO",
@@ -202,10 +202,10 @@ FSIOP-Source: dfspa
 FSIOP-Destination: central-auth
 {
   scopes: [{
-    accountId: 'dfspa.username.1234',
-    actions: ['accounts.getBalance', 'accounts.transfer'],
-    accountId: 'dfspa.username.5678',
-    actions: ['accounts.getBalance', 'accounts.transfer'],
+    address: 'dfspa.username.1234',
+    actions: ['ACCOUNTS_GET_BALANCE', 'ACCOUNTS_TRANSFER'],
+    address: 'dfspa.username.5678',
+    actions: ['ACCOUNTS_GET_BALANCE', 'ACCOUNTS_TRANSFER'],
   }],
   credential: {
     credentialType: "FIDO",

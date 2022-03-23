@@ -5,15 +5,15 @@ properties:
   toParticipantId:
     type: string
   consentRequestId:
-    $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/CorrelationId.yaml'
+    $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/v1_0/openapi3/components/schemas/CorrelationId.yaml'
   accounts:
     type: array
     items:
-      $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/Account.yaml'
+      $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/v1_0/openapi3/components/schemas/Account.yaml'
   actions:
     type: array
     items:
-      $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/openapi3/components/schemas/ConsentScopeType.yaml'
+      $ref: '../../../../../../node_modules/@mojaloop/api-snippets/thirdparty/v1_0/openapi3/components/schemas/ScopeAction.yaml'
   userId:
     type: string
     description: >-

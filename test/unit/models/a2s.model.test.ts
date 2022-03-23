@@ -178,7 +178,8 @@ describe('A2SModel', () => {
       )
       try {
         await loadFromKVS<TestArgs, TestResponse>(config)
-      } catch (err) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (err: any) {
         expect(err.message).toEqual(`A2SModel(${config.modelName}) No data found in KVS for: ${config.key}`)
       }
       expect(getSpy).toHaveBeenCalledWith(config.key)
@@ -211,7 +212,7 @@ describe('A2SModel', () => {
       const m: TestA2SModel = await create<TestArgs, TestResponse>(data, config)
       try {
         await m.run({ first: 'I am the first', second: 234 })
-      } catch (err) {
+      } catch (err: any) {
         expect(err.message).toEqual('from-reformat-message')
         expect(spyReformatMessage).toBeCalledWith({
           the: 'message-listening-on'
@@ -230,7 +231,7 @@ describe('A2SModel', () => {
       const m: TestA2SModel = await create<TestArgs, TestResponse>(data, config)
       try {
         await m.run({ first: 'I am the first', second: 234 })
-      } catch (err) {
+      } catch (err: any) {
         expect(err.message).toEqual('from-requestAction')
         expect(spyRequestAction).toBeCalledWith({ first: 'I am the first', second: 234 })
       }
