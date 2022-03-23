@@ -240,6 +240,21 @@
       "decision": "ignore",
       "madeAt": 1647617283897,
       "expiresAt": 1650209275137
+    },
+    "1067259|@mojaloop/central-services-logger>rc>minimist": {
+      "decision": "ignore",
+      "madeAt": 1648040698161,
+      "expiresAt": 1650632694004
+    },
+    "1067259|@mojaloop/event-sdk>@mojaloop/central-services-logger>rc>minimist": {
+      "decision": "ignore",
+      "madeAt": 1648040698161,
+      "expiresAt": 1650632694004
+    },
+    "1067259|@mojaloop/sdk-scheme-adapter>@mojaloop/event-sdk>@mojaloop/central-services-logger>rc>minimist": {
+      "decision": "ignore",
+      "madeAt": 1648040698161,
+      "expiresAt": 1650632694004
     }
   },
   "rules": {},
