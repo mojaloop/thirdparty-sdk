@@ -367,7 +367,6 @@ describe('Outbound API routes', (): void => {
       )
     }, 100)
     const response = await server.inject(request)
-    console.log(response)
     expect(response.statusCode).toBe(200)
     expect(response.result).toEqual({
       authorization: expect.anything(),
@@ -413,7 +412,6 @@ describe('Outbound API routes', (): void => {
       approveResponse as unknown as Message
     ), 10)
     const response = await server.inject(request)
-    console.log(response)
     expect(response.result).toEqual({
       transactionStatus: { ...approveResponse },
       currentState: 'transactionStatusReceived'

@@ -558,7 +558,6 @@ describe('Inbound API routes', (): void => {
         payload: request.payload
       }
       const response = await server.inject(inRequest)
-      console.log(response)
       expect(response.statusCode).toBe(200)
     })
 
@@ -899,7 +898,6 @@ describe('Inbound API routes', (): void => {
           payload: mockData.inboundPutConsentsIdRequestSignedCredential.payload
         }
         const response = await server.inject(request)
-        console.log(response)
         expect(response.statusCode).toBe(202)
       })
     })

@@ -268,7 +268,6 @@ export class DFSPLinkingModel
       if (!consentRequestsIDPutRequest) {
         throw new Error('consentRequestsIDPutRequest is null or undefined')
       }
-      console.log(consentRequestsIDPutRequest);
       const waitOnAuthTokenFromPISPResponseChannel = DFSPLinkingModel.notificationChannel(
         DFSPLinkingPhase.waitOnAuthTokenFromPISPResponse,
         consentRequestsPostRequest.consentRequestId

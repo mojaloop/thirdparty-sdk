@@ -150,7 +150,6 @@ describe('DFSP Transaction', (): void => {
       expect(historyPostVerifications.length).toEqual(1)
       const historyPostVerificationsPayload = historyPostVerifications[0].body as tpAPI.Schemas.ThirdpartyRequestsVerificationsPostRequest
 
-      console.log(historyPostVerificationsPayload)
       verificationRequestId = historyPostVerificationsPayload.verificationRequestId
 
       expect(historyPostVerificationsPayload).toStrictEqual({
