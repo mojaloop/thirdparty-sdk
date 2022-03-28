@@ -255,6 +255,33 @@
       "decision": "ignore",
       "madeAt": 1648040698161,
       "expiresAt": 1650632694004
+    },
+    "1067285|@mojaloop/central-services-logger>rc>minimist": {
+      "decision": "fix",
+      "madeAt": 1648156223748
+    },
+    "1067285|@mojaloop/sdk-scheme-adapter>@mojaloop/central-services-shared>rc>minimist": {
+      "decision": "fix",
+      "madeAt": 1648156223748
+    },
+    "1067285|@mojaloop/sdk-scheme-adapter>@mojaloop/event-sdk>@mojaloop/central-services-logger>rc>minimist": {
+      "decision": "fix",
+      "madeAt": 1648156223748
+    },
+    "1067296|@mojaloop/central-services-shared>widdershins>yargs>string-width>strip-ansi>ansi-regex": {
+      "decision": "ignore",
+      "madeAt": 1648433239506,
+      "expiresAt": 1651025233728
+    },
+    "1067296|@mojaloop/central-services-shared>widdershins>yargs>cliui>string-width>strip-ansi>ansi-regex": {
+      "decision": "ignore",
+      "madeAt": 1648433239506,
+      "expiresAt": 1651025233728
+    },
+    "1067296|@mojaloop/sdk-scheme-adapter>@mojaloop/central-services-shared>widdershins>yargs>cliui>string-width>strip-ansi>ansi-regex": {
+      "decision": "ignore",
+      "madeAt": 1648433239506,
+      "expiresAt": 1651025233728
     }
   },
   "rules": {},
