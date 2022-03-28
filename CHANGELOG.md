@@ -1,4 +1,12 @@
 # Changelog: [mojaloop/thirdparty-sdk](https://github.com/mojaloop/thirdparty-sdk)
+### [12.0.1](https://github.com/mojaloop/thirdparty-sdk/compare/v12.0.0...v12.0.1) (2022-03-28)
+
+
+### Maintenance
+
+* bump packages with ncu -u -t minor ([#136](https://github.com/mojaloop/thirdparty-sdk/issues/136)) ([b1ada38](https://github.com/mojaloop/thirdparty-sdk/commit/b1ada386f848348420af4a2c0c96044844a7c193))
+* **deps:** bump tmpl from 1.0.4 to 1.0.5 ([#129](https://github.com/mojaloop/thirdparty-sdk/issues/129)) ([bb65929](https://github.com/mojaloop/thirdparty-sdk/commit/bb659297ddb74df66788ac837c0fcd2d4d989aed))
+
 ## [12.0.0](https://github.com/mojaloop/thirdparty-sdk/compare/v11.55.1...v12.0.0) (2022-03-23)
 
 
