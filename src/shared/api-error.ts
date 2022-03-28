@@ -38,7 +38,7 @@ export function reformatError (
   }
 
   return new Errors.MojaloopFSPIOPError(
-    err,
+    err as Error,
     mojaloopErrorCode.message || err.message,
     null as unknown as string,
     mojaloopErrorCode

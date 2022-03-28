@@ -149,7 +149,7 @@ export const StatePlugin = {
       validateConsentRequestsPath: config.SHARED.DFSP_BACKEND_VALIDATE_CONS_REQ_PATH,
       sendOTPPath: config.SHARED.DFSP_BACKEND_SEND_OTP_REQ_PATH,
       storeConsentRequestsPath: config.SHARED.DFSP_BACKEND_STORE_CONS_REQ_PATH,
-      storeValidatedConsentForAccountIdPath: config.SHARED.DFSP_BACKEND_STORE_VALIDATED_CONSENT_FOR_ACCOUNT_ID_PATH,
+      storeValidatedConsentForAccountIdPath: config.SHARED.DFSP_BACKEND_STORE_VALIDATED_CONSENT_FOR_ACCOUNT_ID_PATH
     })
 
     const sdkOutgoingRequests = new SDKOutgoingRequests({
