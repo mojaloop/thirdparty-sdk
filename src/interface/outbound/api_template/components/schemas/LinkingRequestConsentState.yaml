@@ -5,5 +5,5 @@ enum:
   - start
   - errored
   - success
-  - OTPAuthenticationChannelResponseRecieved
+  - OTPAuthenticationChannelResponseReceived
   - WebAuthenticationChannelResponseReceived

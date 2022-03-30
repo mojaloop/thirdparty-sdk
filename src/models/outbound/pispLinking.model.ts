@@ -56,9 +56,9 @@ export class PISPLinkingModel
       init: 'start',
       transitions: [
         { name: 'requestConsent', from: 'start', to: 'channelResponseReceived' },
-        { name: 'changeToOTPAuthentication', from: 'channelResponseReceived', to: 'OTPAuthenticationChannelResponseRecieved' },
+        { name: 'changeToOTPAuthentication', from: 'channelResponseReceived', to: 'OTPAuthenticationChannelResponseReceived' },
         { name: 'changeToWebAuthentication', from: 'channelResponseReceived', to: 'WebAuthenticationChannelResponseReceived' },
-        { name: 'authenticate', from: 'OTPAuthenticationChannelResponseRecieved', to: 'consentReceivedAwaitingCredential' },
+        { name: 'authenticate', from: 'OTPAuthenticationChannelResponseReceived', to: 'consentReceivedAwaitingCredential' },
         { name: 'authenticate', from: 'WebAuthenticationChannelResponseReceived', to: 'consentReceivedAwaitingCredential' },
         { name: 'registerCredential', from: 'consentReceivedAwaitingCredential', to: 'accountsLinked' }
       ],
@@ -287,7 +287,7 @@ export class PISPLinkingModel
   OutboundAPI.Schemas.LinkingRequestConsentIDPassCredentialResponse |
   void {
     switch (this.data.currentState) {
-      case 'OTPAuthenticationChannelResponseRecieved':
+      case 'OTPAuthenticationChannelResponseReceived':
         return {
           channelResponse: this.data.linkingRequestConsentInboundChannelResponse,
           currentState: this.data.currentState
@@ -366,7 +366,7 @@ export class PISPLinkingModel
           await this.saveToKVS()
           return this.getResponse()
 
-        case 'OTPAuthenticationChannelResponseRecieved':
+        case 'OTPAuthenticationChannelResponseReceived':
           this.logger.info(
             `validateRequest for ${data.consentRequestId},  currentState: ${data.currentState}`
           )

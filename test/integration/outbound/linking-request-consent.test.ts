@@ -151,7 +151,7 @@ describe('PISP requests DFSP to validate user consentRequests for linking', (): 
       }
       const expectedResponse = {
         channelResponse: { ...mockData.consentRequestsPutOTP.payload },
-        currentState: 'OTPAuthenticationChannelResponseRecieved'
+        currentState: 'OTPAuthenticationChannelResponseReceived'
       }
       const consentRequestsResponse = await axios.post(linkingRequestConsentURI, linkingRequestConsentRequest)
       expect(consentRequestsResponse.status).toEqual(200)

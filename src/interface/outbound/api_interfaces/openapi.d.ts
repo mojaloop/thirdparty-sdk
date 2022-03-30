@@ -868,7 +868,7 @@ export interface components {
     | 'start'
     | 'errored'
     | 'success'
-    | 'OTPAuthenticationChannelResponseRecieved'
+    | 'OTPAuthenticationChannelResponseReceived'
     | 'WebAuthenticationChannelResponseReceived';
     /** LinkingRequestConsentResponseError */
     LinkingRequestConsentResponseError: {
