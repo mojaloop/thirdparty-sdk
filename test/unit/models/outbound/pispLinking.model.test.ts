@@ -118,7 +118,7 @@ describe('PISPLinkingModel', () => {
     expect(typeof am.onRequestConsent).toEqual('function')
 
     expect(sortedArray(am.fsm.allStates())).toEqual([
-      'OTPAuthenticationChannelResponseRecieved',
+      'OTPAuthenticationChannelResponseReceived',
       'WebAuthenticationChannelResponseReceived',
       'accountsLinked',
       'channelResponseReceived',
