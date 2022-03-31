@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-sdk](https://github.com/mojaloop/thirdparty-sdk)
+### [12.0.2](https://github.com/mojaloop/thirdparty-sdk/compare/v12.0.1...v12.0.2) (2022-03-31)
+
+
+### Maintenance
+
+* fix spelling mistake ([#137](https://github.com/mojaloop/thirdparty-sdk/issues/137)) ([9892cae](https://github.com/mojaloop/thirdparty-sdk/commit/9892cae514bfc55fe2f173293239849fd11449c8))
+
 ### [12.0.1](https://github.com/mojaloop/thirdparty-sdk/compare/v12.0.0...v12.0.1) (2022-03-28)
 
 
