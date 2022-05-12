@@ -1,4 +1,15 @@
 # Changelog: [mojaloop/thirdparty-sdk](https://github.com/mojaloop/thirdparty-sdk)
+## [13.0.0](https://github.com/mojaloop/thirdparty-sdk/compare/v12.0.2...v13.0.0) (2022-05-12)
+
+
+### ⚠ BREAKING CHANGES
+
+* update sdk-scheme-adapter dependency (#141)
+
+### Code Refactor
+
+* update sdk-scheme-adapter dependency ([#141](https://github.com/mojaloop/thirdparty-sdk/issues/141)) ([cccfd0b](https://github.com/mojaloop/thirdparty-sdk/commit/cccfd0b489d496c219b2d0f34d60a961cb26c9db))
+
 ### [12.0.2](https://github.com/mojaloop/thirdparty-sdk/compare/v12.0.1...v12.0.2) (2022-03-31)
 
 
