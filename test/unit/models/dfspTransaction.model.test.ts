@@ -157,11 +157,14 @@ describe('DFSPTransactionModel', () => {
 
     requestQuoteResponse = {
       quotes: {
-        transferAmount: { ...transactionRequestRequest.amount },
-        ilpPacket: 'abcd...',
-        condition: 'xyz....',
-        expiration: (new Date()).toISOString(),
-        payeeReceiveAmount: { ...transactionRequestRequest.amount }
+        body: {
+          transferAmount: { ...transactionRequestRequest.amount },
+          ilpPacket: 'abcd...',
+          condition: 'xyz....',
+          expiration: (new Date()).toISOString(),
+          payeeReceiveAmount: { ...transactionRequestRequest.amount }
+        },
+        headers: {}
       },
       currentState: 'COMPLETED'
     }
@@ -193,7 +196,7 @@ describe('DFSPTransactionModel', () => {
         transferId,
         payeeFsp: transactionRequestRequest.payee.partyIdInfo.fspId!,
         payerFsp: transactionRequestRequest.payer.fspId!,
-        amount: { ...requestQuoteResponse.quotes.transferAmount },
+        amount: { ...requestQuoteResponse.quotes.body.transferAmount },
         ilpPacket: 'abcd...',
         condition: 'xyz....',
         expiration: (new Date()).toISOString()
@@ -202,9 +205,12 @@ describe('DFSPTransactionModel', () => {
 
     requestTransferResponse = {
       transfer: {
-        fulfilment: 'some-fulfilment',
-        completedTimestamp: new Date().toISOString(),
-        transferState: 'COMMITTED'
+        body: {
+          fulfilment: 'some-fulfilment',
+          completedTimestamp: new Date().toISOString(),
+          transferState: 'COMMITTED'
+        },
+        headers: {}
       },
       currentState: 'COMPLETED'
     }
@@ -431,7 +437,7 @@ describe('DFSPTransactionModel', () => {
       // check the setup of transferRequest
       expect(model.data.transferRequest).toBeDefined()
       const rtr = model.data.transferRequest!
-      const quote = model.data.requestQuoteResponse!.quotes
+      const quote = model.data.requestQuoteResponse!.quotes.body
       expect(rtr.fspId).toEqual('dfsp_a')
       expect(rtr.transfersPostRequest).toEqual({
         transferId: model.data.transferId!,

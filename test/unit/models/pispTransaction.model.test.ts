@@ -200,7 +200,10 @@ describe('pipsTransactionModel', () => {
       it('should give response properly populated from backendRequests.requestPartiesInformation', async () => {
         const model = await create(lookupData, modelConfig)
         mocked(modelConfig.sdkOutgoingRequests.requestPartiesInformation).mockImplementationOnce(() => Promise.resolve({
-          party,
+          party: {
+            body: party,
+            headers: {}
+          },
           currentState: RequestPartiesInformationState.COMPLETED
         }))
         // let be sure we don't have expected data yet
@@ -216,7 +219,10 @@ describe('pipsTransactionModel', () => {
 
         // check we got needed part of response stored
         expect(model.data.payeeResolved).toEqual({
-          party,
+          party: {
+            body: party,
+            headers: {}
+          },
           currentState: RequestPartiesInformationState.COMPLETED
         })
 
@@ -324,7 +330,10 @@ describe('pipsTransactionModel', () => {
             }
           },
           payeeResolved: {
-            party,
+            party: {
+              body: party,
+              headers: {}
+            },
             currentState: RequestPartiesInformationState.COMPLETED
           },
           initiateRequest: {
@@ -519,7 +528,10 @@ describe('pipsTransactionModel', () => {
             }
           },
           payeeResolved: {
-            party,
+            party: {
+              body: party,
+              headers: {}
+            },
             currentState: RequestPartiesInformationState.COMPLETED
           },
           initiateRequest: {

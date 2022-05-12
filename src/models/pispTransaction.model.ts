@@ -144,7 +144,7 @@ export class PISPTransactionModel
 
       // store results
       this.data.partyLookupResponse = {
-        party: response.party,
+        party: response.party.body,
         currentState: this.data.currentState as OutboundAPI.Schemas.ThirdpartyTransactionPartyLookupState
       }
     } catch (error) {
