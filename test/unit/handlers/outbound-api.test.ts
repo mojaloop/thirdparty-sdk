@@ -244,7 +244,7 @@ describe('Outbound API routes', (): void => {
       }
     }))
     const response = await server.inject(request)
-    console.log(response)
+
     expect(response.statusCode).toBe(200)
     expect(response.result).toEqual({
       party: { ...partyLookupResponse.party.body },
