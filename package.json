@@ -101,7 +101,7 @@
     "@mojaloop/central-services-metrics": "11.0.0",
     "@mojaloop/central-services-shared": "^14.0.0",
     "@mojaloop/event-sdk": "10.7.1",
-    "@mojaloop/sdk-scheme-adapter": "github:mojaloop/sdk-scheme-adapter",
+    "@mojaloop/sdk-scheme-adapter": "^13.0.2",
     "@mojaloop/sdk-standard-components": "^16.0.1",
     "ajv": "^8.11.0",
     "ajv-keywords": "5.1.0",

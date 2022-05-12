@@ -54,7 +54,6 @@ describe('SDKOutgoingRequests', () => {
       expect(result).toBeDefined()
       // result could be void, so Typescript enforce code branching
       if (result) {
-        // @ts-ignore
         expect(result.party).toBeDefined()
         expect(result.party.headers).toBeDefined()
         expect(result.party.body).toBeDefined()
@@ -102,7 +101,6 @@ describe('SDKOutgoingRequests', () => {
       expect(result).toBeDefined()
       // result could be void, so Typescript enforce code branching
       if (result) {
-        // @ts-ignore
         expect(result.quotes).toBeDefined()
         expect(result.quotes.body).toBeDefined()
         expect(result.quotes.headers).toBeDefined()
@@ -159,7 +157,6 @@ describe('SDKOutgoingRequests', () => {
           },
           currentState: 'COMPLETED'
         })
-        // @ts-ignore
         expect(result.transfer).toBeDefined()
         expect(result.transfer.body).toBeDefined()
         expect(result.transfer.headers).toBeDefined()
