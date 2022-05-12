@@ -54,7 +54,10 @@ describe('SDKOutgoingRequests', () => {
       expect(result).toBeDefined()
       // result could be void, so Typescript enforce code branching
       if (result) {
+        // @ts-ignore
         expect(result.party).toBeDefined()
+        expect(result.party.headers).toBeDefined()
+        expect(result.party.body).toBeDefined()
         expect(result.currentState).toEqual('COMPLETED')
       }
     })
@@ -99,7 +102,10 @@ describe('SDKOutgoingRequests', () => {
       expect(result).toBeDefined()
       // result could be void, so Typescript enforce code branching
       if (result) {
+        // @ts-ignore
         expect(result.quotes).toBeDefined()
+        expect(result.quotes.body).toBeDefined()
+        expect(result.quotes.headers).toBeDefined()
         expect(result.currentState).toEqual('COMPLETED')
       }
     })
@@ -143,13 +149,21 @@ describe('SDKOutgoingRequests', () => {
       if (result) {
         expect(result).toEqual({
           transfer: {
-            transferState: 'COMMITTED',
-            completedTimestamp: expect.anything(),
-            fulfilment: expect.anything()
+            body: {
+              transferState: 'COMMITTED',
+              completedTimestamp: expect.anything(),
+              fulfilment: expect.anything()
+            },
+            headers: expect.any(Object)
+
           },
           currentState: 'COMPLETED'
         })
-        expect(result.transfer.transferState).toEqual('COMMITTED')
+        // @ts-ignore
+        expect(result.transfer).toBeDefined()
+        expect(result.transfer.body).toBeDefined()
+        expect(result.transfer.headers).toBeDefined()
+        expect(result.transfer.body.transferState).toEqual('COMMITTED')
         expect(result.currentState).toEqual('COMPLETED')
       }
     })

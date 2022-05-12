@@ -243,7 +243,7 @@ export class DFSPTransactionModel
       InvalidDataError.throwIfInvalidProperty(this.data, 'requestQuoteResponse')
 
       // shortcut
-      const quote = this.data.requestQuoteResponse!.quotes
+      const quote = this.data.requestQuoteResponse!.quotes.body
       const transferAmount: fspiopAPI.Schemas.Money = quote.transferAmount
       const payeeReceiveAmount = payeeReceiveAmountForQuoteAndFees(
         transferAmount,
@@ -266,7 +266,7 @@ export class DFSPTransactionModel
         payer: this.data.transactionRequestRequest.payer,
         payee: this.data.transactionRequestRequest.payee,
         transactionType: this.data.transactionRequestRequest.transactionType,
-        expiration: this.data.requestQuoteResponse!.quotes.expiration
+        expiration: this.data.requestQuoteResponse!.quotes.body.expiration
       }
       const challenge = deriveTransactionChallenge(authRequestPartial)
 
@@ -410,7 +410,7 @@ export class DFSPTransactionModel
 
             // AuthService has approved, prepare transfer request
             const tr = this.data.transactionRequestRequest
-            const quote = this.data.requestQuoteResponse!.quotes
+            const quote = this.data.requestQuoteResponse!.quotes.body
             this.data.transactionRequestState = 'ACCEPTED'
 
             this.data.transferRequest = {
@@ -470,7 +470,7 @@ export class DFSPTransactionModel
     if (
       !(transferResult &&
         transferResult.currentState === 'COMPLETED' &&
-        transferResult.transfer.transferState === 'COMMITTED'
+        transferResult.transfer.body.transferState === 'COMMITTED'
       )
     ) {
       throw Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_TRANSFER_FAILED
