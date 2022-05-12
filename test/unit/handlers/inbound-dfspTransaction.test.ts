@@ -84,20 +84,26 @@ describe('Inbound DFSP Transaction handler', () => {
     }
     requestQuoteResponse = {
       quotes: {
-        transferAmount: { ...transactionRequestRequest.amount },
-        ilpPacket: 'abcd...',
-        condition: 'xyz....',
-        expiration: (new Date()).toISOString(),
-        payeeReceiveAmount: { ...transactionRequestRequest.amount }
+        body: {
+          transferAmount: { ...transactionRequestRequest.amount },
+          ilpPacket: 'abcd...',
+          condition: 'xyz....',
+          expiration: (new Date()).toISOString(),
+          payeeReceiveAmount: { ...transactionRequestRequest.amount }
+        },
+        headers: {}
       },
       currentState: 'COMPLETED'
     }
 
     requestTransferResponse = {
       transfer: {
-        fulfilment: 'some-fulfilment',
-        completedTimestamp: new Date().toISOString(),
-        transferState: 'COMMITTED'
+        body: {
+          fulfilment: 'some-fulfilment',
+          completedTimestamp: new Date().toISOString(),
+          transferState: 'COMMITTED'
+        },
+        headers: {}
       },
       currentState: 'COMPLETED'
     }

@@ -69,21 +69,24 @@ const putResponse: fspiopAPI.Schemas.AuthorizationsIDPutResponse = {
 
 const partyLookupResponse: SDKOutboundAPI.Schemas.partiesByIdResponse = {
   party: {
-    partyIdInfo: {
-      partyIdType: 'MSISDN',
-      partyIdentifier: '+4412345678',
-      fspId: 'pispA'
-    },
-    merchantClassificationCode: '4321',
-    name: 'Justin Trudeau',
-    personalInfo: {
-      complexName: {
-        firstName: 'Justin',
-        middleName: 'Pierre',
-        lastName: 'Trudeau'
+    body: {
+      partyIdInfo: {
+        partyIdType: 'MSISDN',
+        partyIdentifier: '+4412345678',
+        fspId: 'pispA'
       },
-      dateOfBirth: '1980-01-01'
-    }
+      merchantClassificationCode: '4321',
+      name: 'Justin Trudeau',
+      personalInfo: {
+        complexName: {
+          firstName: 'Justin',
+          middleName: 'Pierre',
+          lastName: 'Trudeau'
+        },
+        dateOfBirth: '1980-01-01'
+      }
+    },
+    headers: {}
   },
   currentState: RequestPartiesInformationState.COMPLETED
 }
@@ -241,9 +244,10 @@ describe('Outbound API routes', (): void => {
       }
     }))
     const response = await server.inject(request)
+    console.log(response)
     expect(response.statusCode).toBe(200)
     expect(response.result).toEqual({
-      party: { ...partyLookupResponse.party },
+      party: { ...partyLookupResponse.party.body },
       currentState: 'partyLookupSuccess'
     })
   })

@@ -146,13 +146,16 @@ describe('SDKOutgoingRequests', () => {
       }
       const response: OutboundAPI.Schemas.quotesPostResponse = {
         quotes: {
-          transferAmount: {
-            currency: 'USD',
-            amount: '100'
+          body: {
+            transferAmount: {
+              currency: 'USD',
+              amount: '100'
+            },
+            ilpPacket: 'abcd...',
+            condition: 'xyz....',
+            expiration: (new Date()).toISOString()
           },
-          ilpPacket: 'abcd...',
-          condition: 'xyz....',
-          expiration: (new Date()).toISOString()
+          headers: {}
         },
         currentState: 'COMPLETED'
       }
@@ -199,21 +202,24 @@ describe('SDKOutgoingRequests', () => {
 
       const response: OutboundAPI.Schemas.simpleTransfersPostResponse = {
         transfer: {
-          fulfilment: 'fulfilment',
-          completedTimestamp: 'completedTimestamp',
-          transferState: 'RECEIVED',
-          extensionList: {
-            extension: [
-              {
-                key: 'qreqkey1',
-                value: 'qreqvalue1'
-              },
-              {
-                key: 'qreqkey2',
-                value: 'qreqvalue2'
-              }
-            ]
-          }
+          body: {
+            fulfilment: 'fulfilment',
+            completedTimestamp: 'completedTimestamp',
+            transferState: 'RECEIVED',
+            extensionList: {
+              extension: [
+                {
+                  key: 'qreqkey1',
+                  value: 'qreqvalue1'
+                },
+                {
+                  key: 'qreqkey2',
+                  value: 'qreqvalue2'
+                }
+              ]
+            }
+          },
+          headers: {}
         },
         currentState: 'COMPLETED'
       }
