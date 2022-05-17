@@ -92,19 +92,6 @@ jobs:
           paths:
             - node_modules
 
-  test-dependencies:
-    executor: default-docker
-    steps:
-      - run:
-          name: Install general dependencies
-          command: *defaults_Dependencies
-      - checkout
-      - restore_cache:
-          key: dependency-cache-{{ checksum "package-lock.json" }}
-      - run:
-          name: Execute dependency tests
-          command: npm run dep:check
-
   test-lint:
     executor: default-docker
     steps:
@@ -531,14 +518,6 @@ workflows:
     jobs:
       - pr-tools/pr-title-check:
           context: org-global
-
-      - test-dependencies:
-          context: org-global
-          requires:
-            - setup
-          filters:
-            tags:
-              only: /.*/
 
       - test-lint:
           context: org-global
