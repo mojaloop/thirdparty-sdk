@@ -94,6 +94,31 @@
       "decision": "ignore",
       "madeAt": 1652763397638,
       "expiresAt": 1655355387019
+    },
+    "1070030|@mojaloop/central-services-shared>@mojaloop/event-sdk>moment>widdershins>markdown-it": {
+      "decision": "ignore",
+      "madeAt": 1652825002296,
+      "expiresAt": 1655416994843
+    },
+    "1070030|shins>markdown-it": {
+      "decision": "ignore",
+      "madeAt": 1652825002296,
+      "expiresAt": 1655416994843
+    },
+    "1068310|@mojaloop/central-services-shared>@mojaloop/event-sdk>moment>widdershins>markdown-it>yargs>yargs-parser": {
+      "decision": "ignore",
+      "madeAt": 1652825003282,
+      "expiresAt": 1655416994843
+    },
+    "1068155|shins>markdown-it>sanitize-html": {
+      "decision": "ignore",
+      "madeAt": 1652825004228,
+      "expiresAt": 1655416994843
+    },
+    "1070260|shins>markdown-it>sanitize-html": {
+      "decision": "ignore",
+      "madeAt": 1652825005177,
+      "expiresAt": 1655416994843
     }
   },
   "rules": {},
