@@ -17,7 +17,7 @@ RUN rm -rf src secrets test docs
 RUN npm prune --production
 
 
-FROM node:16-alpine
+FROM node:16.15.0-alpine
 WORKDIR /opt/thirdparty-sdk
 
 # Create empty log file & link stdout to the application log file
