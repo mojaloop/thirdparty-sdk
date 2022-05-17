@@ -119,7 +119,7 @@
     "@mojaloop/event-sdk": "10.7.1",
     "@mojaloop/sdk-scheme-adapter": "^13.0.2",
     "@mojaloop/sdk-standard-components": "^16.0.1",
-    "ajv": "8.10.0",
+    "ajv": "^8.11.0",
     "ajv-keywords": "5.1.0",
     "axios": "^0.26.1",
     "blipp": "^4.0.2",
