@@ -21,7 +21,8 @@ defaults_Dependencies: &defaults_Dependencies |
   apk --no-cache add ca-certificates
   apk --no-cache add curl
   apk --no-cache add openssh-client
-  apk add --no-cache -t build-dependencies make gcc g++ python libtool autoconf automake jq
+  apk --no-cache add bash
+  apk add --no-cache -t build-dependencies make gcc g++ python3 libtool autoconf automake
   npm config set unsafe-perm true
   npm install -g node-gyp
 
@@ -50,11 +51,11 @@ executors:
   default-docker:
     working_directory: /home/circleci/project
     docker:
-      - image: node:12.16.1-alpine
+      - image: node:16.15.0-alpine
 
   default-machine:
     machine:
-      image: ubuntu-1604:201903-01
+      image: ubuntu-2004:202010-01
 
 ##
 # Jobs
@@ -105,7 +106,7 @@ jobs:
           path: ./test/results
       - store_test_results:
           path: ./test/results
-  
+
   test-bdd:
     executor: default-docker
     steps:
@@ -181,7 +182,7 @@ jobs:
             npm ci
       - run:
           name: Create dir for test results
-          command: | 
+          command: |
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             mkdir -p ./test/results
       - run:
@@ -384,8 +385,8 @@ jobs:
           fail_only: true
           webhook: "$SLACK_WEBHOOK_ANNOUNCEMENT_CI_CD"
           failure_message: 'Publishing docker image failed for: \`"${DOCKER_ORG}/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_TAG}"\`'
-  
-# temporarily disabled as api-snippets is not compatible with existing license policy 
+
+# temporarily disabled as api-snippets is not compatible with existing license policy
   # license-scan:
   #   executor: default-machine
   #   steps:
@@ -550,7 +551,7 @@ workflows:
       # TODO: redis related vulnerabilities found
       # they are related to external dependency so there is a need for proper action, more info here:
       # https://app.circleci.com/pipelines/github/mojaloop/thirdparty-sdk/85/workflows/32f38148-42ba-41fe-a9f3-ece5de28df63/jobs/617
-      # 
+      #
       # - image-scan:
       #     context: org-global
       #     requires:

@@ -7,6 +7,9 @@
   "files": [
     "dist"
   ],
+  "engines": {
+    "node": "=16.x"
+  },
   "scripts": {
     "audit:resolve": "SHELL=sh resolve-audit --production",
     "audit:check": "SHELL=sh check-audit --production",
@@ -86,7 +89,20 @@
     "koa2-oauth-server is an old unmaintained repo. It uses the now unsupported git protocol.",
     "Please see https://github.blog/2021-09-01-improving-git-protocol-security-github/ for more information.",
     "If you regenerate package-lock.json, you will manually have to update `git://` to `https://` on its",
-    "dependencies. koa2-oauth-server is a dependency of @mojaloop/sdk-scheme-adapter"
+    "dependencies. koa2-oauth-server is a dependency of @mojaloop/sdk-scheme-adapter.",
+    "",
+    "npm-audit-resolver v3.0.0-7 is a candidate release to resolve compatibility with npm v7+",
+    "as described in Doesn't work with npm@7. This will need to",
+    "be addressed going forward as npm run audit:resolve (i.e. resolve-audit) is currently not",
+    "functioning. As a work-around, we need to manually run the following command npm audit fix.",
+    "The npm run audit:check (i.e. check-audit) still works as expected.",
+    "",
+    "NPM v7+ installs peerDependencies by default; this is not the case with previous versions of NPM.",
+    "Use npm install --legacy-peer-deps bypass peerDependency auto-installation akin to NPM v6, but this may result in",
+    "conflicts due to potentially breaking changes. https://stackoverflow.com/a/66620869",
+    "In Mojaloop, we have multiple services that have dependencies which are not always in sync",
+    "You can use npm install --legacy-peer-deps to avoid having to make multiple PR's to different",
+    "services to install an extra package. Ideally though we keep dependencies in sync."
   ],
   "dependencies": {
     "@hapi/boom": "9.1.4",
@@ -160,7 +176,7 @@
     "lint-staged": "^10.5.4",
     "multi-file-swagger": "^2.3.0",
     "nodemon": "^2.0.15",
-    "npm-audit-resolver": "^2.3.1",
+    "npm-audit-resolver": "^3.0.0-7",
     "npm-check-updates": "^11.8.5",
     "openapi-response-validator": "^7.4.0",
     "openapi-typescript": "^4.5.0",

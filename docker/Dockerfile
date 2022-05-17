@@ -1,12 +1,12 @@
-FROM node:14.15-alpine as builder
+FROM node:16.15.0-alpine as builder
 USER root
 WORKDIR /opt/thirdparty-sdk
 
 RUN apk update \
-    && apk add --no-cache -t build-dependencies git make gcc g++ python libtool autoconf automake openssh \
+    && apk add --no-cache -t build-dependencies git make gcc g++ python3 libtool autoconf automake openssh \
     && cd $(npm root -g)/npm \
     && npm config set unsafe-perm true \
-    && npm install -g node-gyp 
+    && npm install -g node-gyp
 
 COPY package.json package-lock.json* ./
 RUN npm ci
@@ -17,7 +17,7 @@ RUN rm -rf src secrets test docs
 RUN npm prune --production
 
 
-FROM node:14.15-alpine
+FROM node:16-alpine
 WORKDIR /opt/thirdparty-sdk
 
 # Create empty log file & link stdout to the application log file
