@@ -119,7 +119,7 @@
     "@mojaloop/event-sdk": "10.7.1",
     "@mojaloop/sdk-scheme-adapter": "^13.0.2",
     "@mojaloop/sdk-standard-components": "^16.0.1",
-    "ajv": "^8.11.0",
+    "ajv": "8.10.0",
     "ajv-keywords": "5.1.0",
     "axios": "^0.26.1",
     "blipp": "^4.0.2",
@@ -143,8 +143,7 @@
   "devDependencies": {
     "@commitlint/cli": "^11.0.0",
     "@commitlint/config-conventional": "^11.0.0",
-    "@redocly/openapi-cli": "^1.0.0-beta.90",
-    "@types/axios": "^0.14.0",
+    "@redocly/cli": "^1.0.0-beta.97",
     "@types/convict": "^5.2.2",
     "@types/crypto-js": "^4.1.1",
     "@types/hapi": "^18.0.7",
@@ -193,7 +192,7 @@
     "@mojaloop/central-services-logger": "10.6.2",
     "@mojaloop/central-services-metrics": "11.0.0",
     "@mojaloop/event-sdk": "10.7.1",
-    "ajv": "8.6.0",
+    "ajv": "8.10.0",
     "ajv-keywords": "5.1.0"
   },
   "peerDependenciesMeta": {
