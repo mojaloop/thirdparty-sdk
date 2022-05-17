@@ -100,9 +100,9 @@
     "NPM v7+ installs peerDependencies by default; this is not the case with previous versions of NPM.",
     "Use npm install --legacy-peer-deps bypass peerDependency auto-installation akin to NPM v6, but this may result in",
     "conflicts due to potentially breaking changes. https://stackoverflow.com/a/66620869",
-    "In Mojaloop, we have multiple services that have dependencies which are not always in sync",
+    "In Mojaloop, we have multiple services that have peer dependencies which are not always in sync",
     "You can use npm install --legacy-peer-deps to avoid having to make multiple PR's to different",
-    "services to install an extra package. Ideally though we keep dependencies in sync."
+    "services to install an extra package. Ideally though we keep peer dependencies in sync."
   ],
   "dependencies": {
     "@hapi/boom": "9.1.4",
