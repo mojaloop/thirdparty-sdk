@@ -35,7 +35,7 @@ const apiPath = path.resolve(__dirname, '../../src/interface/api-outbound.yaml')
 const featurePath = path.resolve(__dirname, '../features/outbound-health-check.scenario.feature')
 const feature = loadFeature(featurePath)
 
-async function prepareOutboundAPIServer (): Promise<Server> {
+async function prepareOutboundAPIServer(): Promise<Server> {
   const serverConfig: ServerConfig = {
     port: Config.OUTBOUND.PORT,
     host: Config.OUTBOUND.HOST,
@@ -73,7 +73,7 @@ defineFeature(feature, (test): void => {
       // do nothing
     })
 
-    when('I get \'Health Check\' response', async (): Promise<ServerInjectResponse> => {
+    when("I get 'Health Check' response", async (): Promise<ServerInjectResponse> => {
       const request = {
         method: 'GET',
         url: '/health'
@@ -82,12 +82,12 @@ defineFeature(feature, (test): void => {
       return response
     })
 
-    then('The status should be \'OK\'', (): void => {
+    then("The status should be 'OK'", (): void => {
       interface HealthResponse {
-        status: string;
-        uptime: number;
-        startTime: string;
-        versionNumber: string;
+        status: string
+        uptime: number
+        startTime: string
+        versionNumber: string
       }
       const healthResponse = response.result as HealthResponse
       expect(response.statusCode).toBe(200)

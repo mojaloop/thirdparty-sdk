@@ -26,18 +26,18 @@
  --------------
  ******/
 
- import { Request, ResponseObject } from '@hapi/hapi'
- import { StateResponseToolkit } from '~/server/plugins/state'
- import { Message } from '~/shared/pub-sub'
- import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
- import { DFSPLinkingPhase } from '~/models/inbound/dfspLinking.interface'
- import { DFSPLinkingModel } from '~/models/inbound/dfspLinking.model'
+import { Request, ResponseObject } from '@hapi/hapi'
+import { StateResponseToolkit } from '~/server/plugins/state'
+import { Message } from '~/shared/pub-sub'
+import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
+import { DFSPLinkingPhase } from '~/models/inbound/dfspLinking.interface'
+import { DFSPLinkingModel } from '~/models/inbound/dfspLinking.model'
 import { Enum } from '@mojaloop/central-services-shared'
 
 /**
-* Handles an inbound `PUT /participants/{ID}/error` request
-*/
-async function put (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+ * Handles an inbound `PUT /participants/{ID}/error` request
+ */
+async function put(_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const id = request.params.ID
   const payload = request.payload as tpAPI.Schemas.ErrorInformation
   // this is a inbound request coming from the ALS in response to

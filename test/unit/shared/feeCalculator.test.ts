@@ -2,17 +2,16 @@ import { v1_1 as fspiopAPI } from '@mojaloop/api-snippets'
 import { feeForTransferAndPayeeReceiveAmount, payeeReceiveAmountForQuoteAndFees } from '~/shared/feeCalculator'
 
 describe('feeCalculator', () => {
-
   describe('payeeReceiveAmountForQuoteAndFees', () => {
     it('throws if the currency mismatches for payeeFSPFee', () => {
       // Arrange
       const transferAmount: fspiopAPI.Schemas.Money = {
         currency: 'AUD',
-        amount: 'ABC',
+        amount: 'ABC'
       }
       const payeeFspFee: fspiopAPI.Schemas.Money = {
         currency: 'USD',
-        amount: '1.00',
+        amount: '1.00'
       }
 
       // Act
@@ -29,15 +28,15 @@ describe('feeCalculator', () => {
       // Arrange
       const transferAmount: fspiopAPI.Schemas.Money = {
         currency: 'AUD',
-        amount: 'ABC',
+        amount: 'ABC'
       }
       const payeeFspFee: fspiopAPI.Schemas.Money = {
         currency: 'AUD',
-        amount: '1.00',
+        amount: '1.00'
       }
       const payeeFspCommission: fspiopAPI.Schemas.Money = {
         currency: 'USD',
-        amount: '1.00',
+        amount: '1.00'
       }
 
       // Act
@@ -49,23 +48,23 @@ describe('feeCalculator', () => {
         expect(err.message).toBe('Currency mismatch. Cannot calculate fees across currencies.')
       }
     })
-    
+
     it('throws any of the values evaluates to NaN', () => {
       // Arrange
       const transferAmount: fspiopAPI.Schemas.Money = {
         currency: 'AUD',
-        amount: 'ABC',
+        amount: 'ABC'
       }
       const payeeFspFee: fspiopAPI.Schemas.Money = {
         currency: 'AUD',
-        amount: '1.00',
+        amount: '1.00'
       }
 
       // Act
       try {
         payeeReceiveAmountForQuoteAndFees(transferAmount, payeeFspFee)
         throw new Error('should not be executed')
-      } catch(err: any) {
+      } catch (err: any) {
         // Assert
         expect(err.message).toBe('Invalid amount input. Expected valid number')
       }
@@ -75,23 +74,19 @@ describe('feeCalculator', () => {
       // Arrange
       const transferAmount: fspiopAPI.Schemas.Money = {
         currency: 'AUD',
-        amount: '10.00',
+        amount: '10.00'
       }
       const payeeFspFee: fspiopAPI.Schemas.Money = {
         currency: 'AUD',
-        amount: '1.00',
+        amount: '1.00'
       }
       const payeeFspCommission: fspiopAPI.Schemas.Money = {
         currency: 'AUD',
-        amount: '3.00',
+        amount: '3.00'
       }
 
       // Act
-      const result = payeeReceiveAmountForQuoteAndFees(
-        transferAmount,
-        payeeFspFee,
-        payeeFspCommission
-      )
+      const result = payeeReceiveAmountForQuoteAndFees(transferAmount, payeeFspFee, payeeFspCommission)
 
       // Assert
       expect(result).toStrictEqual({
@@ -104,24 +99,20 @@ describe('feeCalculator', () => {
       // Arrange
       const transferAmount: fspiopAPI.Schemas.Money = {
         currency: 'AUD',
-        amount: '10.00',
+        amount: '10.00'
       }
       const payeeFspFee: fspiopAPI.Schemas.Money = {
         currency: 'AUD',
-        amount: '1.89',
+        amount: '1.89'
       }
       const payeeFspCommission: fspiopAPI.Schemas.Money = {
         currency: 'AUD',
-        amount: '3.00',
+        amount: '3.00'
       }
-      
+
       // Act
-      const result = payeeReceiveAmountForQuoteAndFees(
-        transferAmount, 
-        payeeFspFee,
-        payeeFspCommission
-      )
-      
+      const result = payeeReceiveAmountForQuoteAndFees(transferAmount, payeeFspFee, payeeFspCommission)
+
       // Assert
       expect(result).toStrictEqual({
         currency: 'AUD',
@@ -135,18 +126,18 @@ describe('feeCalculator', () => {
       // Arrange
       const transferAmount: fspiopAPI.Schemas.Money = {
         currency: 'USD',
-        amount: '10.00',
+        amount: '10.00'
       }
       const receiveAmount: fspiopAPI.Schemas.Money = {
         currency: 'AUD',
-        amount: '10.00',
+        amount: '10.00'
       }
-      
+
       // Act
       try {
         feeForTransferAndPayeeReceiveAmount(transferAmount, receiveAmount)
         throw new Error('Should not be executed')
-      } catch (err: any) {  
+      } catch (err: any) {
         // Assert
         expect(err.message).toEqual('Currency mismatch. Cannot calculate fees across currencies.')
       }
@@ -156,11 +147,11 @@ describe('feeCalculator', () => {
       // Arrange
       const transferAmount: fspiopAPI.Schemas.Money = {
         currency: 'AUD',
-        amount: '10.00',
+        amount: '10.00'
       }
       const receiveAmount: fspiopAPI.Schemas.Money = {
         currency: 'AUD',
-        amount: '10.01',
+        amount: '10.01'
       }
 
       // Act
@@ -169,9 +160,7 @@ describe('feeCalculator', () => {
         throw new Error('Should not be executed')
       } catch (err: any) {
         // Assert
-        expect(err.message).toEqual(
-          'Expected transferAmount: 10 to be greater than receive amount: 10.01'
-        )
+        expect(err.message).toEqual('Expected transferAmount: 10 to be greater than receive amount: 10.01')
       }
     })
 
@@ -179,11 +168,11 @@ describe('feeCalculator', () => {
       // Arrange
       const transferAmount: fspiopAPI.Schemas.Money = {
         currency: 'AUD',
-        amount: 'ABC',
+        amount: 'ABC'
       }
       const receiveAmount: fspiopAPI.Schemas.Money = {
         currency: 'AUD',
-        amount: '10.11',
+        amount: '10.11'
       }
 
       // Act
@@ -200,11 +189,11 @@ describe('feeCalculator', () => {
       // Arrange
       const transferAmount: fspiopAPI.Schemas.Money = {
         currency: 'AUD',
-        amount: '10.01',
+        amount: '10.01'
       }
       const receiveAmount: fspiopAPI.Schemas.Money = {
         currency: 'AUD',
-        amount: '10.00',
+        amount: '10.00'
       }
 
       // Act
@@ -219,11 +208,11 @@ describe('feeCalculator', () => {
       // Arrange
       const transferAmount: fspiopAPI.Schemas.Money = {
         currency: 'AUD',
-        amount: '200',
+        amount: '200'
       }
       const receiveAmount: fspiopAPI.Schemas.Money = {
         currency: 'AUD',
-        amount: '199',
+        amount: '199'
       }
 
       // Act

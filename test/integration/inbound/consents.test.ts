@@ -45,13 +45,11 @@ describe('PISP Inbound', (): void => {
       const payload: tpAPI.Schemas.ConsentsPostRequestPISP = {
         consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
         consentRequestId: '997c89f4-053c-4283-bfec-45a1a0a28fbb',
-        scopes: [{
-          address: 'some-id',
-          actions: [
-            'ACCOUNTS_GET_BALANCE',
-            'ACCOUNTS_TRANSFER'
-          ]
-        }
+        scopes: [
+          {
+            address: 'some-id',
+            actions: ['ACCOUNTS_GET_BALANCE', 'ACCOUNTS_TRANSFER']
+          }
         ],
         status: 'ISSUED'
       }
@@ -71,7 +69,8 @@ describe('PISP Inbound', (): void => {
         await subscriber.connect()
         expect(subscriber.isConnected).toBeTruthy()
 
-        subscriber.subscribe('PISPLinking_requestConsentAuthenticate_997c89f4-053c-4283-bfec-45a1a0a28fbb',
+        subscriber.subscribe(
+          'PISPLinking_requestConsentAuthenticate_997c89f4-053c-4283-bfec-45a1a0a28fbb',
           async (channel: string, message: Message) => {
             expect(channel).toEqual('PISPLinking_requestConsentAuthenticate_997c89f4-053c-4283-bfec-45a1a0a28fbb')
             expect(message).toEqual(payload)
@@ -101,13 +100,12 @@ describe('DFSP Inbound', (): void => {
 
     describe('Inbound API', (): void => {
       const signedCredentialPayload: tpAPI.Schemas.ConsentsIDPutResponseSigned = {
-        scopes: [{
-          address: 'some-id',
-          actions: [
-            'ACCOUNTS_GET_BALANCE',
-            'ACCOUNTS_TRANSFER'
-          ]
-        }],
+        scopes: [
+          {
+            address: 'some-id',
+            actions: ['ACCOUNTS_GET_BALANCE', 'ACCOUNTS_TRANSFER']
+          }
+        ],
         credential: {
           credentialType: 'FIDO',
           status: 'PENDING',
@@ -115,11 +113,13 @@ describe('DFSP Inbound', (): void => {
             id: 'credential id: identifier of pair of keys, base64 encoded, min length 59',
             rawId: 'raw credential id: identifier of pair of keys, base64 encoded, min length 59',
             response: {
-              clientDataJSON: 'clientDataJSON-must-not-have-fewer-than-121-' +
+              clientDataJSON:
+                'clientDataJSON-must-not-have-fewer-than-121-' +
                 'characters Lorem ipsum dolor sit amet, consectetur adipiscing ' +
                 'elit, sed do eiusmod tempor incididunt ut labore et dolore magna ' +
                 'aliqua.',
-              attestationObject: 'attestationObject-must-not-have-fewer-than-' +
+              attestationObject:
+                'attestationObject-must-not-have-fewer-than-' +
                 '306-characters Lorem ipsum dolor sit amet, consectetur ' +
                 'adipiscing elit, sed do eiusmod tempor incididunt ut ' +
                 'labore et dolore magna aliqua. Ut enim ad minim veniam, ' +
@@ -162,13 +162,12 @@ describe('DFSP Inbound', (): void => {
         timeout: Config.REDIS.TIMEOUT
       }
       const verifiedCredentialPayload: tpAPI.Schemas.ConsentsIDPutResponseVerified = {
-        scopes: [{
-          address: 'some-id',
-          actions: [
-            'ACCOUNTS_GET_BALANCE',
-            'ACCOUNTS_TRANSFER'
-          ]
-        }],
+        scopes: [
+          {
+            address: 'some-id',
+            actions: ['ACCOUNTS_GET_BALANCE', 'ACCOUNTS_TRANSFER']
+          }
+        ],
         credential: {
           credentialType: 'FIDO',
           status: 'VERIFIED',
@@ -176,11 +175,13 @@ describe('DFSP Inbound', (): void => {
             id: 'credential id: identifier of pair of keys, base64 encoded, min length 59',
             rawId: 'raw credential id: identifier of pair of keys, base64 encoded, min length 59',
             response: {
-              clientDataJSON: 'clientDataJSON-must-not-have-fewer-than-121-' +
+              clientDataJSON:
+                'clientDataJSON-must-not-have-fewer-than-121-' +
                 'characters Lorem ipsum dolor sit amet, consectetur adipiscing ' +
                 'elit, sed do eiusmod tempor incididunt ut labore et dolore magna ' +
                 'aliqua.',
-              attestationObject: 'attestationObject-must-not-have-fewer-than-' +
+              attestationObject:
+                'attestationObject-must-not-have-fewer-than-' +
                 '306-characters Lorem ipsum dolor sit amet, consectetur ' +
                 'adipiscing elit, sed do eiusmod tempor incididunt ut ' +
                 'labore et dolore magna aliqua. Ut enim ad minim veniam, ' +
@@ -215,7 +216,8 @@ describe('DFSP Inbound', (): void => {
         await subscriber.connect()
         expect(subscriber.isConnected).toBeTruthy()
 
-        subscriber.subscribe('DFSPLinking_waitOnAuthServiceResponse_8e34f91d-d078-4077-8263-2c047876fcf6',
+        subscriber.subscribe(
+          'DFSPLinking_waitOnAuthServiceResponse_8e34f91d-d078-4077-8263-2c047876fcf6',
           async (channel: string, message: Message) => {
             expect(channel).toEqual('DFSPLinking_waitOnAuthServiceResponse_8e34f91d-d078-4077-8263-2c047876fcf6')
             expect(message).toEqual(verifiedCredentialPayload)
@@ -284,7 +286,8 @@ describe('DFSP Inbound', (): void => {
         await subscriber.connect()
         expect(subscriber.isConnected).toBeTruthy()
 
-        subscriber.subscribe('DFSPLinking_waitOnAuthServiceResponse_8e34f91d-d078-4077-8263-2c047876fcf6',
+        subscriber.subscribe(
+          'DFSPLinking_waitOnAuthServiceResponse_8e34f91d-d078-4077-8263-2c047876fcf6',
           async (channel: string, message: Message) => {
             expect(channel).toEqual('DFSPLinking_waitOnAuthServiceResponse_8e34f91d-d078-4077-8263-2c047876fcf6')
             expect(message).toEqual(errorPayload)

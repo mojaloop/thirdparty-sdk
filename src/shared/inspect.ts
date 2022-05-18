@@ -33,7 +33,7 @@ export const defaults = {
   COLOR: true
 }
 
-export default function inspect (subject: unknown): string {
+export default function inspect(subject: unknown): string {
   return util.inspect(
     subject,
     config?.INSPECT?.SHOW_HIDDEN || defaults.SHOW_HIDDEN,

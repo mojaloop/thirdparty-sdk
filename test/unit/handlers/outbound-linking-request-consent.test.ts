@@ -66,7 +66,7 @@ describe('Outbound Consent request handler', () => {
     }))
   }
 
-  it('/linking/request-consents should report error when result from \'run\' is undefined', async () => {
+  it("/linking/request-consents should report error when result from 'run' is undefined", async () => {
     const request = {
       method: 'POST',
       url: '/linking/request-consents',

@@ -153,10 +153,7 @@ export const inboundConsentsPostRequest = {
     scopes: [
       {
         address: 'some-id',
-        actions: [
-          'ACCOUNTS_GET_BALANCE',
-          'ACCOUNTS_TRANSFER'
-        ]
+        actions: ['ACCOUNTS_GET_BALANCE', 'ACCOUNTS_TRANSFER']
       }
     ]
   } as tpAPI.Schemas.ConsentsPostRequestPISP
@@ -170,40 +167,27 @@ export const consentRequestsPost = {
     scopes: [
       {
         address: 'dfspa.username.1234',
-        actions: [
-          'ACCOUNTS_TRANSFER',
-          'ACCOUNTS_GET_BALANCE'
-        ]
+        actions: ['ACCOUNTS_TRANSFER', 'ACCOUNTS_GET_BALANCE']
       },
       {
         address: 'dfspa.username.5678',
-        actions: [
-          'ACCOUNTS_TRANSFER',
-          'ACCOUNTS_GET_BALANCE'
-        ]
+        actions: ['ACCOUNTS_TRANSFER', 'ACCOUNTS_GET_BALANCE']
       }
     ],
-    authChannels: [
-      'WEB',
-      'OTP'
-    ],
+    authChannels: ['WEB', 'OTP'],
     callbackUri: 'pisp-app://callback.com'
   } as tpAPI.Schemas.ConsentRequestsPostRequest,
   response: {
     isValid: true,
     data: {
-      authChannels: [
-        'WEB'
-      ],
+      authChannels: ['WEB'],
       authUri: 'dfspa.com/authorize?consentRequestId=456'
     }
   } as BackendValidateConsentRequestsResponse,
   responseOTP: {
     isValid: true,
     data: {
-      authChannels: [
-        'OTP'
-      ]
+      authChannels: ['OTP']
     }
   } as BackendValidateConsentRequestsResponse,
   responseError: {
@@ -216,9 +200,7 @@ export const consentRequestsPost = {
   } as BackendValidateConsentRequestsResponse,
   responseErrorAuthChannel: {
     data: {
-      authChannels: [
-        'TEST'
-      ]
+      authChannels: ['TEST']
     }
   },
   otpRequest: {
@@ -239,24 +221,16 @@ export const consentRequestsPut = {
     scopes: [
       {
         address: 'dfspa.username.1234',
-        actions: [
-          'ACCOUNTS_TRANSFER',
-          'ACCOUNTS_GET_BALANCE'
-        ]
+        actions: ['ACCOUNTS_TRANSFER', 'ACCOUNTS_GET_BALANCE']
       },
       {
         address: 'dfspa.username.5678',
-        actions: [
-          'ACCOUNTS_TRANSFER',
-          'ACCOUNTS_GET_BALANCE'
-        ]
+        actions: ['ACCOUNTS_TRANSFER', 'ACCOUNTS_GET_BALANCE']
       }
     ],
     callbackUri: 'pisp-app://callback.com',
     authUri: 'dfspa.com/authorize?consentRequestId=456',
-    authChannels: [
-      'WEB'
-    ]
+    authChannels: ['WEB']
   } as tpAPI.Schemas.ConsentRequestsIDPutResponseWeb
 }
 export const consentRequestsPutOTP = {
@@ -268,23 +242,15 @@ export const consentRequestsPutOTP = {
     scopes: [
       {
         address: 'dfspa.username.1234',
-        actions: [
-          'ACCOUNTS_TRANSFER',
-          'ACCOUNTS_GET_BALANCE'
-        ]
+        actions: ['ACCOUNTS_TRANSFER', 'ACCOUNTS_GET_BALANCE']
       },
       {
         address: 'dfspa.username.5678',
-        actions: [
-          'ACCOUNTS_TRANSFER',
-          'ACCOUNTS_GET_BALANCE'
-        ]
+        actions: ['ACCOUNTS_TRANSFER', 'ACCOUNTS_GET_BALANCE']
       }
     ],
     callbackUri: 'pisp-app://callback.com',
-    authChannels: [
-      'OTP'
-    ]
+    authChannels: ['OTP']
   } as tpAPI.Schemas.ConsentRequestsIDPutResponseOTP
 }
 export const consentRequestsPutError = {
@@ -321,10 +287,7 @@ export const putServicesByServiceTypeRequest = {
     ServiceType: 'THIRD_PARTY_DFSP'
   },
   payload: {
-    providers: [
-      'dfspA',
-      'dfspB'
-    ]
+    providers: ['dfspA', 'dfspB']
   } as tpAPI.Schemas.ServicesServiceTypePutResponse
 }
 export const putServicesByServiceTypeRequestError = {
@@ -394,8 +357,10 @@ export const linkingRequestConsentIDPassCredentialPostRequest = {
         id: 'credential id: identifier of pair of keys, base64 encoded, min length 59',
         rawId: 'raw credential id: identifier of pair of keys, base64 encoded, min length 59',
         response: {
-          clientDataJSON: 'clientDataJSON-must-not-have-fewer-than-121-characters Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-          attestationObject: 'attestationObject-must-not-have-fewer-than-306-characters Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.'
+          clientDataJSON:
+            'clientDataJSON-must-not-have-fewer-than-121-characters Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+          attestationObject:
+            'attestationObject-must-not-have-fewer-than-306-characters Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.'
         },
         type: 'public-key'
       }
@@ -449,17 +414,11 @@ export const inboundPutConsentsIdRequestSignedCredential = {
     scopes: [
       {
         address: 'dfspa.username.1234',
-        actions: [
-          'ACCOUNTS_TRANSFER',
-          'ACCOUNTS_GET_BALANCE'
-        ]
+        actions: ['ACCOUNTS_TRANSFER', 'ACCOUNTS_GET_BALANCE']
       },
       {
         address: 'dfspa.username.5678',
-        actions: [
-          'ACCOUNTS_TRANSFER',
-          'ACCOUNTS_GET_BALANCE'
-        ]
+        actions: ['ACCOUNTS_TRANSFER', 'ACCOUNTS_GET_BALANCE']
       }
     ],
     credential: {
@@ -469,8 +428,10 @@ export const inboundPutConsentsIdRequestSignedCredential = {
         id: 'credential id: identifier of pair of keys, base64 encoded, min length 59',
         rawId: 'raw credential id: identifier of pair of keys, base64 encoded, min length 59',
         response: {
-          clientDataJSON: 'clientDataJSON-must-not-have-fewer-than-121-characters Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-          attestationObject: 'attestationObject-must-not-have-fewer-than-306-characters Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.'
+          clientDataJSON:
+            'clientDataJSON-must-not-have-fewer-than-121-characters Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+          attestationObject:
+            'attestationObject-must-not-have-fewer-than-306-characters Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.'
         },
         type: 'public-key'
       }
@@ -490,17 +451,11 @@ export const inboundPutConsentsIdRequestVerifiedCredential = {
     scopes: [
       {
         address: 'dfspa.username.1234',
-        actions: [
-          'ACCOUNTS_TRANSFER',
-          'ACCOUNTS_GET_BALANCE'
-        ]
+        actions: ['ACCOUNTS_TRANSFER', 'ACCOUNTS_GET_BALANCE']
       },
       {
         address: 'dfspa.username.5678',
-        actions: [
-          'ACCOUNTS_TRANSFER',
-          'ACCOUNTS_GET_BALANCE'
-        ]
+        actions: ['ACCOUNTS_TRANSFER', 'ACCOUNTS_GET_BALANCE']
       }
     ],
     credential: {
@@ -510,8 +465,10 @@ export const inboundPutConsentsIdRequestVerifiedCredential = {
         id: 'credential id: identifier of pair of keys, base64 encoded, min length 59',
         rawId: 'raw credential id: identifier of pair of keys, base64 encoded, min length 59',
         response: {
-          clientDataJSON: 'clientDataJSON-must-not-have-fewer-than-121-characters Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-          attestationObject: 'attestationObject-must-not-have-fewer-than-306-characters Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.'
+          clientDataJSON:
+            'clientDataJSON-must-not-have-fewer-than-121-characters Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+          attestationObject:
+            'attestationObject-must-not-have-fewer-than-306-characters Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.'
         },
         type: 'public-key'
       }

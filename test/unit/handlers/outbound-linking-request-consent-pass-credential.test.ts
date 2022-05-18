@@ -76,7 +76,7 @@ describe('Outbound linking request consent ID authenticate handlers', () => {
     }
   }
 
-  it('/linking/request-consent/{ID}/pass-credential should report error when result from \'run\' is undefined', async () => {
+  it("/linking/request-consent/{ID}/pass-credential should report error when result from 'run' is undefined", async () => {
     const request = {
       method: 'POST',
       url: '/linking/request-consent/{ID}/pass-credential',

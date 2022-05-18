@@ -27,9 +27,7 @@
 import { StateResponseToolkit } from '~/server/plugins/state'
 import { Request, ResponseObject } from '@hapi/hapi'
 import { PISPLinkingModel, loadFromKVS } from '~/models/outbound/pispLinking.model'
-import {
-  PISPLinkingModelConfig
-} from '~/models/outbound/pispLinking.interface'
+import { PISPLinkingModelConfig } from '~/models/outbound/pispLinking.interface'
 import config from '~/shared/config'
 import inspect from '~/shared/inspect'
 import * as OutboundAPI from '~/interface/outbound/api_interfaces'
@@ -38,8 +36,7 @@ import { Enum } from '@mojaloop/central-services-shared'
 /**
  * Handles outbound PATCH /linking/request-consent/{ID}/authenticate request
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function patch (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+async function patch(_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const payload = request.payload as OutboundAPI.Schemas.LinkingRequestConsentIDAuthenticateRequest
   const consentRequestId = request.params.ID
 
@@ -62,7 +59,7 @@ async function patch (_context: any, request: Request, h: StateResponseToolkit):
       return h.response({}).code(Enum.Http.ReturnCodes.INTERNALSERVERERRROR.CODE)
     }
 
-    const statusCode = (result.currentState === 'errored') ? 500 : 200
+    const statusCode = result.currentState === 'errored' ? 500 : 200
     return h.response(result).code(statusCode)
   } catch (error) {
     // todo: PUT /consentsRequest/{ID}/error to DFSP if PISP is unable to handle

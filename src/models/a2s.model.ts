@@ -96,21 +96,18 @@ export interface A2SModelConfig<Args, A2SActionResponse extends StateData> exten
   requestProcessingTimeoutSeconds: number
 }
 
-export class A2SModel<Args, A2SActionResponse extends StateData>
-  extends PersistentModel<A2SStateMachine, A2SData<A2SActionResponse>> {
+export class A2SModel<Args, A2SActionResponse extends StateData> extends PersistentModel<
+  A2SStateMachine,
+  A2SData<A2SActionResponse>
+> {
   protected config: A2SModelConfig<Args, A2SData<A2SActionResponse>>
   protected args: Args
 
-  constructor (
-    data: A2SData<A2SActionResponse>,
-    config: A2SModelConfig<Args, A2SData<A2SActionResponse>>
-  ) {
+  constructor(data: A2SData<A2SActionResponse>, config: A2SModelConfig<Args, A2SData<A2SActionResponse>>) {
     // request authorization state machine model
     const spec: StateMachineConfig = {
       init: 'start',
-      transitions: [
-        { name: 'requestAction', from: 'start', to: 'succeeded' }
-      ],
+      transitions: [{ name: 'requestAction', from: 'start', to: 'succeeded' }],
       methods: {
         // specific transitions handlers methods
         // eslint-disable-next-line prefer-rest-params
@@ -123,11 +120,11 @@ export class A2SModel<Args, A2SActionResponse extends StateData>
   }
 
   // getters
-  get subscriber (): PubSub {
+  get subscriber(): PubSub {
     return this.config.subscriber
   }
 
-  get modelName (): string {
+  get modelName(): string {
     return this.config.modelName
   }
 
@@ -135,25 +132,24 @@ export class A2SModel<Args, A2SActionResponse extends StateData>
    * @name onRequestAction
    * @description generates the pub/sub channel name
    */
-  async onRequestAction (): Promise<void> {
+  async onRequestAction(): Promise<void> {
     this.logger.push({ args: this.args }).log('onRequestAction - arguments')
     const channel = this.config.channelName(this.args)
     return deferredJob(this.subscriber, channel)
       .init(async (channel: string) => {
         const res = await this.config.requestAction(this.args)
-        this.logger.push({ res, channel, args: this.args })
+        this.logger
+          .push({ res, channel, args: this.args })
           .log('RequestAction call sent to peer, listening on response')
         return res
       })
       .job((message: Message): Promise<void> => {
         this.data.response = {
           // invoke optional reformatMessage
-          ...(this.config.reformatMessage ? this.config.reformatMessage(message) : message as A2SActionResponse),
+          ...(this.config.reformatMessage ? this.config.reformatMessage(message) : (message as A2SActionResponse)),
 
           // response.currentState is remapped from state machine data.currentState
-          currentState: A2SModelState[
-            this.data.currentState as keyof typeof A2SModelState
-          ]
+          currentState: A2SModelState[this.data.currentState as keyof typeof A2SModelState]
         } as A2SActionResponse
         this.logger.push({ message }).log('requestActionMethod message received')
         return Promise.resolve()
@@ -166,7 +162,7 @@ export class A2SModel<Args, A2SActionResponse extends StateData>
    * @description returns the http response payload depending on which state machine is
    * @returns {A2SActionResponse} - the http response payload
    */
-  getResponse (): A2SActionResponse | void {
+  getResponse(): A2SActionResponse | void {
     return this.data.response
   }
 
@@ -176,7 +172,7 @@ export class A2SModel<Args, A2SActionResponse extends StateData>
    * @param {<Args>} args - arguments
    * @returns {Object} - the http response payload
    */
-  async run (args: Args): Promise<A2SActionResponse | void> {
+  async run(args: Args): Promise<A2SActionResponse | void> {
     if (this.config.throwIfInvalidArgs) {
       // optional input validation, it should throws if any of args is invalid
       this.config.throwIfInvalidArgs(args)
@@ -203,7 +199,7 @@ export class A2SModel<Args, A2SActionResponse extends StateData>
           this.logger.log('State machine in errored state')
           return
       }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       this.logger.log(`Error running ${this.modelName} model: ${util.inspect(err)}`)
 
@@ -224,10 +220,10 @@ export class A2SModel<Args, A2SActionResponse extends StateData>
   }
 }
 
-export async function create<Args, A2SActionResponse extends StateData> (
+export async function create<Args, A2SActionResponse extends StateData>(
   data: A2SData<A2SActionResponse>,
   config: A2SModelConfig<Args, A2SData<A2SActionResponse>>
-): Promise <A2SModel<Args, A2SActionResponse>> {
+): Promise<A2SModel<Args, A2SActionResponse>> {
   // create a new model
   const model = new A2SModel<Args, A2SActionResponse>(data, config)
 
@@ -237,9 +233,9 @@ export async function create<Args, A2SActionResponse extends StateData> (
 }
 
 // loads PersistentModel from KVS storage using given `config` and `spec`
-export async function loadFromKVS<Args, A2SActionResponse extends StateData> (
+export async function loadFromKVS<Args, A2SActionResponse extends StateData>(
   config: A2SModelConfig<Args, A2SData<A2SActionResponse>>
-): Promise <A2SModel<Args, A2SActionResponse>> {
+): Promise<A2SModel<Args, A2SActionResponse>> {
   try {
     const data = await config.kvs.get<A2SData<A2SActionResponse>>(config.key)
     if (!data) {

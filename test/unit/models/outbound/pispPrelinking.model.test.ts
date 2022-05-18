@@ -25,21 +25,11 @@ optionally within square brackets <email>.
 --------------
 ******/
 
-import {
-  v1_1 as fspiopAPI,
-  thirdparty as tpAPI
-} from '@mojaloop/api-snippets'
+import { v1_1 as fspiopAPI, thirdparty as tpAPI } from '@mojaloop/api-snippets'
 import { KVS } from '~/shared/kvs'
-import {
-  Message,
-  NotificationCallback,
-  PubSub
-} from '~/shared/pub-sub'
+import { Message, NotificationCallback, PubSub } from '~/shared/pub-sub'
 import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
-import {
-  PISPPrelinkingModel,
-  create
-} from '~/models/outbound/pispPrelinking.model'
+import { PISPPrelinkingModel, create } from '~/models/outbound/pispPrelinking.model'
 import { RedisConnectionConfig } from '~/shared/redis-connection'
 import { mocked } from 'ts-jest/utils'
 
@@ -79,15 +69,13 @@ describe('pispPrelinkingModel', () => {
       } as unknown as ThirdpartyRequests,
       requestProcessingTimeoutSeconds: 3
     }
-    mocked(modelConfig.subscriber.subscribe).mockImplementationOnce(
-      (_channel: string, cb: NotificationCallback) => {
-        handler = cb
-        return ++subId
-      }
-    )
+    mocked(modelConfig.subscriber.subscribe).mockImplementationOnce((_channel: string, cb: NotificationCallback) => {
+      handler = cb
+      return ++subId
+    })
 
-    mocked(publisher.publish).mockImplementationOnce(
-      async (channel: string, message: Message) => handler(channel, message, subId)
+    mocked(publisher.publish).mockImplementationOnce(async (channel: string, message: Message) =>
+      handler(channel, message, subId)
     )
     await modelConfig.kvs.connect()
     await modelConfig.subscriber.connect()
@@ -99,7 +87,7 @@ describe('pispPrelinkingModel', () => {
     await modelConfig.subscriber.disconnect()
   })
 
-  function checkPISPPrelinkingModelLayout (pispPrelinkingModel: PISPPrelinkingModel, optData?: PISPPrelinkingData) {
+  function checkPISPPrelinkingModelLayout(pispPrelinkingModel: PISPPrelinkingModel, optData?: PISPPrelinkingData) {
     expect(pispPrelinkingModel).toBeTruthy()
     expect(pispPrelinkingModel.data).toBeDefined()
     expect(pispPrelinkingModel.fsm.state).toEqual(optData?.currentState || 'start')
@@ -121,11 +109,7 @@ describe('pispPrelinkingModel', () => {
       'providersLookupSuccess',
       'start'
     ])
-    expect(sortedArray(pispPrelinkingModel.fsm.allTransitions())).toEqual([
-      'error',
-      'getProviders',
-      'init'
-    ])
+    expect(sortedArray(pispPrelinkingModel.fsm.allTransitions())).toEqual(['error', 'getProviders', 'init'])
   }
 
   it('module layout', () => {
@@ -158,19 +142,19 @@ describe('pispPrelinkingModel', () => {
     it('getProviders() should transition start to providersLookupSuccess state when successful', async () => {
       const model = await create(prelinkingData, modelConfig)
       // defer publication to notification channel
-      setImmediate(() => publisher.publish(
-        PISPPrelinkingModel.notificationChannel(prelinkingData.serviceType),
-        providersResponse as unknown as Message
-      ))
+      setImmediate(() =>
+        publisher.publish(
+          PISPPrelinkingModel.notificationChannel(prelinkingData.serviceType),
+          providersResponse as unknown as Message
+        )
+      )
       const result = await model.run()
 
       // check that the fsm was able to transition properly
       expect(model.data.currentState).toEqual('providersLookupSuccess')
 
       // check we made a call to thirdpartyRequests.getServices
-      expect(modelConfig.thirdpartyRequests.getServices).toBeCalledWith(
-        'THIRD_PARTY_DFSP'
-      )
+      expect(modelConfig.thirdpartyRequests.getServices).toBeCalledWith('THIRD_PARTY_DFSP')
 
       expect(result).toEqual({
         providers: ['dfspA', 'dfspB'],
@@ -179,10 +163,12 @@ describe('pispPrelinkingModel', () => {
     })
 
     it('should handle a PUT /services/THIRD_PARTY_DFSP/error response', async () => {
-      setImmediate(() => publisher.publish(
-        PISPPrelinkingModel.notificationChannel(prelinkingData.serviceType),
-        genericErrorResponse as unknown as Message
-      ))
+      setImmediate(() =>
+        publisher.publish(
+          PISPPrelinkingModel.notificationChannel(prelinkingData.serviceType),
+          genericErrorResponse as unknown as Message
+        )
+      )
 
       const model = await create(prelinkingData, modelConfig)
       const result = await model.run()

@@ -1,8 +1,6 @@
 import { logger } from '~/shared/logger'
 import { StateResponseToolkit } from '~/server/plugins/state'
-import {
-  PISPTransactionModel
-} from '~/models/pispTransaction.model'
+import { PISPTransactionModel } from '~/models/pispTransaction.model'
 import { PISPTransactionPhase } from '~/models/pispTransaction.interface'
 import NotifyThirdpartyTransactionRequests from '~/handlers/inbound/thirdpartyRequests/transactions/{ID}'
 import ThirdpartyTransactionRequestsError from '~/handlers/inbound/thirdpartyRequests/transactions/{ID}/error'
@@ -64,9 +62,7 @@ describe('Inbound PISP transaction handlers', (): void => {
     )
     expect(result.statusCode).toBe(200)
 
-    const channel = PISPTransactionModel.notificationChannel(
-      PISPTransactionPhase.approval,
-      request.params.ID)
+    const channel = PISPTransactionModel.notificationChannel(PISPTransactionPhase.approval, request.params.ID)
 
     expect(pubSubMock.publish).toBeCalledWith(channel, approveResponse)
   })
@@ -90,9 +86,7 @@ describe('Inbound PISP transaction handlers', (): void => {
     )
     expect(result.statusCode).toBe(200)
 
-    const channel = PISPTransactionModel.notificationChannel(
-      PISPTransactionPhase.approval,
-      request.params.ID)
+    const channel = PISPTransactionModel.notificationChannel(PISPTransactionPhase.approval, request.params.ID)
 
     expect(pubSubMock.publish).toBeCalledWith(channel, errorResponse)
   })

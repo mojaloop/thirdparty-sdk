@@ -33,7 +33,7 @@ import extensions from './extensions'
 import plugins from './plugins'
 import start from './start'
 
-export default async function setupAndStart (
+export default async function setupAndStart(
   config: ServerConfig,
   apiPath: string,
   handlers: { [handler: string]: Handler }

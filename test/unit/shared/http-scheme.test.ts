@@ -24,22 +24,22 @@
  * Paweł Marzec <pawel.marzec@modusbox.com>
  --------------
  ******/
-import HttpScheme, { Scheme, prependHttp2Uri, prependHttps2Uri } from '~/shared/http-scheme'
+import { Scheme, prepend2Uri, prependHttp2Uri, prependHttps2Uri } from '~/shared/http-scheme'
 
 describe('http-scheme', () => {
   it('should have proper default layout', () => {
-    expect(typeof HttpScheme.prepend2Uri).toEqual('function')
-    expect(typeof HttpScheme.prependHttp2Uri).toEqual('function')
-    expect(typeof HttpScheme.prependHttps2Uri).toEqual('function')
+    expect(typeof prepend2Uri).toEqual('function')
+    expect(typeof prependHttp2Uri).toEqual('function')
+    expect(typeof prependHttps2Uri).toEqual('function')
     expect(Scheme.http).toEqual('http')
     expect(Scheme.https).toEqual('https')
   })
 
-  it('should append \'http\'', () => {
+  it("should append 'http'", () => {
     expect(prependHttp2Uri('uri')).toEqual('http://uri')
   })
 
-  it('should append \'https\'', () => {
+  it("should append 'https'", () => {
     expect(prependHttps2Uri('uri')).toEqual('https://uri')
   })
 })

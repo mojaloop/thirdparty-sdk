@@ -30,6 +30,6 @@ import { PathLike } from 'fs'
 
 describe('config', () => {
   it('getFileContent should throw when not existing path', () => {
-    expect(() => getFileContent(undefined as unknown as PathLike)).toThrowError('File doesn\'t exist')
+    expect(() => getFileContent(undefined as unknown as PathLike)).toThrowError("File doesn't exist")
   })
 })

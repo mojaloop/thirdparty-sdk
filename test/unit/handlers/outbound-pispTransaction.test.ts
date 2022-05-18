@@ -110,7 +110,7 @@ describe('Outbound PISP transaction handlers', () => {
       responseType: 'ENTERED'
     }
   }
-  it('/thirdpartyTransaction/partyLookup should report error when result from \'run\' is undefined', async () => {
+  it("/thirdpartyTransaction/partyLookup should report error when result from 'run' is undefined", async () => {
     const request = {
       method: 'POST',
       url: '/thirdpartyTransaction/partyLookup',
@@ -159,7 +159,7 @@ describe('Outbound PISP transaction handlers', () => {
     expect(result.statusCode).toBe(422)
   })
 
-  it('/thirdpartyTransaction/{ID}/initiate should report error when result from \'run\' is undefined', async () => {
+  it("/thirdpartyTransaction/{ID}/initiate should report error when result from 'run' is undefined", async () => {
     const request = {
       method: 'POST',
       url: '/thirdpartyTransaction/{ID}/initiate',
@@ -179,7 +179,7 @@ describe('Outbound PISP transaction handlers', () => {
     )
     expect(result.statusCode).toBe(500)
   })
-  it('/thirdpartyTransaction/{ID}/approve should report error when result from \'run\' is undefined', async () => {
+  it("/thirdpartyTransaction/{ID}/approve should report error when result from 'run' is undefined", async () => {
     const request = {
       method: 'POST',
       url: '/thirdpartyTransaction/{ID}/approve',

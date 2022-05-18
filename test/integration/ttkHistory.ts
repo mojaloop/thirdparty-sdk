@@ -1,6 +1,4 @@
-import axios from "axios"
-
-
+import axios from 'axios'
 
 export interface MLTestingToolkitRequest {
   timestamp: string
@@ -45,30 +43,33 @@ export class TTKHistory {
 
     let filtered = requestHistory
     if (method) {
-      filtered = filtered.filter(req => req.method === method)
+      filtered = filtered.filter((req) => req.method === method)
     }
     if (path) {
-      filtered = filtered.filter(req => req.path === path)
+      filtered = filtered.filter((req) => req.path === path)
     }
 
     return filtered
   }
 
-  public async getAndFilterWithRetries(retries: number, method?: string, path?: string): Promise<Array<MLTestingToolkitRequest>> {
+  public async getAndFilterWithRetries(
+    retries: number,
+    method?: string,
+    path?: string
+  ): Promise<Array<MLTestingToolkitRequest>> {
     let result = await this.getAndFilter(method, path)
-    while(retries > 0 && result.length === 0) {
+    while (retries > 0 && result.length === 0) {
       result = await this.getAndFilter(method, path)
       // wait a bit for the DFSP adapter to process the request
-      await new Promise(resolve => setTimeout(resolve, 200));
+      await new Promise((resolve) => setTimeout(resolve, 200))
 
       retries--
     }
 
-    return result;
+    return result
   }
 
-  public async clear() {
+  public async clear(): Promise<void> {
     await axios.delete(this.uri, {})
   }
-
 }

@@ -27,16 +27,13 @@
 
 import { Request, ResponseObject } from '@hapi/hapi'
 import { Context } from 'openapi-backend'
-import { StateResponseToolkit } from "~/server/plugins/state"
+import { StateResponseToolkit } from '~/server/plugins/state'
 import { DFSPTransactionModel, DFSPTransactionPhase } from '~/models/dfspTransaction.model'
 import { Message } from '~/shared/pub-sub'
 
-import {
-  thirdparty as tpAPI
-} from '@mojaloop/api-snippets'
+import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
 import { PISPTransactionModel } from '~/models/pispTransaction.model'
 import { PISPTransactionPhase } from '~/models/pispTransaction.interface'
-
 
 /**
  * POST /thirdpartyRequests/authorizations
@@ -52,23 +49,19 @@ async function post(_context: unknown, request: Request, h: StateResponseToolkit
     payload as unknown as Message
   )
 
-
   // Note that we will have passed request validation, JWS etc... by this point
   // so it is safe to return 202
   return h.response().code(202)
 }
 
-
 /**
  * PUT /thirdpartyRequests/authorizations/{ID}
- * 
- * or 
- * 
+ *
+ * or
+ *
  * PUT /thirdpartyRequests/authorizations/{ID}/error
  */
-async function put(
-  _context: Context, request: Request, h: StateResponseToolkit
-): Promise<ResponseObject> {
+async function put(_context: Context, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const authorizationRequestId = request.params.ID
   // This could be an error payload or ThirdpartyRequestsAuthorizationsIDPutResponse
   const authorizationResponse = request.payload
@@ -86,5 +79,5 @@ async function put(
 
 export default {
   post,
-  put,
+  put
 }

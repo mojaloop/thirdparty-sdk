@@ -26,25 +26,19 @@
  --------------
  ******/
 
-import {
-  thirdparty as tpAPI,
-} from '@mojaloop/api-snippets'
+import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
 import { Request, ResponseObject } from '@hapi/hapi'
 import { StateResponseToolkit } from '~/server/plugins/state'
 import { Enum } from '@mojaloop/central-services-shared'
-import {
-  DFSPLinkingData,
-  DFSPLinkingModelConfig
-} from '~/models/inbound/dfspLinking.interface'
+import { DFSPLinkingData, DFSPLinkingModelConfig } from '~/models/inbound/dfspLinking.interface'
 import { DFSPLinkingModel, create } from '~/models/inbound/dfspLinking.model'
 import inspect from '~/shared/inspect'
 import config from '~/shared/config'
 
-
 /**
  * Handles an inbound `POST /consentRequests` request
  */
-async function post (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+async function post(_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const logger = h.getLogger()
   const payload = request.payload as tpAPI.Schemas.ConsentRequestsPostRequest
   const consentRequestId = payload.consentRequestId

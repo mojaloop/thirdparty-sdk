@@ -25,9 +25,7 @@
  --------------
  ******/
 import { Request, ResponseObject } from '@hapi/hapi'
-import {
-  v1_1 as fspiopAPI
-} from '@mojaloop/api-snippets'
+import { v1_1 as fspiopAPI } from '@mojaloop/api-snippets'
 import { Message } from '~/shared/pub-sub'
 import { StateResponseToolkit } from '~/server/plugins/state'
 import { Enum } from '@mojaloop/central-services-shared'
@@ -37,7 +35,7 @@ import { PISPLinkingPhase } from '~/models/outbound/pispLinking.interface'
 /**
  * Handles a inbound PUT /consentRequests/{ID}/error request
  */
-async function put (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+async function put(_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   // PUT /consentsRequests/{ID}/error is a response to PATCH /consentRequests
   // when an OTP or secret failed to validate.
   // We publish the request on the PISPConsentRequestModel

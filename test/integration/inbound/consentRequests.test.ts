@@ -45,23 +45,14 @@ describe('DFSP Inbound', (): void => {
         scopes: [
           {
             address: 'dfspa.username.1234',
-            actions: [
-              'ACCOUNTS_TRANSFER',
-              'ACCOUNTS_GET_BALANCE'
-            ]
+            actions: ['ACCOUNTS_TRANSFER', 'ACCOUNTS_GET_BALANCE']
           },
           {
             address: 'dfspa.username.5678',
-            actions: [
-              'ACCOUNTS_TRANSFER',
-              'ACCOUNTS_GET_BALANCE'
-            ]
+            actions: ['ACCOUNTS_TRANSFER', 'ACCOUNTS_GET_BALANCE']
           }
         ],
-        authChannels: [
-          'WEB',
-          'OTP'
-        ],
+        authChannels: ['WEB', 'OTP'],
         callbackUri: 'pisp-app://callback.com'
       }
 
@@ -152,7 +143,8 @@ describe('PISP Inbound', (): void => {
           await subscriber.connect()
           expect(subscriber.isConnected).toBeTruthy()
 
-          subscriber.subscribe('PISPLinking_requestConsent_997c89f4-053c-4283-bfec-45a1a0a28fba',
+          subscriber.subscribe(
+            'PISPLinking_requestConsent_997c89f4-053c-4283-bfec-45a1a0a28fba',
             async (channel: string, message: Message, _id: number) => {
               expect(channel).toEqual('PISPLinking_requestConsent_997c89f4-053c-4283-bfec-45a1a0a28fba')
               expect(message).toEqual(payload)
@@ -163,9 +155,12 @@ describe('PISP Inbound', (): void => {
             }
           )
 
-          subscriber.subscribe('PISPConsentRequests_requestConsentAuthenticate_997c89f4-053c-4283-bfec-45a1a0a28fba',
+          subscriber.subscribe(
+            'PISPConsentRequests_requestConsentAuthenticate_997c89f4-053c-4283-bfec-45a1a0a28fba',
             async (channel: string, message: Message, _id: number) => {
-              expect(channel).toEqual('PISPConsentRequests_requestConsentAuthenticate_997c89f4-053c-4283-bfec-45a1a0a28fba')
+              expect(channel).toEqual(
+                'PISPConsentRequests_requestConsentAuthenticate_997c89f4-053c-4283-bfec-45a1a0a28fba'
+              )
               expect(message).toEqual(payload)
               await subscriber.disconnect()
               expect(subscriber.isConnected).toBeFalsy()
@@ -207,15 +202,15 @@ describe('PISP Inbound', (): void => {
         expect(subscriber.isConnected).toBeTruthy()
         subscriber.subscribe(
           'PISPLinking_requestConsent_997c89f4-053c-4283-bfec-45a1a0a28fbb',
-          async (channel: string, message: Message, _id: number
-          ) => {
+          async (channel: string, message: Message, _id: number) => {
             expect(channel).toEqual('PISPLinking_requestConsent_997c89f4-053c-4283-bfec-45a1a0a28fbb')
             expect(message).toEqual(mockData.consentRequestsPut.payload)
             await subscriber.disconnect()
             expect(subscriber.isConnected).toBeFalsy()
 
             done()
-          })
+          }
+        )
         // Act
         const response = await axios.put(scenarioUri, mockData.consentRequestsPut.payload, axiosConfig)
 

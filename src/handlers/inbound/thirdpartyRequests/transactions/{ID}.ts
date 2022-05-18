@@ -31,7 +31,7 @@ import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
 /**
  * Handles a inbound PATCH /thirdpartyRequests/transactions/{ID} request
  */
-async function patch (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+async function patch(_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const payload = request.payload as tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPatchResponse
   h.getLogger().push({ payload }).info('PATCH /thirdpartyRequests/transactions/{ID} pushing to channel')
 
@@ -46,7 +46,7 @@ async function patch (_context: unknown, request: Request, h: StateResponseToolk
   return h.response({}).code(200)
 }
 
-async function put (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+async function put(_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const payload = request.payload as tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPutResponse
   h.getLogger().push({ payload }).info('PUT /thirdpartyRequests/transactions/{ID} pushing to channel')
 

@@ -26,9 +26,7 @@
  --------------
  ******/
 
-import {
-  thirdparty as tpAPI
-} from '@mojaloop/api-snippets'
+import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
 import { Message } from '~/shared/pub-sub'
 import { Request, ResponseObject } from '@hapi/hapi'
 import { StateResponseToolkit } from '~/server/plugins/state'
@@ -36,14 +34,14 @@ import { Enum } from '@mojaloop/central-services-shared'
 import { PISPLinkingModel } from '~/models/outbound/pispLinking.model'
 import { PISPLinkingPhase } from '~/models/outbound/pispLinking.interface'
 
-async function post (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+async function post(_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const payload = request.payload as tpAPI.Schemas.ConsentsPostRequestPISP
 
   // POST /consents is a follow-up request to PATCH /consentRequests
   // so we publish the request on the PISPConsentRequestModel
   PISPLinkingModel.triggerWorkflow(
     PISPLinkingPhase.requestConsentAuthenticate,
-    payload.consentRequestId!,
+    payload.consentRequestId,
     h.getPublisher(),
     payload as unknown as Message
   )

@@ -27,21 +27,19 @@
 
 import { Request, ResponseObject } from '@hapi/hapi'
 import { Context } from 'openapi-backend'
-import { StateResponseToolkit } from "~/server/plugins/state"
+import { StateResponseToolkit } from '~/server/plugins/state'
 import { DFSPTransactionModel, DFSPTransactionPhase } from '~/models/dfspTransaction.model'
 import { Message } from '~/shared/pub-sub'
 
 /**
  * PUT /thirdpartyRequests/verifications/{ID}
- * 
- * or 
- * or 
- * 
+ *
+ * or
+ * or
+ *
  * PUT /thirdpartyRequests/verifications/{ID}/error
  */
-async function put(
-  _context: Context, request: Request, h: StateResponseToolkit
-): Promise<ResponseObject> {
+async function put(_context: Context, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const verificationRequestId = request.params.ID
   // This could be an error payload or ThirdpartyRequestsVerificationsIDPutResponse
   const verificationResponse = request.payload
@@ -58,5 +56,5 @@ async function put(
 }
 
 export default {
-  put,
+  put
 }

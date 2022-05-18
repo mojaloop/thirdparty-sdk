@@ -28,10 +28,7 @@
 import { StateResponseToolkit } from '~/server/plugins/state'
 import { Request, ResponseObject } from '@hapi/hapi'
 import { PISPLinkingModel, create } from '~/models/outbound/pispLinking.model'
-import {
-  PISPLinkingData,
-  PISPLinkingModelConfig
-} from '~/models/outbound/pispLinking.interface'
+import { PISPLinkingData, PISPLinkingModelConfig } from '~/models/outbound/pispLinking.interface'
 import * as OutboundAPI from '~/interface/outbound/api_interfaces'
 import config from '~/shared/config'
 import { Enum } from '@mojaloop/central-services-shared'
@@ -39,8 +36,7 @@ import { Enum } from '@mojaloop/central-services-shared'
 /**
  * Handles outbound POST /linking/request-consent request
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function post (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+async function post(_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const payload = request.payload as OutboundAPI.Schemas.LinkingRequestConsentPostRequest
   // prepare config
   const data: PISPLinkingData = {
@@ -65,9 +61,8 @@ async function post (_context: any, request: Request, h: StateResponseToolkit): 
     return h.response({}).code(Enum.Http.ReturnCodes.INTERNALSERVERERRROR.CODE)
   }
 
-  const statusCode = (result.currentState === 'errored')
-    ? Enum.Http.ReturnCodes.INTERNALSERVERERRROR.CODE
-    : Enum.Http.ReturnCodes.OK.CODE
+  const statusCode =
+    result.currentState === 'errored' ? Enum.Http.ReturnCodes.INTERNALSERVERERRROR.CODE : Enum.Http.ReturnCodes.OK.CODE
   return h.response(result).code(statusCode)
 }
 

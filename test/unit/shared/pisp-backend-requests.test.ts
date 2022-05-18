@@ -25,9 +25,6 @@
  --------------
  ******/
 
-import {
-  thirdparty as tpAPI
-} from '@mojaloop/api-snippets'
 import { PISPBackendConfig, PISPBackendRequests } from '~/shared/pisp-backend-requests'
 import { Scheme } from '~/shared/http-scheme'
 import mockLogger from '../mockLogger'

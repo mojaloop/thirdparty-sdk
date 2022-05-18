@@ -25,9 +25,7 @@
  --------------
  ******/
 import { Request, ResponseObject } from '@hapi/hapi'
-import {
-  v1_1 as fspiopAPI
-} from '@mojaloop/api-snippets'
+import { v1_1 as fspiopAPI } from '@mojaloop/api-snippets'
 import { Message } from '~/shared/pub-sub'
 import { StateResponseToolkit } from '~/server/plugins/state'
 import { Enum } from '@mojaloop/central-services-shared'
@@ -37,9 +35,9 @@ import { DFSPLinkingModel } from '~/models/inbound/dfspLinking.model'
 import { DFSPLinkingPhase } from '~/models/inbound/dfspLinking.interface'
 
 /**
-* Handles a inbound PUT /consents/{ID}/error request
-*/
-async function put (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+ * Handles a inbound PUT /consents/{ID}/error request
+ */
+async function put(_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const consentId = request.params.ID
   const payload = request.payload as fspiopAPI.Schemas.ErrorInformation
   const publisher = h.getPublisher()

@@ -28,7 +28,7 @@
 import { RequestResponse } from '@mojaloop/sdk-standard-components'
 import { HTTPResponseError, ResponseErrorData } from './http-response-error'
 
-export function throwOrExtractData<Data> (res: RequestResponse<Data>): Data | void {
+export function throwOrExtractData<Data>(res: RequestResponse<Data>): Data | void {
   // TODO: will a 503 or 500 with content-length zero generate an error?
   // or a 404 for that matter?!
 

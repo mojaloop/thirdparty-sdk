@@ -41,19 +41,21 @@ jest.mock('~/shared/kvs')
 jest.mock('~/shared/pub-sub')
 
 // mvp mockup of defferedJob
-jest.mock('~/shared/deferred-job', () => jest.fn(() => ({
-  init: jest.fn((jobInitiator: JobInitiator) => ({
-    job: jest.fn((jobListener: JobListener) => ({
-      wait: jest.fn(async () => {
-        // simulate calling the jobInitiator
-        await jobInitiator('the-channel', 1234)
-        // simulate calling the jobListener
-        await jobListener({ the: 'message-listening-on' })
-      })
-    }))
-  })),
-  trigger: jest.fn()
-})))
+jest.mock('~/shared/deferred-job', () =>
+  jest.fn(() => ({
+    init: jest.fn((jobInitiator: JobInitiator) => ({
+      job: jest.fn((jobListener: JobListener) => ({
+        wait: jest.fn(async () => {
+          // simulate calling the jobInitiator
+          await jobInitiator('the-channel', 1234)
+          // simulate calling the jobListener
+          await jobListener({ the: 'message-listening-on' })
+        })
+      }))
+    })),
+    trigger: jest.fn()
+  }))
+)
 
 // state data interface
 interface TestData extends StateData {
@@ -81,7 +83,7 @@ class TestA2SModelConfig implements A2SModelConfig<TestArgs, TestResponse> {
   public readonly modelName = 'TestA2SModel'
   public readonly requestProcessingTimeoutSeconds = 10000
 
-  constructor (key: string, kvs: KVS, logger: SDKLogger.Logger, subscriber: PubSub) {
+  constructor(key: string, kvs: KVS, logger: SDKLogger.Logger, subscriber: PubSub) {
     this.key = key
     this.kvs = kvs
     this.logger = logger
@@ -89,25 +91,25 @@ class TestA2SModelConfig implements A2SModelConfig<TestArgs, TestResponse> {
   }
 
   // generate a channel name
-  channelName (args: TestArgs): string {
+  channelName(args: TestArgs): string {
     const tokens = [this.modelName, args.first]
-    return tokens.map(x => `${x}`).join('-')
+    return tokens.map((x) => `${x}`).join('-')
   }
 
   // simulate requesting the action
-  requestAction (/* args: TestArgs */): Promise<void> {
+  requestAction(/* args: TestArgs */): Promise<void> {
     return Promise.resolve()
   }
 
   // mvp validation
-  throwIfInvalidArgs (args: TestArgs): void {
+  throwIfInvalidArgs(args: TestArgs): void {
     if (!(args.first || args.second)) {
       throw new Error('throwIfInvalidArgs')
     }
   }
 
   // simple formatter which injects property
-  reformatMessage (message: Message): TestResponse {
+  reformatMessage(message: Message): TestResponse {
     return {
       the: 'injected-property',
       message
@@ -129,12 +131,7 @@ describe('A2SModel', () => {
   let config: TestA2SModelConfig
 
   beforeEach(() => {
-    config = new TestA2SModelConfig(
-      key,
-      new KVS(redisConfig),
-      logger,
-      new PubSub(redisConfig)
-    )
+    config = new TestA2SModelConfig(key, new KVS(redisConfig), logger, new PubSub(redisConfig))
   })
   describe('create', () => {
     it('should be created properly', async () => {
@@ -162,9 +159,9 @@ describe('A2SModel', () => {
 
   describe('loadFromKVS', () => {
     it('should use KVS properly', async () => {
-      const getSpy = jest.spyOn(config.kvs, 'get').mockImplementationOnce(
-        () => Promise.resolve({ property: 'loaded', currentState: 'succeeded' })
-      )
+      const getSpy = jest
+        .spyOn(config.kvs, 'get')
+        .mockImplementationOnce(() => Promise.resolve({ property: 'loaded', currentState: 'succeeded' }))
       const m: TestA2SModel = await loadFromKVS<TestArgs, TestResponse>(config)
       expect(m).toBeDefined()
 
@@ -173,12 +170,10 @@ describe('A2SModel', () => {
     })
 
     it('should handle the empty data from KVS properly', async () => {
-      const getSpy = jest.spyOn(config.kvs, 'get').mockImplementationOnce(
-        () => Promise.resolve()
-      )
+      const getSpy = jest.spyOn(config.kvs, 'get').mockImplementationOnce(() => Promise.resolve())
       try {
         await loadFromKVS<TestArgs, TestResponse>(config)
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
         expect(err.message).toEqual(`A2SModel(${config.modelName}) No data found in KVS for: ${config.key}`)
       }
@@ -201,14 +196,13 @@ describe('A2SModel', () => {
     })
 
     it('should handle the exception from reformatMessage', async () => {
-      const spyReformatMessage = jest.spyOn(config, 'reformatMessage')
-        .mockImplementationOnce(() => {
-          const err = {
-            message: 'from-reformat-message',
-            requestActionState: 'something'
-          }
-          throw err
-        })
+      const spyReformatMessage = jest.spyOn(config, 'reformatMessage').mockImplementationOnce(() => {
+        const err = {
+          message: 'from-reformat-message',
+          requestActionState: 'something'
+        }
+        throw err
+      })
       const m: TestA2SModel = await create<TestArgs, TestResponse>(data, config)
       try {
         await m.run({ first: 'I am the first', second: 234 })
@@ -226,8 +220,9 @@ describe('A2SModel', () => {
     })
 
     it('should handle the exception from requestAction', async () => {
-      const spyRequestAction = jest.spyOn(config, 'requestAction')
-        .mockImplementationOnce(() => { throw new Error('from-requestAction') })
+      const spyRequestAction = jest.spyOn(config, 'requestAction').mockImplementationOnce(() => {
+        throw new Error('from-requestAction')
+      })
       const m: TestA2SModel = await create<TestArgs, TestResponse>(data, config)
       try {
         await m.run({ first: 'I am the first', second: 234 })

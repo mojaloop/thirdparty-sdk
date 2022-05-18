@@ -25,11 +25,7 @@
  --------------
  ******/
 import { KVS } from '~/shared/kvs'
-import {
-  Message,
-  NotificationCallback,
-  PubSub
-} from '~/shared/pub-sub'
+import { Message, NotificationCallback, PubSub } from '~/shared/pub-sub'
 import { MojaloopRequests, ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
 import {
   PISPTransactionData,
@@ -37,21 +33,14 @@ import {
   PISPTransactionPhase,
   RequestPartiesInformationState
 } from '~/models/pispTransaction.interface'
-import {
-  PISPTransactionModel,
-  create,
-  loadFromKVS
-} from '~/models/pispTransaction.model'
+import { PISPTransactionModel, create, loadFromKVS } from '~/models/pispTransaction.model'
 import { RedisConnectionConfig } from '~/shared/redis-connection'
 import { mocked } from 'ts-jest/utils'
 
 import mockLogger from 'test/unit/mockLogger'
 import shouldNotBeExecuted from 'test/unit/shouldNotBeExecuted'
 import sortedArray from 'test/unit/sortedArray'
-import {
-  v1_1 as fspiopAPI,
-  thirdparty as tpAPI
-} from '@mojaloop/api-snippets'
+import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
 import { HTTPResponseError } from '~/shared/http-response-error'
 import { SDKOutgoingRequests } from '~/shared/sdk-outgoing-requests'
 import * as OutboundAPI from '~/interface/outbound/api_interfaces'
@@ -85,8 +74,8 @@ describe('pipsTransactionModel', () => {
     publisher = new PubSub(connectionConfig)
     await publisher.connect()
 
-    mocked(publisher.publish).mockImplementation(
-      async (channel: string, message: Message) => handlers[channel](channel, message, subId)
+    mocked(publisher.publish).mockImplementation(async (channel: string, message: Message) =>
+      handlers[channel](channel, message, subId)
     )
 
     modelConfig = {
@@ -102,21 +91,21 @@ describe('pipsTransactionModel', () => {
         getParties: jest.fn(() => Promise.resolve({ statusCode: 202 }))
       } as unknown as MojaloopRequests,
       sdkOutgoingRequests: {
-        requestPartiesInformation: jest.fn(() => Promise.resolve({
-          party: { Iam: 'mocked-party' },
-          currentStatus: 'COMPLETED'
-        }))
+        requestPartiesInformation: jest.fn(() =>
+          Promise.resolve({
+            party: { Iam: 'mocked-party' },
+            currentStatus: 'COMPLETED'
+          })
+        )
       } as unknown as SDKOutgoingRequests,
       initiateTimeoutInSeconds: 3,
       approveTimeoutInSeconds: 3
     }
 
-    mocked(modelConfig.subscriber.subscribe).mockImplementation(
-      (channel: string, cb: NotificationCallback) => {
-        handlers[channel] = cb
-        return ++subId
-      }
-    )
+    mocked(modelConfig.subscriber.subscribe).mockImplementation((channel: string, cb: NotificationCallback) => {
+      handlers[channel] = cb
+      return ++subId
+    })
 
     await modelConfig.kvs.connect()
     await modelConfig.subscriber.connect()
@@ -128,7 +117,7 @@ describe('pipsTransactionModel', () => {
     await modelConfig.subscriber.disconnect()
   })
 
-  function checkPTMLayout (ptm: PISPTransactionModel, optData?: PISPTransactionData) {
+  function checkPTMLayout(ptm: PISPTransactionModel, optData?: PISPTransactionData) {
     expect(ptm).toBeTruthy()
     expect(ptm.data).toBeDefined()
     expect(ptm.fsm.state).toEqual(optData?.currentState || 'start')
@@ -199,13 +188,15 @@ describe('pipsTransactionModel', () => {
 
       it('should give response properly populated from backendRequests.requestPartiesInformation', async () => {
         const model = await create(lookupData, modelConfig)
-        mocked(modelConfig.sdkOutgoingRequests.requestPartiesInformation).mockImplementationOnce(() => Promise.resolve({
-          party: {
-            body: party,
-            headers: {}
-          },
-          currentState: RequestPartiesInformationState.COMPLETED
-        }))
+        mocked(modelConfig.sdkOutgoingRequests.requestPartiesInformation).mockImplementationOnce(() =>
+          Promise.resolve({
+            party: {
+              body: party,
+              headers: {}
+            },
+            currentState: RequestPartiesInformationState.COMPLETED
+          })
+        )
         // let be sure we don't have expected data yet
         expect(model.data.payeeResolved).toBeFalsy()
         expect(model.data.partyLookupResponse).toBeFalsy()
@@ -234,31 +225,29 @@ describe('pipsTransactionModel', () => {
 
         // check we made a call to mojaloopRequest.getParties
         expect(modelConfig.sdkOutgoingRequests.requestPartiesInformation).toBeCalledWith(
-          'MSISDN', 'party-identifier', undefined
+          'MSISDN',
+          'party-identifier',
+          undefined
         )
       })
 
       it('should handle error', async () => {
-        mocked(
-          modelConfig.sdkOutgoingRequests.requestPartiesInformation
-        ).mockImplementationOnce(
-          () => {
-            const err = new HTTPResponseError({
-              msg: 'error-message',
-              res: {
-                statusCode: 404,
-                data: {
-                  errorInformation: {
-                    errorCode: '3204',
-                    errorDescription: 'Party not found'
-                  },
-                  currentState: 'COMPLETED'
-                }
+        mocked(modelConfig.sdkOutgoingRequests.requestPartiesInformation).mockImplementationOnce(() => {
+          const err = new HTTPResponseError({
+            msg: 'error-message',
+            res: {
+              statusCode: 404,
+              data: {
+                errorInformation: {
+                  errorCode: '3204',
+                  errorDescription: 'Party not found'
+                },
+                currentState: 'COMPLETED'
               }
-            })
-            throw err
-          }
-        )
+            }
+          })
+          throw err
+        })
         const model = await create(lookupData, modelConfig)
 
         const result = await model.run()
@@ -378,15 +367,9 @@ describe('pipsTransactionModel', () => {
         // defer publication to notification channel
         setImmediate(() => {
           // publish authorization request
-          publisher.publish(
-            channelAuthPost,
-            authorizationRequest as unknown as Message
-          )
+          publisher.publish(channelAuthPost, authorizationRequest as unknown as Message)
           // publish transaction status update
-          publisher.publish(
-            channelTransPut,
-            transactionStatus as unknown as Message
-          )
+          publisher.publish(channelTransPut, transactionStatus as unknown as Message)
         })
         // let be sure we don't have expected data yet
         expect(model.data.authorizationRequest).toBeFalsy()
@@ -429,19 +412,15 @@ describe('pipsTransactionModel', () => {
       })
 
       it('should handle error', async (done) => {
-        mocked(
-          modelConfig.thirdpartyRequests.postThirdpartyRequestsTransactions
-        ).mockImplementationOnce(
-          () => {
-            throw new Error('mocked postThirdpartyRequestsTransactions exception')
-          }
-        )
+        mocked(modelConfig.thirdpartyRequests.postThirdpartyRequestsTransactions).mockImplementationOnce(() => {
+          throw new Error('mocked postThirdpartyRequestsTransactions exception')
+        })
         const model = await create(data, modelConfig)
 
         try {
           await model.run()
           shouldNotBeExecuted()
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (err: any) {
           expect(err.message).toEqual('mocked postThirdpartyRequestsTransactions exception')
 
@@ -503,8 +482,10 @@ describe('pipsTransactionModel', () => {
             rawId: '45c+TkfkjQovQeAWmOy+RLBHEJ/e4jYzQYgD8VdbkePgM5d98BaAadadNYrknxgH0jQEON8zBydLgh1EqoC9DA==',
             response: {
               authenticatorData: 'SZYN5YgOjGh0NBcPZHZgW4/krrmihjLHmVzzuoMdl2MBAAAACA==',
-              clientDataJSON: 'eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiQUFBQUFBQUFBQUFBQUFBQUFBRUNBdyIsIm9yaWdpbiI6Imh0dHA6Ly9sb2NhbGhvc3Q6NDIxODEiLCJjcm9zc09yaWdpbiI6ZmFsc2UsIm90aGVyX2tleXNfY2FuX2JlX2FkZGVkX2hlcmUiOiJkbyBub3QgY29tcGFyZSBjbGllbnREYXRhSlNPTiBhZ2FpbnN0IGEgdGVtcGxhdGUuIFNlZSBodHRwczovL2dvby5nbC95YWJQZXgifQ==',
-              signature: 'MEUCIDcJRBu5aOLJVc/sPyECmYi23w8xF35n3RNhyUNVwQ2nAiEA+Lnd8dBn06OKkEgAq00BVbmH87ybQHfXlf1Y4RJqwQ8='
+              clientDataJSON:
+                'eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiQUFBQUFBQUFBQUFBQUFBQUFBRUNBdyIsIm9yaWdpbiI6Imh0dHA6Ly9sb2NhbGhvc3Q6NDIxODEiLCJjcm9zc09yaWdpbiI6ZmFsc2UsIm90aGVyX2tleXNfY2FuX2JlX2FkZGVkX2hlcmUiOiJkbyBub3QgY29tcGFyZSBjbGllbnREYXRhSlNPTiBhZ2FpbnN0IGEgdGVtcGxhdGUuIFNlZSBodHRwczovL2dvby5nbC95YWJQZXgifQ==',
+              signature:
+                'MEUCIDcJRBu5aOLJVc/sPyECmYi23w8xF35n3RNhyUNVwQ2nAiEA+Lnd8dBn06OKkEgAq00BVbmH87ybQHfXlf1Y4RJqwQ8='
             },
             type: 'public-key'
           }
@@ -558,10 +539,7 @@ describe('pipsTransactionModel', () => {
             authorizationResponse
           }
         }
-        channel = PISPTransactionModel.notificationChannel(
-          PISPTransactionPhase.approval,
-          '1234-1234'
-        )
+        channel = PISPTransactionModel.notificationChannel(PISPTransactionPhase.approval, '1234-1234')
       })
 
       it('should be well constructed', async () => {
@@ -578,10 +556,7 @@ describe('pipsTransactionModel', () => {
         expect(model.data.approveResponse).toBeFalsy()
 
         // defer publication to notification channel
-        setImmediate(() => publisher.publish(
-          channel,
-          transactionStatus as unknown as Message
-        ))
+        setImmediate(() => publisher.publish(channel, transactionStatus as unknown as Message))
         // do a request and await on published Message
         const result = await model.run()
         expect(result).toEqual({
@@ -613,17 +588,15 @@ describe('pipsTransactionModel', () => {
       })
 
       it('should handle error', async () => {
-        mocked(modelConfig.thirdpartyRequests.putThirdpartyRequestsAuthorizations).mockImplementationOnce(
-          () => {
-            throw new Error('mocked putThirdpartyRequestsAuthorizations exception')
-          }
-        )
+        mocked(modelConfig.thirdpartyRequests.putThirdpartyRequestsAuthorizations).mockImplementationOnce(() => {
+          throw new Error('mocked putThirdpartyRequestsAuthorizations exception')
+        })
         const model = await create(data, modelConfig)
 
         try {
           await model.run()
           shouldNotBeExecuted()
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (err: any) {
           expect(err.message).toEqual('mocked putThirdpartyRequestsAuthorizations exception')
         }
@@ -666,20 +639,16 @@ describe('pipsTransactionModel', () => {
 
   describe('channel names', () => {
     test('notificationChannel', () => {
-      const phases = [
-        PISPTransactionPhase.lookup,
-        PISPTransactionPhase.initiation,
-        PISPTransactionPhase.approval
-      ]
+      const phases = [PISPTransactionPhase.lookup, PISPTransactionPhase.initiation, PISPTransactionPhase.approval]
 
       phases.forEach((phase) => {
         expect(PISPTransactionModel.notificationChannel(phase, 'trx-id')).toEqual(`pisp_transaction_${phase}_trx-id`)
-        expect(
-          () => PISPTransactionModel.notificationChannel(phase, '')
-        ).toThrowError('PISPTransactionModel.notificationChannel: \'transactionRequestId\' parameter is required')
-        expect(
-          () => PISPTransactionModel.notificationChannel(phase, null as unknown as string)
-        ).toThrowError('PISPTransactionModel.notificationChannel: \'transactionRequestId\' parameter is required')
+        expect(() => PISPTransactionModel.notificationChannel(phase, '')).toThrowError(
+          "PISPTransactionModel.notificationChannel: 'transactionRequestId' parameter is required"
+        )
+        expect(() => PISPTransactionModel.notificationChannel(phase, null as unknown as string)).toThrowError(
+          "PISPTransactionModel.notificationChannel: 'transactionRequestId' parameter is required"
+        )
       })
     })
   })
@@ -700,15 +669,21 @@ describe('pipsTransactionModel', () => {
       expect(model.getResponse()).toBeUndefined()
 
       model.data.currentState = 'partyLookupSuccess'
-      model.data.partyLookupResponse = { am: 'party-lookup-mocked-response' } as unknown as OutboundAPI.Schemas.ThirdpartyTransactionPartyLookupResponse
+      model.data.partyLookupResponse = {
+        am: 'party-lookup-mocked-response'
+      } as unknown as OutboundAPI.Schemas.ThirdpartyTransactionPartyLookupResponse
       expect(model.getResponse()).toEqual({ am: 'party-lookup-mocked-response' })
 
       model.data.currentState = 'authorizationReceived'
-      model.data.initiateResponse = { am: 'authorization-received-mocked-response' } as unknown as OutboundAPI.Schemas.ThirdpartyTransactionIDInitiateResponse
+      model.data.initiateResponse = {
+        am: 'authorization-received-mocked-response'
+      } as unknown as OutboundAPI.Schemas.ThirdpartyTransactionIDInitiateResponse
       expect(model.getResponse()).toEqual({ am: 'authorization-received-mocked-response' })
 
       model.data.currentState = 'transactionStatusReceived'
-      model.data.approveResponse = { am: 'transaction-status-mocked-response' } as unknown as OutboundAPI.Schemas.ThirdpartyTransactionIDApproveResponse
+      model.data.approveResponse = {
+        am: 'transaction-status-mocked-response'
+      } as unknown as OutboundAPI.Schemas.ThirdpartyTransactionIDApproveResponse
       expect(model.getResponse()).toEqual({ am: 'transaction-status-mocked-response' })
     })
   })
@@ -735,16 +710,19 @@ describe('pipsTransactionModel', () => {
       try {
         await loadFromKVS(modelConfig)
         shouldNotBeExecuted()
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
         expect(err.message).toEqual(`No data found in KVS for: ${modelConfig.key}`)
       }
     })
 
     it('should propagate error received from `KVS.get`', async () => {
-      mocked(modelConfig.kvs.get).mockImplementationOnce(jest.fn(async () => { throw new Error('error from KVS.get') }))
-      expect(() => loadFromKVS(modelConfig))
-        .rejects.toEqual(new Error('error from KVS.get'))
+      mocked(modelConfig.kvs.get).mockImplementationOnce(
+        jest.fn(async () => {
+          throw new Error('error from KVS.get')
+        })
+      )
+      expect(() => loadFromKVS(modelConfig)).rejects.toEqual(new Error('error from KVS.get'))
     })
   })
 
@@ -763,7 +741,9 @@ describe('pipsTransactionModel', () => {
       expect(mocked(modelConfig.kvs.set)).toBeCalledWith(model.key, model.data)
     })
     it('should propagate error from KVS.set', async () => {
-      mocked(modelConfig.kvs.set).mockImplementationOnce(() => { throw new Error('error from KVS.set') })
+      mocked(modelConfig.kvs.set).mockImplementationOnce(() => {
+        throw new Error('error from KVS.set')
+      })
       const data: PISPTransactionData = {
         transactionRequestId: '1234-1234',
         currentState: 'transactionStatusReceived'

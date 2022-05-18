@@ -31,28 +31,18 @@ import { StateMachineConfig } from 'javascript-state-machine'
 import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
 import { thirdparty as tpAPI, v1_1 as fspiopAPI } from '@mojaloop/api-snippets'
 import inspect from '~/shared/inspect'
-import {
-  PISPPrelinkingData,
-  PISPPrelinkingStateMachine,
-  PISPPrelinkingModelConfig
-} from './pispPrelinking.interface'
+import { PISPPrelinkingData, PISPPrelinkingStateMachine, PISPPrelinkingModelConfig } from './pispPrelinking.interface'
 
 import deferredJob from '~/shared/deferred-job'
 import * as OutboundAPI from '~/interface/outbound/api_interfaces'
 
-export class PISPPrelinkingModel
-  extends PersistentModel<PISPPrelinkingStateMachine, PISPPrelinkingData> {
+export class PISPPrelinkingModel extends PersistentModel<PISPPrelinkingStateMachine, PISPPrelinkingData> {
   protected config: PISPPrelinkingModelConfig
 
-  constructor (
-    data: PISPPrelinkingData,
-    config: PISPPrelinkingModelConfig
-  ) {
+  constructor(data: PISPPrelinkingData, config: PISPPrelinkingModelConfig) {
     const spec: StateMachineConfig = {
       init: 'start',
-      transitions: [
-        { name: 'getProviders', from: 'start', to: 'providersLookupSuccess' }
-      ],
+      transitions: [{ name: 'getProviders', from: 'start', to: 'providersLookupSuccess' }],
       methods: {
         // specific transitions handlers methods
         onGetProviders: () => this.onGetProviders()
@@ -63,55 +53,49 @@ export class PISPPrelinkingModel
   }
 
   // getters
-  get subscriber (): PubSub {
+  get subscriber(): PubSub {
     return this.config.subscriber
   }
 
-  get thirdpartyRequests (): ThirdpartyRequests {
+  get thirdpartyRequests(): ThirdpartyRequests {
     return this.config.thirdpartyRequests
   }
 
-  static notificationChannel (serviceType: string): string {
+  static notificationChannel(serviceType: string): string {
     return `PISPPrelinking-${serviceType}`
   }
 
-  static async triggerWorkflow (
-    serviceType: string,
-    pubSub: PubSub,
-    message: Message
-  ): Promise<void> {
+  static async triggerWorkflow(serviceType: string, pubSub: PubSub, message: Message): Promise<void> {
     const channel = PISPPrelinkingModel.notificationChannel(serviceType)
     return deferredJob(pubSub, channel).trigger(message)
   }
 
-  async onGetProviders (): Promise<void> {
+  async onGetProviders(): Promise<void> {
     const { serviceType } = this.data
 
-    const channel = PISPPrelinkingModel.notificationChannel(
-      serviceType
-    )
+    const channel = PISPPrelinkingModel.notificationChannel(serviceType)
 
     this.logger.push({ channel }).info('onGetProviders - subscribe to channel')
 
     return deferredJob(this.subscriber, channel)
       .init(async (channel) => {
-        const res = await this.thirdpartyRequests.getServices(
-          serviceType
-        )
+        const res = await this.thirdpartyRequests.getServices(serviceType)
 
-        this.logger.push({ res, channel })
+        this.logger
+          .push({ res, channel })
           .log('ThirdpartyRequests.getServices request call sent to peer, listening on response')
       })
       .job(async (message: Message): Promise<void> => {
         try {
-        type PutResponseOrError = tpAPI.Schemas.ServicesServiceTypePutResponse & fspiopAPI.Schemas.ErrorInformationObject
-        const putResponse = message as unknown as PutResponseOrError
-        if (putResponse.errorInformation) {
-          this.data.errorInformation = putResponse.errorInformation
-        } else {
-          const response = message as unknown as tpAPI.Schemas.ServicesServiceTypePutResponse
-          this.data.providers = response.providers
-        }
+          type PutResponseOrError = tpAPI.Schemas.ServicesServiceTypePutResponse &
+            fspiopAPI.Schemas.ErrorInformationObject
+          const putResponse = message as unknown as PutResponseOrError
+          if (putResponse.errorInformation) {
+            this.data.errorInformation = putResponse.errorInformation
+          } else {
+            const response = message as unknown as tpAPI.Schemas.ServicesServiceTypePutResponse
+            this.data.providers = response.providers
+          }
         } catch (error) {
           this.logger.push(error).error('ThirdpartyRequests.getServices request error')
           return Promise.reject(error)
@@ -120,9 +104,7 @@ export class PISPPrelinkingModel
       .wait(this.config.requestProcessingTimeoutSeconds * 1000)
   }
 
-  getResponse ():
-  OutboundAPI.Schemas.LinkingProvidersResponse |
-  void {
+  getResponse(): OutboundAPI.Schemas.LinkingProvidersResponse | void {
     switch (this.data.currentState) {
       case 'providersLookupSuccess':
         return {
@@ -140,7 +122,7 @@ export class PISPPrelinkingModel
 
   // utility function to check if an error after a transition which
   // pub/subs for a response that can return a mojaloop error
-  async checkModelDataForErrorInformation (): Promise<void> {
+  async checkModelDataForErrorInformation(): Promise<void> {
     if (this.data.errorInformation) {
       await this.fsm.error(this.data.errorInformation)
     }
@@ -149,17 +131,13 @@ export class PISPPrelinkingModel
   /**
    * runs the workflow
    */
-  async run (): Promise<
-  OutboundAPI.Schemas.LinkingProvidersResponse |
-  void> {
+  async run(): Promise<OutboundAPI.Schemas.LinkingProvidersResponse | void> {
     const data = this.data
     try {
       // run transitions based on incoming state
       switch (data.currentState) {
         case 'start':
-          this.logger.info(
-            `getProviders requested for ${data.serviceType},  currentState: ${data.currentState}`
-          )
+          this.logger.info(`getProviders requested for ${data.serviceType},  currentState: ${data.currentState}`)
           await this.fsm.getProviders()
           await this.checkModelDataForErrorInformation()
           return this.getResponse()
@@ -168,7 +146,7 @@ export class PISPPrelinkingModel
           this.logger.info('State machine in errored state')
           return
       }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       this.logger.info(`Error running PISPPrelinkingModel : ${inspect(err)}`)
 
@@ -189,7 +167,7 @@ export class PISPPrelinkingModel
   }
 }
 
-export async function create (
+export async function create(
   data: PISPPrelinkingData,
   config: PISPPrelinkingModelConfig
 ): Promise<PISPPrelinkingModel> {

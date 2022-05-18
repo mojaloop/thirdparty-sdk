@@ -34,7 +34,7 @@ const apiPath = path.resolve(__dirname, '../../src/interface/api-inbound.yaml')
 const featurePath = path.resolve(__dirname, '../features/participants-inbound.feature')
 const feature = loadFeature(featurePath)
 
-async function prepareInboundAPIServer (): Promise<Server> {
+async function prepareInboundAPIServer(): Promise<Server> {
   const serverConfig: ServerConfig = {
     port: Config.INBOUND.PORT,
     host: Config.INBOUND.HOST,
@@ -72,7 +72,7 @@ defineFeature(feature, (test): void => {
       // do nothing
     })
 
-    when('I receive a \'ParticipantsByTypeAndID3\' request', async (): Promise<ServerInjectResponse> => {
+    when("I receive a 'ParticipantsByTypeAndID3' request", async (): Promise<ServerInjectResponse> => {
       jest.mock('~/shared/kvs')
       jest.mock('~/shared/pub-sub')
       const request = {
@@ -93,7 +93,7 @@ defineFeature(feature, (test): void => {
       return response
     })
 
-    then('I get a response with a status code of \'200\'', (): void => {
+    then("I get a response with a status code of '200'", (): void => {
       expect(response.statusCode).toBe(200)
     })
   })
@@ -103,7 +103,7 @@ defineFeature(feature, (test): void => {
       // do nothing
     })
 
-    when('I receive a \'ParticipantsErrorByTypeAndID\' request', async (): Promise<ServerInjectResponse> => {
+    when("I receive a 'ParticipantsErrorByTypeAndID' request", async (): Promise<ServerInjectResponse> => {
       jest.mock('~/shared/kvs')
       jest.mock('~/shared/pub-sub')
       const request = {
@@ -135,7 +135,7 @@ defineFeature(feature, (test): void => {
       return response
     })
 
-    then('I get a response with a status code of \'200\'', (): void => {
+    then("I get a response with a status code of '200'", (): void => {
       expect(response.statusCode).toBe(200)
     })
   })
@@ -145,7 +145,7 @@ defineFeature(feature, (test): void => {
       // do nothing
     })
 
-    when('I receive a \'PutParticipantsByID\' request', async (): Promise<ServerInjectResponse> => {
+    when("I receive a 'PutParticipantsByID' request", async (): Promise<ServerInjectResponse> => {
       jest.mock('~/shared/kvs')
       jest.mock('~/shared/pub-sub')
       const request = {
@@ -173,7 +173,7 @@ defineFeature(feature, (test): void => {
       return response
     })
 
-    then('I get a response with a status code of \'200\'', (): void => {
+    then("I get a response with a status code of '200'", (): void => {
       expect(response.statusCode).toBe(200)
     })
   })
@@ -183,7 +183,7 @@ defineFeature(feature, (test): void => {
       // do nothing
     })
 
-    when('I receive a \'PutParticipantsByIDAndError\' request', async (): Promise<ServerInjectResponse> => {
+    when("I receive a 'PutParticipantsByIDAndError' request", async (): Promise<ServerInjectResponse> => {
       jest.mock('~/shared/kvs')
       jest.mock('~/shared/pub-sub')
       const request = {
@@ -215,7 +215,7 @@ defineFeature(feature, (test): void => {
       return response
     })
 
-    then('I get a response with a status code of \'200\'', (): void => {
+    then("I get a response with a status code of '200'", (): void => {
       expect(response.statusCode).toBe(200)
     })
   })

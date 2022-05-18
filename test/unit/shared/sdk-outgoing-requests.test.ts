@@ -86,8 +86,8 @@ describe('SDKOutgoingRequests', () => {
 
   describe('requestPartiesInformation', () => {
     it('should propagate call loggedRequest', async () => {
-      const loggedRequestSpy = jest.spyOn(sdkRequest, 'loggedRequest').mockImplementationOnce(
-        () => Promise.resolve({
+      const loggedRequestSpy = jest.spyOn(sdkRequest, 'loggedRequest').mockImplementationOnce(() =>
+        Promise.resolve({
           party: { Iam: 'mocked-party' },
           currentState: 'COMPLETED'
         })
@@ -153,15 +153,13 @@ describe('SDKOutgoingRequests', () => {
             },
             ilpPacket: 'abcd...',
             condition: 'xyz....',
-            expiration: (new Date()).toISOString()
+            expiration: new Date().toISOString()
           },
           headers: {}
         },
         currentState: 'COMPLETED'
       }
-      const postSpy = jest.spyOn(sdkRequest, 'post').mockImplementationOnce(
-        () => Promise.resolve(response)
-      )
+      const postSpy = jest.spyOn(sdkRequest, 'post').mockImplementationOnce(() => Promise.resolve(response))
 
       const result = await sdkRequest.requestQuote(request)
       expect(result).toEqual(response)
@@ -182,7 +180,8 @@ describe('SDKOutgoingRequests', () => {
             amount: '100',
             currency: 'USD'
           },
-          ilpPacket: 'AYIBgQAAAAAAAASwNGxldmVsb25lLmRmc3AxLm1lci45T2RTOF81MDdqUUZERmZlakgyOVc4bXFmNEpLMHlGTFGCAUBQU0svMS4wCk5vbmNlOiB1SXlweUYzY3pYSXBFdzVVc05TYWh3CkVuY3J5cHRpb246IG5vbmUKUGF5bWVudC1JZDogMTMyMzZhM2ItOGZhOC00MTYzLTg0NDctNGMzZWQzZGE5OGE3CgpDb250ZW50LUxlbmd0aDogMTM1CkNvbnRlbnQtVHlwZTogYXBwbGljYXRpb24vanNvbgpTZW5kZXItSWRlbnRpZmllcjogOTI4MDYzOTEKCiJ7XCJmZWVcIjowLFwidHJhbnNmZXJDb2RlXCI6XCJpbnZvaWNlXCIsXCJkZWJpdE5hbWVcIjpcImFsaWNlIGNvb3BlclwiLFwiY3JlZGl0TmFtZVwiOlwibWVyIGNoYW50XCIsXCJkZWJpdElkZW50aWZpZXJcIjpcIjkyODA2MzkxXCJ9IgA',
+          ilpPacket:
+            'AYIBgQAAAAAAAASwNGxldmVsb25lLmRmc3AxLm1lci45T2RTOF81MDdqUUZERmZlakgyOVc4bXFmNEpLMHlGTFGCAUBQU0svMS4wCk5vbmNlOiB1SXlweUYzY3pYSXBFdzVVc05TYWh3CkVuY3J5cHRpb246IG5vbmUKUGF5bWVudC1JZDogMTMyMzZhM2ItOGZhOC00MTYzLTg0NDctNGMzZWQzZGE5OGE3CgpDb250ZW50LUxlbmd0aDogMTM1CkNvbnRlbnQtVHlwZTogYXBwbGljYXRpb24vanNvbgpTZW5kZXItSWRlbnRpZmllcjogOTI4MDYzOTEKCiJ7XCJmZWVcIjowLFwidHJhbnNmZXJDb2RlXCI6XCJpbnZvaWNlXCIsXCJkZWJpdE5hbWVcIjpcImFsaWNlIGNvb3BlclwiLFwiY3JlZGl0TmFtZVwiOlwibWVyIGNoYW50XCIsXCJkZWJpdElkZW50aWZpZXJcIjpcIjkyODA2MzkxXCJ9IgA',
           condition: 'f5sqb7tBTWPd5Y8BDFdMm9BJR_MNI4isf8p8n4D5pHA',
           expiration: '2020-01-20T11:31:49.325Z',
           extensionList: {
@@ -224,9 +223,7 @@ describe('SDKOutgoingRequests', () => {
         currentState: 'COMPLETED'
       }
 
-      const postSpy = jest.spyOn(sdkRequest, 'post').mockImplementationOnce(
-        () => Promise.resolve(response)
-      )
+      const postSpy = jest.spyOn(sdkRequest, 'post').mockImplementationOnce(() => Promise.resolve(response))
       const result = await sdkRequest.requestTransfer(request)
       expect(result).toEqual(response)
       expect(postSpy).toHaveBeenCalledWith(sdkRequest.requestTransferPath, request)
@@ -236,9 +233,7 @@ describe('SDKOutgoingRequests', () => {
   describe('requestToPayTransfer', () => {
     it('should propagate call loggedRequest', async () => {
       // TODO: should use proper method from ThirdpartyRequests class from SDK
-      const loggedRequestSpy = jest.spyOn(sdkRequest, 'loggedRequest').mockImplementationOnce(
-        () => Promise.resolve()
-      )
+      const loggedRequestSpy = jest.spyOn(sdkRequest, 'loggedRequest').mockImplementationOnce(() => Promise.resolve())
       const result = await sdkRequest.requestToPayTransfer(requestToPayTransfer)
       expect(result).toBeUndefined()
       expect(loggedRequestSpy).toHaveBeenCalledWith({

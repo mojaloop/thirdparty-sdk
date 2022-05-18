@@ -22,7 +22,7 @@
  --------------
  ******/
 
-export default (): object => ({
+export default (): Record<string, unknown> => ({
   inspect: jest.fn((): string => {
     console.error('inspect-mock is used')
     return 'inspected-object'

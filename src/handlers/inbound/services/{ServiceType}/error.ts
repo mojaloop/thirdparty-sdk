@@ -26,28 +26,21 @@
  --------------
  ******/
 import { Request, ResponseObject } from '@hapi/hapi'
-import {
-  v1_1 as fspiopAPI
-} from '@mojaloop/api-snippets'
+import { v1_1 as fspiopAPI } from '@mojaloop/api-snippets'
 import { StateResponseToolkit } from '~/server/plugins/state'
 import { PISPPrelinkingModel } from '~/models/outbound/pispPrelinking.model'
 import { Enum } from '@mojaloop/central-services-shared'
 import { ServiceType } from '~/models/outbound/pispPrelinking.interface'
 
-
 /**
-* Handles a inbound PUT /services/{ServiceType}/error request
-*/
-async function put (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+ * Handles a inbound PUT /services/{ServiceType}/error request
+ */
+async function put(_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const payload = request.payload as fspiopAPI.Schemas.ErrorInformation
   const serviceType = request.params.ServiceType
 
   if (serviceType == ServiceType.THIRD_PARTY_DFSP) {
-    PISPPrelinkingModel.triggerWorkflow(
-      serviceType,
-      h.getPublisher(),
-      payload
-    )
+    PISPPrelinkingModel.triggerWorkflow(serviceType, h.getPublisher(), payload)
     h.getLogger().info(`Inbound received PUT /services/{ServiceType}/error response`)
   }
 

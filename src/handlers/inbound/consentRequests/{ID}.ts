@@ -29,14 +29,12 @@ import { Request, ResponseObject } from '@hapi/hapi'
 import { StateResponseToolkit } from '~/server/plugins/state'
 import { Enum } from '@mojaloop/central-services-shared'
 import { DFSPLinkingModel } from '~/models/inbound/dfspLinking.model'
-import {
-  DFSPLinkingPhase
-} from '~/models/inbound/dfspLinking.interface'
+import { DFSPLinkingPhase } from '~/models/inbound/dfspLinking.interface'
 import { PISPLinkingModel } from '~/models/outbound/pispLinking.model'
 import { Message } from '~/shared/pub-sub'
 import { PISPLinkingPhase } from '~/models/outbound/pispLinking.interface'
 
-async function patch (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+async function patch(_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const consentRequestId = request.params.ID
 
   DFSPLinkingModel.triggerWorkflow(
@@ -53,7 +51,7 @@ async function patch (_context: unknown, request: Request, h: StateResponseToolk
 /**
  * Handles an inbound `PUT /consentRequests/{ID}` request
  */
-async function put (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+async function put(_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const consentRequestId = request.params.ID
 
   PISPLinkingModel.triggerWorkflow(

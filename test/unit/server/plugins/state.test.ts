@@ -106,9 +106,9 @@ describe('StatePlugin', () => {
   })
 
   it('should prepare WSO2Auth with tlsCreds', async () => {
-    const spyWSO2Auth = jest.spyOn(SDK, 'WSO2Auth').mockImplementationOnce(
-      () => ({ Iam: 'mockedWSO2Auth' } as unknown as SDK.WSO2Auth)
-    )
+    const spyWSO2Auth = jest
+      .spyOn(SDK, 'WSO2Auth')
+      .mockImplementationOnce(() => ({ Iam: 'mockedWSO2Auth' } as unknown as SDK.WSO2Auth))
     config.SHARED.TLS.mutualTLS.enabled = true
     config.SHARED.TLS.creds = {
       ca: 'mocked ca',

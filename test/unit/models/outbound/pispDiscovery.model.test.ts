@@ -32,14 +32,8 @@ import {
   PISPDiscoveryModelConfig,
   PISPDiscoveryModelState
 } from '~/models/outbound/pispDiscovery.interface'
-import {
-  v1_1 as fspiopAPI,
-  thirdparty as tpAPI
-} from '@mojaloop/api-snippets'
-import {
-  PISPDiscoveryModel,
-  create
-} from '~/models/outbound/pispDiscovery.model'
+import { v1_1 as fspiopAPI, thirdparty as tpAPI } from '@mojaloop/api-snippets'
+import { PISPDiscoveryModel, create } from '~/models/outbound/pispDiscovery.model'
 
 import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
 import { RedisConnectionConfig } from '~/shared/redis-connection'
@@ -111,7 +105,7 @@ describe('PISPDiscoveryModel', () => {
     await modelConfig.subscriber.disconnect()
   })
 
-  function checkPISPDiscoveryModelLayout (am: PISPDiscoveryModel, optData?: PISPDiscoveryData) {
+  function checkPISPDiscoveryModelLayout(am: PISPDiscoveryModel, optData?: PISPDiscoveryData) {
     expect(am).toBeTruthy()
     expect(am.data).toBeDefined()
     expect(am.fsm.state).toEqual(optData?.currentState || 'start')
@@ -143,9 +137,7 @@ describe('PISPDiscoveryModel', () => {
     })
 
     it('input validation', () => {
-      expect(
-        () => PISPDiscoveryModel.notificationChannel(null as unknown as string)
-      ).toThrow()
+      expect(() => PISPDiscoveryModel.notificationChannel(null as unknown as string)).toThrow()
     })
   })
 
@@ -158,15 +150,13 @@ describe('PISPDiscoveryModel', () => {
     let putResponse: PutResponseOrError
 
     beforeEach(() => {
-      mocked(modelConfig.subscriber.subscribe).mockImplementationOnce(
-        (_channel: string, cb: NotificationCallback) => {
-          handler = cb
-          return ++subId
-        }
-      )
+      mocked(modelConfig.subscriber.subscribe).mockImplementationOnce((_channel: string, cb: NotificationCallback) => {
+        handler = cb
+        return ++subId
+      })
 
-      mocked(publisher.publish).mockImplementationOnce(
-        async (channel: string, message: Message) => handler(channel, message, subId)
+      mocked(publisher.publish).mockImplementationOnce(async (channel: string, message: Message) =>
+        handler(channel, message, subId)
       )
 
       data = {
@@ -188,10 +178,7 @@ describe('PISPDiscoveryModel', () => {
     it('should give response properly populated from notification channel - success', async () => {
       const model = await create(data, modelConfig)
       // defer publication to notification channel
-      setImmediate(() => publisher.publish(
-        channel,
-        putResponse as unknown as Message
-      ))
+      setImmediate(() => publisher.publish(channel, putResponse as unknown as Message))
       // do a request and await on published Message
       await model.fsm.requestAccounts()
 
@@ -200,7 +187,8 @@ describe('PISPDiscoveryModel', () => {
       // Assertions
       expect(result).toEqual(expectedResp)
       expect(mocked(modelConfig.thirdpartyRequests.getAccounts)).toHaveBeenCalledWith(
-        model.data.userId, model.data.toParticipantId
+        model.data.userId,
+        model.data.toParticipantId
       )
       expect(mocked(modelConfig.subscriber.subscribe)).toBeCalledTimes(1)
       expect(mocked(modelConfig.subscriber.unsubscribe)).toBeCalledWith(channel, subId)
@@ -210,10 +198,7 @@ describe('PISPDiscoveryModel', () => {
       putResponse = mockData.accountsRequestError.payload
       const model = await create(data, modelConfig)
       // defer publication to notification channel
-      setImmediate(() => publisher.publish(
-        channel,
-        putResponse as unknown as Message
-      ))
+      setImmediate(() => publisher.publish(channel, putResponse as unknown as Message))
       // do a request and await on published Message
       await model.fsm.requestAccounts()
 
@@ -222,7 +207,8 @@ describe('PISPDiscoveryModel', () => {
       // Assertions
       expect(result).toEqual(idNotFoundResp)
       expect(mocked(modelConfig.thirdpartyRequests.getAccounts)).toHaveBeenCalledWith(
-        model.data.userId, model.data.toParticipantId
+        model.data.userId,
+        model.data.toParticipantId
       )
       expect(mocked(modelConfig.subscriber.subscribe)).toBeCalledTimes(1)
       expect(mocked(modelConfig.subscriber.unsubscribe)).toBeCalledWith(channel, subId)
@@ -230,9 +216,9 @@ describe('PISPDiscoveryModel', () => {
     })
 
     it('should properly handle error from requests.getAccounts', async () => {
-      mocked(modelConfig.thirdpartyRequests.getAccounts).mockImplementationOnce(
-        () => { throw new Error('error from requests.getAccounts') }
-      )
+      mocked(modelConfig.thirdpartyRequests.getAccounts).mockImplementationOnce(() => {
+        throw new Error('error from requests.getAccounts')
+      })
       const model = await create(data, modelConfig)
 
       // do a request and await on published Message
@@ -253,16 +239,14 @@ describe('PISPDiscoveryModel', () => {
         const model = await create(data, modelConfig)
 
         // defer publication to notification channel
-        setImmediate(() => publisher.publish(
-          channel,
-          putResponse as unknown as Message
-        ))
+        setImmediate(() => publisher.publish(channel, putResponse as unknown as Message))
 
         const result = await model.run()
 
         expect(result).toEqual(expectedResp)
         expect(mocked(modelConfig.thirdpartyRequests.getAccounts)).toHaveBeenCalledWith(
-          model.data.userId, model.data.toParticipantId
+          model.data.userId,
+          model.data.toParticipantId
         )
         expect(mocked(modelConfig.subscriber.subscribe)).toBeCalledTimes(1)
         expect(mocked(modelConfig.subscriber.unsubscribe)).toBeCalledWith(channel, subId)
@@ -294,11 +278,9 @@ describe('PISPDiscoveryModel', () => {
 
       it('exceptions', async () => {
         const error = { message: 'error from requests.getAccounts', accountsState: 'broken' }
-        mocked(modelConfig.thirdpartyRequests.getAccounts).mockImplementationOnce(
-          () => {
-            throw error
-          }
-        )
+        mocked(modelConfig.thirdpartyRequests.getAccounts).mockImplementationOnce(() => {
+          throw error
+        })
         const model = await create(data, modelConfig)
 
         expect(async () => await model.run()).rejects.toEqual(error)
@@ -306,11 +288,9 @@ describe('PISPDiscoveryModel', () => {
 
       it('exceptions - Error', async () => {
         const error = new Error('the-exception')
-        mocked(modelConfig.thirdpartyRequests.getAccounts).mockImplementationOnce(
-          () => {
-            throw error
-          }
-        )
+        mocked(modelConfig.thirdpartyRequests.getAccounts).mockImplementationOnce(() => {
+          throw error
+        })
         const model = await create({ ...data, currentState: 'start' }, modelConfig)
 
         expect(model.run()).rejects.toEqual(error)

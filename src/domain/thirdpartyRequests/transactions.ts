@@ -27,12 +27,9 @@
  ******/
 import { v4 as uuidv4 } from 'uuid'
 import SDK from '@mojaloop/sdk-standard-components'
-import {
-  v1_1 as fspiopAPI,
-  thirdparty as tpAPI
-} from '@mojaloop/api-snippets'
+import { v1_1 as fspiopAPI, thirdparty as tpAPI } from '@mojaloop/api-snippets'
 
-export function buildPayeeQuoteRequestFromTptRequest (
+export function buildPayeeQuoteRequestFromTptRequest(
   request: tpAPI.Schemas.ThirdpartyRequestsTransactionsPostRequest
 ): tpAPI.Schemas.QuotesIDPostRequest {
   const quoteRequest = {
@@ -51,29 +48,36 @@ export function buildPayeeQuoteRequestFromTptRequest (
   return quoteRequest
 }
 
-export async function forwardPostQuoteRequestToPayee (
+export async function forwardPostQuoteRequestToPayee(
   request: tpAPI.Schemas.ThirdpartyRequestsTransactionsPostRequest,
   mojaloopRequests: SDK.MojaloopRequests
 ): Promise<void> {
   const quote = buildPayeeQuoteRequestFromTptRequest(request)
 
   // payee fspid should be defined due to a prior GET /parties call.
-  mojaloopRequests.postQuotes(quote as unknown as fspiopAPI.Schemas.QuotesPostRequest, <string> quote.payee.partyIdInfo.fspId)
+  mojaloopRequests.postQuotes(
+    quote as unknown as fspiopAPI.Schemas.QuotesPostRequest,
+    <string>quote.payee.partyIdInfo.fspId
+  )
 }
 
 // todo: create dfsp outbound calls for these checks.
-export async function verifyConsentId (_consentId: string): Promise<boolean> {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export async function verifyConsentId(_consentId: string): Promise<boolean> {
   return true
 }
 
-export async function verifySourceAccountId (_sourceAccountId: string): Promise<boolean> {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export async function verifySourceAccountId(_sourceAccountId: string): Promise<boolean> {
   return true
 }
 
-export async function verifyPispId (_pispId: string): Promise<boolean> {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export async function verifyPispId(_pispId: string): Promise<boolean> {
   return true
 }
 
-export async function validateGrantedConsent (_consentId: string): Promise<boolean> {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export async function validateGrantedConsent(_consentId: string): Promise<boolean> {
   return true
 }

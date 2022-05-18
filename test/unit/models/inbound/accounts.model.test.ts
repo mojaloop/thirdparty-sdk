@@ -25,10 +25,7 @@ optionally within square brackets <email>.
 --------------
 ******/
 
-import {
-  InboundAccountsModel,
-  InboundAccountsModelConfig
-} from '~/models/inbound/accounts.model'
+import { InboundAccountsModel, InboundAccountsModelConfig } from '~/models/inbound/accounts.model'
 import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
 import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
 import * as mockData from 'test/unit/data/mockData'
@@ -76,16 +73,14 @@ describe('InboundAccountsModel', () => {
     })
 
     test('reformating of thrown exception when res.body present', async () => {
-      mocked(config.thirdpartyRequests.putAccounts).mockImplementationOnce(
-        () => {
-          throw new HTTPResponseError({
-            msg: 'mocked-error',
-            res: {
-              body: JSON.stringify({ statusCode: '2003' })
-            }
-          })
-        }
-      )
+      mocked(config.thirdpartyRequests.putAccounts).mockImplementationOnce(() => {
+        throw new HTTPResponseError({
+          msg: 'mocked-error',
+          res: {
+            body: JSON.stringify({ statusCode: '2003' })
+          }
+        })
+      })
 
       await model.getUserAccounts(userId, dfspId)
 
@@ -103,16 +98,14 @@ describe('InboundAccountsModel', () => {
     })
 
     test('reformating of thrown exception when res.data present and using different statusCode', async () => {
-      mocked(config.thirdpartyRequests.putAccounts).mockImplementationOnce(
-        () => {
-          throw new HTTPResponseError({
-            msg: 'mocked-error',
-            res: {
-              data: { statusCode: '2002' }
-            }
-          })
-        }
-      )
+      mocked(config.thirdpartyRequests.putAccounts).mockImplementationOnce(() => {
+        throw new HTTPResponseError({
+          msg: 'mocked-error',
+          res: {
+            data: { statusCode: '2002' }
+          }
+        })
+      })
 
       await model.getUserAccounts(userId, dfspId)
 
@@ -130,11 +123,9 @@ describe('InboundAccountsModel', () => {
     })
 
     test('reformating of thrown generic Error', async () => {
-      mocked(config.thirdpartyRequests.putAccounts).mockImplementationOnce(
-        () => {
-          throw new Error('generic-error')
-        }
-      )
+      mocked(config.thirdpartyRequests.putAccounts).mockImplementationOnce(() => {
+        throw new Error('generic-error')
+      })
 
       await model.getUserAccounts(userId, dfspId)
 
@@ -152,16 +143,14 @@ describe('InboundAccountsModel', () => {
     })
 
     test('reformating of thrown exception when res.body is not valid JSON string', async () => {
-      mocked(config.thirdpartyRequests.putAccounts).mockImplementationOnce(
-        () => {
-          throw new HTTPResponseError({
-            msg: 'mocked-error',
-            res: {
-              body: '['
-            }
-          })
-        }
-      )
+      mocked(config.thirdpartyRequests.putAccounts).mockImplementationOnce(() => {
+        throw new HTTPResponseError({
+          msg: 'mocked-error',
+          res: {
+            body: '['
+          }
+        })
+      })
 
       await model.getUserAccounts(userId, dfspId)
 
@@ -196,16 +185,14 @@ describe('InboundAccountsModel', () => {
     })
 
     test('reformating of thrown exception when no user accounts returned', async () => {
-      mocked(config.dfspBackendRequests.getUserAccounts).mockImplementationOnce(
-        () => {
-          throw new HTTPResponseError({
-            msg: 'mocked-error',
-            res: {
-              body: JSON.stringify({ statusCode: '3200' })
-            }
-          })
-        }
-      )
+      mocked(config.dfspBackendRequests.getUserAccounts).mockImplementationOnce(() => {
+        throw new HTTPResponseError({
+          msg: 'mocked-error',
+          res: {
+            body: JSON.stringify({ statusCode: '3200' })
+          }
+        })
+      })
       await model.getUserAccounts(userId, dfspId)
 
       expect(config.dfspBackendRequests.getUserAccounts).toHaveBeenCalledWith(userId)

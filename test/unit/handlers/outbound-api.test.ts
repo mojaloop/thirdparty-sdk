@@ -30,16 +30,10 @@
 import { PISPDiscoveryModel } from '~/models/outbound/pispDiscovery.model'
 import { PISPLinkingModel } from '~/models/outbound/pispLinking.model'
 import { PISPPrelinkingModel } from '~/models/outbound/pispPrelinking.model'
-import {
-  v1_1 as fspiopAPI,
-  thirdparty as tpAPI
-} from '@mojaloop/api-snippets'
+import { v1_1 as fspiopAPI, thirdparty as tpAPI } from '@mojaloop/api-snippets'
 import { HealthResponse } from '~/interface/types'
 import { NotificationCallback, Message, PubSub } from '~/shared/pub-sub'
-import {
-  RequestPartiesInformationState
-  , PISPTransactionPhase
-} from '~/models/pispTransaction.interface'
+import { RequestPartiesInformationState, PISPTransactionPhase } from '~/models/pispTransaction.interface'
 import PTM, { PISPTransactionModel } from '~/models/pispTransaction.model'
 import { PISPDiscoveryModelState } from '~/models/outbound/pispDiscovery.interface'
 
@@ -145,22 +139,18 @@ jest.mock('~/shared/pub-sub', () => {
   return {
     PubSub: jest.fn(() => ({
       isConnected: true,
-      subscribe: jest.fn(
-        (channel: string, cb: NotificationCallback) => {
-          handlers[channel] = cb
-          return ++subId
-        }
-      ),
+      subscribe: jest.fn((channel: string, cb: NotificationCallback) => {
+        handlers[channel] = cb
+        return ++subId
+      }),
       unsubscribe: jest.fn(),
-      publish: jest.fn(
-        async (channel: string, message: Message) => {
-          const h = handlers[channel]
-          if (!h) {
-            throw new Error(`PubSub.publish: no handler for channel: ${channel}`)
-          }
-          h(channel, message, subId)
+      publish: jest.fn(async (channel: string, message: Message) => {
+        const h = handlers[channel]
+        if (!h) {
+          throw new Error(`PubSub.publish: no handler for channel: ${channel}`)
         }
-      ),
+        h(channel, message, subId)
+      }),
       connect: jest.fn(() => Promise.resolve()),
       disconnect: jest.fn()
     }))
@@ -236,13 +226,15 @@ describe('Outbound API routes', (): void => {
         transactionRequestId: 'b51ec534-ee48-4575-b6a9-ead2955b8069'
       }
     }
-    jest.spyOn(SDK, 'request').mockImplementationOnce(() => Promise.resolve({
-      statusCode: 200,
-      data: {
-        party: { ...partyLookupResponse.party },
-        currentState: 'COMPLETED'
-      }
-    }))
+    jest.spyOn(SDK, 'request').mockImplementationOnce(() =>
+      Promise.resolve({
+        statusCode: 200,
+        data: {
+          party: { ...partyLookupResponse.party },
+          currentState: 'COMPLETED'
+        }
+      })
+    )
     const response = await server.inject(request)
 
     expect(response.statusCode).toBe(200)
@@ -274,7 +266,6 @@ describe('Outbound API routes', (): void => {
 
   it('/thirdpartyTransaction/{ID}/initiate', async (): Promise<void> => {
     const transactionRequestId = 'b51ec534-ee48-4575-b6a9-ead2955b8069'
-    const transactionId = '52933d2c-f22f-4494-a7ae-99fc560357df'
     const request = {
       method: 'POST',
       url: `/thirdpartyTransaction/${transactionRequestId}/initiate`,
@@ -359,16 +350,10 @@ describe('Outbound API routes', (): void => {
     // defer publication to notification channel
     setTimeout(() => {
       // publish authorization request
-      pubSub.publish(
-        channelAuthPost,
-        thirdpartyAuthorizationRequest as unknown as Message
-      )
+      pubSub.publish(channelAuthPost, thirdpartyAuthorizationRequest as unknown as Message)
 
       // publish transaction status update
-      pubSub.publish(
-        channelTransPut,
-        transactionStatus as unknown as Message
-      )
+      pubSub.publish(channelTransPut, transactionStatus as unknown as Message)
     }, 100)
     const response = await server.inject(request)
     expect(response.statusCode).toBe(200)
@@ -396,8 +381,10 @@ describe('Outbound API routes', (): void => {
               rawId: '45c+TkfkjQovQeAWmOy+RLBHEJ/e4jYzQYgD8VdbkePgM5d98BaAadadNYrknxgH0jQEON8zBydLgh1EqoC9DA==',
               response: {
                 authenticatorData: 'SZYN5YgOjGh0NBcPZHZgW4/krrmihjLHmVzzuoMdl2MBAAAACA==',
-                clientDataJSON: 'eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiQUFBQUFBQUFBQUFBQUFBQUFBRUNBdyIsIm9yaWdpbiI6Imh0dHA6Ly9sb2NhbGhvc3Q6NDIxODEiLCJjcm9zc09yaWdpbiI6ZmFsc2UsIm90aGVyX2tleXNfY2FuX2JlX2FkZGVkX2hlcmUiOiJkbyBub3QgY29tcGFyZSBjbGllbnREYXRhSlNPTiBhZ2FpbnN0IGEgdGVtcGxhdGUuIFNlZSBodHRwczovL2dvby5nbC95YWJQZXgifQ==',
-                signature: 'MEUCIDcJRBu5aOLJVc/sPyECmYi23w8xF35n3RNhyUNVwQ2nAiEA+Lnd8dBn06OKkEgAq00BVbmH87ybQHfXlf1Y4RJqwQ8='
+                clientDataJSON:
+                  'eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiQUFBQUFBQUFBQUFBQUFBQUFBRUNBdyIsIm9yaWdpbiI6Imh0dHA6Ly9sb2NhbGhvc3Q6NDIxODEiLCJjcm9zc09yaWdpbiI6ZmFsc2UsIm90aGVyX2tleXNfY2FuX2JlX2FkZGVkX2hlcmUiOiJkbyBub3QgY29tcGFyZSBjbGllbnREYXRhSlNPTiBhZ2FpbnN0IGEgdGVtcGxhdGUuIFNlZSBodHRwczovL2dvby5nbC95YWJQZXgifQ==',
+                signature:
+                  'MEUCIDcJRBu5aOLJVc/sPyECmYi23w8xF35n3RNhyUNVwQ2nAiEA+Lnd8dBn06OKkEgAq00BVbmH87ybQHfXlf1Y4RJqwQ8='
               },
               type: 'public-key'
             }
@@ -406,15 +393,9 @@ describe('Outbound API routes', (): void => {
       } as OutboundAPI.Schemas.ThirdpartyTransactionIDApproveRequest
     }
     const pubSub = new PubSub({} as RedisConnectionConfig)
-    const channelApprove = PISPTransactionModel.notificationChannel(
-      PISPTransactionPhase.approval,
-      transactionRequestId
-    )
+    const channelApprove = PISPTransactionModel.notificationChannel(PISPTransactionPhase.approval, transactionRequestId)
     // defer publication to notification channel
-    setTimeout(() => pubSub.publish(
-      channelApprove,
-      approveResponse as unknown as Message
-    ), 10)
+    setTimeout(() => pubSub.publish(channelApprove, approveResponse as unknown as Message), 10)
     const response = await server.inject(request)
     expect(response.result).toEqual({
       transactionStatus: { ...approveResponse },
@@ -430,12 +411,14 @@ describe('Outbound API routes', (): void => {
     }
     const pubSub = new PubSub({} as RedisConnectionConfig)
 
-    setTimeout(() => pubSub.publish(
-      PISPPrelinkingModel.notificationChannel(
-        'THIRD_PARTY_DFSP'
-      ),
-      mockData.putServicesByServiceTypeRequest.payload as unknown as Message
-    ), 10)
+    setTimeout(
+      () =>
+        pubSub.publish(
+          PISPPrelinkingModel.notificationChannel('THIRD_PARTY_DFSP'),
+          mockData.putServicesByServiceTypeRequest.payload as unknown as Message
+        ),
+      10
+    )
     const response = await server.inject(request)
     expect(response.statusCode).toBe(200)
     const expectedResp = {
@@ -460,12 +443,14 @@ describe('Outbound API routes', (): void => {
 
     const pubSub = new PubSub({} as RedisConnectionConfig)
 
-    setTimeout(() => pubSub.publish(
-      PISPPrelinkingModel.notificationChannel(
-        'THIRD_PARTY_DFSP'
-      ),
-      errorResponse as unknown as Message
-    ), 10)
+    setTimeout(
+      () =>
+        pubSub.publish(
+          PISPPrelinkingModel.notificationChannel('THIRD_PARTY_DFSP'),
+          errorResponse as unknown as Message
+        ),
+      10
+    )
     const response = await server.inject(request)
     expect(response.statusCode).toBe(500)
     const expectedResp = {
@@ -483,10 +468,14 @@ describe('Outbound API routes', (): void => {
     }
     const pubSub = new PubSub({} as RedisConnectionConfig)
     // defer publication to notification channel
-    setTimeout(() => pubSub.publish(
-      PISPDiscoveryModel.notificationChannel(userId),
-      mockData.accountsRequest.payload as unknown as Message
-    ), 10)
+    setTimeout(
+      () =>
+        pubSub.publish(
+          PISPDiscoveryModel.notificationChannel(userId),
+          mockData.accountsRequest.payload as unknown as Message
+        ),
+      10
+    )
     const response = await server.inject(request)
     expect(response.statusCode).toBe(200)
     const expectedResp = {
@@ -521,10 +510,10 @@ describe('Outbound API routes', (): void => {
     }
     const pubSub = new PubSub({} as RedisConnectionConfig)
     // defer publication to notification channel
-    setTimeout(() => pubSub.publish(
-      PISPDiscoveryModel.notificationChannel(userId),
-      errorResp as unknown as Message
-    ), 10)
+    setTimeout(
+      () => pubSub.publish(PISPDiscoveryModel.notificationChannel(userId), errorResp as unknown as Message),
+      10
+    )
     const response = await server.inject(request)
     expect(response.statusCode).toBe(500)
     const expectedResp = {
@@ -532,7 +521,7 @@ describe('Outbound API routes', (): void => {
       currentState: PISPDiscoveryModelState.succeeded,
       errorInformation: errorResp.errorInformation
     }
-    expect((response.result)).toEqual(expectedResp)
+    expect(response.result).toEqual(expectedResp)
   })
 
   it('/linking/request-consent - success', async (): Promise<void> => {
@@ -548,13 +537,17 @@ describe('Outbound API routes', (): void => {
 
     const pubSub = new PubSub({} as RedisConnectionConfig)
     // defer publication to notification channel
-    setTimeout(() => pubSub.publish(
-      PISPLinkingModel.notificationChannel(
-        PISPLinkingPhase.requestConsent,
-        mockData.linkingRequestConsentPostRequest.payload.consentRequestId
-      ),
-      mockData.consentRequestsPut.payload as unknown as Message
-    ), 10)
+    setTimeout(
+      () =>
+        pubSub.publish(
+          PISPLinkingModel.notificationChannel(
+            PISPLinkingPhase.requestConsent,
+            mockData.linkingRequestConsentPostRequest.payload.consentRequestId
+          ),
+          mockData.consentRequestsPut.payload as unknown as Message
+        ),
+      10
+    )
 
     const response = await server.inject(request)
 
@@ -579,25 +572,24 @@ describe('Outbound API routes', (): void => {
     // defer publication to notification channel
     // the dfsp should respond to a PISP with a POST /consents request
     // where the inbound handler will publish the message
-    setTimeout(() => pubSub.publish(
-      PISPLinkingModel.notificationChannel(
-        PISPLinkingPhase.requestConsentAuthenticate,
-        consentRequestId
-      ),
-      mockData.inboundConsentsPostRequest.payload as unknown as Message
-    ), 10)
+    setTimeout(
+      () =>
+        pubSub.publish(
+          PISPLinkingModel.notificationChannel(PISPLinkingPhase.requestConsentAuthenticate, consentRequestId),
+          mockData.inboundConsentsPostRequest.payload as unknown as Message
+        ),
+      10
+    )
     const response = await server.inject(request)
     const expectedConsent: tpAPI.Schemas.ConsentsPostRequestPISP = {
       consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
       consentRequestId,
       status: 'ISSUED',
-      scopes: [{
-        address: 'some-id',
-        actions: [
-          'ACCOUNTS_GET_BALANCE',
-          'ACCOUNTS_TRANSFER'
-        ]
-      }
+      scopes: [
+        {
+          address: 'some-id',
+          actions: ['ACCOUNTS_GET_BALANCE', 'ACCOUNTS_TRANSFER']
+        }
       ]
     }
     expect(response.statusCode).toBe(200)
@@ -620,11 +612,13 @@ describe('Outbound API routes', (): void => {
             id: 'credential id: identifier of pair of keys, base64 encoded, min length 59',
             rawId: 'raw credential id: identifier of pair of keys, base64 encoded, min length 59',
             response: {
-              clientDataJSON: 'clientDataJSON-must-not-have-fewer-than-121-' +
+              clientDataJSON:
+                'clientDataJSON-must-not-have-fewer-than-121-' +
                 'characters Lorem ipsum dolor sit amet, consectetur adipiscing ' +
                 'elit, sed do eiusmod tempor incididunt ut labore et dolore magna ' +
                 'aliqua.',
-              attestationObject: 'attestationObject-must-not-have-fewer-than-' +
+              attestationObject:
+                'attestationObject-must-not-have-fewer-than-' +
                 '306-characters Lorem ipsum dolor sit amet, consectetur ' +
                 'adipiscing elit, sed do eiusmod tempor incididunt ut ' +
                 'labore et dolore magna aliqua. Ut enim ad minim veniam, ' +
@@ -641,13 +635,17 @@ describe('Outbound API routes', (): void => {
     // defer publication to notification channel
     // the dfsp should respond to a PISP with a POST /consents request
     // where the inbound handler will publish the message
-    setTimeout(() => pubSub.publish(
-      PISPLinkingModel.notificationChannel(
-        PISPLinkingPhase.registerCredential,
-        '8e34f91d-d078-4077-8263-2c047876fcf6'
-      ),
-      mockData.inboundConsentsVerifiedPatchRequest.payload as unknown as Message
-    ), 10)
+    setTimeout(
+      () =>
+        pubSub.publish(
+          PISPLinkingModel.notificationChannel(
+            PISPLinkingPhase.registerCredential,
+            '8e34f91d-d078-4077-8263-2c047876fcf6'
+          ),
+          mockData.inboundConsentsVerifiedPatchRequest.payload as unknown as Message
+        ),
+      10
+    )
     const response = await server.inject(request)
     const expectedConsent: tpAPI.Schemas.ConsentsIDPatchResponseVerified = {
       credential: {

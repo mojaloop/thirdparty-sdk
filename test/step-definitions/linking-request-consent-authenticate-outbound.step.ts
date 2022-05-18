@@ -78,25 +78,21 @@ jest.mock('~/shared/pub-sub', () => {
   return {
     PubSub: jest.fn(() => ({
       isConnected: true,
-      subscribe: jest.fn(
-        (_channel: string, cb: NotificationCallback) => {
-          handler = cb
-          return ++subId
-        }
-      ),
+      subscribe: jest.fn((_channel: string, cb: NotificationCallback) => {
+        handler = cb
+        return ++subId
+      }),
       unsubscribe: jest.fn(),
-      publish: jest.fn(
-        async (channel: string, message: Message) => {
-          return handler(channel, message, subId)
-        }
-      ),
+      publish: jest.fn(async (channel: string, message: Message) => {
+        return handler(channel, message, subId)
+      }),
       connect: jest.fn(() => Promise.resolve()),
       disconnect: jest.fn()
     }))
   }
 })
 
-async function prepareOutboundAPIServer (): Promise<Server> {
+async function prepareOutboundAPIServer(): Promise<Server> {
   const serverConfig: ServerConfig = {
     port: Config.OUTBOUND.PORT,
     host: Config.OUTBOUND.HOST,
@@ -134,20 +130,19 @@ defineFeature(feature, (test): void => {
       consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
       consentRequestId: '997c89f4-053c-4283-bfec-45a1a0a28fba',
       status: 'ISSUED',
-      scopes: [{
-        address: 'some-id',
-        actions: [
-          'ACCOUNTS_GET_BALANCE',
-          'ACCOUNTS_TRANSFER'
-        ]
-      }]
+      scopes: [
+        {
+          address: 'some-id',
+          actions: ['ACCOUNTS_GET_BALANCE', 'ACCOUNTS_TRANSFER']
+        }
+      ]
     }
 
     given('Outbound API server', async (): Promise<void> => {
       // do nothing
     })
 
-    when('I send a \'PatchLinkingRequestConsentIDAuthenticate\' request', async (): Promise<ServerInjectResponse> => {
+    when("I send a 'PatchLinkingRequestConsentIDAuthenticate' request", async (): Promise<ServerInjectResponse> => {
       jest.mock('~/shared/kvs')
       jest.mock('~/shared/pub-sub')
       const pubSub = new PubSub({} as RedisConnectionConfig)
@@ -158,24 +153,16 @@ defineFeature(feature, (test): void => {
         scopes: [
           {
             address: 'dfspa.username.1234',
-            actions: [
-              'ACCOUNTS_TRANSFER',
-              'ACCOUNTS_GET_BALANCE'
-            ]
+            actions: ['ACCOUNTS_TRANSFER', 'ACCOUNTS_GET_BALANCE']
           },
           {
             address: 'dfspa.username.5678',
-            actions: [
-              'ACCOUNTS_TRANSFER',
-              'ACCOUNTS_GET_BALANCE'
-            ]
+            actions: ['ACCOUNTS_TRANSFER', 'ACCOUNTS_GET_BALANCE']
           }
         ],
         callbackUri: 'pisp-app://callback.com',
         authUri: 'dfspa.com/authorize?consentRequestId=456',
-        authChannels: [
-          'WEB'
-        ]
+        authChannels: ['WEB']
       }
 
       const postRequest = {
@@ -199,10 +186,7 @@ defineFeature(feature, (test): void => {
       }
 
       // defer publication to notification channel
-      setTimeout(() => pubSub.publish(
-        'some-channel',
-        consentRequestsIDPutResponseWeb as unknown as Message
-      ), 10)
+      setTimeout(() => pubSub.publish('some-channel', consentRequestsIDPutResponseWeb as unknown as Message), 10)
       await server.inject(postRequest)
 
       // test linking-request-consent-authenticate-outbound now that the model has
@@ -219,15 +203,12 @@ defineFeature(feature, (test): void => {
         }
       }
       // defer publication to notification channel
-      setTimeout(() => pubSub.publish(
-        'some-channel',
-        postConsentsIDPatchResponse as unknown as Message
-      ), 10)
+      setTimeout(() => pubSub.publish('some-channel', postConsentsIDPatchResponse as unknown as Message), 10)
       response = await server.inject(request)
       return response
     })
 
-    then('I get a response with a status code of \'200\'', (): void => {
+    then("I get a response with a status code of '200'", (): void => {
       expect(response.statusCode).toBe(200)
     })
   })

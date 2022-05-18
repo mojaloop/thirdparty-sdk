@@ -125,7 +125,9 @@ describe('HttpRequests', () => {
     })
 
     it('should propagate thrown exception', async () => {
-      const requestSpy = jest.spyOn(SDK, 'request').mockImplementationOnce(() => { throw new Error('exception') })
+      const requestSpy = jest.spyOn(SDK, 'request').mockImplementationOnce(() => {
+        throw new Error('exception')
+      })
       expect(httpRequest.put('zzz', payload)).rejects.toThrowError('exception')
       expect(requestSpy).toBeCalledWith({
         agent: expect.anything(),
@@ -137,10 +139,12 @@ describe('HttpRequests', () => {
     })
 
     it('should return void for 204', async () => {
-      const requestSpy = jest.spyOn(SDK, 'request').mockImplementationOnce(() => Promise.resolve({
-        statusCode: 204,
-        data: { It: 'does not matter' }
-      }))
+      const requestSpy = jest.spyOn(SDK, 'request').mockImplementationOnce(() =>
+        Promise.resolve({
+          statusCode: 204,
+          data: { It: 'does not matter' }
+        })
+      )
       const result = await httpRequest.put('zzz', payload)
       expect(result).toBeUndefined()
       expect(requestSpy).toBeCalledWith({
@@ -153,17 +157,21 @@ describe('HttpRequests', () => {
     })
 
     it('should throw exception non success full status code', async () => {
-      const requestSpy = jest.spyOn(SDK, 'request').mockImplementationOnce(() => Promise.resolve({
-        statusCode: 304,
-        data: { It: 'does not matter' }
-      }))
-      expect(httpRequest.put('zzz', payload)).rejects.toThrow(new HTTPResponseError({
-        msg: `Request returned non-success status code ${304}`,
-        res: {
+      const requestSpy = jest.spyOn(SDK, 'request').mockImplementationOnce(() =>
+        Promise.resolve({
           statusCode: 304,
           data: { It: 'does not matter' }
-        }
-      }))
+        })
+      )
+      expect(httpRequest.put('zzz', payload)).rejects.toThrow(
+        new HTTPResponseError({
+          msg: `Request returned non-success status code ${304}`,
+          res: {
+            statusCode: 304,
+            data: { It: 'does not matter' }
+          }
+        })
+      )
       expect(requestSpy).toBeCalledWith({
         agent: expect.anything(),
         headers,
@@ -175,9 +183,9 @@ describe('HttpRequests', () => {
   })
 
   describe('keepAlive flag', () => {
-    const agentSpy = jest.spyOn(http, 'Agent').mockImplementationOnce(
-      () => ({ Iam: 'mocked-agent' } as unknown as http.Agent)
-    )
+    const agentSpy = jest
+      .spyOn(http, 'Agent')
+      .mockImplementationOnce(() => ({ Iam: 'mocked-agent' } as unknown as http.Agent))
 
     const kaConfig: HttpRequestsConfig = {
       ...config,

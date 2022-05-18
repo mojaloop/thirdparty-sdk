@@ -31,7 +31,7 @@ import { Enum } from '@mojaloop/central-services-shared'
 /**
  * Handles an inbound `PUT /participants/{Type}/{ID}` request
  */
- async function put (_context: unknown, _request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+async function put(_context: unknown, _request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   return h.response({}).code(Enum.Http.ReturnCodes.OK.CODE)
 }
 

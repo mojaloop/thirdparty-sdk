@@ -29,9 +29,9 @@
 import { Request, ResponseObject } from '@hapi/hapi'
 import { StateResponseToolkit } from '~/server/plugins/state'
 import { PACKAGE } from '~/shared/config'
-import Shared from '@mojaloop/central-services-shared'
+import { HealthCheck } from '@mojaloop/central-services-shared'
 
-const healthCheck = new Shared.HealthCheck.HealthCheck(PACKAGE, [])
+const healthCheck = new HealthCheck.HealthCheck(PACKAGE, [])
 
 /**
  * Operations on /health
@@ -45,7 +45,7 @@ const healthCheck = new Shared.HealthCheck.HealthCheck(PACKAGE, [])
  * responses: 200, 400, 401, 403, 404, 405, 406, 501, 503
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const get = async (_context: any, _request: Request, h: StateResponseToolkit): Promise<ResponseObject> => {
+const get = async (_context: unknown, _request: Request, h: StateResponseToolkit): Promise<ResponseObject> => {
   const response = await healthCheck.getHealth()
   response.KVSConnected = h.getKVS().isConnected
   response.PublisherConnected = h.getPublisher().isConnected

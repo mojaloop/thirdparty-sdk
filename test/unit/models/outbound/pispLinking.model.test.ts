@@ -27,19 +27,9 @@
 import { KVS } from '~/shared/kvs'
 import { Message, NotificationCallback, PubSub } from '~/shared/pub-sub'
 
-import {
-  PISPLinkingData,
-  PISPLinkingModelConfig,
-  PISPLinkingPhase
-} from '~/models/outbound/pispLinking.interface'
-import {
-  v1_1 as fspiopAPI,
-  thirdparty as tpAPI
-} from '@mojaloop/api-snippets'
-import {
-  PISPLinkingModel,
-  create
-} from '~/models/outbound/pispLinking.model'
+import { PISPLinkingData, PISPLinkingModelConfig, PISPLinkingPhase } from '~/models/outbound/pispLinking.interface'
+import { v1_1 as fspiopAPI, thirdparty as tpAPI } from '@mojaloop/api-snippets'
+import { PISPLinkingModel, create } from '~/models/outbound/pispLinking.model'
 
 import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
 import { RedisConnectionConfig } from '~/shared/redis-connection'
@@ -101,7 +91,7 @@ describe('PISPLinkingModel', () => {
     await modelConfig.subscriber.disconnect()
   })
 
-  function checkPISPLinkingModelLayout (am: PISPLinkingModel, optData?: PISPLinkingData) {
+  function checkPISPLinkingModelLayout(am: PISPLinkingModel, optData?: PISPLinkingData) {
     expect(am).toBeTruthy()
     expect(am.data).toBeDefined()
     expect(am.fsm.state).toEqual(optData?.currentState || 'start')
@@ -146,17 +136,14 @@ describe('PISPLinkingModel', () => {
   describe('notificationChannel', () => {
     it('should generate proper channel name', () => {
       const id = '123'
-      expect(PISPLinkingModel.notificationChannel(
-        PISPLinkingPhase.requestConsent,
-        id)).toEqual('PISPLinking_requestConsent_123')
+      expect(PISPLinkingModel.notificationChannel(PISPLinkingPhase.requestConsent, id)).toEqual(
+        'PISPLinking_requestConsent_123'
+      )
     })
 
     it('input validation', () => {
-      expect(
-        () => PISPLinkingModel.notificationChannel(
-          PISPLinkingPhase.requestConsent,
-          null as unknown as string
-        )
+      expect(() =>
+        PISPLinkingModel.notificationChannel(PISPLinkingPhase.requestConsent, null as unknown as string)
       ).toThrow()
     })
   })
@@ -167,22 +154,18 @@ describe('PISPLinkingModel', () => {
     let requestConsentAuthenticateChannel: string
     let handler: NotificationCallback
     let data: PISPLinkingData
-    type PutResponse =
-      tpAPI.Schemas.ConsentRequestsIDPutResponseWeb |
-      tpAPI.Schemas.ConsentRequestsIDPutResponseOTP
+    type PutResponse = tpAPI.Schemas.ConsentRequestsIDPutResponseWeb | tpAPI.Schemas.ConsentRequestsIDPutResponseOTP
     type PutResponseOrError = PutResponse | fspiopAPI.Schemas.ErrorInformationObject
     let putResponse: PutResponseOrError
 
     beforeEach(() => {
-      mocked(modelConfig.subscriber.subscribe).mockImplementationOnce(
-        (_channel: string, cb: NotificationCallback) => {
-          handler = cb
-          return ++subId
-        }
-      )
+      mocked(modelConfig.subscriber.subscribe).mockImplementationOnce((_channel: string, cb: NotificationCallback) => {
+        handler = cb
+        return ++subId
+      })
 
-      mocked(publisher.publish).mockImplementationOnce(
-        async (channel: string, message: Message) => handler(channel, message, subId)
+      mocked(publisher.publish).mockImplementationOnce(async (channel: string, message: Message) =>
+        handler(channel, message, subId)
       )
 
       data = {
@@ -212,10 +195,7 @@ describe('PISPLinkingModel', () => {
 
     it('should give response properly populated from notification channel - success', async () => {
       const model = await create(data, modelConfig)
-      setImmediate(() => publisher.publish(
-        requestConsentChannel,
-        putResponse as unknown as Message
-      ))
+      setImmediate(() => publisher.publish(requestConsentChannel, putResponse as unknown as Message))
 
       const result = await model.run()
       // Assertions
@@ -237,10 +217,7 @@ describe('PISPLinkingModel', () => {
       }
       putResponse = mockData.consentRequestsPutError.payload
       const model = await create(data, modelConfig)
-      setImmediate(() => publisher.publish(
-        requestConsentChannel,
-        putResponse as unknown as Message
-      ))
+      setImmediate(() => publisher.publish(requestConsentChannel, putResponse as unknown as Message))
 
       const result = await model.run()
       // Assertions
@@ -255,9 +232,9 @@ describe('PISPLinkingModel', () => {
     })
 
     it('should properly handle error from requests.postConsentRequests', async () => {
-      mocked(modelConfig.thirdpartyRequests.postConsentRequests).mockImplementationOnce(
-        () => { throw new Error('error from requests.postConsentRequests') }
-      )
+      mocked(modelConfig.thirdpartyRequests.postConsentRequests).mockImplementationOnce(() => {
+        throw new Error('error from requests.postConsentRequests')
+      })
       const model = await create(data, modelConfig)
 
       try {
@@ -274,10 +251,7 @@ describe('PISPLinkingModel', () => {
       it('start', async () => {
         const model = await create(data, modelConfig)
 
-        setImmediate(() => publisher.publish(
-          requestConsentChannel,
-          putResponse as unknown as Message
-        ))
+        setImmediate(() => publisher.publish(requestConsentChannel, putResponse as unknown as Message))
 
         const result = await model.run()
 
@@ -301,11 +275,9 @@ describe('PISPLinkingModel', () => {
 
       it('exceptions', async () => {
         const error = { message: 'error from requests.postConsentRequests', consentReqState: 'broken' }
-        mocked(modelConfig.thirdpartyRequests.postConsentRequests).mockImplementationOnce(
-          () => {
-            throw error
-          }
-        )
+        mocked(modelConfig.thirdpartyRequests.postConsentRequests).mockImplementationOnce(() => {
+          throw error
+        })
         const model = await create(data, modelConfig)
 
         expect(async () => await model.run()).rejects.toEqual(error)
@@ -313,11 +285,9 @@ describe('PISPLinkingModel', () => {
 
       it('exceptions - Error', async () => {
         const error = new Error('the-exception')
-        mocked(modelConfig.thirdpartyRequests.postConsentRequests).mockImplementationOnce(
-          () => {
-            throw error
-          }
-        )
+        mocked(modelConfig.thirdpartyRequests.postConsentRequests).mockImplementationOnce(() => {
+          throw error
+        })
         const model = await create({ ...data, currentState: 'start' }, modelConfig)
 
         expect(model.run()).rejects.toEqual(error)
@@ -330,20 +300,19 @@ describe('PISPLinkingModel', () => {
         toParticipantId: 'dfspA',
         consentRequestId: mockData.linkingRequestConsentPostRequest.payload.consentRequestId,
         linkingRequestConsentPostRequest: mockData.linkingRequestConsentPostRequest.payload,
-        linkingRequestConsentIDAuthenticatePatchRequest: mockData.linkingRequestConsentIDAuthenticatePatchRequest.payload,
+        linkingRequestConsentIDAuthenticatePatchRequest:
+          mockData.linkingRequestConsentIDAuthenticatePatchRequest.payload,
         currentState: 'WebAuthenticationChannelResponseReceived'
       }
       const consentPostResponse: tpAPI.Schemas.ConsentsPostRequestPISP = {
         consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
         consentRequestId: consentRequestId,
         status: 'ISSUED',
-        scopes: [{
-          address: 'some-id',
-          actions: [
-            'ACCOUNTS_GET_BALANCE',
-            'ACCOUNTS_TRANSFER'
-          ]
-        }
+        scopes: [
+          {
+            address: 'some-id',
+            actions: ['ACCOUNTS_GET_BALANCE', 'ACCOUNTS_TRANSFER']
+          }
         ]
       }
 
@@ -362,10 +331,9 @@ describe('PISPLinkingModel', () => {
       it('authenticate() should transition start to consentReceivedAwaitingCredential state when successful', async () => {
         const model = await create(validateData, modelConfig)
         // defer publication to notification channel
-        setImmediate(() => publisher.publish(
-          requestConsentAuthenticateChannel,
-          consentPostResponse as unknown as Message
-        ))
+        setImmediate(() =>
+          publisher.publish(requestConsentAuthenticateChannel, consentPostResponse as unknown as Message)
+        )
         const result = await model.run()
 
         // check that the fsm was able to transition properly
@@ -381,13 +349,11 @@ describe('PISPLinkingModel', () => {
           consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
           consentRequestId,
           status: 'ISSUED',
-          scopes: [{
-            address: 'some-id',
-            actions: [
-              'ACCOUNTS_GET_BALANCE',
-              'ACCOUNTS_TRANSFER'
-            ]
-          }
+          scopes: [
+            {
+              address: 'some-id',
+              actions: ['ACCOUNTS_GET_BALANCE', 'ACCOUNTS_TRANSFER']
+            }
           ]
         }
         expect(result).toEqual({
@@ -398,10 +364,9 @@ describe('PISPLinkingModel', () => {
       })
 
       it('should handle a PUT /consentsRequest/{ID}/error response', async () => {
-        setImmediate(() => publisher.publish(
-          requestConsentAuthenticateChannel,
-          genericErrorResponse as unknown as Message
-        ))
+        setImmediate(() =>
+          publisher.publish(requestConsentAuthenticateChannel, genericErrorResponse as unknown as Message)
+        )
 
         const model = await create(validateData, modelConfig)
         const result = await model.run()
@@ -422,13 +387,12 @@ describe('PISPLinkingModel', () => {
         consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
         consentRequestId: consentRequestId,
         status: 'ISSUED',
-        scopes: [{
-          address: 'some-id',
-          actions: [
-            'ACCOUNTS_GET_BALANCE',
-            'ACCOUNTS_TRANSFER'
-          ]
-        }]
+        scopes: [
+          {
+            address: 'some-id',
+            actions: ['ACCOUNTS_GET_BALANCE', 'ACCOUNTS_TRANSFER']
+          }
+        ]
       }
       const consentPatchResponse: tpAPI.Schemas.ConsentsIDPatchResponseVerified = {
         credential: {
@@ -440,8 +404,10 @@ describe('PISPLinkingModel', () => {
         toParticipantId: 'dfspA',
         consentRequestId: mockData.linkingRequestConsentPostRequest.payload.consentRequestId,
         linkingRequestConsentPostRequest: mockData.linkingRequestConsentPostRequest.payload,
-        linkingRequestConsentIDAuthenticatePatchRequest: mockData.linkingRequestConsentIDAuthenticatePatchRequest.payload,
-        linkingRequestConsentIDPassCredentialPostRequest: mockData.linkingRequestConsentIDPassCredentialPostRequest.payload,
+        linkingRequestConsentIDAuthenticatePatchRequest:
+          mockData.linkingRequestConsentIDAuthenticatePatchRequest.payload,
+        linkingRequestConsentIDPassCredentialPostRequest:
+          mockData.linkingRequestConsentIDPassCredentialPostRequest.payload,
         linkingRequestConsentIDAuthenticateInboundConsentResponse: consentPostResponse,
         scopes: consentPostResponse.scopes,
         currentState: 'consentReceivedAwaitingCredential'
@@ -468,10 +434,7 @@ describe('PISPLinkingModel', () => {
         const model = await create(registerCredentialData, modelConfig)
 
         // defer publication to notification channel
-        setImmediate(() => publisher.publish(
-          registerCredentialChannel,
-          consentPatchResponse as unknown as Message
-        ))
+        setImmediate(() => publisher.publish(registerCredentialChannel, consentPatchResponse as unknown as Message))
         const result = await model.run()
 
         // check that the fsm was able to transition properly
@@ -487,11 +450,13 @@ describe('PISPLinkingModel', () => {
                 id: 'credential id: identifier of pair of keys, base64 encoded, min length 59',
                 rawId: 'raw credential id: identifier of pair of keys, base64 encoded, min length 59',
                 response: {
-                  clientDataJSON: 'clientDataJSON-must-not-have-fewer-than-121-' +
+                  clientDataJSON:
+                    'clientDataJSON-must-not-have-fewer-than-121-' +
                     'characters Lorem ipsum dolor sit amet, consectetur adipiscing ' +
                     'elit, sed do eiusmod tempor incididunt ut labore et dolore magna ' +
                     'aliqua.',
-                  attestationObject: 'attestationObject-must-not-have-fewer-than-' +
+                  attestationObject:
+                    'attestationObject-must-not-have-fewer-than-' +
                     '306-characters Lorem ipsum dolor sit amet, consectetur ' +
                     'adipiscing elit, sed do eiusmod tempor incididunt ut ' +
                     'labore et dolore magna aliqua. Ut enim ad minim veniam, ' +
@@ -503,13 +468,12 @@ describe('PISPLinkingModel', () => {
               },
               status: 'PENDING'
             },
-            scopes: [{
-              address: 'some-id',
-              actions: [
-                'ACCOUNTS_GET_BALANCE',
-                'ACCOUNTS_TRANSFER'
-              ]
-            }],
+            scopes: [
+              {
+                address: 'some-id',
+                actions: ['ACCOUNTS_GET_BALANCE', 'ACCOUNTS_TRANSFER']
+              }
+            ],
             status: 'ISSUED'
           },
           'dfspA'
@@ -524,10 +488,7 @@ describe('PISPLinkingModel', () => {
       })
 
       it('should handle a PUT /consents/{ID}/error response', async () => {
-        setImmediate(() => publisher.publish(
-          registerCredentialChannel,
-          genericErrorResponse as unknown as Message
-        ))
+        setImmediate(() => publisher.publish(registerCredentialChannel, genericErrorResponse as unknown as Message))
 
         const model = await create(registerCredentialData, modelConfig)
         const result = await model.run()

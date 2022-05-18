@@ -31,10 +31,7 @@ import {
   PISPDiscoveryData,
   PISPDiscoveryStateMachine
 } from '~/models/outbound/pispDiscovery.interface'
-import {
-  v1_1 as fspiopAPI,
-  thirdparty as tpAPI
-} from '@mojaloop/api-snippets'
+import { v1_1 as fspiopAPI, thirdparty as tpAPI } from '@mojaloop/api-snippets'
 import { Message, PubSub } from '~/shared/pub-sub'
 import { PersistentModel } from '~/models/persistent.model'
 import { StateMachineConfig } from 'javascript-state-machine'
@@ -42,19 +39,13 @@ import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
 
 import inspect from '~/shared/inspect'
 
-export class PISPDiscoveryModel
-  extends PersistentModel<PISPDiscoveryStateMachine, PISPDiscoveryData> {
+export class PISPDiscoveryModel extends PersistentModel<PISPDiscoveryStateMachine, PISPDiscoveryData> {
   protected config: PISPDiscoveryModelConfig
 
-  constructor (
-    data: PISPDiscoveryData,
-    config: PISPDiscoveryModelConfig
-  ) {
+  constructor(data: PISPDiscoveryData, config: PISPDiscoveryModelConfig) {
     const spec: StateMachineConfig = {
       init: 'start',
-      transitions: [
-        { name: 'requestAccounts', from: 'start', to: 'succeeded' }
-      ],
+      transitions: [{ name: 'requestAccounts', from: 'start', to: 'succeeded' }],
       methods: {
         // specific transitions handlers methods
         onRequestAccounts: () => this.onRequestAccounts()
@@ -65,18 +56,18 @@ export class PISPDiscoveryModel
   }
 
   // getters
-  get subscriber (): PubSub {
+  get subscriber(): PubSub {
     return this.config.subscriber
   }
 
-  get thirdpartyRequests (): ThirdpartyRequests {
+  get thirdpartyRequests(): ThirdpartyRequests {
     return this.config.thirdpartyRequests
   }
 
   // generate the name of notification channel dedicated for accounts requests
-  static notificationChannel (id: string): string {
+  static notificationChannel(id: string): string {
     if (!(id && id.toString().length > 0)) {
-      throw new Error('PISPDiscoveryModel.notificationChannel: \'id\' parameter is required')
+      throw new Error("PISPDiscoveryModel.notificationChannel: 'id' parameter is required")
     }
     // channel name
     return `accounts_${id}`
@@ -89,7 +80,7 @@ export class PISPDiscoveryModel
    * than await for a notification on PUT /accounts/${userId}
    * from the PubSub that the requestAccounts has been resolved
    */
-  async onRequestAccounts (): Promise<void> {
+  async onRequestAccounts(): Promise<void> {
     const channel = PISPDiscoveryModel.notificationChannel(this.data.userId)
     const subscriber: PubSub = this.subscriber
 
@@ -109,9 +100,7 @@ export class PISPDiscoveryModel
           // store response which will be returned by 'getResponse' method in workflow 'run'
           this.data.response = {
             accounts: putResponse.errorInformation ? [] : putResponse.accounts!,
-            currentState: PISPDiscoveryModelState[
-              this.data.currentState as keyof typeof PISPDiscoveryModelState
-            ]
+            currentState: PISPDiscoveryModelState[this.data.currentState as keyof typeof PISPDiscoveryModelState]
           }
 
           if (putResponse.errorInformation) {
@@ -136,14 +125,14 @@ export class PISPDiscoveryModel
    *
    * @returns {object} - Response representing the result of the onRequestAccounts process
    */
-  getResponse (): PISPDiscoveryGetResponse | void {
+  getResponse(): PISPDiscoveryGetResponse | void {
     return this.data.response
   }
 
   /**
    * runs the workflow
    */
-  async run (): Promise<PISPDiscoveryGetResponse | void> {
+  async run(): Promise<PISPDiscoveryGetResponse | void> {
     const data = this.data
     try {
       // run transitions based on incoming state
@@ -152,7 +141,7 @@ export class PISPDiscoveryModel
           // the first transition is requestAccounts
           await this.fsm.requestAccounts()
           this.logger.info(`getAccounts requested for ${data.userId},  currentState: ${data.currentState}`)
-          /* falls through */
+        /* falls through */
 
         case 'succeeded':
           // all steps complete so return
@@ -164,7 +153,7 @@ export class PISPDiscoveryModel
           this.logger.info('State machine in errored state')
           return
       }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       this.logger.info(`Error running PISPDiscoveryModel : ${inspect(err)}`)
 
@@ -185,10 +174,7 @@ export class PISPDiscoveryModel
   }
 }
 
-export async function create (
-  data: PISPDiscoveryData,
-  config: PISPDiscoveryModelConfig
-): Promise<PISPDiscoveryModel> {
+export async function create(data: PISPDiscoveryData, config: PISPDiscoveryModelConfig): Promise<PISPDiscoveryModel> {
   // create a new model
   const model = new PISPDiscoveryModel(data, config)
 

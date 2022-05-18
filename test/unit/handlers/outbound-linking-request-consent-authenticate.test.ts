@@ -69,7 +69,7 @@ describe('Outbound linking request consent ID authenticate handlers', () => {
     toParticipantId: 'dfspa'
   }
 
-  it('/linking/request-consent/{ID}/authenticate should report error when result from \'run\' is undefined', async () => {
+  it("/linking/request-consent/{ID}/authenticate should report error when result from 'run' is undefined", async () => {
     const request = {
       method: 'PATCH',
       url: '/linking/request-consent/{ID}/authenticate',

@@ -30,16 +30,11 @@
 import { Message, PubSub } from '~/shared/pub-sub'
 import { PersistentModel } from '~/models/persistent.model'
 import { StateMachineConfig } from 'javascript-state-machine'
-import {
-  MojaloopRequests,
-  ThirdpartyRequests
-} from '@mojaloop/sdk-standard-components'
+import { MojaloopRequests, ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
 import { OutboundAPI as SDKOutboundAPI } from '@mojaloop/sdk-scheme-adapter'
 import * as OutboundAPI from '~/interface/outbound/api_interfaces'
 
-import {
-  thirdparty as tpAPI
-} from '@mojaloop/api-snippets'
+import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
 import {
   PISPTransactionData,
   PISPTransactionModelConfig,
@@ -52,14 +47,10 @@ import { HTTPResponseError } from '~/shared/http-response-error'
 import deferredJob from '~/shared/deferred-job'
 import { InvalidDataError } from '~/shared/invalid-data-error'
 
-export class PISPTransactionModel
-  extends PersistentModel<PISPTransactionStateMachine, PISPTransactionData> {
+export class PISPTransactionModel extends PersistentModel<PISPTransactionStateMachine, PISPTransactionData> {
   protected config: PISPTransactionModelConfig
 
-  constructor (
-    data: PISPTransactionData,
-    config: PISPTransactionModelConfig
-  ) {
+  constructor(data: PISPTransactionData, config: PISPTransactionModelConfig) {
     const spec: StateMachineConfig = {
       init: 'start',
       transitions: [
@@ -72,7 +63,6 @@ export class PISPTransactionModel
 
         // Approve Transaction Phase
         { name: 'approve', from: 'authorizationReceived', to: 'transactionStatusReceived' }
-
       ],
       methods: {
         // specific transitions handlers methods
@@ -87,32 +77,32 @@ export class PISPTransactionModel
   }
 
   // getters
-  get subscriber (): PubSub {
+  get subscriber(): PubSub {
     return this.config.subscriber
   }
 
-  get thirdpartyRequests (): ThirdpartyRequests {
+  get thirdpartyRequests(): ThirdpartyRequests {
     return this.config.thirdpartyRequests
   }
 
-  get mojaloopRequests (): MojaloopRequests {
+  get mojaloopRequests(): MojaloopRequests {
     return this.config.mojaloopRequests
   }
 
-  get sdkOutgoingRequests (): SDKOutgoingRequests {
+  get sdkOutgoingRequests(): SDKOutgoingRequests {
     return this.config.sdkOutgoingRequests
   }
 
-  static notificationChannel (phase: PISPTransactionPhase, transactionRequestId: string): string {
+  static notificationChannel(phase: PISPTransactionPhase, transactionRequestId: string): string {
     if (!transactionRequestId) {
-      throw new Error('PISPTransactionModel.notificationChannel: \'transactionRequestId\' parameter is required')
+      throw new Error("PISPTransactionModel.notificationChannel: 'transactionRequestId' parameter is required")
     }
 
     // channel name
     return `pisp_transaction_${phase}_${transactionRequestId}`
   }
 
-  static async triggerWorkflow (
+  static async triggerWorkflow(
     phase: PISPTransactionPhase,
     transactionRequestId: string,
     pubSub: PubSub,
@@ -122,15 +112,14 @@ export class PISPTransactionModel
     return deferredJob(pubSub, channel).trigger(message)
   }
 
-  async onRequestPartyLookup (): Promise<void> {
+  async onRequestPartyLookup(): Promise<void> {
     // input validation
     InvalidDataError.throwIfInvalidProperty(this.data, 'payeeRequest')
     InvalidDataError.throwIfInvalidProperty(this.data!.payeeRequest as Record<string, unknown>, 'payee')
+    InvalidDataError.throwIfInvalidProperty(this.data!.payeeRequest!.payee as Record<string, unknown>, 'partyIdType')
     InvalidDataError.throwIfInvalidProperty(
-      this.data!.payeeRequest!.payee as Record<string, unknown>, 'partyIdType'
-    )
-    InvalidDataError.throwIfInvalidProperty(
-      this.data!.payeeRequest!.payee as Record<string, unknown>, 'partyIdentifier'
+      this.data!.payeeRequest!.payee as Record<string, unknown>,
+      'partyIdentifier'
     )
 
     // extract params for GET /parties
@@ -138,9 +127,11 @@ export class PISPTransactionModel
 
     try {
       // call GET /parties on sdk-scheme-adapter Outbound service
-      const response = this.data.payeeResolved = await this.sdkOutgoingRequests.requestPartiesInformation(
-        payee.partyIdType, payee.partyIdentifier, payee.partySubIdOrType
-      ) as SDKOutboundAPI.Schemas.partiesByIdResponse
+      const response = (this.data.payeeResolved = (await this.sdkOutgoingRequests.requestPartiesInformation(
+        payee.partyIdType,
+        payee.partyIdentifier,
+        payee.partySubIdOrType
+      )) as SDKOutboundAPI.Schemas.partiesByIdResponse)
 
       // store results
       this.data.partyLookupResponse = {
@@ -168,11 +159,11 @@ export class PISPTransactionModel
     }
   }
 
-  onFailPartyLookup (): void {
+  onFailPartyLookup(): void {
     this.data!.partyLookupResponse!.currentState = 'partyLookupFailure'
   }
 
-  async onInitiate (): Promise<void> {
+  async onInitiate(): Promise<void> {
     InvalidDataError.throwIfInvalidProperty(this.data, 'payeeRequest')
     InvalidDataError.throwIfInvalidProperty(this.data, 'initiateRequest')
 
@@ -192,7 +183,7 @@ export class PISPTransactionModel
         // initiate the workflow - forward request to DFSP
         const request: tpAPI.Schemas.ThirdpartyRequestsTransactionsPostRequest = {
           transactionRequestId: this.data?.transactionRequestId as string,
-          ...this.data?.initiateRequest as OutboundAPI.Schemas.ThirdpartyTransactionIDInitiateRequest
+          ...(this.data?.initiateRequest as OutboundAPI.Schemas.ThirdpartyTransactionIDInitiateRequest)
         }
         const res = await this.thirdpartyRequests.postThirdpartyRequestsTransactions(
           request,
@@ -203,7 +194,7 @@ export class PISPTransactionModel
       .job(async (message: Message): Promise<void> => {
         // receive the transfer state update from PUT /thirdpartyRequests/{ID}/transaction
         this.data.transactionStatusPut = {
-          ...message as unknown as tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPutResponse
+          ...(message as unknown as tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPutResponse)
         }
         // TODO: error case when transactionRequestState !== 'RECEIVED'
         this.saveToKVS()
@@ -227,7 +218,7 @@ export class PISPTransactionModel
       .job(async (message: Message): Promise<void> => {
         // receive auth request from POST /thirdpartyRequests/authorizations
         this.data.authorizationRequest = {
-          ...message as unknown as tpAPI.Schemas.ThirdpartyRequestsAuthorizationsPostRequest
+          ...(message as unknown as tpAPI.Schemas.ThirdpartyRequestsAuthorizationsPostRequest)
         }
         this.saveToKVS()
       })
@@ -246,7 +237,7 @@ export class PISPTransactionModel
     }
   }
 
-  async onApprove (): Promise<void> {
+  async onApprove(): Promise<void> {
     InvalidDataError.throwIfInvalidProperty(this.data, 'payeeRequest')
     InvalidDataError.throwIfInvalidProperty(this.data, 'initiateRequest')
     InvalidDataError.throwIfInvalidProperty(this.data, 'approveRequest')
@@ -271,7 +262,7 @@ export class PISPTransactionModel
       })
       .job(async (message: Message): Promise<void> => {
         this.data.transactionStatusPatch = {
-          ...message as unknown as tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPatchResponse
+          ...(message as unknown as tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPatchResponse)
         }
         this.data.approveResponse = {
           transactionStatus: {
@@ -286,10 +277,11 @@ export class PISPTransactionModel
   /**
    * depending on current state of model returns proper result
    */
-  getResponse (): OutboundAPI.Schemas.ThirdpartyTransactionPartyLookupResponse |
-  OutboundAPI.Schemas.ThirdpartyTransactionIDInitiateResponse |
-  OutboundAPI.Schemas.ThirdpartyTransactionIDApproveResponse |
-  void {
+  getResponse():
+    | OutboundAPI.Schemas.ThirdpartyTransactionPartyLookupResponse
+    | OutboundAPI.Schemas.ThirdpartyTransactionIDInitiateResponse
+    | OutboundAPI.Schemas.ThirdpartyTransactionIDApproveResponse
+    | void {
     switch (this.data.currentState) {
       case 'partyLookupSuccess':
       case 'partyLookupFailure':
@@ -305,11 +297,11 @@ export class PISPTransactionModel
   /**
    * runs the workflow
    */
-  async run (): Promise<
-  OutboundAPI.Schemas.ThirdpartyTransactionPartyLookupResponse |
-  OutboundAPI.Schemas.ThirdpartyTransactionIDInitiateResponse |
-  OutboundAPI.Schemas.ThirdpartyTransactionIDApproveResponse |
-  void
+  async run(): Promise<
+    | OutboundAPI.Schemas.ThirdpartyTransactionPartyLookupResponse
+    | OutboundAPI.Schemas.ThirdpartyTransactionIDInitiateResponse
+    | OutboundAPI.Schemas.ThirdpartyTransactionIDApproveResponse
+    | void
   > {
     const data = this.data
     try {
@@ -325,9 +317,8 @@ export class PISPTransactionModel
           )
           await this.fsm.requestPartyLookup()
           if (
-            (
-              this.data.partyLookupResponse as OutboundAPI.Schemas.ThirdpartyTransactionPartyLookupResponseError
-            ).errorInformation
+            (this.data.partyLookupResponse as OutboundAPI.Schemas.ThirdpartyTransactionPartyLookupResponseError)
+              .errorInformation
           ) {
             await this.fsm.failPartyLookup()
             this.logger.info('requestPartyLookup failed')
@@ -339,9 +330,7 @@ export class PISPTransactionModel
 
         // initiate phase
         case 'partyLookupSuccess':
-          this.logger.info(
-            `initiate requested for ${data.transactionRequestId},  currentState: ${data.currentState}`
-          )
+          this.logger.info(`initiate requested for ${data.transactionRequestId},  currentState: ${data.currentState}`)
           await this.fsm.initiate()
           this.logger.info('initiate completed successfully')
           await this.saveToKVS()
@@ -349,9 +338,7 @@ export class PISPTransactionModel
 
         // approve phase
         case 'authorizationReceived':
-          this.logger.info(
-            `approve requested for ${data.transactionRequestId},  currentState: ${data.currentState}`
-          )
+          this.logger.info(`approve requested for ${data.transactionRequestId},  currentState: ${data.currentState}`)
           await this.fsm.approve()
           this.logger.info('approve completed successfully')
           await this.saveToKVS()
@@ -364,7 +351,7 @@ export class PISPTransactionModel
           this.logger.info('State machine in errored state')
           return this.getResponse()
       }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       this.logger.info(`Error running PISPTransactionModel : ${inspect(err)}`)
 
@@ -385,11 +372,11 @@ export class PISPTransactionModel
   }
 }
 
-export async function existsInKVS (config: PISPTransactionModelConfig): Promise<boolean> {
+export async function existsInKVS(config: PISPTransactionModelConfig): Promise<boolean> {
   return config.kvs.exists(config.key)
 }
 
-export async function create (
+export async function create(
   data: PISPTransactionData,
   config: PISPTransactionModelConfig
 ): Promise<PISPTransactionModel> {
@@ -402,9 +389,7 @@ export async function create (
 }
 
 // loads PersistentModel from KVS storage using given `config` and `spec`
-export async function loadFromKVS (
-  config: PISPTransactionModelConfig
-): Promise<PISPTransactionModel> {
+export async function loadFromKVS(config: PISPTransactionModelConfig): Promise<PISPTransactionModel> {
   try {
     const data = await config.kvs.get<PISPTransactionData>(config.key)
     if (!data) {

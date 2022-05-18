@@ -36,14 +36,14 @@ import { v1_1 as fspiopAPI } from '@mojaloop/api-snippets'
 
 export { PACKAGE }
 
-export function getFileContent (path: PathLike): Buffer {
+export function getFileContent(path: PathLike): Buffer {
   if (!fs.existsSync(path)) {
-    throw new Error('File doesn\'t exist')
+    throw new Error("File doesn't exist")
   }
   return fs.readFileSync(path)
 }
 
-function getFileListContent (pathList: string): Array<Buffer> {
+function getFileListContent(pathList: string): Array<Buffer> {
   return pathList.split(',').map((path) => getFileContent(path))
 }
 
@@ -96,7 +96,7 @@ export interface ServiceConfig {
     DFSP_BACKEND_VERIFY_CONSENT_PATH: string
     DFSP_BACKEND_VALIDATE_THIRDPARTY_TRANSACTION_REQUEST: string
     DFSP_BACKEND_GET_USER_ACCOUNTS_PATH: string
-    DFSP_BACKEND_STORE_VALIDATED_CONSENT_FOR_ACCOUNT_ID_PATH: string,
+    DFSP_BACKEND_STORE_VALIDATED_CONSENT_FOR_ACCOUNT_ID_PATH: string
     DFSP_TRANSACTION_REQUEST_AUTHORIZATION_TIMEOUT_SECONDS: number
     DFSP_TRANSACTION_REQUEST_VERIFICATION_TIMEOUT_SECONDS: number
     PISP_BACKEND_URI: string
@@ -120,10 +120,10 @@ export interface ServiceConfig {
     JWS_SIGNING_KEY: PathLike | Buffer
     TLS: BaseRequestTLSConfig
     TEMP_OVERRIDE_QUOTES_PARTY_ID_TYPE?: fspiopAPI.Schemas.PartyIdType
-    TEST_OVERRIDE_CONSENT_ID?: string,
-    TEST_SHOULD_OVERRIDE_CONSENT_ID: boolean,
-    TEST_CONSENT_REQUEST_TO_CONSENT_MAP: Record<string, string>,
-    TEST_OVERRIDE_TRANSACTION_CHALLENGE?: string,
+    TEST_OVERRIDE_CONSENT_ID?: string
+    TEST_SHOULD_OVERRIDE_CONSENT_ID: boolean
+    TEST_CONSENT_REQUEST_TO_CONSENT_MAP: Record<string, string>
+    TEST_OVERRIDE_TRANSACTION_CHALLENGE?: string
   }
 }
 
@@ -304,7 +304,7 @@ export const ConvictConfig = Convict<ServiceConfig>({
       default: 'dfsp_a'
     },
     DFSP_BACKEND_URI: {
-      doc: 'host address of DFSP\'s ',
+      doc: "host address of DFSP's ",
       format: '*',
       default: 'localhost:9000'
     },
@@ -369,7 +369,7 @@ export const ConvictConfig = Convict<ServiceConfig>({
       default: 15
     },
     PISP_BACKEND_URI: {
-      doc: 'host address of DFSP\'s ',
+      doc: "host address of DFSP's ",
       format: '*',
       default: 'localhost:9000'
     },
@@ -394,7 +394,7 @@ export const ConvictConfig = Convict<ServiceConfig>({
       default: 30
     },
     SDK_OUTGOING_URI: {
-      doc: 'host address of SDK scheme-adapter Outgoing service\'s ',
+      doc: "host address of SDK scheme-adapter Outgoing service's ",
       format: '*',
       default: 'localhost:7002'
     },
@@ -493,18 +493,9 @@ if (ConvictConfig.get('SHARED.JWS_SIGN')) {
 
 // Note: Have not seen these be comma separated value strings. mimicking sdk-scheme-adapter for now
 if (ConvictConfig.get('SHARED.TLS.mutualTLS.enabled')) {
-  ConvictConfig.set(
-    'SHARED.TLS.creds.ca',
-    getFileListContent(<string>ConvictConfig.get('SHARED').TLS.creds.ca)
-  )
-  ConvictConfig.set(
-    'SHARED.TLS.creds.cert',
-    getFileListContent(<string>ConvictConfig.get('SHARED').TLS.creds.cert)
-  )
-  ConvictConfig.set(
-    'SHARED.TLS.creds.key',
-    getFileListContent(<string>ConvictConfig.get('SHARED').TLS.creds.key)
-  )
+  ConvictConfig.set('SHARED.TLS.creds.ca', getFileListContent(<string>ConvictConfig.get('SHARED').TLS.creds.ca))
+  ConvictConfig.set('SHARED.TLS.creds.cert', getFileListContent(<string>ConvictConfig.get('SHARED').TLS.creds.cert))
+  ConvictConfig.set('SHARED.TLS.creds.key', getFileListContent(<string>ConvictConfig.get('SHARED').TLS.creds.key))
 }
 
 // extract simplified config from Convict object

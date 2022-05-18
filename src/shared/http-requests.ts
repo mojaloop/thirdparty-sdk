@@ -25,12 +25,7 @@
  --------------
  ******/
 
-import {
-  Logger as SDKLogger,
-  RequestOptions,
-  request,
-  requests
-} from '@mojaloop/sdk-standard-components'
+import { Logger as SDKLogger, RequestOptions, request, requests } from '@mojaloop/sdk-standard-components'
 import { PrependFun, Scheme, prepend2Uri } from '~/shared/http-scheme'
 import { throwOrExtractData } from '~/shared/throw-or-extract-data'
 import http from 'http'
@@ -60,7 +55,7 @@ export class HttpRequests {
   // the http agent to make requests
   protected agent: http.Agent
 
-  constructor (config: HttpRequestsConfig) {
+  constructor(config: HttpRequestsConfig) {
     this._config = config
     this.agent = new http.Agent({
       keepAlive: typeof config.keepAlive === 'undefined' ? true : config.keepAlive
@@ -71,17 +66,17 @@ export class HttpRequests {
 
   // config getter
   // to allow polymorphic properties in derived classes later
-  protected get config (): HttpRequestsConfig {
+  protected get config(): HttpRequestsConfig {
     return this._config
   }
 
   // get sdk logger
-  protected get logger (): SDKLogger.Logger {
+  protected get logger(): SDKLogger.Logger {
     return this.config.logger
   }
 
   // generates minimal set of headers for request
-  protected get headers (): Record<string, string> {
+  protected get headers(): Record<string, string> {
     return {
       'Content-Type': 'application/json',
       Accept: 'application/json',
@@ -91,26 +86,26 @@ export class HttpRequests {
 
   // getter used to implement dynamic protected method
   // which is used to generate fullUri
-  protected get prependScheme (): PrependFun {
+  protected get prependScheme(): PrependFun {
     return prepend2Uri(this.config.scheme)
   }
 
   // METHODS
 
   // build full URI pointing to backend endpoint using config.uri and config.scheme
-  get endpoint (): string {
+  get endpoint(): string {
     return this.prependScheme(this.config.uri)
   }
 
   // generates the full uri from given path
-  fullUri (path: string): string {
+  fullUri(path: string): string {
     return `${this.endpoint}/${path}`
   }
 
   // request with proper logging
   // extracts data from response
   // throws HTTPResponseError exception if received response has non-successful statusCode
-  async loggedRequest<Response> (opts: RequestOptions): Promise<Response | void> {
+  async loggedRequest<Response>(opts: RequestOptions): Promise<Response | void> {
     const optsWithDefaults = {
       headers: this.headers,
       ...opts
@@ -120,16 +115,16 @@ export class HttpRequests {
       const res = await request<Response>(optsWithDefaults)
       return throwOrExtractData<Response>(res)
     } catch (err) {
-      this.logger.push({ err }).error(
-        `Error attempting ${this.config.scheme} ${optsWithDefaults.method} ${optsWithDefaults.uri}`
-      )
+      this.logger
+        .push({ err })
+        .error(`Error attempting ${this.config.scheme} ${optsWithDefaults.method} ${optsWithDefaults.uri}`)
       throw err
     }
   }
 
   // HTTP methods helpers to stringify
   // GET
-  async get<Response> (path: string): Promise<Response | void> {
+  async get<Response>(path: string): Promise<Response | void> {
     return this.loggedRequest({
       uri: this.fullUri(path),
       agent: this.agent,
@@ -138,7 +133,7 @@ export class HttpRequests {
   }
 
   // PATCH
-  async patch<Body, Response> (path: string, body: Body): Promise<Response | void> {
+  async patch<Body, Response>(path: string, body: Body): Promise<Response | void> {
     return this.loggedRequest({
       uri: this.fullUri(path),
       agent: this.agent,
@@ -148,7 +143,7 @@ export class HttpRequests {
   }
 
   // POST
-  async post<Body, Response> (path: string, body: Body): Promise<Response | void> {
+  async post<Body, Response>(path: string, body: Body): Promise<Response | void> {
     return this.loggedRequest({
       uri: this.fullUri(path),
       agent: this.agent,
@@ -158,7 +153,7 @@ export class HttpRequests {
   }
 
   // PUT
-  async put<Body, Response> (path: string, body: Body): Promise<Response | void> {
+  async put<Body, Response>(path: string, body: Body): Promise<Response | void> {
     return this.loggedRequest({
       uri: this.fullUri(path),
       agent: this.agent,

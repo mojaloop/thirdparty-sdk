@@ -56,15 +56,15 @@ describe('PUT /services/{ServiceType}', (): void => {
       expect(subscriber.isConnected).toBeTruthy()
       subscriber.subscribe(
         'PISPPrelinking-THIRD_PARTY_DFSP',
-        async (channel: string, message: Message, _id: number
-        ) => {
+        async (channel: string, message: Message, _id: number) => {
           expect(channel).toEqual('PISPPrelinking-THIRD_PARTY_DFSP')
           expect(message).toEqual(mockData.putServicesByServiceTypeRequest.payload)
           await subscriber.disconnect()
           expect(subscriber.isConnected).toBeFalsy()
 
           done()
-        })
+        }
+      )
       // Act
       const response = await axios.put(scenarioUri, mockData.putServicesByServiceTypeRequest.payload, axiosConfig)
 
@@ -114,7 +114,8 @@ describe('PUT /services/{ServiceType}/error', (): void => {
         await subscriber.connect()
         expect(subscriber.isConnected).toBeTruthy()
 
-        subscriber.subscribe('PISPPrelinking-THIRD_PARTY_DFSP',
+        subscriber.subscribe(
+          'PISPPrelinking-THIRD_PARTY_DFSP',
           async (channel: string, message: Message, _id: number) => {
             expect(channel).toEqual('PISPPrelinking-THIRD_PARTY_DFSP')
             expect(message).toEqual(payload)

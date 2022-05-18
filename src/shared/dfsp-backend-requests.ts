@@ -68,8 +68,8 @@ export interface BackendStoreValidatedConsentRequest {
 
 export interface BackendTransactionRequestContext {
   // The FSPIOP-compatible payer.payerPartyIdInfo field
-  payerPartyIdInfo: fspiopAPI.Schemas.PartyIdInfo,
-  payerPersonalInfo: fspiopAPI.Schemas.PartyPersonalInfo,
+  payerPartyIdInfo: fspiopAPI.Schemas.PartyIdInfo
+  payerPersonalInfo: fspiopAPI.Schemas.PartyPersonalInfo
   // The ID of the consent for the transaction request
   // based on the payer.idValue of the Thirdparty Transaction Request
   consentId: string
@@ -97,7 +97,7 @@ export interface DFSPBackendConfig extends HttpRequestsConfig {
 export class DFSPBackendRequests extends HttpRequests {
   // we want this constructor for better code support
   // eslint-disable-next-line no-useless-constructor
-  constructor (config: DFSPBackendConfig) {
+  constructor(config: DFSPBackendConfig) {
     super(config)
   }
 
@@ -105,72 +105,70 @@ export class DFSPBackendRequests extends HttpRequests {
 
   // config getter
   // polymorphism for getters can be handy and saves a lot of type casting
-  protected get config (): DFSPBackendConfig {
+  protected get config(): DFSPBackendConfig {
     return super.config as unknown as DFSPBackendConfig
   }
 
   // verify authorization path getter
-  get verifyAuthorizationPath (): string {
+  get verifyAuthorizationPath(): string {
     return this.config.verifyAuthorizationPath
   }
 
   // verify consent path getter
-  get verifyConsentPath (): string {
+  get verifyConsentPath(): string {
     return this.config.verifyConsentPath
   }
 
   // get accounts path getter
-  get getUserAccountsPath (): string {
+  get getUserAccountsPath(): string {
     return this.config.getUserAccountsPath
   }
 
   // validate auth token path getter
-  get validateAuthTokenPath (): string {
+  get validateAuthTokenPath(): string {
     return this.config.validateAuthTokenPath
   }
 
   // get path for validation of ThirdpartyTransactionRequest
-  get validateThirdpartyTransactionRequestPath (): string {
+  get validateThirdpartyTransactionRequestPath(): string {
     return this.config.validateThirdpartyTransactionRequestPath
   }
 
   // validate ConsentRequests path getter
-  get validateConsentRequestsPath (): string {
+  get validateConsentRequestsPath(): string {
     return this.config.validateConsentRequestsPath
   }
 
   // validate ConsentRequests path getter
-  get sendOTPPath (): string {
+  get sendOTPPath(): string {
     return this.config.sendOTPPath
   }
 
   // validate ConsentRequests path getter
-  get storeConsentRequestsPath (): string {
+  get storeConsentRequestsPath(): string {
     return this.config.storeConsentRequestsPath
   }
 
-  get storeValidatedConsentForAccountIdPath (): string {
+  get storeValidatedConsentForAccountIdPath(): string {
     return this.config.storeValidatedConsentForAccountIdPath
   }
 
   // REQUESTS
 
   // request user's accounts details from DFSP Backend
-  async getUserAccounts (userId: string): Promise<tpAPI.Schemas.AccountsIDPutResponse | void> {
+  async getUserAccounts(userId: string): Promise<tpAPI.Schemas.AccountsIDPutResponse | void> {
     const accountsPath = this.getUserAccountsPath.replace('{ID}', userId)
     return this.get<tpAPI.Schemas.AccountsIDPutResponse>(accountsPath)
   }
 
-  async validateConsentRequests (
+  async validateConsentRequests(
     request: tpAPI.Schemas.ConsentRequestsPostRequest
   ): Promise<BackendValidateConsentRequestsResponse | void> {
     const path = this.validateConsentRequestsPath
     return this.post<tpAPI.Schemas.ConsentRequestsPostRequest, BackendValidateConsentRequestsResponse>(path, request)
   }
 
-  async sendOTP (
-    request: tpAPI.Schemas.ConsentRequestsPostRequest
-  ): Promise<BackendSendOTPResponse | void> {
+  async sendOTP(request: tpAPI.Schemas.ConsentRequestsPostRequest): Promise<BackendSendOTPResponse | void> {
     const otpRequest: BackendSendOTPRequest = {
       consentRequestId: request.consentRequestId,
       username: 'TBD',
@@ -179,9 +177,7 @@ export class DFSPBackendRequests extends HttpRequests {
     return this.post<BackendSendOTPRequest, BackendSendOTPResponse>(this.sendOTPPath, otpRequest)
   }
 
-  async storeConsentRequests (
-    request: tpAPI.Schemas.ConsentRequestsPostRequest
-  ): Promise<void> {
+  async storeConsentRequests(request: tpAPI.Schemas.ConsentRequestsPostRequest): Promise<void> {
     const path = this.storeConsentRequestsPath.replace('{ID}', request.consentRequestId)
     const scopesReq: BackendStoreScopesRequest = {
       scopes: request.scopes
@@ -192,7 +188,10 @@ export class DFSPBackendRequests extends HttpRequests {
   // POST the consent request ID and authToken for a DFSP to validate.
   // This check is needed to continue the flow of responding to a /consentRequest
   // with either a POST /consents or PUT /consentRequests/{ID}/error
-  async validateAuthToken (consentRequestId: string, authToken: string): Promise<BackendValidateAuthTokenResponse | void> {
+  async validateAuthToken(
+    consentRequestId: string,
+    authToken: string
+  ): Promise<BackendValidateAuthTokenResponse | void> {
     const validateRequest = {
       consentRequestId: consentRequestId,
       authToken: authToken
@@ -202,20 +201,18 @@ export class DFSPBackendRequests extends HttpRequests {
   }
 
   // validate ThirdpartyTransactionRequest and get context we will need to complete the transaction
-  async validateThirdpartyTransactionRequestAndGetContext (
+  async validateThirdpartyTransactionRequestAndGetContext(
     request: tpAPI.Schemas.ThirdpartyRequestsTransactionsPostRequest
-  ): Promise<IsValidResponse & BackendTransactionRequestContext | void> {
+  ): Promise<(IsValidResponse & BackendTransactionRequestContext) | void> {
     return this.post(this.validateThirdpartyTransactionRequestPath, request)
   }
 
   // validate Authorization response received from PISP
-  async verifyAuthorization (
-    request: fspiopAPI.Schemas.AuthorizationsIDPutResponse
-  ): Promise<IsValidResponse | void> {
+  async verifyAuthorization(request: fspiopAPI.Schemas.AuthorizationsIDPutResponse): Promise<IsValidResponse | void> {
     return this.post(this.verifyAuthorizationPath, request)
   }
 
-  async storeValidatedConsentForAccountId (
+  async storeValidatedConsentForAccountId(
     scopes: tpAPI.Schemas.Scope[],
     consentId: string,
     consentRequestId: string,

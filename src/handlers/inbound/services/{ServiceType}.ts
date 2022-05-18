@@ -32,20 +32,15 @@ import { Enum } from '@mojaloop/central-services-shared'
 import { ServiceType } from '~/models/outbound/pispPrelinking.interface'
 import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
 
-
 /**
  * Handles an inbound `PUT /services/{ServiceType}` request
  */
-async function put (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+async function put(_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const payload = request.payload as tpAPI.Schemas.ServicesServiceTypePutResponse
   const serviceType = request.params.ServiceType
 
   if (serviceType == ServiceType.THIRD_PARTY_DFSP) {
-    PISPPrelinkingModel.triggerWorkflow(
-      serviceType,
-      h.getPublisher(),
-      payload
-    )
+    PISPPrelinkingModel.triggerWorkflow(serviceType, h.getPublisher(), payload)
     h.getLogger().info(`Inbound received PUT /services/{ServiceType} response`)
   }
 
