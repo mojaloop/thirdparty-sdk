@@ -27,8 +27,8 @@
     },
     "1070030|widdershins>markdown-it": {
       "decision": "ignore",
-      "madeAt": 1652763395183,
-      "expiresAt": 1655355387019
+      "madeAt": 1653061084517,
+      "expiresAt": 1655653080778
     },
     "1068155|@mojaloop/central-services-shared>@mojaloop/event-sdk>lodash>moment>axios>shins>markdown-it>sanitize-html": {
       "decision": "ignore",
@@ -139,6 +139,36 @@
       "decision": "ignore",
       "madeAt": 1653056847143,
       "expiresAt": 1655648843496
+    },
+    "1070030|@mojaloop/central-services-shared>shins>markdown-it": {
+      "decision": "ignore",
+      "madeAt": 1653061084517,
+      "expiresAt": 1655653080778
+    },
+    "1070030|@mojaloop/sdk-scheme-adapter>@mojaloop/central-services-shared>shins>markdown-it": {
+      "decision": "ignore",
+      "madeAt": 1653061084517,
+      "expiresAt": 1655653080778
+    },
+    "1068155|@mojaloop/central-services-shared>shins>markdown-it>sanitize-html": {
+      "decision": "ignore",
+      "madeAt": 1653061085340,
+      "expiresAt": 1655653080778
+    },
+    "1068155|@mojaloop/sdk-scheme-adapter>@mojaloop/central-services-shared>shins>markdown-it>sanitize-html": {
+      "decision": "ignore",
+      "madeAt": 1653061085340,
+      "expiresAt": 1655653080778
+    },
+    "1070260|@mojaloop/central-services-shared>shins>markdown-it>sanitize-html": {
+      "decision": "ignore",
+      "madeAt": 1653061086243,
+      "expiresAt": 1655653080778
+    },
+    "1070260|@mojaloop/sdk-scheme-adapter>@mojaloop/central-services-shared>shins>markdown-it>sanitize-html": {
+      "decision": "ignore",
+      "madeAt": 1653061086243,
+      "expiresAt": 1655653080778
     }
   },
   "rules": {},
