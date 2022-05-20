@@ -1,4 +1,20 @@
 # Changelog: [mojaloop/thirdparty-sdk](https://github.com/mojaloop/thirdparty-sdk)
+## [14.0.0](https://github.com/mojaloop/thirdparty-sdk/compare/v13.0.0...v14.0.0) (2022-05-20)
+
+
+### ⚠ BREAKING CHANGES
+
+* update nodejs to lts (#142)
+
+### Features
+
+* update nodejs to lts ([#142](https://github.com/mojaloop/thirdparty-sdk/issues/142)) ([f2a352c](https://github.com/mojaloop/thirdparty-sdk/commit/f2a352c563271efb450b5cfa47d6a241c35b627d))
+
+
+### Maintenance
+
+* remove sonar from build process ([#144](https://github.com/mojaloop/thirdparty-sdk/issues/144)) ([14f9c5b](https://github.com/mojaloop/thirdparty-sdk/commit/14f9c5b559b73cb0d70d7b70cf53c037f777501a))
+
 ## [13.0.0](https://github.com/mojaloop/thirdparty-sdk/compare/v12.0.2...v13.0.0) (2022-05-12)
 
 
