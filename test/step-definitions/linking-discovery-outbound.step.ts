@@ -39,7 +39,10 @@ const featurePath = path.resolve(__dirname, '../features/linking-discovery-outbo
 const feature = loadFeature(featurePath)
 
 jest.mock('@mojaloop/sdk-standard-components', () => {
+  const sdkStandardComponentsActual = jest.requireActual('@mojaloop/sdk-standard-components')
+
   return {
+    ...sdkStandardComponentsActual,
     MojaloopRequests: jest.fn(),
     ThirdpartyRequests: jest.fn(() => ({
       getAccounts: jest.fn(() => Promise.resolve())
