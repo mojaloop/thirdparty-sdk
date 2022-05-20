@@ -98,7 +98,10 @@ const approveResponse: tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPatchRespon
 
 jest.mock('redis')
 jest.mock('@mojaloop/sdk-standard-components', () => {
+  const sdkStandardComponentsActual = jest.requireActual('@mojaloop/sdk-standard-components')
+
   return {
+    ...sdkStandardComponentsActual,
     MojaloopRequests: jest.fn(() => ({
       getParties: jest.fn(() => Promise.resolve(partyLookupResponse))
     })),
