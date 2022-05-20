@@ -41,7 +41,10 @@ const featurePath = path.resolve(__dirname, '../features/linking-request-consent
 const feature = loadFeature(featurePath)
 
 jest.mock('@mojaloop/sdk-standard-components', () => {
+  const sdkStandardComponentsActual = jest.requireActual('@mojaloop/sdk-standard-components')
+
   return {
+    ...sdkStandardComponentsActual,
     MojaloopRequests: jest.fn(),
     ThirdpartyRequests: jest.fn(() => ({
       patchConsentRequests: jest.fn(() => Promise.resolve()),
