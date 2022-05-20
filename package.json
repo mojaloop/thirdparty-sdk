@@ -7,6 +7,9 @@
   "files": [
     "dist"
   ],
+  "engines": {
+    "node": "=16.x"
+  },
   "scripts": {
     "audit:resolve": "SHELL=sh resolve-audit --production",
     "audit:check": "SHELL=sh check-audit --production",
@@ -86,23 +89,26 @@
     "koa2-oauth-server is an old unmaintained repo. It uses the now unsupported git protocol.",
     "Please see https://github.blog/2021-09-01-improving-git-protocol-security-github/ for more information.",
     "If you regenerate package-lock.json, you will manually have to update `git://` to `https://` on its",
-    "dependencies. koa2-oauth-server is a dependency of @mojaloop/sdk-scheme-adapter"
+    "dependencies. koa2-oauth-server is a dependency of @mojaloop/sdk-scheme-adapter.",
+    "",
+    "npm-audit-resolver v3.0.0-7 is a candidate release to resolve compatibility with npm v7+",
+    "as described in Doesn't work with npm@7. This will need to",
+    "be addressed going forward as npm run audit:resolve (i.e. resolve-audit) is currently not",
+    "functioning. As a work-around, we need to manually run the following command npm audit fix.",
+    "The npm run audit:check (i.e. check-audit) still works as expected."
   ],
   "dependencies": {
-    "@hapi/boom": "9.1.4",
+    "@hapi/boom": "10.0.0",
     "@hapi/good": "9.0.1",
-    "@hapi/hapi": "20.2.1",
+    "@hapi/hapi": "20.2.2",
     "@hapi/inert": "6.0.5",
     "@hapi/vision": "6.1.0",
-    "@mojaloop/api-snippets": "^13.0.9",
-    "@mojaloop/central-services-error-handling": "11.3.0",
-    "@mojaloop/central-services-health": "^13.0.0",
-    "@mojaloop/central-services-logger": "10.6.2",
-    "@mojaloop/central-services-metrics": "11.0.0",
-    "@mojaloop/central-services-shared": "^14.0.0",
-    "@mojaloop/event-sdk": "10.7.1",
-    "@mojaloop/sdk-scheme-adapter": "^13.0.2",
-    "@mojaloop/sdk-standard-components": "^16.0.1",
+    "@mojaloop/api-snippets": "^13.0.11",
+    "@mojaloop/central-services-error-handling": "12.0.3",
+    "@mojaloop/central-services-metrics": "12.0.5",
+    "@mojaloop/central-services-shared": "17.0.2",
+    "@mojaloop/sdk-scheme-adapter": "14.0.0",
+    "@mojaloop/sdk-standard-components": "17.0.2",
     "ajv": "^8.11.0",
     "ajv-keywords": "5.1.0",
     "axios": "^0.26.1",
@@ -127,8 +133,7 @@
   "devDependencies": {
     "@commitlint/cli": "^11.0.0",
     "@commitlint/config-conventional": "^11.0.0",
-    "@redocly/openapi-cli": "^1.0.0-beta.90",
-    "@types/axios": "^0.14.0",
+    "@redocly/cli": "^1.0.0-beta.97",
     "@types/convict": "^5.2.2",
     "@types/crypto-js": "^4.1.1",
     "@types/hapi": "^18.0.7",
@@ -162,9 +167,8 @@
     "lint-staged": "^10.5.4",
     "multi-file-swagger": "^2.3.0",
     "nodemon": "^2.0.15",
-    "npm-audit-resolver": "^2.3.1",
-    "npm-check-updates": "^11.8.5",
-    "nyc": "^15.1.0",
+    "npm-audit-resolver": "^3.0.0-7",
+    "npm-check-updates": "^13.0.1",
     "openapi-response-validator": "^7.4.0",
     "openapi-typescript": "^4.5.0",
     "prettier": "^2.6.2",
@@ -175,33 +179,5 @@
     "ts-jest": "^26.5.6",
     "ts-node": "^9.1.1",
     "tsconfig-paths": "^3.14.1"
-  },
-  "peerDependencies": {
-    "@mojaloop/central-services-error-handling": "11.3.0",
-    "@mojaloop/central-services-logger": "10.6.2",
-    "@mojaloop/central-services-metrics": "11.0.0",
-    "@mojaloop/event-sdk": "10.7.1",
-    "ajv": "8.6.0",
-    "ajv-keywords": "5.1.0"
-  },
-  "peerDependenciesMeta": {
-    "@mojaloop/central-services-error-handling": {
-      "optional": false
-    },
-    "@mojaloop/central-services-logger": {
-      "optional": false
-    },
-    "@mojaloop/central-services-metrics": {
-      "optional": false
-    },
-    "@mojaloop/event-sdk": {
-      "optional": false
-    },
-    "ajv": {
-      "optional": false
-    },
-    "ajv-keyboards": {
-      "optional": false
-    }
   }
 }
