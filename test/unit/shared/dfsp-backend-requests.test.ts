@@ -82,9 +82,7 @@ describe('backendRequests', () => {
     it('should propagate call to get', async () => {
       const userId = mockData.accountsRequest.params.ID
       const response = mockData.accountsRequest.payload
-      const getSpy = jest.spyOn(dfspBackendRequests, 'get').mockImplementationOnce(
-        () => Promise.resolve(response)
-      )
+      const getSpy = jest.spyOn(dfspBackendRequests, 'get').mockImplementationOnce(() => Promise.resolve(response))
       const result = await dfspBackendRequests.getUserAccounts(userId)
       expect(result).toEqual(response)
       expect(getSpy).toBeCalledWith(`accounts/${userId}`)
@@ -94,9 +92,7 @@ describe('backendRequests', () => {
   describe('validateAuthToken', () => {
     it('should propagate the call to post', async () => {
       const response = { isValid: true }
-      const postSpy = jest.spyOn(dfspBackendRequests, 'post').mockImplementationOnce(
-        () => Promise.resolve(response)
-      )
+      const postSpy = jest.spyOn(dfspBackendRequests, 'post').mockImplementationOnce(() => Promise.resolve(response))
       const consentRequestId = uuidv4()
       const authToken = uuidv4()
       const result = await dfspBackendRequests.validateAuthToken(consentRequestId, authToken)
@@ -131,12 +127,12 @@ describe('backendRequests', () => {
           initiator: 'PAYER',
           initiatorType: 'CONSUMER'
         },
-        expiration: (new Date()).toISOString()
+        expiration: new Date().toISOString()
       }
-      const postSpy = jest.spyOn(dfspBackendRequests, 'post').mockImplementationOnce(
-        () => Promise.resolve(response)
+      const postSpy = jest.spyOn(dfspBackendRequests, 'post').mockImplementationOnce(() => Promise.resolve(response))
+      const result = await dfspBackendRequests.validateThirdpartyTransactionRequestAndGetContext(
+        transactionRequestRequest
       )
-      const result = await dfspBackendRequests.validateThirdpartyTransactionRequestAndGetContext(transactionRequestRequest)
       expect(result).toEqual(response)
       expect(postSpy).toBeCalledWith(
         dfspBackendRequests.validateThirdpartyTransactionRequestPath,
@@ -149,9 +145,7 @@ describe('backendRequests', () => {
     it('should propagate call to post', async () => {
       const request = mockData.consentRequestsPost.payload
       const response = mockData.consentRequestsPost.response
-      const getSpy = jest.spyOn(dfspBackendRequests, 'post').mockImplementationOnce(
-        () => Promise.resolve(response)
-      )
+      const getSpy = jest.spyOn(dfspBackendRequests, 'post').mockImplementationOnce(() => Promise.resolve(response))
       const result = await dfspBackendRequests.validateConsentRequests(request)
       expect(result).toEqual(response)
       expect(getSpy).toBeCalledWith('validateConsentRequests', request)
@@ -163,9 +157,7 @@ describe('backendRequests', () => {
       const request = mockData.consentRequestsPost.payload
       const otpRequest = mockData.consentRequestsPost.otpRequest
       const response = mockData.consentRequestsPost.otpResponse
-      const getSpy = jest.spyOn(dfspBackendRequests, 'post').mockImplementationOnce(
-        () => Promise.resolve(response)
-      )
+      const getSpy = jest.spyOn(dfspBackendRequests, 'post').mockImplementationOnce(() => Promise.resolve(response))
       const result = await dfspBackendRequests.sendOTP(request)
       expect(result).toEqual(response)
       expect(getSpy).toBeCalledWith('sendOTP', otpRequest)
@@ -175,9 +167,7 @@ describe('backendRequests', () => {
   describe('storeConsentRequests', () => {
     it('should propagate call to post', async () => {
       const request = mockData.consentRequestsPost.payload
-      const getSpy = jest.spyOn(dfspBackendRequests, 'post').mockImplementationOnce(
-        () => Promise.resolve()
-      )
+      const getSpy = jest.spyOn(dfspBackendRequests, 'post').mockImplementationOnce(() => Promise.resolve())
       const result = await dfspBackendRequests.storeConsentRequests(request)
       expect(result).toBeUndefined()
       expect(getSpy).toBeCalledWith(`store/consentRequests/${request.consentRequestId}`, { scopes: request.scopes })
@@ -186,24 +176,16 @@ describe('backendRequests', () => {
 
   describe('storeValidatedConsentForAccountId', () => {
     it('should propagate call to post', async () => {
-      const postSpy = jest.spyOn(dfspBackendRequests, 'post').mockImplementation(
-        () => Promise.resolve()
-      )
+      const postSpy = jest.spyOn(dfspBackendRequests, 'post').mockImplementation(() => Promise.resolve())
       const result = await dfspBackendRequests.storeValidatedConsentForAccountId(
         [
           {
             address: 'dfspa.username.1234',
-            actions: [
-              'ACCOUNTS_TRANSFER',
-              'ACCOUNTS_GET_BALANCE'
-            ]
+            actions: ['ACCOUNTS_TRANSFER', 'ACCOUNTS_GET_BALANCE']
           },
           {
             address: 'dfspa.username.5678',
-            actions: [
-              'ACCOUNTS_TRANSFER',
-              'ACCOUNTS_GET_BALANCE'
-            ]
+            actions: ['ACCOUNTS_TRANSFER', 'ACCOUNTS_GET_BALANCE']
           }
         ],
         'ced49ef2-2393-46e3-a6e5-527d64e61eab',
@@ -216,11 +198,13 @@ describe('backendRequests', () => {
             id: 'credential id: identifier of pair of keys, base64 encoded, min length 59',
             rawId: 'raw credential id: identifier of pair of keys, base64 encoded, min length 59',
             response: {
-              clientDataJSON: 'clientDataJSON-must-not-have-fewer-' +
+              clientDataJSON:
+                'clientDataJSON-must-not-have-fewer-' +
                 'than-121-characters Lorem ipsum dolor sit amet, ' +
                 'consectetur adipiscing elit, sed do eiusmod tempor ' +
                 'incididunt ut labore et dolore magna aliqua.',
-              attestationObject: 'attestationObject-must-not-have-fewer' +
+              attestationObject:
+                'attestationObject-must-not-have-fewer' +
                 '-than-306-characters Lorem ipsum dolor sit amet, ' +
                 'consectetur adipiscing elit, sed do eiusmod tempor ' +
                 'incididunt ut labore et dolore magna aliqua. Ut enim ' +
@@ -238,17 +222,11 @@ describe('backendRequests', () => {
         scopes: [
           {
             address: 'dfspa.username.1234',
-            actions: [
-              'ACCOUNTS_TRANSFER',
-              'ACCOUNTS_GET_BALANCE'
-            ]
+            actions: ['ACCOUNTS_TRANSFER', 'ACCOUNTS_GET_BALANCE']
           },
           {
             address: 'dfspa.username.5678',
-            actions: [
-              'ACCOUNTS_TRANSFER',
-              'ACCOUNTS_GET_BALANCE'
-            ]
+            actions: ['ACCOUNTS_TRANSFER', 'ACCOUNTS_GET_BALANCE']
           }
         ],
         consentId: 'ced49ef2-2393-46e3-a6e5-527d64e61eab',
@@ -261,11 +239,13 @@ describe('backendRequests', () => {
             id: 'credential id: identifier of pair of keys, base64 encoded, min length 59',
             rawId: 'raw credential id: identifier of pair of keys, base64 encoded, min length 59',
             response: {
-              clientDataJSON: 'clientDataJSON-must-not-have-fewer-' +
+              clientDataJSON:
+                'clientDataJSON-must-not-have-fewer-' +
                 'than-121-characters Lorem ipsum dolor sit amet, ' +
                 'consectetur adipiscing elit, sed do eiusmod tempor ' +
                 'incididunt ut labore et dolore magna aliqua.',
-              attestationObject: 'attestationObject-must-not-have-fewer' +
+              attestationObject:
+                'attestationObject-must-not-have-fewer' +
                 '-than-306-characters Lorem ipsum dolor sit amet, ' +
                 'consectetur adipiscing elit, sed do eiusmod tempor ' +
                 'incididunt ut labore et dolore magna aliqua. Ut enim ' +

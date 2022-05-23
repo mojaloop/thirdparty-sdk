@@ -80,23 +80,14 @@ describe('DFSP Inbound', (): void => {
           scopes: [
             {
               address: 'dfspa.username.1234',
-              actions: [
-                'ACCOUNTS_TRANSFER',
-                'ACCOUNTS_GET_BALANCE'
-              ]
+              actions: ['ACCOUNTS_TRANSFER', 'ACCOUNTS_GET_BALANCE']
             },
             {
               address: 'dfspa.username.5678',
-              actions: [
-                'ACCOUNTS_TRANSFER',
-                'ACCOUNTS_GET_BALANCE'
-              ]
+              actions: ['ACCOUNTS_TRANSFER', 'ACCOUNTS_GET_BALANCE']
             }
           ],
-          authChannels: [
-            'WEB',
-            'OTP'
-          ],
+          authChannels: ['WEB', 'OTP'],
           callbackUri: 'pisp-app://callback.com'
         }
 
@@ -106,7 +97,11 @@ describe('DFSP Inbound', (): void => {
         expect(response.status).toEqual(202)
 
         // check that the DFSP has sent a PUT /consentRequests/{ID} to the PISP
-        const putConsentRequestsToPISP = await ttkHistory.getAndFilterWithRetries(2, 'put', '/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fba')
+        const putConsentRequestsToPISP = await ttkHistory.getAndFilterWithRetries(
+          2,
+          'put',
+          '/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fba'
+        )
         expect(putConsentRequestsToPISP.length).toEqual(1)
 
         const historyPayload = putConsentRequestsToPISP[0].body as tpAPI.Schemas.ConsentRequestsIDPutResponseWeb
@@ -114,18 +109,13 @@ describe('DFSP Inbound', (): void => {
           scopes: [
             {
               address: 'dfspa.username.1234',
-              actions: [
-                'ACCOUNTS_TRANSFER',
-                'ACCOUNTS_GET_BALANCE'
-              ]
+              actions: ['ACCOUNTS_TRANSFER', 'ACCOUNTS_GET_BALANCE']
             },
             {
               address: 'dfspa.username.5678',
-              actions: [
-                'ACCOUNTS_TRANSFER',
-                'ACCOUNTS_GET_BALANCE'
-              ]
-            }],
+              actions: ['ACCOUNTS_TRANSFER', 'ACCOUNTS_GET_BALANCE']
+            }
+          ],
           callbackUri: 'pisp-app://callback.com',
           authChannels: ['WEB'],
           authUri: 'dfspa.com/authorize?consentRequestId=997c89f4-053c-4283-bfec-45a1a0a28fba'
@@ -140,7 +130,11 @@ describe('DFSP Inbound', (): void => {
         }
         const patchScenarioUri = `${env.inbound.baseUri}/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fba`
 
-        const responseToPatchConsentRequests = await axios.patch(patchScenarioUri, patchConsentRequestsPayload, axiosConfig)
+        const responseToPatchConsentRequests = await axios.patch(
+          patchScenarioUri,
+          patchConsentRequestsPayload,
+          axiosConfig
+        )
         expect(responseToPatchConsentRequests.status).toEqual(202)
 
         // check that the DFSP has sent a POST /consents to the PISP
@@ -168,17 +162,11 @@ describe('DFSP Inbound', (): void => {
           scopes: [
             {
               address: 'dfspa.username.1234',
-              actions: [
-                'ACCOUNTS_TRANSFER',
-                'ACCOUNTS_GET_BALANCE'
-              ]
+              actions: ['ACCOUNTS_TRANSFER', 'ACCOUNTS_GET_BALANCE']
             },
             {
               address: 'dfspa.username.5678',
-              actions: [
-                'ACCOUNTS_TRANSFER',
-                'ACCOUNTS_GET_BALANCE'
-              ]
+              actions: ['ACCOUNTS_TRANSFER', 'ACCOUNTS_GET_BALANCE']
             }
           ],
           credential: {
@@ -188,11 +176,13 @@ describe('DFSP Inbound', (): void => {
               id: 'credential id: identifier of pair of keys, base64 encoded, min length 59',
               rawId: 'raw credential id: identifier of pair of keys, base64 encoded, min length 59',
               response: {
-                clientDataJSON: 'clientDataJSON-must-not-have-fewer-' +
+                clientDataJSON:
+                  'clientDataJSON-must-not-have-fewer-' +
                   'than-121-characters Lorem ipsum dolor sit amet, ' +
                   'consectetur adipiscing elit, sed do eiusmod tempor ' +
                   'incididunt ut labore et dolore magna aliqua.',
-                attestationObject: 'attestationObject-must-not-have-fewer' +
+                attestationObject:
+                  'attestationObject-must-not-have-fewer' +
                   '-than-306-characters Lorem ipsum dolor sit amet, ' +
                   'consectetur adipiscing elit, sed do eiusmod tempor ' +
                   'incididunt ut labore et dolore magna aliqua. Ut enim ' +
@@ -232,17 +222,11 @@ describe('DFSP Inbound', (): void => {
           scopes: [
             {
               address: 'dfspa.username.1234',
-              actions: [
-                'ACCOUNTS_TRANSFER',
-                'ACCOUNTS_GET_BALANCE'
-              ]
+              actions: ['ACCOUNTS_TRANSFER', 'ACCOUNTS_GET_BALANCE']
             },
             {
               address: 'dfspa.username.5678',
-              actions: [
-                'ACCOUNTS_TRANSFER',
-                'ACCOUNTS_GET_BALANCE'
-              ]
+              actions: ['ACCOUNTS_TRANSFER', 'ACCOUNTS_GET_BALANCE']
             }
           ],
           credential: {
@@ -252,18 +236,20 @@ describe('DFSP Inbound', (): void => {
               id: 'credential id: identifier of pair of keys, base64 encoded, min length 59',
               rawId: 'raw credential id: identifier of pair of keys, base64 encoded, min length 59',
               response: {
-                clientDataJSON: 'clientDataJSON-must-not-have-fewer-' +
-                    'than-121-characters Lorem ipsum dolor sit amet, ' +
-                    'consectetur adipiscing elit, sed do eiusmod tempor ' +
-                    'incididunt ut labore et dolore magna aliqua.',
-                attestationObject: 'attestationObject-must-not-have-fewer' +
-                    '-than-306-characters Lorem ipsum dolor sit amet, ' +
-                    'consectetur adipiscing elit, sed do eiusmod tempor ' +
-                    'incididunt ut labore et dolore magna aliqua. Ut enim ' +
-                    'ad minim veniam, quis nostrud exercitation ullamco ' +
-                    'laboris nisi ut aliquip ex ea commodo consequat. Duis ' +
-                    'aute irure dolor in reprehenderit in voluptate velit ' +
-                    'esse cillum dolore eu fugiat nulla pariatur.'
+                clientDataJSON:
+                  'clientDataJSON-must-not-have-fewer-' +
+                  'than-121-characters Lorem ipsum dolor sit amet, ' +
+                  'consectetur adipiscing elit, sed do eiusmod tempor ' +
+                  'incididunt ut labore et dolore magna aliqua.',
+                attestationObject:
+                  'attestationObject-must-not-have-fewer' +
+                  '-than-306-characters Lorem ipsum dolor sit amet, ' +
+                  'consectetur adipiscing elit, sed do eiusmod tempor ' +
+                  'incididunt ut labore et dolore magna aliqua. Ut enim ' +
+                  'ad minim veniam, quis nostrud exercitation ullamco ' +
+                  'laboris nisi ut aliquip ex ea commodo consequat. Duis ' +
+                  'aute irure dolor in reprehenderit in voluptate velit ' +
+                  'esse cillum dolore eu fugiat nulla pariatur.'
               },
               type: 'public-key'
             }
@@ -271,11 +257,19 @@ describe('DFSP Inbound', (): void => {
         }
 
         const putScenarioUri = `${env.inbound.baseUri}/consents/${consentId}`
-        const responseToPutConsents = await axios.put(putScenarioUri, putConsentsIDVerifiedCredentialPayload, axiosConfig)
+        const responseToPutConsents = await axios.put(
+          putScenarioUri,
+          putConsentsIDVerifiedCredentialPayload,
+          axiosConfig
+        )
         expect(responseToPutConsents.status).toEqual(200)
 
         // check that the DFSP has sent a PATCH /consents/{ID} to the PISP
-        const patchConsentsToAuthService = await ttkHistory.getAndFilterWithRetries(2, 'patch', `/consents/${consentId}`)
+        const patchConsentsToAuthService = await ttkHistory.getAndFilterWithRetries(
+          2,
+          'patch',
+          `/consents/${consentId}`
+        )
         expect(patchConsentsToAuthService.length).toEqual(1)
         const historyPayload = patchConsentsToAuthService[0].body as tpAPI.Schemas.ConsentsIDPatchResponseVerified
 
@@ -324,23 +318,14 @@ describe('DFSP Inbound', (): void => {
           scopes: [
             {
               address: 'dfspa.username.1234',
-              actions: [
-                'ACCOUNTS_TRANSFER',
-                'ACCOUNTS_GET_BALANCE'
-              ]
+              actions: ['ACCOUNTS_TRANSFER', 'ACCOUNTS_GET_BALANCE']
             },
             {
               address: 'dfspa.username.5678',
-              actions: [
-                'ACCOUNTS_TRANSFER',
-                'ACCOUNTS_GET_BALANCE'
-              ]
+              actions: ['ACCOUNTS_TRANSFER', 'ACCOUNTS_GET_BALANCE']
             }
           ],
-          authChannels: [
-            'WEB',
-            'OTP'
-          ],
+          authChannels: ['WEB', 'OTP'],
           callbackUri: 'pisp-app://callback.com'
         }
 
@@ -350,7 +335,11 @@ describe('DFSP Inbound', (): void => {
         expect(response.status).toEqual(202)
 
         // check that the DFSP has sent a PUT /consentRequests/{ID} to the PISP
-        const history = await ttkHistory.getAndFilterWithRetries(2, 'put', '/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fbb')
+        const history = await ttkHistory.getAndFilterWithRetries(
+          2,
+          'put',
+          '/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fbb'
+        )
         expect(history.length).toEqual(1)
 
         const historyPayload = history[0].body as tpAPI.Schemas.ConsentRequestsIDPutResponseOTP
@@ -358,18 +347,13 @@ describe('DFSP Inbound', (): void => {
           scopes: [
             {
               address: 'dfspa.username.1234',
-              actions: [
-                'ACCOUNTS_TRANSFER',
-                'ACCOUNTS_GET_BALANCE'
-              ]
+              actions: ['ACCOUNTS_TRANSFER', 'ACCOUNTS_GET_BALANCE']
             },
             {
               address: 'dfspa.username.5678',
-              actions: [
-                'ACCOUNTS_TRANSFER',
-                'ACCOUNTS_GET_BALANCE'
-              ]
-            }],
+              actions: ['ACCOUNTS_TRANSFER', 'ACCOUNTS_GET_BALANCE']
+            }
+          ],
           callbackUri: 'pisp-app://callback.com',
           authChannels: ['OTP']
         })
@@ -383,7 +367,11 @@ describe('DFSP Inbound', (): void => {
         }
         const patchScenarioUri = `${env.inbound.baseUri}/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fbb`
 
-        const responseToPatchConsentRequests = await axios.patch(patchScenarioUri, patchConsentRequestsPayload, axiosConfig)
+        const responseToPatchConsentRequests = await axios.patch(
+          patchScenarioUri,
+          patchConsentRequestsPayload,
+          axiosConfig
+        )
         expect(responseToPatchConsentRequests.status).toEqual(202)
 
         // check that the DFSP has sent a POST /consents to the PISP
@@ -411,17 +399,11 @@ describe('DFSP Inbound', (): void => {
           scopes: [
             {
               address: 'dfspa.username.1234',
-              actions: [
-                'ACCOUNTS_TRANSFER',
-                'ACCOUNTS_GET_BALANCE'
-              ]
+              actions: ['ACCOUNTS_TRANSFER', 'ACCOUNTS_GET_BALANCE']
             },
             {
               address: 'dfspa.username.5678',
-              actions: [
-                'ACCOUNTS_TRANSFER',
-                'ACCOUNTS_GET_BALANCE'
-              ]
+              actions: ['ACCOUNTS_TRANSFER', 'ACCOUNTS_GET_BALANCE']
             }
           ],
           credential: {
@@ -431,11 +413,13 @@ describe('DFSP Inbound', (): void => {
               id: 'credential id: identifier of pair of keys, base64 encoded, min length 59',
               rawId: 'raw credential id: identifier of pair of keys, base64 encoded, min length 59',
               response: {
-                clientDataJSON: 'clientDataJSON-must-not-have-fewer-' +
+                clientDataJSON:
+                  'clientDataJSON-must-not-have-fewer-' +
                   'than-121-characters Lorem ipsum dolor sit amet, ' +
                   'consectetur adipiscing elit, sed do eiusmod tempor ' +
                   'incididunt ut labore et dolore magna aliqua.',
-                attestationObject: 'attestationObject-must-not-have-fewer' +
+                attestationObject:
+                  'attestationObject-must-not-have-fewer' +
                   '-than-306-characters Lorem ipsum dolor sit amet, ' +
                   'consectetur adipiscing elit, sed do eiusmod tempor ' +
                   'incididunt ut labore et dolore magna aliqua. Ut enim ' +
@@ -475,17 +459,11 @@ describe('DFSP Inbound', (): void => {
           scopes: [
             {
               address: 'dfspa.username.1234',
-              actions: [
-                'ACCOUNTS_TRANSFER',
-                'ACCOUNTS_GET_BALANCE'
-              ]
+              actions: ['ACCOUNTS_TRANSFER', 'ACCOUNTS_GET_BALANCE']
             },
             {
               address: 'dfspa.username.5678',
-              actions: [
-                'ACCOUNTS_TRANSFER',
-                'ACCOUNTS_GET_BALANCE'
-              ]
+              actions: ['ACCOUNTS_TRANSFER', 'ACCOUNTS_GET_BALANCE']
             }
           ],
           credential: {
@@ -495,11 +473,13 @@ describe('DFSP Inbound', (): void => {
               id: 'credential id: identifier of pair of keys, base64 encoded, min length 59',
               rawId: 'raw credential id: identifier of pair of keys, base64 encoded, min length 59',
               response: {
-                clientDataJSON: 'clientDataJSON-must-not-have-fewer-' +
+                clientDataJSON:
+                  'clientDataJSON-must-not-have-fewer-' +
                   'than-121-characters Lorem ipsum dolor sit amet, ' +
                   'consectetur adipiscing elit, sed do eiusmod tempor ' +
                   'incididunt ut labore et dolore magna aliqua.',
-                attestationObject: 'attestationObject-must-not-have-fewer' +
+                attestationObject:
+                  'attestationObject-must-not-have-fewer' +
                   '-than-306-characters Lorem ipsum dolor sit amet, ' +
                   'consectetur adipiscing elit, sed do eiusmod tempor ' +
                   'incididunt ut labore et dolore magna aliqua. Ut enim ' +
@@ -514,7 +494,11 @@ describe('DFSP Inbound', (): void => {
         }
 
         const putScenarioUri = `${env.inbound.baseUri}/consents/${consentId}`
-        const responseToPutConsents = await axios.put(putScenarioUri, putConsentsIDVerifiedCredentialPayload, axiosConfig)
+        const responseToPutConsents = await axios.put(
+          putScenarioUri,
+          putConsentsIDVerifiedCredentialPayload,
+          axiosConfig
+        )
         expect(responseToPutConsents.status).toEqual(200)
 
         // check that the DFSP has sent a PATCH /consents/{ID} to the PISP
@@ -560,23 +544,14 @@ describe('DFSP Inbound', (): void => {
           scopes: [
             {
               address: 'dfspa.username.1234',
-              actions: [
-                'ACCOUNTS_TRANSFER',
-                'ACCOUNTS_GET_BALANCE'
-              ]
+              actions: ['ACCOUNTS_TRANSFER', 'ACCOUNTS_GET_BALANCE']
             },
             {
               address: 'dfspa.username.5678',
-              actions: [
-                'ACCOUNTS_TRANSFER',
-                'ACCOUNTS_GET_BALANCE'
-              ]
+              actions: ['ACCOUNTS_TRANSFER', 'ACCOUNTS_GET_BALANCE']
             }
           ],
-          authChannels: [
-            'WEB',
-            'OTP'
-          ],
+          authChannels: ['WEB', 'OTP'],
           callbackUri: 'pisp-app://callback.com'
         }
 
@@ -594,7 +569,11 @@ describe('DFSP Inbound', (): void => {
         expect(response.status).toEqual(202)
 
         // check that the DFSP has sent a PUT /consentRequests/{ID}/error to the PISP
-        const history = await ttkHistory.getAndFilterWithRetries(2, 'put', '/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fbc/error')
+        const history = await ttkHistory.getAndFilterWithRetries(
+          2,
+          'put',
+          '/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fbc/error'
+        )
         expect(history.length).toEqual(1)
         expect(history[0].body.errorInformation).toEqual({
           errorCode: '7200',
@@ -630,23 +609,14 @@ describe('DFSP Inbound', (): void => {
           scopes: [
             {
               address: 'dfspa.username.1234',
-              actions: [
-                'ACCOUNTS_TRANSFER',
-                'ACCOUNTS_GET_BALANCE'
-              ]
+              actions: ['ACCOUNTS_TRANSFER', 'ACCOUNTS_GET_BALANCE']
             },
             {
               address: 'dfspa.username.5678',
-              actions: [
-                'ACCOUNTS_TRANSFER',
-                'ACCOUNTS_GET_BALANCE'
-              ]
+              actions: ['ACCOUNTS_TRANSFER', 'ACCOUNTS_GET_BALANCE']
             }
           ],
-          authChannels: [
-            'WEB',
-            'OTP'
-          ],
+          authChannels: ['WEB', 'OTP'],
           callbackUri: 'pisp-app://callback.com'
         }
 
@@ -665,7 +635,11 @@ describe('DFSP Inbound', (): void => {
         expect(response.status).toEqual(202)
 
         // check that the DFSP has sent a PUT /consentRequests/{ID}/error to the PISP
-        const history = await ttkHistory.getAndFilterWithRetries(2, 'put', '/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fbd/error')
+        const history = await ttkHistory.getAndFilterWithRetries(
+          2,
+          'put',
+          '/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fbd/error'
+        )
         expect(history.length).toEqual(1)
         expect(history[0].body.errorInformation).toEqual({
           errorCode: '7209',
@@ -702,23 +676,14 @@ describe('DFSP Inbound', (): void => {
           scopes: [
             {
               address: 'dfspa.username.1234',
-              actions: [
-                'ACCOUNTS_TRANSFER',
-                'ACCOUNTS_GET_BALANCE'
-              ]
+              actions: ['ACCOUNTS_TRANSFER', 'ACCOUNTS_GET_BALANCE']
             },
             {
               address: 'dfspa.username.5678',
-              actions: [
-                'ACCOUNTS_TRANSFER',
-                'ACCOUNTS_GET_BALANCE'
-              ]
+              actions: ['ACCOUNTS_TRANSFER', 'ACCOUNTS_GET_BALANCE']
             }
           ],
-          authChannels: [
-            'WEB',
-            'OTP'
-          ],
+          authChannels: ['WEB', 'OTP'],
           callbackUri: 'pisp-app://callback.com'
         }
 
@@ -737,7 +702,11 @@ describe('DFSP Inbound', (): void => {
         expect(response.status).toEqual(202)
 
         // check that the DFSP has sent a PUT /consentRequests/{ID}/error to the PISP
-        const history = await ttkHistory.getAndFilterWithRetries(2, 'put', '/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fbe/error')
+        const history = await ttkHistory.getAndFilterWithRetries(
+          2,
+          'put',
+          '/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fbe/error'
+        )
         expect(history.length).toEqual(1)
         expect(history[0].body.errorInformation).toEqual({
           errorCode: '7200',
@@ -774,23 +743,14 @@ describe('DFSP Inbound', (): void => {
           scopes: [
             {
               address: 'dfspa.username.1234',
-              actions: [
-                'ACCOUNTS_TRANSFER',
-                'ACCOUNTS_GET_BALANCE'
-              ]
+              actions: ['ACCOUNTS_TRANSFER', 'ACCOUNTS_GET_BALANCE']
             },
             {
               address: 'dfspa.username.5678',
-              actions: [
-                'ACCOUNTS_TRANSFER',
-                'ACCOUNTS_GET_BALANCE'
-              ]
+              actions: ['ACCOUNTS_TRANSFER', 'ACCOUNTS_GET_BALANCE']
             }
           ],
-          authChannels: [
-            'WEB',
-            'OTP'
-          ],
+          authChannels: ['WEB', 'OTP'],
           callbackUri: 'pisp-app://callback.com'
         }
 
@@ -809,7 +769,11 @@ describe('DFSP Inbound', (): void => {
         expect(response.status).toEqual(202)
 
         // check that the DFSP has sent a PUT /consentRequests/{ID}/error to the PISP
-        const history = await ttkHistory.getAndFilterWithRetries(2, 'put', '/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fbf/error')
+        const history = await ttkHistory.getAndFilterWithRetries(
+          2,
+          'put',
+          '/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fbf/error'
+        )
         expect(history.length).toEqual(1)
         expect(history[0].body.errorInformation).toEqual({
           errorCode: '7200',
@@ -854,23 +818,14 @@ describe('DFSP Inbound', (): void => {
           scopes: [
             {
               address: 'dfspa.username.12345',
-              actions: [
-                'ACCOUNTS_TRANSFER',
-                'ACCOUNTS_GET_BALANCE'
-              ]
+              actions: ['ACCOUNTS_TRANSFER', 'ACCOUNTS_GET_BALANCE']
             },
             {
               address: 'dfspa.username.5678',
-              actions: [
-                'ACCOUNTS_TRANSFER',
-                'ACCOUNTS_GET_BALANCE'
-              ]
+              actions: ['ACCOUNTS_TRANSFER', 'ACCOUNTS_GET_BALANCE']
             }
           ],
-          authChannels: [
-            'WEB',
-            'OTP'
-          ],
+          authChannels: ['WEB', 'OTP'],
           callbackUri: 'pisp-app://callback.com'
         }
 
@@ -880,7 +835,11 @@ describe('DFSP Inbound', (): void => {
         expect(response.status).toEqual(202)
 
         // check that the DFSP has sent a PUT /consentRequests/{ID} to the PISP
-        const history = await ttkHistory.getAndFilterWithRetries(2, 'put', '/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fba')
+        const history = await ttkHistory.getAndFilterWithRetries(
+          2,
+          'put',
+          '/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fba'
+        )
         expect(history.length).toEqual(1)
 
         const historyPayload = history[0].body as tpAPI.Schemas.ConsentRequestsIDPutResponseOTP
@@ -888,18 +847,13 @@ describe('DFSP Inbound', (): void => {
           scopes: [
             {
               address: 'dfspa.username.12345',
-              actions: [
-                'ACCOUNTS_TRANSFER',
-                'ACCOUNTS_GET_BALANCE'
-              ]
+              actions: ['ACCOUNTS_TRANSFER', 'ACCOUNTS_GET_BALANCE']
             },
             {
               address: 'dfspa.username.5678',
-              actions: [
-                'ACCOUNTS_TRANSFER',
-                'ACCOUNTS_GET_BALANCE'
-              ]
-            }],
+              actions: ['ACCOUNTS_TRANSFER', 'ACCOUNTS_GET_BALANCE']
+            }
+          ],
           callbackUri: 'pisp-app://callback.com',
           authChannels: ['WEB'],
           authUri: 'dfspa.com/authorize?consentRequestId=997c89f4-053c-4283-bfec-45a1a0a28fba'
@@ -914,7 +868,11 @@ describe('DFSP Inbound', (): void => {
         }
         const patchScenarioUri = `${env.inbound.baseUri}/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fba`
 
-        const responseToPatchConsentRequests = await axios.patch(patchScenarioUri, patchConsentRequestsPayload, axiosConfig)
+        const responseToPatchConsentRequests = await axios.patch(
+          patchScenarioUri,
+          patchConsentRequestsPayload,
+          axiosConfig
+        )
         expect(responseToPatchConsentRequests.status).toEqual(202)
 
         // check that the DFSP has sent a POST /consents to the PISP
@@ -942,17 +900,11 @@ describe('DFSP Inbound', (): void => {
           scopes: [
             {
               address: 'dfspa.username.12345',
-              actions: [
-                'ACCOUNTS_TRANSFER',
-                'ACCOUNTS_GET_BALANCE'
-              ]
+              actions: ['ACCOUNTS_TRANSFER', 'ACCOUNTS_GET_BALANCE']
             },
             {
               address: 'dfspa.username.5678',
-              actions: [
-                'ACCOUNTS_TRANSFER',
-                'ACCOUNTS_GET_BALANCE'
-              ]
+              actions: ['ACCOUNTS_TRANSFER', 'ACCOUNTS_GET_BALANCE']
             }
           ],
           credential: {
@@ -962,11 +914,13 @@ describe('DFSP Inbound', (): void => {
               id: 'credential id: identifier of pair of keys, base64 encoded, min length 59',
               rawId: 'raw credential id: identifier of pair of keys, base64 encoded, min length 59',
               response: {
-                clientDataJSON: 'clientDataJSON-must-not-have-fewer-' +
+                clientDataJSON:
+                  'clientDataJSON-must-not-have-fewer-' +
                   'than-121-characters Lorem ipsum dolor sit amet, ' +
                   'consectetur adipiscing elit, sed do eiusmod tempor ' +
                   'incididunt ut labore et dolore magna aliqua.',
-                attestationObject: 'attestationObject-must-not-have-fewer' +
+                attestationObject:
+                  'attestationObject-must-not-have-fewer' +
                   '-than-306-characters Lorem ipsum dolor sit amet, ' +
                   'consectetur adipiscing elit, sed do eiusmod tempor ' +
                   'incididunt ut labore et dolore magna aliqua. Ut enim ' +
@@ -1006,17 +960,11 @@ describe('DFSP Inbound', (): void => {
           scopes: [
             {
               address: 'dfspa.username.12345',
-              actions: [
-                'ACCOUNTS_TRANSFER',
-                'ACCOUNTS_GET_BALANCE'
-              ]
+              actions: ['ACCOUNTS_TRANSFER', 'ACCOUNTS_GET_BALANCE']
             },
             {
               address: 'dfspa.username.5678',
-              actions: [
-                'ACCOUNTS_TRANSFER',
-                'ACCOUNTS_GET_BALANCE'
-              ]
+              actions: ['ACCOUNTS_TRANSFER', 'ACCOUNTS_GET_BALANCE']
             }
           ],
           credential: {
@@ -1026,11 +974,13 @@ describe('DFSP Inbound', (): void => {
               id: 'credential id: identifier of pair of keys, base64 encoded, min length 59',
               rawId: 'raw credential id: identifier of pair of keys, base64 encoded, min length 59',
               response: {
-                clientDataJSON: 'clientDataJSON-must-not-have-fewer-' +
+                clientDataJSON:
+                  'clientDataJSON-must-not-have-fewer-' +
                   'than-121-characters Lorem ipsum dolor sit amet, ' +
                   'consectetur adipiscing elit, sed do eiusmod tempor ' +
                   'incididunt ut labore et dolore magna aliqua.',
-                attestationObject: 'attestationObject-must-not-have-fewer' +
+                attestationObject:
+                  'attestationObject-must-not-have-fewer' +
                   '-than-306-characters Lorem ipsum dolor sit amet, ' +
                   'consectetur adipiscing elit, sed do eiusmod tempor ' +
                   'incididunt ut labore et dolore magna aliqua. Ut enim ' +
@@ -1045,7 +995,11 @@ describe('DFSP Inbound', (): void => {
         }
 
         const putScenarioUri = `${env.inbound.baseUri}/consents/${consentId}`
-        const responseToPutConsents = await axios.put(putScenarioUri, putConsentsIDVerifiedCredentialPayload, axiosConfig)
+        const responseToPutConsents = await axios.put(
+          putScenarioUri,
+          putConsentsIDVerifiedCredentialPayload,
+          axiosConfig
+        )
         expect(responseToPutConsents.status).toEqual(200)
 
         // check that the DFSP has sent a PUT /consents/{ID}/error to the PISP
@@ -1094,23 +1048,14 @@ describe('DFSP Inbound', (): void => {
           scopes: [
             {
               address: 'dfspa.username.1234',
-              actions: [
-                'ACCOUNTS_TRANSFER',
-                'ACCOUNTS_GET_BALANCE'
-              ]
+              actions: ['ACCOUNTS_TRANSFER', 'ACCOUNTS_GET_BALANCE']
             },
             {
               address: 'dfspa.username.5678',
-              actions: [
-                'ACCOUNTS_TRANSFER',
-                'ACCOUNTS_GET_BALANCE'
-              ]
+              actions: ['ACCOUNTS_TRANSFER', 'ACCOUNTS_GET_BALANCE']
             }
           ],
-          authChannels: [
-            'WEB',
-            'OTP'
-          ],
+          authChannels: ['WEB', 'OTP'],
           callbackUri: 'pisp-app://callback.com'
         }
 
@@ -1120,7 +1065,11 @@ describe('DFSP Inbound', (): void => {
         expect(response.status).toEqual(202)
 
         // check that the DFSP has sent a PUT /consentRequests/{ID} to the PISP
-        const history = await ttkHistory.getAndFilterWithRetries(2, 'put', '/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fbb')
+        const history = await ttkHistory.getAndFilterWithRetries(
+          2,
+          'put',
+          '/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fbb'
+        )
         expect(history.length).toEqual(1)
 
         const historyPayload = history[0].body as tpAPI.Schemas.ConsentRequestsIDPutResponseOTP
@@ -1128,18 +1077,13 @@ describe('DFSP Inbound', (): void => {
           scopes: [
             {
               address: 'dfspa.username.1234',
-              actions: [
-                'ACCOUNTS_TRANSFER',
-                'ACCOUNTS_GET_BALANCE'
-              ]
+              actions: ['ACCOUNTS_TRANSFER', 'ACCOUNTS_GET_BALANCE']
             },
             {
               address: 'dfspa.username.5678',
-              actions: [
-                'ACCOUNTS_TRANSFER',
-                'ACCOUNTS_GET_BALANCE'
-              ]
-            }],
+              actions: ['ACCOUNTS_TRANSFER', 'ACCOUNTS_GET_BALANCE']
+            }
+          ],
           callbackUri: 'pisp-app://callback.com',
           authChannels: ['OTP']
         })
@@ -1153,7 +1097,11 @@ describe('DFSP Inbound', (): void => {
         }
         const patchScenarioUri = `${env.inbound.baseUri}/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fbb`
 
-        const responseToPatchConsentRequests = await axios.patch(patchScenarioUri, patchConsentRequestsPayload, axiosConfig)
+        const responseToPatchConsentRequests = await axios.patch(
+          patchScenarioUri,
+          patchConsentRequestsPayload,
+          axiosConfig
+        )
         expect(responseToPatchConsentRequests.status).toEqual(202)
 
         // check that the DFSP has sent a POST /consents to the PISP
@@ -1177,21 +1125,15 @@ describe('DFSP Inbound', (): void => {
     describe('Inbound PUT /consents/{ID} signed credential from PISP', (): void => {
       it('should send back POST /consents to Auth Service', async (): Promise<void> => {
         // the PISP now sends back a PUT /consents/{ID} signed credential request to the DFSP
-        const putConsentsIDSignedCredentialPayload: tpAPI.Schemas.ConsentsIDPutResponseSigned  = {
+        const putConsentsIDSignedCredentialPayload: tpAPI.Schemas.ConsentsIDPutResponseSigned = {
           scopes: [
             {
               address: 'dfspa.username.1234',
-              actions: [
-                'ACCOUNTS_TRANSFER',
-                'ACCOUNTS_GET_BALANCE'
-              ]
+              actions: ['ACCOUNTS_TRANSFER', 'ACCOUNTS_GET_BALANCE']
             },
             {
               address: 'dfspa.username.5678',
-              actions: [
-                'ACCOUNTS_TRANSFER',
-                'ACCOUNTS_GET_BALANCE'
-              ]
+              actions: ['ACCOUNTS_TRANSFER', 'ACCOUNTS_GET_BALANCE']
             }
           ],
           credential: {
@@ -1201,11 +1143,13 @@ describe('DFSP Inbound', (): void => {
               id: 'credential id: identifier of pair of keys, base64 encoded, min length 59',
               rawId: 'raw credential id: identifier of pair of keys, base64 encoded, min length 59',
               response: {
-                clientDataJSON: 'clientDataJSON-must-not-have-fewer-' +
+                clientDataJSON:
+                  'clientDataJSON-must-not-have-fewer-' +
                   'than-121-characters Lorem ipsum dolor sit amet, ' +
                   'consectetur adipiscing elit, sed do eiusmod tempor ' +
                   'incididunt ut labore et dolore magna aliqua.',
-                attestationObject: 'attestationObject-must-not-have-fewer' +
+                attestationObject:
+                  'attestationObject-must-not-have-fewer' +
                   '-than-306-characters Lorem ipsum dolor sit amet, ' +
                   'consectetur adipiscing elit, sed do eiusmod tempor ' +
                   'incididunt ut labore et dolore magna aliqua. Ut enim ' +
@@ -1257,14 +1201,12 @@ describe('DFSP Inbound', (): void => {
         expect(history.length).toEqual(1)
         const historyPayload = history[0].body as tpAPI.Schemas.ErrorInformation
 
-        expect(historyPayload).toEqual(
-          {
-            errorInformation: {
-              errorCode: '7213',
-              errorDescription: 'Consent is invalid'
-            }
+        expect(historyPayload).toEqual({
+          errorInformation: {
+            errorCode: '7213',
+            errorDescription: 'Consent is invalid'
           }
-        )
+        })
       })
     })
   })

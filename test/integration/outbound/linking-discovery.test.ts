@@ -64,11 +64,10 @@ describe('GET /linking/accounts/{fspId}/{userId}', (): void => {
       currentState: 'COMPLETED'
     }
 
-    await axios.get(scenariosURI)
-      .catch(error => {
-        // Assert
-        expect(error.response.status).toBe(500)
-        expect(error.response.data).toEqual(expect.objectContaining(idNotFoundResp))
-      })
+    await axios.get(scenariosURI).catch((error) => {
+      // Assert
+      expect(error.response.status).toBe(500)
+      expect(error.response.data).toEqual(expect.objectContaining(idNotFoundResp))
+    })
   })
 })

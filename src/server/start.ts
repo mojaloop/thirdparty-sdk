@@ -31,7 +31,7 @@ import { PACKAGE } from '../shared/config'
 import { Server } from '@hapi/hapi'
 import { ServerApp } from './create'
 
-export default async function start (server: Server): Promise<Server> {
+export default async function start(server: Server): Promise<Server> {
   await server.start()
   const serverApp = server.settings.app as ServerApp
   logger.info(`Service '${PACKAGE.name}' is running '${serverApp.api} API' @ ${server.info.uri}`)

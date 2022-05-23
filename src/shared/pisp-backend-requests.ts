@@ -39,7 +39,7 @@ export interface PISPBackendConfig extends HttpRequestsConfig {
 export class PISPBackendRequests extends HttpRequests {
   // we want this constructor for better code support
   // eslint-disable-next-line no-useless-constructor
-  constructor (config: PISPBackendConfig) {
+  constructor(config: PISPBackendConfig) {
     super(config)
   }
 
@@ -47,11 +47,11 @@ export class PISPBackendRequests extends HttpRequests {
 
   // config getter
   // polymorphism for getters can be handy and saves a lot of type casting
-  protected get config (): PISPBackendConfig {
+  protected get config(): PISPBackendConfig {
     return super.config as unknown as PISPBackendConfig
   }
 
-  get signAuthorizationPath (): string {
+  get signAuthorizationPath(): string {
     return this.config.signAuthorizationPath
   }
 }

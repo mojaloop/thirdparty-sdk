@@ -29,16 +29,9 @@
 
 import { Handlers, ServerAPI, ServerConfig } from '~/server'
 import { HealthResponse } from '~/interface/types'
-import {
-  v1_1 as fspiopAPI,
-  thirdparty as tpAPI
-} from '@mojaloop/api-snippets'
-import {
-  PISPDiscoveryModel
-} from '~/models/outbound/pispDiscovery.model'
-import {
-  PISPLinkingModel
-} from '~/models/outbound/pispLinking.model'
+import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
+import { PISPDiscoveryModel } from '~/models/outbound/pispDiscovery.model'
+import { PISPLinkingModel } from '~/models/outbound/pispLinking.model'
 import ConsentsHandler from '~/handlers/inbound/consents'
 import ConsentsIdHandler from '~/handlers/inbound/consents/{ID}'
 import ConsentsIdErrorHandler from '~/handlers/inbound/consents/{ID}/error'
@@ -130,13 +123,11 @@ const postConsentRequest: tpAPI.Schemas.ConsentsPostRequestPISP = {
   consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
   consentRequestId: '997c89f4-053c-4283-bfec-45a1a0a28fba',
   status: 'ISSUED',
-  scopes: [{
-    address: 'some-id',
-    actions: [
-      'ACCOUNTS_GET_BALANCE',
-      'ACCOUNTS_TRANSFER'
-    ]
-  }
+  scopes: [
+    {
+      address: 'some-id',
+      actions: ['ACCOUNTS_GET_BALANCE', 'ACCOUNTS_TRANSFER']
+    }
   ]
 }
 
@@ -211,10 +202,7 @@ describe('Inbound API routes', (): void => {
     const response = await server.inject(request)
     expect(response.statusCode).toBe(202)
 
-    expect(__postQuotes).toBeCalledWith(
-      quoteRequest,
-      quoteRequest.payee.partyIdInfo.fspId
-    )
+    expect(__postQuotes).toBeCalledWith(quoteRequest, quoteRequest.payee.partyIdInfo.fspId)
   })
 
   describe('/thirdpartyRequests/transactions', () => {
@@ -538,10 +526,7 @@ describe('Inbound API routes', (): void => {
       jest.runAllImmediates()
       expect(toolkit.getPublisher).toBeCalledTimes(1)
 
-      const channel = PISPLinkingModel.notificationChannel(
-        PISPLinkingPhase.requestConsent,
-        request.params.ID
-      )
+      const channel = PISPLinkingModel.notificationChannel(PISPLinkingPhase.requestConsent, request.params.ID)
       expect(pubSubMock.publish).toBeCalledWith(channel, request.payload)
     })
 
@@ -588,10 +573,7 @@ describe('Inbound API routes', (): void => {
       jest.runAllImmediates()
       expect(toolkit.getPublisher).toBeCalledTimes(2)
 
-      const channel = PISPLinkingModel.notificationChannel(
-        PISPLinkingPhase.requestConsent,
-        errorRequest.params.ID
-      )
+      const channel = PISPLinkingModel.notificationChannel(PISPLinkingPhase.requestConsent, errorRequest.params.ID)
       expect(pubSubMock.publish).toBeCalledWith(channel, errorRequest.payload)
 
       const authTokenChannel = PISPLinkingModel.notificationChannel(
@@ -630,9 +612,11 @@ describe('Inbound API routes', (): void => {
         getLogger: jest.fn(() => logger),
         getDFSPId: jest.fn(() => 'dfspA'),
         getDFSPBackendRequests: jest.fn(() => ({
-          validateAuthToken: jest.fn(() => Promise.resolve({
-            isValid: true
-          }))
+          validateAuthToken: jest.fn(() =>
+            Promise.resolve({
+              isValid: true
+            })
+          )
         })),
         getThirdpartyRequests: jest.fn(() => ({
           postConsents: jest.fn()

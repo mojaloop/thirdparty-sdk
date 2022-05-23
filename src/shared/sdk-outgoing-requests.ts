@@ -48,7 +48,7 @@ export interface SDKOutgoingRequestsConfig extends HttpRequestsConfig {
 export class SDKOutgoingRequests extends HttpRequests {
   // we want this constructor for better code support
   // eslint-disable-next-line no-useless-constructor
-  constructor (config: SDKOutgoingRequestsConfig) {
+  constructor(config: SDKOutgoingRequestsConfig) {
     super(config)
   }
 
@@ -56,32 +56,32 @@ export class SDKOutgoingRequests extends HttpRequests {
 
   // config getter
   // polymorphism for getters can be handy and saves a lot of type casting
-  protected get config (): SDKOutgoingRequestsConfig {
+  protected get config(): SDKOutgoingRequestsConfig {
     return super.config as unknown as SDKOutgoingRequestsConfig
   }
 
   // requestToPayTransfer path getter
-  get requestPartiesInformationPath (): string {
+  get requestPartiesInformationPath(): string {
     return this.config.requestPartiesInformationPath
   }
 
   // requestToPayTransfer path getter
-  get requestToPayTransferPath (): string {
+  get requestToPayTransferPath(): string {
     return this.config.requestToPayTransferPath
   }
 
   // requestQuote path getter
-  get requestQuotePath (): string {
+  get requestQuotePath(): string {
     return this.config.requestQuotePath
   }
 
   // requestAuthorization path getter
-  get requestAuthorizationPath (): string {
+  get requestAuthorizationPath(): string {
     return this.config.requestAuthorizationPath
   }
 
   // requestTransfer path getter
-  get requestTransferPath (): string {
+  get requestTransferPath(): string {
     return this.config.requestTransferPath
   }
 
@@ -95,8 +95,10 @@ export class SDKOutgoingRequests extends HttpRequests {
    * @param {string} [subId] - optional sub id of party
    * @returns {Promise<OutboundAPI.Schemas.partiesByIdResponse | void>} information about the party
    */
-  async requestPartiesInformation (
-    type: string, id: string, subId?: string
+  async requestPartiesInformation(
+    type: string,
+    id: string,
+    subId?: string
   ): Promise<OutboundAPI.Schemas.partiesByIdResponse | void> {
     // generate uri from template
     const uri = this.fullUri(
@@ -105,10 +107,7 @@ export class SDKOutgoingRequests extends HttpRequests {
         .replace('{Type}', type)
         .replace('{ID}', id)
         // SubId is optional so replace placeholder or cleanup the path
-        .replace(
-          subId ? '{SubId}' : '/{SubId}',
-          subId || ''
-        )
+        .replace(subId ? '{SubId}' : '/{SubId}', subId || '')
     )
     this.logger.push({ uri }).info('requestPartiesInformation')
 
@@ -126,7 +125,7 @@ export class SDKOutgoingRequests extends HttpRequests {
    * @param {OutboundAPI.Schemas.quotesPostRequest} request - quotes request
    * @returns {Promise<<OutboundAPI.Schemas.quotesPostResponse|void>} - quotes response
    */
-  async requestQuote (
+  async requestQuote(
     request: OutboundAPI.Schemas.quotesPostRequest
   ): Promise<OutboundAPI.Schemas.quotesPostResponse | void> {
     return this.post(this.requestQuotePath, request)
@@ -137,14 +136,14 @@ export class SDKOutgoingRequests extends HttpRequests {
    * @param {OutboundAPI.Schemas.simpleTransfersPostRequest} request - transfer request
    * @returns {Promise<OutboundAPI.Schemas.simpleTransfersPostResponse | void>}
    */
-  async requestTransfer (
+  async requestTransfer(
     request: OutboundAPI.Schemas.simpleTransfersPostRequest
   ): Promise<OutboundAPI.Schemas.simpleTransfersPostResponse | void> {
     return this.post(this.requestTransferPath, request)
   }
 
   // TODO: drop it and replace by requestTransfer
-  async requestToPayTransfer (
+  async requestToPayTransfer(
     request: OutboundRequestToPayTransferPostRequest
   ): Promise<OutboundRequestToPayTransferPostResponse | void> {
     return this.loggedRequest<OutboundRequestToPayTransferPostResponse>({

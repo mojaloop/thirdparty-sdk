@@ -79,25 +79,21 @@ jest.mock('~/shared/pub-sub', () => {
   return {
     PubSub: jest.fn(() => ({
       isConnected: true,
-      subscribe: jest.fn(
-        (_channel: string, cb: NotificationCallback) => {
-          handler = cb
-          return ++subId
-        }
-      ),
+      subscribe: jest.fn((_channel: string, cb: NotificationCallback) => {
+        handler = cb
+        return ++subId
+      }),
       unsubscribe: jest.fn(),
-      publish: jest.fn(
-        async (channel: string, message: Message) => {
-          return handler(channel, message, subId)
-        }
-      ),
+      publish: jest.fn(async (channel: string, message: Message) => {
+        return handler(channel, message, subId)
+      }),
       connect: jest.fn(() => Promise.resolve()),
       disconnect: jest.fn()
     }))
   }
 })
 
-async function prepareOutboundAPIServer (): Promise<Server> {
+async function prepareOutboundAPIServer(): Promise<Server> {
   const serverConfig: ServerConfig = {
     port: Config.OUTBOUND.PORT,
     host: Config.OUTBOUND.HOST,
@@ -150,7 +146,7 @@ defineFeature(feature, (test): void => {
       // do nothing
     })
 
-    when('I send a \'GetLinkingAccountsByUserId\' request', async (): Promise<ServerInjectResponse> => {
+    when("I send a 'GetLinkingAccountsByUserId' request", async (): Promise<ServerInjectResponse> => {
       jest.mock('~/shared/kvs')
       jest.mock('~/shared/pub-sub')
       const request = {
@@ -165,15 +161,12 @@ defineFeature(feature, (test): void => {
       }
       const pubSub = new PubSub({} as RedisConnectionConfig)
       // defer publication to notification channel
-      setTimeout(() => pubSub.publish(
-        'some-channel',
-        accountsIDPutResponse as unknown as Message
-      ), 10)
+      setTimeout(() => pubSub.publish('some-channel', accountsIDPutResponse as unknown as Message), 10)
       response = await server.inject(request)
       return response
     })
 
-    then('I get a response with a status code of \'200\'', (): void => {
+    then("I get a response with a status code of '200'", (): void => {
       expect(response.statusCode).toBe(200)
     })
   })

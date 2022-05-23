@@ -38,9 +38,7 @@ import config from '~/shared/config'
 /**
  * Handles a DFSP inbound POST /thirdpartyRequests/transaction request
  */
-async function post (
-  _context: Context, request: Request, h: StateResponseToolkit
-): Promise<ResponseObject> {
+async function post(_context: Context, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const transactionRequest = request.payload as tpAPI.Schemas.ThirdpartyRequestsTransactionsPostRequest
   const participantId = request.headers['fspiop-source']
 

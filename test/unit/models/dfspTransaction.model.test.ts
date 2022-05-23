@@ -95,14 +95,16 @@ describe('DFSPTransactionModel', () => {
         requestTransfer: jest.fn(() => Promise.resolve(requestTransferResponse))
       } as unknown as SDKOutgoingRequests,
       dfspBackendRequests: {
-        validateThirdpartyTransactionRequestAndGetContext: jest.fn(() => Promise.resolve({
-          isValid: true,
-          consentId: '123456789',
-          payerPartyIdInfo: {
-            partyIdType: 'MSISDN',
-            partyIdentifier: '61414414414'
-          }
-        })),
+        validateThirdpartyTransactionRequestAndGetContext: jest.fn(() =>
+          Promise.resolve({
+            isValid: true,
+            consentId: '123456789',
+            payerPartyIdInfo: {
+              partyIdType: 'MSISDN',
+              partyIdentifier: '61414414414'
+            }
+          })
+        ),
         verifyAuthorization: jest.fn(() => Promise.resolve({ isValid: true }))
       } as unknown as DFSPBackendRequests,
       transactionRequestAuthorizationTimeoutSeconds: 100,
@@ -135,7 +137,7 @@ describe('DFSPTransactionModel', () => {
         initiator: 'PAYER',
         initiatorType: 'CONSUMER'
       },
-      expiration: (new Date()).toISOString()
+      expiration: new Date().toISOString()
     }
     transactionRequestPutUpdate = {
       transactionId: uuidv4(),
@@ -161,7 +163,7 @@ describe('DFSPTransactionModel', () => {
           transferAmount: { ...transactionRequestRequest.amount },
           ilpPacket: 'abcd...',
           condition: 'xyz....',
-          expiration: (new Date()).toISOString(),
+          expiration: new Date().toISOString(),
           payeeReceiveAmount: { ...transactionRequestRequest.amount }
         },
         headers: {}
@@ -182,8 +184,10 @@ describe('DFSPTransactionModel', () => {
           rawId: '45c+TkfkjQovQeAWmOy+RLBHEJ/e4jYzQYgD8VdbkePgM5d98BaAadadNYrknxgH0jQEON8zBydLgh1EqoC9DA==',
           response: {
             authenticatorData: 'SZYN5YgOjGh0NBcPZHZgW4/krrmihjLHmVzzuoMdl2MBAAAACA==',
-            clientDataJSON: 'eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiQUFBQUFBQUFBQUFBQUFBQUFBRUNBdyIsIm9yaWdpbiI6Imh0dHA6Ly9sb2NhbGhvc3Q6NDIxODEiLCJjcm9zc09yaWdpbiI6ZmFsc2UsIm90aGVyX2tleXNfY2FuX2JlX2FkZGVkX2hlcmUiOiJkbyBub3QgY29tcGFyZSBjbGllbnREYXRhSlNPTiBhZ2FpbnN0IGEgdGVtcGxhdGUuIFNlZSBodHRwczovL2dvby5nbC95YWJQZXgifQ==',
-            signature: 'MEUCIDcJRBu5aOLJVc/sPyECmYi23w8xF35n3RNhyUNVwQ2nAiEA+Lnd8dBn06OKkEgAq00BVbmH87ybQHfXlf1Y4RJqwQ8='
+            clientDataJSON:
+              'eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiQUFBQUFBQUFBQUFBQUFBQUFBRUNBdyIsIm9yaWdpbiI6Imh0dHA6Ly9sb2NhbGhvc3Q6NDIxODEiLCJjcm9zc09yaWdpbiI6ZmFsc2UsIm90aGVyX2tleXNfY2FuX2JlX2FkZGVkX2hlcmUiOiJkbyBub3QgY29tcGFyZSBjbGllbnREYXRhSlNPTiBhZ2FpbnN0IGEgdGVtcGxhdGUuIFNlZSBodHRwczovL2dvby5nbC95YWJQZXgifQ==',
+            signature:
+              'MEUCIDcJRBu5aOLJVc/sPyECmYi23w8xF35n3RNhyUNVwQ2nAiEA+Lnd8dBn06OKkEgAq00BVbmH87ybQHfXlf1Y4RJqwQ8='
           },
           type: 'public-key'
         }
@@ -199,7 +203,7 @@ describe('DFSPTransactionModel', () => {
         amount: { ...requestQuoteResponse.quotes.body.transferAmount },
         ilpPacket: 'abcd...',
         condition: 'xyz....',
-        expiration: (new Date()).toISOString()
+        expiration: new Date().toISOString()
       }
     }
 
@@ -221,7 +225,7 @@ describe('DFSPTransactionModel', () => {
     await modelConfig.kvs.disconnect()
   })
 
-  function checkDTMLayout (dtm: DFSPTransactionModel, optData?: DFSPTransactionData) {
+  function checkDTMLayout(dtm: DFSPTransactionModel, optData?: DFSPTransactionData) {
     expect(dtm).toBeDefined()
     expect(dtm.data).toBeDefined()
     expect(dtm.fsm.state).toEqual(optData!.currentState || 'start')
@@ -318,25 +322,24 @@ describe('DFSPTransactionModel', () => {
         transactionId: model.data.transactionId,
         transactionRequestState: 'RECEIVED'
       })
-      expect(modelConfig.dfspBackendRequests.validateThirdpartyTransactionRequestAndGetContext)
-        .toBeCalledWith(transactionRequestRequest)
+      expect(modelConfig.dfspBackendRequests.validateThirdpartyTransactionRequestAndGetContext).toBeCalledWith(
+        transactionRequestRequest
+      )
 
       // onNotifyTransactionRequestIsValid
-      expect(modelConfig.thirdpartyRequests.putThirdpartyRequestsTransactions)
-        .toBeCalledWith(
-          model.data.transactionRequestPutUpdate,
-          model.data.transactionRequestId,
-          model.data.participantId
-        )
+      expect(modelConfig.thirdpartyRequests.putThirdpartyRequestsTransactions).toBeCalledWith(
+        model.data.transactionRequestPutUpdate,
+        model.data.transactionRequestId,
+        model.data.participantId
+      )
 
       // check properly requestQuoteRequest
       expect(model.data.requestQuoteRequest).toBeDefined()
-      expect(modelConfig.thirdpartyRequests.putThirdpartyRequestsTransactions)
-        .toBeCalledWith(
-          model.data.transactionRequestPutUpdate,
-          model.data.transactionRequestId,
-          model.data.participantId
-        )
+      expect(modelConfig.thirdpartyRequests.putThirdpartyRequestsTransactions).toBeCalledWith(
+        model.data.transactionRequestPutUpdate,
+        model.data.transactionRequestId,
+        model.data.participantId
+      )
       // check properly requestQuoteRequest
       expect(model.data.requestQuoteRequest).toBeDefined()
 
@@ -354,12 +357,10 @@ describe('DFSPTransactionModel', () => {
       const rqr = rq.quotesPostRequest
 
       // transactionId should be the same as sent to PISP
-      expect(rqr.transactionId)
-        .toEqual(model.data.transactionRequestPutUpdate!.transactionId)
+      expect(rqr.transactionId).toEqual(model.data.transactionRequestPutUpdate!.transactionId)
 
       // transactionRequestId should be the same as received
-      expect(rqr.transactionRequestId)
-        .toEqual(tr.transactionRequestId)
+      expect(rqr.transactionRequestId).toEqual(tr.transactionRequestId)
 
       // payee should be the same as received
       expect(rqr.payee).toEqual(tr.payee)
@@ -388,12 +389,10 @@ describe('DFSPTransactionModel', () => {
       expect(rq.quotesPostRequest.quoteId).toBeDefined()
 
       // transactionId should be the same as sent to PISP
-      expect(rqr.transactionId)
-        .toEqual(model.data.transactionRequestPutUpdate!.transactionId)
+      expect(rqr.transactionId).toEqual(model.data.transactionRequestPutUpdate!.transactionId)
 
       // transactionRequestId should be the same as received
-      expect(rqr.transactionRequestId)
-        .toEqual(tr.transactionRequestId)
+      expect(rqr.transactionRequestId).toEqual(tr.transactionRequestId)
 
       // payee should be the same as received
       expect(rqr.payee).toEqual(tr.payee)
@@ -471,21 +470,23 @@ describe('DFSPTransactionModel', () => {
 
     it('should throw if transactionRequestRequest is not valid', async (done) => {
       mocked(modelConfig.kvs.set).mockImplementationOnce(() => Promise.resolve(true))
-      mocked(modelConfig.dfspBackendRequests.validateThirdpartyTransactionRequestAndGetContext)
-        .mockImplementationOnce(() => Promise.resolve({
-          isValid: false,
-          consentId: '123456789',
-          payerPartyIdInfo: {
-            partyIdType: 'MSISDN',
-            partyIdentifier: '61414414414'
-          },
-          payerPersonalInfo: {
-            complexName: {
-              firstName: 'Alice',
-              lastName: 'K'
+      mocked(modelConfig.dfspBackendRequests.validateThirdpartyTransactionRequestAndGetContext).mockImplementationOnce(
+        () =>
+          Promise.resolve({
+            isValid: false,
+            consentId: '123456789',
+            payerPartyIdInfo: {
+              partyIdType: 'MSISDN',
+              partyIdentifier: '61414414414'
+            },
+            payerPersonalInfo: {
+              complexName: {
+                firstName: 'Alice',
+                lastName: 'K'
+              }
             }
-          }
-        }))
+          })
+      )
 
       const data: DFSPTransactionData = {
         transactionRequestId,
@@ -540,8 +541,8 @@ describe('DFSPTransactionModel', () => {
 
     it('should throw if requestQuotes failed', async (done) => {
       mocked(modelConfig.kvs.set).mockImplementationOnce(() => Promise.resolve(true))
-      mocked(modelConfig.sdkOutgoingRequests.requestQuote).mockImplementationOnce(
-        () => Promise.resolve({ currentState: 'ERROR_OCCURRED' } as SDKOutboundAPI.Schemas.quotesPostResponse)
+      mocked(modelConfig.sdkOutgoingRequests.requestQuote).mockImplementationOnce(() =>
+        Promise.resolve({ currentState: 'ERROR_OCCURRED' } as SDKOutboundAPI.Schemas.quotesPostResponse)
       )
       const data: DFSPTransactionData = {
         transactionRequestId,
@@ -563,10 +564,11 @@ describe('DFSPTransactionModel', () => {
 
     it('should throw if requestAuthorization failed', async (done) => {
       mocked(modelConfig.kvs.set).mockImplementationOnce(() => Promise.resolve(true))
-      mocked(modelConfig.thirdpartyRequests.putThirdpartyRequestsTransactionsError)
-        .mockImplementationOnce(() => Promise.resolve(undefined))
-      mocked(modelConfig.thirdpartyRequests.postThirdpartyRequestsAuthorizations).mockImplementationOnce(
-        () => Promise.resolve(undefined)
+      mocked(modelConfig.thirdpartyRequests.putThirdpartyRequestsTransactionsError).mockImplementationOnce(() =>
+        Promise.resolve(undefined)
+      )
+      mocked(modelConfig.thirdpartyRequests.postThirdpartyRequestsAuthorizations).mockImplementationOnce(() =>
+        Promise.resolve(undefined)
       )
 
       // mock PUT /thirdpartyRequests/authorizations/{ID}/error callback
@@ -598,8 +600,8 @@ describe('DFSPTransactionModel', () => {
 
     it('should throw if verifyAuthorization failed', async (done) => {
       mocked(modelConfig.kvs.set).mockImplementationOnce(() => Promise.resolve(true))
-      mocked(modelConfig.thirdpartyRequests.postThirdpartyRequestsVerifications).mockImplementationOnce(
-        () => Promise.resolve(undefined)
+      mocked(modelConfig.thirdpartyRequests.postThirdpartyRequestsVerifications).mockImplementationOnce(() =>
+        Promise.resolve(undefined)
       )
 
       // mock PUT /thirdpartyRequests/verifications/{ID}/error callback
@@ -633,8 +635,8 @@ describe('DFSPTransactionModel', () => {
     // TODO: fix me - latest API needs to add back REJECTED option... :(
     it.skip('should throw if user REJECTED authorization/transfer', async (done) => {
       mocked(modelConfig.kvs.set).mockImplementationOnce(() => Promise.resolve(true))
-      mocked(modelConfig.dfspBackendRequests.verifyAuthorization).mockImplementationOnce(
-        () => Promise.resolve({ isValid: false })
+      mocked(modelConfig.dfspBackendRequests.verifyAuthorization).mockImplementationOnce(() =>
+        Promise.resolve({ isValid: false })
       )
       const data: DFSPTransactionData = {
         transactionRequestId,
@@ -665,9 +667,8 @@ describe('DFSPTransactionModel', () => {
 
     it('should throw if transfer failed', async (done) => {
       mocked(modelConfig.kvs.set).mockImplementationOnce(() => Promise.resolve(true))
-      mocked(modelConfig.sdkOutgoingRequests.requestTransfer).mockImplementationOnce(
-        () => Promise.resolve(
-          { currentState: 'ERROR_OCCURRED' } as SDKOutboundAPI.Schemas.simpleTransfersPostResponse)
+      mocked(modelConfig.sdkOutgoingRequests.requestTransfer).mockImplementationOnce(() =>
+        Promise.resolve({ currentState: 'ERROR_OCCURRED' } as SDKOutboundAPI.Schemas.simpleTransfersPostResponse)
       )
       const data: DFSPTransactionData = {
         transactionRequestId,
@@ -699,8 +700,8 @@ describe('DFSPTransactionModel', () => {
 
     it('should throw if notify transfer patch failed', async (done) => {
       mocked(modelConfig.kvs.set).mockImplementationOnce(() => Promise.resolve(true))
-      mocked(modelConfig.thirdpartyRequests.patchThirdpartyRequestsTransactions).mockImplementationOnce(
-        () => Promise.reject(new Error('error from patch'))
+      mocked(modelConfig.thirdpartyRequests.patchThirdpartyRequestsTransactions).mockImplementationOnce(() =>
+        Promise.reject(new Error('error from patch'))
       )
       const data: DFSPTransactionData = {
         transactionRequestId,
@@ -761,21 +762,23 @@ describe('DFSPTransactionModel', () => {
 
   it('should propagate error to callback', async () => {
     mocked(modelConfig.kvs.set).mockImplementation(() => Promise.resolve(true))
-    mocked(modelConfig.dfspBackendRequests.validateThirdpartyTransactionRequestAndGetContext)
-      .mockImplementationOnce(() => Promise.resolve({
-        isValid: false,
-        consentId: '123456789',
-        payerPartyIdInfo: {
-          partyIdType: 'MSISDN',
-          partyIdentifier: '61414414414'
-        },
-        payerPersonalInfo: {
-          complexName: {
-            firstName: 'Alice',
-            lastName: 'K'
+    mocked(modelConfig.dfspBackendRequests.validateThirdpartyTransactionRequestAndGetContext).mockImplementationOnce(
+      () =>
+        Promise.resolve({
+          isValid: false,
+          consentId: '123456789',
+          payerPartyIdInfo: {
+            partyIdType: 'MSISDN',
+            partyIdentifier: '61414414414'
+          },
+          payerPersonalInfo: {
+            complexName: {
+              firstName: 'Alice',
+              lastName: 'K'
+            }
           }
-        }
-      }))
+        })
+    )
 
     const data: DFSPTransactionData = {
       transactionRequestId,
@@ -798,9 +801,7 @@ describe('DFSPTransactionModel', () => {
 
     // the error callback should be called
     expect(mocked(modelConfig.thirdpartyRequests.putThirdpartyRequestsTransactionsError)).toBeCalledWith(
-      reformatError(
-        Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_REQUEST_NOT_VALID, model.logger
-      ),
+      reformatError(Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_REQUEST_NOT_VALID, model.logger),
       model.data.transactionRequestId,
       model.data.participantId
     )
@@ -831,7 +832,7 @@ describe('DFSPTransactionModel', () => {
       try {
         await loadFromKVS(modelConfig)
         shouldNotBeExecuted()
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         expect(error.message).toEqual(`No data found in KVS for: ${modelConfig.key}`)
       }
@@ -856,7 +857,9 @@ describe('DFSPTransactionModel', () => {
       expect(mocked(modelConfig.kvs.set)).toBeCalledWith(model.key, model.data)
     })
     it('should propagate error from KVS.set', async () => {
-      mocked(modelConfig.kvs.set).mockImplementationOnce(() => { throw new Error('error from KVS.set') })
+      mocked(modelConfig.kvs.set).mockImplementationOnce(() => {
+        throw new Error('error from KVS.set')
+      })
       const data: DFSPTransactionData = {
         transactionRequestId,
         transactionRequestState: 'RECEIVED',

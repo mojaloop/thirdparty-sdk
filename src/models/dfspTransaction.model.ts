@@ -53,14 +53,10 @@ export enum DFSPTransactionPhase {
   waitOnVerificationResponseFromSwitchChannel = 'waitOnVerificationResponseFromSwitchChannel'
 }
 
-export class DFSPTransactionModel
-  extends PersistentModel<DFSPTransactionStateMachine, DFSPTransactionData> {
+export class DFSPTransactionModel extends PersistentModel<DFSPTransactionStateMachine, DFSPTransactionData> {
   protected config: DFSPTransactionModelConfig
 
-  constructor (
-    data: DFSPTransactionData,
-    config: DFSPTransactionModelConfig
-  ) {
+  constructor(data: DFSPTransactionData, config: DFSPTransactionModelConfig) {
     const spec: StateMachineConfig = {
       init: 'start',
       transitions: [
@@ -116,32 +112,32 @@ export class DFSPTransactionModel
   }
 
   // getters
-  get subscriber (): PubSub {
+  get subscriber(): PubSub {
     return this.config.subscriber
   }
 
-  get sdkOutgoingRequests (): SDKOutgoingRequests {
+  get sdkOutgoingRequests(): SDKOutgoingRequests {
     return this.config.sdkOutgoingRequests
   }
 
-  get dfspBackendRequests (): DFSPBackendRequests {
+  get dfspBackendRequests(): DFSPBackendRequests {
     return this.config.dfspBackendRequests
   }
 
-  get thirdpartyRequests (): ThirdpartyRequests {
+  get thirdpartyRequests(): ThirdpartyRequests {
     return this.config.thirdpartyRequests
   }
 
-  static notificationChannel (phase: DFSPTransactionPhase, id: string): string {
+  static notificationChannel(phase: DFSPTransactionPhase, id: string): string {
     if (!id) {
-      throw new Error('DFSPTransactionModel.notificationChannel: \'id\' parameter is required')
+      throw new Error("DFSPTransactionModel.notificationChannel: 'id' parameter is required")
     }
     // channel name
     return `DFSPTransaction_${phase}_${id}`
   }
 
   // transitions handlers
-  async onValidateTransactionRequest (): Promise<void> {
+  async onValidateTransactionRequest(): Promise<void> {
     InvalidDataError.throwIfInvalidProperty(this.data, 'transactionRequestId')
     InvalidDataError.throwIfInvalidProperty(this.data, 'transactionRequestState')
     InvalidDataError.throwIfInvalidProperty(this.data, 'participantId')
@@ -172,14 +168,12 @@ export class DFSPTransactionModel
     }
   }
 
-  async onNotifyTransactionRequestIsValid (): Promise<void> {
+  async onNotifyTransactionRequestIsValid(): Promise<void> {
     InvalidDataError.throwIfInvalidProperty(this.data, 'transactionRequestPutUpdate')
     InvalidDataError.throwIfInvalidProperty(this.data, 'transactionRequestContext')
 
     // TODO: fspId field for payee.partyIdInfo should be mandatory, now it is optional
-    InvalidDataError.throwIfInvalidProperty(
-      this.data.transactionRequestRequest.payee.partyIdInfo, 'fspId'
-    )
+    InvalidDataError.throwIfInvalidProperty(this.data.transactionRequestRequest.payee.partyIdInfo, 'fspId')
 
     // this field will be present which is guaranteed by InvalidDataError validation above
     const update = this.data.transactionRequestPutUpdate as tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPutResponse
@@ -223,7 +217,7 @@ export class DFSPTransactionModel
     }
   }
 
-  async onRequestQuote (): Promise<void> {
+  async onRequestQuote(): Promise<void> {
     InvalidDataError.throwIfInvalidProperty(this.data, 'requestQuoteRequest')
 
     // request quote via sync interface on sdk-scheme-adapter
@@ -238,7 +232,7 @@ export class DFSPTransactionModel
     this.data.requestQuoteResponse = resultQuote
   }
 
-  async onRequestAuthorization (): Promise<void> {
+  async onRequestAuthorization(): Promise<void> {
     try {
       InvalidDataError.throwIfInvalidProperty(this.data, 'requestQuoteResponse')
 
@@ -281,13 +275,14 @@ export class DFSPTransactionModel
       )
 
       await deferredJob(this.subscriber, waitOnAuthResponseFromPISPChannel)
-        .init(async channel => {
+        .init(async (channel) => {
           // Send the request to the PISP
           const response = await this.thirdpartyRequests.postThirdpartyRequestsAuthorizations(
             this.data.requestAuthorizationPostRequest!,
             this.data.participantId
           )
-          this.logger.push({ response, channel })
+          this.logger
+            .push({ response, channel })
             .log('ThirdpartyRequests.postThirdpartyRequestsAuthorizations call sent to peer, listening on response')
         })
         .job(async (message: Message): Promise<void> => {
@@ -328,7 +323,7 @@ export class DFSPTransactionModel
     }
   }
 
-  async onVerifyAuthorization (): Promise<void> {
+  async onVerifyAuthorization(): Promise<void> {
     try {
       InvalidDataError.throwIfInvalidProperty(this.data, 'requestAuthorizationResponse')
       InvalidDataError.throwIfInvalidProperty(this.data.requestAuthorizationResponse!, 'signedPayload')
@@ -341,20 +336,22 @@ export class DFSPTransactionModel
         verificationRequestId
       )
       // TODO: Need to handle rejection case
-      if (this.data.requestAuthorizationResponse?.responseType &&
-        this.data.requestAuthorizationResponse?.responseType === 'REJECTED') {
+      if (
+        this.data.requestAuthorizationResponse?.responseType &&
+        this.data.requestAuthorizationResponse?.responseType === 'REJECTED'
+      ) {
         throw new Error('PISP end user rejection not supported')
       }
 
       const authResponse = this.data.requestAuthorizationResponse as
-        tpAPI.Schemas.ThirdpartyRequestsAuthorizationsIDPutResponseFIDO |
-        tpAPI.Schemas.ThirdpartyRequestsAuthorizationsIDPutResponseGeneric
+        | tpAPI.Schemas.ThirdpartyRequestsAuthorizationsIDPutResponseFIDO
+        | tpAPI.Schemas.ThirdpartyRequestsAuthorizationsIDPutResponseGeneric
       const signedPayloadType = authResponse.signedPayload.signedPayloadType
 
       switch (signedPayloadType) {
         case 'FIDO': {
-          const rar = this.data.requestAuthorizationResponse! as
-            tpAPI.Schemas.ThirdpartyRequestsAuthorizationsIDPutResponseFIDO
+          const rar = this.data
+            .requestAuthorizationResponse! as tpAPI.Schemas.ThirdpartyRequestsAuthorizationsIDPutResponseFIDO
           this.data.requestVerificationPostRequest = {
             verificationRequestId,
             consentId: this.data.transactionRequestContext!.consentId,
@@ -365,8 +362,8 @@ export class DFSPTransactionModel
           break
         }
         case 'GENERIC': {
-          const rar = this.data.requestAuthorizationResponse! as
-            tpAPI.Schemas.ThirdpartyRequestsAuthorizationsIDPutResponseGeneric
+          const rar = this.data
+            .requestAuthorizationResponse! as tpAPI.Schemas.ThirdpartyRequestsAuthorizationsIDPutResponseGeneric
           this.data.requestVerificationPostRequest = {
             verificationRequestId,
             consentId: this.data.transactionRequestContext!.consentId,
@@ -383,13 +380,14 @@ export class DFSPTransactionModel
       console.log('onVerifyAuthorization - challenge is', this.data.requestAuthorizationPostRequest!.challenge)
 
       await deferredJob(this.subscriber, channel)
-        .init(async channel => {
+        .init(async (channel) => {
           // Send the request to the auth service for verification.
           const response = await this.thirdpartyRequests.postThirdpartyRequestsVerifications(
             this.data.requestVerificationPostRequest!,
             this.config.authServiceParticipantId
           )
-          this.logger.push({ response, channel })
+          this.logger
+            .push({ response, channel })
             .log('ThirdpartyRequests.postThirdpartyRequestsVerifications call sent to peer, listening on response')
         })
         .job(async (message: Message): Promise<void> => {
@@ -428,8 +426,7 @@ export class DFSPTransactionModel
                 condition: quote.condition,
 
                 // TODO: investigate recalculation of expiry...
-                expiration:
-                  tr.expiration
+                expiration: tr.expiration
               }
             }
           } catch (error) {
@@ -442,10 +439,7 @@ export class DFSPTransactionModel
     } catch (error) {
       this.logger.info(error)
 
-      const mojaloopError = reformatError(
-        Errors.MojaloopApiErrorCodes.TP_AUTH_SERVICE_ERROR,
-        this.logger
-      )
+      const mojaloopError = reformatError(Errors.MojaloopApiErrorCodes.TP_AUTH_SERVICE_ERROR, this.logger)
 
       // If something failed here, inform the PISP that the transactionRequest failed
       await this.thirdpartyRequests.putThirdpartyRequestsTransactionsError(
@@ -458,17 +452,16 @@ export class DFSPTransactionModel
     }
   }
 
-  async onRequestTransfer (): Promise<void> {
+  async onRequestTransfer(): Promise<void> {
     InvalidDataError.throwIfInvalidProperty(this.data, 'transferRequest')
 
     // make a call to switch via sync sdk api
-    const transferResult = await this.sdkOutgoingRequests.requestTransfer(
-      this.data.transferRequest!
-    )
+    const transferResult = await this.sdkOutgoingRequests.requestTransfer(this.data.transferRequest!)
 
     // check result
     if (
-      !(transferResult &&
+      !(
+        transferResult &&
         transferResult.currentState === 'COMPLETED' &&
         transferResult.transfer.body.transferState === 'COMMITTED'
       )
@@ -483,7 +476,7 @@ export class DFSPTransactionModel
     }
   }
 
-  async onNotifyTransferIsDone (): Promise<void> {
+  async onNotifyTransferIsDone(): Promise<void> {
     InvalidDataError.throwIfInvalidProperty(this.data, 'transactionRequestPatchUpdate')
 
     try {
@@ -499,7 +492,7 @@ export class DFSPTransactionModel
   }
 
   // workflow
-  async run (): Promise<void> {
+  async run(): Promise<void> {
     try {
       switch (this.data.currentState) {
         case 'start':
@@ -539,7 +532,7 @@ export class DFSPTransactionModel
           // stopped in errored state
           this.logger.info('State machine in errored state')
       }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       const mojaloopError = reformatError(error, this.logger)
       this.logger.push({ error, mojaloopError }).info(`Sending error response to ${this.data.participantId}`)
@@ -554,7 +547,7 @@ export class DFSPTransactionModel
   }
 }
 
-export async function create (
+export async function create(
   data: DFSPTransactionData,
   config: DFSPTransactionModelConfig
 ): Promise<DFSPTransactionModel> {
@@ -567,9 +560,7 @@ export async function create (
 }
 
 // loads PersistentModel from KVS storage using given `config` and `spec`
-export async function loadFromKVS (
-  config: DFSPTransactionModelConfig
-): Promise<DFSPTransactionModel> {
+export async function loadFromKVS(config: DFSPTransactionModelConfig): Promise<DFSPTransactionModel> {
   try {
     const data = await config.kvs.get<DFSPTransactionData>(config.key)
     if (!data) {

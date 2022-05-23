@@ -25,12 +25,7 @@
 
  --------------
  ******/
-import {
-  WSO2Auth,
-  MojaloopRequests,
-  ThirdpartyRequests,
-  Logger as SDKLogger
-} from '@mojaloop/sdk-standard-components'
+import { WSO2Auth, MojaloopRequests, ThirdpartyRequests, Logger as SDKLogger } from '@mojaloop/sdk-standard-components'
 import { KVS } from '~/shared/kvs'
 import { PubSub } from '~/shared/pub-sub'
 import { ResponseToolkit, Server } from '@hapi/hapi'
@@ -92,9 +87,7 @@ export const StatePlugin = {
     const wso2Auth = new WSO2Auth({
       ...config.WSO2_AUTH,
       logger,
-      tlsCreds: config.SHARED.TLS.mutualTLS.enabled
-        ? config.SHARED.TLS.creds as TLSCreds
-        : undefined
+      tlsCreds: config.SHARED.TLS.mutualTLS.enabled ? (config.SHARED.TLS.creds as TLSCreds) : undefined
     })
 
     // prepare Requests instances

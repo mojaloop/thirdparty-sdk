@@ -29,11 +29,11 @@ import { RedisConnection } from './redis-connection'
 import { promisify } from 'util'
 
 export class InvalidKeyError extends Error {
-  constructor () {
+  constructor() {
     super('key should be non empty string')
   }
 
-  static throwIfInvalid (key: string): void {
+  static throwIfInvalid(key: string): void {
     if (!(key?.length > 0)) {
       throw new InvalidKeyError()
     }
@@ -44,7 +44,7 @@ export class InvalidKeyError extends Error {
 export class KVS extends RedisConnection {
   // retrieve the value for given key
   // if there is no value for given key 'undefined' is returned
-  async get<T> (key: string): Promise<T|undefined> {
+  async get<T>(key: string): Promise<T | undefined> {
     InvalidKeyError.throwIfInvalid(key)
 
     const asyncGet = promisify(this.client.get)
@@ -54,7 +54,7 @@ export class KVS extends RedisConnection {
   }
 
   // store the value for given key
-  async set<T> (key: string, value: T): Promise<boolean> {
+  async set<T>(key: string, value: T): Promise<boolean> {
     InvalidKeyError.throwIfInvalid(key)
 
     const asyncSet = promisify(this.client.set)
@@ -64,13 +64,13 @@ export class KVS extends RedisConnection {
   }
 
   // removes the value for given key
-  async del (key: string): Promise<boolean> {
+  async del(key: string): Promise<boolean> {
     InvalidKeyError.throwIfInvalid(key)
     return this.client.del(key)
   }
 
   // check is any data for given key
-  async exists (key: string): Promise<boolean> {
+  async exists(key: string): Promise<boolean> {
     // there is problem with TS typings
     // so using `promisify` isn't working
     return new Promise((resolve, reject) => {

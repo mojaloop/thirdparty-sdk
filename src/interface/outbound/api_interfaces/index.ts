@@ -32,9 +32,12 @@ export namespace Schemas {
   export type AccountAddress = components['schemas']['AccountAddress']
   export type Name = components['schemas']['Name']
   export type Account = components['schemas']['Account']
-  export type ThirdpartyTransactionPartyLookupResponseSuccess = components['schemas']['ThirdpartyTransactionPartyLookupResponseSuccess']
-  export type ThirdpartyTransactionPartyLookupResponseError = components['schemas']['ThirdpartyTransactionPartyLookupResponseError']
-  export type ThirdpartyTransactionPartyLookupResponse = components['schemas']['ThirdpartyTransactionPartyLookupResponse']
+  export type ThirdpartyTransactionPartyLookupResponseSuccess =
+    components['schemas']['ThirdpartyTransactionPartyLookupResponseSuccess']
+  export type ThirdpartyTransactionPartyLookupResponseError =
+    components['schemas']['ThirdpartyTransactionPartyLookupResponseError']
+  export type ThirdpartyTransactionPartyLookupResponse =
+    components['schemas']['ThirdpartyTransactionPartyLookupResponse']
   export type ThirdpartyTransactionPartyLookupState = components['schemas']['ThirdpartyTransactionPartyLookupState']
   export type Party = components['schemas']['Party']
   export type PartyIdTypeTPLink = components['schemas']['PartyIdTypeTPLink']
@@ -50,16 +53,21 @@ export namespace Schemas {
   export type TransactionType = components['schemas']['TransactionType']
   export type ThirdpartyTransactionIDInitiateRequest = components['schemas']['ThirdpartyTransactionIDInitiateRequest']
   export type ThirdpartyTransactionIDInitiateState = components['schemas']['ThirdpartyTransactionIDInitiateState']
-  export type ThirdpartyTransactionIDInitiateResponseError = components['schemas']['ThirdpartyTransactionIDInitiateResponseError']
-  export type ThirdpartyRequestsAuthorizationsPostRequest = components['schemas']['ThirdpartyRequestsAuthorizationsPostRequest']
-  export type ThirdpartyTransactionIDInitiateResponseSuccess = components['schemas']['ThirdpartyTransactionIDInitiateResponseSuccess']
+  export type ThirdpartyTransactionIDInitiateResponseError =
+    components['schemas']['ThirdpartyTransactionIDInitiateResponseError']
+  export type ThirdpartyRequestsAuthorizationsPostRequest =
+    components['schemas']['ThirdpartyRequestsAuthorizationsPostRequest']
+  export type ThirdpartyTransactionIDInitiateResponseSuccess =
+    components['schemas']['ThirdpartyTransactionIDInitiateResponseSuccess']
   export type ThirdpartyTransactionIDInitiateResponse = components['schemas']['ThirdpartyTransactionIDInitiateResponse']
   export type ThirdpartyTransactionIDApproveRequest = components['schemas']['ThirdpartyTransactionIDApproveRequest']
   export type ThirdpartyTransactionIDApproveState = components['schemas']['ThirdpartyTransactionIDApproveState']
-  export type ThirdpartyTransactionIDApproveResponseError = components['schemas']['ThirdpartyTransactionIDApproveResponseError']
+  export type ThirdpartyTransactionIDApproveResponseError =
+    components['schemas']['ThirdpartyTransactionIDApproveResponseError']
   export type ThirdpartyTransactionIDApproveResponse = components['schemas']['ThirdpartyTransactionIDApproveResponse']
   export type TransactionRequestState = components['schemas']['TransactionRequestState']
-  export type ThirdpartyTransactionIDApproveResponseSuccess = components['schemas']['ThirdpartyTransactionIDApproveResponseSuccess']
+  export type ThirdpartyTransactionIDApproveResponseSuccess =
+    components['schemas']['ThirdpartyTransactionIDApproveResponseSuccess']
   export type AccountsIDPutResponse = components['schemas']['AccountsIDPutResponse']
   export type ScopeAction = components['schemas']['ScopeAction']
   export type Scope = components['schemas']['Scope']
@@ -69,10 +77,16 @@ export namespace Schemas {
   export type LinkingRequestConsentResponse = components['schemas']['LinkingRequestConsentResponse']
   export type LinkingRequestConsentState = components['schemas']['LinkingRequestConsentState']
   export type LinkingRequestConsentPostRequest = components['schemas']['LinkingRequestConsentPostRequest']
-  export type LinkingRequestConsentIDAuthenticateRequest = components['schemas']['LinkingRequestConsentIDAuthenticateRequest']
-  export type LinkingRequestConsentIDAuthenticateState = components['schemas']['LinkingRequestConsentIDAuthenticateState']
-  export type LinkingRequestConsentIDAuthenticateResponse = components['schemas']['LinkingRequestConsentIDAuthenticateResponse']
-  export type LinkingRequestConsentIDPassCredentialRequest = components['schemas']['LinkingRequestConsentIDPassCredentialRequest']
-  export type LinkingRequestConsentIDPassCredentialState = components['schemas']['LinkingRequestConsentIDPassCredentialState']
-  export type LinkingRequestConsentIDPassCredentialResponse = components['schemas']['LinkingRequestConsentIDPassCredentialResponse']
+  export type LinkingRequestConsentIDAuthenticateRequest =
+    components['schemas']['LinkingRequestConsentIDAuthenticateRequest']
+  export type LinkingRequestConsentIDAuthenticateState =
+    components['schemas']['LinkingRequestConsentIDAuthenticateState']
+  export type LinkingRequestConsentIDAuthenticateResponse =
+    components['schemas']['LinkingRequestConsentIDAuthenticateResponse']
+  export type LinkingRequestConsentIDPassCredentialRequest =
+    components['schemas']['LinkingRequestConsentIDPassCredentialRequest']
+  export type LinkingRequestConsentIDPassCredentialState =
+    components['schemas']['LinkingRequestConsentIDPassCredentialState']
+  export type LinkingRequestConsentIDPassCredentialResponse =
+    components['schemas']['LinkingRequestConsentIDPassCredentialResponse']
 }

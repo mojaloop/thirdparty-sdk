@@ -72,5 +72,5 @@ export default {
   PutThirdpartyRequestsAuthorizationsById: ThirdpartyRequestsAuthorizations.put,
   PutThirdpartyRequestsAuthorizationsByIdAndError: ThirdpartyRequestsAuthorizations.put,
   PutThirdpartyRequestsVerificationsById: ThirdpartyRequestsVerifications.put,
-  PutThirdpartyRequestsVerificationsByIdAndError: ThirdpartyRequestsVerifications.put,
+  PutThirdpartyRequestsVerificationsByIdAndError: ThirdpartyRequestsVerifications.put
 }

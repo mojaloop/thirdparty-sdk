@@ -37,7 +37,7 @@ const apiPath = path.resolve(__dirname, '../../src/interface/api-inbound.yaml')
 const featurePath = path.resolve(__dirname, '../features/consents-inbound.feature')
 const feature = loadFeature(featurePath)
 
-async function prepareInboundAPIServer (): Promise<Server> {
+async function prepareInboundAPIServer(): Promise<Server> {
   const serverConfig: ServerConfig = {
     port: Config.INBOUND.PORT,
     host: Config.INBOUND.HOST,
@@ -75,20 +75,18 @@ defineFeature(feature, (test): void => {
       // do nothing
     })
 
-    when('I receive a \'PostConsents\' request', async (): Promise<ServerInjectResponse> => {
+    when("I receive a 'PostConsents' request", async (): Promise<ServerInjectResponse> => {
       jest.mock('~/shared/kvs')
       jest.mock('~/shared/pub-sub')
       const payload: tpAPI.Schemas.ConsentsPostRequestPISP = {
         consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
         consentRequestId: '997c89f4-053c-4283-bfec-45a1a0a28fba',
         status: 'ISSUED',
-        scopes: [{
-          address: 'some-id',
-          actions: [
-            'ACCOUNTS_GET_BALANCE',
-            'ACCOUNTS_TRANSFER'
-          ]
-        }
+        scopes: [
+          {
+            address: 'some-id',
+            actions: ['ACCOUNTS_GET_BALANCE', 'ACCOUNTS_TRANSFER']
+          }
         ]
       }
       const request = {
@@ -107,7 +105,7 @@ defineFeature(feature, (test): void => {
       return response
     })
 
-    then('I get a response with a status code of \'202\'', (): void => {
+    then("I get a response with a status code of '202'", (): void => {
       expect(response.statusCode).toBe(202)
     })
   })
@@ -117,17 +115,16 @@ defineFeature(feature, (test): void => {
       // do nothing
     })
 
-    when('I receive a \'PutConsentByID\' request', async (): Promise<ServerInjectResponse> => {
+    when("I receive a 'PutConsentByID' request", async (): Promise<ServerInjectResponse> => {
       jest.mock('~/shared/kvs')
       jest.mock('~/shared/pub-sub')
       const payload: tpAPI.Schemas.ConsentsIDPutResponseSigned = {
-        scopes: [{
-          address: 'some-id',
-          actions: [
-            'ACCOUNTS_GET_BALANCE',
-            'ACCOUNTS_TRANSFER'
-          ]
-        }],
+        scopes: [
+          {
+            address: 'some-id',
+            actions: ['ACCOUNTS_GET_BALANCE', 'ACCOUNTS_TRANSFER']
+          }
+        ],
         credential: {
           credentialType: 'FIDO',
           status: 'PENDING',
@@ -135,11 +132,13 @@ defineFeature(feature, (test): void => {
             id: 'credential id: identifier of pair of keys, base64 encoded, min length 59',
             rawId: 'raw credential id: identifier of pair of keys, base64 encoded, min length 59',
             response: {
-              clientDataJSON: 'clientDataJSON-must-not-have-fewer-than-121-' +
+              clientDataJSON:
+                'clientDataJSON-must-not-have-fewer-than-121-' +
                 'characters Lorem ipsum dolor sit amet, consectetur adipiscing ' +
                 'elit, sed do eiusmod tempor incididunt ut labore et dolore magna ' +
                 'aliqua.',
-              attestationObject: 'attestationObject-must-not-have-fewer-than-' +
+              attestationObject:
+                'attestationObject-must-not-have-fewer-than-' +
                 '306-characters Lorem ipsum dolor sit amet, consectetur ' +
                 'adipiscing elit, sed do eiusmod tempor incididunt ut ' +
                 'labore et dolore magna aliqua. Ut enim ad minim veniam, ' +
@@ -167,7 +166,7 @@ defineFeature(feature, (test): void => {
       return response
     })
 
-    then('I get a response with a status code of \'202\'', (): void => {
+    then("I get a response with a status code of '202'", (): void => {
       expect(response.statusCode).toBe(202)
     })
   })
@@ -177,17 +176,16 @@ defineFeature(feature, (test): void => {
       // do nothing
     })
 
-    when('I receive a \'PutConsentByID\' request', async (): Promise<ServerInjectResponse> => {
+    when("I receive a 'PutConsentByID' request", async (): Promise<ServerInjectResponse> => {
       jest.mock('~/shared/kvs')
       jest.mock('~/shared/pub-sub')
       const payload: tpAPI.Schemas.ConsentsIDPutResponseVerified = {
-        scopes: [{
-          address: 'some-id',
-          actions: [
-            'ACCOUNTS_GET_BALANCE',
-            'ACCOUNTS_TRANSFER'
-          ]
-        }],
+        scopes: [
+          {
+            address: 'some-id',
+            actions: ['ACCOUNTS_GET_BALANCE', 'ACCOUNTS_TRANSFER']
+          }
+        ],
         credential: {
           credentialType: 'FIDO',
           status: 'VERIFIED',
@@ -195,11 +193,13 @@ defineFeature(feature, (test): void => {
             id: 'credential id: identifier of pair of keys, base64 encoded, min length 59',
             rawId: 'raw credential id: identifier of pair of keys, base64 encoded, min length 59',
             response: {
-              clientDataJSON: 'clientDataJSON-must-not-have-fewer-than-121-' +
+              clientDataJSON:
+                'clientDataJSON-must-not-have-fewer-than-121-' +
                 'characters Lorem ipsum dolor sit amet, consectetur adipiscing ' +
                 'elit, sed do eiusmod tempor incididunt ut labore et dolore magna ' +
                 'aliqua.',
-              attestationObject: 'attestationObject-must-not-have-fewer-than-' +
+              attestationObject:
+                'attestationObject-must-not-have-fewer-than-' +
                 '306-characters Lorem ipsum dolor sit amet, consectetur ' +
                 'adipiscing elit, sed do eiusmod tempor incididunt ut ' +
                 'labore et dolore magna aliqua. Ut enim ad minim veniam, ' +
@@ -227,7 +227,7 @@ defineFeature(feature, (test): void => {
       return response
     })
 
-    then('I get a response with a status code of \'200\'', (): void => {
+    then("I get a response with a status code of '200'", (): void => {
       expect(response.statusCode).toBe(200)
     })
   })

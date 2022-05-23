@@ -33,8 +33,8 @@ import { logger } from './logger'
 
 // copy of ThirdpartyRequestsAuthorizationsPostRequest, without extensions or challenge
 export interface AuthRequestPartial {
-  authorizationRequestId: string,
-  transactionRequestId: string,
+  authorizationRequestId: string
+  transactionRequestId: string
   transferAmount: tpAPI.Schemas.Money
   payeeReceiveAmount: tpAPI.Schemas.Money
   fees: tpAPI.Schemas.Money
@@ -53,7 +53,7 @@ export interface AuthRequestPartial {
  *  where AuthRequestPartial is the payload of POST /thirdpartyRequests/authorizations
  *  without the extensions or challenge fields
  */
-export function deriveTransactionChallenge (authRequestPartial: AuthRequestPartial): string {
+export function deriveTransactionChallenge(authRequestPartial: AuthRequestPartial): string {
   if (config.SHARED.TEST_OVERRIDE_TRANSACTION_CHALLENGE && config.SHARED.TEST_OVERRIDE_TRANSACTION_CHALLENGE !== '') {
     logger.warn('TEST_OVERRIDE_TRANSACTION_CHALLENGE is configured - for testing purposes only')
     return config.SHARED.TEST_OVERRIDE_TRANSACTION_CHALLENGE

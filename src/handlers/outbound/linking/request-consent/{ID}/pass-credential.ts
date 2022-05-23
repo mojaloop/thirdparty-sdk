@@ -28,9 +28,7 @@
 import { StateResponseToolkit } from '~/server/plugins/state'
 import { Request, ResponseObject } from '@hapi/hapi'
 import { PISPLinkingModel, loadFromKVS } from '~/models/outbound/pispLinking.model'
-import {
-  PISPLinkingModelConfig
-} from '~/models/outbound/pispLinking.interface'
+import { PISPLinkingModelConfig } from '~/models/outbound/pispLinking.interface'
 import config from '~/shared/config'
 import inspect from '~/shared/inspect'
 import * as OutboundAPI from '~/interface/outbound/api_interfaces'
@@ -39,11 +37,9 @@ import { Enum } from '@mojaloop/central-services-shared'
 /**
  * Handles outbound POST /linking/request-consent/{ID}/pass-credential request
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 // todo: consider changing this to PUT /linking/request-consent/{ID}/pass-credential
 //       since the flow triggers a PUT /consents/{ID}
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function post (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+async function post(_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const payload = request.payload as OutboundAPI.Schemas.LinkingRequestConsentIDPassCredentialRequest
   const consentRequestId = request.params.ID
 
@@ -65,7 +61,7 @@ async function post (_context: any, request: Request, h: StateResponseToolkit): 
       h.getLogger().error('outbound POST /linking/request-consent/{ID}/pass-credential unexpected result from workflow')
       return h.response({}).code(Enum.Http.ReturnCodes.INTERNALSERVERERRROR.CODE)
     }
-    const statusCode = (result.currentState === 'errored') ? 500 : 200
+    const statusCode = result.currentState === 'errored' ? 500 : 200
     return h.response(result).code(statusCode)
   } catch (error) {
     // todo: PUT /consents/{ID}/error to DFSP if PISP is unable to handle

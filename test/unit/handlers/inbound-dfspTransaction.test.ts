@@ -25,7 +25,8 @@ const requestAuthorizationResponse: tpAPI.Schemas.ThirdpartyRequestsAuthorizatio
       rawId: '45c+TkfkjQovQeAWmOy+RLBHEJ/e4jYzQYgD8VdbkePgM5d98BaAadadNYrknxgH0jQEON8zBydLgh1EqoC9DA==',
       response: {
         authenticatorData: 'SZYN5YgOjGh0NBcPZHZgW4/krrmihjLHmVzzuoMdl2MBAAAACA==',
-        clientDataJSON: 'eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiQUFBQUFBQUFBQUFBQUFBQUFBRUNBdyIsIm9yaWdpbiI6Imh0dHA6Ly9sb2NhbGhvc3Q6NDIxODEiLCJjcm9zc09yaWdpbiI6ZmFsc2UsIm90aGVyX2tleXNfY2FuX2JlX2FkZGVkX2hlcmUiOiJkbyBub3QgY29tcGFyZSBjbGllbnREYXRhSlNPTiBhZ2FpbnN0IGEgdGVtcGxhdGUuIFNlZSBodHRwczovL2dvby5nbC95YWJQZXgifQ==',
+        clientDataJSON:
+          'eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiQUFBQUFBQUFBQUFBQUFBQUFBRUNBdyIsIm9yaWdpbiI6Imh0dHA6Ly9sb2NhbGhvc3Q6NDIxODEiLCJjcm9zc09yaWdpbiI6ZmFsc2UsIm90aGVyX2tleXNfY2FuX2JlX2FkZGVkX2hlcmUiOiJkbyBub3QgY29tcGFyZSBjbGllbnREYXRhSlNPTiBhZ2FpbnN0IGEgdGVtcGxhdGUuIFNlZSBodHRwczovL2dvby5nbC95YWJQZXgifQ==',
         signature: 'MEUCIDcJRBu5aOLJVc/sPyECmYi23w8xF35n3RNhyUNVwQ2nAiEA+Lnd8dBn06OKkEgAq00BVbmH87ybQHfXlf1Y4RJqwQ8='
       },
       type: 'public-key'
@@ -80,7 +81,7 @@ describe('Inbound DFSP Transaction handler', () => {
         initiator: 'PAYER',
         initiatorType: 'CONSUMER'
       },
-      expiration: (new Date()).toISOString()
+      expiration: new Date().toISOString()
     }
     requestQuoteResponse = {
       quotes: {
@@ -88,7 +89,7 @@ describe('Inbound DFSP Transaction handler', () => {
           transferAmount: { ...transactionRequestRequest.amount },
           ilpPacket: 'abcd...',
           condition: 'xyz....',
-          expiration: (new Date()).toISOString(),
+          expiration: new Date().toISOString(),
           payeeReceiveAmount: { ...transactionRequestRequest.amount }
         },
         headers: {}
@@ -191,8 +192,7 @@ describe('Inbound DFSP Transaction handler', () => {
 
   it('PUT /thirdpartyRequests/authorizations/{ID}', async () => {
     // Arrange
-    jest.spyOn(DFSPTransactionModel, 'notificationChannel')
-      .mockReturnValueOnce('channel1234')
+    jest.spyOn(DFSPTransactionModel, 'notificationChannel').mockReturnValueOnce('channel1234')
     const authorizationRequestId = uuidv4()
     const request = {
       method: 'PUT',
@@ -206,14 +206,8 @@ describe('Inbound DFSP Transaction handler', () => {
       },
       payload: requestAuthorizationResponse
     }
-    const expectedNotificationChannel: unknown[] = [
-      'waitOnAuthResponseFromPISPChannel',
-      authorizationRequestId
-    ]
-    const expectedPublishMock: unknown[] = [
-      'channel1234',
-      requestAuthorizationResponse
-    ]
+    const expectedNotificationChannel: unknown[] = ['waitOnAuthResponseFromPISPChannel', authorizationRequestId]
+    const expectedPublishMock: unknown[] = ['channel1234', requestAuthorizationResponse]
 
     // Act
     const result = await ThirdpartyRequestsAuthorizations.put(
@@ -230,8 +224,7 @@ describe('Inbound DFSP Transaction handler', () => {
 
   it('PUT /thirdpartyRequests/verifications/{ID}', async () => {
     // Arrange
-    jest.spyOn(DFSPTransactionModel, 'notificationChannel')
-      .mockReturnValueOnce('channel1234')
+    jest.spyOn(DFSPTransactionModel, 'notificationChannel').mockReturnValueOnce('channel1234')
     const verificationRequestId = uuidv4()
     const request = {
       method: 'PUT',
@@ -249,10 +242,7 @@ describe('Inbound DFSP Transaction handler', () => {
       'waitOnVerificationResponseFromSwitchChannel',
       verificationRequestId
     ]
-    const expectedPublishMock: unknown[] = [
-      'channel1234',
-      requestVerificationResponse
-    ]
+    const expectedPublishMock: unknown[] = ['channel1234', requestVerificationResponse]
 
     // Act
     const result = await ThirdpartyRequestsVerifications.put(

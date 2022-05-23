@@ -33,16 +33,12 @@ import {
   PISPDiscoveryModelConfig,
   PISPDiscoveryGetResponse
 } from '~/models/outbound/pispDiscovery.interface'
-import {
-  PISPDiscoveryModel,
-  create
-} from '~/models/outbound/pispDiscovery.model'
+import { PISPDiscoveryModel, create } from '~/models/outbound/pispDiscovery.model'
 
 /**
  * Handles outbound GET /linking/accounts/{fspId}/{userId} request
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function get (_context: any, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+async function get(_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const userId: string = request.params.userId
   // prepare config
   const data: PISPDiscoveryData = {
@@ -60,7 +56,7 @@ async function get (_context: any, request: Request, h: StateResponseToolkit): P
 
   const model: PISPDiscoveryModel = await create(data, config)
   const result = (await model.run()) as PISPDiscoveryGetResponse
-  const statusCode = (result.errorInformation)
+  const statusCode = result.errorInformation
     ? Enum.Http.ReturnCodes.INTERNALSERVERERRROR.CODE
     : Enum.Http.ReturnCodes.OK.CODE
   return h.response(result).code(statusCode)

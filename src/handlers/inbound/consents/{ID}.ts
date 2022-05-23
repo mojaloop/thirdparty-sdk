@@ -39,7 +39,7 @@ import { Enum } from '@mojaloop/central-services-shared'
 /**
  * Handles an inbound `PATCH /consents/{ID}` request
  */
-async function patch (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+async function patch(_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const consentId = request.params.ID
 
   PISPLinkingModel.triggerWorkflow(
@@ -56,11 +56,11 @@ async function patch (_context: unknown, request: Request, h: StateResponseToolk
 /**
  * Handles an inbound `PUT /consents/{ID}` request
  */
- async function put (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+async function put(_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const consentId = request.params.ID
   const payload = request.payload as
-    tpAPI.Schemas.ConsentsIDPutResponseSigned |
-    tpAPI.Schemas.ConsentsIDPatchResponseVerified
+    | tpAPI.Schemas.ConsentsIDPutResponseSigned
+    | tpAPI.Schemas.ConsentsIDPatchResponseVerified
 
   // Select proper Pub channel basing on `credential.status`
   if (payload.credential.status == 'PENDING') {

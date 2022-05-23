@@ -35,18 +35,18 @@ export enum ServerAPI {
 }
 // minimal server configuration
 export interface ServerConfig {
-  host: string;
-  port: number;
+  host: string
+  port: number
   // the exposed api descriptor
-  api: ServerAPI;
+  api: ServerAPI
 }
 // server app interface accessible in handlers and plugins via settings.app[key]
 export interface ServerApp {
   // specify which API is exposed
-  api: ServerAPI;
+  api: ServerAPI
 }
 
-export default async function create (config: ServerConfig): Promise<Server> {
+export default async function create(config: ServerConfig): Promise<Server> {
   const server: Server = await new Server({
     host: config.host,
     port: config.port,

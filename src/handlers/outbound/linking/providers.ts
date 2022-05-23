@@ -27,10 +27,7 @@
 import { StateResponseToolkit } from '~/server/plugins/state'
 import { Request, ResponseObject } from '@hapi/hapi'
 import { PISPPrelinkingModel, create } from '~/models/outbound/pispPrelinking.model'
-import {
-  PISPPrelinkingData,
-  PISPPrelinkingModelConfig
-} from '~/models/outbound/pispPrelinking.interface'
+import { PISPPrelinkingData, PISPPrelinkingModelConfig } from '~/models/outbound/pispPrelinking.interface'
 import config from '~/shared/config'
 import inspect from '~/shared/inspect'
 import { Enum } from '@mojaloop/central-services-shared'
@@ -38,7 +35,7 @@ import { Enum } from '@mojaloop/central-services-shared'
 /**
  * Handles outbound GET /linking/providers request
  */
-async function get (_context: unknown, _request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+async function get(_context: unknown, _request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const serviceType = 'THIRD_PARTY_DFSP'
 
   // prepare config
@@ -64,7 +61,7 @@ async function get (_context: unknown, _request: Request, h: StateResponseToolki
       return h.response({}).code(Enum.Http.ReturnCodes.INTERNALSERVERERRROR.CODE)
     }
 
-    const statusCode = (result.currentState === 'errored') ? 500 : 200
+    const statusCode = result.currentState === 'errored' ? 500 : 200
     return h.response(result).code(statusCode)
   } catch (error) {
     h.getLogger().info(`Error running PISPPrelinkingModel : ${inspect(error)}`)

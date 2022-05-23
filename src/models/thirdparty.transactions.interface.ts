@@ -25,9 +25,7 @@
  --------------
 ******/
 
-import {
-  v1_1 as fspiopAPI
-} from '@mojaloop/api-snippets'
+import { v1_1 as fspiopAPI } from '@mojaloop/api-snippets'
 
 export interface InboundThirdpartyTransactionPostRequest {
   transactionRequestId: string

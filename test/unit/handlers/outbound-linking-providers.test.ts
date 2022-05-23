@@ -65,7 +65,7 @@ describe('Outbound linking provider handler', () => {
       }))
     }))
   }
-  it('/linking/providers should report error when result from \'run\' is undefined', async () => {
+  it("/linking/providers should report error when result from 'run' is undefined", async () => {
     const request = {
       method: 'GET',
       url: '/linking/providers',

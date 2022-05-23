@@ -42,7 +42,6 @@ declare module '@mojaloop/central-services-error-handling'{
     public toApiErrorRecord(options: { includeCauseExtension?: boolean; truncateExtensions?: boolean }): APIError
   }
   interface FactoryI {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     createFSPIOPErrorFromOpenapiError(error: any, replyTo?: any): FSPIOPError;
   }
   export const Factory: FactoryI
@@ -329,9 +328,7 @@ declare module '@mojaloop/central-services-shared' {
       payload?: Record<string, unknown>,
       responseType?: string,
       span?: SpawnSyncOptions,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       jwsSigner?: any
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ): Promise<any>
   }
 

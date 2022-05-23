@@ -27,93 +27,95 @@
  */
 export interface PersonalInfo {
   complexName?: {
-    firstName?: string;
-    middleName?: string;
-    lastName?: string;
-  };
-  dateOfBirth?: string;
+    firstName?: string
+    middleName?: string
+    lastName?: string
+  }
+  dateOfBirth?: string
 }
 export interface PartyIdInfo {
-  partyIdType: string;
-  partyIdentifier: string;
-  partySubIdOrType?: string;
-  fspId?: string;
+  partyIdType: string
+  partyIdentifier: string
+  partySubIdOrType?: string
+  fspId?: string
 }
 export enum AmountType {
   SEND = 'SEND',
-  RECEIVE = 'RECEIVE',
+  RECEIVE = 'RECEIVE'
 }
 /**
-* common interface used for payee and payer
-*/
+ * common interface used for payee and payer
+ */
 export interface Party {
-  partyIdInfo: PartyIdInfo;
-  merchantClassificationCode?: string;
-  name?: string;
-  personalInfo?: PersonalInfo;
+  partyIdInfo: PartyIdInfo
+  merchantClassificationCode?: string
+  name?: string
+  personalInfo?: PersonalInfo
 }
 /**
-* This is used for amount fields
-*/
+ * This is used for amount fields
+ */
 export interface Money {
-  currency: string;
-  amount: string;
+  currency: string
+  amount: string
 }
 /**
-* This interface used for transaction information
-*/
+ * This interface used for transaction information
+ */
 export interface TransactionType {
-  scenario: string;
-  subScenario?: string;
-  initiator: string;
-  initiatorType: string;
+  scenario: string
+  subScenario?: string
+  initiator: string
+  initiatorType: string
   refundInfo?: {
-    originalTransactionId: string;
-    refundReason?: string;
-  };
-  balanceOfPayments?: string;
+    originalTransactionId: string
+    refundReason?: string
+  }
+  balanceOfPayments?: string
 }
 /**
-* This interface used for transaction requests
-*/
+ * This interface used for transaction requests
+ */
 export interface ThirdpartyTransactionRequest {
-  transactionRequestId: string;
-  sourceAccountId: string;
-  consentId: string;
-  payee: Party;
-  payer: Party;
-  amountType: AmountType;
-  amount: Money;
-  transactionType: TransactionType;
-  expiration: string;
+  transactionRequestId: string
+  sourceAccountId: string
+  consentId: string
+  payee: Party
+  payer: Party
+  amountType: AmountType
+  amount: Money
+  transactionType: TransactionType
+  expiration: string
 }
 /**
-* This interface used for common errors
-*/
+ * This interface used for common errors
+ */
 export interface ErrorInformation {
-  errorCode?: string;
-  errorDescription?: string;
+  errorCode?: string
+  errorDescription?: string
   extensionList?: {
-    extension: [{
-      key: string;
-      value: string;
-    }];
-  };
+    extension: [
+      {
+        key: string
+        value: string
+      }
+    ]
+  }
 }
 
 /**
-* This interface used for transaction requests
-*/
+ * This interface used for transaction requests
+ */
 export interface QuoteRequest {
-  quoteId: string;
-  transactionId: string;
-  transactionRequestId: string;
-  payee: Party;
-  payer: Party;
-  amountType: AmountType;
-  amount: Money;
-  transactionType: TransactionType;
-  note?: string;
+  quoteId: string
+  transactionId: string
+  transactionRequestId: string
+  payee: Party
+  payer: Party
+  amountType: AmountType
+  amount: Money
+  transactionType: TransactionType
+  note?: string
 }
 
 export interface HealthResponse {

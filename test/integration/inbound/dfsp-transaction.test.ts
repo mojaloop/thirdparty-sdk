@@ -14,7 +14,7 @@ describe('DFSP Transaction', (): void => {
     headers: {
       'Content-Type': 'application/json',
       'FSPIOP-Source': 'pisp',
-      Date: (new Date()).toISOString(),
+      Date: new Date().toISOString(),
       'FSPIOP-Destination': 'dfspA'
     }
   }
@@ -51,7 +51,7 @@ describe('DFSP Transaction', (): void => {
       initiator: 'PAYER',
       initiatorType: 'CONSUMER'
     },
-    expiration: (new Date()).toISOString()
+    expiration: new Date().toISOString()
   }
 
   const requestAuthorizationResponse: tpAPI.Schemas.ThirdpartyRequestsAuthorizationsIDPutResponseFIDO = {
@@ -63,7 +63,8 @@ describe('DFSP Transaction', (): void => {
         rawId: '45c+TkfkjQovQeAWmOy+RLBHEJ/e4jYzQYgD8VdbkePgM5d98BaAadadNYrknxgH0jQEON8zBydLgh1EqoC9DA==',
         response: {
           authenticatorData: 'SZYN5YgOjGh0NBcPZHZgW4/krrmihjLHmVzzuoMdl2MBAAAACA==',
-          clientDataJSON: 'eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiQUFBQUFBQUFBQUFBQUFBQUFBRUNBdyIsIm9yaWdpbiI6Imh0dHA6Ly9sb2NhbGhvc3Q6NDIxODEiLCJjcm9zc09yaWdpbiI6ZmFsc2UsIm90aGVyX2tleXNfY2FuX2JlX2FkZGVkX2hlcmUiOiJkbyBub3QgY29tcGFyZSBjbGllbnREYXRhSlNPTiBhZ2FpbnN0IGEgdGVtcGxhdGUuIFNlZSBodHRwczovL2dvby5nbC95YWJQZXgifQ==',
+          clientDataJSON:
+            'eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiQUFBQUFBQUFBQUFBQUFBQUFBRUNBdyIsIm9yaWdpbiI6Imh0dHA6Ly9sb2NhbGhvc3Q6NDIxODEiLCJjcm9zc09yaWdpbiI6ZmFsc2UsIm90aGVyX2tleXNfY2FuX2JlX2FkZGVkX2hlcmUiOiJkbyBub3QgY29tcGFyZSBjbGllbnREYXRhSlNPTiBhZ2FpbnN0IGEgdGVtcGxhdGUuIFNlZSBodHRwczovL2dvby5nbC95YWJQZXgifQ==',
           signature: 'MEUCIDcJRBu5aOLJVc/sPyECmYi23w8xF35n3RNhyUNVwQ2nAiEA+Lnd8dBn06OKkEgAq00BVbmH87ybQHfXlf1Y4RJqwQ8='
         },
         type: 'public-key'
@@ -96,7 +97,11 @@ describe('DFSP Transaction', (): void => {
       expect(result.status).toBe(202)
 
       // check that the DFSP has sent a PUT /thirdpartyRequests/transactions/{ID} to the PISP
-      const historyTPRT = await ttkHistory.getAndFilterWithRetries(2, 'put', `/thirdpartyRequests/transactions/${transactionRequestId}`)
+      const historyTPRT = await ttkHistory.getAndFilterWithRetries(
+        2,
+        'put',
+        `/thirdpartyRequests/transactions/${transactionRequestId}`
+      )
       expect(historyTPRT.length).toEqual(1)
       const tprTransactionsPayload = historyTPRT[0].body as tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPutResponse
 
@@ -146,9 +151,14 @@ describe('DFSP Transaction', (): void => {
       expect(result.status).toBe(200)
 
       // check that the DFSP has sent a POST /thirdpartyRequests/verifications to the auth service
-      const historyPostVerifications = await ttkHistory.getAndFilterWithRetries(2, 'post', '/thirdpartyRequests/verifications')
+      const historyPostVerifications = await ttkHistory.getAndFilterWithRetries(
+        2,
+        'post',
+        '/thirdpartyRequests/verifications'
+      )
       expect(historyPostVerifications.length).toEqual(1)
-      const historyPostVerificationsPayload = historyPostVerifications[0].body as tpAPI.Schemas.ThirdpartyRequestsVerificationsPostRequest
+      const historyPostVerificationsPayload = historyPostVerifications[0]
+        .body as tpAPI.Schemas.ThirdpartyRequestsVerificationsPostRequest
 
       verificationRequestId = historyPostVerificationsPayload.verificationRequestId
 
@@ -171,7 +181,11 @@ describe('DFSP Transaction', (): void => {
       expect(result.status).toBe(200)
 
       // check that the DFSP has sent a patch /thirdpartyRequests/transactions/{ID} to the pisp
-      const history = await ttkHistory.getAndFilterWithRetries(3, 'patch', `/thirdpartyRequests/transactions/${transactionRequestId}`)
+      const history = await ttkHistory.getAndFilterWithRetries(
+        3,
+        'patch',
+        `/thirdpartyRequests/transactions/${transactionRequestId}`
+      )
       expect(history.length).toEqual(1)
       const payload = history[0].body as tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPatchResponse
 

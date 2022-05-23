@@ -24,6 +24,7 @@
  --------------
  ******/
 import { Request, ResponseToolkit } from '@hapi/hapi'
+// eslint-disable-next-line import/no-named-as-default
 import Boom from '@hapi/boom'
 import onValidateFail from '~/handlers/shared/onValidateFail'
 
@@ -32,11 +33,7 @@ describe('server/handlers/onValidateFail', (): void => {
     const spyBoomify = jest.spyOn(Boom, 'boomify')
     const err = new Error('sample error')
     expect((): void => {
-      onValidateFail(
-        null as unknown as Request,
-        null as unknown as ResponseToolkit,
-        err
-      )
+      onValidateFail(null as unknown as Request, null as unknown as ResponseToolkit, err)
     }).toThrowError(err)
     expect(spyBoomify).toBeCalledWith(err)
   })

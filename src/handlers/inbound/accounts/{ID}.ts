@@ -26,24 +26,17 @@
  --------------
  ******/
 
-import {
-  thirdparty as tpAPI
-} from '@mojaloop/api-snippets'
+import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
 import { Message } from '~/shared/pub-sub'
-import {
-  InboundAccountsModel,
-  InboundAccountsModelConfig
-} from '~/models/inbound/accounts.model'
-import {
-  PISPDiscoveryModel
-} from '~/models/outbound/pispDiscovery.model'
+import { InboundAccountsModel, InboundAccountsModelConfig } from '~/models/inbound/accounts.model'
+import { PISPDiscoveryModel } from '~/models/outbound/pispDiscovery.model'
 import { Request, ResponseObject } from '@hapi/hapi'
 import { StateResponseToolkit } from '~/server/plugins/state'
 
 /**
  * Handles an inbound PUT /accounts/{ID} request
  */
-async function put (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+async function put(_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const payload = request.payload as unknown as tpAPI.Schemas.AccountsIDPutResponse
   const userId: string = request.params.ID
   const channel = PISPDiscoveryModel.notificationChannel(userId)
@@ -57,7 +50,7 @@ async function put (_context: unknown, request: Request, h: StateResponseToolkit
  * Handles an inbound GET /accounts/{ID} request
  */
 
-async function get (_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
+async function get(_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const userId: string = request.params.ID
   const logger = h.getLogger()
   const sourceFspId = request.headers['fspiop-source']

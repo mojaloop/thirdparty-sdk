@@ -46,7 +46,7 @@ const program = new Command(PACKAGE.name)
  * @param handlers { { [handler: string]: Handler } } dictionary with api handlers, will be joined with Handlers.Shared
  * @returns () => Promise<void> asynchronous commander action to start api
  */
-function mkStartAPI (api: ServerAPI, handlers: { [handler: string]: Handler }): () => Promise<void> {
+function mkStartAPI(api: ServerAPI, handlers: { [handler: string]: Handler }): () => Promise<void> {
   return async (): Promise<void> => {
     // update config from program parameters,
     // so setupAndStart will know on which PORT/HOST bind the server
@@ -82,14 +82,10 @@ program
   .option('-H, --host <string>', 'listen on host')
 
 // setup standalone command to start Inbound service
-program.command('inbound')
-  .description('start Inbound API service')
-  .action(startInboundAPI)
+program.command('inbound').description('start Inbound API service').action(startInboundAPI)
 
 // setup standalone command to start Outbound service
-program.command('outbound')
-  .description('start Outbound API service')
-  .action(startOutboundAPI)
+program.command('outbound').description('start Outbound API service').action(startOutboundAPI)
 
 // fetch parameters from command line and execute
 program.parseAsync(process.argv)

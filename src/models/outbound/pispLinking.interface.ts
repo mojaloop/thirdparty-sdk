@@ -24,15 +24,10 @@
  - Sridhar Voruganti - sridhar.voruganti@modusbox.com
  --------------
  ******/
-import {
-  ControlledStateMachine,
-  PersistentModelConfig, StateData
-} from '~/models/persistent.model'
+import { ControlledStateMachine, PersistentModelConfig, StateData } from '~/models/persistent.model'
 import { Method } from 'javascript-state-machine'
 import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
-import {
-  thirdparty as tpAPI
-} from '@mojaloop/api-snippets'
+import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
 import { PubSub } from '~/shared/pub-sub'
 import * as OutboundAPI from '~/interface/outbound/api_interfaces'
 
@@ -43,9 +38,9 @@ export enum PISPLinkingPhase {
 }
 
 export type PISPLinkingModelState =
-  OutboundAPI.Schemas.LinkingRequestConsentState |
-  OutboundAPI.Schemas.LinkingRequestConsentIDAuthenticateState |
-  OutboundAPI.Schemas.LinkingRequestConsentIDPassCredentialState
+  | OutboundAPI.Schemas.LinkingRequestConsentState
+  | OutboundAPI.Schemas.LinkingRequestConsentIDAuthenticateState
+  | OutboundAPI.Schemas.LinkingRequestConsentIDPassCredentialState
 
 export interface PISPLinkingStateMachine extends ControlledStateMachine {
   requestConsent: Method
@@ -74,8 +69,8 @@ export interface PISPLinkingData extends StateData<PISPLinkingModelState> {
   // request consent phase
   linkingRequestConsentPostRequest: OutboundAPI.Schemas.LinkingRequestConsentPostRequest
   linkingRequestConsentInboundChannelResponse?:
-  tpAPI.Schemas.ConsentRequestsIDPutResponseWeb |
-  tpAPI.Schemas.ConsentRequestsIDPutResponseOTP
+    | tpAPI.Schemas.ConsentRequestsIDPutResponseWeb
+    | tpAPI.Schemas.ConsentRequestsIDPutResponseOTP
   linkingRequestConsentPostResponse?: OutboundAPI.Schemas.LinkingRequestConsentResponse
 
   // authentication phase

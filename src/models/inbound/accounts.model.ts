@@ -26,14 +26,8 @@
  ******/
 
 import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
-import {
-  Logger as SDKLogger,
-  ThirdpartyRequests,
-  Errors
-} from '@mojaloop/sdk-standard-components'
-import {
-  v1_1 as fspiopAPI
-} from '@mojaloop/api-snippets'
+import { Logger as SDKLogger, ThirdpartyRequests, Errors } from '@mojaloop/sdk-standard-components'
+import { v1_1 as fspiopAPI } from '@mojaloop/api-snippets'
 import { HTTPResponseError } from '~/shared/http-response-error'
 
 // todo: refactor this into dfspDiscoveryModel. this solution will suffice for
@@ -47,23 +41,23 @@ export interface InboundAccountsModelConfig {
 export class InboundAccountsModel {
   protected config: InboundAccountsModelConfig
 
-  constructor (config: InboundAccountsModelConfig) {
+  constructor(config: InboundAccountsModelConfig) {
     this.config = config
   }
 
-  protected get logger (): SDKLogger.Logger {
+  protected get logger(): SDKLogger.Logger {
     return this.config.logger
   }
 
-  protected get dfspBackendRequests (): DFSPBackendRequests {
+  protected get dfspBackendRequests(): DFSPBackendRequests {
     return this.config.dfspBackendRequests
   }
 
-  protected get thirdpartyRequests (): ThirdpartyRequests {
+  protected get thirdpartyRequests(): ThirdpartyRequests {
     return this.config.thirdpartyRequests
   }
 
-  async getUserAccounts (userId: string, srcDfspId: string): Promise<void> {
+  async getUserAccounts(userId: string, srcDfspId: string): Promise<void> {
     try {
       const userAccounts = await this.dfspBackendRequests.getUserAccounts(userId)
       if (!userAccounts) {
@@ -71,7 +65,7 @@ export class InboundAccountsModel {
       }
 
       await this.thirdpartyRequests.putAccounts(userId, userAccounts, srcDfspId)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       this.logger.push({ err }).error('Error in getUserAccounts @ Inbound')
       const mojaloopError = this.reformatError(err)
@@ -84,7 +78,7 @@ export class InboundAccountsModel {
     }
   }
 
-  protected reformatError (err: Error): Errors.MojaloopApiErrorObject {
+  protected reformatError(err: Error): Errors.MojaloopApiErrorObject {
     let mojaloopErrorCode = Errors.MojaloopApiErrorCodes.INTERNAL_SERVER_ERROR
     if (err instanceof HTTPResponseError) {
       const e = err.getData()

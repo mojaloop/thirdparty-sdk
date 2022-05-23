@@ -26,11 +26,7 @@
  ******/
 
 import { SDKOutgoingRequests } from '~/shared/sdk-outgoing-requests'
-import {
-  Logger as SDKLogger,
-  MojaloopRequests,
-  ThirdpartyRequests
-} from '@mojaloop/sdk-standard-components'
+import { Logger as SDKLogger, MojaloopRequests, ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
 import {
   InboundThirdpartyTransactionPostRequest,
   OutboundRequestToPayTransferPostRequest,
@@ -49,29 +45,29 @@ export interface InboundThirdpartyTransactionsModelConfig {
 export class InboundThirdpartyTransactionsModel {
   protected config: InboundThirdpartyTransactionsModelConfig
 
-  constructor (config: InboundThirdpartyTransactionsModelConfig) {
+  constructor(config: InboundThirdpartyTransactionsModelConfig) {
     this.config = config
   }
 
-  protected get logger (): SDKLogger.Logger {
+  protected get logger(): SDKLogger.Logger {
     return this.config.logger
   }
 
-  protected get sdkOutgoingRequests (): SDKOutgoingRequests {
+  protected get sdkOutgoingRequests(): SDKOutgoingRequests {
     return this.config.sdkOutgoingRequests
   }
 
-  protected get mojaloopRequests (): MojaloopRequests {
+  protected get mojaloopRequests(): MojaloopRequests {
     return this.config.mojaloopRequests
   }
 
-  protected get thirdpartyRequests (): ThirdpartyRequests {
+  protected get thirdpartyRequests(): ThirdpartyRequests {
     return this.config.thirdpartyRequests
   }
 
   // RequestToPay endpoint was used by POC PISPTransaction code
   // TODO: use it when PISPMerchantTransaction flow will be implemented in future
-  async requestToPayTransfer (
+  async requestToPayTransfer(
     inRequest: InboundThirdpartyTransactionPostRequest,
     pispId: string
   ): Promise<OutboundRequestToPayTransferPostResponse> {
@@ -105,9 +101,9 @@ export class InboundThirdpartyTransactionsModel {
     }
     this.logger.push({ requestToPayTransfer }).info('requestToPayTransfer: requestToPayTransfer')
 
-    const response = await this.sdkOutgoingRequests.requestToPayTransfer(
+    const response = (await this.sdkOutgoingRequests.requestToPayTransfer(
       requestToPayTransfer
-    ) as OutboundRequestToPayTransferPostResponse
+    )) as OutboundRequestToPayTransferPostResponse
 
     this.logger.push({ response }).info('requestToPayTransfer: response')
 

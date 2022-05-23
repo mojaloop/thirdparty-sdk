@@ -24,18 +24,10 @@
  - Sridhar Voruganti - sridhar.voruganti@modusbox.com
  --------------
  ******/
-import {
-  ControlledStateMachine,
-  PersistentModelConfig, StateData
-} from '~/models/persistent.model'
+import { ControlledStateMachine, PersistentModelConfig, StateData } from '~/models/persistent.model'
 import { Method } from 'javascript-state-machine'
-import {
-  ThirdpartyRequests
-} from '@mojaloop/sdk-standard-components'
-import {
-  v1_1 as fspiopAPI,
-  thirdparty as tpAPI
-} from '@mojaloop/api-snippets'
+import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
+import { v1_1 as fspiopAPI, thirdparty as tpAPI } from '@mojaloop/api-snippets'
 import { PubSub } from '~/shared/pub-sub'
 
 export enum PISPDiscoveryModelState {

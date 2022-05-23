@@ -24,16 +24,10 @@
  - Sridhar Voruganti - sridhar.voruganti@modusbox.com
  --------------
  ******/
-import {
-  ControlledStateMachine,
-  PersistentModelConfig,
-  StateData
-} from '~/models/persistent.model'
+import { ControlledStateMachine, PersistentModelConfig, StateData } from '~/models/persistent.model'
 import { Method } from 'javascript-state-machine'
 import { ThirdpartyRequests, MojaloopRequests } from '@mojaloop/sdk-standard-components'
-import {
-  thirdparty as tpAPI
-} from '@mojaloop/api-snippets'
+import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
 import { PubSub } from '~/shared/pub-sub'
 import { BackendValidateConsentRequestsResponse, DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
 
@@ -95,8 +89,8 @@ export interface DFSPLinkingData extends StateData {
 
   // authenticate phase
   consentRequestsIDPutRequest?:
-  tpAPI.Schemas.ConsentRequestsIDPutResponseOTP |
-  tpAPI.Schemas.ConsentRequestsIDPutResponseWeb
+    | tpAPI.Schemas.ConsentRequestsIDPutResponseOTP
+    | tpAPI.Schemas.ConsentRequestsIDPutResponseWeb
   consentRequestsIDPatchResponse?: tpAPI.Schemas.ConsentRequestsIDPatchRequest
 
   // grant consent phase

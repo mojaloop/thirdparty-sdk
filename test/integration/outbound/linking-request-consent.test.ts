@@ -81,17 +81,18 @@ describe('PISP requests DFSP to validate user consentRequests for linking', (): 
       const expectedResponse = {
         consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
         consentRequestId: consentRequestId,
-        scopes: [{
-          address: 'some-id',
-          actions: [
-            'ACCOUNTS_GET_BALANCE',
-            'ACCOUNTS_TRANSFER'
-          ]
-        }
+        scopes: [
+          {
+            address: 'some-id',
+            actions: ['ACCOUNTS_GET_BALANCE', 'ACCOUNTS_TRANSFER']
+          }
         ],
         status: 'ISSUED'
       }
-      const consentRequestsResponse = await axios.patch<any>(linkingRequestConsentAuthenticateURI, linkingRequestConsentAuthenticateRequest)
+      const consentRequestsResponse = await axios.patch<any>(
+        linkingRequestConsentAuthenticateURI,
+        linkingRequestConsentAuthenticateRequest
+      )
       expect(consentRequestsResponse.status).toEqual(200)
       expect(consentRequestsResponse.data.currentState).toEqual('consentReceivedAwaitingCredential')
       expect(consentRequestsResponse.data.consent).toEqual(expectedResponse)
@@ -102,28 +103,31 @@ describe('PISP requests DFSP to validate user consentRequests for linking', (): 
       const linkingRequestConsentPassCredentialURI = `${env.outbound.baseUri}/linking/request-consent/${consentRequestId}/pass-credential`
 
       // ttk uses an credential.payload.id of below for a verified response
-      const linkingRequestConsentPassCredentialRequest: OutboundAPI.Schemas.LinkingRequestConsentIDPassCredentialRequest = {
-        credential: {
-          payload: {
-            id: 'credential id: identifier of pair of keys, base64 encoded, min length 59',
-            rawId: 'raw credential id: identifier of pair of keys, base64 encoded, min length 59',
-            response: {
-              clientDataJSON: 'clientDataJSON-must-not-have-fewer-than-121-' +
-                'characters Lorem ipsum dolor sit amet, consectetur adipiscing ' +
-                'elit, sed do eiusmod tempor incididunt ut labore et dolore magna ' +
-                'aliqua.',
-              attestationObject: 'attestationObject-must-not-have-fewer-than-' +
-                '306-characters Lorem ipsum dolor sit amet, consectetur ' +
-                'adipiscing elit, sed do eiusmod tempor incididunt ut ' +
-                'labore et dolore magna aliqua. Ut enim ad minim veniam, ' +
-                'quis nostrud exercitation ullamco laboris nisi ut aliquip ' +
-                'ex ea commodo consequat. Duis aute irure dolor in reprehenderit ' +
-                'in voluptate velit esse cillum dolore eu fugiat nulla pariatur.'
-            },
-            type: 'public-key'
+      const linkingRequestConsentPassCredentialRequest: OutboundAPI.Schemas.LinkingRequestConsentIDPassCredentialRequest =
+        {
+          credential: {
+            payload: {
+              id: 'credential id: identifier of pair of keys, base64 encoded, min length 59',
+              rawId: 'raw credential id: identifier of pair of keys, base64 encoded, min length 59',
+              response: {
+                clientDataJSON:
+                  'clientDataJSON-must-not-have-fewer-than-121-' +
+                  'characters Lorem ipsum dolor sit amet, consectetur adipiscing ' +
+                  'elit, sed do eiusmod tempor incididunt ut labore et dolore magna ' +
+                  'aliqua.',
+                attestationObject:
+                  'attestationObject-must-not-have-fewer-than-' +
+                  '306-characters Lorem ipsum dolor sit amet, consectetur ' +
+                  'adipiscing elit, sed do eiusmod tempor incididunt ut ' +
+                  'labore et dolore magna aliqua. Ut enim ad minim veniam, ' +
+                  'quis nostrud exercitation ullamco laboris nisi ut aliquip ' +
+                  'ex ea commodo consequat. Duis aute irure dolor in reprehenderit ' +
+                  'in voluptate velit esse cillum dolore eu fugiat nulla pariatur.'
+              },
+              type: 'public-key'
+            }
           }
         }
-      }
       const expectedResponse = {
         credential: {
           status: 'VERIFIED'
@@ -169,13 +173,11 @@ describe('PISP requests DFSP to validate user consentRequests for linking', (): 
       const expectedResponse = {
         consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
         consentRequestId: consentRequestId,
-        scopes: [{
-          address: 'some-id',
-          actions: [
-            'ACCOUNTS_GET_BALANCE',
-            'ACCOUNTS_TRANSFER'
-          ]
-        }
+        scopes: [
+          {
+            address: 'some-id',
+            actions: ['ACCOUNTS_GET_BALANCE', 'ACCOUNTS_TRANSFER']
+          }
         ],
         status: 'ISSUED'
       }
@@ -194,35 +196,41 @@ describe('PISP requests DFSP to validate user consentRequests for linking', (): 
       const linkingRequestConsentPassCredentialURI = `${env.outbound.baseUri}/linking/request-consent/${consentRequestId}/pass-credential`
 
       // ttk uses an credential.payload.id of below for a verified response
-      const linkingRequestConsentPassCredentialRequest: OutboundAPI.Schemas.LinkingRequestConsentIDPassCredentialRequest = {
-        credential: {
-          payload: {
-            id: 'credential id: identifier of pair of keys, base64 encoded, min length 59',
-            rawId: 'raw credential id: identifier of pair of keys, base64 encoded, min length 59',
-            response: {
-              clientDataJSON: 'clientDataJSON-must-not-have-fewer-than-121-' +
-                'characters Lorem ipsum dolor sit amet, consectetur adipiscing ' +
-                'elit, sed do eiusmod tempor incididunt ut labore et dolore magna ' +
-                'aliqua.',
-              attestationObject: 'attestationObject-must-not-have-fewer-than-' +
-                '306-characters Lorem ipsum dolor sit amet, consectetur ' +
-                'adipiscing elit, sed do eiusmod tempor incididunt ut ' +
-                'labore et dolore magna aliqua. Ut enim ad minim veniam, ' +
-                'quis nostrud exercitation ullamco laboris nisi ut aliquip ' +
-                'ex ea commodo consequat. Duis aute irure dolor in reprehenderit ' +
-                'in voluptate velit esse cillum dolore eu fugiat nulla pariatur.'
-            },
-            type: 'public-key'
+      const linkingRequestConsentPassCredentialRequest: OutboundAPI.Schemas.LinkingRequestConsentIDPassCredentialRequest =
+        {
+          credential: {
+            payload: {
+              id: 'credential id: identifier of pair of keys, base64 encoded, min length 59',
+              rawId: 'raw credential id: identifier of pair of keys, base64 encoded, min length 59',
+              response: {
+                clientDataJSON:
+                  'clientDataJSON-must-not-have-fewer-than-121-' +
+                  'characters Lorem ipsum dolor sit amet, consectetur adipiscing ' +
+                  'elit, sed do eiusmod tempor incididunt ut labore et dolore magna ' +
+                  'aliqua.',
+                attestationObject:
+                  'attestationObject-must-not-have-fewer-than-' +
+                  '306-characters Lorem ipsum dolor sit amet, consectetur ' +
+                  'adipiscing elit, sed do eiusmod tempor incididunt ut ' +
+                  'labore et dolore magna aliqua. Ut enim ad minim veniam, ' +
+                  'quis nostrud exercitation ullamco laboris nisi ut aliquip ' +
+                  'ex ea commodo consequat. Duis aute irure dolor in reprehenderit ' +
+                  'in voluptate velit esse cillum dolore eu fugiat nulla pariatur.'
+              },
+              type: 'public-key'
+            }
           }
         }
-      }
       const expectedResponse = {
         credential: {
           status: 'VERIFIED'
         },
         currentState: 'accountsLinked'
       }
-      const consentRequestsResponse = await axios.post<any>(linkingRequestConsentPassCredentialURI, linkingRequestConsentPassCredentialRequest)
+      const consentRequestsResponse = await axios.post<any>(
+        linkingRequestConsentPassCredentialURI,
+        linkingRequestConsentPassCredentialRequest
+      )
       expect(consentRequestsResponse.status).toEqual(200)
       expect(consentRequestsResponse.data.currentState).toEqual('accountsLinked')
       expect(consentRequestsResponse.data).toEqual(expectedResponse)
@@ -241,12 +249,11 @@ describe('PISP requests DFSP to validate user consentRequests for linking', (): 
         ...mockData.consentRequestsPutError.payload,
         currentState: 'errored'
       }
-      await axios.post(linkingRequestConsentURI, linkingRequestConsentRequest)
-        .catch(error => {
-          expect(error.response.status).toEqual(500)
-          expect(error.response.data).toEqual(expectedResponse)
-          done()
-        })
+      await axios.post(linkingRequestConsentURI, linkingRequestConsentRequest).catch((error) => {
+        expect(error.response.status).toEqual(500)
+        expect(error.response.data).toEqual(expectedResponse)
+        done()
+      })
     })
   })
 
@@ -283,8 +290,9 @@ describe('PISP requests DFSP to validate user consentRequests for linking', (): 
         currentState: 'errored'
       }
 
-      await axios.patch(linkingRequestConsentAuthenticateURI, linkingRequestConsentAuthenticateRequest)
-        .catch(error => {
+      await axios
+        .patch(linkingRequestConsentAuthenticateURI, linkingRequestConsentAuthenticateRequest)
+        .catch((error) => {
           expect(error.response.status).toEqual(500)
           expect(error.response.data.currentState).toEqual('errored')
           expect(error.response.data).toEqual(expectedResponse)
@@ -320,18 +328,19 @@ describe('PISP requests DFSP to validate user consentRequests for linking', (): 
       const expectedResponse = {
         consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
         consentRequestId: consentRequestId,
-        scopes: [{
-          address: 'some-id',
-          actions: [
-            'ACCOUNTS_GET_BALANCE',
-            'ACCOUNTS_TRANSFER'
-          ]
-        }
+        scopes: [
+          {
+            address: 'some-id',
+            actions: ['ACCOUNTS_GET_BALANCE', 'ACCOUNTS_TRANSFER']
+          }
         ],
         status: 'ISSUED'
       }
 
-      const consentRequestsResponse = await axios.patch<any>(linkingRequestConsentAuthenticateURI, linkingRequestConsentAuthenticateRequest)
+      const consentRequestsResponse = await axios.patch<any>(
+        linkingRequestConsentAuthenticateURI,
+        linkingRequestConsentAuthenticateRequest
+      )
       expect(consentRequestsResponse.status).toEqual(200)
       expect(consentRequestsResponse.data.currentState).toEqual('consentReceivedAwaitingCredential')
       expect(consentRequestsResponse.data.consent).toEqual(expectedResponse)
@@ -342,28 +351,31 @@ describe('PISP requests DFSP to validate user consentRequests for linking', (): 
       const linkingRequestConsentPassCredentialURI = `${env.outbound.baseUri}/linking/request-consent/${consentRequestId}/pass-credential`
 
       // ttk uses an credential.payload.id of below for a error response
-      const linkingRequestConsentPassCredentialRequest: OutboundAPI.Schemas.LinkingRequestConsentIDPassCredentialRequest = {
-        credential: {
-          payload: {
-            id: 'credential id error: identifier of pair of keys, base64 encoded, min length 59',
-            rawId: 'raw credential id: identifier of pair of keys, base64 encoded, min length 59',
-            response: {
-              clientDataJSON: 'clientDataJSON-must-not-have-fewer-than-121-' +
-                'characters Lorem ipsum dolor sit amet, consectetur adipiscing ' +
-                'elit, sed do eiusmod tempor incididunt ut labore et dolore magna ' +
-                'aliqua.',
-              attestationObject: 'attestationObject-must-not-have-fewer-than-' +
-                '306-characters Lorem ipsum dolor sit amet, consectetur ' +
-                'adipiscing elit, sed do eiusmod tempor incididunt ut ' +
-                'labore et dolore magna aliqua. Ut enim ad minim veniam, ' +
-                'quis nostrud exercitation ullamco laboris nisi ut aliquip ' +
-                'ex ea commodo consequat. Duis aute irure dolor in reprehenderit ' +
-                'in voluptate velit esse cillum dolore eu fugiat nulla pariatur.'
-            },
-            type: 'public-key'
+      const linkingRequestConsentPassCredentialRequest: OutboundAPI.Schemas.LinkingRequestConsentIDPassCredentialRequest =
+        {
+          credential: {
+            payload: {
+              id: 'credential id error: identifier of pair of keys, base64 encoded, min length 59',
+              rawId: 'raw credential id: identifier of pair of keys, base64 encoded, min length 59',
+              response: {
+                clientDataJSON:
+                  'clientDataJSON-must-not-have-fewer-than-121-' +
+                  'characters Lorem ipsum dolor sit amet, consectetur adipiscing ' +
+                  'elit, sed do eiusmod tempor incididunt ut labore et dolore magna ' +
+                  'aliqua.',
+                attestationObject:
+                  'attestationObject-must-not-have-fewer-than-' +
+                  '306-characters Lorem ipsum dolor sit amet, consectetur ' +
+                  'adipiscing elit, sed do eiusmod tempor incididunt ut ' +
+                  'labore et dolore magna aliqua. Ut enim ad minim veniam, ' +
+                  'quis nostrud exercitation ullamco laboris nisi ut aliquip ' +
+                  'ex ea commodo consequat. Duis aute irure dolor in reprehenderit ' +
+                  'in voluptate velit esse cillum dolore eu fugiat nulla pariatur.'
+              },
+              type: 'public-key'
+            }
           }
         }
-      }
       const expectedResponse = {
         currentState: 'errored',
         errorInformation: {
@@ -379,8 +391,9 @@ describe('PISP requests DFSP to validate user consentRequests for linking', (): 
           }
         }
       }
-      await axios.post(linkingRequestConsentPassCredentialURI, linkingRequestConsentPassCredentialRequest)
-        .catch(error => {
+      await axios
+        .post(linkingRequestConsentPassCredentialURI, linkingRequestConsentPassCredentialRequest)
+        .catch((error) => {
           expect(error.response.status).toEqual(500)
           expect(error.response.data.currentState).toEqual('errored')
           expect(error.response.data).toEqual(expectedResponse)

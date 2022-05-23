@@ -1,6 +1,6 @@
 import { v1_1 as fspiopAPI } from '@mojaloop/api-snippets'
 
-export function payeeReceiveAmountForQuoteAndFees (
+export function payeeReceiveAmountForQuoteAndFees(
   transferAmount: fspiopAPI.Schemas.Money,
   payeeFspFee?: fspiopAPI.Schemas.Money,
   payeeFspCommission?: fspiopAPI.Schemas.Money
@@ -53,7 +53,7 @@ export function payeeReceiveAmountForQuoteAndFees (
  * @param receiveAmount
  * @returns
  */
-export function feeForTransferAndPayeeReceiveAmount (
+export function feeForTransferAndPayeeReceiveAmount(
   transferAmount: fspiopAPI.Schemas.Money,
   receiveAmount: fspiopAPI.Schemas.Money
 ): fspiopAPI.Schemas.Money {

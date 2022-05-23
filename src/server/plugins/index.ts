@@ -36,11 +36,7 @@ import { StatePlugin } from './state'
 import { Util } from '@mojaloop/central-services-shared'
 import Vision from '@hapi/vision'
 
-async function register (
-  server: Server,
-  apiPath: string,
-  handlers: { [handler: string]: Handler }
-): Promise<Server> {
+async function register(server: Server, apiPath: string, handlers: { [handler: string]: Handler }): Promise<Server> {
   const openapiBackend = await OpenAPI.initialize(apiPath, handlers)
   const plugins = [
     StatePlugin,
@@ -74,8 +70,8 @@ async function register (
         req,
         h
       )
-  // TODO: follow instructions
-  // https://github.com/anttiviljami/openapi-backend/blob/master/DOCS.md#postresponsehandler-handler
+    // TODO: follow instructions
+    // https://github.com/anttiviljami/openapi-backend/blob/master/DOCS.md#postresponsehandler-handler
   })
 
   return server

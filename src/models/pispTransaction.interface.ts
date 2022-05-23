@@ -26,10 +26,7 @@
  - Sridhar Voruganti <sridhar.voruganti@modusbox.com>
  --------------
  ******/
-import {
-  ThirdpartyRequests,
-  MojaloopRequests
-} from '@mojaloop/sdk-standard-components'
+import { ThirdpartyRequests, MojaloopRequests } from '@mojaloop/sdk-standard-components'
 import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
 import { OutboundAPI as SDKOutboundAPI } from '@mojaloop/sdk-scheme-adapter'
 import { Method } from 'javascript-state-machine'
@@ -45,7 +42,7 @@ export enum RequestPartiesInformationState {
 }
 
 export type PISPTransactionModelState =
-  OutboundAPI.Schemas.ThirdpartyTransactionPartyLookupState
+  | OutboundAPI.Schemas.ThirdpartyTransactionPartyLookupState
   | OutboundAPI.Schemas.ThirdpartyTransactionIDInitiateState
   | OutboundAPI.Schemas.ThirdpartyTransactionIDApproveState
 
@@ -54,7 +51,7 @@ export enum PISPTransactionPhase {
   initiation = 'initiation',
   waitOnTransactionPut = 'waitOnTransactionPut',
   waitOnAuthorizationPost = 'waitOnAuthorizationPost',
-  approval = 'approval',
+  approval = 'approval'
 }
 export interface PISPTransactionStateMachine extends ControlledStateMachine {
   requestPartyLookup: Method

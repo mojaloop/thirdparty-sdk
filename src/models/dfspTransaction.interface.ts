@@ -34,16 +34,16 @@ import { OutboundAPI as SDKOutboundAPI } from '@mojaloop/sdk-scheme-adapter'
 import { PubSub } from '~/shared/pub-sub'
 
 export type DFSPTransactionModelState =
-  'start' |
-  'errored' |
-  'transactionRequestIsValid' |
-  'notifiedTransactionRequestIsValid' |
-  'quoteReceived' |
-  'authorizationReceived' |
-  'authorizationReceivedIsValid' |
-  'authorizationIsValid' |
-  'transferIsDone' |
-  'transactionRequestIsDone'
+  | 'start'
+  | 'errored'
+  | 'transactionRequestIsValid'
+  | 'notifiedTransactionRequestIsValid'
+  | 'quoteReceived'
+  | 'authorizationReceived'
+  | 'authorizationReceivedIsValid'
+  | 'authorizationIsValid'
+  | 'transferIsDone'
+  | 'transactionRequestIsDone'
 
 export interface DFSPTransactionStateMachine extends ControlledStateMachine {
   // on Initiate PISPTransactionModel phase
@@ -69,11 +69,11 @@ export interface DFSPTransactionModelConfig extends PersistentModelConfig {
   dfspId: string
   thirdpartyRequests: ThirdpartyRequests
   sdkOutgoingRequests: SDKOutgoingRequests
-  dfspBackendRequests: DFSPBackendRequests,
-  subscriber: PubSub,
-  transactionRequestAuthorizationTimeoutSeconds: number,
-  transactionRequestVerificationTimeoutSeconds: number,
-  authServiceParticipantId: string,
+  dfspBackendRequests: DFSPBackendRequests
+  subscriber: PubSub
+  transactionRequestAuthorizationTimeoutSeconds: number
+  transactionRequestVerificationTimeoutSeconds: number
+  authServiceParticipantId: string
 }
 
 export interface DFSPTransactionData extends StateData<DFSPTransactionModelState> {
