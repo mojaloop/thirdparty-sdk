@@ -34,6 +34,7 @@
     "lint:fix": "eslint --fix --ext ts --ext js test src",
     "pretest": "echo \"pretest - TODO...\"",
     "release": "standard-version --releaseCommitMessageFormat 'chore(release): {{currentTag}} [skip ci]'",
+    "snapshot": "standard-version --no-verify --skip.changelog --prerelease snapshot --releaseCommitMessageFormat 'chore(snapshot): {{currentTag}}'",
     "standard": "echo '\\033[1;33m  This project uses eslint instead of standard. Use `npm run lint` instead.'",
     "start": "echo 'use `npm run start:inbound` or `npm run start:outbound`'",
     "start:inbound-ts": "ts-node --project ./tsconfig.json --files --require tsconfig-paths/register ./src/cli.ts inbound",
