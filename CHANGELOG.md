@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-sdk](https://github.com/mojaloop/thirdparty-sdk)
+### [14.0.1](https://github.com/mojaloop/thirdparty-sdk/compare/v14.0.0...v14.0.1) (2022-05-23)
+
+
+### Maintenance
+
+* conform linting config to typescript-svc-template ([#143](https://github.com/mojaloop/thirdparty-sdk/issues/143)) ([49189c8](https://github.com/mojaloop/thirdparty-sdk/commit/49189c8efb8c0b85cbaa3d4975e72a4bf293d2c4))
+
 ## [14.0.0](https://github.com/mojaloop/thirdparty-sdk/compare/v13.0.0...v14.0.0) (2022-05-20)
 
 
