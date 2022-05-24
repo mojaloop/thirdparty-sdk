@@ -8,8 +8,11 @@ module.exports = {
     // Upgrading past redis@3 to the next major version introduces a lot of breaking changes.
     'redis',
     '@types/redis',
-    // Upgrading past jest/ts-jest@26 introduces a lot of breaking changes to current tests.
+    // Upgrading past jest|ts-jest|@types/jest@26 introduces a lot of breaking changes to current tests.
     'jest',
-    'ts-jest'
+    'ts-jest',
+    '@types/jest',
+    // Upgrading past commander@7 introduces a lot of breaking changes.
+    'commander'
   ]
 }
