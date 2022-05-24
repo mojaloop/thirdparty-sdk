@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-sdk](https://github.com/mojaloop/thirdparty-sdk)
+### [14.0.2](https://github.com/mojaloop/thirdparty-sdk/compare/v14.0.1...v14.0.2) (2022-05-24)
+
+
+### Maintenance
+
+* fix publish job and update packages ([#145](https://github.com/mojaloop/thirdparty-sdk/issues/145)) ([808afd1](https://github.com/mojaloop/thirdparty-sdk/commit/808afd196d852750e0ee61ba6ccbddee4c8975fd))
+
 ### [14.0.1](https://github.com/mojaloop/thirdparty-sdk/compare/v14.0.0...v14.0.1) (2022-05-23)
 
 
