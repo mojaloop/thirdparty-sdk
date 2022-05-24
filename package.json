@@ -29,7 +29,7 @@
     "build:ttk-fspiop:api": "openapi bundle --output ./docker/contract/ml-testing-toolkit/spec_files/api_definitions/fspiop_1.0/api_spec.yaml --ext yaml ./docker/contract/ml-testing-toolkit/spec_files/api_definitions/fspiop_1.0/api-template.yaml",
     "build:ttk-3p:api": "openapi bundle --output ./docker/contract/ml-testing-toolkit/spec_files/api_definitions/thirdparty_pisp/api_spec.yaml --ext yaml ./docker/contract/ml-testing-toolkit/spec_files/api_definitions/thirdparty_pisp/thirdparty-pisp-api-template.yaml",
     "validate:api:ttk": "swagger-cli validate ./docker/contract/ml-testing-toolkit/spec_files/api_definitions/fspiop_1.0/api_spec.yaml; swagger-cli validate ./docker/contract/ml-testing-toolkit/spec_files/api_definitions/thirdparty_pisp/thirdparty-pisp-api-template.yaml",
-    "docker:build": "docker build -t thirdparty-sdk:local -f ./docker/Dockerfile ./",
+    "docker:build": "docker build -t thirdparty-sdk:local -f ./Dockerfile ./",
     "docker:run:inbound": "docker run -p 4005:4005 thirdparty-sdk:local npm run start:inbound",
     "docker:run:outbound": "docker run -p 4006:4006 thirdparty-sdk:local npm run start:outbound",
     "lint": "eslint --ext ts --ext js test src",
