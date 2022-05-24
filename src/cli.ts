@@ -30,13 +30,14 @@
 // the js `require()` can resolve the '~' paths
 require('module-alias/register')
 
-import { ConvictConfig, PACKAGE } from '~/shared/config'
+import { ConvictConfig, OutConfig, PACKAGE, ServiceConfig } from '~/shared/config'
 import { ServerAPI, ServerConfig } from '~/server'
 import { Command } from 'commander'
 import { Handler } from 'openapi-backend'
 import Handlers from '~/handlers'
 import index from './index'
 import path from 'path'
+import { Path } from 'convict'
 
 // handle script parameters
 const program = new Command(PACKAGE.name)
@@ -50,7 +51,7 @@ function mkStartAPI(api: ServerAPI, handlers: { [handler: string]: Handler }): (
   return async (): Promise<void> => {
     // update config from program parameters,
     // so setupAndStart will know on which PORT/HOST bind the server
-    const apiConfig = ConvictConfig.get(api.toUpperCase())
+    const apiConfig: OutConfig = ConvictConfig.get(api.toUpperCase() as Path<ServiceConfig>) as OutConfig
 
     // resolve the path to openapi v3 definition file
     const apiPath = path.resolve(__dirname, `../src/interface/api-${api}.yaml`)
