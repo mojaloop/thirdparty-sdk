@@ -627,6 +627,17 @@ workflows:
               ignore:
                 - /feature*/
                 - /bugfix*/
+      - test-bdd:
+          context: org-global
+          requires:
+            - setup
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              ignore:
+                - /feature*/
+                - /bugfix*/
       - test-coverage:
           context: org-global
           requires:
@@ -678,6 +689,7 @@ workflows:
             - test-dependencies
             - test-lint
             - test-unit
+            - test-bdd
             - test-coverage
             - test-integration
             - vulnerability-check
@@ -716,6 +728,7 @@ workflows:
             - test-dependencies
             - test-lint
             - test-unit
+            - test-bdd
             - test-coverage
             - test-integration
             - vulnerability-check
@@ -743,6 +756,7 @@ workflows:
             - test-dependencies
             - test-lint
             - test-unit
+            - test-bdd
             - test-coverage
             - test-integration
             - vulnerability-check
@@ -763,6 +777,7 @@ workflows:
             - test-dependencies
             - test-lint
             - test-unit
+            - test-bdd
             - test-coverage
             - test-integration
             - vulnerability-check
