@@ -359,6 +359,7 @@ describe('Outbound API routes', (): void => {
       pubSub.publish(channelTransPut, transactionStatus as unknown as Message)
     }, 100)
     const response = await server.inject(request)
+    console.log(response)
     expect(response.statusCode).toBe(200)
     expect(response.result).toEqual({
       authorization: expect.anything(),

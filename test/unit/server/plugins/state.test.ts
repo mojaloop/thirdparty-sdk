@@ -113,9 +113,14 @@ describe('StatePlugin', () => {
       .mockImplementationOnce(() => ({ Iam: 'mockedWSO2Auth' } as unknown as SDK.WSO2Auth))
     config.INBOUND.TLS.mutualTLS.enabled = true
     config.INBOUND.TLS.creds = {
-      ca: 'mocked ca',
-      cert: 'mocked cert',
-      key: 'mocked key'
+      ca: 'mocked inbound ca',
+      cert: 'mocked inbound cert',
+      key: 'mocked inbound key'
+    }
+    config.OUTBOUND.TLS.creds = {
+      ca: 'mocked outbound ca',
+      cert: 'mocked outbound cert',
+      key: 'mocked outbound key'
     }
     await StatePlugin.register(ServerMock as unknown as Server)
     expect(spyWSO2Auth).toBeCalledWith({
@@ -131,10 +136,15 @@ describe('StatePlugin', () => {
       .spyOn(SDK, 'WSO2Auth')
       .mockImplementationOnce(() => ({ Iam: 'mockedWSO2Auth' } as unknown as SDK.WSO2Auth))
     config.OUTBOUND.TLS.mutualTLS.enabled = true
+    config.INBOUND.TLS.creds = {
+      ca: 'mocked inbound ca',
+      cert: 'mocked inbound cert',
+      key: 'mocked inbound key'
+    }
     config.OUTBOUND.TLS.creds = {
-      ca: 'mocked ca',
-      cert: 'mocked cert',
-      key: 'mocked key'
+      ca: 'mocked outbound ca',
+      cert: 'mocked outbound cert',
+      key: 'mocked outbound key'
     }
     const OutboundServerMock = ServerMock
     OutboundServerMock.settings.app.api = ServerAPI.outbound

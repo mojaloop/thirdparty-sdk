@@ -46,21 +46,10 @@ export function getFileContent(path: PathLike): Buffer {
 function getFileListContent(pathList: string): Array<Buffer> {
   return pathList.split(',').map((path) => getFileContent(path))
 }
-
-export interface Tls {
-  mutualTLS: {
-    enabled: boolean
-  }
-  creds: {
-    ca: Buffer[] | string
-    cert: Buffer | string
-    key: Buffer | string
-  }
-}
 export interface OutConfig {
   HOST: string
   PORT: number
-  TLS: Tls
+  TLS: BaseRequestTLSConfig
 }
 
 export interface InConfig extends OutConfig {
@@ -69,7 +58,7 @@ export interface InConfig extends OutConfig {
 
 export interface ControlConfig {
   MGMT_API_WS_URL: string
-  MGMT_API_WS_PORT: string
+  MGMT_API_WS_PORT: number
 }
 
 // interface to represent service configuration
@@ -135,7 +124,6 @@ export interface ServiceConfig {
     DFSP_BACKEND_STORE_CONS_REQ_PATH: string
     JWS_SIGN: boolean
     JWS_SIGNING_KEY: PathLike | Buffer
-    TLS: BaseRequestTLSConfig
     TEMP_OVERRIDE_QUOTES_PARTY_ID_TYPE?: fspiopAPI.Schemas.PartyIdType
     TEST_OVERRIDE_CONSENT_ID?: string
     TEST_SHOULD_OVERRIDE_CONSENT_ID: boolean
@@ -208,10 +196,6 @@ export const ConvictConfig = Convict<ServiceConfig>({
     }
   },
   CONTROL: {
-    default: {
-      MGMT_API_WS_URL: '127.0.0.1',
-      MGMT_API_WS_PORT: '4005'
-    },
     MGMT_API_WS_URL: {
       doc: 'The OutboundAPI Hostname/IP address to bind.',
       format: '*',
@@ -301,8 +285,6 @@ export const ConvictConfig = Convict<ServiceConfig>({
     }
   },
   SHARED: {
-    format: Object,
-    default: null,
     PEER_ENDPOINT: {
       doc: 'Peer/Switch endpoint',
       format: '*',
@@ -491,8 +473,14 @@ export const ConvictConfig = Convict<ServiceConfig>({
       format: '*',
       default: 'localhost:9000/thirdpartyRequests/transactions/{ID}'
     },
-    JWS_SIGN: false,
-    JWS_SIGNING_KEY: '',
+    JWS_SIGN: {
+      format: 'Boolean',
+      default: false
+    },
+    JWS_SIGNING_KEY: {
+      format: '*',
+      default: ''
+    },
     TEMP_OVERRIDE_QUOTES_PARTY_ID_TYPE: {
       doc: 'DEPRECATED - No longer in use. Implement the backend request validateThirdpartyTransactionRequestAndGetContext instead.',
       format: '*',
