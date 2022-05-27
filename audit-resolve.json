@@ -169,6 +169,11 @@
       "decision": "ignore",
       "madeAt": 1653061086243,
       "expiresAt": 1655653080778
+    },
+    "1070412|ejs": {
+      "decision": "ignore",
+      "madeAt": 1653669237396,
+      "expiresAt": 1656261231609
     }
   },
   "rules": {},

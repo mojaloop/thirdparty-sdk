@@ -161,6 +161,7 @@ export interface components {
      * specific access to a given account.
      *
      * @example PERSONAL_ID
+     * @enum {string}
      */
     PartyIdType:
       | 'MSISDN'
@@ -214,6 +215,7 @@ export interface components {
     /**
      * ThirdpartyTransactionPartyLookupState
      * @description state of thirdparty transaction partyLookup phase
+     * @enum {string}
      */
     ThirdpartyTransactionPartyLookupState: 'start' | 'partyLookupSuccess' | 'partyLookupFailure' | 'errored'
     /** ThirdpartyTransactionPartyLookupResponseError */
@@ -300,6 +302,7 @@ export interface components {
      * @description - THIRD_PARTY_LINK - is the DFSP's internal reference which allows DFSP to find out the corresponding consent
      *
      * @example PERSONAL_ID
+     * @enum {string}
      */
     PartyIdTypeTPLink: 'THIRD_PARTY_LINK'
     /**
@@ -319,11 +322,13 @@ export interface components {
      * - SEND - Amount the Payer would like to send, that is, the amount that should be withdrawn from the Payer account including any fees.
      * - RECEIVE - Amount the Payer would like the Payee to receive, that is, the amount that should be sent to the receiver exclusive of any fees.
      * @example RECEIVE
+     * @enum {string}
      */
     AmountType: 'SEND' | 'RECEIVE'
     /**
      * Currency
      * @description The currency codes defined in [ISO 4217](https://www.iso.org/iso-4217-currency-codes.html) as three-letter alphabetic codes are used as the standard naming representation for currencies.
+     * @enum {string}
      */
     Currency:
       | 'AED'
@@ -513,6 +518,7 @@ export interface components {
      * - PAYMENT - Usually used for performing a transaction from a Consumer to a Merchant or Organization, but could also be for a B2B (Business to Business) payment. The transaction could be online for a purchase in an Internet store, in a physical store where both the Consumer and Business User are present, a bill payment, a donation, and so on.
      * - REFUND - Used for performing a refund of transaction.
      * @example DEPOSIT
+     * @enum {string}
      */
     TransactionScenario: 'DEPOSIT' | 'WITHDRAWAL' | 'TRANSFER' | 'PAYMENT' | 'REFUND'
     /**
@@ -527,6 +533,7 @@ export interface components {
      * - PAYER - Sender of funds is initiating the transaction. The account to send from is either owned by the Payer or is connected to the Payer in some way.
      * - PAYEE - Recipient of the funds is initiating the transaction by sending a transaction request. The Payer must approve the transaction, either automatically by a pre-generated OTP or by pre-approval of the Payee, or by manually approving in his or her own Device.
      * @example PAYEE
+     * @enum {string}
      */
     TransactionInitiator: 'PAYER' | 'PAYEE'
     /**
@@ -537,6 +544,7 @@ export interface components {
      * - BUSINESS - Business is the initiator of the transaction.
      * - DEVICE - Device is the initiator of the transaction.
      * @example CONSUMER
+     * @enum {string}
      */
     TransactionInitiatorType: 'CONSUMER' | 'AGENT' | 'BUSINESS' | 'DEVICE'
     /**
@@ -587,6 +595,7 @@ export interface components {
     /**
      * ThirdpartyTransactionIDInitiateState
      * @description state of thirdparty transaction for initiate phase
+     * @enum {string}
      */
     ThirdpartyTransactionIDInitiateState: 'partyLookupSuccess' | 'authorizationReceived' | 'errored'
     /** ThirdpartyTransactionIDInitateResponseError */
@@ -639,11 +648,14 @@ export interface components {
     /**
      * AuthorizationResponseType
      * @description The customer accepted the terms of the transfer
+     *
+     * @enum {string}
      */
     AuthorizationResponseTypeAccepted: 'ACCEPTED'
     /**
      * SignedPayloadTypeGeneric
      * @description Describes a challenge that has been signed with a private key
+     * @enum {string}
      */
     SignedPayloadTypeGeneric: 'GENERIC'
     /** @description The API data type BinaryString is a JSON String. The string is a base64url  encoding of a string of raw bytes, where padding (character ‘=’) is added at the end of the data if needed to ensure that the string is a multiple of 4 characters. The length restriction indicates the allowed number of characters. */
@@ -665,6 +677,7 @@ export interface components {
     /**
      * SignedPayloadTypeFIDO
      * @description Describes a challenge that has been signed with FIDO Attestation flows
+     * @enum {string}
      */
     SignedPayloadTypeFIDO: 'FIDO'
     /**
@@ -700,7 +713,10 @@ export interface components {
          */
         userHandle?: string
       }
-      /** @description response type, we need only the type of public-key */
+      /**
+       * @description response type, we need only the type of public-key
+       * @enum {string}
+       */
       type: 'public-key'
     }
     /** SignedPayloadFIDO */
@@ -726,6 +742,7 @@ export interface components {
     /**
      * ThirdpartyTransactionIDApproveState
      * @description state of thirdparty transaction
+     * @enum {string}
      */
     ThirdpartyTransactionIDApproveState: 'authorizationReceived' | 'transactionStatusReceived' | 'errored'
     /** ThirdpartyTransactionIDApproveResponseError */
@@ -740,6 +757,7 @@ export interface components {
      * - PENDING - Payer FSP has sent the transaction request to the Payer.
      * - ACCEPTED - Payer has approved the transaction.
      * - REJECTED - Payer has rejected the transaction.
+     * @enum {string}
      */
     TransactionRequestState: 'RECEIVED' | 'PENDING' | 'ACCEPTED' | 'REJECTED'
     /** ThirdpartyTransactionIDApproveResponseSuccess */
@@ -756,6 +774,7 @@ export interface components {
     /**
      * LinkingProvidersState
      * @description State of GET /linking/providers request
+     * @enum {string}
      */
     LinkingProvidersState: 'start' | 'errored' | 'providersLookupSuccess'
     /** LinkingProvidersResponseError */
@@ -826,6 +845,8 @@ export interface components {
      * - ACCOUNTS_GET_BALANCE: PISP can request a balance for the linked account
      * - ACCOUNTS_TRANSFER: PISP can request a transfer of funds from the linked account in the DFSP
      * - ACCOUNTS_STATEMENT: PISP can request a statement of individual transactions on a user's account
+     *
+     * @enum {string}
      */
     ScopeAction: 'ACCOUNTS_GET_BALANCE' | 'ACCOUNTS_TRANSFER' | 'ACCOUNTS_STATEMENT'
     /**
@@ -845,6 +866,7 @@ export interface components {
     /**
      * LinkingRequestConsentState
      * @description State of `POST /linking/request-consent` request
+     * @enum {string}
      */
     LinkingRequestConsentState:
       | 'start'
@@ -869,6 +891,8 @@ export interface components {
     /**
      * ConsentRequestChannelTypeWeb
      * @description The web auth channel being used for `PUT /consentRequest/{ID}` request.
+     *
+     * @enum {string}
      */
     ConsentRequestChannelTypeWeb: 'WEB'
     /**
@@ -895,6 +919,8 @@ export interface components {
     /**
      * ConsentRequestChannelTypeOTP
      * @description The OTP auth channel being used for `PUT /consentRequests/{ID}` request.
+     *
+     * @enum {string}
      */
     ConsentRequestChannelTypeOTP: 'OTP'
     /**
@@ -929,6 +955,7 @@ export interface components {
     /**
      * LinkingRequestConsentIDAuthenticateState
      * @description State of PATCH linking request consent Authenticate
+     * @enum {string}
      */
     LinkingRequestConsentIDAuthenticateState: 'errored' | 'consentReceivedAwaitingCredential'
     /** LinkingRequestConsentIDAuthenticateResponseError */
@@ -941,6 +968,7 @@ export interface components {
      * @description Allowed values for the enumeration ConsentStatus
      * - ISSUED - The consent has been issued by the DFSP
      * - REVOKED - The consent has been revoked
+     * @enum {string}
      */
     ConsentStatus: 'ISSUED' | 'REVOKED'
     /**
@@ -993,7 +1021,10 @@ export interface components {
         /** @description CBOR.encoded attestation object */
         attestationObject: string
       }
-      /** @description response type, we need only the type of public-key */
+      /**
+       * @description response type, we need only the type of public-key
+       * @enum {string}
+       */
       type: 'public-key'
     }
     /**
@@ -1008,6 +1039,7 @@ export interface components {
     /**
      * LinkingRequestConsentIDPassCredentialState
      * @description State of post linking request consent pass credential
+     * @enum {string}
      */
     LinkingRequestConsentIDPassCredentialState: 'errored' | 'accountsLinked'
     /** LinkingRequestConsentIDPassCredentialResponseError */
@@ -1019,6 +1051,8 @@ export interface components {
      * CredentialStatusVerified
      * @description The status of the Credential.
      * - "VERIFIED" - The Credential is valid and verified.
+     *
+     * @enum {string}
      */
     CredentialStatusVerified: 'VERIFIED'
     /** LinkingRequestConsentIDPassCredentialResponseSuccess */

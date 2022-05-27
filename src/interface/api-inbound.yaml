@@ -359,6 +359,7 @@ paths:
     put:
       tags:
         - consentRequests
+        - sampled
       operationId: NotifyErrorConsentRequests
       summary: NotifyErrorConsentRequests
       description: >
@@ -637,6 +638,7 @@ paths:
     put:
       tags:
         - consents
+        - sampled
       operationId: NotifyErrorConsents
       summary: NotifyErrorConsents
       description: >
@@ -848,6 +850,7 @@ paths:
       summary: Create participant information
       tags:
         - participants
+        - sampled
       operationId: ParticipantsByIDAndType
       parameters:
         - $ref: '#/components/parameters/Accept'
@@ -1015,6 +1018,7 @@ paths:
       summary: Return participant information error
       tags:
         - participants
+        - sampled
       operationId: ParticipantsErrorByTypeAndID
       parameters:
         - $ref: '#/components/parameters/Content-Length'
@@ -1063,6 +1067,7 @@ paths:
         PISP to initiate a 3rd party Transaction request with a DFSP
       tags:
         - thirdpartyRequests
+        - sampled
       parameters:
         - $ref: '#/components/parameters/Accept'
         - $ref: '#/components/parameters/Content-Length'
@@ -1112,6 +1117,7 @@ paths:
       summary: PostThirdpartyRequestsAuthorizations
       tags:
         - authorizations
+        - sampled
       parameters:
         - $ref: '#/components/parameters/Accept'
         - $ref: '#/components/parameters/Content-Length'
@@ -1167,6 +1173,7 @@ paths:
       summary: GetThirdpartyRequestsAuthorizationsById
       tags:
         - authorizations
+        - sampled
       parameters:
         - $ref: '#/components/parameters/Accept'
       responses:
