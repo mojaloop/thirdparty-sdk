@@ -47,13 +47,29 @@ function getFileListContent(pathList: string): Array<Buffer> {
   return pathList.split(',').map((path) => getFileContent(path))
 }
 
+export interface Tls {
+  mutualTLS: {
+    enabled: boolean
+  }
+  creds: {
+    ca: Buffer[] | string
+    cert: Buffer | string
+    key: Buffer | string
+  }
+}
 export interface OutConfig {
   HOST: string
   PORT: number
+  TLS: Tls
 }
 
 export interface InConfig extends OutConfig {
   PISP_TRANSACTION_MODE: boolean
+}
+
+export interface ControlConfig {
+  MGMT_API_WS_URL: string
+  MGMT_API_WS_PORT: string
 }
 
 // interface to represent service configuration
@@ -61,6 +77,7 @@ export interface ServiceConfig {
   ENV: string
   INBOUND: InConfig
   OUTBOUND: OutConfig
+  CONTROL: ControlConfig
   REQUEST_PROCESSING_TIMEOUT_SECONDS: number
   WSO2_AUTH: {
     staticToken: string
@@ -125,6 +142,7 @@ export interface ServiceConfig {
     TEST_CONSENT_REQUEST_TO_CONSENT_MAP: Record<string, string>
     TEST_OVERRIDE_TRANSACTION_CHALLENGE?: string
   }
+  PM4ML_ENABLED: boolean
 }
 
 // Declare configuration schema, default values and bindings to environment variables
@@ -153,6 +171,16 @@ export const ConvictConfig = Convict<ServiceConfig>({
       format: 'Boolean',
       default: false,
       env: 'PISP_TRANSACTION_MODE'
+    },
+    TLS: {
+      mutualTLS: {
+        enabled: false
+      },
+      creds: {
+        ca: '',
+        cert: '',
+        key: ''
+      }
     }
   },
   OUTBOUND: {
@@ -167,6 +195,34 @@ export const ConvictConfig = Convict<ServiceConfig>({
       format: 'port',
       default: 3002,
       env: 'OUTBOUND_PORT'
+    },
+    TLS: {
+      mutualTLS: {
+        enabled: false
+      },
+      creds: {
+        ca: '',
+        cert: '',
+        key: ''
+      }
+    }
+  },
+  CONTROL: {
+    default: {
+      MGMT_API_WS_URL: '127.0.0.1',
+      MGMT_API_WS_PORT: '4005'
+    },
+    MGMT_API_WS_URL: {
+      doc: 'The OutboundAPI Hostname/IP address to bind.',
+      format: '*',
+      default: '127.0.0.1',
+      env: 'CONTROL_MGMT_API_WS_URL'
+    },
+    MGMT_API_WS_PORT: {
+      doc: 'The OutboundAPI port to bind.',
+      format: 'port',
+      default: 4005,
+      env: 'CONTROL_MGMT_API_WS_URL'
     }
   },
   REQUEST_PROCESSING_TIMEOUT_SECONDS: {
@@ -245,6 +301,8 @@ export const ConvictConfig = Convict<ServiceConfig>({
     }
   },
   SHARED: {
+    format: Object,
+    default: null,
     PEER_ENDPOINT: {
       doc: 'Peer/Switch endpoint',
       format: '*',
@@ -435,17 +493,6 @@ export const ConvictConfig = Convict<ServiceConfig>({
     },
     JWS_SIGN: false,
     JWS_SIGNING_KEY: '',
-    // Todo: Investigate proper key setup
-    TLS: {
-      mutualTLS: {
-        enabled: false
-      },
-      creds: {
-        ca: '',
-        cert: '',
-        key: ''
-      }
-    },
     TEMP_OVERRIDE_QUOTES_PARTY_ID_TYPE: {
       doc: 'DEPRECATED - No longer in use. Implement the backend request validateThirdpartyTransactionRequestAndGetContext instead.',
       format: '*',
@@ -476,6 +523,9 @@ it will fallback to default behaviour (random consentId)`,
       format: '*',
       default: undefined
     }
+  },
+  PM4ML_ENABLED: {
+    default: false
   }
 })
 
@@ -491,11 +541,16 @@ if (ConvictConfig.get('SHARED.JWS_SIGN')) {
   ConvictConfig.set('SHARED.JWS_SIGNING_KEY', getFileContent(ConvictConfig.get('SHARED').JWS_SIGNING_KEY))
 }
 
-// Note: Have not seen these be comma separated value strings. mimicking sdk-scheme-adapter for now
-if (ConvictConfig.get('SHARED.TLS.mutualTLS.enabled')) {
-  ConvictConfig.set('SHARED.TLS.creds.ca', getFileListContent(<string>ConvictConfig.get('SHARED').TLS.creds.ca))
-  ConvictConfig.set('SHARED.TLS.creds.cert', getFileListContent(<string>ConvictConfig.get('SHARED').TLS.creds.cert))
-  ConvictConfig.set('SHARED.TLS.creds.key', getFileListContent(<string>ConvictConfig.get('SHARED').TLS.creds.key))
+if (ConvictConfig.get('INBOUND.TLS.mutualTLS.enabled')) {
+  ConvictConfig.set('INBOUND.TLS.creds.ca', getFileListContent(<string>ConvictConfig.get('INBOUND').TLS.creds.ca))
+  ConvictConfig.set('INBOUND.TLS.creds.cert', getFileContent(<string>ConvictConfig.get('INBOUND').TLS.creds.cert))
+  ConvictConfig.set('INBOUND.TLS.creds.key', getFileContent(<string>ConvictConfig.get('INBOUND').TLS.creds.key))
+}
+
+if (ConvictConfig.get('OUTBOUND.TLS.mutualTLS.enabled')) {
+  ConvictConfig.set('OUTBOUND.TLS.creds.ca', getFileListContent(<string>ConvictConfig.get('OUTBOUND').TLS.creds.ca))
+  ConvictConfig.set('OUTBOUND.TLS.creds.cert', getFileContent(<string>ConvictConfig.get('OUTBOUND').TLS.creds.cert))
+  ConvictConfig.set('OUTBOUND.TLS.creds.key', getFileContent(<string>ConvictConfig.get('OUTBOUND').TLS.creds.key))
 }
 
 // extract simplified config from Convict object
@@ -503,11 +558,13 @@ const config: ServiceConfig = {
   ENV: ConvictConfig.get('ENV'),
   INBOUND: ConvictConfig.get('INBOUND'),
   OUTBOUND: ConvictConfig.get('OUTBOUND'),
+  CONTROL: ConvictConfig.get('CONTROL'),
   REQUEST_PROCESSING_TIMEOUT_SECONDS: ConvictConfig.get('REQUEST_PROCESSING_TIMEOUT_SECONDS'),
   WSO2_AUTH: ConvictConfig.get('WSO2_AUTH'),
   REDIS: ConvictConfig.get('REDIS'),
   INSPECT: ConvictConfig.get('INSPECT'),
-  SHARED: ConvictConfig.get('SHARED')
+  SHARED: ConvictConfig.get('SHARED'),
+  PM4ML_ENABLED: ConvictConfig.get('PM4ML_ENABLED')
 }
 
 export default config

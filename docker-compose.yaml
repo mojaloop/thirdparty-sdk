@@ -12,6 +12,7 @@ services:
       dockerfile: ./Dockerfile
     command: sh -c "/opt/thirdparty-sdk/wait4/wait4.js inbound-thirdparty-sdk && NODE_ENV=integration npm run start:inbound"
     volumes:
+      - ./docker/secrets:/secrets
       - ./docker/wait4:/opt/thirdparty-sdk/wait4
     environment:
       - NODE_ENV=integration
@@ -36,6 +37,7 @@ services:
       dockerfile: ./Dockerfile
     command: sh -c "/opt/thirdparty-sdk/wait4/wait4.js outbound-thirdparty-sdk && NODE_ENV=integration npm run start:outbound"
     volumes:
+      - ./docker/secrets:/secrets
       - ./docker/wait4:/opt/thirdparty-sdk/wait4
     environment:
       - NODE_ENV=integration

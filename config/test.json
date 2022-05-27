@@ -2,11 +2,31 @@
   "INBOUND": {
     "PORT": 4005,
     "HOST": "0.0.0.0",
-    "PISP_TRANSACTION_MODE": false
+    "PISP_TRANSACTION_MODE": false,
+    "TLS": {
+      "mutualTLS": {
+        "enabled": false
+      },
+      "creds": {
+        "ca": "./secrets/dfsp_a_client.crt",
+        "cert": "./secrets/dfsp_a_client.crt",
+        "key": "./secrets/dfsp_a_client.crt"
+      }
+    }
   },
   "OUTBOUND": {
     "PORT": 4006,
-    "HOST": "0.0.0.0"
+    "HOST": "0.0.0.0",
+    "TLS": {
+      "mutualTLS": {
+        "enabled": false
+      },
+      "creds": {
+        "ca": "./secrets/dfsp_a_client.crt",
+        "cert": "./secrets/dfsp_a_client.crt",
+        "key": "./secrets/dfsp_a_client.crt"
+      }
+    }
   },
   "REQUEST_PROCESSING_TIMEOUT_SECONDS": 30,
   "WSO2_AUTH": {
@@ -45,16 +65,7 @@
     "SDK_OUTGOING_PARTIES_INFORMATION_PATH": "parties/{Type}/{ID}/{SubId}",
     "SDK_NOTIFY_ABOUT_TRANSFER_URI": "localhost:9000/thridpartyRequests/transactions/{ID}",
     "JWS_SIGN": false,
-    "JWS_SIGNING_KEY": "./secrets/jwsSigningKey.key",
-    "TLS": {
-      "mutualTLS": {
-        "enabled": false
-      },
-      "creds": {
-        "ca": "./secrets/dfsp_a_client.crt",
-        "cert": "./secrets/dfsp_a_client.crt",
-        "key": "./secrets/dfsp_a_client.crt"
-      }
-    }
-  }
+    "JWS_SIGNING_KEY": "./secrets/jwsSigningKey.key"
+  },
+  "PM4ML_ENABLED": false
 }

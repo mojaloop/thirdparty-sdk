@@ -49,7 +49,9 @@ describe('StatePlugin', () => {
     },
     decorate: jest.fn(),
     settings: {
-      app: ServerAPI.inbound
+      app: {
+        api: ServerAPI.inbound
+      }
     }
   }
 
@@ -105,12 +107,12 @@ describe('StatePlugin', () => {
     mockExit.mockRestore()
   })
 
-  it('should prepare WSO2Auth with tlsCreds', async () => {
+  it('should prepare WSO2Auth with inbound tlsCreds', async () => {
     const spyWSO2Auth = jest
       .spyOn(SDK, 'WSO2Auth')
       .mockImplementationOnce(() => ({ Iam: 'mockedWSO2Auth' } as unknown as SDK.WSO2Auth))
-    config.SHARED.TLS.mutualTLS.enabled = true
-    config.SHARED.TLS.creds = {
+    config.INBOUND.TLS.mutualTLS.enabled = true
+    config.INBOUND.TLS.creds = {
       ca: 'mocked ca',
       cert: 'mocked cert',
       key: 'mocked key'
@@ -119,8 +121,30 @@ describe('StatePlugin', () => {
     expect(spyWSO2Auth).toBeCalledWith({
       ...config.WSO2_AUTH,
       logger,
-      tlsCreds: config.SHARED.TLS.creds
+      tlsCreds: config.INBOUND.TLS.creds
     })
-    config.SHARED.TLS.mutualTLS.enabled = false
+    config.INBOUND.TLS.mutualTLS.enabled = false
+  })
+
+  it('should prepare WSO2Auth with outbound tlsCreds', async () => {
+    const spyWSO2Auth = jest
+      .spyOn(SDK, 'WSO2Auth')
+      .mockImplementationOnce(() => ({ Iam: 'mockedWSO2Auth' } as unknown as SDK.WSO2Auth))
+    config.OUTBOUND.TLS.mutualTLS.enabled = true
+    config.OUTBOUND.TLS.creds = {
+      ca: 'mocked ca',
+      cert: 'mocked cert',
+      key: 'mocked key'
+    }
+    const OutboundServerMock = ServerMock
+    OutboundServerMock.settings.app.api = ServerAPI.outbound
+
+    await StatePlugin.register(ServerMock as unknown as Server)
+    expect(spyWSO2Auth).toBeCalledWith({
+      ...config.WSO2_AUTH,
+      logger,
+      tlsCreds: config.OUTBOUND.TLS.creds
+    })
+    config.OUTBOUND.TLS.mutualTLS.enabled = false
   })
 })
