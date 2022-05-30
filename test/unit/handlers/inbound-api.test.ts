@@ -143,7 +143,8 @@ describe('Inbound API routes', (): void => {
     const serverConfig: ServerConfig = {
       port: config.INBOUND.PORT,
       host: config.INBOUND.HOST,
-      api: ServerAPI.inbound
+      api: ServerAPI.inbound,
+      tls: config.INBOUND.TLS
     }
     const serverHandlers = {
       ...Handlers.Shared,

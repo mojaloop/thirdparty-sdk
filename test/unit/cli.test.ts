@@ -43,7 +43,8 @@ describe('cli', (): void => {
       {
         port: Config.INBOUND.PORT,
         host: Config.INBOUND.HOST,
-        api: 'inbound'
+        api: 'inbound',
+        tls: Config.INBOUND.TLS
       },
       path.resolve(__dirname, '../../src/interface/api-inbound.yaml'),
       {
