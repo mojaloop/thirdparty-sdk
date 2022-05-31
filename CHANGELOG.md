@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-sdk](https://github.com/mojaloop/thirdparty-sdk)
+### [14.0.3](https://github.com/mojaloop/thirdparty-sdk/compare/v14.0.2...v14.0.3) (2022-05-31)
+
+
+### Code Refactor
+
+* refactor config to handle diff inbound/outbound certs ([#146](https://github.com/mojaloop/thirdparty-sdk/issues/146)) ([4649743](https://github.com/mojaloop/thirdparty-sdk/commit/4649743ddb0f8f07bc70f683a960635a35194aa9))
+
 ### [14.0.2](https://github.com/mojaloop/thirdparty-sdk/compare/v14.0.1...v14.0.2) (2022-05-24)
 
 
