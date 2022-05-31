@@ -194,13 +194,13 @@ export const ConvictConfig = Convict<ServiceConfig>({
   },
   CONTROL: {
     MGMT_API_WS_URL: {
-      doc: 'The OutboundAPI Hostname/IP address to bind.',
+      doc: 'Management API websocket connection host.',
       format: '*',
       default: '127.0.0.1',
       env: 'CONTROL_MGMT_API_WS_URL'
     },
     MGMT_API_WS_PORT: {
-      doc: 'The OutboundAPI port to bind.',
+      doc: 'Management API websocket connection port.',
       format: 'port',
       default: 4005,
       env: 'CONTROL_MGMT_API_WS_URL'
