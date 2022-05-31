@@ -96,7 +96,7 @@ This package exemplifies the use of the Mojaloop SDK Standard Components for TLS
 
 
 ### When used by a DFSP
-   DFSP's needs to have Inbound service running, DFSP's will need to implement
+   DFSPs need to have Inbound service running, DFSPs will need to implement
    a Backend API to handle backend requests from the `thirdparty-sdk` and configure
    the `thirdparty-sdk` to point to the DFSP's `sdk-scheme-adapter`.
 
