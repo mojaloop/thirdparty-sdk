@@ -41,7 +41,8 @@ async function prepareInboundAPIServer(): Promise<Server> {
   const serverConfig: ServerConfig = {
     port: Config.INBOUND.PORT,
     host: Config.INBOUND.HOST,
-    api: ServerAPI.inbound
+    api: ServerAPI.inbound,
+    tls: Config.INBOUND.TLS
   }
   const serverHandlers = {
     ...Handlers.Shared,
