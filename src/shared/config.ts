@@ -46,14 +46,19 @@ export function getFileContent(path: PathLike): Buffer {
 function getFileListContent(pathList: string): Array<Buffer> {
   return pathList.split(',').map((path) => getFileContent(path))
 }
-
 export interface OutConfig {
   HOST: string
   PORT: number
+  TLS: BaseRequestTLSConfig
 }
 
 export interface InConfig extends OutConfig {
   PISP_TRANSACTION_MODE: boolean
+}
+
+export interface ControlConfig {
+  MGMT_API_WS_URL: string
+  MGMT_API_WS_PORT: number
 }
 
 // interface to represent service configuration
@@ -61,6 +66,7 @@ export interface ServiceConfig {
   ENV: string
   INBOUND: InConfig
   OUTBOUND: OutConfig
+  CONTROL: ControlConfig
   REQUEST_PROCESSING_TIMEOUT_SECONDS: number
   WSO2_AUTH: {
     staticToken: string
@@ -99,9 +105,6 @@ export interface ServiceConfig {
     DFSP_BACKEND_STORE_VALIDATED_CONSENT_FOR_ACCOUNT_ID_PATH: string
     DFSP_TRANSACTION_REQUEST_AUTHORIZATION_TIMEOUT_SECONDS: number
     DFSP_TRANSACTION_REQUEST_VERIFICATION_TIMEOUT_SECONDS: number
-    PISP_BACKEND_URI: string
-    PISP_BACKEND_HTTP_SCHEME: string
-    PISP_BACKEND_SIGN_AUTHORIZATION_PATH: string
     PISP_TRANSACTION_INITIATE_TIMEOUT_IN_SECONDS: number
     PISP_TRANSACTION_APPROVE_TIMEOUT_IN_SECONDS: number
     SDK_OUTGOING_URI: string
@@ -118,13 +121,13 @@ export interface ServiceConfig {
     DFSP_BACKEND_STORE_CONS_REQ_PATH: string
     JWS_SIGN: boolean
     JWS_SIGNING_KEY: PathLike | Buffer
-    TLS: BaseRequestTLSConfig
     TEMP_OVERRIDE_QUOTES_PARTY_ID_TYPE?: fspiopAPI.Schemas.PartyIdType
     TEST_OVERRIDE_CONSENT_ID?: string
     TEST_SHOULD_OVERRIDE_CONSENT_ID: boolean
     TEST_CONSENT_REQUEST_TO_CONSENT_MAP: Record<string, string>
     TEST_OVERRIDE_TRANSACTION_CHALLENGE?: string
   }
+  PM4ML_ENABLED: boolean
 }
 
 // Declare configuration schema, default values and bindings to environment variables
@@ -153,6 +156,16 @@ export const ConvictConfig = Convict<ServiceConfig>({
       format: 'Boolean',
       default: false,
       env: 'PISP_TRANSACTION_MODE'
+    },
+    TLS: {
+      mutualTLS: {
+        enabled: false
+      },
+      creds: {
+        ca: '',
+        cert: '',
+        key: ''
+      }
     }
   },
   OUTBOUND: {
@@ -167,6 +180,30 @@ export const ConvictConfig = Convict<ServiceConfig>({
       format: 'port',
       default: 3002,
       env: 'OUTBOUND_PORT'
+    },
+    TLS: {
+      mutualTLS: {
+        enabled: false
+      },
+      creds: {
+        ca: '',
+        cert: '',
+        key: ''
+      }
+    }
+  },
+  CONTROL: {
+    MGMT_API_WS_URL: {
+      doc: 'Management API websocket connection host.',
+      format: '*',
+      default: '127.0.0.1',
+      env: 'CONTROL_MGMT_API_WS_URL'
+    },
+    MGMT_API_WS_PORT: {
+      doc: 'Management API websocket connection port.',
+      format: 'port',
+      default: 4005,
+      env: 'CONTROL_MGMT_API_WS_URL'
     }
   },
   REQUEST_PROCESSING_TIMEOUT_SECONDS: {
@@ -368,21 +405,6 @@ export const ConvictConfig = Convict<ServiceConfig>({
       format: 'nat',
       default: 15
     },
-    PISP_BACKEND_URI: {
-      doc: "host address of DFSP's ",
-      format: '*',
-      default: 'localhost:9000'
-    },
-    PISP_BACKEND_SIGN_AUTHORIZATION_PATH: {
-      doc: 'path use by PISPBackendRequests.signAuthorization',
-      format: '*',
-      default: 'signchallenge'
-    },
-    PISP_BACKEND_HTTP_SCHEME: {
-      doc: 'Http scheme ',
-      format: ['http', 'https'],
-      default: 'http'
-    },
     PISP_TRANSACTION_INITIATE_TIMEOUT_IN_SECONDS: {
       doc: 'Timeout for Transaction Initiate phase',
       format: 'nat',
@@ -433,18 +455,13 @@ export const ConvictConfig = Convict<ServiceConfig>({
       format: '*',
       default: 'localhost:9000/thirdpartyRequests/transactions/{ID}'
     },
-    JWS_SIGN: false,
-    JWS_SIGNING_KEY: '',
-    // Todo: Investigate proper key setup
-    TLS: {
-      mutualTLS: {
-        enabled: false
-      },
-      creds: {
-        ca: '',
-        cert: '',
-        key: ''
-      }
+    JWS_SIGN: {
+      format: 'Boolean',
+      default: false
+    },
+    JWS_SIGNING_KEY: {
+      format: '*',
+      default: ''
     },
     TEMP_OVERRIDE_QUOTES_PARTY_ID_TYPE: {
       doc: 'DEPRECATED - No longer in use. Implement the backend request validateThirdpartyTransactionRequestAndGetContext instead.',
@@ -476,6 +493,9 @@ it will fallback to default behaviour (random consentId)`,
       format: '*',
       default: undefined
     }
+  },
+  PM4ML_ENABLED: {
+    default: false
   }
 })
 
@@ -491,11 +511,16 @@ if (ConvictConfig.get('SHARED.JWS_SIGN')) {
   ConvictConfig.set('SHARED.JWS_SIGNING_KEY', getFileContent(ConvictConfig.get('SHARED').JWS_SIGNING_KEY))
 }
 
-// Note: Have not seen these be comma separated value strings. mimicking sdk-scheme-adapter for now
-if (ConvictConfig.get('SHARED.TLS.mutualTLS.enabled')) {
-  ConvictConfig.set('SHARED.TLS.creds.ca', getFileListContent(<string>ConvictConfig.get('SHARED').TLS.creds.ca))
-  ConvictConfig.set('SHARED.TLS.creds.cert', getFileListContent(<string>ConvictConfig.get('SHARED').TLS.creds.cert))
-  ConvictConfig.set('SHARED.TLS.creds.key', getFileListContent(<string>ConvictConfig.get('SHARED').TLS.creds.key))
+if (ConvictConfig.get('INBOUND.TLS.mutualTLS.enabled')) {
+  ConvictConfig.set('INBOUND.TLS.creds.ca', getFileListContent(<string>ConvictConfig.get('INBOUND').TLS.creds.ca))
+  ConvictConfig.set('INBOUND.TLS.creds.cert', getFileContent(<string>ConvictConfig.get('INBOUND').TLS.creds.cert))
+  ConvictConfig.set('INBOUND.TLS.creds.key', getFileContent(<string>ConvictConfig.get('INBOUND').TLS.creds.key))
+}
+
+if (ConvictConfig.get('OUTBOUND.TLS.mutualTLS.enabled')) {
+  ConvictConfig.set('OUTBOUND.TLS.creds.ca', getFileListContent(<string>ConvictConfig.get('OUTBOUND').TLS.creds.ca))
+  ConvictConfig.set('OUTBOUND.TLS.creds.cert', getFileContent(<string>ConvictConfig.get('OUTBOUND').TLS.creds.cert))
+  ConvictConfig.set('OUTBOUND.TLS.creds.key', getFileContent(<string>ConvictConfig.get('OUTBOUND').TLS.creds.key))
 }
 
 // extract simplified config from Convict object
@@ -503,11 +528,13 @@ const config: ServiceConfig = {
   ENV: ConvictConfig.get('ENV'),
   INBOUND: ConvictConfig.get('INBOUND'),
   OUTBOUND: ConvictConfig.get('OUTBOUND'),
+  CONTROL: ConvictConfig.get('CONTROL'),
   REQUEST_PROCESSING_TIMEOUT_SECONDS: ConvictConfig.get('REQUEST_PROCESSING_TIMEOUT_SECONDS'),
   WSO2_AUTH: ConvictConfig.get('WSO2_AUTH'),
   REDIS: ConvictConfig.get('REDIS'),
   INSPECT: ConvictConfig.get('INSPECT'),
-  SHARED: ConvictConfig.get('SHARED')
+  SHARED: ConvictConfig.get('SHARED'),
+  PM4ML_ENABLED: ConvictConfig.get('PM4ML_ENABLED')
 }
 
 export default config

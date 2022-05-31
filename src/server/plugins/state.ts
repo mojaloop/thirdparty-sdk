@@ -33,7 +33,6 @@ import { RedisConnectionConfig } from '~/shared/redis-connection'
 import { logger } from '~/shared/logger'
 
 import config from '~/shared/config'
-import { PISPBackendRequests } from '~/shared/pisp-backend-requests'
 import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
 import { SDKOutgoingRequests } from '~/shared/sdk-outgoing-requests'
 import { Scheme } from '~/shared/http-scheme'
@@ -46,7 +45,6 @@ export interface StateResponseToolkit extends ResponseToolkit {
   getMojaloopRequests: () => MojaloopRequests
   getThirdpartyRequests: () => ThirdpartyRequests
   getWSO2Auth: () => WSO2Auth
-  getPISPBackendRequests: () => PISPBackendRequests
   getDFSPBackendRequests: () => DFSPBackendRequests
   getSDKOutgoingRequests: () => SDKOutgoingRequests
   getDFSPId: () => string
@@ -87,7 +85,7 @@ export const StatePlugin = {
     const wso2Auth = new WSO2Auth({
       ...config.WSO2_AUTH,
       logger,
-      tlsCreds: config.SHARED.TLS.mutualTLS.enabled ? (config.SHARED.TLS.creds as TLSCreds) : undefined
+      tlsCreds: config.OUTBOUND.TLS.mutualTLS.enabled ? (config.OUTBOUND.TLS.creds as TLSCreds) : undefined
     })
 
     // prepare Requests instances
@@ -102,7 +100,7 @@ export const StatePlugin = {
       thirdpartyRequestsEndpoint: config.SHARED.THIRDPARTY_REQUESTS_ENDPOINT,
       transactionRequestsEndpoint: config.SHARED.TRANSACTION_REQUEST_ENDPOINT,
       dfspId: config.SHARED.DFSP_ID,
-      tls: config.SHARED.TLS,
+      tls: config.OUTBOUND.TLS,
       jwsSign: config.SHARED.JWS_SIGN,
       jwsSigningKey: <Buffer>config.SHARED.JWS_SIGNING_KEY
     })
@@ -118,16 +116,9 @@ export const StatePlugin = {
       thirdpartyRequestsEndpoint: config.SHARED.THIRDPARTY_REQUESTS_ENDPOINT,
       transactionRequestsEndpoint: config.SHARED.TRANSACTION_REQUEST_ENDPOINT,
       dfspId: config.SHARED.DFSP_ID,
-      tls: config.SHARED.TLS,
+      tls: config.OUTBOUND.TLS,
       jwsSign: config.SHARED.JWS_SIGN,
       jwsSigningKey: <Buffer>config.SHARED.JWS_SIGNING_KEY
-    })
-
-    const pispBackendRequests = new PISPBackendRequests({
-      logger,
-      uri: config.SHARED.PISP_BACKEND_URI,
-      scheme: config.SHARED.PISP_BACKEND_HTTP_SCHEME as Scheme,
-      signAuthorizationPath: config.SHARED.PISP_BACKEND_SIGN_AUTHORIZATION_PATH
     })
 
     const dfspBackendRequests = new DFSPBackendRequests({
@@ -170,7 +161,6 @@ export const StatePlugin = {
       server.decorate('toolkit', 'getMojaloopRequests', (): MojaloopRequests => mojaloopRequests)
       server.decorate('toolkit', 'getThirdpartyRequests', (): ThirdpartyRequests => thirdpartyRequest)
       server.decorate('toolkit', 'getWSO2Auth', (): WSO2Auth => wso2Auth)
-      server.decorate('toolkit', 'getPISPBackendRequests', (): PISPBackendRequests => pispBackendRequests)
       server.decorate('toolkit', 'getDFSPBackendRequests', (): DFSPBackendRequests => dfspBackendRequests)
       server.decorate('toolkit', 'getSDKOutgoingRequests', (): SDKOutgoingRequests => sdkOutgoingRequests)
       server.decorate('toolkit', 'getDFSPId', (): string => config.SHARED.DFSP_ID)

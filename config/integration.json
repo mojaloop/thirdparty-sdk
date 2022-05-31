@@ -2,11 +2,31 @@
   "INBOUND": {
     "PORT": 4005,
     "HOST": "0.0.0.0",
-    "PISP_TRANSACTION_MODE": true
+    "PISP_TRANSACTION_MODE": true,
+    "TLS": {
+      "mutualTLS": {
+        "enabled": false
+      },
+      "creds": {
+        "ca": "./secrets/dfsp_or_3ppi_client_cacert.pem",
+        "cert": "./secrets/dfsp_or_3ppi_server_cert.pem",
+        "key": "./secrets/dfsp_or_3ppi_server_key.key"
+      }
+    }
   },
   "OUTBOUND": {
     "PORT": 4006,
-    "HOST": "0.0.0.0"
+    "HOST": "0.0.0.0",
+    "TLS": {
+      "mutualTLS": {
+        "enabled": false
+      },
+      "creds": {
+        "ca": "./secrets/hub_server_cacert.pem",
+        "cert": "./secrets/dfsp_or_3ppi_client_cert.cer",
+        "key": "./secrets/dfsp_or_3ppi_client_key.key"
+      }
+    }
   },
   "REQUEST_PROCESSING_TIMEOUT_SECONDS": 30,
   "WSO2_AUTH": {
@@ -36,25 +56,13 @@
     "DFSP_BACKEND_HTTP_SCHEME": "http",
     "DFSP_BACKEND_VERIFY_AUTHORIZATION_PATH": "verify-authorization",
     "DFSP_BACKEND_VERIFY_CONSENT_PATH": "verify-consent",
-    "PISP_BACKEND_URI": "pisp-simulator:3000",
-    "PISP_BACKEND_HTTP_SCHEME": "http",
-    "PISP_BACKEND_SIGN_AUTHORIZATION_PATH": "signchallenge",
     "SDK_REQUEST_TO_PAY_TRANSFER_URI": "0.0.0.0:3000/requestToPayTransfer",
     "SDK_OUTGOING_URI": "sdk-scheme-adapter:4001",
     "SDK_OUTGOING_HTTP_SCHEME": "http",
     "SDK_OUTGOING_PARTIES_INFORMATION_PATH": "parties/{Type}/{ID}/{SubId}",
     "SDK_NOTIFY_ABOUT_TRANSFER_URI": "ml-testing-toolkit:5000/thirdpartyRequests/transactions/{ID}",
     "JWS_SIGN": false,
-    "JWS_SIGNING_KEY": "./secrets/jwsSigningKey.key",
-    "TLS": {
-      "mutualTLS": {
-        "enabled": false
-      },
-      "creds": {
-        "ca": "./secrets/dfsp_a_client.crt",
-        "cert": "./secrets/dfsp_a_client.crt",
-        "key": "./secrets/dfsp_a_client.crt"
-      }
-    }
-  }
+    "JWS_SIGNING_KEY": "./secrets/jwsSigningKey.key"
+  },
+  "PM4ML_ENABLED": false
 }

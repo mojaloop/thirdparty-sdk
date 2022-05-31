@@ -49,7 +49,9 @@ describe('StatePlugin', () => {
     },
     decorate: jest.fn(),
     settings: {
-      app: ServerAPI.inbound
+      app: {
+        api: ServerAPI.inbound
+      }
     }
   }
 
@@ -83,11 +85,9 @@ describe('StatePlugin', () => {
     expect(ServerMock.decorate.mock.calls[6][0]).toEqual('toolkit')
     expect(ServerMock.decorate.mock.calls[6][1]).toEqual('getWSO2Auth')
     expect(ServerMock.decorate.mock.calls[7][0]).toEqual('toolkit')
-    expect(ServerMock.decorate.mock.calls[7][1]).toEqual('getPISPBackendRequests')
+    expect(ServerMock.decorate.mock.calls[7][1]).toEqual('getDFSPBackendRequests')
     expect(ServerMock.decorate.mock.calls[8][0]).toEqual('toolkit')
-    expect(ServerMock.decorate.mock.calls[8][1]).toEqual('getDFSPBackendRequests')
-    expect(ServerMock.decorate.mock.calls[9][0]).toEqual('toolkit')
-    expect(ServerMock.decorate.mock.calls[9][1]).toEqual('getSDKOutgoingRequests')
+    expect(ServerMock.decorate.mock.calls[8][1]).toEqual('getSDKOutgoingRequests')
 
     // check listener registration on 'stop' event
     expect(ServerMock.events.on).toBeCalledTimes(1)
@@ -105,22 +105,30 @@ describe('StatePlugin', () => {
     mockExit.mockRestore()
   })
 
-  it('should prepare WSO2Auth with tlsCreds', async () => {
+  it('should prepare WSO2Auth with outbound tlsCreds', async () => {
     const spyWSO2Auth = jest
       .spyOn(SDK, 'WSO2Auth')
       .mockImplementationOnce(() => ({ Iam: 'mockedWSO2Auth' } as unknown as SDK.WSO2Auth))
-    config.SHARED.TLS.mutualTLS.enabled = true
-    config.SHARED.TLS.creds = {
-      ca: 'mocked ca',
-      cert: 'mocked cert',
-      key: 'mocked key'
+    config.OUTBOUND.TLS.mutualTLS.enabled = true
+    config.INBOUND.TLS.creds = {
+      ca: 'mocked inbound ca',
+      cert: 'mocked inbound cert',
+      key: 'mocked inbound key'
     }
+    config.OUTBOUND.TLS.creds = {
+      ca: 'mocked outbound ca',
+      cert: 'mocked outbound cert',
+      key: 'mocked outbound key'
+    }
+    const OutboundServerMock = ServerMock
+    OutboundServerMock.settings.app.api = ServerAPI.outbound
+
     await StatePlugin.register(ServerMock as unknown as Server)
     expect(spyWSO2Auth).toBeCalledWith({
       ...config.WSO2_AUTH,
       logger,
-      tlsCreds: config.SHARED.TLS.creds
+      tlsCreds: config.OUTBOUND.TLS.creds
     })
-    config.SHARED.TLS.mutualTLS.enabled = false
+    config.OUTBOUND.TLS.mutualTLS.enabled = false
   })
 })

@@ -65,7 +65,8 @@ function mkStartAPI(api: ServerAPI, handlers: { [handler: string]: Handler }): (
     const serverConfig: ServerConfig = {
       port: apiConfig.PORT,
       host: apiConfig.HOST,
-      api
+      api,
+      tls: apiConfig.TLS
     }
     // setup & start @hapi server
     await index.server.setupAndStart(serverConfig, apiPath, joinedHandlers)

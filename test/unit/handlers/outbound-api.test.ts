@@ -168,7 +168,8 @@ describe('Outbound API routes', (): void => {
     const serverConfig: ServerConfig = {
       port: Config.OUTBOUND.PORT,
       host: Config.OUTBOUND.HOST,
-      api: ServerAPI.outbound
+      api: ServerAPI.outbound,
+      tls: Config.OUTBOUND.TLS
     }
     const serverHandlers = {
       ...Handlers.Shared,
