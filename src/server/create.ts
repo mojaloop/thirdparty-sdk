@@ -49,7 +49,7 @@ export interface ServerApp {
 }
 
 export default async function create(config: ServerConfig): Promise<Server> {
-  const server: Server = await new Server({
+  const server: Server = new Server({
     host: config.host,
     port: config.port,
     routes: {

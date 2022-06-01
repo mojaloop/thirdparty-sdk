@@ -30,14 +30,18 @@
 // the js `require()` can resolve the '~' paths
 require('module-alias/register')
 
-import { ConvictConfig, OutConfig, PACKAGE, ServiceConfig } from '~/shared/config'
+import config, { OutConfig, PACKAGE, ServiceConfig, ControlConfig } from '~/shared/config'
 import { ServerAPI, ServerConfig } from '~/server'
 import { Command } from 'commander'
 import { Handler } from 'openapi-backend'
 import Handlers from '~/handlers'
 import index from './index'
 import path from 'path'
-import { Path } from 'convict'
+
+import { Logger as SDKLogger } from '@mojaloop/sdk-standard-components'
+import _ from 'lodash'
+import { KeyObject } from 'crypto'
+import * as ControlAgent from '~/reconfiguration/controlAgent'
 
 // handle script parameters
 const program = new Command(PACKAGE.name)
@@ -47,11 +51,13 @@ const program = new Command(PACKAGE.name)
  * @param handlers { { [handler: string]: Handler } } dictionary with api handlers, will be joined with Handlers.Shared
  * @returns () => Promise<void> asynchronous commander action to start api
  */
-function mkStartAPI(api: ServerAPI, handlers: { [handler: string]: Handler }): () => Promise<void> {
+export function mkStartAPI(api: ServerAPI, handlers: { [handler: string]: Handler }): () => Promise<void> {
   return async (): Promise<void> => {
     // update config from program parameters,
     // so setupAndStart will know on which PORT/HOST bind the server
-    const apiConfig: OutConfig = ConvictConfig.get(api.toUpperCase() as Path<ServiceConfig>) as OutConfig
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const apiConfig: OutConfig = config[api.toUpperCase()] as OutConfig
 
     // resolve the path to openapi v3 definition file
     const apiPath = path.resolve(__dirname, `../src/interface/api-${api}.yaml`)
@@ -68,9 +74,91 @@ function mkStartAPI(api: ServerAPI, handlers: { [handler: string]: Handler }): (
       api,
       tls: apiConfig.TLS
     }
+
+    // Check Management API for updated config
+    const controlConfig: ControlConfig = config.CONTROL
+    const serviceConfig: ServiceConfig = config
+    const logger = new SDKLogger.Logger()
+
+    if (config.PM4ML_ENABLED) {
+      const controlClient = await ControlAgent.Client.Create(
+        controlConfig.MGMT_API_WS_URL,
+        controlConfig.MGMT_API_WS_PORT,
+        serviceConfig
+      )
+      const updatedConfigFromMgmtAPI = await GetUpdatedConfigFromMgmtAPI(controlConfig, logger, controlClient)
+      logger.info(`updatedConfigFromMgmtAPI: ${JSON.stringify(updatedConfigFromMgmtAPI)}`)
+      _.merge(serviceConfig, updatedConfigFromMgmtAPI)
+      controlClient.close()
+    }
+
     // setup & start @hapi server
     await index.server.setupAndStart(serverConfig, apiPath, joinedHandlers)
   }
+}
+
+interface MgmtApiConfig {
+  outbound: {
+    tls: {
+      creds: {
+        ca: string | Buffer | Array<string | Buffer>
+        cert: string | Buffer | Array<string | Buffer>
+        key?: string | Buffer | Array<Buffer | KeyObject>
+      }
+    }
+  }
+  inbound: {
+    tls: {
+      creds: {
+        ca: string | Buffer | Array<string | Buffer>
+        cert: string | Buffer | Array<string | Buffer>
+        key?: string | Buffer | Array<Buffer | KeyObject>
+      }
+    }
+  }
+}
+
+interface ConformedMgmtApiConfig {
+  OUTBOUND: {
+    tls: {
+      creds: {
+        ca: string | Buffer | Array<string | Buffer>
+        cert: string | Buffer | Array<string | Buffer>
+        key?: string | Buffer | Array<Buffer | KeyObject>
+      }
+    }
+  }
+  INBOUND: {
+    tls: {
+      creds: {
+        ca: string | Buffer | Array<string | Buffer>
+        cert: string | Buffer | Array<string | Buffer>
+        key?: string | Buffer | Array<Buffer | KeyObject>
+      }
+    }
+  }
+}
+
+async function GetUpdatedConfigFromMgmtAPI(
+  conf: ControlConfig,
+  logger: SDKLogger.Logger,
+  client: ControlAgent.Client
+): Promise<ConformedMgmtApiConfig> {
+  logger.log(`Getting updated config from Management API at ${conf.MGMT_API_WS_URL}:${conf.MGMT_API_WS_PORT}...`)
+
+  await client.send(ControlAgent.build.CONFIGURATION.READ(null))
+  const responseRead = await client.receive()
+
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+
+  const creds: MgmtApiConfig = responseRead.data
+  // Copy config over to all caps keys to match `thirdparty-sdk` keys
+  const conformedConfig = {
+    OUTBOUND: creds.outbound,
+    INBOUND: creds.inbound
+  }
+  return conformedConfig
 }
 
 const startInboundAPI = mkStartAPI(ServerAPI.inbound, Handlers.Inbound)

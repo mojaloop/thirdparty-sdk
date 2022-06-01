@@ -1,4 +1,8 @@
 {
+  "CONTROL": {
+    "MGMT_API_WS_URL": "127.0.0.1",
+    "MGMT_API_WS_PORT": 4005
+  },
   "INBOUND": {
     "PORT": 4005,
     "HOST": "0.0.0.0",
@@ -64,5 +68,5 @@
     "JWS_SIGN": false,
     "JWS_SIGNING_KEY": "./secrets/jwsSigningKey.key"
   },
-  "PM4ML_ENABLED": false
+  "PM4ML_ENABLED": true
 }
