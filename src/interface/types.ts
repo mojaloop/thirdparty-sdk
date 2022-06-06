@@ -22,6 +22,8 @@
  --------------
  ******/
 
+import { KeyObject } from 'crypto'
+
 /**
  * This is used for personal information
  */
@@ -129,4 +131,47 @@ export interface HealthResponse {
   LoggerPresent: boolean
   MojaloopRequestsPresent: boolean
   ThirdpartyRequestsPresent: boolean
+}
+
+// Interfaces for management api certificate configuration
+export interface MgmtApiConfig {
+  outbound: {
+    tls: {
+      creds: {
+        ca: string | Buffer | Array<string | Buffer>
+        cert: string | Buffer | Array<string | Buffer>
+        key?: string | Buffer | Array<Buffer | KeyObject>
+      }
+    }
+  }
+  inbound: {
+    tls: {
+      creds: {
+        ca: string | Buffer | Array<string | Buffer>
+        cert: string | Buffer | Array<string | Buffer>
+        key?: string | Buffer | Array<Buffer | KeyObject>
+      }
+    }
+  }
+}
+
+export interface ConformedMgmtApiConfig {
+  OUTBOUND: {
+    tls: {
+      creds: {
+        ca: string | Buffer | Array<string | Buffer>
+        cert: string | Buffer | Array<string | Buffer>
+        key?: string | Buffer | Array<Buffer | KeyObject>
+      }
+    }
+  }
+  INBOUND: {
+    tls: {
+      creds: {
+        ca: string | Buffer | Array<string | Buffer>
+        cert: string | Buffer | Array<string | Buffer>
+        key?: string | Buffer | Array<Buffer | KeyObject>
+      }
+    }
+  }
 }

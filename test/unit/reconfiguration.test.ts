@@ -31,11 +31,15 @@ import path from 'path'
 import { WebSocketServer } from 'ws'
 import * as ControlAgent from '~/reconfiguration/controlAgent'
 import index from '~/index'
-import { Server } from '@hapi/hapi'
+import { Server as HapiServer } from '@hapi/hapi'
+import { Server } from '~/cli'
+
 const setupAndStartSpy = jest.spyOn(index.server, 'setupAndStart')
+const setupAndRestartSpy = jest.spyOn(index.server, 'setupAndRestart')
 
 describe('cli', () => {
   let wsServer: WebSocketServer
+  let server: Server
   const appConfig = Config
   const managementApiResponse = {
     inbound: {
@@ -91,7 +95,7 @@ describe('cli', () => {
     }
   }
 
-  beforeEach(async (done): Promise<void> => {
+  beforeEach(async (): Promise<void> => {
     Config.PM4ML_ENABLED = true
     Config.CONTROL.MGMT_API_WS_URL = 'localhost'
     Config.CONTROL.MGMT_API_WS_PORT = 31000
@@ -122,23 +126,26 @@ describe('cli', () => {
             ws.send(ControlAgent.build.ERROR.NOTIFY.UNSUPPORTED_MESSAGE(msg.id))
             break
         }
-      }).on('close', async () => {
-        done()
       })
     })
 
-    setupAndStartSpy.mockResolvedValue({ Iam: 'mocked-server' } as unknown as Server)
-    process.argv = ['jest', 'cli.ts', 'inbound']
-    const cli = await import('~/cli')
-    expect(cli).toBeDefined()
+    setupAndStartSpy.mockImplementation(() =>
+      Promise.resolve({ Iam: 'mocked-server', stop: jest.fn() } as unknown as HapiServer)
+    )
+    setupAndRestartSpy.mockImplementation(() =>
+      Promise.resolve({ Iam: 'mocked-server', stop: jest.fn() } as unknown as HapiServer)
+    )
+    server = await Server.create(Config)
   })
 
   afterEach(async (): Promise<void> => {
     wsServer.close()
+    await server.stop()
   })
 
-  it('should use default port & host for inbound', async (): Promise<void> => {
-    expect(index.server.setupAndStart).toHaveBeenCalledWith(
+  it('should retrieve updated configuration from management api on start', async (): Promise<void> => {
+    expect(index.server.setupAndStart).toHaveBeenNthCalledWith(
+      1,
       {
         port: Config.INBOUND.PORT,
         host: Config.INBOUND.HOST,
@@ -149,6 +156,58 @@ describe('cli', () => {
       {
         ...Handlers.Shared,
         ...Handlers.Inbound
+      }
+    )
+    expect(index.server.setupAndStart).toHaveBeenNthCalledWith(
+      2,
+      {
+        port: Config.OUTBOUND.PORT,
+        host: Config.OUTBOUND.HOST,
+        api: 'outbound',
+        tls: expectedUpdatedAppConfig.OUTBOUND.TLS
+      },
+      path.resolve(__dirname, '../../src/interface/api-outbound.yaml'),
+      {
+        ...Handlers.Shared,
+        ...Handlers.Outbound
+      }
+    )
+  })
+
+  it.only('should retrieve updated configuration from management api on start', async (): Promise<void> => {
+    // Send a message to the client of updated configuration after its running
+    wsServer.clients.forEach(function each(client) {
+      client.send(ControlAgent.build.CONFIGURATION.NOTIFY(managementApiResponse, ''))
+    })
+    // We wait for the servers to get restarted
+    await new Promise((wait) => setTimeout(wait, 1000))
+
+    expect(index.server.setupAndRestart).toHaveBeenNthCalledWith(
+      1,
+      {
+        port: Config.INBOUND.PORT,
+        host: Config.INBOUND.HOST,
+        api: 'inbound',
+        tls: expectedUpdatedAppConfig.INBOUND.TLS
+      },
+      path.resolve(__dirname, '../../src/interface/api-inbound.yaml'),
+      {
+        ...Handlers.Shared,
+        ...Handlers.Inbound
+      }
+    )
+    expect(index.server.setupAndRestart).toHaveBeenNthCalledWith(
+      2,
+      {
+        port: Config.OUTBOUND.PORT,
+        host: Config.OUTBOUND.HOST,
+        api: 'outbound',
+        tls: expectedUpdatedAppConfig.OUTBOUND.TLS
+      },
+      path.resolve(__dirname, '../../src/interface/api-outbound.yaml'),
+      {
+        ...Handlers.Shared,
+        ...Handlers.Outbound
       }
     )
   })

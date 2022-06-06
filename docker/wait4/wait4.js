@@ -17,7 +17,7 @@ const util = require('util')
  *
  *
  */
-async function main () {
+async function main() {
   console.log('args are', process.argv)
 
   try {
@@ -43,13 +43,13 @@ async function main () {
 
 main()
 
-function getService (config) {
+function getService(config) {
   const serviceName = process.argv.slice(-1).pop() || process.env.WAIT4_SERVICE
   if (!serviceName) {
     console.error('wait4 Environment variable WAIT4_SERVICE or service name parameter are required')
     process.exit(1)
   }
-  return config.services.find(s => s.name === serviceName)
+  return config.services.find((s) => s.name === serviceName)
 }
 /**
  * @function getWaiters
@@ -57,19 +57,21 @@ function getService (config) {
  * @param {array} wait4 - list of wait job descriptions
  * @param {object} config - configuration
  */
-function getWaiters (wait4, config) {
+function getWaiters(wait4, config) {
   const methods = {
     mongo: methodMongoDB,
     mysql: methodMySQL,
     ncat: methodNCat
   }
   console.log(`wait4 Dependencies to wait for:\n${util.inspect(wait4, false, 5, true)}`)
-  return wait4.map(waitJob => wrapWithRetries(
-    methods[waitJob.method],
-    waitJob,
-    waitJob.retries || config.retries,
-    waitJob.waitMs || config.waitMs
-  ))
+  return wait4.map((waitJob) =>
+    wrapWithRetries(
+      methods[waitJob.method],
+      waitJob,
+      waitJob.retries || config.retries,
+      waitJob.waitMs || config.waitMs
+    )
+  )
 }
 
 /**
@@ -80,7 +82,7 @@ function getWaiters (wait4, config) {
  * @param {number} retries - Number of times to retry before returning an error if the func fails
  * @param {number} waitTimeMs - Ms time to wait before trying again
  */
-async function wrapWithRetries (method, waitJob, retries, waitTimeMs) {
+async function wrapWithRetries(method, waitJob, retries, waitTimeMs) {
   try {
     // generate method's RC config
     const RC = getRC(waitJob)
@@ -109,7 +111,7 @@ async function wrapWithRetries (method, waitJob, retries, waitTimeMs) {
  * @description - create RC config instance
  * @param {object} waitJob
  */
-function getRC (waitJob) {
+function getRC(waitJob) {
   // acquire rc parameters
   const namespace = (waitJob.rc && waitJob.rc.namespace) || 'CLEDG'
   const configPath = (waitJob.rc && waitJob.rc.configPath) || '../config/default.json'
@@ -128,7 +130,7 @@ function getRC (waitJob) {
  * @param {object} waitJob
  * @param {object} RC
  */
-async function methodMongoDB (waitJob, RC) {
+async function methodMongoDB(waitJob, RC) {
   const isDisabled = RC.MONGODB.DISABLED && RC.MONGODB.DISABLED.toString().trim().toLowerCase() === 'true'
   if (isDisabled) {
     return `MongoDB(${waitJob.uri}) Disabled`
@@ -148,7 +150,7 @@ async function methodMongoDB (waitJob, RC) {
  * @param {*} waitJob
  * @param {*} RC
  */
-async function methodMySQL (waitJob, RC) {
+async function methodMySQL(waitJob, RC) {
   // make connection to MySQL using `knex`
   const knex = require('knex')({
     client: RC.DATABASE.DIALECT,
@@ -171,8 +173,11 @@ async function methodMySQL (waitJob, RC) {
  * @param {*} waitJob
  * @param {*} RC
  */
-async function methodNCat (waitJob) {
-  const [host, port] = waitJob.uri.toString().split(':').map(x => x.trim())
+async function methodNCat(waitJob) {
+  const [host, port] = waitJob.uri
+    .toString()
+    .split(':')
+    .map((x) => x.trim())
   const { execSync } = require('child_process')
   const command = `nc -z ${host} ${port}`
   execSync(command)

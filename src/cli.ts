@@ -30,113 +30,85 @@
 // the js `require()` can resolve the '~' paths
 require('module-alias/register')
 
-import config, { OutConfig, PACKAGE, ServiceConfig, ControlConfig } from '~/shared/config'
+import config, { OutConfig, ServiceConfig, ControlConfig } from '~/shared/config'
 import { ServerAPI, ServerConfig } from '~/server'
-import { Command } from 'commander'
 import { Handler } from 'openapi-backend'
 import Handlers from '~/handlers'
 import index from './index'
 import path from 'path'
+import { Server as HapiServer } from '@hapi/hapi'
 
 import { Logger as SDKLogger } from '@mojaloop/sdk-standard-components'
 import _ from 'lodash'
-import { KeyObject } from 'crypto'
 import * as ControlAgent from '~/reconfiguration/controlAgent'
-
-// handle script parameters
-const program = new Command(PACKAGE.name)
+import { ConformedMgmtApiConfig } from './interface/types'
+import { start, stop } from './server/start'
 /**
  * prepares commander action
  * @param api {string} the name of the api to start can be `inbound` or `outbound`
  * @param handlers { { [handler: string]: Handler } } dictionary with api handlers, will be joined with Handlers.Shared
  * @returns () => Promise<void> asynchronous commander action to start api
  */
-export function mkStartAPI(api: ServerAPI, handlers: { [handler: string]: Handler }): () => Promise<void> {
-  return async (): Promise<void> => {
-    // update config from program parameters,
-    // so setupAndStart will know on which PORT/HOST bind the server
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    const apiConfig: OutConfig = config[api.toUpperCase()] as OutConfig
+export async function mkStartAPI(
+  api: ServerAPI,
+  handlers: { [handler: string]: Handler },
+  serviceConfig = config
+): Promise<HapiServer> {
+  // update config from program parameters,
+  // so setupAndStart will know on which PORT/HOST bind the server
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  const apiConfig: OutConfig = serviceConfig[api.toUpperCase()] as OutConfig
 
-    // resolve the path to openapi v3 definition file
-    const apiPath = path.resolve(__dirname, `../src/interface/api-${api}.yaml`)
+  // resolve the path to openapi v3 definition file
+  const apiPath = path.resolve(__dirname, `../src/interface/api-${api}.yaml`)
 
-    // prepare API handlers
-    const joinedHandlers = {
-      ...Handlers.Shared,
-      ...handlers
-    }
-
-    const serverConfig: ServerConfig = {
-      port: apiConfig.PORT,
-      host: apiConfig.HOST,
-      api,
-      tls: apiConfig.TLS
-    }
-
-    // Check Management API for updated config
-    const controlConfig: ControlConfig = config.CONTROL
-    const serviceConfig: ServiceConfig = config
-    const logger = new SDKLogger.Logger()
-
-    if (config.PM4ML_ENABLED) {
-      const controlClient = await ControlAgent.Client.Create(
-        controlConfig.MGMT_API_WS_URL,
-        controlConfig.MGMT_API_WS_PORT,
-        serviceConfig
-      )
-      const updatedConfigFromMgmtAPI = await GetUpdatedConfigFromMgmtAPI(controlConfig, logger, controlClient)
-      logger.info(`updatedConfigFromMgmtAPI: ${JSON.stringify(updatedConfigFromMgmtAPI)}`)
-      _.merge(serviceConfig, updatedConfigFromMgmtAPI)
-      controlClient.close()
-    }
-
-    // setup & start @hapi server
-    await index.server.setupAndStart(serverConfig, apiPath, joinedHandlers)
+  // prepare API handlers
+  const joinedHandlers = {
+    ...Handlers.Shared,
+    ...handlers
   }
+
+  const serverConfig: ServerConfig = {
+    port: apiConfig.PORT,
+    host: apiConfig.HOST,
+    api,
+    tls: apiConfig.TLS
+  }
+
+  // setup & start @hapi server
+  return await index.server.setupAndStart(serverConfig, apiPath, joinedHandlers)
 }
 
-interface MgmtApiConfig {
-  outbound: {
-    tls: {
-      creds: {
-        ca: string | Buffer | Array<string | Buffer>
-        cert: string | Buffer | Array<string | Buffer>
-        key?: string | Buffer | Array<Buffer | KeyObject>
-      }
-    }
-  }
-  inbound: {
-    tls: {
-      creds: {
-        ca: string | Buffer | Array<string | Buffer>
-        cert: string | Buffer | Array<string | Buffer>
-        key?: string | Buffer | Array<Buffer | KeyObject>
-      }
-    }
-  }
-}
+export async function mkRestartAPI(
+  api: ServerAPI,
+  handlers: { [handler: string]: Handler },
+  serviceConfig = config
+): Promise<HapiServer> {
+  // update config from program parameters,
+  // so setupAndStart will know on which PORT/HOST bind the server
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  const apiConfig: OutConfig = serviceConfig[api.toUpperCase()] as OutConfig
 
-interface ConformedMgmtApiConfig {
-  OUTBOUND: {
-    tls: {
-      creds: {
-        ca: string | Buffer | Array<string | Buffer>
-        cert: string | Buffer | Array<string | Buffer>
-        key?: string | Buffer | Array<Buffer | KeyObject>
-      }
-    }
+  // resolve the path to openapi v3 definition file
+  const apiPath = path.resolve(__dirname, `../src/interface/api-${api}.yaml`)
+
+  // prepare API handlers
+  const joinedHandlers = {
+    ...Handlers.Shared,
+    ...handlers
   }
-  INBOUND: {
-    tls: {
-      creds: {
-        ca: string | Buffer | Array<string | Buffer>
-        cert: string | Buffer | Array<string | Buffer>
-        key?: string | Buffer | Array<Buffer | KeyObject>
-      }
-    }
+
+  const serverConfig: ServerConfig = {
+    port: apiConfig.PORT,
+    host: apiConfig.HOST,
+    api,
+    tls: apiConfig.TLS
   }
+
+  // setup & start @hapi server
+  return await index.server.setupAndRestart(serverConfig, apiPath, joinedHandlers)
 }
 
 async function GetUpdatedConfigFromMgmtAPI(
@@ -161,21 +133,70 @@ async function GetUpdatedConfigFromMgmtAPI(
   return conformedConfig
 }
 
-const startInboundAPI = mkStartAPI(ServerAPI.inbound, Handlers.Inbound)
-const startOutboundAPI = mkStartAPI(ServerAPI.outbound, Handlers.Outbound)
+export class Server {
+  private conf!: ServiceConfig
+  private controlConfig!: ControlConfig
+  public inboundServer!: HapiServer
+  public outboundServer!: HapiServer
+  public controlClient!: ControlAgent.Client
 
-// setup cli program
-program
-  .version(PACKAGE.version)
-  .description('thirdparty-sdk')
-  .option('-p, --port <number>', 'listen on port')
-  .option('-H, --host <string>', 'listen on host')
+  async initialize(conf: ServiceConfig) {
+    this.conf = conf
+    this.controlConfig = conf.CONTROL
 
-// setup standalone command to start Inbound service
-program.command('inbound').description('start Inbound API service').action(startInboundAPI)
+    // Check Management API for updated config
+    // We only start the control client if we're running within Mojaloop Payment Manager.
+    // The control server is the Payment Manager Management API Service.
+    // We only start the client to connect to and listen to the Management API service for
+    // management protocol messages e.g configuration changes, certificate updates etc.
+    if (config.PM4ML_ENABLED) {
+      const logger = new SDKLogger.Logger()
+      this.controlClient = await ControlAgent.Client.Create(
+        this.controlConfig.MGMT_API_WS_URL,
+        this.controlConfig.MGMT_API_WS_PORT,
+        conf
+      )
+      const updatedConfigFromMgmtAPI = await GetUpdatedConfigFromMgmtAPI(this.controlConfig, logger, this.controlClient)
+      logger.info(`updatedConfigFromMgmtAPI: ${JSON.stringify(updatedConfigFromMgmtAPI)}`)
+      _.merge(this.conf, updatedConfigFromMgmtAPI)
 
-// setup standalone command to start Outbound service
-program.command('outbound').description('start Outbound API service').action(startOutboundAPI)
+      this.controlClient.on(ControlAgent.EVENT.RECONFIGURE, this.restart.bind(this))
+    }
 
-// fetch parameters from command line and execute
-program.parseAsync(process.argv)
+    this.inboundServer = await mkStartAPI(ServerAPI.inbound, Handlers.Inbound, conf)
+    this.outboundServer = await mkStartAPI(ServerAPI.outbound, Handlers.Outbound, conf)
+  }
+
+  static async create(conf: ServiceConfig) {
+    const server = new Server()
+    await server.initialize(conf)
+    return server
+  }
+
+  async restart(conf: ServiceConfig) {
+    this.inboundServer = await mkRestartAPI(ServerAPI.inbound, Handlers.Inbound, conf)
+    this.outboundServer = await mkRestartAPI(ServerAPI.outbound, Handlers.Outbound, conf)
+    await Promise.all([this.inboundServer, this.outboundServer])
+  }
+
+  async stop() {
+    return Promise.all([stop(this.inboundServer), stop(this.outboundServer), this.controlClient.stop()])
+  }
+}
+
+if (require.main === module) {
+  ;(async () => {
+    // this module is main i.e. we were started as a server;
+    // not used in unit test or "require" scenarios
+    const logger = new SDKLogger.Logger()
+
+    const svr = await Server.create(config)
+
+    // handle SIGTERM to exit gracefully
+    process.on('SIGTERM', async () => {
+      logger.log('SIGTERM received. Shutting down APIs...')
+      await svr.stop()
+      process.exit(0)
+    })
+  })()
+}

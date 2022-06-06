@@ -31,13 +31,19 @@ import { PACKAGE } from '../shared/config'
 import { Server } from '@hapi/hapi'
 import { ServerApp } from './create'
 
-let serverInstance: Server
+let serverInstance: Server | null
 
 export async function start(server: Server): Promise<Server> {
   await server.start()
   const serverApp = server.settings.app as ServerApp
   logger.info(`Service '${PACKAGE.name}' is running '${serverApp.api} API' @ ${server.info.uri}`)
   serverInstance = server
+  return server
+}
+
+export async function stop(server: Server): Promise<Server> {
+  await server.stop()
+  serverInstance = null
   return server
 }
 

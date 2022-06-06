@@ -5,12 +5,12 @@ networks:
     name: mojaloop-net
 
 services:
-  inbound-thirdparty-sdk:
-    container_name: inbound-thirdparty-sdk
+  thirdparty-sdk:
+    container_name: thirdparty-sdk
     build:
       context: ./
       dockerfile: ./Dockerfile
-    command: sh -c "/opt/thirdparty-sdk/wait4/wait4.js inbound-thirdparty-sdk && NODE_ENV=integration npm run start:inbound"
+    command: sh -c "/opt/thirdparty-sdk/wait4/wait4.js thirdparty-sdk && NODE_ENV=integration npm run start"
     volumes:
       - ./docker/wait4:/opt/thirdparty-sdk/wait4
     environment:
@@ -19,6 +19,7 @@ services:
       - mojaloop-net
     ports:
       - "4005:4005"
+      - "4006:4006"
     depends_on:
       - redis
       - ml-testing-toolkit
@@ -29,31 +30,6 @@ services:
       retries: 10
       start_period: 10s
       interval: 30s
-  outbound-thirdparty-sdk:
-    container_name: outbound-thirdparty-sdk
-    build:
-      context: ./
-      dockerfile: ./Dockerfile
-    command: sh -c "/opt/thirdparty-sdk/wait4/wait4.js outbound-thirdparty-sdk && NODE_ENV=integration npm run start:outbound"
-    volumes:
-      - ./docker/wait4:/opt/thirdparty-sdk/wait4
-    environment:
-      - NODE_ENV=integration
-    networks:
-      - mojaloop-net
-    ports:
-      - "4006:4006"
-    depends_on:
-      - redis
-      - ml-testing-toolkit
-      - pisp-simulator
-    healthcheck:
-      test: wget -q http://localhost:4006/health -O /dev/null || exit 1
-      timeout: 3s
-      retries: 10
-      start_period: 10s
-      interval: 30s
-
   sdk-scheme-adapter:
     image: "mojaloop/sdk-scheme-adapter:v13.0.2"
     container_name: sdk-scheme-adapter

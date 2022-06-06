@@ -20,6 +20,8 @@ import ws from 'ws'
 import jsonPatch from 'fast-json-patch'
 import { generateSlug } from 'random-word-slugs'
 import { Logger as SDKLogger } from '@mojaloop/sdk-standard-components'
+import { MgmtApiConfig } from '~/interface/types'
+import _ from 'lodash'
 
 // TODO: This needs proper typing, for now inferred types are used.
 
@@ -62,7 +64,7 @@ export const deserialize = (msg: { toString: () => string }) => {
       'data' in v &&
       Array.isArray(v.data)
     ) {
-      return new Buffer(v.data)
+      return Buffer.from(v.data)
     }
     return v
   })
@@ -193,7 +195,14 @@ export class Client extends ws {
           case VERB.NOTIFY:
           case VERB.PATCH: {
             const dup = JSON.parse(JSON.stringify(this.appConfig)) // fast-json-patch explicitly mutates
-            jsonPatch.applyPatch(dup, msg.data)
+
+            const creds: MgmtApiConfig = msg.data
+            // Copy config over to all caps keys to match `thirdparty-sdk` keys
+            const conformedConfig = {
+              OUTBOUND: creds.outbound,
+              INBOUND: creds.inbound
+            }
+            _.merge(dup, conformedConfig)
             this.logger.push({ oldConf: this.appConfig, newConf: dup }).log('Emitting new configuration')
             this.emit(EVENT.RECONFIGURE, dup)
             break
