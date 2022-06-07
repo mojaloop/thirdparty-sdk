@@ -27,29 +27,50 @@
 
 import Config from '~/shared/config'
 import Handlers from '~/handlers'
-import { Server } from '@hapi/hapi'
+import { Server as HapiServer } from '@hapi/hapi'
 import index from '~/index'
 import path from 'path'
-const setupAndStartSpy = jest.spyOn(index.server, 'setupAndStart')
 
+const setupAndStartSpy = jest.spyOn(index.server, 'setupAndStart')
+setupAndStartSpy.mockImplementationOnce(() => {
+  return Promise.resolve({ Iam: 'mocked-server', stop: jest.fn() } as unknown as HapiServer)
+})
+setupAndStartSpy.mockImplementationOnce(() => {
+  return Promise.resolve({ Iam: 'mocked-server', stop: jest.fn() } as unknown as HapiServer)
+})
 describe('cli', (): void => {
-  it('should use default port & host for inbound', async (): Promise<void> => {
-    setupAndStartSpy.mockResolvedValue({ Iam: 'mocked-server' } as unknown as Server)
-    process.argv = ['jest', 'cli.ts', 'inbound']
+  it('should use default port & host', async (): Promise<void> => {
+    process.argv = ['jest', 'cli.ts', 'all']
     const cli = await import('~/cli')
     expect(cli).toBeDefined()
-    // eslint-disable-next-line import/no-named-as-default-member
-    expect(setupAndStartSpy).toHaveBeenCalledWith(
+    // Give some time for servers to setup
+    await new Promise((wait) => setTimeout(wait, 1000))
+    expect(setupAndStartSpy).toHaveBeenNthCalledWith(
+      1,
       {
-        port: Config.INBOUND.PORT,
-        host: Config.INBOUND.HOST,
+        port: Config.inbound.port,
+        host: Config.inbound.host,
         api: 'inbound',
-        tls: Config.INBOUND.TLS
+        tls: Config.inbound.tls
       },
       path.resolve(__dirname, '../../src/interface/api-inbound.yaml'),
       {
         ...Handlers.Shared,
         ...Handlers.Inbound
+      }
+    )
+    expect(setupAndStartSpy).toHaveBeenNthCalledWith(
+      2,
+      {
+        port: Config.outbound.port,
+        host: Config.outbound.host,
+        api: 'outbound',
+        tls: Config.outbound.tls
+      },
+      path.resolve(__dirname, '../../src/interface/api-outbound.yaml'),
+      {
+        ...Handlers.Shared,
+        ...Handlers.Outbound
       }
     )
   })

@@ -195,14 +195,7 @@ export class Client extends ws {
           case VERB.NOTIFY:
           case VERB.PATCH: {
             const dup = JSON.parse(JSON.stringify(this.appConfig)) // fast-json-patch explicitly mutates
-
-            const creds: MgmtApiConfig = msg.data
-            // Copy config over to all caps keys to match `thirdparty-sdk` keys
-            const conformedConfig = {
-              OUTBOUND: creds.outbound,
-              INBOUND: creds.inbound
-            }
-            _.merge(dup, conformedConfig)
+            jsonPatch.applyPatch(dup, msg.data)
             this.logger.push({ oldConf: this.appConfig, newConf: dup }).log('Emitting new configuration')
             this.emit(EVENT.RECONFIGURE, dup)
             break

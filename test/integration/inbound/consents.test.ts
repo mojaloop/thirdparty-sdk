@@ -37,10 +37,10 @@ describe('PISP Inbound', (): void => {
     const scenarioUri = `${env.inbound.baseUri}/consents`
     describe('Inbound API', (): void => {
       const config: RedisConnectionConfig = {
-        host: Config.REDIS.HOST,
-        port: Config.REDIS.PORT,
+        host: Config.redis.host,
+        port: Config.redis.port,
         logger: mockLogger(),
-        timeout: Config.REDIS.TIMEOUT
+        timeout: Config.redis.timeout
       }
       const payload: tpAPI.Schemas.ConsentsPostRequestPISP = {
         consentId: '8e34f91d-d078-4077-8263-2c047876fcf6',
@@ -156,10 +156,10 @@ describe('DFSP Inbound', (): void => {
 
     describe('Inbound API', (): void => {
       const config: RedisConnectionConfig = {
-        host: Config.REDIS.HOST,
-        port: Config.REDIS.PORT,
+        host: Config.redis.host,
+        port: Config.redis.port,
         logger: mockLogger(),
-        timeout: Config.REDIS.TIMEOUT
+        timeout: Config.redis.timeout
       }
       const verifiedCredentialPayload: tpAPI.Schemas.ConsentsIDPutResponseVerified = {
         scopes: [
@@ -244,10 +244,10 @@ describe('DFSP Inbound', (): void => {
 
     describe('Inbound API', (): void => {
       const config: RedisConnectionConfig = {
-        host: Config.REDIS.HOST,
-        port: Config.REDIS.PORT,
+        host: Config.redis.host,
+        port: Config.redis.port,
         logger: mockLogger(),
-        timeout: Config.REDIS.TIMEOUT
+        timeout: Config.redis.timeout
       }
       const errorPayload = {
         errorInformation: {

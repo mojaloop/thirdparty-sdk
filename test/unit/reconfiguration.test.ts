@@ -32,7 +32,7 @@ import { WebSocketServer } from 'ws'
 import * as ControlAgent from '~/reconfiguration/controlAgent'
 import index from '~/index'
 import { Server as HapiServer } from '@hapi/hapi'
-import { Server } from '~/cli'
+import { Server } from '~/api'
 
 const setupAndStartSpy = jest.spyOn(index.server, 'setupAndStart')
 const setupAndRestartSpy = jest.spyOn(index.server, 'setupAndRestart')
@@ -43,7 +43,7 @@ describe('cli', () => {
   const appConfig = Config
   const managementApiResponse = {
     inbound: {
-      TLS: {
+      tls: {
         creds: {
           ca: 'new_string',
           cert: 'new_string',
@@ -52,7 +52,7 @@ describe('cli', () => {
       }
     },
     outbound: {
-      TLS: {
+      tls: {
         creds: {
           ca: 'new_string',
           cert: 'new_string',
@@ -64,11 +64,11 @@ describe('cli', () => {
 
   const expectedUpdatedAppConfig = {
     ...appConfig,
-    INBOUND: {
-      PORT: 4005,
-      HOST: '0.0.0.0',
-      PISP_TRANSACTION_MODE: true,
-      TLS: {
+    inbound: {
+      port: 4005,
+      host: '0.0.0.0',
+      pispTransactionMode: true,
+      tls: {
         mutualTLS: {
           enabled: false
         },
@@ -80,9 +80,9 @@ describe('cli', () => {
       }
     },
     outbound: {
-      PORT: 4006,
-      HOST: '0.0.0.0',
-      TLS: {
+      port: 4006,
+      host: '0.0.0.0',
+      tls: {
         mutualTLS: {
           enabled: false
         },
@@ -96,10 +96,10 @@ describe('cli', () => {
   }
 
   beforeEach(async (): Promise<void> => {
-    Config.PM4ML_ENABLED = true
-    Config.CONTROL.MGMT_API_WS_URL = 'localhost'
-    Config.CONTROL.MGMT_API_WS_PORT = 31000
-    wsServer = new WebSocketServer({ port: Config.CONTROL.MGMT_API_WS_PORT })
+    Config.pm4mlEnabled = true
+    Config.control.mgmtAPIWsUrl = 'localhost'
+    Config.control.mgmtAPIWsPort = 31000
+    wsServer = new WebSocketServer({ port: Config.control.mgmtAPIWsPort })
 
     wsServer.on('connection', function connection(ws) {
       // A quick server solution that reuses ControlAgent functions
@@ -147,10 +147,10 @@ describe('cli', () => {
     expect(index.server.setupAndStart).toHaveBeenNthCalledWith(
       1,
       {
-        port: Config.INBOUND.PORT,
-        host: Config.INBOUND.HOST,
+        port: Config.inbound.port,
+        host: Config.inbound.host,
         api: 'inbound',
-        tls: expectedUpdatedAppConfig.INBOUND.TLS
+        tls: expectedUpdatedAppConfig.inbound.tls
       },
       path.resolve(__dirname, '../../src/interface/api-inbound.yaml'),
       {
@@ -161,10 +161,10 @@ describe('cli', () => {
     expect(index.server.setupAndStart).toHaveBeenNthCalledWith(
       2,
       {
-        port: Config.OUTBOUND.PORT,
-        host: Config.OUTBOUND.HOST,
+        port: Config.outbound.port,
+        host: Config.outbound.host,
         api: 'outbound',
-        tls: expectedUpdatedAppConfig.OUTBOUND.TLS
+        tls: expectedUpdatedAppConfig.outbound.tls
       },
       path.resolve(__dirname, '../../src/interface/api-outbound.yaml'),
       {
@@ -185,10 +185,10 @@ describe('cli', () => {
     expect(index.server.setupAndRestart).toHaveBeenNthCalledWith(
       1,
       {
-        port: Config.INBOUND.PORT,
-        host: Config.INBOUND.HOST,
+        port: Config.inbound.port,
+        host: Config.inbound.host,
         api: 'inbound',
-        tls: expectedUpdatedAppConfig.INBOUND.TLS
+        tls: expectedUpdatedAppConfig.inbound.tls
       },
       path.resolve(__dirname, '../../src/interface/api-inbound.yaml'),
       {
@@ -199,10 +199,10 @@ describe('cli', () => {
     expect(index.server.setupAndRestart).toHaveBeenNthCalledWith(
       2,
       {
-        port: Config.OUTBOUND.PORT,
-        host: Config.OUTBOUND.HOST,
+        port: Config.outbound.port,
+        host: Config.outbound.host,
         api: 'outbound',
-        tls: expectedUpdatedAppConfig.OUTBOUND.TLS
+        tls: expectedUpdatedAppConfig.outbound.tls
       },
       path.resolve(__dirname, '../../src/interface/api-outbound.yaml'),
       {

@@ -47,117 +47,119 @@ function getFileListContent(pathList: string): Array<Buffer> {
   return pathList.split(',').map((path) => getFileContent(path))
 }
 export interface OutConfig {
-  HOST: string
-  PORT: number
-  TLS: BaseRequestTLSConfig
+  host: string
+  port: number
+  tls: BaseRequestTLSConfig
 }
 
 export interface InConfig extends OutConfig {
-  PISP_TRANSACTION_MODE: boolean
+  pispTransactionMode: boolean
 }
 
 export interface ControlConfig {
-  MGMT_API_WS_URL: string
-  MGMT_API_WS_PORT: number
+  mgmtAPIWsUrl: string
+  mgmtAPIWsPort: number
 }
 
 // interface to represent service configuration
 export interface ServiceConfig {
-  ENV: string
-  INBOUND: InConfig
-  OUTBOUND: OutConfig
-  CONTROL: ControlConfig
-  REQUEST_PROCESSING_TIMEOUT_SECONDS: number
-  WSO2_AUTH: {
-    staticToken: string
-    tokenEndpoint: string
-    clientKey: string
-    clientSecret: string
-    refreshSeconds: number
+  env: string
+  inbound: InConfig
+  outbound: OutConfig
+  control: ControlConfig
+  requestProcessingTimeoutSeconds: number
+  wso2: {
+    auth: {
+      staticToken: string
+      tokenEndpoint: string
+      clientKey: string
+      clientSecret: string
+      refreshSeconds: number
+    }
   }
-  REDIS: {
-    HOST: string
-    PORT: number
-    TIMEOUT: number
+  redis: {
+    host: string
+    port: number
+    timeout: number
   }
-  INSPECT: {
-    DEPTH: number
-    SHOW_HIDDEN: boolean
-    COLOR: boolean
+  inspect: {
+    depth: number
+    showHidden: boolean
+    color: boolean
   }
-  SHARED: {
-    PEER_ENDPOINT: string
-    ALS_ENDPOINT?: string
-    QUOTES_ENDPOINT?: string
-    TRANSFERS_ENDPOINT?: string
-    BULK_TRANSFERS_ENDPOINT?: string
-    SERVICES_ENDPOINT?: string
-    THIRDPARTY_REQUESTS_ENDPOINT?: string
-    TRANSACTION_REQUEST_ENDPOINT?: string
-    AUTH_SERVICE_PARTICIPANT_ID: string
-    DFSP_ID: string
-    DFSP_BACKEND_URI: string
-    DFSP_BACKEND_HTTP_SCHEME: string
-    DFSP_BACKEND_VERIFY_AUTHORIZATION_PATH: string
-    DFSP_BACKEND_VERIFY_CONSENT_PATH: string
-    DFSP_BACKEND_VALIDATE_THIRDPARTY_TRANSACTION_REQUEST: string
-    DFSP_BACKEND_GET_USER_ACCOUNTS_PATH: string
-    DFSP_BACKEND_STORE_VALIDATED_CONSENT_FOR_ACCOUNT_ID_PATH: string
-    DFSP_TRANSACTION_REQUEST_AUTHORIZATION_TIMEOUT_SECONDS: number
-    DFSP_TRANSACTION_REQUEST_VERIFICATION_TIMEOUT_SECONDS: number
-    PISP_TRANSACTION_INITIATE_TIMEOUT_IN_SECONDS: number
-    PISP_TRANSACTION_APPROVE_TIMEOUT_IN_SECONDS: number
-    SDK_OUTGOING_URI: string
-    SDK_OUTGOING_HTTP_SCHEME: string
-    SDK_OUTGOING_REQUEST_QUOTE_PATH: string
-    SDK_OUTGOING_REQUEST_AUTHORIZATION_PATH: string
-    SDK_OUTGOING_REQUEST_TRANSFER_PATH: string
-    SDK_REQUEST_TO_PAY_TRANSFER_URI: string
-    SDK_OUTGOING_PARTIES_INFORMATION_PATH: string
-    SDK_NOTIFY_ABOUT_TRANSFER_URI: string
-    DFSP_BACKEND_VALIDATE_AUTH_TOKEN_PATH: string
-    DFSP_BACKEND_VALIDATE_CONS_REQ_PATH: string
-    DFSP_BACKEND_SEND_OTP_REQ_PATH: string
-    DFSP_BACKEND_STORE_CONS_REQ_PATH: string
-    JWS_SIGN: boolean
-    JWS_SIGNING_KEY: PathLike | Buffer
-    TEMP_OVERRIDE_QUOTES_PARTY_ID_TYPE?: fspiopAPI.Schemas.PartyIdType
-    TEST_OVERRIDE_CONSENT_ID?: string
-    TEST_SHOULD_OVERRIDE_CONSENT_ID: boolean
-    TEST_CONSENT_REQUEST_TO_CONSENT_MAP: Record<string, string>
-    TEST_OVERRIDE_TRANSACTION_CHALLENGE?: string
+  shared: {
+    peerEndpoint: string
+    alsEndpoint?: string
+    quotesEndpoint?: string
+    transfersEndpoint?: string
+    bulkTransfersEndpoint?: string
+    servicesEndpoint?: string
+    thirdpartyRequestsEndpoint?: string
+    transactionRequestEndpoint?: string
+    authServiceParticipantId: string
+    dfspId: string
+    dfspBackendUri: string
+    dfspBackendHttpScheme: string
+    dfspBackendVerifyAuthorizationPath: string
+    dfspBackendVerifyConsentPath: string
+    dfspBackendValidateThirdpartyTransactionRequest: string
+    dfspBackendGetUserAccountsPath: string
+    dfspBackendStoreValidatedConsentForAccountIdPath: string
+    dfspTransactionRequestAuthorizationTimeoutSeconds: number
+    dfspTransactionRequestVerificationTimeoutSeconds: number
+    pispTransactionInitiateTimeoutInSeconds: number
+    pispTransactionApproveTimeoutInSeconds: number
+    sdkOutgoingUri: string
+    sdkOutgoingHttpScheme: string
+    sdkOutgoingRequestQuotePath: string
+    sdkOutgoingRequestAuthorizationPath: string
+    sdkOutgoingRequestTransferPath: string
+    sdkRequestToPayTransferUri: string
+    sdkOutgoingPartiesInformationPath: string
+    sdkNotifyAboutTransferUri: string
+    dfspBackendValidateAuthTokenPath: string
+    dfspBackendValidateConsReqPath: string
+    dfspBackendSendOtpReqPath: string
+    dfspBackendStoreConsReqPath: string
+    jwsSign: boolean
+    jwsSigningKey: PathLike | Buffer
+    tempOverrideQuotesPartyIdType?: fspiopAPI.Schemas.PartyIdType
+    testOverrideConsentId?: string
+    testShouldOverrideConsentId: boolean
+    testConsentRequestToConsentMap: Record<string, string>
+    testOverrideTransactionChallenge?: string
   }
-  PM4ML_ENABLED: boolean
+  pm4mlEnabled: boolean
 }
 
 // Declare configuration schema, default values and bindings to environment variables
 export const ConvictConfig = Convict<ServiceConfig>({
-  ENV: {
+  env: {
     doc: 'The application environment.',
     format: ['production', 'development', 'test', 'integration', 'e2e'],
     default: 'development',
     env: 'NODE_ENV'
   },
-  INBOUND: {
-    HOST: {
+  inbound: {
+    host: {
       doc: 'The InboundAPI Hostname/IP address to bind.',
       format: '*',
       default: '0.0.0.0',
       env: 'INBOUND_HOST'
     },
-    PORT: {
+    port: {
       doc: 'The InboundAPI port to bind.',
       format: 'port',
       default: 3001,
       env: 'INBOUND_PORT'
     },
-    PISP_TRANSACTION_MODE: {
+    pispTransactionMode: {
       doc: 'PISPTransactionModel to be used',
       format: 'Boolean',
       default: false,
       env: 'PISP_TRANSACTION_MODE'
     },
-    TLS: {
+    tls: {
       mutualTLS: {
         enabled: false
       },
@@ -168,20 +170,20 @@ export const ConvictConfig = Convict<ServiceConfig>({
       }
     }
   },
-  OUTBOUND: {
-    HOST: {
+  outbound: {
+    host: {
       doc: 'The OutboundAPI Hostname/IP address to bind.',
       format: '*',
       default: '0.0.0.0',
       env: 'OUTBOUND_HOST'
     },
-    PORT: {
+    port: {
       doc: 'The OutboundAPI port to bind.',
       format: 'port',
       default: 3002,
       env: 'OUTBOUND_PORT'
     },
-    TLS: {
+    tls: {
       mutualTLS: {
         enabled: false
       },
@@ -192,349 +194,351 @@ export const ConvictConfig = Convict<ServiceConfig>({
       }
     }
   },
-  CONTROL: {
-    MGMT_API_WS_URL: {
+  control: {
+    mgmtAPIWsUrl: {
       doc: 'Management API websocket connection host.',
       format: '*',
       default: '127.0.0.1',
       env: 'CONTROL_MGMT_API_WS_URL'
     },
-    MGMT_API_WS_PORT: {
+    mgmtAPIWsPort: {
       doc: 'Management API websocket connection port.',
       format: 'port',
       default: 4005,
       env: 'CONTROL_MGMT_API_WS_URL'
     }
   },
-  REQUEST_PROCESSING_TIMEOUT_SECONDS: {
+  requestProcessingTimeoutSeconds: {
     doc: 'The timeout for waiting for a response to a request',
     env: 'REQUEST_PROCESSING_TIMEOUT_SECONDS',
     default: 30
   },
-  WSO2_AUTH: {
-    staticToken: {
-      doc: 'The statically defined token',
-      format: '*',
-      env: 'WSO2_BEARER_TOKEN',
-      default: ''
-    },
-    tokenEndpoint: {
-      doc: 'The OAuth server endpoint',
-      format: '*',
-      env: 'OAUTH_TOKEN_ENDPOINT',
-      default: ''
-    },
-    clientKey: {
-      doc: 'The OAuth client KEY',
-      format: '*',
-      env: 'OAUTH_CLIENT_KEY',
-      default: ''
-    },
-    clientSecret: {
-      doc: 'The OAuth client SECRET',
-      format: '*',
-      env: 'OAUTH_CLIENT_SECRET',
-      default: ''
-    },
-    refreshSeconds: {
-      doc: 'The token refresh timeout',
-      format: 'nat',
-      env: 'OAUTH_REFRESH_SECONDS',
-      default: 60
+  wso2: {
+    auth: {
+      staticToken: {
+        doc: 'The statically defined token',
+        format: '*',
+        env: 'WSO2_BEARER_TOKEN',
+        default: ''
+      },
+      tokenEndpoint: {
+        doc: 'The OAuth server endpoint',
+        format: '*',
+        env: 'OAUTH_TOKEN_ENDPOINT',
+        default: ''
+      },
+      clientKey: {
+        doc: 'The OAuth client KEY',
+        format: '*',
+        env: 'OAUTH_CLIENT_KEY',
+        default: ''
+      },
+      clientSecret: {
+        doc: 'The OAuth client SECRET',
+        format: '*',
+        env: 'OAUTH_CLIENT_SECRET',
+        default: ''
+      },
+      refreshSeconds: {
+        doc: 'The token refresh timeout',
+        format: 'nat',
+        env: 'OAUTH_REFRESH_SECONDS',
+        default: 60
+      }
     }
   },
-  REDIS: {
-    HOST: {
+  redis: {
+    host: {
       doc: 'The Redis Hostname/IP address to connect.',
       format: '*',
       default: 'localhost',
       env: 'REDIS_HOST'
     },
-    PORT: {
+    port: {
       doc: 'The Redis port to connect.',
       format: 'port',
       default: 6379,
       env: 'REDIS_PORT'
     },
-    TIMEOUT: {
+    timeout: {
       doc: 'The Redis connection timeout',
       format: 'nat',
       default: 100,
       env: 'REDIS_TIMEOUT'
     }
   },
-  INSPECT: {
-    DEPTH: {
+  inspect: {
+    depth: {
       doc: 'Inspection depth',
       format: 'nat',
       env: 'INSPECT_DEPTH',
       default: 4
     },
-    SHOW_HIDDEN: {
+    showHidden: {
       doc: 'Show hidden properties',
       format: 'Boolean',
       default: false
     },
-    COLOR: {
+    color: {
       doc: 'Show colors in output',
       format: 'Boolean',
       default: true
     }
   },
-  SHARED: {
-    PEER_ENDPOINT: {
+  shared: {
+    peerEndpoint: {
       doc: 'Peer/Switch endpoint',
       format: '*',
       default: '0.0.0.0:4003',
       env: 'PEER_ENDPOINT'
     },
-    ALS_ENDPOINT: {
+    alsEndpoint: {
       doc: 'ALS endpoint',
       format: '*',
       default: undefined, // '0.0.0.0:4002',
       env: 'ALS_ENDPOINT'
     },
-    QUOTES_ENDPOINT: {
+    quotesEndpoint: {
       doc: 'Quotes endpoint',
       format: '*',
       default: undefined, // '0.0.0.0:3002',
       env: 'QUOTES_ENDPOINT'
     },
-    TRANSFERS_ENDPOINT: {
+    transfersEndpoint: {
       doc: 'Peer/Switch endpoint',
       format: '*',
       default: undefined, // '0.0.0.0:3000',
       env: 'TRANSFERS_ENDPOINT'
     },
-    BULK_TRANSFERS_ENDPOINT: {
+    bulkTransfersEndpoint: {
       doc: 'Bulk Transfers endpoint',
       format: '*',
       env: 'BULK_TRANSFERS_ENDPOINT',
       default: undefined
     },
-    SERVICES_ENDPOINT: {
+    servicesEndpoint: {
       doc: 'Service provider request endpoint',
       format: '*',
       env: 'SERVICES_ENDPOINT',
       default: undefined
     },
-    THIRDPARTY_REQUESTS_ENDPOINT: {
+    thirdpartyRequestsEndpoint: {
       doc: 'Thirdparty Requests endpoint',
       format: '*',
       env: 'THIRDPARTY_REQUESTS_ENDPOINT',
       default: undefined
     },
-    TRANSACTION_REQUEST_ENDPOINT: {
+    transactionRequestEndpoint: {
       doc: 'Transaction Request endpoint',
       format: '*',
       env: 'TRANSACTION_REQUEST_ENDPOINT',
       default: undefined
     },
-    AUTH_SERVICE_PARTICIPANT_ID: {
+    authServiceParticipantId: {
       doc: 'Participant ID of an auth service',
       format: '*',
       default: 'central-auth'
     },
-    DFSP_ID: {
+    dfspId: {
       doc: 'Id of DFSP',
       format: '*',
       default: 'dfsp_a'
     },
-    DFSP_BACKEND_URI: {
+    dfspBackendUri: {
       doc: "host address of DFSP's ",
       format: '*',
       default: 'localhost:9000'
     },
-    DFSP_BACKEND_HTTP_SCHEME: {
+    dfspBackendHttpScheme: {
       doc: 'Http scheme ',
       format: ['http', 'https'],
       default: 'http'
     },
-    DFSP_BACKEND_VERIFY_AUTHORIZATION_PATH: {
+    dfspBackendVerifyAuthorizationPath: {
       doc: 'path use by DFSPBackendRequests.verifyAuthorization',
       format: '*',
       default: 'verify-authorization'
     },
-    DFSP_BACKEND_VERIFY_CONSENT_PATH: {
+    dfspBackendVerifyConsentPath: {
       doc: 'path use by DFSPBackendRequests.verifyConsent',
       format: '*',
       default: 'verify-consent'
     },
-    DFSP_BACKEND_GET_USER_ACCOUNTS_PATH: {
+    dfspBackendGetUserAccountsPath: {
       doc: 'path use by DFSPBackendRequests.getUserAccounts',
       format: '*',
       default: 'accounts/{ID}'
     },
-    DFSP_BACKEND_VALIDATE_CONS_REQ_PATH: {
+    dfspBackendValidateConsReqPath: {
       doc: 'path use by DFSPBackendRequests.validateConsentRequests',
       format: '*',
       default: 'validateConsentRequests'
     },
-    DFSP_BACKEND_SEND_OTP_REQ_PATH: {
+    dfspBackendSendOtpReqPath: {
       doc: 'path use by DFSPBackendRequests.sendOTP',
       format: '*',
       default: 'sendOTP'
     },
-    DFSP_BACKEND_STORE_CONS_REQ_PATH: {
+    dfspBackendStoreConsReqPath: {
       doc: 'path use by DFSPBackendRequests.storeConsentRequests',
       format: '*',
       default: 'store/consentRequests/{ID}'
     },
-    DFSP_BACKEND_VALIDATE_AUTH_TOKEN_PATH: {
+    dfspBackendValidateAuthTokenPath: {
       doc: 'uri to sdk-scheme-adapter validateAuthToken endpoint',
       format: '*',
       default: 'validateAuthToken'
     },
-    DFSP_BACKEND_VALIDATE_THIRDPARTY_TRANSACTION_REQUEST: {
+    dfspBackendValidateThirdpartyTransactionRequest: {
       doc: 'path used by DFSPBackendRequests.validateThirdpartyTransactionRequest',
       format: '*',
       default: 'validate-thirdparty-transaction-request'
     },
-    DFSP_BACKEND_STORE_VALIDATED_CONSENT_FOR_ACCOUNT_ID_PATH: {
+    dfspBackendStoreValidatedConsentForAccountIdPath: {
       doc: 'path use by DFSPBackendRequests.storeValidatedConsentForAccountId',
       format: '*',
       default: 'store/consent'
     },
-    DFSP_TRANSACTION_REQUEST_AUTHORIZATION_TIMEOUT_SECONDS: {
+    dfspTransactionRequestAuthorizationTimeoutSeconds: {
       doc: 'Timeout for the DFSP waiting on the PISP response to POST /thirdpartyRequests/authorization',
       format: 'nat',
       default: 100
     },
-    DFSP_TRANSACTION_REQUEST_VERIFICATION_TIMEOUT_SECONDS: {
+    dfspTransactionRequestVerificationTimeoutSeconds: {
       doc: 'Timeout for the DFSP waiting on the Auth-Service response to POST /thirdpartyRequests/verifications',
       format: 'nat',
       default: 15
     },
-    PISP_TRANSACTION_INITIATE_TIMEOUT_IN_SECONDS: {
+    pispTransactionInitiateTimeoutInSeconds: {
       doc: 'Timeout for Transaction Initiate phase',
       format: 'nat',
       default: 30
     },
-    PISP_TRANSACTION_APPROVE_TIMEOUT_IN_SECONDS: {
+    pispTransactionApproveTimeoutInSeconds: {
       doc: 'Timeout for Transaction Approve phase',
       format: 'nat',
       default: 30
     },
-    SDK_OUTGOING_URI: {
+    sdkOutgoingUri: {
       doc: "host address of SDK scheme-adapter Outgoing service's ",
       format: '*',
       default: 'localhost:7002'
     },
-    SDK_OUTGOING_HTTP_SCHEME: {
+    sdkOutgoingHttpScheme: {
       doc: 'Http scheme ',
       format: ['http', 'https'],
       default: 'http'
     },
-    SDK_OUTGOING_REQUEST_QUOTE_PATH: {
+    sdkOutgoingRequestQuotePath: {
       doc: 'path to sdk outgoing quote sync interface',
       format: '*',
       default: 'quotes'
     },
-    SDK_OUTGOING_REQUEST_AUTHORIZATION_PATH: {
+    sdkOutgoingRequestAuthorizationPath: {
       doc: 'path to sdk outgoing authorization sync interface',
       format: '*',
       default: 'authorizations'
     },
-    SDK_OUTGOING_REQUEST_TRANSFER_PATH: {
+    sdkOutgoingRequestTransferPath: {
       doc: 'path to sdk outgoing transfer sync interface',
       format: '*',
       default: 'simpleTransfers'
     },
-    SDK_REQUEST_TO_PAY_TRANSFER_URI: {
+    sdkRequestToPayTransferUri: {
       doc: 'uri to sdk-scheme-adapter requestToPayTransfer endpoint',
       format: '*',
       default: 'localhost:9000/requestToPayTransfer'
     },
-    SDK_OUTGOING_PARTIES_INFORMATION_PATH: {
+    sdkOutgoingPartiesInformationPath: {
       doc: 'uri to sdk-scheme-adapter requestToPayTransfer endpoint',
       format: '*',
       default: 'localhost:7002/parties/{Type}/{ID}/{SubId}'
     },
-    SDK_NOTIFY_ABOUT_TRANSFER_URI: {
+    sdkNotifyAboutTransferUri: {
       doc: 'uri to sdk-scheme-adapter requestToPayTransfer endpoint',
       format: '*',
       default: 'localhost:9000/thirdpartyRequests/transactions/{ID}'
     },
-    JWS_SIGN: {
+    jwsSign: {
       format: 'Boolean',
       default: false
     },
-    JWS_SIGNING_KEY: {
+    jwsSigningKey: {
       format: '*',
       default: ''
     },
-    TEMP_OVERRIDE_QUOTES_PARTY_ID_TYPE: {
+    tempOverrideQuotesPartyIdType: {
       doc: 'DEPRECATED - No longer in use. Implement the backend request validateThirdpartyTransactionRequestAndGetContext instead.',
       format: '*',
       env: 'TEMP_OVERRIDE_QUOTES_PARTY_ID_TYPE',
       default: undefined
     },
-    TEST_OVERRIDE_CONSENT_ID: {
+    testOverrideConsentId: {
       doc: `DEPRECTAED - use TEST_SHOULD_OVERRIDE_CONSENT_ID and TEST_CONSENT_REQUEST_TO_CONSENT_MAP instead.
 If set, this will override the consentId generated by the adapter, this is purely for testing purposes, do NOT use this variable in production`,
       format: '*',
       env: 'TEST_OVERRIDE_CONSENT_ID',
       default: undefined
     },
-    TEST_SHOULD_OVERRIDE_CONSENT_ID: {
+    testShouldOverrideConsentId: {
       doc: `If true, will generate a deterministic consentId from the consentRequestId -> consentId
 mapping in TEST_CONSENT_REQUEST_TO_CONSENT_MAP. If a consentId cannot be found for a consentRequestId,
 it will fallback to default behaviour (random consentId)`,
       format: 'Boolean',
       default: false
     },
-    TEST_CONSENT_REQUEST_TO_CONSENT_MAP: {
+    testConsentRequestToConsentMap: {
       doc: 'A map of consentIds to use for a given consentRequestId. This allows automated tests to know in advance the consentId.',
       format: '*',
       default: {}
     },
-    TEST_OVERRIDE_TRANSACTION_CHALLENGE: {
+    testOverrideTransactionChallenge: {
       doc: 'If set to a non empty string, the derived challenge will be replaced with this value. This allows automated tests to use pre-signed transaction payloads.',
       format: '*',
       default: undefined
     }
   },
-  PM4ML_ENABLED: {
+  pm4mlEnabled: {
     default: false
   }
 })
 
 // Load environment dependent configuration
-const env = ConvictConfig.get('ENV')
+const env = ConvictConfig.get('env')
 ConvictConfig.loadFile(path.join(__dirname, `/../../config/${env}.json`))
 
 // Perform configuration validation
 ConvictConfig.validate({ allowed: 'strict' })
 
 // Load file contents for keys and secrets
-if (ConvictConfig.get('SHARED.JWS_SIGN')) {
-  ConvictConfig.set('SHARED.JWS_SIGNING_KEY', getFileContent(ConvictConfig.get('SHARED').JWS_SIGNING_KEY))
+if (ConvictConfig.get('shared.jwsSign')) {
+  ConvictConfig.set('shared.jwsSigningKey', getFileContent(ConvictConfig.get('shared').jwsSigningKey))
 }
 
-if (ConvictConfig.get('INBOUND.TLS.mutualTLS.enabled')) {
-  ConvictConfig.set('INBOUND.TLS.creds.ca', getFileListContent(<string>ConvictConfig.get('INBOUND').TLS.creds.ca))
-  ConvictConfig.set('INBOUND.TLS.creds.cert', getFileContent(<string>ConvictConfig.get('INBOUND').TLS.creds.cert))
-  ConvictConfig.set('INBOUND.TLS.creds.key', getFileContent(<string>ConvictConfig.get('INBOUND').TLS.creds.key))
+if (ConvictConfig.get('inbound.tls.mutualTLS.enabled')) {
+  ConvictConfig.set('inbound.tls.creds.ca', getFileListContent(<string>ConvictConfig.get('inbound').tls.creds.ca))
+  ConvictConfig.set('inbound.tls.creds.cert', getFileContent(<string>ConvictConfig.get('inbound').tls.creds.cert))
+  ConvictConfig.set('inbound.tls.creds.key', getFileContent(<string>ConvictConfig.get('inbound').tls.creds.key))
 }
 
-if (ConvictConfig.get('OUTBOUND.TLS.mutualTLS.enabled')) {
-  ConvictConfig.set('OUTBOUND.TLS.creds.ca', getFileListContent(<string>ConvictConfig.get('OUTBOUND').TLS.creds.ca))
-  ConvictConfig.set('OUTBOUND.TLS.creds.cert', getFileContent(<string>ConvictConfig.get('OUTBOUND').TLS.creds.cert))
-  ConvictConfig.set('OUTBOUND.TLS.creds.key', getFileContent(<string>ConvictConfig.get('OUTBOUND').TLS.creds.key))
+if (ConvictConfig.get('outbound.tls.mutualTLS.enabled')) {
+  ConvictConfig.set('outbound.tls.creds.ca', getFileListContent(<string>ConvictConfig.get('outbound').tls.creds.ca))
+  ConvictConfig.set('outbound.tls.creds.cert', getFileContent(<string>ConvictConfig.get('outbound').tls.creds.cert))
+  ConvictConfig.set('outbound.tls.creds.key', getFileContent(<string>ConvictConfig.get('outbound').tls.creds.key))
 }
 
 // extract simplified config from Convict object
 const config: ServiceConfig = {
-  ENV: ConvictConfig.get('ENV'),
-  INBOUND: ConvictConfig.get('INBOUND'),
-  OUTBOUND: ConvictConfig.get('OUTBOUND'),
-  CONTROL: ConvictConfig.get('CONTROL'),
-  REQUEST_PROCESSING_TIMEOUT_SECONDS: ConvictConfig.get('REQUEST_PROCESSING_TIMEOUT_SECONDS'),
-  WSO2_AUTH: ConvictConfig.get('WSO2_AUTH'),
-  REDIS: ConvictConfig.get('REDIS'),
-  INSPECT: ConvictConfig.get('INSPECT'),
-  SHARED: ConvictConfig.get('SHARED'),
-  PM4ML_ENABLED: ConvictConfig.get('PM4ML_ENABLED')
+  env: ConvictConfig.get('env'),
+  inbound: ConvictConfig.get('inbound'),
+  outbound: ConvictConfig.get('outbound'),
+  control: ConvictConfig.get('control'),
+  requestProcessingTimeoutSeconds: ConvictConfig.get('requestProcessingTimeoutSeconds'),
+  wso2: ConvictConfig.get('wso2'),
+  redis: ConvictConfig.get('redis'),
+  inspect: ConvictConfig.get('inspect'),
+  shared: ConvictConfig.get('shared'),
+  pm4mlEnabled: ConvictConfig.get('pm4mlEnabled')
 }
 
 export default config

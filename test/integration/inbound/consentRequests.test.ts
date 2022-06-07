@@ -107,10 +107,10 @@ describe('PISP Inbound', (): void => {
     const scenarioUri = `${env.inbound.baseUri}/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fba/error`
     describe('Inbound API', (): void => {
       const config: RedisConnectionConfig = {
-        host: Config.REDIS.HOST,
-        port: Config.REDIS.PORT,
+        host: Config.redis.host,
+        port: Config.redis.port,
         logger: mockLogger(),
-        timeout: Config.REDIS.TIMEOUT
+        timeout: Config.redis.timeout
       }
       const payload = {
         errorInformation: {
@@ -182,10 +182,10 @@ describe('PISP Inbound', (): void => {
     const scenarioUri = `${env.inbound.baseUri}/consentRequests/997c89f4-053c-4283-bfec-45a1a0a28fbb`
     describe('Inbound API', (): void => {
       const config: RedisConnectionConfig = {
-        host: Config.REDIS.HOST,
-        port: Config.REDIS.PORT,
+        host: Config.redis.host,
+        port: Config.redis.port,
         logger: mockLogger(),
-        timeout: Config.REDIS.TIMEOUT
+        timeout: Config.redis.timeout
       }
       const axiosConfig = {
         headers: {

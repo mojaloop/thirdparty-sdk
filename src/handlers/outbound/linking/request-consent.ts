@@ -51,7 +51,7 @@ async function post(_context: unknown, request: Request, h: StateResponseToolkit
     key: payload.consentRequestId,
     logger: h.getLogger(),
     thirdpartyRequests: h.getThirdpartyRequests(),
-    requestProcessingTimeoutSeconds: config.REQUEST_PROCESSING_TIMEOUT_SECONDS
+    requestProcessingTimeoutSeconds: config.requestProcessingTimeoutSeconds
   }
   const model: PISPLinkingModel = await create(data, modelConfig)
 

@@ -154,24 +154,3 @@ export interface MgmtApiConfig {
     }
   }
 }
-
-export interface ConformedMgmtApiConfig {
-  OUTBOUND: {
-    tls: {
-      creds: {
-        ca: string | Buffer | Array<string | Buffer>
-        cert: string | Buffer | Array<string | Buffer>
-        key?: string | Buffer | Array<Buffer | KeyObject>
-      }
-    }
-  }
-  INBOUND: {
-    tls: {
-      creds: {
-        ca: string | Buffer | Array<string | Buffer>
-        cert: string | Buffer | Array<string | Buffer>
-        key?: string | Buffer | Array<Buffer | KeyObject>
-      }
-    }
-  }
-}

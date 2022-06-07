@@ -1,13 +1,13 @@
 {
-  "CONTROL": {
-    "MGMT_API_WS_URL": "127.0.0.1",
-    "MGMT_API_WS_PORT": 4010
+  "control": {
+    "mgmtApiWsUrl": "127.0.0.1",
+    "mgmtApiWsPort": 4010
   },
-  "INBOUND": {
-    "PORT": 4005,
-    "HOST": "0.0.0.0",
-    "PISP_TRANSACTION_MODE": true,
-    "TLS": {
+  "inbound": {
+    "port": 4005,
+    "host": "0.0.0.0",
+    "pispTransactionMode": true,
+    "tls": {
       "mutualTLS": {
         "enabled": false
       },
@@ -18,10 +18,10 @@
       }
     }
   },
-  "OUTBOUND": {
-    "PORT": 4006,
-    "HOST": "0.0.0.0",
-    "TLS": {
+  "outbound": {
+    "port": 4006,
+    "host": "0.0.0.0",
+    "tls": {
       "mutualTLS": {
         "enabled": false
       },
@@ -32,41 +32,43 @@
       }
     }
   },
-  "REQUEST_PROCESSING_TIMEOUT_SECONDS": 30,
-  "WSO2_AUTH": {
-    "staticToken": "0706c62f-c022-3c42-8d14-8b5df128876d",
-    "tokenEndpoint": "",
-    "clientKey": "test-client-key",
-    "clientSecret": "test-client-secret",
-    "refreshSeconds": 3600
+  "requestProcessingTimeoutSeconds": 30,
+  "wso2": {
+    "auth": {
+      "staticToken": "0706c62f-c022-3c42-8d14-8b5df128876d",
+      "tokenEndpoint": "",
+      "clientKey": "test-client-key",
+      "clientSecret": "test-client-secret",
+      "refreshSeconds": 3600
+    }
   },
-  "REDIS": {
-    "PORT": 6379,
-    "HOST": "redis",
-    "TIMEOUT": 100
+  "redis": {
+    "port": 6379,
+    "host": "redis",
+    "timeout": 100
   },
-  "INSPECT": {
-    "DEPTH": 4,
-    "SHOW_HIDDEN": false,
-    "COLOR": true
+  "inspect": {
+    "depth": 4,
+    "showHidden": false,
+    "color": true
   },
-  "SHARED": {
-    "PEER_ENDPOINT": "ml-testing-toolkit:5000",
-    "ALS_ENDPOINT": "ml-testing-toolkit:5000",
-    "QUOTES_ENDPOINT": "ml-testing-toolkit:5000",
-    "TRANSFERS_ENDPOINT": "ml-testing-toolkit:5000",
-    "DFSP_ID": "dfsp_a",
-    "DFSP_BACKEND_URI": "pisp-simulator:3000",
-    "DFSP_BACKEND_HTTP_SCHEME": "http",
-    "DFSP_BACKEND_VERIFY_AUTHORIZATION_PATH": "verify-authorization",
-    "DFSP_BACKEND_VERIFY_CONSENT_PATH": "verify-consent",
-    "SDK_REQUEST_TO_PAY_TRANSFER_URI": "0.0.0.0:3000/requestToPayTransfer",
-    "SDK_OUTGOING_URI": "sdk-scheme-adapter:4001",
-    "SDK_OUTGOING_HTTP_SCHEME": "http",
-    "SDK_OUTGOING_PARTIES_INFORMATION_PATH": "parties/{Type}/{ID}/{SubId}",
-    "SDK_NOTIFY_ABOUT_TRANSFER_URI": "ml-testing-toolkit:5000/thirdpartyRequests/transactions/{ID}",
-    "JWS_SIGN": false,
-    "JWS_SIGNING_KEY": "./secrets/jwsSigningKey.key"
+  "shared": {
+    "peerEndpoint": "ml-testing-toolkit:5000",
+    "alsEndpoint": "ml-testing-toolkit:5000",
+    "quotesEndpoint": "ml-testing-toolkit:5000",
+    "transfersEndpoint": "ml-testing-toolkit:5000",
+    "dfspId": "dfsp_a",
+    "dfspBackendUri": "pisp-simulator:3000",
+    "dfspBackendHttpScheme": "http",
+    "dfspBackendVerifyAuthorizationPath": "verify-authorization",
+    "dfspBackendVerifyConsentPath": "verify-consent",
+    "sdkRequestToPayTransferUri": "0.0.0.0:3000/requestToPayTransfer",
+    "sdkOutgoingUri": "sdk-scheme-adapter:4001",
+    "sdkOutgoingHttpScheme": "http",
+    "sdkOutgoingPartiesInformationPath": "parties/{Type}/{ID}/{SubId}",
+    "sdkNotifyAboutTransferUri": "ml-testing-toolkit:5000/thirdpartyRequests/transactions/{ID}",
+    "jwsSign": false,
+    "jwsSigningKey": "./secrets/jwsSigningKey.key"
   },
-  "PM4ML_ENABLED": false
+  "pm4mlEnabled": false
 }

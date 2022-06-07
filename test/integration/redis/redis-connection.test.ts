@@ -31,10 +31,10 @@ import Config from '~/shared/config'
 
 describe('RedisConnection', () => {
   const config: RedisConnectionConfig = {
-    host: Config.REDIS.HOST,
-    port: Config.REDIS.PORT,
+    host: Config.redis.host,
+    port: Config.redis.port,
     logger: mockLogger(),
-    timeout: Config.REDIS.TIMEOUT
+    timeout: Config.redis.timeout
   }
   let rc: RedisConnection
 

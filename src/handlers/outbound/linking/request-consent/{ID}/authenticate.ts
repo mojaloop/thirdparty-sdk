@@ -46,7 +46,7 @@ async function patch(_context: unknown, request: Request, h: StateResponseToolki
     key: consentRequestId,
     logger: h.getLogger(),
     thirdpartyRequests: h.getThirdpartyRequests(),
-    requestProcessingTimeoutSeconds: config.REQUEST_PROCESSING_TIMEOUT_SECONDS
+    requestProcessingTimeoutSeconds: config.requestProcessingTimeoutSeconds
   }
 
   try {

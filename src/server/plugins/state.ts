@@ -59,9 +59,9 @@ export const StatePlugin = {
   register: async (server: Server): Promise<void> => {
     // KVS & PubSub are using the same Redis instance
     const connection: RedisConnectionConfig = {
-      host: config.REDIS.HOST,
-      port: config.REDIS.PORT,
-      timeout: config.REDIS.TIMEOUT,
+      host: config.redis.host,
+      port: config.redis.port,
+      timeout: config.redis.timeout,
       logger
     }
 
@@ -83,68 +83,68 @@ export const StatePlugin = {
     }
     // prepare WSO2Auth
     const wso2Auth = new WSO2Auth({
-      ...config.WSO2_AUTH,
+      ...config.wso2,
       logger,
-      tlsCreds: config.OUTBOUND.TLS.mutualTLS.enabled ? (config.OUTBOUND.TLS.creds as TLSCreds) : undefined
+      tlsCreds: config.outbound.tls.mutualTLS.enabled ? (config.outbound.tls.creds as TLSCreds) : undefined
     })
 
     // prepare Requests instances
     const mojaloopRequests = new MojaloopRequests({
       logger,
-      peerEndpoint: config.SHARED.PEER_ENDPOINT,
-      alsEndpoint: config.SHARED.ALS_ENDPOINT,
-      quotesEndpoint: config.SHARED.QUOTES_ENDPOINT,
-      transfersEndpoint: config.SHARED.TRANSFERS_ENDPOINT,
-      bulkTransfersEndpoint: config.SHARED.BULK_TRANSFERS_ENDPOINT,
-      servicesEndpoint: config.SHARED.SERVICES_ENDPOINT,
-      thirdpartyRequestsEndpoint: config.SHARED.THIRDPARTY_REQUESTS_ENDPOINT,
-      transactionRequestsEndpoint: config.SHARED.TRANSACTION_REQUEST_ENDPOINT,
-      dfspId: config.SHARED.DFSP_ID,
-      tls: config.OUTBOUND.TLS,
-      jwsSign: config.SHARED.JWS_SIGN,
-      jwsSigningKey: <Buffer>config.SHARED.JWS_SIGNING_KEY
+      peerEndpoint: config.shared.peerEndpoint,
+      alsEndpoint: config.shared.alsEndpoint,
+      quotesEndpoint: config.shared.quotesEndpoint,
+      transfersEndpoint: config.shared.transfersEndpoint,
+      bulkTransfersEndpoint: config.shared.bulkTransfersEndpoint,
+      servicesEndpoint: config.shared.servicesEndpoint,
+      thirdpartyRequestsEndpoint: config.shared.thirdpartyRequestsEndpoint,
+      transactionRequestsEndpoint: config.shared.transactionRequestEndpoint,
+      dfspId: config.shared.dfspId,
+      tls: config.outbound.tls,
+      jwsSign: config.shared.jwsSign,
+      jwsSigningKey: <Buffer>config.shared.jwsSigningKey
     })
 
     const thirdpartyRequest = new ThirdpartyRequests({
       logger,
-      peerEndpoint: config.SHARED.PEER_ENDPOINT,
-      alsEndpoint: config.SHARED.ALS_ENDPOINT,
-      quotesEndpoint: config.SHARED.QUOTES_ENDPOINT,
-      transfersEndpoint: config.SHARED.TRANSFERS_ENDPOINT,
-      bulkTransfersEndpoint: config.SHARED.BULK_TRANSFERS_ENDPOINT,
-      servicesEndpoint: config.SHARED.SERVICES_ENDPOINT,
-      thirdpartyRequestsEndpoint: config.SHARED.THIRDPARTY_REQUESTS_ENDPOINT,
-      transactionRequestsEndpoint: config.SHARED.TRANSACTION_REQUEST_ENDPOINT,
-      dfspId: config.SHARED.DFSP_ID,
-      tls: config.OUTBOUND.TLS,
-      jwsSign: config.SHARED.JWS_SIGN,
-      jwsSigningKey: <Buffer>config.SHARED.JWS_SIGNING_KEY
+      peerEndpoint: config.shared.peerEndpoint,
+      alsEndpoint: config.shared.alsEndpoint,
+      quotesEndpoint: config.shared.quotesEndpoint,
+      transfersEndpoint: config.shared.transfersEndpoint,
+      bulkTransfersEndpoint: config.shared.bulkTransfersEndpoint,
+      servicesEndpoint: config.shared.servicesEndpoint,
+      thirdpartyRequestsEndpoint: config.shared.thirdpartyRequestsEndpoint,
+      transactionRequestsEndpoint: config.shared.transactionRequestEndpoint,
+      dfspId: config.shared.dfspId,
+      tls: config.outbound.tls,
+      jwsSign: config.shared.jwsSign,
+      jwsSigningKey: <Buffer>config.shared.jwsSigningKey
     })
 
     const dfspBackendRequests = new DFSPBackendRequests({
       logger,
-      uri: config.SHARED.DFSP_BACKEND_URI,
-      scheme: config.SHARED.DFSP_BACKEND_HTTP_SCHEME as Scheme,
-      verifyAuthorizationPath: config.SHARED.DFSP_BACKEND_VERIFY_AUTHORIZATION_PATH,
-      verifyConsentPath: config.SHARED.DFSP_BACKEND_VERIFY_CONSENT_PATH,
-      getUserAccountsPath: config.SHARED.DFSP_BACKEND_GET_USER_ACCOUNTS_PATH,
-      validateAuthTokenPath: config.SHARED.DFSP_BACKEND_VALIDATE_AUTH_TOKEN_PATH,
-      validateThirdpartyTransactionRequestPath: config.SHARED.DFSP_BACKEND_VALIDATE_THIRDPARTY_TRANSACTION_REQUEST,
-      validateConsentRequestsPath: config.SHARED.DFSP_BACKEND_VALIDATE_CONS_REQ_PATH,
-      sendOTPPath: config.SHARED.DFSP_BACKEND_SEND_OTP_REQ_PATH,
-      storeConsentRequestsPath: config.SHARED.DFSP_BACKEND_STORE_CONS_REQ_PATH,
-      storeValidatedConsentForAccountIdPath: config.SHARED.DFSP_BACKEND_STORE_VALIDATED_CONSENT_FOR_ACCOUNT_ID_PATH
+      uri: config.shared.dfspBackendUri,
+      scheme: config.shared.dfspBackendHttpScheme as Scheme,
+      verifyAuthorizationPath: config.shared.dfspBackendVerifyAuthorizationPath,
+      verifyConsentPath: config.shared.dfspBackendVerifyConsentPath,
+      getUserAccountsPath: config.shared.dfspBackendGetUserAccountsPath,
+      validateAuthTokenPath: config.shared.dfspBackendValidateAuthTokenPath,
+      validateThirdpartyTransactionRequestPath: config.shared.dfspBackendValidateThirdpartyTransactionRequest,
+      validateConsentRequestsPath: config.shared.dfspBackendValidateConsReqPath,
+      sendOTPPath: config.shared.dfspBackendSendOtpReqPath,
+      storeConsentRequestsPath: config.shared.dfspBackendStoreConsReqPath,
+      storeValidatedConsentForAccountIdPath: config.shared.dfspBackendStoreValidatedConsentForAccountIdPath
     })
 
     const sdkOutgoingRequests = new SDKOutgoingRequests({
       logger,
-      uri: config.SHARED.SDK_OUTGOING_URI,
-      scheme: config.SHARED.SDK_OUTGOING_HTTP_SCHEME as Scheme,
-      requestPartiesInformationPath: config.SHARED.SDK_OUTGOING_PARTIES_INFORMATION_PATH,
-      requestToPayTransferPath: config.SHARED.SDK_REQUEST_TO_PAY_TRANSFER_URI,
-      requestQuotePath: config.SHARED.SDK_OUTGOING_REQUEST_QUOTE_PATH,
-      requestAuthorizationPath: config.SHARED.SDK_OUTGOING_REQUEST_AUTHORIZATION_PATH,
-      requestTransferPath: config.SHARED.SDK_OUTGOING_REQUEST_TRANSFER_PATH
+      uri: config.shared.sdkOutgoingUri,
+      scheme: config.shared.sdkOutgoingHttpScheme as Scheme,
+      requestPartiesInformationPath: config.shared.sdkOutgoingPartiesInformationPath,
+      requestToPayTransferPath: config.shared.sdkRequestToPayTransferUri,
+      requestQuotePath: config.shared.sdkOutgoingRequestQuotePath,
+      requestAuthorizationPath: config.shared.sdkOutgoingRequestAuthorizationPath,
+      requestTransferPath: config.shared.sdkOutgoingRequestTransferPath
     })
 
     try {
@@ -163,8 +163,8 @@ export const StatePlugin = {
       server.decorate('toolkit', 'getWSO2Auth', (): WSO2Auth => wso2Auth)
       server.decorate('toolkit', 'getDFSPBackendRequests', (): DFSPBackendRequests => dfspBackendRequests)
       server.decorate('toolkit', 'getSDKOutgoingRequests', (): SDKOutgoingRequests => sdkOutgoingRequests)
-      server.decorate('toolkit', 'getDFSPId', (): string => config.SHARED.DFSP_ID)
-      server.decorate('toolkit', 'getAuthServiceParticipantId', (): string => config.SHARED.AUTH_SERVICE_PARTICIPANT_ID)
+      server.decorate('toolkit', 'getDFSPId', (): string => config.shared.dfspId)
+      server.decorate('toolkit', 'getAuthServiceParticipantId', (): string => config.shared.authServiceParticipantId)
       // disconnect from redis when server is stopped
       server.events.on('stop', async () => {
         await Promise.allSettled([kvs.disconnect(), publisher.disconnect(), subscriber.disconnect()])

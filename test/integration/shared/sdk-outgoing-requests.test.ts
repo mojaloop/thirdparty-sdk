@@ -36,12 +36,12 @@ describe('SDKOutgoingRequests', () => {
   const sdkConfig: SDKOutgoingRequestsConfig = {
     logger: mockLogger(),
     scheme: Scheme.http,
-    uri: config.SHARED.SDK_OUTGOING_URI,
-    requestPartiesInformationPath: config.SHARED.SDK_OUTGOING_PARTIES_INFORMATION_PATH,
-    requestToPayTransferPath: config.SHARED.SDK_REQUEST_TO_PAY_TRANSFER_URI,
-    requestQuotePath: config.SHARED.SDK_OUTGOING_REQUEST_QUOTE_PATH,
-    requestAuthorizationPath: config.SHARED.SDK_OUTGOING_REQUEST_AUTHORIZATION_PATH,
-    requestTransferPath: config.SHARED.SDK_OUTGOING_REQUEST_TRANSFER_PATH
+    uri: config.shared.sdkOutgoingUri,
+    requestPartiesInformationPath: config.shared.sdkOutgoingPartiesInformationPath,
+    requestToPayTransferPath: config.shared.sdkRequestToPayTransferUri,
+    requestQuotePath: config.shared.sdkOutgoingRequestQuotePath,
+    requestAuthorizationPath: config.shared.sdkOutgoingRequestAuthorizationPath,
+    requestTransferPath: config.shared.sdkOutgoingRequestTransferPath
   }
   const sdkOutRequest = new SDKOutgoingRequests(sdkConfig)
 

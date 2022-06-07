@@ -36,8 +36,8 @@ export const defaults = {
 export default function inspect(subject: unknown): string {
   return util.inspect(
     subject,
-    config?.INSPECT?.SHOW_HIDDEN || defaults.SHOW_HIDDEN,
-    config?.INSPECT?.DEPTH || defaults.DEPTH,
-    config?.INSPECT?.COLOR || defaults.COLOR
+    config?.inspect?.showHidden || defaults.SHOW_HIDDEN,
+    config?.inspect?.depth || defaults.DEPTH,
+    config?.inspect?.color || defaults.COLOR
   )
 }
