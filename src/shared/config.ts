@@ -66,7 +66,7 @@ export interface ServiceConfig {
   env: string
   inbound: InConfig
   outbound: OutConfig
-  control: ControlConfig
+  control?: ControlConfig
   requestProcessingTimeoutSeconds: number
   wso2: {
     auth: {

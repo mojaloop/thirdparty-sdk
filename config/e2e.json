@@ -1,4 +1,8 @@
 {
+  "control": {
+    "mgmtAPIWsUrl": "127.0.0.1",
+    "mgmtAPIWsPort": 4010
+  },
   "inbound": {
     "port": 4005,
     "host": "0.0.0.0",

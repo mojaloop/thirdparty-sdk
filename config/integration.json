@@ -1,7 +1,7 @@
 {
   "control": {
-    "mgmtApiWsUrl": "127.0.0.1",
-    "mgmtApiWsPort": 4010
+    "mgmtAPIWsUrl": "127.0.0.1",
+    "mgmtAPIWsPort": 4010
   },
   "inbound": {
     "port": 4005,

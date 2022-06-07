@@ -20,8 +20,6 @@ import ws from 'ws'
 import jsonPatch from 'fast-json-patch'
 import { generateSlug } from 'random-word-slugs'
 import { Logger as SDKLogger } from '@mojaloop/sdk-standard-components'
-import { MgmtApiConfig } from '~/interface/types'
-import _ from 'lodash'
 
 // TODO: This needs proper typing, for now inferred types are used.
 
