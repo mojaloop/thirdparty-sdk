@@ -42,7 +42,7 @@ import { Logger as SDKLogger } from '@mojaloop/sdk-standard-components'
 import _ from 'lodash'
 import * as ControlAgent from '~/reconfiguration/controlAgent'
 import { ConformedMgmtApiConfig } from './interface/types'
-import { start, stop } from './server/start'
+import { stop } from './server/start'
 /**
  * prepares commander action
  * @param api {string} the name of the api to start can be `inbound` or `outbound`

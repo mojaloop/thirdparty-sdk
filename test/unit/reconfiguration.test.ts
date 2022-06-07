@@ -174,7 +174,7 @@ describe('cli', () => {
     )
   })
 
-  it.only('should retrieve updated configuration from management api on start', async (): Promise<void> => {
+  it('should retrieve updated configuration from management api on start', async (): Promise<void> => {
     // Send a message to the client of updated configuration after its running
     wsServer.clients.forEach(function each(client) {
       client.send(ControlAgent.build.CONFIGURATION.NOTIFY(managementApiResponse, ''))
