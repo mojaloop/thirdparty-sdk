@@ -16,12 +16,14 @@ import { stop } from './server/start'
  * prepares commander action
  * @param api {string} the name of the api to start can be `inbound` or `outbound`
  * @param handlers { { [handler: string]: Handler } } dictionary with api handlers, will be joined with Handlers.Shared
+ * @param serviceConfig {ServiceConfig} dictionary with config options. see `src/shared/config` for interface
+ * @param restart {boolean} option for when you need to restart the api
  * @returns () => Promise<void> asynchronous commander action to start api
  */
 export async function mkStartAPI(
   api: ServerAPI,
   handlers: { [handler: string]: Handler },
-  serviceConfig = config,
+  serviceConfig: ServiceConfig = config,
   restart = false
 ): Promise<HapiServer> {
   // update config from program parameters,
