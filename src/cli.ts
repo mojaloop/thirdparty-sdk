@@ -32,13 +32,13 @@ require('module-alias/register')
 
 import { program } from 'commander'
 import { PACKAGE } from '~/shared/config'
-import { startAPI } from './api'
+import { startAPISuite } from './api'
 
 // setup cli program
 program.version(PACKAGE.version).description('thirdparty-sdk')
 
 // setup standalone command to start service
-program.command('all').description('start API service').action(startAPI())
+program.command('all').description('start API services').action(startAPISuite())
 
 // fetch parameters from command line and execute
 program.parseAsync(process.argv)

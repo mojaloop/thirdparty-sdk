@@ -11,6 +11,7 @@ import _ from 'lodash'
 import * as ControlAgent from '~/reconfiguration/controlAgent'
 import { MgmtApiConfig } from './interface/types'
 import { stop } from './server/start'
+
 /**
  * prepares commander action
  * @param api {string} the name of the api to start can be `inbound` or `outbound`
@@ -20,7 +21,8 @@ import { stop } from './server/start'
 export async function mkStartAPI(
   api: ServerAPI,
   handlers: { [handler: string]: Handler },
-  serviceConfig = config
+  serviceConfig = config,
+  restart = false
 ): Promise<HapiServer> {
   // update config from program parameters,
   // so setupAndStart will know on which PORT/HOST bind the server
@@ -44,38 +46,11 @@ export async function mkStartAPI(
     tls: apiConfig.tls
   }
   // setup & start @hapi server
-  return await index.server.setupAndStart(serverConfig, apiPath, joinedHandlers)
-}
-
-export async function mkRestartAPI(
-  api: ServerAPI,
-  handlers: { [handler: string]: Handler },
-  serviceConfig = config
-): Promise<HapiServer> {
-  // update config from program parameters,
-  // so setupAndStart will know on which PORT/HOST bind the server
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  const apiConfig: OutConfig = serviceConfig[api] as OutConfig
-
-  // resolve the path to openapi v3 definition file
-  const apiPath = path.resolve(__dirname, `../src/interface/api-${api}.yaml`)
-
-  // prepare API handlers
-  const joinedHandlers = {
-    ...Handlers.Shared,
-    ...handlers
+  if (restart) {
+    return await index.server.setupAndRestart(serverConfig, apiPath, joinedHandlers)
+  } else {
+    return await index.server.setupAndStart(serverConfig, apiPath, joinedHandlers)
   }
-
-  const serverConfig: ServerConfig = {
-    port: apiConfig.port,
-    host: apiConfig.host,
-    api,
-    tls: apiConfig.tls
-  }
-
-  // setup & start @hapi server
-  return await index.server.setupAndRestart(serverConfig, apiPath, joinedHandlers)
 }
 
 async function GetUpdatedConfigFromMgmtAPI(
@@ -133,8 +108,8 @@ export class Server {
   }
 
   async restart(conf: ServiceConfig) {
-    this.inboundServer = await mkRestartAPI(ServerAPI.inbound, Handlers.Inbound, conf)
-    this.outboundServer = await mkRestartAPI(ServerAPI.outbound, Handlers.Outbound, conf)
+    this.inboundServer = await mkStartAPI(ServerAPI.inbound, Handlers.Inbound, conf, true)
+    this.outboundServer = await mkStartAPI(ServerAPI.outbound, Handlers.Outbound, conf, true)
     await Promise.all([this.inboundServer, this.outboundServer])
   }
 
@@ -143,7 +118,7 @@ export class Server {
   }
 }
 
-export function startAPI() {
+export function startAPISuite() {
   return async (): Promise<void> => {
     const logger = new SDKLogger.Logger()
     const svr = await Server.create(config)
