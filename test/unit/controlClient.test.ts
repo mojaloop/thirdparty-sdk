@@ -22,7 +22,8 @@ describe('ControlAgent', () => {
     beforeEach(async () => {
       wsServer = new WebSocketServer({ port: 8080 })
       wsServer.on('connection', function connection(ws) {
-        // A quick server solution that reuses ControlAgent functions to format messages
+        // Quick mock server solution that reuses ControlAgent functions to format messages
+        // that mocks `mojaloop-payment-manager-management-api` ws server
         ws.on('message', function message(data) {
           let msg
           try {

@@ -21,7 +21,7 @@
  * Gates Foundation
  - Name Surname <name.surname@gatesfoundation.com>
 
- * Paweł Marzec <pawel.marzec@modusbox.com>
+ * Kevin Leyow <kevin.leyow@modusbox.com>
  --------------
  ******/
 
@@ -102,7 +102,8 @@ describe('cli', () => {
     wsServer = new WebSocketServer({ port: Config.control.mgmtAPIWsPort })
 
     wsServer.on('connection', function connection(ws) {
-      // A quick server solution that reuses ControlAgent functions
+      // Quick mock server solution that reuses ControlAgent functions to format messages
+      // that mocks `mojaloop-payment-manager-management-api` ws server
       ws.on('message', function message(data) {
         let msg
         try {
@@ -174,7 +175,7 @@ describe('cli', () => {
     )
   })
 
-  it('should retrieve updated configuration from management api on start', async (): Promise<void> => {
+  it('should restart servers with updated configuration on configuration ws message', async (): Promise<void> => {
     // Send a message to the client of updated configuration after its running
     wsServer.clients.forEach(function each(client) {
       client.send(ControlAgent.build.CONFIGURATION.NOTIFY(managementApiResponse, ''))

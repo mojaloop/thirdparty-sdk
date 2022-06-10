@@ -25,11 +25,12 @@ services:
       - ml-testing-toolkit
       - pisp-simulator
     healthcheck:
-      test: wget -q http://localhost:4005/health -O /dev/null || exit 1
+      test: wget -q http://localhost:4005/health http://localhost:4006/health -O /dev/null || exit 1
       timeout: 3s
       retries: 10
       start_period: 10s
       interval: 30s
+
   sdk-scheme-adapter:
     image: "mojaloop/sdk-scheme-adapter:v13.0.2"
     container_name: sdk-scheme-adapter
