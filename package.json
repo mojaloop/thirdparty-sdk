@@ -128,7 +128,7 @@
     "redis": "3.1.2",
     "typescript": "4.7.3",
     "uuid": "^8.3.2",
-    "ws": "^8.7.0"
+    "ws": "^8.8.0"
   },
   "@comment devDependencies": [
     "Caution advised in upgrading redis-mock past 0.52.0. Investigation needed."
@@ -136,7 +136,7 @@
   "devDependencies": {
     "@commitlint/cli": "^17.0.2",
     "@commitlint/config-conventional": "^17.0.2",
-    "@redocly/cli": "^1.0.0-beta.100",
+    "@redocly/cli": "^1.0.0-beta.102",
     "@types/convict": "^6.1.1",
     "@types/crypto-js": "^4.1.1",
     "@types/hapi": "^18.0.7",
@@ -169,7 +169,7 @@
     "jest-cucumber": "^3.0.2",
     "jest-junit": "13.2.0",
     "jest-mock-process": "^1.5.1",
-    "lint-staged": "^13.0.0",
+    "lint-staged": "^13.0.1",
     "multi-file-swagger": "^2.3.0",
     "nodemon": "^2.0.16",
     "npm-audit-resolver": "^3.0.0-7",

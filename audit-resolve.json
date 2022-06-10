@@ -234,6 +234,16 @@
       "decision": "ignore",
       "madeAt": 1654268546351,
       "expiresAt": 1656860541597
+    },
+    "1070483|@mojaloop/central-services-shared>@mojaloop/event-sdk>grpc>protobufjs": {
+      "decision": "ignore",
+      "madeAt": 1654855425468,
+      "expiresAt": 1657447419729
+    },
+    "1070483|@mojaloop/sdk-scheme-adapter>@mojaloop/central-services-shared>@mojaloop/event-sdk>grpc>protobufjs": {
+      "decision": "ignore",
+      "madeAt": 1654855425468,
+      "expiresAt": 1657447419729
     }
   },
   "rules": {},
