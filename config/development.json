@@ -67,9 +67,11 @@
     "sdkOutgoingUri": "0.0.0.0:7002",
     "sdkOutgoingHttpScheme": "http",
     "sdkOutgoingPartiesInformationPath": "parties/{Type}/{ID}/{SubId}",
-    "sdkNotifyAboutTransferUri": "localhost:9000/thirdpartyRequests/transactions/{ID}",
-    "jwsSign": false,
-    "jwsSigningKey": "./secrets/jwsSigningKey.key"
+    "sdkNotifyAboutTransferUri": "localhost:9000/thirdpartyRequests/transactions/{ID}"
   },
-  "pm4mlEnabled": false
+  "pm4mlEnabled": false,
+  "validateInboundJws": false,
+  "jwsSign": false,
+  "jwsSigningKey": "/jwsSigningKey.key",
+  "jwsVerificationKeysDirectory": null
 }

@@ -121,8 +121,6 @@ export interface ServiceConfig {
     dfspBackendValidateConsReqPath: string
     dfspBackendSendOtpReqPath: string
     dfspBackendStoreConsReqPath: string
-    jwsSign: boolean
-    jwsSigningKey: PathLike | Buffer
     tempOverrideQuotesPartyIdType?: fspiopAPI.Schemas.PartyIdType
     testOverrideConsentId?: string
     testShouldOverrideConsentId: boolean
@@ -130,6 +128,10 @@ export interface ServiceConfig {
     testOverrideTransactionChallenge?: string
   }
   pm4mlEnabled: boolean
+  validateInboundJws: boolean
+  jwsSign: boolean
+  jwsSigningKey: PathLike | Buffer
+  jwsVerificationKeysDirectory: string
 }
 
 // Declare configuration schema, default values and bindings to environment variables
@@ -459,14 +461,6 @@ export const ConvictConfig = Convict<ServiceConfig>({
       format: '*',
       default: 'localhost:9000/thirdpartyRequests/transactions/{ID}'
     },
-    jwsSign: {
-      format: 'Boolean',
-      default: false
-    },
-    jwsSigningKey: {
-      format: '*',
-      default: ''
-    },
     tempOverrideQuotesPartyIdType: {
       doc: 'DEPRECATED - No longer in use. Implement the backend request validateThirdpartyTransactionRequestAndGetContext instead.',
       format: '*',
@@ -500,6 +494,26 @@ it will fallback to default behaviour (random consentId)`,
   },
   pm4mlEnabled: {
     default: false
+  },
+  validateInboundJws: {
+    format: 'Boolean',
+    default: false,
+    env: 'VALIDATE_INBOUND_JWS'
+  },
+  jwsSign: {
+    format: 'Boolean',
+    default: false,
+    env: 'JWS_SIGN'
+  },
+  jwsSigningKey: {
+    format: '*',
+    default: '',
+    env: 'JWS_SIGNING_KEY_PATH'
+  },
+  jwsVerificationKeysDirectory: {
+    format: '*',
+    default: '',
+    env: 'JWS_VERIFICATION_KEYS_DIRECTORY'
   }
 })
 
@@ -511,8 +525,8 @@ ConvictConfig.loadFile(path.join(__dirname, `/../../config/${env}.json`))
 ConvictConfig.validate({ allowed: 'strict' })
 
 // Load file contents for keys and secrets
-if (ConvictConfig.get('shared.jwsSign')) {
-  ConvictConfig.set('shared.jwsSigningKey', getFileContent(ConvictConfig.get('shared').jwsSigningKey))
+if (ConvictConfig.get('jwsSign')) {
+  ConvictConfig.set('jwsSigningKey', getFileContent(ConvictConfig.get().jwsSigningKey))
 }
 
 if (ConvictConfig.get('inbound.tls.mutualTLS.enabled')) {
@@ -538,7 +552,11 @@ const config: ServiceConfig = {
   redis: ConvictConfig.get('redis'),
   inspect: ConvictConfig.get('inspect'),
   shared: ConvictConfig.get('shared'),
-  pm4mlEnabled: ConvictConfig.get('pm4mlEnabled')
+  pm4mlEnabled: ConvictConfig.get('pm4mlEnabled'),
+  validateInboundJws: ConvictConfig.get('validateInboundJws'),
+  jwsSign: ConvictConfig.get('jwsSign'),
+  jwsSigningKey: ConvictConfig.get('jwsSigningKey'),
+  jwsVerificationKeysDirectory: ConvictConfig.get('jwsVerificationKeysDirectory')
 }
 
 export default config

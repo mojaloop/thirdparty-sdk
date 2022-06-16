@@ -20,6 +20,7 @@ import ws from 'ws'
 import jsonPatch from 'fast-json-patch'
 import { generateSlug } from 'random-word-slugs'
 import { Logger as SDKLogger } from '@mojaloop/sdk-standard-components'
+import _ from 'lodash'
 
 // TODO: This needs proper typing, for now inferred types are used.
 
@@ -190,7 +191,13 @@ export class Client extends ws {
     switch (msg.msg) {
       case MESSAGE.CONFIGURATION:
         switch (msg.verb) {
-          case VERB.NOTIFY:
+          case VERB.NOTIFY: {
+            const dup = JSON.parse(JSON.stringify(this.appConfig)) // fast-json-patch explicitly mutates
+            _.merge(dup, msg.data)
+            this.logger.push({ oldConf: this.appConfig, newConf: dup }).log('Emitting new configuration')
+            this.emit(EVENT.RECONFIGURE, dup)
+            break
+          }
           case VERB.PATCH: {
             const dup = JSON.parse(JSON.stringify(this.appConfig)) // fast-json-patch explicitly mutates
             jsonPatch.applyPatch(dup, msg.data)

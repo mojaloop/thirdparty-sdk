@@ -66,9 +66,11 @@
     "sdkOutgoingUri": "sdk-scheme-adapter:4001",
     "sdkOutgoingHttpScheme": "http",
     "sdkOutgoingPartiesInformationPath": "parties/{Type}/{ID}/{SubId}",
-    "sdkNotifyAboutTransferUri": "ml-testing-toolkit:5000/thirdpartyRequests/transactions/{ID}",
-    "jwsSign": false,
-    "jwsSigningKey": "./secrets/jwsSigningKey.key"
+    "sdkNotifyAboutTransferUri": "ml-testing-toolkit:5000/thirdpartyRequests/transactions/{ID}"
   },
-  "pm4mlEnabled": false
+  "pm4mlEnabled": false,
+  "validateInboundJws": false,
+  "jwsSign": false,
+  "jwsSigningKey": "/jwsSigningKey.key",
+  "jwsVerificationKeysDirectory": null
 }

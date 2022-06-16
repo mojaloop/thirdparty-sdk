@@ -101,8 +101,8 @@ export const StatePlugin = {
       transactionRequestsEndpoint: config.shared.transactionRequestEndpoint,
       dfspId: config.shared.dfspId,
       tls: config.outbound.tls,
-      jwsSign: config.shared.jwsSign,
-      jwsSigningKey: <Buffer>config.shared.jwsSigningKey
+      jwsSign: config.jwsSign,
+      jwsSigningKey: <Buffer>config.jwsSigningKey
     })
 
     const thirdpartyRequest = new ThirdpartyRequests({
@@ -117,8 +117,8 @@ export const StatePlugin = {
       transactionRequestsEndpoint: config.shared.transactionRequestEndpoint,
       dfspId: config.shared.dfspId,
       tls: config.outbound.tls,
-      jwsSign: config.shared.jwsSign,
-      jwsSigningKey: <Buffer>config.shared.jwsSigningKey
+      jwsSign: config.jwsSign,
+      jwsSigningKey: <Buffer>config.jwsSigningKey
     })
 
     const dfspBackendRequests = new DFSPBackendRequests({
