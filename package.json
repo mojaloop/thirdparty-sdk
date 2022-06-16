@@ -1,6 +1,6 @@
 {
   "name": "@mojaloop/thirdparty-sdk",
-  "version": "14.0.3",
+  "version": "14.1.0-snapshot.0",
   "description": "SDK for DFSPs and PISPs to easily integrate with Mojaloop's Third Party API",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -35,8 +35,8 @@
     "lint": "eslint --ext ts --ext js test src",
     "lint:fix": "eslint --fix --ext ts --ext js test src",
     "pretest": "echo \"pretest - TODO...\"",
-    "release": "release-please --releaseCommitMessageFormat 'chore(release): {{currentTag}} [skip ci]'",
-    "snapshot": "release-please --no-verify --skip.changelog --prerelease snapshot --releaseCommitMessageFormat 'chore(snapshot): {{currentTag}}'",
+    "release": "standard-version --releaseCommitMessageFormat 'chore(release): {{currentTag}} [skip ci]'",
+    "snapshot": "standard-version --no-verify --skip.changelog --prerelease snapshot --releaseCommitMessageFormat 'chore(snapshot): {{currentTag}}'",
     "standard": "echo '\\033[1;33m  This project uses eslint instead of standard. Use `npm run lint` instead.'",
     "start:ts": "ts-node --project ./tsconfig.json --files --require tsconfig-paths/register ./src/cli.ts all",
     "start": "node ./dist/src/cli.js all",
