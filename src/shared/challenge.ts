@@ -54,9 +54,9 @@ export interface AuthRequestPartial {
  *  without the extensions or challenge fields
  */
 export function deriveTransactionChallenge(authRequestPartial: AuthRequestPartial): string {
-  if (config.SHARED.TEST_OVERRIDE_TRANSACTION_CHALLENGE && config.SHARED.TEST_OVERRIDE_TRANSACTION_CHALLENGE !== '') {
-    logger.warn('TEST_OVERRIDE_TRANSACTION_CHALLENGE is configured - for testing purposes only')
-    return config.SHARED.TEST_OVERRIDE_TRANSACTION_CHALLENGE
+  if (config.shared.testOverrideTransactionChallenge && config.shared.testOverrideTransactionChallenge !== '') {
+    logger.warn('testOverrideTransactionChallenge is configured - for testing purposes only')
+    return config.shared.testOverrideTransactionChallenge
   }
 
   const cJSONRequest = canonicalize(authRequestPartial)

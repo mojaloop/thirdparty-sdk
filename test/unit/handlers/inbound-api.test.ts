@@ -141,10 +141,10 @@ describe('Inbound API routes', (): void => {
   beforeAll(async (): Promise<void> => {
     const apiPath = path.resolve(__dirname, '../../../src/interface/api-inbound.yaml')
     const serverConfig: ServerConfig = {
-      port: config.INBOUND.PORT,
-      host: config.INBOUND.HOST,
+      port: config.inbound.port,
+      host: config.inbound.host,
       api: ServerAPI.inbound,
-      tls: config.INBOUND.TLS
+      tls: config.inbound.tls
     }
     const serverHandlers = {
       ...Handlers.Shared,

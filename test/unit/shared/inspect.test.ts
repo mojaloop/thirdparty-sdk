@@ -37,12 +37,12 @@ describe('shared/inspect', (): void => {
   })
 
   it('should call util.inspect with defaults', (): void => {
-    // remove config.INSPECT so defaults will be used
-    const storeBeforeDelete = config.INSPECT
+    // remove config.inspect so defaults will be used
+    const storeBeforeDelete = config.inspect
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    delete config.INSPECT
+    delete config.inspect
 
     const inspectSpy = jest.spyOn(util, 'inspect')
     const result = inspect({})
@@ -52,6 +52,6 @@ describe('shared/inspect', (): void => {
     expect(inspectSpy).toHaveBeenCalledWith({}, false, 5, true)
 
     // restore INSPECT to not interfere other tests
-    config.INSPECT = storeBeforeDelete
+    config.inspect = storeBeforeDelete
   })
 })

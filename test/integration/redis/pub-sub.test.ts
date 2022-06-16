@@ -32,10 +32,10 @@ import Config from '~/shared/config'
 
 describe('PubSub', () => {
   const config: RedisConnectionConfig = {
-    host: Config.REDIS.HOST,
-    port: Config.REDIS.PORT,
+    host: Config.redis.host,
+    port: Config.redis.port,
     logger: logger,
-    timeout: Config.REDIS.TIMEOUT
+    timeout: Config.redis.timeout
   }
   let listener: PubSub
   let publisher: PubSub

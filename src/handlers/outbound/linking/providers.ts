@@ -50,7 +50,7 @@ async function get(_context: unknown, _request: Request, h: StateResponseToolkit
     key: serviceType,
     logger: h.getLogger(),
     thirdpartyRequests: h.getThirdpartyRequests(),
-    requestProcessingTimeoutSeconds: config.REQUEST_PROCESSING_TIMEOUT_SECONDS
+    requestProcessingTimeoutSeconds: config.requestProcessingTimeoutSeconds
   }
 
   try {

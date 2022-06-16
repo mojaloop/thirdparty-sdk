@@ -102,7 +102,7 @@ export class SDKOutgoingRequests extends HttpRequests {
   ): Promise<OutboundAPI.Schemas.partiesByIdResponse | void> {
     // generate uri from template
     const uri = this.fullUri(
-      // config.SHARED.SDK_OUTGOING_PARTIES_INFORMATION_PATH
+      // config.shared.sdkOutgoingPartiesInformationPath
       this.requestPartiesInformationPath
         .replace('{Type}', type)
         .replace('{ID}', id)

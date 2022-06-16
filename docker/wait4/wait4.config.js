@@ -54,19 +54,7 @@ module.exports = {
       ]
     },
     {
-      name: 'inbound-thirdparty-sdk',
-
-      // list of services to wait for
-      wait4: [
-        {
-          description: 'Redis Cache',
-          uri: 'redis:6379',
-          method: 'ncat'
-        }
-      ]
-    },
-    {
-      name: 'outbound-thirdparty-sdk',
+      name: 'thirdparty-sdk',
 
       // list of services to wait for
       wait4: [

@@ -38,10 +38,10 @@ const feature = loadFeature(featurePath)
 
 async function prepareInboundAPIServer(): Promise<Server> {
   const serverConfig: ServerConfig = {
-    port: Config.INBOUND.PORT,
-    host: Config.INBOUND.HOST,
+    port: Config.inbound.port,
+    host: Config.inbound.host,
     api: ServerAPI.inbound,
-    tls: Config.INBOUND.TLS
+    tls: Config.inbound.tls
   }
   const serverHandlers = {
     ...Handlers.Shared,

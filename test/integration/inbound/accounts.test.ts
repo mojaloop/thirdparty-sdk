@@ -37,10 +37,10 @@ describe('PUT /accounts/{ID}', (): void => {
   const scenarioUri = `${env.inbound.baseUri}/accounts/username1234`
   describe('Inbound API', (): void => {
     const config: RedisConnectionConfig = {
-      host: Config.REDIS.HOST,
-      port: Config.REDIS.PORT,
+      host: Config.redis.host,
+      port: Config.redis.port,
       logger: mockLogger(),
-      timeout: Config.REDIS.TIMEOUT
+      timeout: Config.redis.timeout
     }
 
     const payload: tpAPI.Schemas.AccountsIDPutResponse = mockData.accountsRequest.payload

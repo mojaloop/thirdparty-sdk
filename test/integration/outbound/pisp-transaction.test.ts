@@ -9,10 +9,10 @@ import * as OutboundAPI from '~/interface/outbound/api_interfaces'
 
 describe('PISP Transaction', (): void => {
   const config: RedisConnectionConfig = {
-    host: Config.REDIS.HOST,
-    port: Config.REDIS.PORT,
+    host: Config.redis.host,
+    port: Config.redis.port,
     logger: mockLogger(),
-    timeout: Config.REDIS.TIMEOUT
+    timeout: Config.redis.timeout
   }
   let kvs: KVS
   const transactionRequestId = 'b51ec534-ee48-4575-b6a9-ead2955b8069'

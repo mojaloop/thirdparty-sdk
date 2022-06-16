@@ -166,10 +166,10 @@ describe('Outbound API routes', (): void => {
   beforeAll(async (): Promise<void> => {
     const apiPath = path.resolve(__dirname, '../../../src/interface/api-outbound.yaml')
     const serverConfig: ServerConfig = {
-      port: Config.OUTBOUND.PORT,
-      host: Config.OUTBOUND.HOST,
+      port: Config.outbound.port,
+      host: Config.outbound.host,
       api: ServerAPI.outbound,
-      tls: Config.OUTBOUND.TLS
+      tls: Config.outbound.tls
     }
     const serverHandlers = {
       ...Handlers.Shared,

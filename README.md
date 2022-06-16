@@ -124,6 +124,18 @@ This package exemplifies the use of the Mojaloop SDK Standard Components for TLS
    and they handle the rest.
 
    config.INBOUND.TLS represents the certs needed by the `thirdparty-sdk` Hapi Inbound server.
+
+## PM4ML (Payment Manager for Mojaloop) (In progress)
+
+   This project has the option of being configured to work with [PM4ML](https://github.com/pm4ml) which connects to
+   [MCM](https://github.com/modusbox/connection-manager-api).
+
+   Setting `pm4mlEnabled` to `true` and configuring `control.mgmtAPIWsUrl` and `control.mgmtAPIWsPort` to
+   a [Management API service](https://github.com/pm4ml/mojaloop-payment-manager-management-api) instance
+   will connect to and listen to the Management API service for
+   management protocol messages e.g configuration changes, certificate updates etc and restart the server
+   with updated configuration.
+
 ## Integration Test
    To run integration tests, first start `docker-compose` in root folder
 

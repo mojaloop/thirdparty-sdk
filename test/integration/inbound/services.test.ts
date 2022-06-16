@@ -36,10 +36,10 @@ describe('PUT /services/{ServiceType}', (): void => {
   const scenarioUri = `${env.inbound.baseUri}/services/THIRD_PARTY_DFSP`
   describe('Inbound API', (): void => {
     const config: RedisConnectionConfig = {
-      host: Config.REDIS.HOST,
-      port: Config.REDIS.PORT,
+      host: Config.redis.host,
+      port: Config.redis.port,
       logger: mockLogger(),
-      timeout: Config.REDIS.TIMEOUT
+      timeout: Config.redis.timeout
     }
     const axiosConfig = {
       headers: {
@@ -78,10 +78,10 @@ describe('PUT /services/{ServiceType}/error', (): void => {
   const scenarioUri = `${env.inbound.baseUri}/services/THIRD_PARTY_DFSP/error`
   describe('Inbound API', (): void => {
     const config: RedisConnectionConfig = {
-      host: Config.REDIS.HOST,
-      port: Config.REDIS.PORT,
+      host: Config.redis.host,
+      port: Config.redis.port,
       logger: mockLogger(),
-      timeout: Config.REDIS.TIMEOUT
+      timeout: Config.redis.timeout
     }
     const payload = {
       errorInformation: {

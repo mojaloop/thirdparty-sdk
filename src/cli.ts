@@ -30,64 +30,15 @@
 // the js `require()` can resolve the '~' paths
 require('module-alias/register')
 
-import { ConvictConfig, OutConfig, PACKAGE, ServiceConfig } from '~/shared/config'
-import { ServerAPI, ServerConfig } from '~/server'
-import { Command } from 'commander'
-import { Handler } from 'openapi-backend'
-import Handlers from '~/handlers'
-import index from './index'
-import path from 'path'
-import { Path } from 'convict'
-
-// handle script parameters
-const program = new Command(PACKAGE.name)
-/**
- * prepares commander action
- * @param api {string} the name of the api to start can be `inbound` or `outbound`
- * @param handlers { { [handler: string]: Handler } } dictionary with api handlers, will be joined with Handlers.Shared
- * @returns () => Promise<void> asynchronous commander action to start api
- */
-function mkStartAPI(api: ServerAPI, handlers: { [handler: string]: Handler }): () => Promise<void> {
-  return async (): Promise<void> => {
-    // update config from program parameters,
-    // so setupAndStart will know on which PORT/HOST bind the server
-    const apiConfig: OutConfig = ConvictConfig.get(api.toUpperCase() as Path<ServiceConfig>) as OutConfig
-
-    // resolve the path to openapi v3 definition file
-    const apiPath = path.resolve(__dirname, `../src/interface/api-${api}.yaml`)
-
-    // prepare API handlers
-    const joinedHandlers = {
-      ...Handlers.Shared,
-      ...handlers
-    }
-
-    const serverConfig: ServerConfig = {
-      port: apiConfig.PORT,
-      host: apiConfig.HOST,
-      api,
-      tls: apiConfig.TLS
-    }
-    // setup & start @hapi server
-    await index.server.setupAndStart(serverConfig, apiPath, joinedHandlers)
-  }
-}
-
-const startInboundAPI = mkStartAPI(ServerAPI.inbound, Handlers.Inbound)
-const startOutboundAPI = mkStartAPI(ServerAPI.outbound, Handlers.Outbound)
+import { program } from 'commander'
+import { PACKAGE } from '~/shared/config'
+import { startAPISuite } from './api'
 
 // setup cli program
-program
-  .version(PACKAGE.version)
-  .description('thirdparty-sdk')
-  .option('-p, --port <number>', 'listen on port')
-  .option('-H, --host <string>', 'listen on host')
+program.version(PACKAGE.version).description('thirdparty-sdk')
 
-// setup standalone command to start Inbound service
-program.command('inbound').description('start Inbound API service').action(startInboundAPI)
-
-// setup standalone command to start Outbound service
-program.command('outbound').description('start Outbound API service').action(startOutboundAPI)
+// setup standalone command to start service
+program.command('all').description('start API services').action(startAPISuite())
 
 // fetch parameters from command line and execute
 program.parseAsync(process.argv)

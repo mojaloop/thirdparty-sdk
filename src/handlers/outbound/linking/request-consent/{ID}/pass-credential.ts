@@ -49,7 +49,7 @@ async function post(_context: unknown, request: Request, h: StateResponseToolkit
     key: consentRequestId,
     logger: h.getLogger(),
     thirdpartyRequests: h.getThirdpartyRequests(),
-    requestProcessingTimeoutSeconds: config.REQUEST_PROCESSING_TIMEOUT_SECONDS
+    requestProcessingTimeoutSeconds: config.requestProcessingTimeoutSeconds
   }
 
   try {
