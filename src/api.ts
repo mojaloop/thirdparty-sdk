@@ -96,7 +96,6 @@ export class Server {
       _.merge(this.conf, updatedConfigFromMgmtAPI)
 
       this.controlClient.on(ControlAgent.EVENT.RECONFIGURE, this.restart.bind(this))
-      this.controlClient.on('close', this.restart.bind(this))
     }
 
     this.inboundServer = await mkStartAPI(ServerAPI.inbound, Handlers.Inbound, conf)
