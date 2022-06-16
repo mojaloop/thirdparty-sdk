@@ -124,6 +124,9 @@ This package exemplifies the use of the Mojaloop SDK Standard Components for TLS
    and they handle the rest.
 
    config.INBOUND.TLS represents the certs needed by the `thirdparty-sdk` Hapi Inbound server.
+
+## PM4ML (Payment Manager for Mojaloop)
+
 ## Integration Test
    To run integration tests, first start `docker-compose` in root folder
 
