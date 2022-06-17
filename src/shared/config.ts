@@ -132,6 +132,7 @@ export interface ServiceConfig {
   jwsSign: boolean
   jwsSigningKey: PathLike
   jwsVerificationKeysDirectory: PathLike | null
+  peerJWSKeys: Record<string, string>
 }
 
 // Declare configuration schema, default values and bindings to environment variables
@@ -207,7 +208,7 @@ export const ConvictConfig = Convict<ServiceConfig>({
       doc: 'Management API websocket connection port.',
       format: 'port',
       default: 4005,
-      env: 'CONTROL_MGMT_API_WS_URL'
+      env: 'CONTROL_MGMT_API_WS_PORT'
     }
   },
   requestProcessingTimeoutSeconds: {
@@ -519,6 +520,12 @@ sdk-standard-components.MojaloopRequests and sdk-standard-componentsThirdpartyRe
     format: '*',
     default: null,
     env: 'JWS_VERIFICATION_KEYS_DIRECTORY'
+  },
+  peerJWSKeys: {
+    doc: `peerJWSKeys is a special config option specifically for Payment Manager for Mojaloop
+that is populated by an management api. This map supersedes local keys that would be loaded in by jwsVerificationKeysDirectory.`,
+    format: '*',
+    default: {}
   }
 })
 
@@ -561,7 +568,8 @@ const config: ServiceConfig = {
   validateInboundJws: ConvictConfig.get('validateInboundJws'),
   jwsSign: ConvictConfig.get('jwsSign'),
   jwsSigningKey: ConvictConfig.get('jwsSigningKey'),
-  jwsVerificationKeysDirectory: ConvictConfig.get('jwsVerificationKeysDirectory')
+  jwsVerificationKeysDirectory: ConvictConfig.get('jwsVerificationKeysDirectory'),
+  peerJWSKeys: ConvictConfig.get('peerJWSKeys')
 }
 
 export default config

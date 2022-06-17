@@ -25,15 +25,16 @@ export const jwsValidatorPlugin = {
   name: 'jws-validator',
   register: function (server: Server) {
     server.ext('onPostAuth', (request, h) => {
-      let jwsVerificationKeys: Record<string, Buffer>
+      let jwsVerificationKeys: Record<string, Buffer> | Record<string, string>
       const logger = new SDKLogger.Logger()
 
       if ((server.settings.app as ServerApp).serviceConfig.validateInboundJws) {
-        // Is jws verification a pm4ml only feature? double check why the sdk-scheme-adapter has this
-        // conditional.
+        // peerJWSKey is a special config option specifically for Payment Manager for Mojaloop
+        // that is populated by a management api.
+        // This map supersedes local keys that would be loaded in by jwsVerificationKeysDirectory.
         jwsVerificationKeys = (server.settings.app as ServerApp).serviceConfig.pm4mlEnabled
-          ? getJwsKeys((server.settings.app as ServerApp).serviceConfig.jwsVerificationKeysDirectory)
-          : {}
+          ? (server.settings.app as ServerApp).serviceConfig.peerJWSKeys
+          : getJwsKeys((server.settings.app as ServerApp).serviceConfig.jwsVerificationKeysDirectory)
 
         // @ts-ignore
         const jwsValidator = new Jws.validator({

@@ -75,6 +75,7 @@ async function GetUpdatedConfigFromMgmtAPI(
 export class Server {
   private conf!: ServiceConfig
   private controlConfig!: ControlConfig
+  public logger!: SDKLogger.Logger
   public inboundServer!: HapiServer
   public outboundServer!: HapiServer
   public controlClient!: ControlAgent.Client
@@ -82,21 +83,24 @@ export class Server {
   async initialize(conf: ServiceConfig): Promise<void> {
     this.conf = conf
     this.controlConfig = conf.control
-
+    this.logger = new SDKLogger.Logger()
     // Check Management API for updated config
     // We only start the control client if we're running within Mojaloop Payment Manager.
     // The control server is the Payment Manager Management API Service.
     // We only start the client to connect to and listen to the Management API service for
     // management protocol messages e.g configuration changes, certificate updates etc.
     if (config.pm4mlEnabled) {
-      const logger = new SDKLogger.Logger()
       this.controlClient = await ControlAgent.Client.Create(
         this.controlConfig.mgmtAPIWsUrl,
         this.controlConfig.mgmtAPIWsPort,
         conf
       )
-      const updatedConfigFromMgmtAPI = await GetUpdatedConfigFromMgmtAPI(this.controlConfig, logger, this.controlClient)
-      logger.info(`updatedConfigFromMgmtAPI: ${JSON.stringify(updatedConfigFromMgmtAPI)}`)
+      const updatedConfigFromMgmtAPI = await GetUpdatedConfigFromMgmtAPI(
+        this.controlConfig,
+        this.logger,
+        this.controlClient
+      )
+      this.logger.info(`updatedConfigFromMgmtAPI: ${JSON.stringify(updatedConfigFromMgmtAPI)}`)
       _.merge(this.conf, updatedConfigFromMgmtAPI)
 
       this.controlClient.on(ControlAgent.EVENT.RECONFIGURE, this.restart.bind(this))
@@ -114,6 +118,9 @@ export class Server {
   }
 
   async restart(conf: ServiceConfig) {
+    this.logger.info(`Received new config. Restarting servers: ${JSON.stringify(conf)}`)
+
+    await Promise.all([stop(this.inboundServer), stop(this.outboundServer)])
     this.inboundServer = await mkStartAPI(ServerAPI.inbound, Handlers.Inbound, conf, true)
     this.outboundServer = await mkStartAPI(ServerAPI.outbound, Handlers.Outbound, conf, true)
     await Promise.all([this.inboundServer, this.outboundServer])
