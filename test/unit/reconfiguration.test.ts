@@ -59,7 +59,11 @@ describe('cli', () => {
           key: 'new_string'
         }
       }
-    }
+    },
+    validateInboundJws: true,
+    jwsSign: true,
+    jwsSigningKey: 'new_string',
+    jwsVerificationKeysDirectory: 'new_string'
   }
 
   const expectedUpdatedAppConfig = {
@@ -92,7 +96,11 @@ describe('cli', () => {
           key: 'new_string'
         }
       }
-    }
+    },
+    validateInboundJws: true,
+    jwsSign: true,
+    jwsSigningKey: 'new_string',
+    jwsVerificationKeysDirectory: 'new_string'
   }
 
   beforeEach(async (): Promise<void> => {
@@ -151,7 +159,12 @@ describe('cli', () => {
         port: Config.inbound.port,
         host: Config.inbound.host,
         api: 'inbound',
-        tls: expectedUpdatedAppConfig.inbound.tls
+        tls: expectedUpdatedAppConfig.inbound.tls,
+        pm4mlEnabled: true,
+        validateInboundJws: true,
+        jwsSign: true,
+        jwsSigningKey: 'new_string',
+        jwsVerificationKeysDirectory: 'new_string'
       },
       path.resolve(__dirname, '../../src/interface/api-inbound.yaml'),
       {
@@ -165,7 +178,12 @@ describe('cli', () => {
         port: Config.outbound.port,
         host: Config.outbound.host,
         api: 'outbound',
-        tls: expectedUpdatedAppConfig.outbound.tls
+        tls: expectedUpdatedAppConfig.outbound.tls,
+        pm4mlEnabled: true,
+        validateInboundJws: true,
+        jwsSign: true,
+        jwsSigningKey: 'new_string',
+        jwsVerificationKeysDirectory: 'new_string'
       },
       path.resolve(__dirname, '../../src/interface/api-outbound.yaml'),
       {
@@ -189,7 +207,12 @@ describe('cli', () => {
         port: Config.inbound.port,
         host: Config.inbound.host,
         api: 'inbound',
-        tls: expectedUpdatedAppConfig.inbound.tls
+        tls: expectedUpdatedAppConfig.inbound.tls,
+        pm4mlEnabled: true,
+        validateInboundJws: true,
+        jwsSign: true,
+        jwsSigningKey: 'new_string',
+        jwsVerificationKeysDirectory: 'new_string'
       },
       path.resolve(__dirname, '../../src/interface/api-inbound.yaml'),
       {
@@ -203,7 +226,12 @@ describe('cli', () => {
         port: Config.outbound.port,
         host: Config.outbound.host,
         api: 'outbound',
-        tls: expectedUpdatedAppConfig.outbound.tls
+        tls: expectedUpdatedAppConfig.outbound.tls,
+        pm4mlEnabled: true,
+        validateInboundJws: true,
+        jwsSign: true,
+        jwsSigningKey: 'new_string',
+        jwsVerificationKeysDirectory: 'new_string'
       },
       path.resolve(__dirname, '../../src/interface/api-outbound.yaml'),
       {

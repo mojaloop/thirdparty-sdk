@@ -130,8 +130,8 @@ export interface ServiceConfig {
   pm4mlEnabled: boolean
   validateInboundJws: boolean
   jwsSign: boolean
-  jwsSigningKey: PathLike | Buffer
-  jwsVerificationKeysDirectory: string
+  jwsSigningKey: PathLike
+  jwsVerificationKeysDirectory: PathLike | null
 }
 
 // Declare configuration schema, default values and bindings to environment variables
@@ -495,24 +495,29 @@ it will fallback to default behaviour (random consentId)`,
   pm4mlEnabled: {
     default: false
   },
-  validateInboundJws: {
-    format: 'Boolean',
-    default: false,
-    env: 'VALIDATE_INBOUND_JWS'
-  },
   jwsSign: {
+    doc: `If true, will enable the jws signing on requests made by thirdparty-sdk by configuring
+sdk-standard-components.MojaloopRequests and sdk-standard-componentsThirdpartyRequests to use ServiceConfig.jwsSigningKey`,
     format: 'Boolean',
     default: false,
     env: 'JWS_SIGN'
   },
   jwsSigningKey: {
+    doc: 'A file path to JWS signing key used to sign requests made by `thirdparty-sdk`',
     format: '*',
     default: '',
     env: 'JWS_SIGNING_KEY_PATH'
   },
+  validateInboundJws: {
+    doc: 'If true, will enable the jws validator on the inbound server which will validate inbound requests using keys found in `ServiceConfig.jwsVerificationKeysDirectory`',
+    format: 'Boolean',
+    default: false,
+    env: 'VALIDATE_INBOUND_JWS'
+  },
   jwsVerificationKeysDirectory: {
+    doc: 'A directory path string containing jws verification key. These are passed into `sdk-standard-components.Jws.validator`',
     format: '*',
-    default: '',
+    default: null,
     env: 'JWS_VERIFICATION_KEYS_DIRECTORY'
   }
 })

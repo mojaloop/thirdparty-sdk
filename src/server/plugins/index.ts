@@ -35,11 +35,13 @@ import OpenAPI from './openAPI'
 import { StatePlugin } from './state'
 import { Util } from '@mojaloop/central-services-shared'
 import Vision from '@hapi/vision'
+import { jwsValidatorPlugin } from './jwsValidator'
 
 async function register(server: Server, apiPath: string, handlers: { [handler: string]: Handler }): Promise<Server> {
   const openapiBackend = await OpenAPI.initialize(apiPath, handlers)
   const plugins = [
     StatePlugin,
+    jwsValidatorPlugin,
     Util.Hapi.OpenapiBackendValidator,
     Good,
     openapiBackend,

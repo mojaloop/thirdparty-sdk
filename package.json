@@ -111,6 +111,7 @@
     "@mojaloop/sdk-standard-components": "17.0.3",
     "ajv": "^8.11.0",
     "ajv-keywords": "5.1.0",
+    "atob": "^2.1.2",
     "axios": "^0.27.2",
     "blipp": "^4.0.2",
     "commander": "7.2.0",
