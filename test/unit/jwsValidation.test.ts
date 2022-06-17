@@ -86,11 +86,7 @@ async function prepareInboundAPIServer(): Promise<Server> {
     host: Config.inbound.host,
     api: ServerAPI.inbound,
     tls: Config.inbound.tls,
-    pm4mlEnabled: true,
-    validateInboundJws: true,
-    jwsVerificationKeysDirectory: null,
-    jwsSign: true,
-    jwsSigningKey: ''
+    serviceConfig: Config
   }
 
   const serverHandlers = {

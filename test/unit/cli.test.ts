@@ -51,7 +51,8 @@ describe('cli', (): void => {
         port: Config.inbound.port,
         host: Config.inbound.host,
         api: 'inbound',
-        tls: Config.inbound.tls
+        tls: Config.inbound.tls,
+        serviceConfig: Config
       },
       path.resolve(__dirname, '../../src/interface/api-inbound.yaml'),
       {
@@ -65,7 +66,8 @@ describe('cli', (): void => {
         port: Config.outbound.port,
         host: Config.outbound.host,
         api: 'outbound',
-        tls: Config.outbound.tls
+        tls: Config.outbound.tls,
+        serviceConfig: Config
       },
       path.resolve(__dirname, '../../src/interface/api-outbound.yaml'),
       {

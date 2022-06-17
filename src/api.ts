@@ -49,11 +49,7 @@ export async function mkStartAPI(
     // we are just going pass all of the config here for convenience purposes
     // so that when the server is restarted with a config that isn't on the local
     // disk
-    pm4mlEnabled: serviceConfig.pm4mlEnabled,
-    jwsSign: serviceConfig.jwsSign,
-    jwsSigningKey: serviceConfig.jwsSigningKey,
-    validateInboundJws: serviceConfig.validateInboundJws,
-    jwsVerificationKeysDirectory: serviceConfig.jwsVerificationKeysDirectory
+    serviceConfig: serviceConfig
   }
   // setup & start @hapi server
   if (restart) {

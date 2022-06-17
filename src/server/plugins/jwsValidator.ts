@@ -28,11 +28,11 @@ export const jwsValidatorPlugin = {
       let jwsVerificationKeys: Record<string, Buffer>
       const logger = new SDKLogger.Logger()
 
-      if ((server.settings.app as ServerApp).validateInboundJws) {
+      if ((server.settings.app as ServerApp).serviceConfig.validateInboundJws) {
         // Is jws verification a pm4ml only feature? double check why the sdk-scheme-adapter has this
         // conditional.
-        jwsVerificationKeys = (server.settings.app as ServerApp).pm4mlEnabled
-          ? getJwsKeys((server.settings.app as ServerApp).jwsVerificationKeysDirectory)
+        jwsVerificationKeys = (server.settings.app as ServerApp).serviceConfig.pm4mlEnabled
+          ? getJwsKeys((server.settings.app as ServerApp).serviceConfig.jwsVerificationKeysDirectory)
           : {}
 
         // @ts-ignore
