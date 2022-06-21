@@ -18,6 +18,9 @@ function getJwsKeys(fromDir: PathLike | null) {
   return keys
 }
 
+/*
+  A Hapi plugin to intercept incoming requests on the
+*/
 export const jwsValidatorPlugin = {
   name: 'jws-validator',
   register: function (server: Server) {

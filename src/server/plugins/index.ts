@@ -36,12 +36,18 @@ import { StatePlugin } from './state'
 import { Util } from '@mojaloop/central-services-shared'
 import Vision from '@hapi/vision'
 import { jwsValidatorPlugin } from './jwsValidator'
+import { ServerAPI, ServerApp } from '../create'
 
 async function register(server: Server, apiPath: string, handlers: { [handler: string]: Handler }): Promise<Server> {
   const openapiBackend = await OpenAPI.initialize(apiPath, handlers)
+
+  const api = (server.settings.app as ServerApp).api
+
   const plugins = [
     StatePlugin,
-    jwsValidatorPlugin,
+    // only the inbound server needs the jws validation
+    // order of plugins is important, giving it a high priority seems fitting
+    api == ServerAPI.inbound ? jwsValidatorPlugin : null,
     Util.Hapi.OpenapiBackendValidator,
     Good,
     openapiBackend,
@@ -53,6 +59,11 @@ async function register(server: Server, apiPath: string, handlers: { [handler: s
     // TODO: check do we really need this headers validation for Outbound/Inbound services
     // Util.Hapi.FSPIOPHeaderValidation
   ]
+
+  // filter out any null values
+  plugins.filter(function (e) {
+    return e
+  })
 
   await server.register(plugins)
 
