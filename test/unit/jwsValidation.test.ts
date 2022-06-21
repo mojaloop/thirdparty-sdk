@@ -25,7 +25,7 @@ optionally within square brackets <email>.
 --------------
 ******/
 
-import { Server, ServerInjectResponse } from '@hapi/hapi'
+import { Server } from '@hapi/hapi'
 import { ServerAPI, ServerConfig } from '~/server'
 import Config from '~/shared/config'
 import Handlers from '~/handlers'
@@ -128,13 +128,11 @@ describe('validation', () => {
     }
     const response = await server.inject(request)
     expect(response.statusCode).toBe(200)
-    expect(Jws.validator.__validate).toHaveBeenCalledWith(
-      {
-        headers: expect.objectContaining(request.headers),
-        body: request.payload
-      },
-      expect.anything()
-    )
+    // @ts-ignore
+    expect(Jws.validator.__validate).toHaveBeenCalledWith({
+      headers: expect.objectContaining(request.headers),
+      body: request.payload
+    })
     server.stop({ timeout: 0 })
   })
 
@@ -161,6 +159,7 @@ describe('validation', () => {
     }
     const response = await server.inject(request)
     expect(response.statusCode).toBe(200)
+    // @ts-ignore
     expect(Jws.validator.__validate).toHaveBeenCalledTimes(0)
     server.stop({ timeout: 0 })
   })

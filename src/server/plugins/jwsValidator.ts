@@ -1,7 +1,4 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-
 import { Server } from '@hapi/hapi'
-// @ts-ignore
 import { Errors, Jws, Logger as SDKLogger } from '@mojaloop/sdk-standard-components'
 import fs, { PathLike } from 'fs'
 import path from 'path'
@@ -35,7 +32,6 @@ export const jwsValidatorPlugin = {
           ? (server.settings.app as ServerApp).serviceConfig.peerJWSKeys
           : getJwsKeys((server.settings.app as ServerApp).serviceConfig.jwsVerificationKeysDirectory)
 
-        // @ts-ignore
         const jwsValidator = new Jws.validator({
           logger,
           validationKeys: jwsVerificationKeys
@@ -48,13 +44,10 @@ export const jwsValidatorPlugin = {
           // determine permission sets i.e. what is "readable"
           if (request.method !== 'get') {
             logger.push({ request: request, body: request.payload }).log('Validating JWS')
-            jwsValidator.validate(
-              {
-                headers: request.headers,
-                body: request.payload
-              },
-              logger
-            )
+            jwsValidator.validate({
+              headers: request.headers,
+              body: request.payload as Record<string, unknown>
+            })
           }
         } catch (err) {
           logger.push({ err }).log('Inbound request failed JWS validation')

@@ -28,8 +28,6 @@ export async function mkStartAPI(
 ): Promise<HapiServer> {
   // update config from program parameters,
   // so setupAndStart will know on which PORT/HOST bind the server
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
   const apiConfig: OutConfig = serviceConfig[api] as OutConfig
 
   // resolve the path to openapi v3 definition file
