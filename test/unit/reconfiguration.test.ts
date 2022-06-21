@@ -161,11 +161,11 @@ describe('cli', () => {
         api: 'inbound',
         tls: expectedUpdatedAppConfig.inbound.tls,
         serviceConfig: expect.objectContaining({
-          pm4mlEnabled: true,
-          validateInboundJws: true,
-          jwsSign: true,
-          jwsSigningKey: 'new_string',
-          jwsVerificationKeysDirectory: 'new_string'
+          pm4mlEnabled: expectedUpdatedAppConfig.pm4mlEnabled,
+          validateInboundJws: expectedUpdatedAppConfig.validateInboundJws,
+          jwsSign: expectedUpdatedAppConfig.jwsSign,
+          jwsSigningKey: expectedUpdatedAppConfig.jwsSigningKey,
+          jwsVerificationKeysDirectory: expectedUpdatedAppConfig.jwsVerificationKeysDirectory
         })
       },
       path.resolve(__dirname, '../../src/interface/api-inbound.yaml'),
@@ -182,11 +182,11 @@ describe('cli', () => {
         api: 'outbound',
         tls: expectedUpdatedAppConfig.outbound.tls,
         serviceConfig: expect.objectContaining({
-          pm4mlEnabled: true,
-          validateInboundJws: true,
-          jwsSign: true,
-          jwsSigningKey: 'new_string',
-          jwsVerificationKeysDirectory: 'new_string'
+          pm4mlEnabled: expectedUpdatedAppConfig.pm4mlEnabled,
+          validateInboundJws: expectedUpdatedAppConfig.validateInboundJws,
+          jwsSign: expectedUpdatedAppConfig.jwsSign,
+          jwsSigningKey: expectedUpdatedAppConfig.jwsSigningKey,
+          jwsVerificationKeysDirectory: expectedUpdatedAppConfig.jwsVerificationKeysDirectory
         })
       },
       path.resolve(__dirname, '../../src/interface/api-outbound.yaml'),
@@ -213,11 +213,11 @@ describe('cli', () => {
         api: 'inbound',
         tls: expectedUpdatedAppConfig.inbound.tls,
         serviceConfig: expect.objectContaining({
-          pm4mlEnabled: true,
-          validateInboundJws: true,
-          jwsSign: true,
-          jwsSigningKey: 'new_string',
-          jwsVerificationKeysDirectory: 'new_string'
+          pm4mlEnabled: expectedUpdatedAppConfig.pm4mlEnabled,
+          validateInboundJws: expectedUpdatedAppConfig.validateInboundJws,
+          jwsSign: expectedUpdatedAppConfig.jwsSign,
+          jwsSigningKey: expectedUpdatedAppConfig.jwsSigningKey,
+          jwsVerificationKeysDirectory: expectedUpdatedAppConfig.jwsVerificationKeysDirectory
         })
       },
       path.resolve(__dirname, '../../src/interface/api-inbound.yaml'),
@@ -234,11 +234,11 @@ describe('cli', () => {
         api: 'outbound',
         tls: expectedUpdatedAppConfig.outbound.tls,
         serviceConfig: expect.objectContaining({
-          pm4mlEnabled: true,
-          validateInboundJws: true,
-          jwsSign: true,
-          jwsSigningKey: 'new_string',
-          jwsVerificationKeysDirectory: 'new_string'
+          pm4mlEnabled: expectedUpdatedAppConfig.pm4mlEnabled,
+          validateInboundJws: expectedUpdatedAppConfig.validateInboundJws,
+          jwsSign: expectedUpdatedAppConfig.jwsSign,
+          jwsSigningKey: expectedUpdatedAppConfig.jwsSigningKey,
+          jwsVerificationKeysDirectory: expectedUpdatedAppConfig.jwsVerificationKeysDirectory
         })
       },
       path.resolve(__dirname, '../../src/interface/api-outbound.yaml'),

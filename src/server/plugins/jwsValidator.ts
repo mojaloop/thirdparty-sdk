@@ -27,7 +27,6 @@ export const jwsValidatorPlugin = {
     server.ext('onPostAuth', (request, h) => {
       let jwsVerificationKeys: Record<string, Buffer> | Record<string, string>
       const logger = new SDKLogger.Logger()
-
       if ((server.settings.app as ServerApp).serviceConfig.validateInboundJws) {
         // peerJWSKey is a special config option specifically for Payment Manager for Mojaloop
         // that is populated by a management api.

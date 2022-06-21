@@ -68,7 +68,7 @@
     "sdkOutgoingPartiesInformationPath": "parties/{Type}/{ID}/{SubId}",
     "sdkNotifyAboutTransferUri": "ml-testing-toolkit:5000/thirdpartyRequests/transactions/{ID}"
   },
-  "pm4mlEnabled": true,
+  "pm4mlEnabled": false,
   "validateInboundJws": false,
   "jwsSign": false,
   "jwsSigningKey": "/jwsSigningKey.key",

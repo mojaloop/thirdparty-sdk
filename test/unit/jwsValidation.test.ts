@@ -78,6 +78,9 @@ jest.mock('@mojaloop/sdk-standard-components', () => {
   }
 })
 
+// @ts-ignore
+import { Jws } from '@mojaloop/sdk-standard-components'
+
 const apiPath = path.resolve(__dirname, '../../src/interface/api-inbound.yaml')
 
 async function prepareInboundAPIServer(): Promise<Server> {
@@ -97,28 +100,16 @@ async function prepareInboundAPIServer(): Promise<Server> {
 }
 
 describe('validation', () => {
-  let server: Server
-  let response: ServerInjectResponse
-
-  // tests seem to not like the server booting up/down between tests.
-  // so we prepare a server for all tests in the feature
-  beforeAll(async (): Promise<void> => {
-    server = await prepareInboundAPIServer()
-  })
-
-  afterAll(async (done): Promise<void> => {
-    server.events.on('stop', done)
-    server.stop({ timeout: 0 })
-  })
-
   afterEach((): void => {
     jest.resetAllMocks()
     jest.resetModules()
   })
 
-  it('should retrieve updated configuration from management api on start', async (): Promise<void> => {
+  it('should pass incoming jws signed requests to sdk-standard-components validator when validateInboundJws enabled', async (): Promise<void> => {
     jest.mock('~/shared/kvs')
     jest.mock('~/shared/pub-sub')
+    Config.validateInboundJws = true
+    const server = await prepareInboundAPIServer()
     const request = {
       method: 'PUT',
       url: '/services/THIRD_PARTY_DFSP',
@@ -129,13 +120,48 @@ describe('validation', () => {
         'fspiop-signature':
           '{"signature":"aTTa1TTCBJA1K1VoEFgpSicWYU0q1VYXV-bjkk7uoeNicog7QSp9_AbwtYm4u8NJ1HFM_3mekE8wioAs5YNugnTlJ1k-q4Ouvp5Jo3ZnozoPVtnLaqdhxRMUBOHfDp0X8eCHEo7lETjKcCcH4r5_KT_9Vwx5TMytoG_y9Be8PpviJFkOqOV5jCeIl7XzL_pZQoY0pRJdkXDzYpXDu-HTYKr8ckxWQzx4HO-viJQd2ByQkbqPfQom9IQaAX1t4yztCCpOQn1LY9j9sbfEX9RPXG3UbY6UyDsNjUKYP9BAhXwI9pFWlgv2i9FvEtay2QYdwbW7XEpIiGZ_vi5d6yc12w","protectedHeader":"eyJhbGciOiJSUzI1NiIsIkZTUElPUC1VUkkiOiIvcGFydGllcy9NU0lTRE4vMTIzNDU2Nzg5IiwiRlNQSU9QLUhUVFAtTWV0aG9kIjoiUFVUIiwiRlNQSU9QLVNvdXJjZSI6InNpbSIsIkZTUElPUC1EZXN0aW5hdGlvbiI6ImRmc3AiLCJEYXRlIjoiVGh1LCAzMSBPY3QgMjAxOSAxMTo0MTo0MyBHTVQifQ"}',
         accept: '',
-        Date: 'Thu, 24 Jan 2019 10:22:12 GMT'
+        date: 'Thu, 24 Jan 2019 10:22:12 GMT'
       },
       payload: {
         providers: ['dfspA', 'dfspB']
       }
     }
-    response = await server.inject(request)
+    const response = await server.inject(request)
     expect(response.statusCode).toBe(200)
+    expect(Jws.validator.__validate).toHaveBeenCalledWith(
+      {
+        headers: expect.objectContaining(request.headers),
+        body: request.payload
+      },
+      expect.anything()
+    )
+    server.stop({ timeout: 0 })
+  })
+
+  it('should not pass incoming jws signed requests to sdk-standard-components validator when validateInboundJws disabled', async (): Promise<void> => {
+    jest.mock('~/shared/kvs')
+    jest.mock('~/shared/pub-sub')
+    Config.validateInboundJws = false
+    const server = await prepareInboundAPIServer()
+    const request = {
+      method: 'PUT',
+      url: '/services/THIRD_PARTY_DFSP',
+      headers: {
+        'content-type': 'application/vnd.interoperability.services+json;version=1.1',
+        'fspiop-source': 'other-dfsp',
+        'fspiop-destination': 'mojaloop-sdk',
+        'fspiop-signature':
+          '{"signature":"aTTa1TTCBJA1K1VoEFgpSicWYU0q1VYXV-bjkk7uoeNicog7QSp9_AbwtYm4u8NJ1HFM_3mekE8wioAs5YNugnTlJ1k-q4Ouvp5Jo3ZnozoPVtnLaqdhxRMUBOHfDp0X8eCHEo7lETjKcCcH4r5_KT_9Vwx5TMytoG_y9Be8PpviJFkOqOV5jCeIl7XzL_pZQoY0pRJdkXDzYpXDu-HTYKr8ckxWQzx4HO-viJQd2ByQkbqPfQom9IQaAX1t4yztCCpOQn1LY9j9sbfEX9RPXG3UbY6UyDsNjUKYP9BAhXwI9pFWlgv2i9FvEtay2QYdwbW7XEpIiGZ_vi5d6yc12w","protectedHeader":"eyJhbGciOiJSUzI1NiIsIkZTUElPUC1VUkkiOiIvcGFydGllcy9NU0lTRE4vMTIzNDU2Nzg5IiwiRlNQSU9QLUhUVFAtTWV0aG9kIjoiUFVUIiwiRlNQSU9QLVNvdXJjZSI6InNpbSIsIkZTUElPUC1EZXN0aW5hdGlvbiI6ImRmc3AiLCJEYXRlIjoiVGh1LCAzMSBPY3QgMjAxOSAxMTo0MTo0MyBHTVQifQ"}',
+        accept: '',
+        date: 'Thu, 24 Jan 2019 10:22:12 GMT'
+      },
+      payload: {
+        providers: ['dfspA', 'dfspB']
+      }
+    }
+    const response = await server.inject(request)
+    expect(response.statusCode).toBe(200)
+    expect(Jws.validator.__validate).toHaveBeenCalledTimes(0)
+    server.stop({ timeout: 0 })
   })
 })

@@ -15,8 +15,8 @@ services:
       - ./docker/wait4:/opt/thirdparty-sdk/wait4
     environment:
       - NODE_ENV=integration
-      - CONTROL_MGMT_API_WS_URL=172.17.0.1
-      - CONTROL_MGMT_API_WS_PORT=4010
+      # - CONTROL_MGMT_API_WS_URL=172.17.0.1
+      # - CONTROL_MGMT_API_WS_PORT=4010
     networks:
       - mojaloop-net
     ports:
