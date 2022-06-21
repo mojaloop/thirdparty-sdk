@@ -35,11 +35,13 @@ import { Server as HapiServer } from '@hapi/hapi'
 import { Server } from '~/api'
 
 const setupAndStartSpy = jest.spyOn(index.server, 'setupAndStart')
-const setupAndRestartSpy = jest.spyOn(index.server, 'setupAndRestart')
 
 describe('cli', () => {
   let wsServer: WebSocketServer
   let server: Server
+  Config.pm4mlEnabled = true
+  Config.control.mgmtAPIWsUrl = 'localhost'
+  Config.control.mgmtAPIWsPort = 31000
   const appConfig = Config
   const managementApiResponse = {
     inbound: {
@@ -104,9 +106,6 @@ describe('cli', () => {
   }
 
   beforeEach(async (): Promise<void> => {
-    Config.pm4mlEnabled = true
-    Config.control.mgmtAPIWsUrl = 'localhost'
-    Config.control.mgmtAPIWsPort = 31000
     wsServer = new WebSocketServer({ port: Config.control.mgmtAPIWsPort })
 
     wsServer.on('connection', function connection(ws) {
@@ -141,13 +140,11 @@ describe('cli', () => {
     setupAndStartSpy.mockImplementation(() =>
       Promise.resolve({ Iam: 'mocked-server', stop: jest.fn() } as unknown as HapiServer)
     )
-    setupAndRestartSpy.mockImplementation(() =>
-      Promise.resolve({ Iam: 'mocked-server', stop: jest.fn() } as unknown as HapiServer)
-    )
     server = await Server.create(Config)
   })
 
   afterEach(async (): Promise<void> => {
+    jest.clearAllMocks()
     wsServer.close()
     await server.stop()
   })
@@ -205,7 +202,7 @@ describe('cli', () => {
     // We wait for the servers to get restarted
     await new Promise((wait) => setTimeout(wait, 1000))
 
-    expect(index.server.setupAndRestart).toHaveBeenNthCalledWith(
+    expect(index.server.setupAndStart).toHaveBeenNthCalledWith(
       1,
       {
         port: Config.inbound.port,
@@ -226,7 +223,7 @@ describe('cli', () => {
         ...Handlers.Inbound
       }
     )
-    expect(index.server.setupAndRestart).toHaveBeenNthCalledWith(
+    expect(index.server.setupAndStart).toHaveBeenNthCalledWith(
       2,
       {
         port: Config.outbound.port,

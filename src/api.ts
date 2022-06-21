@@ -23,8 +23,7 @@ import { stop } from './server/start'
 export async function mkStartAPI(
   api: ServerAPI,
   handlers: { [handler: string]: Handler },
-  serviceConfig: ServiceConfig = config,
-  restart = false
+  serviceConfig: ServiceConfig = config
 ): Promise<HapiServer> {
   // update config from program parameters,
   // so setupAndStart will know on which PORT/HOST bind the server
@@ -50,11 +49,7 @@ export async function mkStartAPI(
     serviceConfig: serviceConfig
   }
   // setup & start @hapi server
-  if (restart) {
-    return await index.server.setupAndRestart(serverConfig, apiPath, joinedHandlers)
-  } else {
-    return await index.server.setupAndStart(serverConfig, apiPath, joinedHandlers)
-  }
+  return await index.server.setupAndStart(serverConfig, apiPath, joinedHandlers)
 }
 
 async function GetUpdatedConfigFromMgmtAPI(
@@ -117,10 +112,9 @@ export class Server {
 
   async restart(conf: ServiceConfig) {
     this.logger.info(`Received new config. Restarting servers: ${JSON.stringify(conf)}`)
-
     await Promise.all([stop(this.inboundServer), stop(this.outboundServer)])
-    this.inboundServer = await mkStartAPI(ServerAPI.inbound, Handlers.Inbound, conf, true)
-    this.outboundServer = await mkStartAPI(ServerAPI.outbound, Handlers.Outbound, conf, true)
+    this.inboundServer = await mkStartAPI(ServerAPI.inbound, Handlers.Inbound, conf)
+    this.outboundServer = await mkStartAPI(ServerAPI.outbound, Handlers.Outbound, conf)
     await Promise.all([this.inboundServer, this.outboundServer])
   }
 

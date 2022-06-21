@@ -31,7 +31,7 @@ import { Handler } from 'openapi-backend'
 import { Server } from '@hapi/hapi'
 import extensions from './extensions'
 import plugins from './plugins'
-import { start, restart } from './start'
+import { start } from './start'
 
 export async function setupAndStart(
   config: ServerConfig,
@@ -42,17 +42,5 @@ export async function setupAndStart(
   await plugins.register(server, apiPath, handlers)
   await extensions.register(server)
   await start(server)
-  return server
-}
-
-export async function setupAndRestart(
-  config: ServerConfig,
-  apiPath: string,
-  handlers: { [handler: string]: Handler }
-): Promise<Server> {
-  const server = await create(config)
-  await plugins.register(server, apiPath, handlers)
-  await extensions.register(server)
-  await restart(server)
   return server
 }

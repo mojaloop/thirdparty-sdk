@@ -31,6 +31,5 @@ describe('index', (): void => {
   it('should have proper layout', (): void => {
     expect(typeof index.server).toBeDefined()
     expect(typeof index.server.setupAndStart).toEqual('function')
-    expect(typeof index.server.setupAndRestart).toEqual('function')
   })
 })
