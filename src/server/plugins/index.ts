@@ -43,7 +43,7 @@ async function register(server: Server, apiPath: string, handlers: { [handler: s
 
   const api = (server.settings.app as ServerApp).api
 
-  const plugins = [
+  let plugins = [
     StatePlugin,
     // only the inbound server needs the jws validation
     // order of plugins is important, giving it a high priority seems fitting
@@ -61,8 +61,8 @@ async function register(server: Server, apiPath: string, handlers: { [handler: s
   ]
 
   // filter out any null values
-  plugins.filter(function (e) {
-    return e
+  plugins = plugins.filter(function (e) {
+    return e != null
   })
 
   await server.register(plugins)
