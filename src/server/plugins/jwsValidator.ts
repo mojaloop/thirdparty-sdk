@@ -19,7 +19,8 @@ function getJwsKeys(fromDir: PathLike | null) {
 }
 
 /*
-  A Hapi plugin to intercept incoming requests on the
+  A Hapi plugin to intercept incoming requests on the inbound server and
+  validate requests with `sdk-standard-components` JWS validator.
 */
 export const jwsValidatorPlugin = {
   name: 'jws-validator',
