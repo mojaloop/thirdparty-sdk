@@ -114,6 +114,41 @@
       "decision": "ignore",
       "madeAt": 1655915992967,
       "expiresAt": 1658507975418
+    },
+    "1070030|@mojaloop/central-services-shared>@mojaloop/event-sdk>grpc>protobufjs>widdershins>markdown-it": {
+      "decision": "ignore",
+      "madeAt": 1655916246382,
+      "expiresAt": 1658508240839
+    },
+    "1070030|@mojaloop/sdk-scheme-adapter>@mojaloop/central-services-shared>@mojaloop/event-sdk>grpc>protobufjs>widdershins>markdown-it": {
+      "decision": "ignore",
+      "madeAt": 1655916246382,
+      "expiresAt": 1658508240839
+    },
+    "1070030|shins>markdown-it": {
+      "decision": "ignore",
+      "madeAt": 1655916246383,
+      "expiresAt": 1658508240839
+    },
+    "1068310|@mojaloop/central-services-shared>@mojaloop/event-sdk>grpc>protobufjs>widdershins>markdown-it>yargs>yargs-parser": {
+      "decision": "ignore",
+      "madeAt": 1655916247308,
+      "expiresAt": 1658508240839
+    },
+    "1068310|@mojaloop/sdk-scheme-adapter>@mojaloop/central-services-shared>@mojaloop/event-sdk>grpc>protobufjs>widdershins>markdown-it>yargs>yargs-parser": {
+      "decision": "ignore",
+      "madeAt": 1655916247309,
+      "expiresAt": 1658508240839
+    },
+    "1068155|shins>markdown-it>sanitize-html": {
+      "decision": "ignore",
+      "madeAt": 1655916248199,
+      "expiresAt": 1658508240839
+    },
+    "1070260|shins>markdown-it>sanitize-html": {
+      "decision": "ignore",
+      "madeAt": 1655916249138,
+      "expiresAt": 1658508240839
     }
   },
   "rules": {},
