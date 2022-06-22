@@ -37,8 +37,8 @@
     },
     "1070030|widdershins>markdown-it": {
       "decision": "ignore",
-      "madeAt": 1655915983510,
-      "expiresAt": 1658507975418
+      "madeAt": 1655917296562,
+      "expiresAt": 1658509292168
     },
     "1068155|@mojaloop/central-services-shared>@mojaloop/event-sdk>grpc>protobufjs>shins>ejs>markdown-it>sanitize-html": {
       "decision": "ignore",
@@ -149,6 +149,41 @@
       "decision": "ignore",
       "madeAt": 1655916249138,
       "expiresAt": 1658508240839
+    },
+    "1070030|@mojaloop/central-services-shared>@mojaloop/event-sdk>grpc>protobufjs>shins>markdown-it": {
+      "decision": "ignore",
+      "madeAt": 1655917296562,
+      "expiresAt": 1658509292168
+    },
+    "1070030|@mojaloop/sdk-scheme-adapter>@mojaloop/central-services-shared>@mojaloop/event-sdk>grpc>protobufjs>shins>markdown-it": {
+      "decision": "ignore",
+      "madeAt": 1655917296562,
+      "expiresAt": 1658509292168
+    },
+    "1068155|@mojaloop/central-services-shared>@mojaloop/event-sdk>grpc>protobufjs>shins>markdown-it>sanitize-html": {
+      "decision": "ignore",
+      "madeAt": 1655917297691,
+      "expiresAt": 1658509292168
+    },
+    "1068155|@mojaloop/sdk-scheme-adapter>@mojaloop/central-services-shared>@mojaloop/event-sdk>grpc>protobufjs>shins>markdown-it>sanitize-html": {
+      "decision": "ignore",
+      "madeAt": 1655917297691,
+      "expiresAt": 1658509292168
+    },
+    "1070260|@mojaloop/central-services-shared>@mojaloop/event-sdk>grpc>protobufjs>shins>markdown-it>sanitize-html": {
+      "decision": "ignore",
+      "madeAt": 1655917298727,
+      "expiresAt": 1658509292168
+    },
+    "1070260|@mojaloop/sdk-scheme-adapter>@mojaloop/central-services-shared>@mojaloop/event-sdk>grpc>protobufjs>shins>markdown-it>sanitize-html": {
+      "decision": "ignore",
+      "madeAt": 1655917298727,
+      "expiresAt": 1658509292168
+    },
+    "1068310|widdershins>markdown-it>yargs>yargs-parser": {
+      "decision": "ignore",
+      "madeAt": 1655917299705,
+      "expiresAt": 1658509292168
     }
   },
   "rules": {},
