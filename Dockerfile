@@ -30,4 +30,4 @@ RUN adduser -D app-user
 USER app-user
 COPY --chown=app-user --from=builder /opt/app/ ./
 
-EXPOSE 4005 4006 4010
+EXPOSE 4005 4006
