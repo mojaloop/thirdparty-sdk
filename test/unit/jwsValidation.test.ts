@@ -38,19 +38,6 @@ import { RequestPartiesInformationState } from '~/models/pispTransaction.interfa
 jest.mock('~/shared/kvs')
 jest.mock('~/shared/pub-sub')
 jest.mock('@mojaloop/sdk-standard-components', () => {
-  const loggerMethods = {
-    log: jest.fn(),
-
-    // generated methods from default levels
-    verbose: jest.fn(),
-    debug: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn(),
-    trace: jest.fn(),
-    info: jest.fn(),
-    fatal: jest.fn()
-  }
-
   // exclude mocks that are not explicitly defined
   const sdkStandardComponentsActual = jest.requireActual('@mojaloop/sdk-standard-components')
 
