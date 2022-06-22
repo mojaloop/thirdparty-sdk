@@ -32,6 +32,8 @@ import Handlers from '~/handlers'
 import index from '~/index'
 import path from 'path'
 
+jest.mock('~/shared/kvs')
+jest.mock('~/shared/pub-sub')
 jest.mock('@mojaloop/sdk-standard-components', () => {
   const loggerMethods = {
     log: jest.fn(),
@@ -106,8 +108,6 @@ describe('validation', () => {
   })
 
   it('should pass incoming jws signed requests to sdk-standard-components validator when validateInboundJws enabled', async (): Promise<void> => {
-    jest.mock('~/shared/kvs')
-    jest.mock('~/shared/pub-sub')
     Config.validateInboundJws = true
     const server = await prepareInboundAPIServer()
     const request = {
@@ -137,8 +137,6 @@ describe('validation', () => {
   })
 
   it('should not pass incoming jws signed requests to sdk-standard-components validator when validateInboundJws disabled', async (): Promise<void> => {
-    jest.mock('~/shared/kvs')
-    jest.mock('~/shared/pub-sub')
     Config.validateInboundJws = false
     const server = await prepareInboundAPIServer()
     const request = {
