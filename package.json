@@ -1,6 +1,6 @@
 {
   "name": "@mojaloop/thirdparty-sdk",
-  "version": "14.1.0-snapshot.0",
+  "version": "15.0.0",
   "description": "SDK for DFSPs and PISPs to easily integrate with Mojaloop's Third Party API",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",

@@ -1,4 +1,23 @@
 # Changelog: [mojaloop/thirdparty-sdk](https://github.com/mojaloop/thirdparty-sdk)
+## [15.0.0](https://github.com/mojaloop/thirdparty-sdk/compare/v14.0.3...v15.0.0) (2022-06-22)
+
+
+### ⚠ BREAKING CHANGES
+
+* add ws client to pull updated configuration (#147)
+
+### Features
+
+* add ws client to pull updated configuration ([#147](https://github.com/mojaloop/thirdparty-sdk/issues/147)) ([6e2e2a8](https://github.com/mojaloop/thirdparty-sdk/commit/6e2e2a84b71aa7673552a876ecd65682a2f80241))
+
+
+### Maintenance
+
+* bump dependencies ([#148](https://github.com/mojaloop/thirdparty-sdk/issues/148)) ([a3ef539](https://github.com/mojaloop/thirdparty-sdk/commit/a3ef5393b9b5db0a46840eca86bb4f0dce04109b))
+* dep update ([#149](https://github.com/mojaloop/thirdparty-sdk/issues/149)) ([ab527d8](https://github.com/mojaloop/thirdparty-sdk/commit/ab527d80bdfe2048222cfc80103b03e98c491917))
+* remove expose ([94cdebb](https://github.com/mojaloop/thirdparty-sdk/commit/94cdebb122b24963a8a098b0b8fcc85e21aba14b))
+* update dep and audit ([#152](https://github.com/mojaloop/thirdparty-sdk/issues/152)) ([e78a430](https://github.com/mojaloop/thirdparty-sdk/commit/e78a430e28e1e7383d1c608df526903c24da7b07))
+
 ### [14.0.3](https://github.com/mojaloop/thirdparty-sdk/compare/v14.0.2...v14.0.3) (2022-05-31)
 
 
