@@ -31,6 +31,9 @@ import Config from '~/shared/config'
 import Handlers from '~/handlers'
 import index from '~/index'
 import path from 'path'
+import SDK, { Jws } from '@mojaloop/sdk-standard-components'
+import { OutboundAPI as SDKOutboundAPI } from '@mojaloop/sdk-scheme-adapter'
+import { RequestPartiesInformationState } from '~/models/pispTransaction.interface'
 
 jest.mock('~/shared/kvs')
 jest.mock('~/shared/pub-sub')
@@ -68,24 +71,36 @@ jest.mock('@mojaloop/sdk-standard-components', () => {
     ...sdkStandardComponentsActual,
     Jws: {
       validator: MockJwsValidator
-    },
-    Logger: {
-      Logger: jest.fn(() => ({
-        push: jest.fn(() => loggerMethods),
-        configure: jest.fn(),
-        ...loggerMethods
-      })),
-      buildStringify: jest.fn()
     }
   }
 })
 
-// @ts-ignore
-import { Jws } from '@mojaloop/sdk-standard-components'
-
-const apiPath = path.resolve(__dirname, '../../src/interface/api-inbound.yaml')
+const partyLookupResponse: SDKOutboundAPI.Schemas.partiesByIdResponse = {
+  party: {
+    body: {
+      partyIdInfo: {
+        partyIdType: 'MSISDN',
+        partyIdentifier: '+4412345678',
+        fspId: 'pispA'
+      },
+      merchantClassificationCode: '4321',
+      name: 'Justin Trudeau',
+      personalInfo: {
+        complexName: {
+          firstName: 'Justin',
+          middleName: 'Pierre',
+          lastName: 'Trudeau'
+        },
+        dateOfBirth: '1980-01-01'
+      }
+    },
+    headers: {}
+  },
+  currentState: RequestPartiesInformationState.COMPLETED
+}
 
 async function prepareInboundAPIServer(): Promise<Server> {
+  const apiPath = path.resolve(__dirname, '../../src/interface/api-inbound.yaml')
   const serverConfig: ServerConfig = {
     port: Config.inbound.port,
     host: Config.inbound.host,
@@ -101,13 +116,30 @@ async function prepareInboundAPIServer(): Promise<Server> {
   return index.server.setupAndStart(serverConfig, apiPath, serverHandlers)
 }
 
+async function prepareOutboundAPIServer(): Promise<Server> {
+  const apiPath = path.resolve(__dirname, '../../src/interface/api-outbound.yaml')
+  const serverConfig: ServerConfig = {
+    port: Config.outbound.port,
+    host: Config.outbound.host,
+    api: ServerAPI.outbound,
+    tls: Config.outbound.tls,
+    serviceConfig: Config
+  }
+
+  const serverHandlers = {
+    ...Handlers.Shared,
+    ...Handlers.Outbound
+  }
+  return index.server.setupAndStart(serverConfig, apiPath, serverHandlers)
+}
+
 describe('validation', () => {
   afterEach((): void => {
     jest.resetAllMocks()
     jest.resetModules()
   })
 
-  it('should pass incoming jws signed requests to sdk-standard-components validator when validateInboundJws enabled', async (): Promise<void> => {
+  it('should pass incoming jws signed requests to sdk-standard-components validator when validateInboundJws enabled on Inbound', async (): Promise<void> => {
     Config.validateInboundJws = true
     const server = await prepareInboundAPIServer()
     const request = {
@@ -136,7 +168,7 @@ describe('validation', () => {
     server.stop({ timeout: 0 })
   })
 
-  it('should not pass incoming jws signed requests to sdk-standard-components validator when validateInboundJws disabled', async (): Promise<void> => {
+  it('should not pass incoming jws signed requests to sdk-standard-components validator when validateInboundJws disabled on Inbound', async (): Promise<void> => {
     Config.validateInboundJws = false
     const server = await prepareInboundAPIServer()
     const request = {
@@ -155,6 +187,39 @@ describe('validation', () => {
         providers: ['dfspA', 'dfspB']
       }
     }
+    const response = await server.inject(request)
+    expect(response.statusCode).toBe(200)
+    // @ts-ignore
+    expect(Jws.validator.__validate).toHaveBeenCalledTimes(0)
+    server.stop({ timeout: 0 })
+  })
+
+  it('should not pass incoming jws signed requests to sdk-standard-components validator when validateInboundJws enabled on Outbound', async (): Promise<void> => {
+    Config.validateInboundJws = true
+    const server = await prepareOutboundAPIServer()
+    const request = {
+      method: 'POST',
+      url: '/thirdpartyTransaction/partyLookup',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      payload: {
+        payee: {
+          partyIdType: 'MSISDN',
+          partyIdentifier: '+4412345678'
+        },
+        transactionRequestId: 'b51ec534-ee48-4575-b6a9-ead2955b8069'
+      }
+    }
+    jest.spyOn(SDK, 'request').mockImplementationOnce(() =>
+      Promise.resolve({
+        statusCode: 200,
+        data: {
+          party: { ...partyLookupResponse.party },
+          currentState: 'COMPLETED'
+        }
+      })
+    )
     const response = await server.inject(request)
     expect(response.statusCode).toBe(200)
     // @ts-ignore
