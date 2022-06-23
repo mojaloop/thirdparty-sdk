@@ -153,7 +153,7 @@ export const ConvictConfig = Convict<ServiceConfig>({
       doc: 'The InboundAPI port to bind.',
       format: 'port',
       default: 3001,
-      env: 'INBOUND_PORT'
+      env: 'INBOUND_LISTEN_PORT'
     },
     pispTransactionMode: {
       doc: 'PISPTransactionModel to be used',
@@ -163,12 +163,25 @@ export const ConvictConfig = Convict<ServiceConfig>({
     },
     tls: {
       mutualTLS: {
-        enabled: false
+        enabled: {
+          doc: 'If set true, will enabled mTls on the inbound server.',
+          default: false,
+          env: 'INBOUND_MUTUAL_TLS_ENABLED'
+        }
       },
       creds: {
-        ca: '',
-        cert: '',
-        key: ''
+        ca: {
+          default: '',
+          env: 'IN_CA_CERT_PATH'
+        },
+        cert: {
+          default: '',
+          env: 'IN_SERVER_CERT_PATH'
+        },
+        key: {
+          default: '',
+          env: 'IN_SERVER_KEY_PATH'
+        }
       }
     }
   },
@@ -183,16 +196,29 @@ export const ConvictConfig = Convict<ServiceConfig>({
       doc: 'The OutboundAPI port to bind.',
       format: 'port',
       default: 3002,
-      env: 'OUTBOUND_PORT'
+      env: 'OUTBOUND_LISTEN_PORT'
     },
     tls: {
       mutualTLS: {
-        enabled: false
+        enabled: {
+          doc: 'If set true, will enabled mTls on the outbound server.',
+          default: false,
+          env: 'OUTBOUND_MUTUAL_TLS_ENABLED'
+        }
       },
       creds: {
-        ca: '',
-        cert: '',
-        key: ''
+        ca: {
+          default: '',
+          env: 'OUT_CA_CERT_PATH'
+        },
+        cert: {
+          default: '',
+          env: 'OUT_CLIENT_CERT_PATH'
+        },
+        key: {
+          default: '',
+          env: 'OUT_CLIENT_KEY_PATH'
+        }
       }
     }
   },
@@ -260,7 +286,7 @@ export const ConvictConfig = Convict<ServiceConfig>({
       doc: 'The Redis port to connect.',
       format: 'port',
       default: 6379,
-      env: 'REDIS_PORT'
+      env: 'REDIS_LISTEN_PORT'
     },
     timeout: {
       doc: 'The Redis connection timeout',
@@ -339,127 +365,152 @@ export const ConvictConfig = Convict<ServiceConfig>({
     authServiceParticipantId: {
       doc: 'Participant ID of an auth service',
       format: '*',
-      default: 'central-auth'
+      default: 'central-auth',
+      env: 'AUTH_SERVICE_PARTICIPANT_ID'
     },
     dfspId: {
       doc: 'Id of DFSP',
       format: '*',
-      default: 'dfsp_a'
+      default: 'dfsp_a',
+      env: 'DFSP_ID'
     },
     dfspBackendUri: {
       doc: "host address of DFSP's ",
       format: '*',
-      default: 'localhost:9000'
+      default: 'localhost:9000',
+      env: 'DFSP_BACKEND_URI'
     },
     dfspBackendHttpScheme: {
       doc: 'Http scheme ',
       format: ['http', 'https'],
-      default: 'http'
+      default: 'http',
+      env: 'DFSP_BACKEND_HTTP_SCHEME'
     },
     dfspBackendVerifyAuthorizationPath: {
       doc: 'path use by DFSPBackendRequests.verifyAuthorization',
       format: '*',
-      default: 'verify-authorization'
+      default: 'verify-authorization',
+      env: 'DFSP_BACKEND_VERIFY_AUTHORIZATION_PATH'
     },
     dfspBackendVerifyConsentPath: {
       doc: 'path use by DFSPBackendRequests.verifyConsent',
       format: '*',
-      default: 'verify-consent'
+      default: 'verify-consent',
+      env: 'DFSP_BACKEND_VERIFY_CONSENT_PATH'
     },
     dfspBackendGetUserAccountsPath: {
       doc: 'path use by DFSPBackendRequests.getUserAccounts',
       format: '*',
-      default: 'accounts/{ID}'
+      default: 'accounts/{ID}',
+      env: 'DFSP_BACKEND_GET_USER_ACCOUNTS_PATH'
     },
     dfspBackendValidateConsReqPath: {
       doc: 'path use by DFSPBackendRequests.validateConsentRequests',
       format: '*',
-      default: 'validateConsentRequests'
+      default: 'validateConsentRequests',
+      env: 'DFSP_BACKEND_VALIDATE_CONS_REQ_PATH'
     },
     dfspBackendSendOtpReqPath: {
       doc: 'path use by DFSPBackendRequests.sendOTP',
       format: '*',
-      default: 'sendOTP'
+      default: 'sendOTP',
+      env: 'DFSP_BACKEND_SEND_OTP_REQ_PATH'
     },
     dfspBackendStoreConsReqPath: {
       doc: 'path use by DFSPBackendRequests.storeConsentRequests',
       format: '*',
-      default: 'store/consentRequests/{ID}'
+      default: 'store/consentRequests/{ID}',
+      env: 'DFSP_BACKEND_STORE_CONS_REQ_PATH'
     },
     dfspBackendValidateAuthTokenPath: {
       doc: 'uri to sdk-scheme-adapter validateAuthToken endpoint',
       format: '*',
-      default: 'validateAuthToken'
+      default: 'validateAuthToken',
+      env: 'DFSP_BACKEND_VALIDATE_AUTH_TOKEN_PATH'
     },
     dfspBackendValidateThirdpartyTransactionRequest: {
       doc: 'path used by DFSPBackendRequests.validateThirdpartyTransactionRequest',
       format: '*',
-      default: 'validate-thirdparty-transaction-request'
+      default: 'validate-thirdparty-transaction-request',
+      env: 'DFSP_BACKEND_VALIDATE_THIRDPARTY_TRANSACTION_REQUEST'
     },
     dfspBackendStoreValidatedConsentForAccountIdPath: {
       doc: 'path use by DFSPBackendRequests.storeValidatedConsentForAccountId',
       format: '*',
-      default: 'store/consent'
+      default: 'store/consent',
+      env: 'DFSP_BACKEND_STORE_VALIDATED_CONSENT_FOR_ACCOUNT_ID_PATH'
     },
     dfspTransactionRequestAuthorizationTimeoutSeconds: {
       doc: 'Timeout for the DFSP waiting on the PISP response to POST /thirdpartyRequests/authorization',
       format: 'nat',
-      default: 100
+      default: 100,
+      env: 'DFSP_TRANSACTION_REQUEST_AUTHORIZATION_TIMEOUT_SECONDS'
     },
     dfspTransactionRequestVerificationTimeoutSeconds: {
       doc: 'Timeout for the DFSP waiting on the Auth-Service response to POST /thirdpartyRequests/verifications',
       format: 'nat',
-      default: 15
+      default: 15,
+      env: 'DFSP_TRANSACTION_REQUEST_VERIFICATION_TIMEOUT_SECONDS'
     },
     pispTransactionInitiateTimeoutInSeconds: {
       doc: 'Timeout for Transaction Initiate phase',
       format: 'nat',
-      default: 30
+      default: 30,
+      env: 'PISP_TRANSACTION_INITIATE_TIMEOUT_IN_SECONDS'
     },
     pispTransactionApproveTimeoutInSeconds: {
       doc: 'Timeout for Transaction Approve phase',
       format: 'nat',
-      default: 30
+      default: 30,
+      env: 'PISP_TRANSACTION_APPROVE_TIMEOUT_IN_SECOND'
     },
     sdkOutgoingUri: {
       doc: "host address of SDK scheme-adapter Outgoing service's ",
       format: '*',
-      default: 'localhost:7002'
+      default: 'localhost:7002',
+      env: 'SDK_OUTGOING_URI'
     },
     sdkOutgoingHttpScheme: {
       doc: 'Http scheme ',
       format: ['http', 'https'],
-      default: 'http'
+      default: 'http',
+      env: 'SDK_OUTGOING_HTTP_SCHEME'
     },
     sdkOutgoingRequestQuotePath: {
       doc: 'path to sdk outgoing quote sync interface',
       format: '*',
-      default: 'quotes'
+      default: 'quotes',
+      env: 'SDK_OUTGOING_REQUEST_QUOTE_PATH'
     },
     sdkOutgoingRequestAuthorizationPath: {
       doc: 'path to sdk outgoing authorization sync interface',
       format: '*',
-      default: 'authorizations'
+      default: 'authorizations',
+      env: 'SDK_OUTGOING_REQUEST_AUTHORIZATION_PATH'
     },
     sdkOutgoingRequestTransferPath: {
       doc: 'path to sdk outgoing transfer sync interface',
       format: '*',
-      default: 'simpleTransfers'
+      default: 'simpleTransfers',
+      env: 'SDK_OUTGOING_REQUEST_TRANSFER_PATH'
     },
     sdkRequestToPayTransferUri: {
       doc: 'uri to sdk-scheme-adapter requestToPayTransfer endpoint',
       format: '*',
-      default: 'localhost:9000/requestToPayTransfer'
+      default: 'localhost:9000/requestToPayTransfer',
+      env: 'SDK_REQUEST_TO_PAY_TRANSFER_URI'
     },
     sdkOutgoingPartiesInformationPath: {
       doc: 'uri to sdk-scheme-adapter requestToPayTransfer endpoint',
       format: '*',
-      default: 'localhost:7002/parties/{Type}/{ID}/{SubId}'
+      default: 'localhost:7002/parties/{Type}/{ID}/{SubId}',
+      env: 'SDK_OUTGOING_PARTIES_INFORMATION_PATH'
     },
     sdkNotifyAboutTransferUri: {
       doc: 'uri to sdk-scheme-adapter requestToPayTransfer endpoint',
       format: '*',
-      default: 'localhost:9000/thirdpartyRequests/transactions/{ID}'
+      default: 'localhost:9000/thirdpartyRequests/transactions/{ID}',
+      env: 'SDK_NOTIFY_ABOUT_TRANSFER_URI'
     },
     tempOverrideQuotesPartyIdType: {
       doc: 'DEPRECATED - No longer in use. Implement the backend request validateThirdpartyTransactionRequestAndGetContext instead.',
@@ -479,38 +530,48 @@ If set, this will override the consentId generated by the adapter, this is purel
 mapping in TEST_CONSENT_REQUEST_TO_CONSENT_MAP. If a consentId cannot be found for a consentRequestId,
 it will fallback to default behaviour (random consentId)`,
       format: 'Boolean',
-      default: false
+      default: false,
+      env: 'TEST_SHOULD_OVERRIDE_CONSENT_ID'
     },
     testConsentRequestToConsentMap: {
       doc: 'A map of consentIds to use for a given consentRequestId. This allows automated tests to know in advance the consentId.',
       format: '*',
-      default: {}
+      default: {},
+      env: 'TEST_CONSENT_REQUEST_TO_CONSENT_MAP'
     },
     testOverrideTransactionChallenge: {
       doc: 'If set to a non empty string, the derived challenge will be replaced with this value. This allows automated tests to use pre-signed transaction payloads.',
       format: '*',
-      default: undefined
+      default: undefined,
+      env: 'TEST_OVERRIDE_TRANSACTION_CHALLENGE'
     }
   },
   pm4mlEnabled: {
-    default: false
+    doc: `If set true, this will run the thirdparty-sdk in PM4ML mode, booting up a web socket client
+control.mgmtAPIWsUrl and control.mgmtAPIWsPort that can reconfigure mTLS and JWS related configurations.`,
+    default: false,
+    env: 'PM4ML_ENABLED'
   },
   validateInboundJws: {
+    doc: 'If set true, this will enable a JWS validator on the inbound server to verify messages originated from a certain participant',
     format: 'Boolean',
     default: false,
     env: 'VALIDATE_INBOUND_JWS'
   },
   jwsSign: {
+    doc: 'If set true, this will sign outgoing requests using `jwsSigningKey`',
     format: 'Boolean',
     default: false,
     env: 'JWS_SIGN'
   },
   jwsSigningKey: {
+    doc: 'The path of a JWS signing key. The contents of the file are then loaded in as a `Buffer`',
     format: '*',
     default: '',
     env: 'JWS_SIGNING_KEY_PATH'
   },
   jwsVerificationKeysDirectory: {
+    doc: 'The directory path of peer JWS keys. The contents of the file are then loaded in as a a list of `Buffer`s used to verify that messages originated from a peer.',
     format: '*',
     default: '',
     env: 'JWS_VERIFICATION_KEYS_DIRECTORY'
