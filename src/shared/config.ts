@@ -164,6 +164,7 @@ export const ConvictConfig = Convict<ServiceConfig>({
     tls: {
       mutualTLS: {
         enabled: {
+          doc: 'If set true, will enabled mTls on the inbound server.',
           default: false,
           env: 'INBOUND_MUTUAL_TLS_ENABLED'
         }
@@ -200,6 +201,7 @@ export const ConvictConfig = Convict<ServiceConfig>({
     tls: {
       mutualTLS: {
         enabled: {
+          doc: 'If set true, will enabled mTls on the outbound server.',
           default: false,
           env: 'OUTBOUND_MUTUAL_TLS_ENABLED'
         }
@@ -545,25 +547,31 @@ it will fallback to default behaviour (random consentId)`,
     }
   },
   pm4mlEnabled: {
+    doc: `If set true, this will run the thirdparty-sdk in PM4ML mode, booting up a web socket client
+control.mgmtAPIWsUrl and control.mgmtAPIWsPort that can reconfigure mTLS and JWS related configurations.`,
     default: false,
     env: 'PM4ML_ENABLED'
   },
   validateInboundJws: {
+    doc: 'If set true, this will enable a JWS validator on the inbound server to verify messages originated from a certain participant',
     format: 'Boolean',
     default: false,
     env: 'VALIDATE_INBOUND_JWS'
   },
   jwsSign: {
+    doc: 'If set true, this will sign outgoing requests using `jwsSigningKey`',
     format: 'Boolean',
     default: false,
     env: 'JWS_SIGN'
   },
   jwsSigningKey: {
+    doc: 'The path of a JWS signing key. The contents of the file are then loaded in as a `Buffer`',
     format: '*',
     default: '',
     env: 'JWS_SIGNING_KEY_PATH'
   },
   jwsVerificationKeysDirectory: {
+    doc: 'The directory path of peer JWS keys. The contents of the file are then loaded in as a a list of `Buffer`s used to verify that messages originated from a peer.',
     format: '*',
     default: '',
     env: 'JWS_VERIFICATION_KEYS_DIRECTORY'
