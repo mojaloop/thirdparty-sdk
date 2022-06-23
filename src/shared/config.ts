@@ -153,7 +153,7 @@ export const ConvictConfig = Convict<ServiceConfig>({
       doc: 'The InboundAPI port to bind.',
       format: 'port',
       default: 3001,
-      env: 'INBOUND_PORT'
+      env: 'INBOUND_LISTEN_PORT'
     },
     pispTransactionMode: {
       doc: 'PISPTransactionModel to be used',
@@ -183,7 +183,7 @@ export const ConvictConfig = Convict<ServiceConfig>({
       doc: 'The OutboundAPI port to bind.',
       format: 'port',
       default: 3002,
-      env: 'OUTBOUND_PORT'
+      env: 'OUTBOUND_LISTEN_PORT'
     },
     tls: {
       mutualTLS: {
