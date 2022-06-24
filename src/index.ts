@@ -24,10 +24,9 @@
  - Paweł Marzec <pawel.marzec@modusbox.com>
  --------------
  ******/
-import { setupAndStart, setupAndRestart } from './server'
+import { setupAndStart } from './server'
 export default {
   server: {
-    setupAndStart,
-    setupAndRestart
+    setupAndStart
   }
 }

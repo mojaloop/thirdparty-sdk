@@ -139,6 +139,7 @@ export class PISPTransactionModel extends PersistentModel<PISPTransactionStateMa
         currentState: this.data.currentState as OutboundAPI.Schemas.ThirdpartyTransactionPartyLookupState
       }
     } catch (error) {
+      console.log(error)
       this.logger.push({ error }).error('onRequestPartyLookup -> requestPartiesInformation')
       // try to handle specific HTTP related error
       if (error instanceof HTTPResponseError) {

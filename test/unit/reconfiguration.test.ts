@@ -35,11 +35,13 @@ import { Server as HapiServer } from '@hapi/hapi'
 import { Server } from '~/api'
 
 const setupAndStartSpy = jest.spyOn(index.server, 'setupAndStart')
-const setupAndRestartSpy = jest.spyOn(index.server, 'setupAndRestart')
 
 describe('cli', () => {
   let wsServer: WebSocketServer
   let server: Server
+  Config.pm4mlEnabled = true
+  Config.control.mgmtAPIWsUrl = 'localhost'
+  Config.control.mgmtAPIWsPort = 31000
   const appConfig = Config
   const managementApiResponse = {
     inbound: {
@@ -59,7 +61,11 @@ describe('cli', () => {
           key: 'new_string'
         }
       }
-    }
+    },
+    validateInboundJws: true,
+    jwsSign: true,
+    jwsSigningKey: 'new_string',
+    jwsVerificationKeysDirectory: 'new_string'
   }
 
   const expectedUpdatedAppConfig = {
@@ -92,13 +98,14 @@ describe('cli', () => {
           key: 'new_string'
         }
       }
-    }
+    },
+    validateInboundJws: true,
+    jwsSign: true,
+    jwsSigningKey: 'new_string',
+    jwsVerificationKeysDirectory: 'new_string'
   }
 
   beforeEach(async (): Promise<void> => {
-    Config.pm4mlEnabled = true
-    Config.control.mgmtAPIWsUrl = 'localhost'
-    Config.control.mgmtAPIWsPort = 31000
     wsServer = new WebSocketServer({ port: Config.control.mgmtAPIWsPort })
 
     wsServer.on('connection', function connection(ws) {
@@ -133,13 +140,11 @@ describe('cli', () => {
     setupAndStartSpy.mockImplementation(() =>
       Promise.resolve({ Iam: 'mocked-server', stop: jest.fn() } as unknown as HapiServer)
     )
-    setupAndRestartSpy.mockImplementation(() =>
-      Promise.resolve({ Iam: 'mocked-server', stop: jest.fn() } as unknown as HapiServer)
-    )
     server = await Server.create(Config)
   })
 
   afterEach(async (): Promise<void> => {
+    jest.clearAllMocks()
     wsServer.close()
     await server.stop()
   })
@@ -151,7 +156,14 @@ describe('cli', () => {
         port: Config.inbound.port,
         host: Config.inbound.host,
         api: 'inbound',
-        tls: expectedUpdatedAppConfig.inbound.tls
+        tls: expectedUpdatedAppConfig.inbound.tls,
+        serviceConfig: expect.objectContaining({
+          pm4mlEnabled: expectedUpdatedAppConfig.pm4mlEnabled,
+          validateInboundJws: expectedUpdatedAppConfig.validateInboundJws,
+          jwsSign: expectedUpdatedAppConfig.jwsSign,
+          jwsSigningKey: expectedUpdatedAppConfig.jwsSigningKey,
+          jwsVerificationKeysDirectory: expectedUpdatedAppConfig.jwsVerificationKeysDirectory
+        })
       },
       path.resolve(__dirname, '../../src/interface/api-inbound.yaml'),
       {
@@ -165,7 +177,14 @@ describe('cli', () => {
         port: Config.outbound.port,
         host: Config.outbound.host,
         api: 'outbound',
-        tls: expectedUpdatedAppConfig.outbound.tls
+        tls: expectedUpdatedAppConfig.outbound.tls,
+        serviceConfig: expect.objectContaining({
+          pm4mlEnabled: expectedUpdatedAppConfig.pm4mlEnabled,
+          validateInboundJws: expectedUpdatedAppConfig.validateInboundJws,
+          jwsSign: expectedUpdatedAppConfig.jwsSign,
+          jwsSigningKey: expectedUpdatedAppConfig.jwsSigningKey,
+          jwsVerificationKeysDirectory: expectedUpdatedAppConfig.jwsVerificationKeysDirectory
+        })
       },
       path.resolve(__dirname, '../../src/interface/api-outbound.yaml'),
       {
@@ -183,13 +202,20 @@ describe('cli', () => {
     // We wait for the servers to get restarted
     await new Promise((wait) => setTimeout(wait, 1000))
 
-    expect(index.server.setupAndRestart).toHaveBeenNthCalledWith(
+    expect(index.server.setupAndStart).toHaveBeenNthCalledWith(
       1,
       {
         port: Config.inbound.port,
         host: Config.inbound.host,
         api: 'inbound',
-        tls: expectedUpdatedAppConfig.inbound.tls
+        tls: expectedUpdatedAppConfig.inbound.tls,
+        serviceConfig: expect.objectContaining({
+          pm4mlEnabled: expectedUpdatedAppConfig.pm4mlEnabled,
+          validateInboundJws: expectedUpdatedAppConfig.validateInboundJws,
+          jwsSign: expectedUpdatedAppConfig.jwsSign,
+          jwsSigningKey: expectedUpdatedAppConfig.jwsSigningKey,
+          jwsVerificationKeysDirectory: expectedUpdatedAppConfig.jwsVerificationKeysDirectory
+        })
       },
       path.resolve(__dirname, '../../src/interface/api-inbound.yaml'),
       {
@@ -197,13 +223,20 @@ describe('cli', () => {
         ...Handlers.Inbound
       }
     )
-    expect(index.server.setupAndRestart).toHaveBeenNthCalledWith(
+    expect(index.server.setupAndStart).toHaveBeenNthCalledWith(
       2,
       {
         port: Config.outbound.port,
         host: Config.outbound.host,
         api: 'outbound',
-        tls: expectedUpdatedAppConfig.outbound.tls
+        tls: expectedUpdatedAppConfig.outbound.tls,
+        serviceConfig: expect.objectContaining({
+          pm4mlEnabled: expectedUpdatedAppConfig.pm4mlEnabled,
+          validateInboundJws: expectedUpdatedAppConfig.validateInboundJws,
+          jwsSign: expectedUpdatedAppConfig.jwsSign,
+          jwsSigningKey: expectedUpdatedAppConfig.jwsSigningKey,
+          jwsVerificationKeysDirectory: expectedUpdatedAppConfig.jwsVerificationKeysDirectory
+        })
       },
       path.resolve(__dirname, '../../src/interface/api-outbound.yaml'),
       {

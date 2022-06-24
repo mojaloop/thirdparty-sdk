@@ -28,6 +28,7 @@ import { Server } from '@hapi/hapi'
 import onValidateFail from '~/handlers/shared/onValidateFail'
 import { validateRoutes } from '@mojaloop/central-services-error-handling'
 import { BaseRequestTLSConfig } from '@mojaloop/sdk-standard-components'
+import { ServiceConfig } from '~/shared/config'
 
 // distinguish APIs exposed
 export enum ServerAPI {
@@ -41,11 +42,13 @@ export interface ServerConfig {
   // the exposed api descriptor
   api: ServerAPI
   tls: BaseRequestTLSConfig
+  serviceConfig: ServiceConfig
 }
 // server app interface accessible in handlers and plugins via settings.app[key]
 export interface ServerApp {
   // specify which API is exposed
   api: ServerAPI
+  serviceConfig: ServiceConfig
 }
 
 export default async function create(config: ServerConfig): Promise<Server> {
@@ -59,7 +62,8 @@ export default async function create(config: ServerConfig): Promise<Server> {
       }
     },
     app: {
-      api: config.api
+      api: config.api,
+      serviceConfig: config.serviceConfig
     },
     // only the inbound hapi server needs tls enabled
     tls: config.api == ServerAPI.inbound && config.tls.mutualTLS.enabled ? config.tls.creds : false

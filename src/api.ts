@@ -23,13 +23,10 @@ import { stop } from './server/start'
 export async function mkStartAPI(
   api: ServerAPI,
   handlers: { [handler: string]: Handler },
-  serviceConfig: ServiceConfig = config,
-  restart = false
+  serviceConfig: ServiceConfig = config
 ): Promise<HapiServer> {
   // update config from program parameters,
   // so setupAndStart will know on which PORT/HOST bind the server
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
   const apiConfig: OutConfig = serviceConfig[api] as OutConfig
 
   // resolve the path to openapi v3 definition file
@@ -45,14 +42,14 @@ export async function mkStartAPI(
     port: apiConfig.port,
     host: apiConfig.host,
     api,
-    tls: apiConfig.tls
+    tls: apiConfig.tls,
+    // we are just going pass all of the config here for convenience purposes
+    // so that when the server is restarted with a config that isn't on the local
+    // disk
+    serviceConfig: serviceConfig
   }
   // setup & start @hapi server
-  if (restart) {
-    return await index.server.setupAndRestart(serverConfig, apiPath, joinedHandlers)
-  } else {
-    return await index.server.setupAndStart(serverConfig, apiPath, joinedHandlers)
-  }
+  return await index.server.setupAndStart(serverConfig, apiPath, joinedHandlers)
 }
 
 async function GetUpdatedConfigFromMgmtAPI(
@@ -71,6 +68,7 @@ async function GetUpdatedConfigFromMgmtAPI(
 export class Server {
   private conf!: ServiceConfig
   private controlConfig!: ControlConfig
+  public logger!: SDKLogger.Logger
   public inboundServer!: HapiServer
   public outboundServer!: HapiServer
   public controlClient!: ControlAgent.Client
@@ -78,21 +76,24 @@ export class Server {
   async initialize(conf: ServiceConfig): Promise<void> {
     this.conf = conf
     this.controlConfig = conf.control
-
+    this.logger = new SDKLogger.Logger()
     // Check Management API for updated config
     // We only start the control client if we're running within Mojaloop Payment Manager.
     // The control server is the Payment Manager Management API Service.
     // We only start the client to connect to and listen to the Management API service for
     // management protocol messages e.g configuration changes, certificate updates etc.
     if (config.pm4mlEnabled) {
-      const logger = new SDKLogger.Logger()
       this.controlClient = await ControlAgent.Client.Create(
         this.controlConfig.mgmtAPIWsUrl,
         this.controlConfig.mgmtAPIWsPort,
         conf
       )
-      const updatedConfigFromMgmtAPI = await GetUpdatedConfigFromMgmtAPI(this.controlConfig, logger, this.controlClient)
-      logger.info(`updatedConfigFromMgmtAPI: ${JSON.stringify(updatedConfigFromMgmtAPI)}`)
+      const updatedConfigFromMgmtAPI = await GetUpdatedConfigFromMgmtAPI(
+        this.controlConfig,
+        this.logger,
+        this.controlClient
+      )
+      this.logger.info(`updatedConfigFromMgmtAPI: ${JSON.stringify(updatedConfigFromMgmtAPI)}`)
       _.merge(this.conf, updatedConfigFromMgmtAPI)
 
       this.controlClient.on(ControlAgent.EVENT.RECONFIGURE, this.restart.bind(this))
@@ -110,8 +111,10 @@ export class Server {
   }
 
   async restart(conf: ServiceConfig) {
-    this.inboundServer = await mkStartAPI(ServerAPI.inbound, Handlers.Inbound, conf, true)
-    this.outboundServer = await mkStartAPI(ServerAPI.outbound, Handlers.Outbound, conf, true)
+    this.logger.info(`Received new config. Restarting servers: ${JSON.stringify(conf)}`)
+    await Promise.all([stop(this.inboundServer), stop(this.outboundServer)])
+    this.inboundServer = await mkStartAPI(ServerAPI.inbound, Handlers.Inbound, conf)
+    this.outboundServer = await mkStartAPI(ServerAPI.outbound, Handlers.Outbound, conf)
     await Promise.all([this.inboundServer, this.outboundServer])
   }
 
