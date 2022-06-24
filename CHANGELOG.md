@@ -1,4 +1,16 @@
 # Changelog: [mojaloop/thirdparty-sdk](https://github.com/mojaloop/thirdparty-sdk)
+## [15.1.0](https://github.com/mojaloop/thirdparty-sdk/compare/v15.0.0...v15.1.0) (2022-06-24)
+
+
+### Features
+
+* add jws validation on inbound server and update reconfig for jws signing ([#151](https://github.com/mojaloop/thirdparty-sdk/issues/151)) ([bc19c32](https://github.com/mojaloop/thirdparty-sdk/commit/bc19c3291b0e55eca92abebead39b1d74a923c1d))
+
+
+### Maintenance
+
+* fix env variables ([#154](https://github.com/mojaloop/thirdparty-sdk/issues/154)) ([5505711](https://github.com/mojaloop/thirdparty-sdk/commit/550571138ec469a57cb71b6fd3a63dc4db7caf4c))
+
 ## [15.0.0](https://github.com/mojaloop/thirdparty-sdk/compare/v14.0.3...v15.0.0) (2022-06-22)
 
 
