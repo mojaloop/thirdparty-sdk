@@ -36,7 +36,7 @@ import {
   create,
   loadFromKVS
 } from '~/models/persistent.model'
-import { mocked } from 'ts-jest/utils'
+import { mocked } from "jest-mock";
 import mockLogger from 'test/unit/mockLogger'
 import shouldNotBeExecuted from 'test/unit/shouldNotBeExecuted'
 import sortedArray from 'test/unit/sortedArray'

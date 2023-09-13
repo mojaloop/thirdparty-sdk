@@ -19,24 +19,23 @@ npm run release
 ```
 before pushing changes to remote repository. The [CHANGELOG.md](CHANGELOG.md) file will be generated.
 
-## Code Audit
-There are two `npm script` commands dedicated to code audit:
+## Auditing Dependencies
 
+We use `audit-ci` along with `npm audit` to check dependencies for node vulnerabilities, and keep track of resolved dependencies with an `audit-ci.jsonc` file.
 
-`audit:check` is used to check vulnerability in code dependencies
+To start a new resolution process, run:
+
+```bash
+npm run audit:fix
+```
+
+You can then check to see if the CI will pass based on the current dependencies with:
+
 ```bash
 npm run audit:check
 ```
-This command is run as guard in CI/CD pipeline to ensure our code is not vulnerable.
 
-
-`audit:resolve` should be used to resolve audit problems.
-Generated `audit-resolve.json` file should be committed,
-elsewhere CI/CD pipeline will stop with error in case of any audit problems.
-```bash
-npm run audit:resolve
-```
-
+The [audit-ci.jsonc](./audit-ci.jsonc) contains any audit-exceptions that cannot be fixed to ensure that CircleCI will build correctly.
 ## Pre-commit hook
 > Pull Requests with broken code will not be accepted to merge.
 

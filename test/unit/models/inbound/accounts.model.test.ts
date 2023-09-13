@@ -31,7 +31,7 @@ import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
 import * as mockData from 'test/unit/data/mockData'
 
 import mockLogger from '../../mockLogger'
-import { mocked } from 'ts-jest/utils'
+import { mocked } from "jest-mock";
 import { HTTPResponseError } from '../../../../src/shared/http-response-error'
 
 describe('InboundAccountsModel', () => {
