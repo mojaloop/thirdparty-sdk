@@ -26,7 +26,7 @@
  --------------
 ******/
 
-import { mocked } from "jest-mock";
+import { mocked } from 'ts-jest'
 import { v4 as uuidv4 } from 'uuid'
 import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
 

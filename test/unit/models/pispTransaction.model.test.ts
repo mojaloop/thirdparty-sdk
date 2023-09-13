@@ -35,7 +35,7 @@ import {
 } from '~/models/pispTransaction.interface'
 import { PISPTransactionModel, create, loadFromKVS } from '~/models/pispTransaction.model'
 import { RedisConnectionConfig } from '~/shared/redis-connection'
-import { mocked } from "jest-mock";
+import { mocked } from 'ts-jest'
 
 import mockLogger from 'test/unit/mockLogger'
 import shouldNotBeExecuted from 'test/unit/shouldNotBeExecuted'

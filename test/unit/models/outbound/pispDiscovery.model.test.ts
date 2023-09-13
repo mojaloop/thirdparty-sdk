@@ -37,7 +37,7 @@ import { PISPDiscoveryModel, create } from '~/models/outbound/pispDiscovery.mode
 
 import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
 import { RedisConnectionConfig } from '~/shared/redis-connection'
-import { mocked } from "jest-mock";
+import { mocked } from 'ts-jest'
 
 import * as mockData from 'test/unit/data/mockData'
 import mockLogger from 'test/unit/mockLogger'

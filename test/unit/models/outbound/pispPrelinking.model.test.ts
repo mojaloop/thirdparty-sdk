@@ -31,7 +31,7 @@ import { Message, NotificationCallback, PubSub } from '~/shared/pub-sub'
 import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
 import { PISPPrelinkingModel, create } from '~/models/outbound/pispPrelinking.model'
 import { RedisConnectionConfig } from '~/shared/redis-connection'
-import { mocked } from "jest-mock";
+import { mocked } from 'ts-jest'
 
 import mockLogger from 'test/unit/mockLogger'
 import sortedArray from 'test/unit/sortedArray'

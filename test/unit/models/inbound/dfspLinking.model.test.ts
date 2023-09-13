@@ -31,7 +31,7 @@ import { Message, NotificationCallback, PubSub } from '~/shared/pub-sub'
 import { ThirdpartyRequests, MojaloopRequests } from '@mojaloop/sdk-standard-components'
 import { DFSPLinkingModel, create } from '~/models/inbound/dfspLinking.model'
 import { RedisConnectionConfig } from '~/shared/redis-connection'
-import { mocked } from "jest-mock";
+import { mocked } from 'ts-jest'
 
 import mockLogger from 'test/unit/mockLogger'
 import sortedArray from 'test/unit/sortedArray'

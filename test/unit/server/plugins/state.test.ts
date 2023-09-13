@@ -29,7 +29,7 @@
 import { KVS } from '~/shared/kvs'
 import { PubSub } from '~/shared/pub-sub'
 import { StatePlugin } from '~/server/plugins/state'
-import { mocked } from "jest-mock";
+import { mocked } from 'ts-jest'
 import { Server } from '@hapi/hapi'
 import { mockProcessExit } from 'jest-mock-process'
 import { ServerAPI } from '~/server/create'
