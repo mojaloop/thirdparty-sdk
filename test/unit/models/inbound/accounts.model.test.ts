@@ -24,15 +24,16 @@ optionally within square brackets <email>.
 - Sridhar Voruganti - sridhar.voruganti@modusbox.com
 --------------
 ******/
-
+import { jest } from '@jest/globals'
 import { InboundAccountsModel, InboundAccountsModelConfig } from '~/models/inbound/accounts.model'
 import { DFSPBackendRequests } from '~/shared/dfsp-backend-requests'
 import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
 import * as mockData from 'test/unit/data/mockData'
 
 import mockLogger from '../../mockLogger'
-import { mocked } from 'ts-jest'
 import { HTTPResponseError } from '../../../../src/shared/http-response-error'
+
+const { mocked } = jest
 
 describe('InboundAccountsModel', () => {
   const logger = mockLogger()

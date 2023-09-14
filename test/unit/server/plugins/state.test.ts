@@ -25,11 +25,10 @@
 
  --------------
  ******/
-
+import { jest } from '@jest/globals'
 import { KVS } from '~/shared/kvs'
 import { PubSub } from '~/shared/pub-sub'
 import { StatePlugin } from '~/server/plugins/state'
-import { mocked } from 'ts-jest'
 import { Server } from '@hapi/hapi'
 import { mockProcessExit } from 'jest-mock-process'
 import { ServerAPI } from '~/server/create'
@@ -37,6 +36,8 @@ import { ServerAPI } from '~/server/create'
 import SDK from '@mojaloop/sdk-standard-components'
 import config from '~/shared/config'
 import { logger } from '~/shared/logger'
+
+const { mocked } = jest
 
 jest.mock('~/shared/kvs')
 jest.mock('~/shared/pub-sub')

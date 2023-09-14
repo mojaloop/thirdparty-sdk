@@ -26,7 +26,7 @@
  --------------
 ******/
 
-import { mocked } from 'ts-jest'
+import { jest } from '@jest/globals'
 import { v4 as uuidv4 } from 'uuid'
 import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
 
@@ -45,6 +45,8 @@ import { OutboundAPI as SDKOutboundAPI } from '@mojaloop/sdk-scheme-adapter'
 import { reformatError } from '~/shared/api-error'
 import { PubSub } from '~/shared/pub-sub'
 import { mockDeferredJobWithCallbackMessage } from '../mockDeferredJob'
+
+const { mocked } = jest
 
 // mock KVS default exported class
 jest.mock('~/shared/kvs')

@@ -25,6 +25,7 @@
  --------------
  ******/
 
+import { jest } from '@jest/globals'
 import { KVS } from '~/shared/kvs'
 import { RedisConnectionConfig } from '~/shared/redis-connection'
 import { StateMachineConfig, Method } from 'javascript-state-machine'
@@ -36,10 +37,11 @@ import {
   create,
   loadFromKVS
 } from '~/models/persistent.model'
-import { mocked } from 'ts-jest'
 import mockLogger from 'test/unit/mockLogger'
 import shouldNotBeExecuted from 'test/unit/shouldNotBeExecuted'
 import sortedArray from 'test/unit/sortedArray'
+
+const { mocked } = jest
 
 // mock KVS default exported class
 jest.mock('~/shared/kvs')

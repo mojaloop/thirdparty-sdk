@@ -24,6 +24,7 @@
  - Paweł Marzec <pawel.marzec@modusbox.com>
  --------------
  ******/
+ import { jest } from '@jest/globals'
 import { KVS } from '~/shared/kvs'
 import { Message, NotificationCallback, PubSub } from '~/shared/pub-sub'
 import { MojaloopRequests, ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
@@ -35,7 +36,6 @@ import {
 } from '~/models/pispTransaction.interface'
 import { PISPTransactionModel, create, loadFromKVS } from '~/models/pispTransaction.model'
 import { RedisConnectionConfig } from '~/shared/redis-connection'
-import { mocked } from 'ts-jest'
 
 import mockLogger from 'test/unit/mockLogger'
 import shouldNotBeExecuted from 'test/unit/shouldNotBeExecuted'
@@ -47,6 +47,8 @@ import * as OutboundAPI from '~/interface/outbound/api_interfaces'
 import { v4 } from 'uuid'
 // mock KVS default exported class
 jest.mock('~/shared/kvs')
+
+const { mocked } = jest
 
 // mock PubSub default exported class
 jest.mock('~/shared/pub-sub')

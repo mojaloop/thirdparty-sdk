@@ -24,6 +24,7 @@
  - Sridhar Voruganti - sridhar.voruganti@modusbox.com
  --------------
  ******/
+ import { jest } from '@jest/globals'
 import { KVS } from '~/shared/kvs'
 import { Message, NotificationCallback, PubSub } from '~/shared/pub-sub'
 
@@ -33,12 +34,13 @@ import { PISPLinkingModel, create } from '~/models/outbound/pispLinking.model'
 
 import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
 import { RedisConnectionConfig } from '~/shared/redis-connection'
-import { mocked } from 'ts-jest'
 
 import * as mockData from 'test/unit/data/mockData'
 import mockLogger from 'test/unit/mockLogger'
 import shouldNotBeExecuted from 'test/unit/shouldNotBeExecuted'
 import sortedArray from 'test/unit/sortedArray'
+
+const { mocked } = jest
 
 // mock KVS default exported class
 jest.mock('~/shared/kvs')
