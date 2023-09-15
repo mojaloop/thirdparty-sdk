@@ -179,10 +179,10 @@ describe('Outbound API routes', (): void => {
     server = await index.server.setupAndStart(serverConfig, apiPath, serverHandlers)
   })
 
-  afterAll(async (done): Promise<void> => {
+  afterAll((done) => {
     // StatePlugin is waiting on stop event so give it a chance to close the redis connections
     server.events.on('stop', () => setTimeout(done, 100))
-    await server.stop()
+    server.stop()
   })
 
   it('/health', async (): Promise<void> => {

@@ -47,6 +47,7 @@
     "test:coverage-check": "jest -w 1 --coverage --testMatch '**/test/unit/**/*.(test|spec).ts'",
     "test:integration": "jest --config './jest.integration.config.js' --testMatch '**/test/integration/**/*.(test|spec).ts' --runInBand",
     "test:unit": "jest -w 1 --coverageThreshold='{}' --testMatch '**/test/unit/**/*.(test|spec).ts'",
+    "test:specific": "jest -w 1 --coverageThreshold='{}' --testMatch '**/test/unit/handlers/inbound-api.test.ts'",
     "updates:check": "npm-check-updates",
     "updates:update": "npm-check-updates -u && npm install",
     "watch": "tsc -w"
@@ -106,8 +107,8 @@
     "@mojaloop/api-snippets": "^17.2.4",
     "@mojaloop/central-services-error-handling": "12.0.7",
     "@mojaloop/central-services-metrics": "12.0.8",
-    "@mojaloop/central-services-shared": "18.1.1",
-    "@mojaloop/sdk-scheme-adapter": "18.0.2",
+    "@mojaloop/central-services-shared": "^18.1.1",
+    "@mojaloop/sdk-scheme-adapter": "^18.0.2",
     "@mojaloop/sdk-standard-components": "17.1.3",
     "ajv": "^8.12.0",
     "ajv-keywords": "5.1.0",
@@ -146,7 +147,7 @@
     "@types/hapi__inert": "^5.2.6",
     "@types/hapi__vision": "^5.5.4",
     "@types/javascript-state-machine": "^2.4.3",
-    "@types/jest": "26.0.24",
+    "@types/jest": "29.5.4",
     "@types/lodash": "^4.14.198",
     "@types/node": "^20.6.0",
     "@types/promise-timeout": "^1.3.0",
@@ -184,7 +185,7 @@
     "release-please": "^15.13.0",
     "source-map-support": "0.5.21",
     "swagger-cli": "^4.0.4",
-    "ts-jest": "29.0.5",
+    "ts-jest": "29.1.1",
     "ts-node": "^10.9.1",
     "tsconfig-paths": "^4.2.0"
   }

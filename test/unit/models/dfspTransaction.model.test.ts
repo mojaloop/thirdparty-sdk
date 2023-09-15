@@ -470,7 +470,7 @@ describe('DFSPTransactionModel', () => {
       )
     })
 
-    it('should throw if transactionRequestRequest is not valid', async (done) => {
+    it('should throw if transactionRequestRequest is not valid', async () => {
       mocked(modelConfig.kvs.set).mockImplementationOnce(() => Promise.resolve(true))
       mocked(modelConfig.dfspBackendRequests.validateThirdpartyTransactionRequestAndGetContext).mockImplementationOnce(
         () =>
@@ -502,11 +502,10 @@ describe('DFSPTransactionModel', () => {
         await model.fsm.validateTransactionRequest()
       } catch (err) {
         expect(err).toEqual(Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_REQUEST_NOT_VALID)
-        done()
       }
     })
 
-    it('should throw if PUT /thirdpartyRequests/transactions/{ID} failed', async (done) => {
+    it('should throw if PUT /thirdpartyRequests/transactions/{ID} failed', async () => {
       mocked(modelConfig.kvs.set).mockImplementationOnce(() => Promise.resolve(true))
       mocked(modelConfig.thirdpartyRequests.putThirdpartyRequestsTransactions)
         // eslint-disable-next-line prefer-promise-reject-errors
@@ -537,11 +536,10 @@ describe('DFSPTransactionModel', () => {
         await model.fsm.notifyTransactionRequestIsValid()
       } catch (err) {
         expect(err).toEqual(Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_UPDATE_FAILED)
-        done()
       }
     })
 
-    it('should throw if requestQuotes failed', async (done) => {
+    it('should throw if requestQuotes failed', async () => {
       mocked(modelConfig.kvs.set).mockImplementationOnce(() => Promise.resolve(true))
       mocked(modelConfig.sdkOutgoingRequests.requestQuote).mockImplementationOnce(() =>
         Promise.resolve({ currentState: 'ERROR_OCCURRED' } as SDKOutboundAPI.Schemas.quotesPostResponse)
@@ -560,11 +558,10 @@ describe('DFSPTransactionModel', () => {
         await model.fsm.requestQuote()
       } catch (err) {
         expect(err).toEqual(Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_REQUEST_QUOTE_FAILED)
-        done()
       }
     })
 
-    it('should throw if requestAuthorization failed', async (done) => {
+    it('should throw if requestAuthorization failed', async () => {
       mocked(modelConfig.kvs.set).mockImplementationOnce(() => Promise.resolve(true))
       mocked(modelConfig.thirdpartyRequests.putThirdpartyRequestsTransactionsError).mockImplementationOnce(() =>
         Promise.resolve(undefined)
@@ -596,11 +593,10 @@ describe('DFSPTransactionModel', () => {
         await model.fsm.requestAuthorization()
       } catch (err) {
         expect(err).toEqual(Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_AUTHORIZATION_UNEXPECTED)
-        done()
       }
     })
 
-    it('should throw if verifyAuthorization failed', async (done) => {
+    it('should throw if verifyAuthorization failed', async () => {
       mocked(modelConfig.kvs.set).mockImplementationOnce(() => Promise.resolve(true))
       mocked(modelConfig.thirdpartyRequests.postThirdpartyRequestsVerifications).mockImplementationOnce(() =>
         Promise.resolve(undefined)
@@ -630,12 +626,11 @@ describe('DFSPTransactionModel', () => {
         await model.fsm.verifyAuthorization()
       } catch (err) {
         expect(err).toEqual(Errors.MojaloopApiErrorCodes.TP_AUTH_SERVICE_ERROR)
-        done()
       }
     })
 
     // TODO: fix me - latest API needs to add back REJECTED option... :(
-    it.skip('should throw if user REJECTED authorization/transfer', async (done) => {
+    it.skip('should throw if user REJECTED authorization/transfer', async () => {
       mocked(modelConfig.kvs.set).mockImplementationOnce(() => Promise.resolve(true))
       mocked(modelConfig.dfspBackendRequests.verifyAuthorization).mockImplementationOnce(() =>
         Promise.resolve({ isValid: false })
@@ -663,11 +658,10 @@ describe('DFSPTransactionModel', () => {
       } catch (err) {
         expect(model.data.transactionRequestState).toEqual('REJECTED')
         expect(err).toEqual(Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_AUTHORIZATION_REJECTED_BY_USER)
-        done()
       }
     })
 
-    it('should throw if transfer failed', async (done) => {
+    it('should throw if transfer failed', async () => {
       mocked(modelConfig.kvs.set).mockImplementationOnce(() => Promise.resolve(true))
       mocked(modelConfig.sdkOutgoingRequests.requestTransfer).mockImplementationOnce(() =>
         Promise.resolve({ currentState: 'ERROR_OCCURRED' } as SDKOutboundAPI.Schemas.simpleTransfersPostResponse)
@@ -696,11 +690,10 @@ describe('DFSPTransactionModel', () => {
         await model.fsm.onRequestTransfer()
       } catch (err) {
         expect(err).toEqual(Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_TRANSFER_FAILED)
-        done()
       }
     })
 
-    it('should throw if notify transfer patch failed', async (done) => {
+    it('should throw if notify transfer patch failed', async () => {
       mocked(modelConfig.kvs.set).mockImplementationOnce(() => Promise.resolve(true))
       mocked(modelConfig.thirdpartyRequests.patchThirdpartyRequestsTransactions).mockImplementationOnce(() =>
         Promise.reject(new Error('error from patch'))
@@ -733,7 +726,6 @@ describe('DFSPTransactionModel', () => {
         await model.fsm.onNotifyTransferIsDone()
       } catch (err) {
         expect(err).toEqual(Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_NOTIFICATION_FAILED)
-        done()
       }
     })
     it('should handle errored state', async () => {
@@ -818,7 +810,7 @@ describe('DFSPTransactionModel', () => {
         transactionRequestRequest,
         currentState: 'start'
       }
-      mocked(modelConfig.kvs.get).mockImplementationOnce(async () => dataFromCache)
+      mocked(modelConfig.kvs.get<DFSPTransactionData>).mockImplementationOnce(async () => dataFromCache)
       const model = await loadFromKVS(modelConfig)
       checkDTMLayout(model, dataFromCache)
 
@@ -830,7 +822,7 @@ describe('DFSPTransactionModel', () => {
     })
 
     it('should throw when received invalid data from `KVS.get`', async () => {
-      mocked(modelConfig.kvs.get).mockImplementationOnce(async () => null)
+      mocked(modelConfig.kvs.get<null>).mockImplementationOnce(async () => null)
       try {
         await loadFromKVS(modelConfig)
         shouldNotBeExecuted()

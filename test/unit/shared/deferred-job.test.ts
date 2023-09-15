@@ -72,7 +72,7 @@ describe('deferredJob', () => {
       await pubSub.disconnect()
     })
 
-    test('happy flow', async (done) => {
+    test('happy flow', (done) => {
       const jobInitiator = jest.fn(() => Promise.resolve())
       const jobListener = jest.fn(() => Promise.resolve())
       const initOrTrigger = deferredJob(pubSub, channel)
@@ -94,10 +94,10 @@ describe('deferredJob', () => {
         done()
       })
       expect(spySubscribe).toHaveBeenCalledWith(channel, expect.any(Function))
-      await initOrTrigger.trigger({ the: 'message' })
+      initOrTrigger.trigger({ the: 'message' })
     })
 
-    test('timeout', async (done) => {
+    test('timeout', (done) => {
       const jobInitiator = jest.fn(() => Promise.resolve())
       const jobListener = jest.fn(() => Promise.resolve())
 
@@ -111,7 +111,7 @@ describe('deferredJob', () => {
         done()
       })
       expect(spySubscribe).toHaveBeenCalledWith(channel, expect.any(Function))
-      await deferredJob(pubSub, channel).trigger({ the: 'message' })
+      deferredJob(pubSub, channel).trigger({ the: 'message' })
     })
 
     test('exception from jobInitiator', (done) => {
@@ -132,7 +132,7 @@ describe('deferredJob', () => {
       expect(spySubscribe).toHaveBeenCalledWith(channel, expect.any(Function))
     })
 
-    test('exception from jobListener', async (done) => {
+    test('exception from jobListener', (done) => {
       const jobInitiator = jest.fn(() => Promise.resolve())
       const jobListener = jest.fn(() => {
         throw new Error('job-listener throws')
@@ -149,7 +149,7 @@ describe('deferredJob', () => {
         done()
       })
       expect(spySubscribe).toHaveBeenCalledWith(channel, expect.any(Function))
-      await deferredJob(pubSub, channel).trigger({ the: 'message' })
+      deferredJob(pubSub, channel).trigger({ the: 'message' })
     })
 
     test('input validation', () => {

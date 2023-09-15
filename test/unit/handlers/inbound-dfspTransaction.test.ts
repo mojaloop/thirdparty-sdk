@@ -150,7 +150,7 @@ describe('Inbound DFSP Transaction handler', () => {
     } as unknown as StateResponseToolkit
   })
 
-  it('POST /thirdPartyRequests/transactions', async (done) => {
+  it('POST /thirdPartyRequests/transactions', (done) => {
     const request = {
       method: 'POST',
       url: '/thirdpartyRequests/transactions',
@@ -164,15 +164,14 @@ describe('Inbound DFSP Transaction handler', () => {
     // Initial call
     mockDeferredJobWithCallbackMessage('testAuthChannel', requestAuthorizationResponse)
     mockDeferredJobWithCallbackMessage('testVerifyChannel', requestVerificationResponse)
-    const result = await ThirdpartyRequestsTransactions.post(
+    ThirdpartyRequestsTransactions.post(
       {} as unknown as Context,
       request as unknown as Request,
       toolkit as unknown as StateResponseToolkit
-    )
-    expect(result.statusCode).toBe(202)
+    ).then((result) => expect(result.statusCode).toBe(202))
 
     // give 100ms for post background job to be done
-    setTimeout(async () => {
+    setTimeout(() => {
       // it is the happy flow so no error callback should be called
       expect(thirdpartyRequestsMock.putThirdpartyRequestsTransactionsError).not.toBeCalled()
 

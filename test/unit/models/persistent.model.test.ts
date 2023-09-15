@@ -233,7 +233,7 @@ describe('PersistentModel', () => {
   describe('loadFromKVS', () => {
     it('should properly call `KVS.get`, get expected data in `context.data` and setup state of machine', async () => {
       const dataFromCache: TestData = { the: 'data from cache', currentState: 'end' }
-      mocked(modelConfig.kvs.get).mockImplementationOnce(async () => dataFromCache)
+      mocked(modelConfig.kvs.get<TestData>).mockImplementationOnce(async () => dataFromCache)
       const pm = await loadFromKVS<TestStateMachine, TestData>(modelConfig, smConfig)
       checkPSMLayout(pm, dataFromCache)
 
@@ -245,7 +245,7 @@ describe('PersistentModel', () => {
     })
 
     it('should throw when received invalid data from `KVS.get`', async () => {
-      mocked(modelConfig.kvs.get).mockImplementationOnce(async () => null)
+      mocked(modelConfig.kvs.get<null>).mockImplementationOnce(async () => null)
       try {
         await loadFromKVS<TestStateMachine, TestData>(modelConfig, smConfig)
         shouldNotBeExecuted()

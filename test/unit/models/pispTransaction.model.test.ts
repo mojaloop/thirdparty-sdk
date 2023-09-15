@@ -413,26 +413,18 @@ describe('pipsTransactionModel', () => {
         )
       })
 
-      it('should handle error', async (done) => {
+      it('should handle error', async () => {
         mocked(modelConfig.thirdpartyRequests.postThirdpartyRequestsTransactions).mockImplementationOnce(() => {
           throw new Error('mocked postThirdpartyRequestsTransactions exception')
         })
         const model = await create(data, modelConfig)
+        expect(model.run()).rejects.toThrow('mocked postThirdpartyRequestsTransactions exception')
 
-        try {
-          await model.run()
-          shouldNotBeExecuted()
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } catch (err: any) {
-          expect(err.message).toEqual('mocked postThirdpartyRequestsTransactions exception')
+        // check that correct subscription has been done
+        expect(modelConfig.subscriber.subscribe).toBeCalledWith(channelTransPut, expect.anything())
 
-          // check that correct subscription has been done
-          expect(modelConfig.subscriber.subscribe).toBeCalledWith(channelTransPut, expect.anything())
-
-          // check that correct unsubscription has been done
-          expect(modelConfig.subscriber.unsubscribe).toBeCalledWith(channelTransPut, expect.anything())
-          done()
-        }
+        // check that correct unsubscription has been done
+        expect(modelConfig.subscriber.unsubscribe).toBeCalledWith(channelTransPut, expect.anything())
       })
     })
 
@@ -696,7 +688,7 @@ describe('pipsTransactionModel', () => {
         transactionRequestId: '1234-1234',
         currentState: 'transactionStatusReceived'
       }
-      mocked(modelConfig.kvs.get).mockImplementationOnce(async () => dataFromCache)
+      mocked(modelConfig.kvs.get<PISPTransactionData>).mockImplementationOnce(async () => dataFromCache)
       const model = await loadFromKVS(modelConfig)
       checkPTMLayout(model, dataFromCache)
 
@@ -708,7 +700,7 @@ describe('pipsTransactionModel', () => {
     })
 
     it('should throw when received invalid data from `KVS.get`', async () => {
-      mocked(modelConfig.kvs.get).mockImplementationOnce(async () => null)
+      mocked(modelConfig.kvs.get<null>).mockImplementationOnce(async () => null)
       try {
         await loadFromKVS(modelConfig)
         shouldNotBeExecuted()
