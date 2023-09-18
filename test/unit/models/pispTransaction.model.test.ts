@@ -24,7 +24,7 @@
  - Paweł Marzec <pawel.marzec@modusbox.com>
  --------------
  ******/
- import { jest } from '@jest/globals'
+import { jest } from '@jest/globals'
 import { KVS } from '~/shared/kvs'
 import { Message, NotificationCallback, PubSub } from '~/shared/pub-sub'
 import { MojaloopRequests, ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
@@ -413,18 +413,22 @@ describe('pipsTransactionModel', () => {
         )
       })
 
-      it('should handle error', async () => {
+      it('should handle error', (done) => {
         mocked(modelConfig.thirdpartyRequests.postThirdpartyRequestsTransactions).mockImplementationOnce(() => {
           throw new Error('mocked postThirdpartyRequestsTransactions exception')
         })
-        const model = await create(data, modelConfig)
-        expect(model.run()).rejects.toThrow('mocked postThirdpartyRequestsTransactions exception')
+        create(data, modelConfig).then((model) => {
+          model.run().catch((err: any) => {
+            expect(err.message).toEqual('mocked postThirdpartyRequestsTransactions exception')
 
-        // check that correct subscription has been done
-        expect(modelConfig.subscriber.subscribe).toBeCalledWith(channelTransPut, expect.anything())
+            // check that correct subscription has been done
+            expect(modelConfig.subscriber.subscribe).toBeCalledWith(channelTransPut, expect.anything())
 
-        // check that correct unsubscription has been done
-        expect(modelConfig.subscriber.unsubscribe).toBeCalledWith(channelTransPut, expect.anything())
+            // check that correct unsubscription has been done
+            expect(modelConfig.subscriber.unsubscribe).toBeCalledWith(channelTransPut, expect.anything())
+            done()
+          })
+        })
       })
     })
 

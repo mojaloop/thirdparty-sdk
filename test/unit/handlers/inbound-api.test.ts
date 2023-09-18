@@ -151,12 +151,7 @@ describe('Inbound API routes', (): void => {
       ...Handlers.Shared,
       ...Handlers.Inbound
     }
-    try {
-      server = await index.server.setupAndStart(serverConfig, apiPath, serverHandlers)
-      console.log(server)
-    } catch (e) {
-      console.log(e)
-    }
+    server = await index.server.setupAndStart(serverConfig, apiPath, serverHandlers)
     jest.clearAllMocks()
   })
 
