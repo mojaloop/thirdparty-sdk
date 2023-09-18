@@ -238,7 +238,7 @@ describe('PISP requests DFSP to validate user consentRequests for linking', (): 
   })
 
   describe('PISP Linking flow OTP - Error @ consent request stage', (): void => {
-    it('validateRequest should be errored', async (done): Promise<void> => {
+    it('validateRequest should be errored', async (): Promise<void> => {
       // ttk returns Error response for id 'd51ec534-ee48-4575-b6a9-ead2955b8069'
       const linkingRequestConsentRequest: OutboundAPI.Schemas.LinkingRequestConsentPostRequest = {
         ...mockData.linkingRequestConsentPostRequest.payload,
@@ -249,10 +249,10 @@ describe('PISP requests DFSP to validate user consentRequests for linking', (): 
         ...mockData.consentRequestsPutError.payload,
         currentState: 'errored'
       }
-      await axios.post(linkingRequestConsentURI, linkingRequestConsentRequest).catch((error) => {
+      await axios.post(linkingRequestConsentURI, linkingRequestConsentRequest).catch(async (error) => {
         expect(error.response.status).toEqual(500)
         expect(error.response.data).toEqual(expectedResponse)
-        done()
+        await new Promise(process.nextTick)
       })
     })
   })

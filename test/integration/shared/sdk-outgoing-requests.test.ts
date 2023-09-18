@@ -162,6 +162,7 @@ describe('SDKOutgoingRequests', () => {
         expect(result.transfer.headers).toBeDefined()
         expect(result.transfer.body.transferState).toEqual('COMMITTED')
         expect(result.currentState).toEqual('COMPLETED')
+        await new Promise(process.nextTick)
       }
     })
   })
