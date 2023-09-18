@@ -109,7 +109,7 @@ describe('StatePlugin', () => {
   it('should prepare WSO2Auth with outbound tlsCreds', async () => {
     const spyWSO2Auth = jest
       .spyOn(SDK, 'WSO2Auth')
-      .mockImplementationOnce(() => ({ Iam: 'mockedWSO2Auth' } as unknown as SDK.WSO2Auth))
+      .mockImplementationOnce(() => ({ Iam: 'mockedWSO2Auth' }) as unknown as SDK.WSO2Auth)
     config.outbound.tls.mutualTLS.enabled = true
     config.inbound.tls.creds = {
       ca: 'mocked inbound ca',

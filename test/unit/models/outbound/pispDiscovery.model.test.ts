@@ -24,7 +24,7 @@
  - Sridhar Voruganti - sridhar.voruganti@modusbox.com
  --------------
  ******/
- import { jest } from '@jest/globals'
+import { jest } from '@jest/globals'
 import { KVS } from '~/shared/kvs'
 import { Message, NotificationCallback, PubSub } from '~/shared/pub-sub'
 
