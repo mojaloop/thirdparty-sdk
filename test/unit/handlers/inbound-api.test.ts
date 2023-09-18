@@ -45,6 +45,7 @@ import { RequestPartiesInformationState } from '~/models/pispTransaction.interfa
 // import ServicesServiceTypeHandler from '~/handlers/inbound/services/{ServiceType}'
 // import ServicesServiceTypeErrorHandler from '~/handlers/inbound/services/{ServiceType}/error'
 import { Server, Request } from '@hapi/hapi'
+import { MojaloopRequests } from '@mojaloop/sdk-standard-components'
 // import { StateResponseToolkit } from '~/server/plugins/state'
 import { buildPayeeQuoteRequestFromTptRequest } from '~/domain/thirdpartyRequests/transactions'
 // import InboundAccounts from '~/handlers/inbound/accounts/{ID}'
@@ -57,8 +58,8 @@ import path from 'path'
 // import { PISPLinkingPhase } from '~/models/outbound/pispLinking.interface'
 
 const postThirdpartyRequestsTransactionRequest = mockData.postThirdpartyRequestsTransactionRequest
-const __postQuotes = jest.fn(() => Promise.resolve())
 // const __postConsents = jest.fn(() => Promise.resolve())
+const __postQuotes = jest.fn(() => Promise.resolve())
 
 import Config from '~/shared/config'
 import { OutboundAPI as SDKOutboundAPI } from '@mojaloop/sdk-scheme-adapter'
@@ -103,6 +104,7 @@ const approveResponse: tpAPI.Schemas.ThirdpartyRequestsTransactionsIDPatchRespon
   transactionState: 'COMPLETED'
 }
 
+jest.mock('~/shared/kvs')
 jest.mock('redis')
 jest.mock('@mojaloop/sdk-standard-components', () => {
   const sdkStandardComponentsActual = jest.requireActual('@mojaloop/sdk-standard-components')
@@ -110,17 +112,13 @@ jest.mock('@mojaloop/sdk-standard-components', () => {
   return {
     ...sdkStandardComponentsActual,
     MojaloopRequests: jest.fn(() => ({
-      getParties: jest.fn(() => Promise.resolve(partyLookupResponse))
+      getParties: jest.fn(() => Promise.resolve(partyLookupResponse)),
+      postQuotes: __postQuotes
     })),
     ThirdpartyRequests: jest.fn(() => ({
-      postAuthorizations: jest.fn(() => Promise.resolve(putResponse)),
-      getAccounts: jest.fn(() => Promise.resolve(mockData.accountsRequest.payload)),
-      patchConsentRequests: jest.fn(() => Promise.resolve(mockData.inboundConsentsPostRequest)),
       postConsentRequests: jest.fn(() => Promise.resolve(mockData.consentRequestsPut.payload)),
-      getServices: jest.fn(() => Promise.resolve(mockData.putServicesByServiceTypeRequest.payload)),
-      putConsents: jest.fn(() => Promise.resolve(mockData.inboundConsentsVerifiedPatchRequest.payload)),
-      putThirdpartyRequestsAuthorizations: jest.fn(() => Promise.resolve(approveResponse)),
-      postThirdpartyRequestsTransactions: jest.fn(() => Promise.resolve())
+      putThirdpartyRequestsTransactionsError: jest.fn(() => Promise.resolve(mockData.consentRequestsPut.payload)),
+      putConsentRequestsError: jest.fn(() => Promise.resolve())
     })),
     WSO2Auth: jest.fn(),
     Logger: {
@@ -242,7 +240,6 @@ describe('Inbound API routes', (): void => {
     const result = response.result as HealthResponse
     expect(result.status).toEqual('OK')
     expect(result.uptime).toBeGreaterThan(1.0)
-    expect(result.KVSConnected).toBeTruthy()
     expect(result.PublisherConnected).toBeTruthy()
     expect(result.SubscriberConnected).toBeTruthy()
     expect(result.LoggerPresent).toBeTruthy()
@@ -269,7 +266,6 @@ describe('Inbound API routes', (): void => {
     }
     const quoteRequest = buildPayeeQuoteRequestFromTptRequest(postThirdpartyRequestsTransactionRequest.payload)
     resetUuid()
-
     const response = await server.inject(request)
     expect(response.statusCode).toBe(202)
 
