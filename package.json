@@ -51,7 +51,7 @@
     "updates:check": "npm-check-updates",
     "updates:update": "npm-check-updates -u && npm install",
     "watch": "tsc -w",
-    "wait-4-docker": "node ./scripts/_wait4_all.js"
+    "wait-4-docker": "docker/wait4/wait4.js thirdparty-sdk"
   },
   "husky": {
     "hooks": {
