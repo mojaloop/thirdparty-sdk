@@ -10,9 +10,7 @@ services:
     build:
       context: ./
       dockerfile: ./Dockerfile
-    command: sh -c "/opt/thirdparty-sdk/wait4/wait4.js thirdparty-sdk && NODE_ENV=integration npm run start"
-    volumes:
-      - ./docker/wait4:/opt/thirdparty-sdk/wait4
+    command: sh -c "npm run wait-4-docker && NODE_ENV=integration npm run start"
     environment:
       - NODE_ENV=integration
       # - CONTROL_MGMT_API_WS_URL=172.17.0.1
