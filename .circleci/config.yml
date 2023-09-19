@@ -399,25 +399,29 @@ jobs:
       - store_test_results:
           path: ./test/results
 
-  test-functional:
-    executor: default-machine
-    environment:
-      <<: *defaults_environment
-      ML_CORE_TEST_HARNESS_DIR: /tmp/ml-core-test-harness
+  test-bdd:
+    executor: default-docker
     steps:
+      - run:
+          name: Install general dependencies
+          command: *defaults_Dependencies
       - checkout
-      - attach_workspace:
-          at: /tmp
       - run:
-          name: Load the pre-built docker image from workspace
-          command: docker load -i /tmp/docker-image.tar
+          <<: *defaults_configure_nvm
+      - restore_cache:
+          key: dependency-cache-{{ .Environment.CIRCLE_SHA1 }}
       - run:
-          name: Execute TTK functional tests
-          command: bash ./scripts/test-functional.sh
+          name: Execute unit tests
+          command: npm run test:bdd
+      - run:
+          name: prepare test/results
+          command: |
+            mkdir -p test/results
+            mv junit.xml test/results
       - store_artifacts:
-          path: /tmp/ml-core-test-harness/reports
-          destination: test
-
+          path: ./test/results
+      - store_test_results:
+          path: ./test/results
   vulnerability-check:
     executor: default-docker
     environment:
@@ -849,7 +853,7 @@ workflows:
               ignore:
                 - /feature*/
                 - /bugfix*/
-      - test-functional:
+      - test-bdd:
           context: org-global
           requires:
             - setup
@@ -913,7 +917,7 @@ workflows:
             - test-unit
             - test-coverage
             - test-integration
-            - test-functional
+            - test-bdd
             - vulnerability-check
             - audit-licenses
             - license-scan
@@ -941,7 +945,7 @@ workflows:
             - test-unit
             - test-coverage
             - test-integration
-            - test-functional
+            - test-bdd
             - vulnerability-check
             - audit-licenses
             - test-integration
@@ -962,7 +966,7 @@ workflows:
             - test-unit
             - test-coverage
             - test-integration
-            - test-functional
+            - test-bdd
             - vulnerability-check
             - audit-licenses
             - test-integration
