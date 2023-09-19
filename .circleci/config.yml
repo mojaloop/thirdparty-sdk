@@ -404,11 +404,12 @@ jobs:
     steps:
       - run:
           name: Install general dependencies
-          command: *defaults_Dependencies
+          command: *defaults_machine_Dependencies
       - checkout
       - run:
           <<: *defaults_configure_nvm
       - restore_cache:
+          name: Restore npm Package Cache
           key: dependency-cache-{{ .Environment.CIRCLE_SHA1 }}
       - run:
           name: Execute unit tests
