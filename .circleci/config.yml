@@ -378,9 +378,6 @@ jobs:
             # Set Node version to default (Note: this is needed on Ubuntu)
             nvm use default
 
-            # check service health
-            curl localhost:4005/health && \
-
             # run integration tests
             npm run wait-4-docker && npm run test:int | tee ./test/results/test-int.log
           environment:
