@@ -183,7 +183,7 @@
     "openapi-typescript": "^6.6.1",
     "prettier": "^3.0.3",
     "redis-mock": "0.52.0",
-    "release-please": "^15.13.0",
+    "release-please": "^16.0.0",
     "source-map-support": "0.5.21",
     "swagger-cli": "^4.0.4",
     "ts-jest": "29.1.1",
