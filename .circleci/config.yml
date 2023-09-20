@@ -32,21 +32,6 @@ defaults_docker_Dependencies: &defaults_docker_Dependencies |
 
 ## Default 'default-machine' executor dependencies
 defaults_machine_Dependencies: &defaults_machine_Dependencies |
-  ## Upgrade Docker
-  # Add Docker's official GPG key:
-  sudo apt-get update
-  sudo apt-get install ca-certificates curl gnupg
-  sudo install -m 0755 -d /etc/apt/keyrings
-  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-  sudo chmod a+r /etc/apt/keyrings/docker.gpg
-  # Add the repository to Apt sources:
-  echo \
-    "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-    "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
-    sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-  sudo apt-get update
-  sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-
   ## Add Package Repos
   ## Ref: https://docs.confluent.io/platform/current/installation/installing_cp/deb-ubuntu.html#get-the-software
   wget -qO - https://packages.confluent.io/deb/7.4/archive.key | sudo apt-key add -
@@ -159,7 +144,6 @@ defaults_display_versions: &defaults_display_versions
     echo "yarn: $(yarn --version)"
     echo "npm: $(npm --version)"
     echo "nvm: $(nvm --version)"
-    echo "docker: $(docker -v)"
 
 defaults_environment: &defaults_environment
   ## env var for nx to set main branch
@@ -393,6 +377,9 @@ jobs:
           command: |
             # Set Node version to default (Note: this is needed on Ubuntu)
             nvm use default
+
+            # check service health
+            curl localhost:4005/health && \
 
             # run integration tests
             npm run wait-4-docker && npm run test:int | tee ./test/results/test-int.log
