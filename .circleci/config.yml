@@ -373,13 +373,25 @@ jobs:
             # Check straight away to see if any containers have exited
             docker-compose ps
       - run:
-          name: Execute Integration Tests
+          name: Wait for Health Services
           command: |
             # Set Node version to default (Note: this is needed on Ubuntu)
             nvm use default
 
+            # wait for services to be up and running
+            npm run wait-4-docker
+      - run:
+          name: Execute Integration Tests
+          command: |
+            # Set Node version to default (Note: this is needed on Ubuntu)
+            nvm use default
+xn
+            # check service health
+            curl -v localhost:4005/health && \
+            curl -v localhost:4006/health && \
+
             # run integration tests
-            npm run wait-4-docker && npm run test:integration | tee ./test/results/test-int.log
+            npm run test:integration | tee ./test/results/test-int.log
           environment:
             ENDPOINT_URL: http://localhost:4545/notification
       - store_artifacts:
