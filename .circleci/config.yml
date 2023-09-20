@@ -368,6 +368,7 @@ jobs:
       - run:
           name: Start docker-compose
           command: |
+            docker-compose -v && docker -v
             docker-compose up -d
 
             # Check straight away to see if any containers have exited
