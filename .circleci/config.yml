@@ -385,7 +385,7 @@ jobs:
           command: |
             # Set Node version to default (Note: this is needed on Ubuntu)
             nvm use default
-xn
+
             # check service health
             curl -v localhost:4005/health && \
             curl -v localhost:4006/health && \
