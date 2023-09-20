@@ -390,6 +390,9 @@ jobs:
             curl -v localhost:4005/health && \
             curl -v localhost:4006/health && \
 
+            # Setup Redis host
+            echo '127.0.0.1  redis' | sudo tee -a /etc/hosts
+
             # run integration tests
             npm run test:integration | tee ./test/results/test-int.log
           environment:
