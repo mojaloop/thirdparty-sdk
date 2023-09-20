@@ -40,6 +40,10 @@ defaults_machine_Dependencies: &defaults_machine_Dependencies |
   ## Install deps
   sudo apt install -y librdkafka-dev curl bash
 
+  ## Update Docker
+  sudo apt-get update
+  sudo apt-get upgrade docker-ce
+
 defaults_awsCliDependencies: &defaults_awsCliDependencies |
     apk --no-cache add aws-cli
 
