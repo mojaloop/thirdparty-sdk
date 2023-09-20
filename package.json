@@ -131,7 +131,7 @@
     "redis": "3.1.2",
     "typescript": "5.2.2",
     "uuid": "^9.0.1",
-    "ws": "^8.14.1"
+    "ws": "^8.14.2"
   },
   "@comment devDependencies": [
     "Caution advised in upgrading redis-mock past 0.52.0. Investigation needed."
