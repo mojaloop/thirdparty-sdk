@@ -379,7 +379,7 @@ jobs:
             nvm use default
 
             # run integration tests
-            npm run wait-4-docker && npm run test:int | tee ./test/results/test-int.log
+            npm run wait-4-docker && npm run test:integration | tee ./test/results/test-int.log
           environment:
             ENDPOINT_URL: http://localhost:4545/notification
       - store_artifacts:
