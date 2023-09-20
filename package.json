@@ -86,7 +86,7 @@
   "bugs": {
     "url": "https://github.com/mojaloop/thirdparty-sdk/issues"
   },
-  "homepage": "https://github.com/mojaloop/thirdpartyscheme-adapter#readme",
+  "homepage": "https://github.com/mojaloop/thirdparty-sdk#readme",
   "@comment dependencies": [
     "koa2-oauth-server is an old unmaintained repo. It uses the now unsupported git protocol.",
     "Please see https://github.blog/2021-09-01-improving-git-protocol-security-github/ for more information.",
