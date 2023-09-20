@@ -6,13 +6,13 @@ networks:
 
 services:
   thirdparty-sdk:
+    image: mojaloop/thirdparty-sdk:local
     container_name: thirdparty-sdk
     build:
-      context: ./
+      context: .
       dockerfile: ./Dockerfile
       cache_from:
-        - mojaloop/thirdparty-sdk:local
-        - thirdparty-sdk
+        - mojaloop/thirdparty-sdk
     command: sh -c "docker/wait4/wait4.js thirdparty-sdk && NODE_ENV=integration npm run start"
     environment:
       - NODE_ENV=integration
