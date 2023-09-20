@@ -9,11 +9,7 @@ const { execSync } = require('child_process')
 
 // Define the docker-compose containers you want to monitor here
 const expectedContainers = [
-  'redis',
-  'sdk-scheme-adapter',
   'thirdparty-sdk',
-  'mongo',
-  'pisp-simulator'
   // ## NOTE: These are not needed for Integration Tests
   // 'kowl'
 ]
