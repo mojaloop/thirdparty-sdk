@@ -32,6 +32,10 @@ defaults_docker_Dependencies: &defaults_docker_Dependencies |
 
 ## Default 'default-machine' executor dependencies
 defaults_machine_Dependencies: &defaults_machine_Dependencies |
+  ## Update Docker
+  sudo apt-get update
+  sudo apt-get upgrade docker-ce
+
   ## Add Package Repos
   ## Ref: https://docs.confluent.io/platform/current/installation/installing_cp/deb-ubuntu.html#get-the-software
   wget -qO - https://packages.confluent.io/deb/7.4/archive.key | sudo apt-key add -
@@ -39,10 +43,6 @@ defaults_machine_Dependencies: &defaults_machine_Dependencies |
 
   ## Install deps
   sudo apt install -y librdkafka-dev curl bash
-
-  ## Update Docker
-  sudo apt-get update
-  sudo apt-get upgrade docker-ce
 
 defaults_awsCliDependencies: &defaults_awsCliDependencies |
     apk --no-cache add aws-cli
