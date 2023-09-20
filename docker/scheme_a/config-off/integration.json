@@ -17,7 +17,7 @@
   },
   "REDIS": {
     "PORT": 6379,
-    "HOST": "redis",
+    "HOST": "0.0.0.0",
     "TIMEOUT": 100
   },
   "INSPECT": {
