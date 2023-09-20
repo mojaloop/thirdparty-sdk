@@ -32,14 +32,20 @@ defaults_docker_Dependencies: &defaults_docker_Dependencies |
 
 ## Default 'default-machine' executor dependencies
 defaults_machine_Dependencies: &defaults_machine_Dependencies |
-  ## Update Docker
-  sudo apt remove docker docker-engine docker.io
-  sudo apt install apt-transport-https ca-certificates curl software-properties-common
-  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-  sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-  sudo apt update
-  sudo apt install docker-ce
-  docker --version
+  ## Upgrade Docker
+  # Add Docker's official GPG key:
+  sudo apt-get update
+  sudo apt-get install ca-certificates curl gnupg
+  sudo install -m 0755 -d /etc/apt/keyrings
+  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+  sudo chmod a+r /etc/apt/keyrings/docker.gpg
+  # Add the repository to Apt sources:
+  echo \
+    "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+    "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+    sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+  sudo apt-get update
+  sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
   ## Add Package Repos
   ## Ref: https://docs.confluent.io/platform/current/installation/installing_cp/deb-ubuntu.html#get-the-software
@@ -153,6 +159,7 @@ defaults_display_versions: &defaults_display_versions
     echo "yarn: $(yarn --version)"
     echo "npm: $(npm --version)"
     echo "nvm: $(nvm --version)"
+    echo "docker: $(docker -v)"
 
 defaults_environment: &defaults_environment
   ## env var for nx to set main branch
@@ -377,7 +384,6 @@ jobs:
       - run:
           name: Start docker-compose
           command: |
-            docker-compose -v && docker -v
             docker-compose up -d
 
             # Check straight away to see if any containers have exited
