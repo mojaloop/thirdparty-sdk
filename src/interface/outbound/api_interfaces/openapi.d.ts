@@ -3,38 +3,61 @@
  * Do not make direct changes to the file.
  */
 
+
 export interface paths {
   "/health": {
-    /** The HTTP request GET /health is used to return the current status of the API. */
+    /**
+     * Health check endpoint
+     * @description The HTTP request GET /health is used to return the current status of the API.
+     */
     get: operations["HealthGet"];
   };
   "/metrics": {
-    /** The HTTP request GET /metrics is used to return metrics for the API. */
+    /**
+     * Prometheus metrics endpoint
+     * @description The HTTP request GET /metrics is used to return metrics for the API.
+     */
     get: operations["MetricsGet"];
   };
   "/thirdpartyTransaction/partyLookup": {
-    /** The HTTP request `POST /thirdpartyTransaction/partyLookup` is used to lookup information regarding the requested Party, defined by `Type`, `ID` and optionally `SubId`. */
+    /**
+     * Thirdparty transaction party lookup.
+     * @description The HTTP request `POST /thirdpartyTransaction/partyLookup` is used to lookup information regarding the requested Party, defined by `Type`, `ID` and optionally `SubId`.
+     */
     post: operations["ThirdpartyTransactionPartyLookup"];
   };
   "/thirdpartyTransaction/{ID}/initiate": {
-    /** The HTTP request `POST /thirdpartyTransaction/{ID}/initiate` is sent to the Switch to initiate a third party request transaction. */
+    /**
+     * Initiates a third party transaction.
+     * @description The HTTP request `POST /thirdpartyTransaction/{ID}/initiate` is sent to the Switch to initiate a third party request transaction.
+     */
     post: operations["ThirdpartyTransactionIDInitiate"];
   };
   "/thirdpartyTransaction/{ID}/approve": {
-    /** The HTTP request `POST /thirdpartyTransaction/{ID}/approve` is used to approve a third party transaction . */
+    /**
+     * Approve a third party transaction.
+     * @description The HTTP request `POST /thirdpartyTransaction/{ID}/approve` is used to approve a third party transaction .
+     */
     post: operations["ThirdpartyTransactionIDApprove"];
   };
   "/linking/providers": {
-    /** The HTTP request `GET /linking/providers` is used to retrieve a list of thirdparty enabled DFSP identifiers. */
+    /**
+     * GetLinkingProviders
+     * @description The HTTP request `GET /linking/providers` is used to retrieve a list of thirdparty enabled DFSP identifiers.
+     */
     get: operations["GetLinkingProviders"];
   };
   "/linking/accounts/{fspId}/{userId}": {
-    /** The HTTP request `GET /linking/accounts/{fspId}/{userId}` is used to retrieve the list of potential accounts available for linking. */
+    /**
+     * GetLinkingAccountsByUserId
+     * @description The HTTP request `GET /linking/accounts/{fspId}/{userId}` is used to retrieve the list of potential accounts available for linking.
+     */
     get: operations["GetLinkingAccountsByUserId"];
   };
   "/linking/request-consent": {
     /**
-     * The HTTP request `POST /linking/request-consent` is used to by a PISP to ask
+     * PostLinkingRequestConsent
+     * @description The HTTP request `POST /linking/request-consent` is used to by a PISP to ask
      * a specific DFSP to start the process of establishing consent between three parties.
      *
      * - The PISP
@@ -45,19 +68,23 @@ export interface paths {
   };
   "/linking/request-consent/{ID}/authenticate": {
     /**
-     * Used in the authentication phase of account linking.
+     * Outbound PATCH /linking/request-consent/{ID}/authenticate endpoint
+     * @description Used in the authentication phase of account linking.
      * Used by the PISP to pass an Auth token on behalf of the user to the DFSP to establish a chain of trust.
      */
     patch: operations["PatchLinkingRequestConsentIDAuthenticate"];
   };
   "/linking/request-consent/{ID}/pass-credential": {
     /**
-     * Used in the credential registration phase of account linking.
+     * Outbound POST /linking/request-consent/{ID}/pass-credential endpoint
+     * @description Used in the credential registration phase of account linking.
      * Used by the PISP to pass an credential on behalf of the user to the DFSP.
      */
     post: operations["PostLinkingRequestConsentIDPassCredential"];
   };
 }
+
+export type webhooks = Record<string, never>;
 
 export interface components {
   schemas: {
@@ -163,17 +190,7 @@ export interface components {
      * @example PERSONAL_ID
      * @enum {string}
      */
-    PartyIdType:
-      | "MSISDN"
-      | "EMAIL"
-      | "PERSONAL_ID"
-      | "BUSINESS"
-      | "DEVICE"
-      | "ACCOUNT_ID"
-      | "IBAN"
-      | "ALIAS"
-      | "CONSENT"
-      | "THIRD_PARTY_LINK";
+    PartyIdType: "MSISDN" | "EMAIL" | "PERSONAL_ID" | "BUSINESS" | "DEVICE" | "ACCOUNT_ID" | "IBAN" | "ALIAS" | "CONSENT" | "THIRD_PARTY_LINK";
     /**
      * PartyIdentifier
      * @description Identifier of the Party.
@@ -217,11 +234,7 @@ export interface components {
      * @description state of thirdparty transaction partyLookup phase
      * @enum {string}
      */
-    ThirdpartyTransactionPartyLookupState:
-      | "start"
-      | "partyLookupSuccess"
-      | "partyLookupFailure"
-      | "errored";
+    ThirdpartyTransactionPartyLookupState: "start" | "partyLookupSuccess" | "partyLookupFailure" | "errored";
     /** ThirdpartyTransactionPartyLookupResponseError */
     ThirdpartyTransactionPartyLookupResponseError: {
       currentState: components["schemas"]["ThirdpartyTransactionPartyLookupState"];
@@ -288,9 +301,7 @@ export interface components {
         personalInfo?: components["schemas"]["PartyPersonalInfo"];
       };
     };
-    ThirdpartyTransactionPartyLookupResponse:
-      | components["schemas"]["ThirdpartyTransactionPartyLookupResponseError"]
-      | components["schemas"]["ThirdpartyTransactionPartyLookupResponseSuccess"];
+    ThirdpartyTransactionPartyLookupResponse: components["schemas"]["ThirdpartyTransactionPartyLookupResponseError"] | components["schemas"]["ThirdpartyTransactionPartyLookupResponseSuccess"];
     /**
      * Party
      * @description Data model for the complex type Party.
@@ -334,171 +345,7 @@ export interface components {
      * @description The currency codes defined in [ISO 4217](https://www.iso.org/iso-4217-currency-codes.html) as three-letter alphabetic codes are used as the standard naming representation for currencies.
      * @enum {string}
      */
-    Currency:
-      | "AED"
-      | "AFN"
-      | "ALL"
-      | "AMD"
-      | "ANG"
-      | "AOA"
-      | "ARS"
-      | "AUD"
-      | "AWG"
-      | "AZN"
-      | "BAM"
-      | "BBD"
-      | "BDT"
-      | "BGN"
-      | "BHD"
-      | "BIF"
-      | "BMD"
-      | "BND"
-      | "BOB"
-      | "BRL"
-      | "BSD"
-      | "BTN"
-      | "BWP"
-      | "BYN"
-      | "BZD"
-      | "CAD"
-      | "CDF"
-      | "CHF"
-      | "CLP"
-      | "CNY"
-      | "COP"
-      | "CRC"
-      | "CUC"
-      | "CUP"
-      | "CVE"
-      | "CZK"
-      | "DJF"
-      | "DKK"
-      | "DOP"
-      | "DZD"
-      | "EGP"
-      | "ERN"
-      | "ETB"
-      | "EUR"
-      | "FJD"
-      | "FKP"
-      | "GBP"
-      | "GEL"
-      | "GGP"
-      | "GHS"
-      | "GIP"
-      | "GMD"
-      | "GNF"
-      | "GTQ"
-      | "GYD"
-      | "HKD"
-      | "HNL"
-      | "HRK"
-      | "HTG"
-      | "HUF"
-      | "IDR"
-      | "ILS"
-      | "IMP"
-      | "INR"
-      | "IQD"
-      | "IRR"
-      | "ISK"
-      | "JEP"
-      | "JMD"
-      | "JOD"
-      | "JPY"
-      | "KES"
-      | "KGS"
-      | "KHR"
-      | "KMF"
-      | "KPW"
-      | "KRW"
-      | "KWD"
-      | "KYD"
-      | "KZT"
-      | "LAK"
-      | "LBP"
-      | "LKR"
-      | "LRD"
-      | "LSL"
-      | "LYD"
-      | "MAD"
-      | "MDL"
-      | "MGA"
-      | "MKD"
-      | "MMK"
-      | "MNT"
-      | "MOP"
-      | "MRO"
-      | "MUR"
-      | "MVR"
-      | "MWK"
-      | "MXN"
-      | "MYR"
-      | "MZN"
-      | "NAD"
-      | "NGN"
-      | "NIO"
-      | "NOK"
-      | "NPR"
-      | "NZD"
-      | "OMR"
-      | "PAB"
-      | "PEN"
-      | "PGK"
-      | "PHP"
-      | "PKR"
-      | "PLN"
-      | "PYG"
-      | "QAR"
-      | "RON"
-      | "RSD"
-      | "RUB"
-      | "RWF"
-      | "SAR"
-      | "SBD"
-      | "SCR"
-      | "SDG"
-      | "SEK"
-      | "SGD"
-      | "SHP"
-      | "SLL"
-      | "SOS"
-      | "SPL"
-      | "SRD"
-      | "STD"
-      | "SVC"
-      | "SYP"
-      | "SZL"
-      | "THB"
-      | "TJS"
-      | "TMT"
-      | "TND"
-      | "TOP"
-      | "TRY"
-      | "TTD"
-      | "TVD"
-      | "TWD"
-      | "TZS"
-      | "UAH"
-      | "UGX"
-      | "USD"
-      | "UYU"
-      | "UZS"
-      | "VEF"
-      | "VND"
-      | "VUV"
-      | "WST"
-      | "XAF"
-      | "XCD"
-      | "XDR"
-      | "XOF"
-      | "XPF"
-      | "XTS"
-      | "XXX"
-      | "YER"
-      | "ZAR"
-      | "ZMW"
-      | "ZWD";
+    Currency: "AED" | "AFN" | "ALL" | "AMD" | "ANG" | "AOA" | "ARS" | "AUD" | "AWG" | "AZN" | "BAM" | "BBD" | "BDT" | "BGN" | "BHD" | "BIF" | "BMD" | "BND" | "BOB" | "BRL" | "BSD" | "BTN" | "BWP" | "BYN" | "BZD" | "CAD" | "CDF" | "CHF" | "CLP" | "CNY" | "COP" | "CRC" | "CUC" | "CUP" | "CVE" | "CZK" | "DJF" | "DKK" | "DOP" | "DZD" | "EGP" | "ERN" | "ETB" | "EUR" | "FJD" | "FKP" | "GBP" | "GEL" | "GGP" | "GHS" | "GIP" | "GMD" | "GNF" | "GTQ" | "GYD" | "HKD" | "HNL" | "HRK" | "HTG" | "HUF" | "IDR" | "ILS" | "IMP" | "INR" | "IQD" | "IRR" | "ISK" | "JEP" | "JMD" | "JOD" | "JPY" | "KES" | "KGS" | "KHR" | "KMF" | "KPW" | "KRW" | "KWD" | "KYD" | "KZT" | "LAK" | "LBP" | "LKR" | "LRD" | "LSL" | "LYD" | "MAD" | "MDL" | "MGA" | "MKD" | "MMK" | "MNT" | "MOP" | "MRO" | "MUR" | "MVR" | "MWK" | "MXN" | "MYR" | "MZN" | "NAD" | "NGN" | "NIO" | "NOK" | "NPR" | "NZD" | "OMR" | "PAB" | "PEN" | "PGK" | "PHP" | "PKR" | "PLN" | "PYG" | "QAR" | "RON" | "RSD" | "RUB" | "RWF" | "SAR" | "SBD" | "SCR" | "SDG" | "SEK" | "SGD" | "SHP" | "SLL" | "SOS" | "SPL" | "SRD" | "STD" | "SVC" | "SYP" | "SZL" | "THB" | "TJS" | "TMT" | "TND" | "TOP" | "TRY" | "TTD" | "TVD" | "TWD" | "TZS" | "UAH" | "UGX" | "USD" | "UYU" | "UZS" | "VEF" | "VND" | "VUV" | "WST" | "XAF" | "XCD" | "XDR" | "XOF" | "XPF" | "XTS" | "XXX" | "YER" | "ZAR" | "ZMW" | "ZWD";
     /**
      * Amount
      * @description The API data type Amount is a JSON String in a canonical format that is restricted by a regular expression for interoperability reasons. This pattern does not allow any trailing zeroes at all, but allows an amount without a minor currency unit. It also only allows four digits in the minor currency unit; a negative value is not allowed. Using more than 18 digits in the major currency unit is not allowed.
@@ -524,12 +371,7 @@ export interface components {
      * @example DEPOSIT
      * @enum {string}
      */
-    TransactionScenario:
-      | "DEPOSIT"
-      | "WITHDRAWAL"
-      | "TRANSFER"
-      | "PAYMENT"
-      | "REFUND";
+    TransactionScenario: "DEPOSIT" | "WITHDRAWAL" | "TRANSFER" | "PAYMENT" | "REFUND";
     /**
      * TransactionSubScenario
      * @description Possible sub-scenario, defined locally within the scheme (UndefinedEnum Type).
@@ -606,10 +448,7 @@ export interface components {
      * @description state of thirdparty transaction for initiate phase
      * @enum {string}
      */
-    ThirdpartyTransactionIDInitiateState:
-      | "partyLookupSuccess"
-      | "authorizationReceived"
-      | "errored";
+    ThirdpartyTransactionIDInitiateState: "partyLookupSuccess" | "authorizationReceived" | "errored";
     /** ThirdpartyTransactionIDInitateResponseError */
     ThirdpartyTransactionIDInitiateResponseError: {
       currentState: components["schemas"]["ThirdpartyTransactionIDInitiateState"];
@@ -627,7 +466,7 @@ export interface components {
      * The HTTP request POST /thirdpartyRequests/authorizations is used to request the validation by a customer for the transfer described in the request.
      * Callback and data model information for POST /thirdpartyRequests/authorizations:
      * Callback - PUT /thirdpartyRequests/authorizations/{ID} Error Callback - PUT /thirdpartyRequests/authorizations/{ID}/error Data Model - See below url
-     * https://github.com/mojaloop/documentation/blob/master/website/versioned_docs/v1.0.1/api/thirdparty/data-models.md#31612-post-thirdpartyrequestsauthorizations
+     * https://github.com/mojaloop/documentation/blob/main/website/versioned_docs/v1.0.1/api/thirdparty/data-models.md#31612-post-thirdpartyrequestsauthorizations
      */
     ThirdpartyRequestsAuthorizationsPostRequest: {
       authorizationRequestId: components["schemas"]["CorrelationId"];
@@ -654,9 +493,7 @@ export interface components {
       currentState: components["schemas"]["ThirdpartyTransactionIDInitiateState"];
       authorization: components["schemas"]["ThirdpartyRequestsAuthorizationsPostRequest"];
     };
-    ThirdpartyTransactionIDInitiateResponse:
-      | components["schemas"]["ThirdpartyTransactionIDInitiateResponseError"]
-      | components["schemas"]["ThirdpartyTransactionIDInitiateResponseSuccess"];
+    ThirdpartyTransactionIDInitiateResponse: components["schemas"]["ThirdpartyTransactionIDInitiateResponseError"] | components["schemas"]["ThirdpartyTransactionIDInitiateResponseSuccess"];
     /**
      * AuthorizationResponseType
      * @description The customer accepted the terms of the transfer
@@ -701,7 +538,7 @@ export interface components {
      * Javascript ArrayBuffer.
      * For this API, we represent ArrayBuffers as base64 encoded utf-8 strings.
      *
-     * https://github.com/mojaloop/documentation/blob/master/website/versioned_docs/v1.0.1/api/thirdparty/data-models.md#32128-fidopublickeycredentialassertion
+     * https://github.com/mojaloop/documentation/blob/main/website/versioned_docs/v1.0.1/api/thirdparty/data-models.md#32128-fidopublickeycredentialassertion
      */
     FIDOPublicKeyCredentialAssertion: {
       /**
@@ -747,19 +584,14 @@ export interface components {
     };
     /** ThirdpartyTransactionIDApproveRequest */
     ThirdpartyTransactionIDApproveRequest: {
-      authorizationResponse:
-        | components["schemas"]["ThirdpartyRequestsAuthorizationsIDPutResponseGeneric"]
-        | components["schemas"]["ThirdpartyRequestsAuthorizationsIDPutResponseFIDO"];
+      authorizationResponse: components["schemas"]["ThirdpartyRequestsAuthorizationsIDPutResponseGeneric"] | components["schemas"]["ThirdpartyRequestsAuthorizationsIDPutResponseFIDO"];
     };
     /**
      * ThirdpartyTransactionIDApproveState
      * @description state of thirdparty transaction
      * @enum {string}
      */
-    ThirdpartyTransactionIDApproveState:
-      | "authorizationReceived"
-      | "transactionStatusReceived"
-      | "errored";
+    ThirdpartyTransactionIDApproveState: "authorizationReceived" | "transactionStatusReceived" | "errored";
     /** ThirdpartyTransactionIDApproveResponseError */
     ThirdpartyTransactionIDApproveResponseError: {
       currentState: components["schemas"]["ThirdpartyTransactionIDApproveState"];
@@ -783,9 +615,7 @@ export interface components {
       };
       currentState: components["schemas"]["ThirdpartyTransactionIDApproveState"];
     };
-    ThirdpartyTransactionIDApproveResponse:
-      | components["schemas"]["ThirdpartyTransactionIDApproveResponseError"]
-      | components["schemas"]["ThirdpartyTransactionIDApproveResponseSuccess"];
+    ThirdpartyTransactionIDApproveResponse: components["schemas"]["ThirdpartyTransactionIDApproveResponseError"] | components["schemas"]["ThirdpartyTransactionIDApproveResponseSuccess"];
     /**
      * LinkingProvidersState
      * @description State of GET /linking/providers request
@@ -802,9 +632,7 @@ export interface components {
       providers: components["schemas"]["FspId"][];
       currentState: components["schemas"]["LinkingProvidersState"];
     };
-    LinkingProvidersResponse:
-      | components["schemas"]["LinkingProvidersResponseError"]
-      | components["schemas"]["LinkingProvidersResponseSuccess"];
+    LinkingProvidersResponse: components["schemas"]["LinkingProvidersResponseError"] | components["schemas"]["LinkingProvidersResponseSuccess"];
     /**
      * AccountAddress
      * @description The AccountAddress data type is a variable length string with a maximum size of 1023 characters and consists of:
@@ -812,7 +640,7 @@ export interface components {
      * - Underscore (_) - Tilde (~) - Hyphen (-) - Period (.) Addresses MUST NOT end in a period (.) character
      * An entity providing accounts to parties (i.e. a participant) can provide any value for an AccountAddress that is meaningful to that entity. It does not need to provide an address that makes the account identifiable outside the entity's domain.
      * IMPORTANT: The policy for defining addresses and the life-cycle of these is at the discretion of the address space owner (the payer DFSP in this case).
-     * https://github.com/mojaloop/documentation/blob/master/website/versioned_docs/v1.0.1/api/thirdparty/data-models.md#3212-accountaddress
+     * https://github.com/mojaloop/documentation/blob/main/website/versioned_docs/v1.0.1/api/thirdparty/data-models.md#3212-accountaddress
      */
     AccountAddress: string;
     /**
@@ -827,7 +655,7 @@ export interface components {
     /**
      * Account
      * @description Data model for the complex type Account.
-     * https://github.com/mojaloop/documentation/blob/master/website/versioned_docs/v1.0.1/api/thirdparty/data-models.md#3211-account
+     * https://github.com/mojaloop/documentation/blob/main/website/versioned_docs/v1.0.1/api/thirdparty/data-models.md#3211-account
      */
     Account: {
       accountNickname: components["schemas"]["Name"];
@@ -837,7 +665,7 @@ export interface components {
     /**
      * AccountList
      * @description The AccountList data model is used to hold information about the accounts that a party controls.
-     * https://github.com/mojaloop/documentation/blob/master/website/versioned_docs/v1.0.1/api/thirdparty/data-models.md#3213-accountlist
+     * https://github.com/mojaloop/documentation/blob/main/website/versioned_docs/v1.0.1/api/thirdparty/data-models.md#3213-accountlist
      */
     AccountList: components["schemas"]["Account"][];
     /**
@@ -845,7 +673,7 @@ export interface components {
      * @description Callback and data model information for GET /accounts/{ID}:
      * Callback - PUT /accounts/{ID} Error Callback - PUT /accounts/{ID}/error Data Model - Empty body
      * The PUT /accounts/{ID} response is used to inform the requester of the result of a request for accounts information. The identifier ID given in the call are the values given in the original request.
-     * https://github.com/mojaloop/documentation/blob/master/website/versioned_docs/v1.0.1/api/thirdparty/data-models.md#31121--put-accountsid
+     * https://github.com/mojaloop/documentation/blob/main/website/versioned_docs/v1.0.1/api/thirdparty/data-models.md#31121--put-accountsid
      */
     AccountsIDPutResponse: {
       accounts: components["schemas"]["AccountList"];
@@ -863,10 +691,7 @@ export interface components {
      *
      * @enum {string}
      */
-    ScopeAction:
-      | "ACCOUNTS_GET_BALANCE"
-      | "ACCOUNTS_TRANSFER"
-      | "ACCOUNTS_STATEMENT";
+    ScopeAction: "ACCOUNTS_GET_BALANCE" | "ACCOUNTS_TRANSFER" | "ACCOUNTS_STATEMENT";
     /**
      * LinkingRequestConsentPostRequest
      * @description The object sent in a `POST /linking/request-consent` request.
@@ -886,12 +711,7 @@ export interface components {
      * @description State of `POST /linking/request-consent` request
      * @enum {string}
      */
-    LinkingRequestConsentState:
-      | "start"
-      | "errored"
-      | "success"
-      | "OTPAuthenticationChannelResponseReceived"
-      | "WebAuthenticationChannelResponseReceived";
+    LinkingRequestConsentState: "start" | "errored" | "success" | "OTPAuthenticationChannelResponseReceived" | "WebAuthenticationChannelResponseReceived";
     /** LinkingRequestConsentResponseError */
     LinkingRequestConsentResponseError: {
       errorInformation: components["schemas"]["ErrorInformation"];
@@ -900,7 +720,7 @@ export interface components {
     /**
      * Scope
      * @description The Scope element contains an identifier defining, in the terms of a DFSP, an account on which access types can be requested or granted. It also defines the access types which are requested or granted.
-     * https://github.com/mojaloop/documentation/blob/master/website/versioned_docs/v1.0.1/api/thirdparty/data-models.md#32121-scope
+     * https://github.com/mojaloop/documentation/blob/main/website/versioned_docs/v1.0.1/api/thirdparty/data-models.md#32121-scope
      */
     Scope: {
       address: components["schemas"]["AccountAddress"];
@@ -955,14 +775,10 @@ export interface components {
     };
     /** LinkingRequestConsentResponseSuccess */
     LinkingRequestConsentResponseSuccess: {
-      channelResponse:
-        | components["schemas"]["ConsentRequestsIDPutResponseWeb"]
-        | components["schemas"]["ConsentRequestsIDPutResponseOTP"];
+      channelResponse: components["schemas"]["ConsentRequestsIDPutResponseWeb"] | components["schemas"]["ConsentRequestsIDPutResponseOTP"];
       currentState: components["schemas"]["LinkingRequestConsentState"];
     };
-    LinkingRequestConsentResponse:
-      | components["schemas"]["LinkingRequestConsentResponseError"]
-      | components["schemas"]["LinkingRequestConsentResponseSuccess"];
+    LinkingRequestConsentResponse: components["schemas"]["LinkingRequestConsentResponseError"] | components["schemas"]["LinkingRequestConsentResponseSuccess"];
     /**
      * LinkingRequestConsentIDAuthenticateRequest
      * @description PATCH /linking/request-consent/{ID}/authenticate Request object
@@ -975,9 +791,7 @@ export interface components {
      * @description State of PATCH linking request consent Authenticate
      * @enum {string}
      */
-    LinkingRequestConsentIDAuthenticateState:
-      | "errored"
-      | "consentReceivedAwaitingCredential";
+    LinkingRequestConsentIDAuthenticateState: "errored" | "consentReceivedAwaitingCredential";
     /** LinkingRequestConsentIDAuthenticateResponseError */
     LinkingRequestConsentIDAuthenticateResponseError: {
       errorInformation: components["schemas"]["ErrorInformation"];
@@ -1014,9 +828,7 @@ export interface components {
       challenge: string;
       currentState: components["schemas"]["LinkingRequestConsentIDAuthenticateState"];
     };
-    LinkingRequestConsentIDAuthenticateResponse:
-      | components["schemas"]["LinkingRequestConsentIDAuthenticateResponseError"]
-      | components["schemas"]["LinkingRequestConsentIDAuthenticateResponseSuccess"];
+    LinkingRequestConsentIDAuthenticateResponse: components["schemas"]["LinkingRequestConsentIDAuthenticateResponseError"] | components["schemas"]["LinkingRequestConsentIDAuthenticateResponseSuccess"];
     /**
      * FIDOPublicKeyCredentialAttestation
      * @description A data model representing a FIDO Attestation result. Derived from
@@ -1082,95 +894,119 @@ export interface components {
       };
       currentState: components["schemas"]["LinkingRequestConsentIDPassCredentialState"];
     };
-    LinkingRequestConsentIDPassCredentialResponse:
-      | components["schemas"]["LinkingRequestConsentIDPassCredentialResponseError"]
-      | components["schemas"]["LinkingRequestConsentIDPassCredentialResponseSuccess"];
+    LinkingRequestConsentIDPassCredentialResponse: components["schemas"]["LinkingRequestConsentIDPassCredentialResponseError"] | components["schemas"]["LinkingRequestConsentIDPassCredentialResponseSuccess"];
   };
   responses: {
-    /** OK */
-    200: unknown;
-    /** Bad Request */
+    /** @description OK */
+    200: {
+      content: never;
+    };
+    /** @description Bad Request */
     400: {
-      headers: {};
+      headers: {
+        "Content-Length": components["headers"]["Content-Length"];
+        "Content-Type": components["headers"]["Content-Type"];
+      };
       content: {
         "application/json": components["schemas"]["ErrorInformationResponse"];
       };
     };
-    /** Unauthorized */
+    /** @description Unauthorized */
     401: {
-      headers: {};
+      headers: {
+        "Content-Length": components["headers"]["Content-Length"];
+        "Content-Type": components["headers"]["Content-Type"];
+      };
       content: {
         "application/json": components["schemas"]["ErrorInformationResponse"];
       };
     };
-    /** Forbidden */
+    /** @description Forbidden */
     403: {
-      headers: {};
+      headers: {
+        "Content-Length": components["headers"]["Content-Length"];
+        "Content-Type": components["headers"]["Content-Type"];
+      };
       content: {
         "application/json": components["schemas"]["ErrorInformationResponse"];
       };
     };
-    /** Not Found */
+    /** @description Not Found */
     404: {
-      headers: {};
+      headers: {
+        "Content-Length": components["headers"]["Content-Length"];
+        "Content-Type": components["headers"]["Content-Type"];
+      };
       content: {
         "application/json": components["schemas"]["ErrorInformationResponse"];
       };
     };
-    /** Method Not Allowed */
+    /** @description Method Not Allowed */
     405: {
-      headers: {};
+      headers: {
+        "Content-Length": components["headers"]["Content-Length"];
+        "Content-Type": components["headers"]["Content-Type"];
+      };
       content: {
         "application/json": components["schemas"]["ErrorInformationResponse"];
       };
     };
-    /** Not Acceptable */
+    /** @description Not Acceptable */
     406: {
-      headers: {};
+      headers: {
+        "Content-Length": components["headers"]["Content-Length"];
+        "Content-Type": components["headers"]["Content-Type"];
+      };
       content: {
         "application/json": components["schemas"]["ErrorInformationResponse"];
       };
     };
-    /** Not Implemented */
+    /** @description Not Implemented */
     501: {
-      headers: {};
+      headers: {
+        "Content-Length": components["headers"]["Content-Length"];
+        "Content-Type": components["headers"]["Content-Type"];
+      };
       content: {
         "application/json": components["schemas"]["ErrorInformationResponse"];
       };
     };
-    /** Service Unavailable */
+    /** @description Service Unavailable */
     503: {
-      headers: {};
+      headers: {
+        "Content-Length": components["headers"]["Content-Length"];
+        "Content-Type": components["headers"]["Content-Type"];
+      };
       content: {
         "application/json": components["schemas"]["ErrorInformationResponse"];
       };
     };
-    /** ThirdpartyTransaction partyLookup response */
+    /** @description ThirdpartyTransaction partyLookup response */
     ThirdpartyTransactionPartyLookupResponse: {
       content: {
         "application/json": components["schemas"]["ThirdpartyTransactionPartyLookupResponse"];
       };
     };
-    /** ThirdpartyTransactionIDInitiate response */
+    /** @description ThirdpartyTransactionIDInitiate response */
     ThirdpartyTransactionIDInitiateResponse: {
       content: {
         "application/json": components["schemas"]["ThirdpartyTransactionIDInitiateResponse"];
       };
     };
-    /** ThirdpartyTransactionIDApproveResponse */
+    /** @description ThirdpartyTransactionIDApproveResponse */
     ThirdpartyTransactionIDApproveResponse: {
       content: {
         "application/json": components["schemas"]["ThirdpartyTransactionIDApproveResponse"];
       };
     };
-    /** Response body of GET /linking/providers */
+    /** @description Response body of GET /linking/providers */
     LinkingProvidersResponse: {
       content: {
         "application/json": components["schemas"]["LinkingProvidersResponse"];
       };
     };
     /**
-     * response body of GET /accounts/{ID}
+     * @description response body of GET /accounts/{ID}
      * derived from UpdateAccountsByUserId by Inbound Service via Pub/Sub channel
      */
     AccountsByUserIdResponse: {
@@ -1178,19 +1014,19 @@ export interface components {
         "application/json": components["schemas"]["AccountsIDPutResponse"];
       };
     };
-    /** Response body of POST /linking/request-consent. */
+    /** @description Response body of POST /linking/request-consent. */
     LinkingRequestConsentResponse: {
       content: {
         "application/json": components["schemas"]["LinkingRequestConsentResponse"];
       };
     };
-    /** Linking request consent authenticate response */
+    /** @description Linking request consent authenticate response */
     LinkingRequestConsentIDAuthenticateResponse: {
       content: {
         "application/json": components["schemas"]["LinkingRequestConsentIDAuthenticateResponse"];
       };
     };
-    /** Linking request consent pass credential response */
+    /** @description Linking request consent pass credential response */
     LinkingRequestConsentIDPassCredentialResponse: {
       content: {
         "application/json": components["schemas"]["LinkingRequestConsentIDPassCredentialResponse"];
@@ -1201,20 +1037,30 @@ export interface components {
     /** @description The identifier value. */
     ID: string;
   };
+  requestBodies: never;
   headers: {
     /**
-     * The `Content-Length` header field indicates the anticipated size of the payload body. Only sent if there is a body.
+     * @description The `Content-Length` header field indicates the anticipated size of the payload body. Only sent if there is a body.
      *
      * **Note:** The API supports a maximum size of 5242880 bytes (5 Megabytes).
      */
-    "Content-Length"?: number;
-    /** The `Content-Type` header indicates the specific version of the API used to send the payload body. */
+    "Content-Length": number;
+    /** @description The `Content-Type` header indicates the specific version of the API used to send the payload body. */
     "Content-Type": string;
   };
+  pathItems: never;
 }
 
+export type $defs = Record<string, never>;
+
+export type external = Record<string, never>;
+
 export interface operations {
-  /** The HTTP request GET /health is used to return the current status of the API. */
+
+  /**
+   * Health check endpoint
+   * @description The HTTP request GET /health is used to return the current status of the API.
+   */
   HealthGet: {
     responses: {
       200: components["responses"]["200"];
@@ -1228,7 +1074,10 @@ export interface operations {
       503: components["responses"]["503"];
     };
   };
-  /** The HTTP request GET /metrics is used to return metrics for the API. */
+  /**
+   * Prometheus metrics endpoint
+   * @description The HTTP request GET /metrics is used to return metrics for the API.
+   */
   MetricsGet: {
     responses: {
       200: components["responses"]["200"];
@@ -1242,65 +1091,129 @@ export interface operations {
       503: components["responses"]["503"];
     };
   };
-  /** The HTTP request `POST /thirdpartyTransaction/partyLookup` is used to lookup information regarding the requested Party, defined by `Type`, `ID` and optionally `SubId`. */
+  /**
+   * Thirdparty transaction party lookup.
+   * @description The HTTP request `POST /thirdpartyTransaction/partyLookup` is used to lookup information regarding the requested Party, defined by `Type`, `ID` and optionally `SubId`.
+   */
   ThirdpartyTransactionPartyLookup: {
+    /** @description Thirdparty transaction party lookup body. */
+    requestBody: {
+      content: {
+        /**
+         * @example {
+         *   "transactionRequestId": "b51ec534-ee48-4575-b6a9-ead2955b8069",
+         *   "payee": {
+         *     "partyIdType": "MSISDN",
+         *     "partyIdentifier": "16135551212"
+         *   }
+         * }
+         */
+        "application/json": components["schemas"]["ThirdpartyTransactionPartyLookupRequest"];
+      };
+    };
     responses: {
       200: components["responses"]["ThirdpartyTransactionPartyLookupResponse"];
       default: components["responses"]["400"];
     };
-    /** Thirdparty transaction party lookup body. */
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["ThirdpartyTransactionPartyLookupRequest"];
-      };
-    };
   };
-  /** The HTTP request `POST /thirdpartyTransaction/{ID}/initiate` is sent to the Switch to initiate a third party request transaction. */
+  /**
+   * Initiates a third party transaction.
+   * @description The HTTP request `POST /thirdpartyTransaction/{ID}/initiate` is sent to the Switch to initiate a third party request transaction.
+   */
   ThirdpartyTransactionIDInitiate: {
     parameters: {
       path: {
-        /** The identifier value. */
         ID: components["parameters"]["ID"];
+      };
+    };
+    /** @description Thirdparty transaction initiate request body. */
+    requestBody: {
+      content: {
+        /**
+         * @example {
+         *   "payee": {
+         *     "name": "Bob bobbington",
+         *     "partyIdInfo": {
+         *       "fspId": "dfspb",
+         *       "partyIdType": "MSISDN",
+         *       "partyIdentifier": "16135551212"
+         *     }
+         *   },
+         *   "payer": {
+         *     "partyIdType": "THIRD_PARTY_LINK",
+         *     "partyIdentifier": "16135551212",
+         *     "fspId": "dfspa"
+         *   },
+         *   "amountType": "RECEIVE",
+         *   "amount": {
+         *     "currency": "USD",
+         *     "amount": "123.47"
+         *   },
+         *   "transactionType": {
+         *     "scenario": "DEPOSIT",
+         *     "initiator": "PAYER",
+         *     "initiatorType": "CONSUMER"
+         *   },
+         *   "expiration": "2021-05-24T08:38:08.699-04:00"
+         * }
+         */
+        "application/json": components["schemas"]["ThirdpartyTransactionIDInitiateRequest"];
       };
     };
     responses: {
       200: components["responses"]["ThirdpartyTransactionIDInitiateResponse"];
       default: components["responses"]["400"];
     };
-    /** Thirdparty transaction initiate request body. */
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["ThirdpartyTransactionIDInitiateRequest"];
-      };
-    };
   };
-  /** The HTTP request `POST /thirdpartyTransaction/{ID}/approve` is used to approve a third party transaction . */
+  /**
+   * Approve a third party transaction.
+   * @description The HTTP request `POST /thirdpartyTransaction/{ID}/approve` is used to approve a third party transaction .
+   */
   ThirdpartyTransactionIDApprove: {
     parameters: {
       path: {
-        /** The identifier value. */
         ID: components["parameters"]["ID"];
+      };
+    };
+    /** @description Thirdparty transaction approve request body contains Authorization details */
+    requestBody: {
+      content: {
+        /**
+         * @example {
+         *   "authorizationResponse": {
+         *     "authenticationInfo": {
+         *       "authentication": "U2F",
+         *       "authenticationValue": {
+         *         "pinValue": "xxxxxxxxxxx",
+         *         "counter": "1"
+         *       }
+         *     },
+         *     "responseType": "ENTERED"
+         *   }
+         * }
+         */
+        "application/json": components["schemas"]["ThirdpartyTransactionIDApproveRequest"];
       };
     };
     responses: {
       200: components["responses"]["ThirdpartyTransactionIDApproveResponse"];
       default: components["responses"]["400"];
     };
-    /** Thirdparty transaction approve request body contains Authorization details */
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["ThirdpartyTransactionIDApproveRequest"];
-      };
-    };
   };
-  /** The HTTP request `GET /linking/providers` is used to retrieve a list of thirdparty enabled DFSP identifiers. */
+  /**
+   * GetLinkingProviders
+   * @description The HTTP request `GET /linking/providers` is used to retrieve a list of thirdparty enabled DFSP identifiers.
+   */
   GetLinkingProviders: {
     responses: {
       200: components["responses"]["LinkingProvidersResponse"];
       default: components["responses"]["400"];
     };
   };
-  /** The HTTP request `GET /linking/accounts/{fspId}/{userId}` is used to retrieve the list of potential accounts available for linking. */
+  /**
+   * GetLinkingAccountsByUserId
+   * @description The HTTP request `GET /linking/accounts/{fspId}/{userId}` is used to retrieve the list of potential accounts available for linking.
+   */
   GetLinkingAccountsByUserId: {
     parameters: {
       path: {
@@ -1314,7 +1227,8 @@ export interface operations {
     };
   };
   /**
-   * The HTTP request `POST /linking/request-consent` is used to by a PISP to ask
+   * PostLinkingRequestConsent
+   * @description The HTTP request `POST /linking/request-consent` is used to by a PISP to ask
    * a specific DFSP to start the process of establishing consent between three parties.
    *
    * - The PISP
@@ -1322,19 +1236,38 @@ export interface operations {
    * - A user presumed to be a customer of 'The DFSP'
    */
   PostLinkingRequestConsent: {
+    /** @description Consent requests validate request details */
+    requestBody: {
+      content: {
+        /**
+         * @example {
+         *   "consentRequestId": "f6ab43b0-71cc-49f9-b763-2ac3f05ac8c1",
+         *   "toParticipantId": "dfspa",
+         *   "accounts": [
+         *     {
+         *       "accountNickname": "SpeXXXXXXXXnt",
+         *       "id": "dfspa.username.5678",
+         *       "currency": "USD"
+         *     }
+         *   ],
+         *   "actions": [
+         *     "ACCOUNTS_TRANSFER"
+         *   ],
+         *   "userId": "username1234",
+         *   "callbackUri": "pisp-app://callback"
+         * }
+         */
+        "application/json": components["schemas"]["LinkingRequestConsentPostRequest"];
+      };
+    };
     responses: {
       200: components["responses"]["LinkingRequestConsentResponse"];
       default: components["responses"]["400"];
     };
-    /** Consent requests validate request details */
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["LinkingRequestConsentPostRequest"];
-      };
-    };
   };
   /**
-   * Used in the authentication phase of account linking.
+   * Outbound PATCH /linking/request-consent/{ID}/authenticate endpoint
+   * @description Used in the authentication phase of account linking.
    * Used by the PISP to pass an Auth token on behalf of the user to the DFSP to establish a chain of trust.
    */
   PatchLinkingRequestConsentIDAuthenticate: {
@@ -1343,19 +1276,25 @@ export interface operations {
         ID: components["schemas"]["CorrelationId"];
       };
     };
+    /** @description Linking request consent authenticate request details */
+    requestBody: {
+      content: {
+        /**
+         * @example {
+         *   "authToken": "123456"
+         * }
+         */
+        "application/json": components["schemas"]["LinkingRequestConsentIDAuthenticateRequest"];
+      };
+    };
     responses: {
       200: components["responses"]["LinkingRequestConsentIDAuthenticateResponse"];
       default: components["responses"]["400"];
     };
-    /** Linking request consent authenticate request details */
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["LinkingRequestConsentIDAuthenticateRequest"];
-      };
-    };
   };
   /**
-   * Used in the credential registration phase of account linking.
+   * Outbound POST /linking/request-consent/{ID}/pass-credential endpoint
+   * @description Used in the credential registration phase of account linking.
    * Used by the PISP to pass an credential on behalf of the user to the DFSP.
    */
   PostLinkingRequestConsentIDPassCredential: {
@@ -1364,17 +1303,32 @@ export interface operations {
         ID: components["schemas"]["CorrelationId"];
       };
     };
+    /** @description Linking request consent pass credential request details */
+    requestBody: {
+      content: {
+        /**
+         * @example {
+         *   "credential": {
+         *     "credentialType": "FIDO",
+         *     "status": "PENDING",
+         *     "payload": {
+         *       "id": "HskU2gw4np09IUtYNHnxMM696jJHqvccUdBmd0xP6XEWwH0xLei1PUzDJCM19SZ3A2Ex0fNLw0nc2hrIlFnAtw",
+         *       "rawId": "HskU2gw4np09IUtYNHnxMM696jJHqvccUdBmd0xP6XEWwH0xLei1PUzDJCM19SZ3A2Ex0fNLw0nc2hrIlFnAtw==",
+         *       "response": {
+         *         "clientDataJSON": "eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiWXpSaFpHRmlZak16WlRrek1EWmlNRE00TURnNE1UTXlZV1ptWTJSbE5UVTJZelV3WkRneVpqWXdNMlkwTnpjeE1XRTVOVEV3WW1ZelltVmxaalprTmciLCJvcmlnaW4iOiJodHRwOi8vbG9jYWxob3N0OjQyMTgxIiwiY3Jvc3NPcmlnaW4iOmZhbHNlfQ==",
+         *         "attestationObject": "o2NmbXRmcGFja2VkZ2F0dFN0bXSjY2FsZyZjc2lnWEcwRQIhAN2JDPPTse/45EHSqSpEJiiok5sns+HqdJch3+gsL09VAiAh7W7ZhQC8gMIkgwcA+S4rQkaHoHnP9AkkohaKCuuA62N4NWOBWQLBMIICvTCCAaWgAwIBAgIECwXNUzANBgkqhkiG9w0BAQsFADAuMSwwKgYDVQQDEyNZdWJpY28gVTJGIFJvb3QgQ0EgU2VyaWFsIDQ1NzIwMDYzMTAgFw0xNDA4MDEwMDAwMDBaGA8yMDUwMDkwNDAwMDAwMFowbjELMAkGA1UEBhMCU0UxEjAQBgNVBAoMCVl1YmljbyBBQjEiMCAGA1UECwwZQXV0aGVudGljYXRvciBBdHRlc3RhdGlvbjEnMCUGA1UEAwweWXViaWNvIFUyRiBFRSBTZXJpYWwgMTg0OTI5NjE5MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEIRpvsbWJJcsKwRhffCrjqLSIEBR5sR7/9VXgfZdRvSsXaiUt7lns44WZIFuz6ii/j9f8fadcBUJyrkhY5ZH8WqNsMGowIgYJKwYBBAGCxAoCBBUxLjMuNi4xLjQuMS40MTQ4Mi4xLjEwEwYLKwYBBAGC5RwCAQEEBAMCBDAwIQYLKwYBBAGC5RwBAQQEEgQQFJogIY72QTOWuIH41bfx9TAMBgNVHRMBAf8EAjAAMA0GCSqGSIb3DQEBCwUAA4IBAQA+/qPfPSrgclePfgTQ3VpLaNsBr+hjLhi04LhzQxiRGWwYS+vB1TOiPXeLsQQIwbmqQU51doVbCTaXGLNIr1zvbLAwhnLWH7i9m4ahCqaCzowtTvCQ7VBUGP5T1M4eYnoo83IDCVjQj/pZG8QYgOGOigztGoWAf5CWcUF6C0UyFbONwUcqJEl2QLToa/7E8VRjm4W46IAUljYkODVZASv8h3wLROx9p5TSBlSymtwdulxQe/DKbfNSvM3edA0up+EIJKLOOU+QTR2ZQV46fEW1/ih6m8vcaY6L3NW0eYpc7TXeijUJAgoUtya/vzmnRAecuY9bncoJt8PrvL2ir2kDaGF1dGhEYXRhWMRJlg3liA6MaHQ0Fw9kdmBbj+SuuaKGMseZXPO6gx2XY0EAAAAEFJogIY72QTOWuIH41bfx9QBAHskU2gw4np09IUtYNHnxMM696jJHqvccUdBmd0xP6XEWwH0xLei1PUzDJCM19SZ3A2Ex0fNLw0nc2hrIlFnAt6UBAgMmIAEhWCBYz+SV6fSy7ZjFzdj+SWxaMbfaw4ZT+wYgClN3v93kVSJYIGSzY41DNLrh1jXp4J53qCnq4+b9HYXud/0UEsZquDeV"
+         *       },
+         *       "type": "public-key"
+         *     }
+         *   }
+         * }
+         */
+        "application/json": components["schemas"]["LinkingRequestConsentIDPassCredentialRequest"];
+      };
+    };
     responses: {
       200: components["responses"]["LinkingRequestConsentIDPassCredentialResponse"];
       default: components["responses"]["400"];
     };
-    /** Linking request consent pass credential request details */
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["LinkingRequestConsentIDPassCredentialRequest"];
-      };
-    };
   };
 }
-
-export interface external {}

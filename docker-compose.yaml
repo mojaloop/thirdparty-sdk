@@ -13,7 +13,7 @@ services:
       dockerfile: ./Dockerfile
       cache_from:
         - mojaloop/thirdparty-sdk
-    command: sh -c "docker/wait4/wait4.js thirdparty-sdk && NODE_ENV=integration npm run start"
+    command: sh -c "NODE_ENV=integration npm run start"
     environment:
       - NODE_ENV=integration
       # - CONTROL_MGMT_API_WS_URL=172.17.0.1
