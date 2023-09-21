@@ -24,18 +24,19 @@ optionally within square brackets <email>.
 - Kevin Leyow - kevin.leyow@modusbox.com
 --------------
 ******/
-
+import { jest } from '@jest/globals'
 import { v1_1 as fspiopAPI, thirdparty as tpAPI } from '@mojaloop/api-snippets'
 import { KVS } from '~/shared/kvs'
 import { Message, NotificationCallback, PubSub } from '~/shared/pub-sub'
 import { ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
 import { PISPPrelinkingModel, create } from '~/models/outbound/pispPrelinking.model'
 import { RedisConnectionConfig } from '~/shared/redis-connection'
-import { mocked } from 'ts-jest/utils'
 
 import mockLogger from 'test/unit/mockLogger'
 import sortedArray from 'test/unit/sortedArray'
 import { PISPPrelinkingModelConfig, PISPPrelinkingData } from '~/models/outbound/pispPrelinking.interface'
+
+const { mocked } = jest
 
 // mock KVS default exported class
 jest.mock('~/shared/kvs')

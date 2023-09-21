@@ -64,7 +64,7 @@ describe('PISP Inbound', (): void => {
         }
       }
 
-      it('should propagate message via Redis PUB/SUB', async (done): Promise<void> => {
+      it('should propagate message via Redis PUB/SUB', async (): Promise<void> => {
         const subscriber = new PubSub(config)
         await subscriber.connect()
         expect(subscriber.isConnected).toBeTruthy()
@@ -77,7 +77,7 @@ describe('PISP Inbound', (): void => {
             await subscriber.disconnect()
             expect(subscriber.isConnected).toBeFalsy()
 
-            done()
+            await new Promise(process.nextTick)
           }
         )
 
@@ -211,7 +211,7 @@ describe('DFSP Inbound', (): void => {
         expect(response.status).toEqual(200)
       })
 
-      it('should propagate message via Redis PUB/SUB', async (done): Promise<void> => {
+      it('should propagate message via Redis PUB/SUB', async (): Promise<void> => {
         const subscriber = new PubSub(config)
         await subscriber.connect()
         expect(subscriber.isConnected).toBeTruthy()
@@ -224,7 +224,7 @@ describe('DFSP Inbound', (): void => {
             await subscriber.disconnect()
             expect(subscriber.isConnected).toBeFalsy()
 
-            done()
+            await new Promise(process.nextTick)
           }
         )
 
@@ -281,7 +281,7 @@ describe('DFSP Inbound', (): void => {
         expect(response.status).toEqual(200)
       })
 
-      it('should propagate message via Redis PUB/SUB', async (done): Promise<void> => {
+      it('should propagate message via Redis PUB/SUB', async (): Promise<void> => {
         const subscriber = new PubSub(config)
         await subscriber.connect()
         expect(subscriber.isConnected).toBeTruthy()
@@ -294,7 +294,7 @@ describe('DFSP Inbound', (): void => {
             await subscriber.disconnect()
             expect(subscriber.isConnected).toBeFalsy()
 
-            done()
+            await new Promise(process.nextTick)
           }
         )
 

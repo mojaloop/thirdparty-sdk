@@ -6,13 +6,14 @@ networks:
 
 services:
   thirdparty-sdk:
+    image: mojaloop/thirdparty-sdk:local
     container_name: thirdparty-sdk
     build:
-      context: ./
+      context: .
       dockerfile: ./Dockerfile
-    command: sh -c "/opt/thirdparty-sdk/wait4/wait4.js thirdparty-sdk && NODE_ENV=integration npm run start"
-    volumes:
-      - ./docker/wait4:/opt/thirdparty-sdk/wait4
+      cache_from:
+        - mojaloop/thirdparty-sdk
+    command: sh -c "NODE_ENV=integration npm run start"
     environment:
       - NODE_ENV=integration
       # - CONTROL_MGMT_API_WS_URL=172.17.0.1

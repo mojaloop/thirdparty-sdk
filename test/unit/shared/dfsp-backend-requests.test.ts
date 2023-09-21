@@ -130,9 +130,8 @@ describe('backendRequests', () => {
         expiration: new Date().toISOString()
       }
       const postSpy = jest.spyOn(dfspBackendRequests, 'post').mockImplementationOnce(() => Promise.resolve(response))
-      const result = await dfspBackendRequests.validateThirdpartyTransactionRequestAndGetContext(
-        transactionRequestRequest
-      )
+      const result =
+        await dfspBackendRequests.validateThirdpartyTransactionRequestAndGetContext(transactionRequestRequest)
       expect(result).toEqual(response)
       expect(postSpy).toBeCalledWith(
         dfspBackendRequests.validateThirdpartyTransactionRequestPath,

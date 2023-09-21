@@ -59,8 +59,8 @@ defineFeature(feature, (test): void => {
     server = await prepareInboundAPIServer()
   })
 
-  afterAll(async (done): Promise<void> => {
-    server.events.on('stop', done)
+  afterAll(async (): Promise<void> => {
+    server.events.on('stop', await new Promise(process.nextTick))
     server.stop({ timeout: 0 })
   })
 

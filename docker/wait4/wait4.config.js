@@ -28,7 +28,7 @@ module.exports = {
         },
         {
           description: 'Redis Cache',
-          uri: 'localhost:6379',
+          uri: '0.0.0.0:6379',
           method: 'ncat'
         },
         {
@@ -60,7 +60,7 @@ module.exports = {
       wait4: [
         {
           description: 'Redis Cache',
-          uri: 'redis:6379',
+          uri: '0.0.0.0:6379',
           method: 'ncat'
         }
       ]

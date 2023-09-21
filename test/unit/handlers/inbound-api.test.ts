@@ -51,7 +51,7 @@ import { resetUuid } from '../__mocks__/uuid'
 import * as mockData from 'test/unit/data/mockData'
 import index from '~/index'
 import path from 'path'
-import config from '~/shared/config'
+import Config from '~/shared/config'
 import { logger } from '~/shared/logger'
 import { PISPLinkingPhase } from '~/models/outbound/pispLinking.interface'
 
@@ -141,11 +141,11 @@ describe('Inbound API routes', (): void => {
   beforeAll(async (): Promise<void> => {
     const apiPath = path.resolve(__dirname, '../../../src/interface/api-inbound.yaml')
     const serverConfig: ServerConfig = {
-      port: config.inbound.port,
-      host: config.inbound.host,
+      port: Config.inbound.port,
+      host: Config.inbound.host,
       api: ServerAPI.inbound,
-      tls: config.inbound.tls,
-      serviceConfig: config
+      tls: Config.inbound.tls,
+      serviceConfig: Config
     }
     const serverHandlers = {
       ...Handlers.Shared,
@@ -155,10 +155,10 @@ describe('Inbound API routes', (): void => {
     jest.clearAllMocks()
   })
 
-  afterAll(async (done): Promise<void> => {
+  afterAll((done) => {
     // StatePlugin is waiting on stop event so give it a chance to close the redis connections
     server.events.on('stop', () => setTimeout(done, 100))
-    await server.stop()
+    server.stop()
   })
 
   it('/health', async (): Promise<void> => {
@@ -497,7 +497,7 @@ describe('Inbound API routes', (): void => {
   })
 
   describe('PUT /consentRequests/{ID}', () => {
-    jest.useFakeTimers()
+    // jest.useFakeTimers()
     const request = mockData.consentRequestsPut
     const errorRequest = mockData.consentRequestsPutError
     it('PUT handler && pubSub invocation', async (): Promise<void> => {
@@ -525,7 +525,6 @@ describe('Inbound API routes', (): void => {
       )
 
       expect(result.statusCode).toEqual(200)
-      jest.runAllImmediates()
       expect(toolkit.getPublisher).toBeCalledTimes(1)
 
       const channel = PISPLinkingModel.notificationChannel(PISPLinkingPhase.requestConsent, request.params.ID)
@@ -572,7 +571,6 @@ describe('Inbound API routes', (): void => {
       )
 
       expect(result.statusCode).toEqual(200)
-      jest.runAllImmediates()
       expect(toolkit.getPublisher).toBeCalledTimes(2)
 
       const channel = PISPLinkingModel.notificationChannel(PISPLinkingPhase.requestConsent, errorRequest.params.ID)

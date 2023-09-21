@@ -24,6 +24,7 @@
  - Paweł Marzec <pawel.marzec@modusbox.com>
  --------------
  ******/
+import { jest } from '@jest/globals'
 import { KVS } from '~/shared/kvs'
 import { Message, NotificationCallback, PubSub } from '~/shared/pub-sub'
 import { MojaloopRequests, ThirdpartyRequests } from '@mojaloop/sdk-standard-components'
@@ -35,7 +36,6 @@ import {
 } from '~/models/pispTransaction.interface'
 import { PISPTransactionModel, create, loadFromKVS } from '~/models/pispTransaction.model'
 import { RedisConnectionConfig } from '~/shared/redis-connection'
-import { mocked } from 'ts-jest/utils'
 
 import mockLogger from 'test/unit/mockLogger'
 import shouldNotBeExecuted from 'test/unit/shouldNotBeExecuted'
@@ -47,6 +47,8 @@ import * as OutboundAPI from '~/interface/outbound/api_interfaces'
 import { v4 } from 'uuid'
 // mock KVS default exported class
 jest.mock('~/shared/kvs')
+
+const { mocked } = jest
 
 // mock PubSub default exported class
 jest.mock('~/shared/pub-sub')
@@ -411,26 +413,22 @@ describe('pipsTransactionModel', () => {
         )
       })
 
-      it('should handle error', async (done) => {
+      it('should handle error', (done) => {
         mocked(modelConfig.thirdpartyRequests.postThirdpartyRequestsTransactions).mockImplementationOnce(() => {
           throw new Error('mocked postThirdpartyRequestsTransactions exception')
         })
-        const model = await create(data, modelConfig)
+        create(data, modelConfig).then((model) => {
+          model.run().catch((err: any) => {
+            expect(err.message).toEqual('mocked postThirdpartyRequestsTransactions exception')
 
-        try {
-          await model.run()
-          shouldNotBeExecuted()
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } catch (err: any) {
-          expect(err.message).toEqual('mocked postThirdpartyRequestsTransactions exception')
+            // check that correct subscription has been done
+            expect(modelConfig.subscriber.subscribe).toBeCalledWith(channelTransPut, expect.anything())
 
-          // check that correct subscription has been done
-          expect(modelConfig.subscriber.subscribe).toBeCalledWith(channelTransPut, expect.anything())
-
-          // check that correct unsubscription has been done
-          expect(modelConfig.subscriber.unsubscribe).toBeCalledWith(channelTransPut, expect.anything())
-          done()
-        }
+            // check that correct unsubscription has been done
+            expect(modelConfig.subscriber.unsubscribe).toBeCalledWith(channelTransPut, expect.anything())
+            done()
+          })
+        })
       })
     })
 
@@ -694,7 +692,7 @@ describe('pipsTransactionModel', () => {
         transactionRequestId: '1234-1234',
         currentState: 'transactionStatusReceived'
       }
-      mocked(modelConfig.kvs.get).mockImplementationOnce(async () => dataFromCache)
+      mocked(modelConfig.kvs.get<PISPTransactionData>).mockImplementationOnce(async () => dataFromCache)
       const model = await loadFromKVS(modelConfig)
       checkPTMLayout(model, dataFromCache)
 
@@ -706,7 +704,7 @@ describe('pipsTransactionModel', () => {
     })
 
     it('should throw when received invalid data from `KVS.get`', async () => {
-      mocked(modelConfig.kvs.get).mockImplementationOnce(async () => null)
+      mocked(modelConfig.kvs.get<null>).mockImplementationOnce(async () => null)
       try {
         await loadFromKVS(modelConfig)
         shouldNotBeExecuted()

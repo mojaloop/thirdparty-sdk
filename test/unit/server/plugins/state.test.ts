@@ -25,11 +25,10 @@
 
  --------------
  ******/
-
+import { jest } from '@jest/globals'
 import { KVS } from '~/shared/kvs'
 import { PubSub } from '~/shared/pub-sub'
 import { StatePlugin } from '~/server/plugins/state'
-import { mocked } from 'ts-jest/utils'
 import { Server } from '@hapi/hapi'
 import { mockProcessExit } from 'jest-mock-process'
 import { ServerAPI } from '~/server/create'
@@ -37,6 +36,8 @@ import { ServerAPI } from '~/server/create'
 import SDK from '@mojaloop/sdk-standard-components'
 import config from '~/shared/config'
 import { logger } from '~/shared/logger'
+
+const { mocked } = jest
 
 jest.mock('~/shared/kvs')
 jest.mock('~/shared/pub-sub')
@@ -108,7 +109,7 @@ describe('StatePlugin', () => {
   it('should prepare WSO2Auth with outbound tlsCreds', async () => {
     const spyWSO2Auth = jest
       .spyOn(SDK, 'WSO2Auth')
-      .mockImplementationOnce(() => ({ Iam: 'mockedWSO2Auth' } as unknown as SDK.WSO2Auth))
+      .mockImplementationOnce(() => ({ Iam: 'mockedWSO2Auth' }) as unknown as SDK.WSO2Auth)
     config.outbound.tls.mutualTLS.enabled = true
     config.inbound.tls.creds = {
       ca: 'mocked inbound ca',

@@ -58,7 +58,7 @@ describe('RedisConnection', () => {
     invalidPort.port = 8080
     const invalidRC = new RedisConnection(invalidPort)
     expect(invalidRC.connect()).rejects.toThrowError(
-      new Error('Redis connection to localhost:8080 failed - connect ECONNREFUSED 127.0.0.1:8080')
+      new Error('Redis connection to redis:8080 failed - connect ECONNREFUSED 127.0.0.1:8080')
     )
     expect(invalidRC.isConnected).toBeFalsy()
   })

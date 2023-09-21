@@ -185,7 +185,7 @@ describe('HttpRequests', () => {
   describe('keepAlive flag', () => {
     const agentSpy = jest
       .spyOn(http, 'Agent')
-      .mockImplementationOnce(() => ({ Iam: 'mocked-agent' } as unknown as http.Agent))
+      .mockImplementationOnce(() => ({ Iam: 'mocked-agent' }) as unknown as http.Agent)
 
     const kaConfig: HttpRequestsConfig = {
       ...config,

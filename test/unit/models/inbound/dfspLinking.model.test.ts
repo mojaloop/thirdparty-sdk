@@ -25,13 +25,12 @@ optionally within square brackets <email>.
 - Sridhar Voruganti - sridhar.voruganti@modusbox.com
 --------------
 ******/
-
+import { jest } from '@jest/globals'
 import { KVS } from '~/shared/kvs'
 import { Message, NotificationCallback, PubSub } from '~/shared/pub-sub'
 import { ThirdpartyRequests, MojaloopRequests } from '@mojaloop/sdk-standard-components'
 import { DFSPLinkingModel, create } from '~/models/inbound/dfspLinking.model'
 import { RedisConnectionConfig } from '~/shared/redis-connection'
-import { mocked } from 'ts-jest/utils'
 
 import mockLogger from 'test/unit/mockLogger'
 import sortedArray from 'test/unit/sortedArray'
@@ -43,6 +42,8 @@ import * as mockData from 'test/unit/data/mockData'
 import { HTTPResponseError } from '../../../../src/shared/http-response-error'
 
 import { resetUuid } from '../../__mocks__/uuid'
+
+const { mocked } = jest
 
 // mock KVS default exported class
 jest.mock('~/shared/kvs')
