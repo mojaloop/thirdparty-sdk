@@ -51,15 +51,8 @@
     "updates:check": "npm-check-updates",
     "updates:update": "npm-check-updates -u && npm install",
     "watch": "tsc -w",
-    "wait-4-docker": "node ./scripts/_wait4_all.js"
-  },
-  "husky": {
-    "hooks": {
-      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
-      "pre-commit": "lint-staged && npm test",
-      "post-commit": "git update-index --again",
-      "pre-push": "npm test && npm run updates:check && npm run audit:check"
-    }
+    "wait-4-docker": "node ./scripts/_wait4_all.js",
+    "prepare": "husky install"
   },
   "lint-staged": {
     "*.{js,ts}": "eslint --cache --fix"
