@@ -1,4 +1,12 @@
 # Changelog: [mojaloop/thirdparty-sdk](https://github.com/mojaloop/thirdparty-sdk)
+## [15.1.1](https://github.com/mojaloop/thirdparty-sdk/compare/v15.1.0...v15.1.1) (2023-10-10)
+
+
+### Maintenance
+
+* **mojaloop/#3522:** upgrade nodejs version ([#167](https://github.com/mojaloop/thirdparty-sdk/issues/167)) ([a1b0523](https://github.com/mojaloop/thirdparty-sdk/commit/a1b05238d5130de41aa4b35cda468250636c8062)), closes [mojaloop/#3522](https://github.com/mojaloop/thirdparty-sdk/issues/3522)
+* **mojaloop/#3533:** fix release ([#168](https://github.com/mojaloop/thirdparty-sdk/issues/168)) ([8f2a7c0](https://github.com/mojaloop/thirdparty-sdk/commit/8f2a7c06e0e9346e46b6813baaf8d86f9ee7a5b6))
+
 ## [15.1.0](https://github.com/mojaloop/thirdparty-sdk/compare/v15.0.0...v15.1.0) (2022-06-24)
 
 
