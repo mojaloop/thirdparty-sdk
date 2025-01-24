@@ -33,6 +33,14 @@ import * as ControlAgent from '~/reconfiguration/controlAgent'
 import index from '~/index'
 import { Server as HapiServer } from '@hapi/hapi'
 import { Server } from '~/api'
+import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals'
+import { Logger as SDKLogger } from '@mojaloop/sdk-standard-components'
+
+// default SDKLogger instance
+export const logger = new SDKLogger.Logger()
+export function createLogger(params?: SDKLogger.LoggerConstructorParams): SDKLogger.Logger {
+  return new SDKLogger.Logger(params)
+}
 
 const setupAndStartSpy = jest.spyOn(index.server, 'setupAndStart')
 
@@ -116,6 +124,7 @@ describe('cli', () => {
         try {
           msg = ControlAgent.deserialize(data)
         } catch (err) {
+          logger.error(err)
           ws.send(ControlAgent.build.ERROR.NOTIFY.JSON_PARSE_ERROR(null))
         }
 

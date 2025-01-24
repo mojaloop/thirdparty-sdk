@@ -25,6 +25,7 @@
  * Paweł Marzec <pawel.marzec@modusbox.com>
  --------------
  ******/
+import { describe, it, expect } from '@jest/globals'
 
 import index from '~/index'
 describe('index', (): void => {

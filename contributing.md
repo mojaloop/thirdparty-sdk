@@ -6,7 +6,7 @@ they don't compromise those goals and follow the [Mojaloop Contributors Guide](h
 
 ## Code style
 Coding style is `standard` described through the EditorConfig [.editorconfig](./.editorconfig) file
-and enforced by ESLint through the [.eslintrc.js](./.eslintrc.js) file.
+and enforced by ESLint through the [eslint.config.mjs](./eslint.config.mjs) file.
 
 ```bash
 npm run lint

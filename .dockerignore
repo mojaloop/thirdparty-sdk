@@ -1,6 +1,5 @@
 
 .dockerignore
-.eslintignore
 .git/
 .gitignore
 .circleci/

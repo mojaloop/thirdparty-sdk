@@ -1,5 +1,6 @@
 import deferredJob, { JobInitiator, JobListener, DeferredInitOrTrigger } from '~/shared/deferred-job'
 import { Message } from '~/shared/pub-sub'
+import { jest } from '@jest/globals'
 
 jest.mock('~/shared/deferred-job')
 

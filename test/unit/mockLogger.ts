@@ -26,6 +26,7 @@
  ******/
 
 import { Logger as SDKLogger } from '@mojaloop/sdk-standard-components'
+import { jest } from '@jest/globals'
 
 export default function mockLogger(keepQuiet = true): SDKLogger.Logger {
   if (keepQuiet) {

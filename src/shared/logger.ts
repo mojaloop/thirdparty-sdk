@@ -49,6 +49,7 @@ export function logResponse(request: RequestLogged): void {
     try {
       response = JSON.stringify(request.response.source)
     } catch (e) {
+      logger.error(`AS-Trace - Error: ${e}`)
       response = inspect(request.response.source)
     }
     if (!response) {

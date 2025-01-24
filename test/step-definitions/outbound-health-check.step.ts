@@ -30,6 +30,7 @@ import { defineFeature, loadFeature } from 'jest-cucumber'
 import Config from '~/shared/config'
 import index from '~/index'
 import path from 'path'
+import { beforeAll, afterAll, afterEach, jest, expect } from '@jest/globals'
 
 const apiPath = path.resolve(__dirname, '../../src/interface/api-outbound.yaml')
 const featurePath = path.resolve(__dirname, '../features/outbound-health-check.scenario.feature')

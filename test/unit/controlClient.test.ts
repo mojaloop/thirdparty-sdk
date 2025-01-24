@@ -2,6 +2,14 @@ import * as ControlAgent from '~/reconfiguration/controlAgent'
 import defaultConfig from '~/shared/config'
 import { WebSocketServer } from 'ws'
 import { generateSlug } from 'random-word-slugs'
+import { describe, it, expect, beforeEach, afterEach } from '@jest/globals'
+import { Logger as SDKLogger } from '@mojaloop/sdk-standard-components'
+
+// default SDKLogger instance
+export const logger = new SDKLogger.Logger()
+export function createLogger(params?: SDKLogger.LoggerConstructorParams): SDKLogger.Logger {
+  return new SDKLogger.Logger(params)
+}
 
 describe('ControlAgent', () => {
   it('exposes a valid message API', () => {
@@ -29,6 +37,7 @@ describe('ControlAgent', () => {
           try {
             msg = ControlAgent.deserialize(data)
           } catch (err) {
+            logger.error(err)
             ws.send(ControlAgent.build.ERROR.NOTIFY.JSON_PARSE_ERROR(null))
           }
 
