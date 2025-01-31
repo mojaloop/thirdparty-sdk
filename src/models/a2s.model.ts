@@ -110,7 +110,6 @@ export class A2SModel<Args, A2SActionResponse extends StateData> extends Persist
       transitions: [{ name: 'requestAction', from: 'start', to: 'succeeded' }],
       methods: {
         // specific transitions handlers methods
-        // eslint-disable-next-line prefer-rest-params
         onRequestAction: () => this.onRequestAction()
       }
     }
@@ -188,7 +187,6 @@ export class A2SModel<Args, A2SActionResponse extends StateData> extends Persist
           // don't await to finish the save
           this.saveToKVS()
 
-        // eslint-disable-next-line no-fallthrough
         case 'succeeded':
           // all steps complete so return
           this.logger.log('Action called successfully')
@@ -199,7 +197,6 @@ export class A2SModel<Args, A2SActionResponse extends StateData> extends Persist
           this.logger.log('State machine in errored state')
           return
       }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       this.logger.log(`Error running ${this.modelName} model: ${util.inspect(err)}`)
 

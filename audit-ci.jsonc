@@ -4,18 +4,5 @@
     // Only use one of ["low": true, "moderate": true, "high": true, "critical": true]
     "moderate": true,
     "allowlist": [ // NOTE: Please add as much information as possible to any items added to the allowList
-      // Currently no fixes available for the following
-      "GHSA-v88g-cgmw-v5xw", // https://github.com/advisories/GHSA-v88g-cgmw-v5xw
-      "GHSA-phwq-j96m-2c2q", // https://github.com/advisories/GHSA-phwq-j96m-2c2q
-      "GHSA-282f-qqgm-c34q", // https://github.com/advisories/GHSA-282f-qqgm-c34q
-      "GHSA-6vfc-qv3f-vr6c", // https://github.com/advisories/GHSA-6vfc-qv3f-vr6c
-      "GHSA-wc69-rhjr-hc9g", // https://github.com/advisories/GHSA-wc69-rhjr-hc9g
-      "GHSA-7fh5-64p2-3v2j", // https://github.com/advisories/GHSA-7fh5-64p2-3v2j
-      "GHSA-g954-5hwp-pp24", // https://github.com/advisories/GHSA-g954-5hwp-pp24
-      "GHSA-h755-8qp9-cq85", // https://github.com/advisories/GHSA-h755-8qp9-cq85
-      "GHSA-mjxr-4v3x-q3m4", // https://github.com/advisories/GHSA-mjxr-4v3x-q3m4
-      "GHSA-rjqq-98f6-6j3r", // https://github.com/advisories/GHSA-rjqq-98f6-6j3r
-      "GHSA-f9xv-q969-pqx4", // https://github.com/advisories/GHSA-f9xv-q969-pqx4
-      "GHSA-p9pc-299p-vxgp"  // https://github.com/advisories/GHSA-p9pc-299p-vxgp
     ]
   }

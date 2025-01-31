@@ -32,7 +32,6 @@ export class TTKHistory {
     try {
       requestHistory = (await axios.get(this.uri, this.requestConfig)).data as unknown as MLTestingToolkitRequest[]
     } catch (err) {
-      console.log(err)
       return []
     }
 

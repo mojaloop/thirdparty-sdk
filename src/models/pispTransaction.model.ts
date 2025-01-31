@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /*****
  License
  --------------
@@ -139,7 +138,6 @@ export class PISPTransactionModel extends PersistentModel<PISPTransactionStateMa
         currentState: this.data.currentState as OutboundAPI.Schemas.ThirdpartyTransactionPartyLookupState
       }
     } catch (error) {
-      console.log(error)
       this.logger.push({ error }).error('onRequestPartyLookup -> requestPartiesInformation')
       // try to handle specific HTTP related error
       if (error instanceof HTTPResponseError) {
@@ -302,8 +300,7 @@ export class PISPTransactionModel extends PersistentModel<PISPTransactionStateMa
     | OutboundAPI.Schemas.ThirdpartyTransactionPartyLookupResponse
     | OutboundAPI.Schemas.ThirdpartyTransactionIDInitiateResponse
     | OutboundAPI.Schemas.ThirdpartyTransactionIDApproveResponse
-    | void
-  > {
+    | void> {
     const data = this.data
     try {
       // run transitions based on incoming state
@@ -352,7 +349,6 @@ export class PISPTransactionModel extends PersistentModel<PISPTransactionStateMa
           this.logger.info('State machine in errored state')
           return this.getResponse()
       }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       this.logger.info(`Error running PISPTransactionModel : ${inspect(err)}`)
 

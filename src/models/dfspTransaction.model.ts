@@ -1,5 +1,3 @@
-/* eslint-disable no-fallthrough */
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /*****
  License
  --------------
@@ -376,7 +374,7 @@ export class DFSPTransactionModel extends PersistentModel<DFSPTransactionStateMa
         default:
           throw new Error(`unhandled signedPayloadType: ${signedPayloadType}`)
       }
-
+      // eslint-disable-next-line no-console
       console.log('onVerifyAuthorization - challenge is', this.data.requestAuthorizationPostRequest!.challenge)
 
       await deferredJob(this.subscriber, channel)
@@ -532,7 +530,6 @@ export class DFSPTransactionModel extends PersistentModel<DFSPTransactionStateMa
           // stopped in errored state
           this.logger.info('State machine in errored state')
       }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       const mojaloopError = reformatError(error, this.logger)
       this.logger.push({ error, mojaloopError }).info(`Sending error response to ${this.data.participantId}`)
