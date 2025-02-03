@@ -203,6 +203,7 @@
       "sanitize-html": "2.12.1"
     },
     "yaml": "2.7.0",
-    "yargs-parser": "18.1.1"
+    "yargs": "17.6.2",
+    "yargs-parser": "21.1.1"
   }
 }
