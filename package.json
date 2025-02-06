@@ -47,7 +47,6 @@
     "test:coverage": "jest --coverage  --testMatch '**/test/unit/**/*.(test|spec).ts'",
     "test:coverage-check": "jest -w 1 --coverage --testMatch '**/test/unit/**/*.(test|spec).ts'",
     "test:integration": "jest --config './jest.integration.config.js' --reporters=default --reporters=jest-junit --testMatch '**/test/integration/**/*.(test|spec).ts' --runInBand",
-    "test:int": "jest --config './jest.integration.config.js' --reporters=default --reporters=jest-junit --testMatch '**/test/integration/**/linking-request-consent.test.ts' --runInBand",
     "test:unit": "jest -w 1 --coverageThreshold='{}' --reporters=default --reporters=jest-junit --testMatch '**/test/unit/**/*.(test|spec).ts'",
     "test:junit": "jest -w 1 --coverageThreshold='{}' --reporters=default --reporters=jest-junit --testMatch '**/test/unit/**/*.(test|spec).ts'",
     "updates:check": "npm-check-updates",
