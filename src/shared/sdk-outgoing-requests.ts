@@ -47,7 +47,7 @@ export interface SDKOutgoingRequestsConfig extends HttpRequestsConfig {
  */
 export class SDKOutgoingRequests extends HttpRequests {
   // we want this constructor for better code support
-  // eslint-disable-next-line no-useless-constructor
+   
   constructor(config: SDKOutgoingRequestsConfig) {
     super(config)
   }

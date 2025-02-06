@@ -152,7 +152,7 @@ export default function deferredJob(cache: PubSub, channel: string): DeferredIni
                 }
               }
 
-              // eslint-disable-next-line no-async-promise-executor
+               
               const promise = new Promise<void>(async (resolve, reject) => {
                 try {
                   // subscribe to the channel to execute the jobListener when the message arrive

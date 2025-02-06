@@ -28,8 +28,6 @@ export function payeeReceiveAmountForQuoteAndFees(
     }
   }
 
-  console.log('taValue', taValue)
-
   if (isNaN(taValue) || isNaN(feeAmount) || isNaN(commissionAmount)) {
     throw new Error('Invalid amount input. Expected valid number')
   }

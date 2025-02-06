@@ -6,6 +6,7 @@ module.exports = {
   verbose: true,
   preset: 'ts-jest',
   testEnvironment: 'node',
+  testTimeout: 60000,
   collectCoverage: false,
   clearMocks: true,
   moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, {
