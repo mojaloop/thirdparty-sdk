@@ -219,13 +219,12 @@
     "event": {
       "type": "FIXED_CALLBACK",
       "params": {
-        "statusCode": 400,
-        "errorData": {
-          "res": {
-            "body": {
-              "statusCode": "400",
-              "message": "Bad Request"
-            }
+        "statusCode": 202,
+        "body": {
+          "isValid": false,
+          "errorInformation": {
+            "errorCode": "7200",
+            "errorDescription": "Generic Thirdparty account linking error"
           }
         }
       }

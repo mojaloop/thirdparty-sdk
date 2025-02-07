@@ -96,7 +96,7 @@ export interface DFSPBackendConfig extends HttpRequestsConfig {
  */
 export class DFSPBackendRequests extends HttpRequests {
   // we want this constructor for better code support
-  // eslint-disable-next-line no-useless-constructor
+   
   constructor(config: DFSPBackendConfig) {
     super(config)
   }

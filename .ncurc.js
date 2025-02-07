@@ -6,6 +6,10 @@ module.exports = {
     'redis',
     '@types/redis',
     // Upgrading past commander@7 introduces a lot of breaking changes.
-    'commander'
+    'commander',
+    // Need a major refactor to upgrade to the next major version of this package.
+    '@mojaloop/sdk-scheme-adapter',
+    // This breaks internal tests.
+    '@mojaloop/sdk-standard-components'
   ]
 }

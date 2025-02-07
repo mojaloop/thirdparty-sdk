@@ -35,7 +35,7 @@ export class InvalidDataError extends Error {
   }
 
   static throwIfInvalidProperty(data: Record<string, unknown>, propertyName: string): void {
-    // eslint-disable-next-line no-prototype-builtins
+     
     if (!data.hasOwnProperty(propertyName)) {
       throw new InvalidDataError(data, propertyName)
     }

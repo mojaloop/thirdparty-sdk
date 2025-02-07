@@ -5,6 +5,7 @@ module.exports = {
   verbose: true,
   preset: 'ts-jest',
   testEnvironment: 'node',
+  testTimeout: 60000,
   collectCoverage: true,
   // TODO: when interface/types.ts will be used collect the coverage for this file
   collectCoverageFrom: ['./src/**/*.ts', '!./src/interface/types.ts'],
