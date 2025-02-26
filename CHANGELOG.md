@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-sdk](https://github.com/mojaloop/thirdparty-sdk)
+## [15.1.3](https://github.com/mojaloop/thirdparty-sdk/compare/v15.1.2...v15.1.3) (2025-02-26)
+
+
+### Maintenance
+
+* maintenance updates ([#173](https://github.com/mojaloop/thirdparty-sdk/issues/173)) ([61849db](https://github.com/mojaloop/thirdparty-sdk/commit/61849db5b612ad1940715a36eadf629e9594ee4d))
+
 ## [15.1.2](https://github.com/mojaloop/thirdparty-sdk/compare/v15.1.1...v15.1.2) (2025-02-07)
 
 
