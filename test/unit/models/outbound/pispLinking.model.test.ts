@@ -207,9 +207,9 @@ describe('PISPLinkingModel', () => {
         model.linkingRequestConsentPostRequestToConsentRequestsPostRequest(),
         model.data.toParticipantId
       )
-      expect(mocked(modelConfig.subscriber.subscribe)).toBeCalledTimes(1)
-      expect(mocked(modelConfig.subscriber.unsubscribe)).toBeCalledWith(requestConsentChannel, subId)
-      expect(mocked(publisher.publish)).toBeCalledWith(requestConsentChannel, putResponse)
+      expect(mocked(modelConfig.subscriber.subscribe)).toHaveBeenCalledTimes(1)
+      expect(mocked(modelConfig.subscriber.unsubscribe)).toHaveBeenCalledWith(requestConsentChannel, subId)
+      expect(mocked(publisher.publish)).toHaveBeenCalledWith(requestConsentChannel, putResponse)
     })
     it('should give response properly populated from notification channel - error response', async () => {
       data = {
@@ -229,9 +229,9 @@ describe('PISPLinkingModel', () => {
         model.linkingRequestConsentPostRequestToConsentRequestsPostRequest(),
         model.data.toParticipantId
       )
-      expect(mocked(modelConfig.subscriber.subscribe)).toBeCalledTimes(1)
-      expect(mocked(modelConfig.subscriber.unsubscribe)).toBeCalledWith(requestConsentChannel, subId)
-      expect(mocked(publisher.publish)).toBeCalledWith(requestConsentChannel, putResponse)
+      expect(mocked(modelConfig.subscriber.subscribe)).toHaveBeenCalledTimes(1)
+      expect(mocked(modelConfig.subscriber.unsubscribe)).toHaveBeenCalledWith(requestConsentChannel, subId)
+      expect(mocked(publisher.publish)).toHaveBeenCalledWith(requestConsentChannel, putResponse)
     })
 
     it('should properly handle error from requests.postConsentRequests', async () => {
@@ -245,8 +245,8 @@ describe('PISPLinkingModel', () => {
         shouldNotBeExecuted()
       } catch (err) {
         expect(err).toEqual(new Error('error from requests.postConsentRequests'))
-        expect(mocked(modelConfig.subscriber.subscribe)).toBeCalledTimes(1)
-        expect(mocked(modelConfig.subscriber.unsubscribe)).toBeCalledWith(requestConsentChannel, subId)
+        expect(mocked(modelConfig.subscriber.subscribe)).toHaveBeenCalledTimes(1)
+        expect(mocked(modelConfig.subscriber.unsubscribe)).toHaveBeenCalledWith(requestConsentChannel, subId)
       }
     })
 
@@ -263,9 +263,9 @@ describe('PISPLinkingModel', () => {
           model.linkingRequestConsentPostRequestToConsentRequestsPostRequest(),
           model.data.toParticipantId
         )
-        expect(mocked(modelConfig.subscriber.subscribe)).toBeCalledTimes(1)
-        expect(mocked(modelConfig.subscriber.unsubscribe)).toBeCalledWith(requestConsentChannel, subId)
-        expect(mocked(publisher.publish)).toBeCalledWith(requestConsentChannel, putResponse)
+        expect(mocked(modelConfig.subscriber.subscribe)).toHaveBeenCalledTimes(1)
+        expect(mocked(modelConfig.subscriber.unsubscribe)).toHaveBeenCalledWith(requestConsentChannel, subId)
+        expect(mocked(publisher.publish)).toHaveBeenCalledWith(requestConsentChannel, putResponse)
         mocked(modelConfig.logger.info).mockReset()
         expect(model.data.currentState).toEqual('WebAuthenticationChannelResponseReceived')
       })
@@ -343,7 +343,7 @@ describe('PISPLinkingModel', () => {
         expect(model.data.currentState).toEqual('consentReceivedAwaitingCredential')
 
         // check we made a call to thirdpartyRequests.patchConsentRequests
-        expect(modelConfig.thirdpartyRequests.patchConsentRequests).toBeCalledWith(
+        expect(modelConfig.thirdpartyRequests.patchConsentRequests).toHaveBeenCalledWith(
           consentRequestId,
           { authToken: '123456' },
           'dfspA'
@@ -444,7 +444,7 @@ describe('PISPLinkingModel', () => {
         expect(model.data.currentState).toEqual('accountsLinked')
 
         // check we made a call to thirdpartyRequests.putConsents
-        expect(modelConfig.thirdpartyRequests.putConsents).toBeCalledWith(
+        expect(modelConfig.thirdpartyRequests.putConsents).toHaveBeenCalledWith(
           registerCredentialData.linkingRequestConsentIDAuthenticateInboundConsentResponse!.consentId,
           {
             credential: {

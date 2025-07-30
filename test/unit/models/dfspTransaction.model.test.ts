@@ -315,7 +315,7 @@ describe('DFSPTransactionModel', () => {
       expect(model.data.currentState).toEqual('transactionRequestIsDone')
 
       // there are seven steps in workflow
-      expect(mocked(modelConfig.kvs.set)).toBeCalledTimes(7)
+      expect(mocked(modelConfig.kvs.set)).toHaveBeenCalledTimes(7)
 
       expect(model.data.transactionId).toBeDefined()
       expect(model.data.transactionRequestState).toEqual('ACCEPTED')
@@ -325,12 +325,12 @@ describe('DFSPTransactionModel', () => {
         transactionId: model.data.transactionId,
         transactionRequestState: 'RECEIVED'
       })
-      expect(modelConfig.dfspBackendRequests.validateThirdpartyTransactionRequestAndGetContext).toBeCalledWith(
+      expect(modelConfig.dfspBackendRequests.validateThirdpartyTransactionRequestAndGetContext).toHaveBeenCalledWith(
         transactionRequestRequest
       )
 
       // onNotifyTransactionRequestIsValid
-      expect(modelConfig.thirdpartyRequests.putThirdpartyRequestsTransactions).toBeCalledWith(
+      expect(modelConfig.thirdpartyRequests.putThirdpartyRequestsTransactions).toHaveBeenCalledWith(
         model.data.transactionRequestPutUpdate,
         model.data.transactionRequestId,
         model.data.participantId
@@ -338,7 +338,7 @@ describe('DFSPTransactionModel', () => {
 
       // check properly requestQuoteRequest
       expect(model.data.requestQuoteRequest).toBeDefined()
-      expect(modelConfig.thirdpartyRequests.putThirdpartyRequestsTransactions).toBeCalledWith(
+      expect(modelConfig.thirdpartyRequests.putThirdpartyRequestsTransactions).toHaveBeenCalledWith(
         model.data.transactionRequestPutUpdate,
         model.data.transactionRequestId,
         model.data.participantId
@@ -418,7 +418,7 @@ describe('DFSPTransactionModel', () => {
 
       // onRequestAuthorization
       expect(model.data.requestAuthorizationPostRequest).toBeDefined()
-      expect(modelConfig.thirdpartyRequests.postThirdpartyRequestsAuthorizations).toBeCalledWith(
+      expect(modelConfig.thirdpartyRequests.postThirdpartyRequestsAuthorizations).toHaveBeenCalledWith(
         model.data.requestAuthorizationPostRequest,
         model.data.participantId
       )
@@ -431,7 +431,7 @@ describe('DFSPTransactionModel', () => {
 
       // onVerifyAuthorization
       // check did we do proper call back to Switch
-      expect(modelConfig.thirdpartyRequests.postThirdpartyRequestsVerifications).toBeCalledWith(
+      expect(modelConfig.thirdpartyRequests.postThirdpartyRequestsVerifications).toHaveBeenCalledWith(
         model.data.requestVerificationPostRequest,
         'centralAuth'
       )
@@ -452,7 +452,7 @@ describe('DFSPTransactionModel', () => {
       })
 
       // onRequestTransfer
-      expect(model.sdkOutgoingRequests.requestTransfer).toBeCalledWith(model.data.transferRequest)
+      expect(model.sdkOutgoingRequests.requestTransfer).toHaveBeenCalledWith(model.data.transferRequest)
 
       expect(model.data.transferResponse).toBeDefined()
       expect(model.data.transferResponse).toEqual(requestTransferResponse)
@@ -748,7 +748,7 @@ describe('DFSPTransactionModel', () => {
       expect(model.data.currentState).toEqual('errored')
 
       // errored state should be saved
-      expect(mocked(modelConfig.kvs.set)).toBeCalledTimes(1)
+      expect(mocked(modelConfig.kvs.set)).toHaveBeenCalledTimes(1)
 
       // state data shouldn't be modified
       expect(model.data).toEqual(data)
@@ -792,10 +792,10 @@ describe('DFSPTransactionModel', () => {
     expect(model.data.currentState).toEqual('errored')
 
     // errored state should be saved
-    expect(mocked(modelConfig.kvs.set)).toBeCalledTimes(1)
+    expect(mocked(modelConfig.kvs.set)).toHaveBeenCalledTimes(1)
 
     // the error callback should be called
-    expect(mocked(modelConfig.thirdpartyRequests.putThirdpartyRequestsTransactionsError)).toBeCalledWith(
+    expect(mocked(modelConfig.thirdpartyRequests.putThirdpartyRequestsTransactionsError)).toHaveBeenCalledWith(
       reformatError(Errors.MojaloopApiErrorCodes.TP_FSP_TRANSACTION_REQUEST_NOT_VALID, model.logger),
       model.data.transactionRequestId,
       model.data.participantId
@@ -849,7 +849,7 @@ describe('DFSPTransactionModel', () => {
 
       // transition `init` should encounter exception when saving `context.data`
       await model.saveToKVS()
-      expect(mocked(modelConfig.kvs.set)).toBeCalledWith(model.key, model.data)
+      expect(mocked(modelConfig.kvs.set)).toHaveBeenCalledWith(model.key, model.data)
     })
     it('should propagate error from KVS.set', async () => {
       mocked(modelConfig.kvs.set).mockImplementationOnce(() => {
@@ -867,7 +867,7 @@ describe('DFSPTransactionModel', () => {
 
       // transition `init` should encounter exception when saving `context.data`
       expect(() => model.saveToKVS()).rejects.toEqual(new Error('error from KVS.set'))
-      expect(mocked(modelConfig.kvs.set)).toBeCalledWith(model.key, model.data)
+      expect(mocked(modelConfig.kvs.set)).toHaveBeenCalledWith(model.key, model.data)
     })
   })
 })

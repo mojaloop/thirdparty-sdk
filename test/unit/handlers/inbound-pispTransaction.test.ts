@@ -64,7 +64,7 @@ describe('Inbound PISP transaction handlers', (): void => {
 
     const channel = PISPTransactionModel.notificationChannel(PISPTransactionPhase.approval, request.params.ID)
 
-    expect(pubSubMock.publish).toBeCalledWith(channel, approveResponse)
+    expect(pubSubMock.publish).toHaveBeenCalledWith(channel, approveResponse)
   })
   it('PUT /thirdpartyRequests/transactions/{ID}/error', async (): Promise<void> => {
     const request = {
@@ -88,6 +88,6 @@ describe('Inbound PISP transaction handlers', (): void => {
 
     const channel = PISPTransactionModel.notificationChannel(PISPTransactionPhase.approval, request.params.ID)
 
-    expect(pubSubMock.publish).toBeCalledWith(channel, errorResponse)
+    expect(pubSubMock.publish).toHaveBeenCalledWith(channel, errorResponse)
   })
 })

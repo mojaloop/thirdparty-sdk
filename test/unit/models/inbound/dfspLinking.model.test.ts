@@ -218,7 +218,7 @@ describe('dfspLinkingModel', () => {
       expect(model.data.consentRequestsIDPutRequest).toEqual(expectedWebConsentRequestResponse)
 
       // check we made a call to dfspBackendRequests.validateConsentRequests
-      expect(modelConfig.dfspBackendRequests.validateConsentRequests).toBeCalledWith(
+      expect(modelConfig.dfspBackendRequests.validateConsentRequests).toHaveBeenCalledWith(
         mockData.consentRequestsPost.payload
       )
     })
@@ -240,7 +240,7 @@ describe('dfspLinkingModel', () => {
       expect(model.data.consentRequestsIDPutRequest).toEqual(expectedOTPConsentRequestResponse)
 
       // check we made a call to dfspBackendRequests.validateConsentRequests
-      expect(modelConfig.dfspBackendRequests.validateConsentRequests).toBeCalledWith(
+      expect(modelConfig.dfspBackendRequests.validateConsentRequests).toHaveBeenCalledWith(
         mockData.consentRequestsPost.payload
       )
     })
@@ -260,7 +260,7 @@ describe('dfspLinkingModel', () => {
       }
 
       // check a PUT /consentsRequest/{ID}/error response was sent to source participant
-      expect(modelConfig.thirdpartyRequests.putConsentRequestsError).toBeCalledWith(
+      expect(modelConfig.thirdpartyRequests.putConsentRequestsError).toHaveBeenCalledWith(
         mockData.consentRequestsPutError.params.ID,
         mockData.consentRequestsPutError.payload,
         'pispa'
@@ -280,7 +280,7 @@ describe('dfspLinkingModel', () => {
       }
 
       // check a PUT /consentsRequest/{ID}/error response was sent to source participant
-      expect(modelConfig.thirdpartyRequests.putConsentRequestsError).toBeCalledWith(
+      expect(modelConfig.thirdpartyRequests.putConsentRequestsError).toHaveBeenCalledWith(
         mockData.consentRequestsPutError.params.ID,
         {
           errorInformation: {
@@ -307,7 +307,7 @@ describe('dfspLinkingModel', () => {
       }
 
       // check a PUT /consentsRequest/{ID}/error response was sent to source participant
-      expect(modelConfig.thirdpartyRequests.putConsentRequestsError).toBeCalledWith(
+      expect(modelConfig.thirdpartyRequests.putConsentRequestsError).toHaveBeenCalledWith(
         mockData.consentRequestsPutError.params.ID,
         {
           errorInformation: {
@@ -337,7 +337,7 @@ describe('dfspLinkingModel', () => {
       } catch (err: any) {
         expect(err.message).toEqual('mocked-error')
       }
-      expect(modelConfig.thirdpartyRequests.putConsentRequestsError).toBeCalledWith(
+      expect(modelConfig.thirdpartyRequests.putConsentRequestsError).toHaveBeenCalledWith(
         mockData.consentRequestsPutError.params.ID,
         {
           errorInformation: {
@@ -367,7 +367,7 @@ describe('dfspLinkingModel', () => {
       } catch (err: any) {
         expect(err.message).toEqual('mocked-error')
       }
-      expect(modelConfig.thirdpartyRequests.putConsentRequestsError).toBeCalledWith(
+      expect(modelConfig.thirdpartyRequests.putConsentRequestsError).toHaveBeenCalledWith(
         mockData.consentRequestsPutError.params.ID,
         {
           errorInformation: {
@@ -392,7 +392,7 @@ describe('dfspLinkingModel', () => {
       } catch (err: any) {
         expect(err.message).toEqual('generic-error')
       }
-      expect(modelConfig.thirdpartyRequests.putConsentRequestsError).toBeCalledWith(
+      expect(modelConfig.thirdpartyRequests.putConsentRequestsError).toHaveBeenCalledWith(
         mockData.consentRequestsPutError.params.ID,
         {
           errorInformation: {
@@ -436,7 +436,7 @@ describe('dfspLinkingModel', () => {
       expect(model.data.currentState).toEqual('consentRequestValidatedAndStored')
 
       // check we made dfspBackendRequests calls
-      expect(modelConfig.dfspBackendRequests.storeConsentRequests).toBeCalledWith(mockData.consentRequestsPost.payload)
+      expect(modelConfig.dfspBackendRequests.storeConsentRequests).toHaveBeenCalledWith(mockData.consentRequestsPost.payload)
       expect(modelConfig.dfspBackendRequests.sendOTP).not.toHaveBeenCalled()
     })
 
@@ -458,7 +458,7 @@ describe('dfspLinkingModel', () => {
       expect(model.data.currentState).toEqual('consentRequestValidatedAndStored')
 
       // check we made dfspBackendRequests calls
-      expect(modelConfig.dfspBackendRequests.sendOTP).toBeCalledWith(mockData.consentRequestsPost.payload)
+      expect(modelConfig.dfspBackendRequests.sendOTP).toHaveBeenCalledWith(mockData.consentRequestsPost.payload)
       expect(modelConfig.dfspBackendRequests.storeConsentRequests).not.toHaveBeenCalled()
     })
 
@@ -572,7 +572,7 @@ describe('dfspLinkingModel', () => {
       }
 
       // check a PUT /consentsRequests/{ID}/error response was sent to source participant
-      expect(modelConfig.thirdpartyRequests.putConsentRequestsError).toBeCalledWith(
+      expect(modelConfig.thirdpartyRequests.putConsentRequestsError).toHaveBeenCalledWith(
         'b51ec534-ee48-4575-b6a9-ead2955b8069',
         {
           errorInformation: {
@@ -621,7 +621,7 @@ describe('dfspLinkingModel', () => {
       expect(model.data.currentState).toEqual('authTokenValidated')
 
       // check we made a call to dfspBackendRequests.validateAuthToken
-      expect(modelConfig.dfspBackendRequests.validateAuthToken).toBeCalledWith(
+      expect(modelConfig.dfspBackendRequests.validateAuthToken).toHaveBeenCalledWith(
         'b51ec534-ee48-4575-b6a9-ead2955b8069',
         '123456'
       )
@@ -645,7 +645,7 @@ describe('dfspLinkingModel', () => {
 
       // check a PUT /consentsRequest/{ID}/error response was sent to source participant
       // todo: better and more descriptive error handling
-      expect(modelConfig.thirdpartyRequests.putConsentRequestsError).toBeCalledWith(
+      expect(modelConfig.thirdpartyRequests.putConsentRequestsError).toHaveBeenCalledWith(
         'b51ec534-ee48-4575-b6a9-ead2955b8069',
         {
           errorInformation: {
@@ -671,7 +671,7 @@ describe('dfspLinkingModel', () => {
 
       // check a PUT /consentsRequest/{ID}/error response was sent to source participant
       // todo: better and more descriptive error handling
-      expect(modelConfig.thirdpartyRequests.putConsentRequestsError).toBeCalledWith(
+      expect(modelConfig.thirdpartyRequests.putConsentRequestsError).toHaveBeenCalledWith(
         'b51ec534-ee48-4575-b6a9-ead2955b8069',
         {
           errorInformation: {
@@ -698,7 +698,7 @@ describe('dfspLinkingModel', () => {
       }
 
       // check a PUT /consentsRequest/{ID}/error response was sent to source participant
-      expect(modelConfig.thirdpartyRequests.putConsentRequestsError).toBeCalledWith(
+      expect(modelConfig.thirdpartyRequests.putConsentRequestsError).toHaveBeenCalledWith(
         'b51ec534-ee48-4575-b6a9-ead2955b8069',
         {
           errorInformation: {
@@ -767,7 +767,7 @@ describe('dfspLinkingModel', () => {
         mockData.inboundPutConsentsIdRequestSignedCredential.payload
       )
       // check we made a call to thirdpartyRequests.postConsents
-      expect(modelConfig.thirdpartyRequests.postConsents).toBeCalledWith(
+      expect(modelConfig.thirdpartyRequests.postConsents).toHaveBeenCalledWith(
         {
           consentId: '00000000-0000-1000-8000-000000000001',
           consentRequestId: 'b51ec534-ee48-4575-b6a9-ead2955b8069',
@@ -802,7 +802,7 @@ describe('dfspLinkingModel', () => {
       }
 
       // check a PUT /consents/{ID}/error response was sent to source participant
-      expect(modelConfig.thirdpartyRequests.putConsentsError).toBeCalledWith(
+      expect(modelConfig.thirdpartyRequests.putConsentsError).toHaveBeenCalledWith(
         '00000000-0000-1000-8000-000000000001',
         {
           errorInformation: {
@@ -904,7 +904,7 @@ describe('dfspLinkingModel', () => {
       expect(model.data.currentState).toEqual('consentRegisteredAndValidated')
 
       // check we made a call to thirdpartyRequests.postConsents
-      expect(modelConfig.thirdpartyRequests.postConsents).toBeCalledWith(
+      expect(modelConfig.thirdpartyRequests.postConsents).toHaveBeenCalledWith(
         {
           consentId: '00000000-0000-1000-8000-000000000001',
           scopes: [
@@ -972,7 +972,7 @@ describe('dfspLinkingModel', () => {
       expect(model.data.currentState).toEqual('errored')
 
       // check we made a call to thirdpartyRequests.postConsents
-      expect(modelConfig.thirdpartyRequests.putConsentsError).toBeCalledWith(
+      expect(modelConfig.thirdpartyRequests.putConsentsError).toHaveBeenCalledWith(
         validateData.consentId,
         {
           errorInformation: {
@@ -999,7 +999,7 @@ describe('dfspLinkingModel', () => {
       }
 
       // check a PUT /consents/{ID}/error response was sent to source participant
-      expect(modelConfig.thirdpartyRequests.putConsentsError).toBeCalledWith(
+      expect(modelConfig.thirdpartyRequests.putConsentsError).toHaveBeenCalledWith(
         '00000000-0000-1000-8000-000000000001',
         {
           errorInformation: {
@@ -1097,7 +1097,7 @@ describe('dfspLinkingModel', () => {
       expect(model.data.currentState).toEqual('validatedConsentStoredWithDFSP')
 
       // check we made dfspBackendRequests calls
-      expect(modelConfig.dfspBackendRequests.storeValidatedConsentForAccountId).toBeCalledWith(
+      expect(modelConfig.dfspBackendRequests.storeValidatedConsentForAccountId).toHaveBeenCalledWith(
         [
           {
             address: 'dfspa.username.1234',
@@ -1242,7 +1242,7 @@ describe('dfspLinkingModel', () => {
       expect(model.data.currentState).toEqual('notificationSent')
 
       // check we made a call to thirdpartyRequests.postConsents
-      expect(modelConfig.thirdpartyRequests.patchConsents).toBeCalledWith(
+      expect(modelConfig.thirdpartyRequests.patchConsents).toHaveBeenCalledWith(
         validateData.consentId!,
         {
           credential: {
@@ -1268,7 +1268,7 @@ describe('dfspLinkingModel', () => {
       }
 
       // check a PUT /consents/{ID}/error response was sent to source participant
-      expect(modelConfig.thirdpartyRequests.putConsentsError).toBeCalledWith(
+      expect(modelConfig.thirdpartyRequests.putConsentsError).toHaveBeenCalledWith(
         '00000000-0000-1000-8000-000000000001',
         {
           errorInformation: {
@@ -1390,7 +1390,7 @@ describe('dfspLinkingModel', () => {
 
       const result = await model.run()
 
-      expect(mocked(modelConfig.logger.info)).toBeCalledWith('State machine in errored state')
+      expect(mocked(modelConfig.logger.info)).toHaveBeenCalledWith('State machine in errored state')
 
       expect(result).toBeUndefined()
     })
@@ -1474,7 +1474,7 @@ describe('dfspLinkingModel', () => {
         mockData.inboundPutConsentsIdRequestSignedCredential.payload
       )
       // check we made a call to thirdpartyRequests.postConsents
-      expect(modelConfig.thirdpartyRequests.postConsents).toBeCalledWith(
+      expect(modelConfig.thirdpartyRequests.postConsents).toHaveBeenCalledWith(
         {
           consentId: '12340000-0000-1000-8000-000000000001',
           consentRequestId: 'b51ec534-ee48-4575-b6a9-ead2955b8069',
@@ -1510,7 +1510,7 @@ describe('dfspLinkingModel', () => {
       }
 
       // check a PUT /consents/{ID}/error response was sent to source participant
-      expect(modelConfig.thirdpartyRequests.putConsentsError).toBeCalledWith(
+      expect(modelConfig.thirdpartyRequests.putConsentsError).toHaveBeenCalledWith(
         '12340000-0000-1000-8000-000000000001',
         {
           errorInformation: {
