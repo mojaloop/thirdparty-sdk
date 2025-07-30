@@ -86,7 +86,7 @@ describe('backendRequests', () => {
       const getSpy = jest.spyOn(dfspBackendRequests, 'get').mockImplementationOnce(() => Promise.resolve(response))
       const result = await dfspBackendRequests.getUserAccounts(userId)
       expect(result).toEqual(response)
-      expect(getSpy).toBeCalledWith(`accounts/${userId}`)
+      expect(getSpy).toHaveBeenCalledWith(`accounts/${userId}`)
     })
   })
 
@@ -98,7 +98,7 @@ describe('backendRequests', () => {
       const authToken = uuidv4()
       const result = await dfspBackendRequests.validateAuthToken(consentRequestId, authToken)
       expect(result).toEqual(response)
-      expect(postSpy).toBeCalledWith(dfspBackendRequests.validateAuthTokenPath, { authToken, consentRequestId })
+      expect(postSpy).toHaveBeenCalledWith(dfspBackendRequests.validateAuthTokenPath, { authToken, consentRequestId })
     })
   })
 
@@ -134,7 +134,7 @@ describe('backendRequests', () => {
       const result =
         await dfspBackendRequests.validateThirdpartyTransactionRequestAndGetContext(transactionRequestRequest)
       expect(result).toEqual(response)
-      expect(postSpy).toBeCalledWith(
+      expect(postSpy).toHaveBeenCalledWith(
         dfspBackendRequests.validateThirdpartyTransactionRequestPath,
         transactionRequestRequest
       )
@@ -148,7 +148,7 @@ describe('backendRequests', () => {
       const getSpy = jest.spyOn(dfspBackendRequests, 'post').mockImplementationOnce(() => Promise.resolve(response))
       const result = await dfspBackendRequests.validateConsentRequests(request)
       expect(result).toEqual(response)
-      expect(getSpy).toBeCalledWith('validateConsentRequests', request)
+      expect(getSpy).toHaveBeenCalledWith('validateConsentRequests', request)
     })
   })
 
@@ -160,7 +160,7 @@ describe('backendRequests', () => {
       const getSpy = jest.spyOn(dfspBackendRequests, 'post').mockImplementationOnce(() => Promise.resolve(response))
       const result = await dfspBackendRequests.sendOTP(request)
       expect(result).toEqual(response)
-      expect(getSpy).toBeCalledWith('sendOTP', otpRequest)
+      expect(getSpy).toHaveBeenCalledWith('sendOTP', otpRequest)
     })
   })
 
@@ -170,7 +170,7 @@ describe('backendRequests', () => {
       const getSpy = jest.spyOn(dfspBackendRequests, 'post').mockImplementationOnce(() => Promise.resolve())
       const result = await dfspBackendRequests.storeConsentRequests(request)
       expect(result).toBeUndefined()
-      expect(getSpy).toBeCalledWith(`store/consentRequests/${request.consentRequestId}`, { scopes: request.scopes })
+      expect(getSpy).toHaveBeenCalledWith(`store/consentRequests/${request.consentRequestId}`, { scopes: request.scopes })
     })
   })
 
@@ -218,7 +218,7 @@ describe('backendRequests', () => {
         }
       )
       expect(result).toBeUndefined()
-      expect(postSpy).toBeCalledWith('accountConsentInfo', {
+      expect(postSpy).toHaveBeenCalledWith('accountConsentInfo', {
         scopes: [
           {
             address: 'dfspa.username.1234',

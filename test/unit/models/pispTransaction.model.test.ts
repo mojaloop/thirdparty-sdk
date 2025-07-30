@@ -227,7 +227,7 @@ describe('pipsTransactionModel', () => {
         })
 
         // check we made a call to mojaloopRequest.getParties
-        expect(modelConfig.sdkOutgoingRequests.requestPartiesInformation).toBeCalledWith(
+        expect(modelConfig.sdkOutgoingRequests.requestPartiesInformation).toHaveBeenCalledWith(
           'MSISDN',
           'party-identifier',
           undefined
@@ -387,12 +387,12 @@ describe('pipsTransactionModel', () => {
         })
 
         // check that correct subscription has been done
-        expect(modelConfig.subscriber.subscribe).toBeCalledWith(channelAuthPost, expect.anything())
-        expect(modelConfig.subscriber.subscribe).toBeCalledWith(channelTransPut, expect.anything())
+        expect(modelConfig.subscriber.subscribe).toHaveBeenCalledWith(channelAuthPost, expect.anything())
+        expect(modelConfig.subscriber.subscribe).toHaveBeenCalledWith(channelTransPut, expect.anything())
 
         // check that correct unsubscription has been done
-        expect(modelConfig.subscriber.unsubscribe).toBeCalledWith(channelAuthPost, expect.anything())
-        expect(modelConfig.subscriber.unsubscribe).toBeCalledWith(channelTransPut, expect.anything())
+        expect(modelConfig.subscriber.unsubscribe).toHaveBeenCalledWith(channelAuthPost, expect.anything())
+        expect(modelConfig.subscriber.unsubscribe).toHaveBeenCalledWith(channelTransPut, expect.anything())
 
         // check we got needed part of response stored
         expect(model.data.authorizationRequest).toEqual(authorizationRequest)
@@ -405,7 +405,7 @@ describe('pipsTransactionModel', () => {
         })
 
         // check we made a call to hirdpartyRequests.postThirdpartyRequestsTransactions
-        expect(modelConfig.thirdpartyRequests.postThirdpartyRequestsTransactions).toBeCalledWith(
+        expect(modelConfig.thirdpartyRequests.postThirdpartyRequestsTransactions).toHaveBeenCalledWith(
           {
             transactionRequestId: data.transactionRequestId,
             ...data.initiateRequest
@@ -423,10 +423,10 @@ describe('pipsTransactionModel', () => {
             expect(err.message).toEqual('mocked postThirdpartyRequestsTransactions exception')
 
             // check that correct subscription has been done
-            expect(modelConfig.subscriber.subscribe).toBeCalledWith(channelTransPut, expect.anything())
+            expect(modelConfig.subscriber.subscribe).toHaveBeenCalledWith(channelTransPut, expect.anything())
 
             // check that correct unsubscription has been done
-            expect(modelConfig.subscriber.unsubscribe).toBeCalledWith(channelTransPut, expect.anything())
+            expect(modelConfig.subscriber.unsubscribe).toHaveBeenCalledWith(channelTransPut, expect.anything())
             done()
           })
         })
@@ -564,10 +564,10 @@ describe('pipsTransactionModel', () => {
         })
 
         // check that correct subscription has been done
-        expect(modelConfig.subscriber.subscribe).toBeCalledWith(channel, expect.anything())
+        expect(modelConfig.subscriber.subscribe).toHaveBeenCalledWith(channel, expect.anything())
 
         // check that correct unsubscription has been done
-        expect(modelConfig.subscriber.unsubscribe).toBeCalledWith(channel, 1)
+        expect(modelConfig.subscriber.unsubscribe).toHaveBeenCalledWith(channel, 1)
 
         // check we got needed part of response stored
         expect(model.data.transactionStatusPatch).toEqual(transactionStatus)
@@ -579,7 +579,7 @@ describe('pipsTransactionModel', () => {
         })
 
         // check we made a call to thirdpartyRequests.putThirdpartyRequestsAuthorizations
-        expect(modelConfig.thirdpartyRequests.putThirdpartyRequestsAuthorizations).toBeCalledWith(
+        expect(modelConfig.thirdpartyRequests.putThirdpartyRequestsAuthorizations).toHaveBeenCalledWith(
           authorizationResponse,
           data.authorizationRequest?.authorizationRequestId,
           data.initiateRequest?.payer.fspId
@@ -601,10 +601,10 @@ describe('pipsTransactionModel', () => {
         }
 
         // check that correct subscription has been done
-        expect(modelConfig.subscriber.subscribe).toBeCalledWith(channel, expect.anything())
+        expect(modelConfig.subscriber.subscribe).toHaveBeenCalledWith(channel, expect.anything())
 
         // check that correct unsubscription has been done
-        expect(modelConfig.subscriber.unsubscribe).toBeCalledWith(channel, 1)
+        expect(modelConfig.subscriber.unsubscribe).toHaveBeenCalledWith(channel, 1)
       })
     })
 
@@ -632,7 +632,7 @@ describe('pipsTransactionModel', () => {
       }
       const model = await create(invalidData, modelConfig)
       expect(model.fsm.state).toEqual('partyLookupSuccess')
-      expect(model.run()).rejects.toThrowError('invalid payeeRequest data')
+      expect(model.run()).rejects.toThrow('invalid payeeRequest data')
     })
   })
 
@@ -642,10 +642,10 @@ describe('pipsTransactionModel', () => {
 
       phases.forEach((phase) => {
         expect(PISPTransactionModel.notificationChannel(phase, 'trx-id')).toEqual(`pisp_transaction_${phase}_trx-id`)
-        expect(() => PISPTransactionModel.notificationChannel(phase, '')).toThrowError(
+        expect(() => PISPTransactionModel.notificationChannel(phase, '')).toThrow(
           "PISPTransactionModel.notificationChannel: 'transactionRequestId' parameter is required"
         )
-        expect(() => PISPTransactionModel.notificationChannel(phase, null as unknown as string)).toThrowError(
+        expect(() => PISPTransactionModel.notificationChannel(phase, null as unknown as string)).toThrow(
           "PISPTransactionModel.notificationChannel: 'transactionRequestId' parameter is required"
         )
       })
@@ -737,7 +737,7 @@ describe('pipsTransactionModel', () => {
 
       // transition `init` should encounter exception when saving `context.data`
       await model.saveToKVS()
-      expect(mocked(modelConfig.kvs.set)).toBeCalledWith(model.key, model.data)
+      expect(mocked(modelConfig.kvs.set)).toHaveBeenCalledWith(model.key, model.data)
     })
     it('should propagate error from KVS.set', async () => {
       mocked(modelConfig.kvs.set).mockImplementationOnce(() => {
@@ -752,7 +752,7 @@ describe('pipsTransactionModel', () => {
 
       // transition `init` should encounter exception when saving `context.data`
       expect(() => model.saveToKVS()).rejects.toEqual(new Error('error from KVS.set'))
-      expect(mocked(modelConfig.kvs.set)).toBeCalledWith(model.key, model.data)
+      expect(mocked(modelConfig.kvs.set)).toHaveBeenCalledWith(model.key, model.data)
     })
   })
 })

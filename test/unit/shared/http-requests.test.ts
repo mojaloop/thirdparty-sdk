@@ -78,7 +78,7 @@ describe('HttpRequests', () => {
       const requestSpy = jest.spyOn(SDK, 'request').mockImplementationOnce(() => Promise.resolve(response))
       const result = await httpRequest.get('zzz')
       expect(result).toEqual(response.data)
-      expect(requestSpy).toBeCalledWith({
+      expect(requestSpy).toHaveBeenCalledWith({
         agent: expect.anything(),
         headers,
         method: 'GET',
@@ -90,7 +90,7 @@ describe('HttpRequests', () => {
       const requestSpy = jest.spyOn(SDK, 'request').mockImplementationOnce(() => Promise.resolve(response))
       const result = await httpRequest.patch('zzz', payload)
       expect(result).toEqual(response.data)
-      expect(requestSpy).toBeCalledWith({
+      expect(requestSpy).toHaveBeenCalledWith({
         agent: expect.anything(),
         headers,
         method: 'PATCH',
@@ -103,7 +103,7 @@ describe('HttpRequests', () => {
       const requestSpy = jest.spyOn(SDK, 'request').mockImplementationOnce(() => Promise.resolve(response))
       const result = await httpRequest.post('zzz', payload)
       expect(result).toEqual(response.data)
-      expect(requestSpy).toBeCalledWith({
+      expect(requestSpy).toHaveBeenCalledWith({
         agent: expect.anything(),
         headers,
         method: 'POST',
@@ -116,7 +116,7 @@ describe('HttpRequests', () => {
       const requestSpy = jest.spyOn(SDK, 'request').mockImplementationOnce(() => Promise.resolve(response))
       const result = await httpRequest.put('zzz', payload)
       expect(result).toEqual(response.data)
-      expect(requestSpy).toBeCalledWith({
+      expect(requestSpy).toHaveBeenCalledWith({
         agent: expect.anything(),
         headers,
         method: 'PUT',
@@ -129,8 +129,8 @@ describe('HttpRequests', () => {
       const requestSpy = jest.spyOn(SDK, 'request').mockImplementationOnce(() => {
         throw new Error('exception')
       })
-      expect(httpRequest.put('zzz', payload)).rejects.toThrowError('exception')
-      expect(requestSpy).toBeCalledWith({
+      expect(httpRequest.put('zzz', payload)).rejects.toThrow('exception')
+      expect(requestSpy).toHaveBeenCalledWith({
         agent: expect.anything(),
         headers,
         method: 'PUT',
@@ -148,7 +148,7 @@ describe('HttpRequests', () => {
       )
       const result = await httpRequest.put('zzz', payload)
       expect(result).toBeUndefined()
-      expect(requestSpy).toBeCalledWith({
+      expect(requestSpy).toHaveBeenCalledWith({
         agent: expect.anything(),
         headers,
         method: 'PUT',
@@ -173,7 +173,7 @@ describe('HttpRequests', () => {
           }
         })
       )
-      expect(requestSpy).toBeCalledWith({
+      expect(requestSpy).toHaveBeenCalledWith({
         agent: expect.anything(),
         headers,
         method: 'PUT',
@@ -195,6 +195,6 @@ describe('HttpRequests', () => {
 
     const request = new HttpRequests(kaConfig)
     expect(request).toBeTruthy()
-    expect(agentSpy).toBeCalledWith({ keepAlive: false })
+    expect(agentSpy).toHaveBeenCalledWith({ keepAlive: false })
   })
 })

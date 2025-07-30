@@ -173,16 +173,16 @@ describe('Inbound DFSP Transaction handler', () => {
     // give 100ms for post background job to be done
     setTimeout(() => {
       // it is the happy flow so no error callback should be called
-      expect(thirdpartyRequestsMock.putThirdpartyRequestsTransactionsError).not.toBeCalled()
+      expect(thirdpartyRequestsMock.putThirdpartyRequestsTransactionsError).not.toHaveBeenCalled()
 
       // all these endpoints are used by the flow
-      expect(thirdpartyRequestsMock.postThirdpartyRequestsAuthorizations).toBeCalledTimes(1)
-      expect(thirdpartyRequestsMock.postThirdpartyRequestsVerifications).toBeCalledTimes(1)
-      expect(thirdpartyRequestsMock.putThirdpartyRequestsTransactions).toBeCalledTimes(1)
-      expect(thirdpartyRequestsMock.patchThirdpartyRequestsTransactions).toBeCalledTimes(1)
-      expect(dfspBackendRequestsMock.validateThirdpartyTransactionRequestAndGetContext).toBeCalledTimes(1)
-      expect(sdkOutgoingRequestsMock.requestQuote).toBeCalledTimes(1)
-      expect(sdkOutgoingRequestsMock.requestTransfer).toBeCalledTimes(1)
+      expect(thirdpartyRequestsMock.postThirdpartyRequestsAuthorizations).toHaveBeenCalledTimes(1)
+      expect(thirdpartyRequestsMock.postThirdpartyRequestsVerifications).toHaveBeenCalledTimes(1)
+      expect(thirdpartyRequestsMock.putThirdpartyRequestsTransactions).toHaveBeenCalledTimes(1)
+      expect(thirdpartyRequestsMock.patchThirdpartyRequestsTransactions).toHaveBeenCalledTimes(1)
+      expect(dfspBackendRequestsMock.validateThirdpartyTransactionRequestAndGetContext).toHaveBeenCalledTimes(1)
+      expect(sdkOutgoingRequestsMock.requestQuote).toHaveBeenCalledTimes(1)
+      expect(sdkOutgoingRequestsMock.requestTransfer).toHaveBeenCalledTimes(1)
 
       // we are done!
       done()

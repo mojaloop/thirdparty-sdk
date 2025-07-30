@@ -205,7 +205,7 @@ describe('Inbound API routes', (): void => {
     const response = await server.inject(request)
     expect(response.statusCode).toBe(202)
 
-    expect(__postQuotes).toBeCalledWith(quoteRequest, quoteRequest.payee.partyIdInfo.fspId)
+    expect(__postQuotes).toHaveBeenCalledWith(quoteRequest, quoteRequest.payee.partyIdInfo.fspId)
   })
 
   describe('/thirdpartyRequests/transactions', () => {
@@ -294,10 +294,10 @@ describe('Inbound API routes', (): void => {
       )
 
       expect(result.statusCode).toEqual(200)
-      expect(toolkit.getPublisher).toBeCalledTimes(1)
+      expect(toolkit.getPublisher).toHaveBeenCalledTimes(1)
 
       const channel = PISPDiscoveryModel.notificationChannel(request.params.ID)
-      expect(pubSubMock.publish).toBeCalledWith(channel, request.payload)
+      expect(pubSubMock.publish).toHaveBeenCalledWith(channel, request.payload)
     })
 
     it('input validation', async (): Promise<void> => {
@@ -369,10 +369,10 @@ describe('Inbound API routes', (): void => {
       )
 
       expect(result.statusCode).toEqual(200)
-      expect(toolkit.getPublisher).toBeCalledTimes(1)
+      expect(toolkit.getPublisher).toHaveBeenCalledTimes(1)
 
       const channel = PISPDiscoveryModel.notificationChannel(errorRequest.params.ID)
-      expect(pubSubMock.publish).toBeCalledWith(channel, errorRequest.payload)
+      expect(pubSubMock.publish).toHaveBeenCalledWith(channel, errorRequest.payload)
     })
   })
   describe('POST /consents', () => {
@@ -409,8 +409,8 @@ describe('Inbound API routes', (): void => {
         PISPLinkingPhase.requestConsentAuthenticate,
         postConsentRequest.consentRequestId!
       )
-      expect(toolkit.getPublisher).toBeCalledTimes(1)
-      expect(pubSubMock.publish).toBeCalledWith(channel, postConsentRequest)
+      expect(toolkit.getPublisher).toHaveBeenCalledTimes(1)
+      expect(pubSubMock.publish).toHaveBeenCalledWith(channel, postConsentRequest)
     })
 
     it('input validation', async (): Promise<void> => {
@@ -526,10 +526,10 @@ describe('Inbound API routes', (): void => {
       )
 
       expect(result.statusCode).toEqual(200)
-      expect(toolkit.getPublisher).toBeCalledTimes(1)
+      expect(toolkit.getPublisher).toHaveBeenCalledTimes(1)
 
       const channel = PISPLinkingModel.notificationChannel(PISPLinkingPhase.requestConsent, request.params.ID)
-      expect(pubSubMock.publish).toBeCalledWith(channel, request.payload)
+      expect(pubSubMock.publish).toHaveBeenCalledWith(channel, request.payload)
     })
 
     it('input validation', async (): Promise<void> => {
@@ -572,16 +572,16 @@ describe('Inbound API routes', (): void => {
       )
 
       expect(result.statusCode).toEqual(200)
-      expect(toolkit.getPublisher).toBeCalledTimes(2)
+      expect(toolkit.getPublisher).toHaveBeenCalledTimes(2)
 
       const channel = PISPLinkingModel.notificationChannel(PISPLinkingPhase.requestConsent, errorRequest.params.ID)
-      expect(pubSubMock.publish).toBeCalledWith(channel, errorRequest.payload)
+      expect(pubSubMock.publish).toHaveBeenCalledWith(channel, errorRequest.payload)
 
       const authTokenChannel = PISPLinkingModel.notificationChannel(
         PISPLinkingPhase.requestConsentAuthenticate,
         errorRequest.params.ID
       )
-      expect(pubSubMock.publish).toBeCalledWith(authTokenChannel, errorRequest.payload)
+      expect(pubSubMock.publish).toHaveBeenCalledWith(authTokenChannel, errorRequest.payload)
     })
   })
 

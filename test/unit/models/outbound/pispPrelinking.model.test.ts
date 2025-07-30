@@ -156,7 +156,7 @@ describe('pispPrelinkingModel', () => {
       expect(model.data.currentState).toEqual('providersLookupSuccess')
 
       // check we made a call to thirdpartyRequests.getServices
-      expect(modelConfig.thirdpartyRequests.getServices).toBeCalledWith('THIRD_PARTY_DFSP')
+      expect(modelConfig.thirdpartyRequests.getServices).toHaveBeenCalledWith ('THIRD_PARTY_DFSP')
 
       expect(result).toEqual({
         providers: ['dfspA', 'dfspB'],

@@ -193,9 +193,9 @@ describe('PISPDiscoveryModel', () => {
         model.data.userId,
         model.data.toParticipantId
       )
-      expect(mocked(modelConfig.subscriber.subscribe)).toBeCalledTimes(1)
-      expect(mocked(modelConfig.subscriber.unsubscribe)).toBeCalledWith(channel, subId)
-      expect(mocked(publisher.publish)).toBeCalledWith(channel, putResponse)
+      expect(mocked(modelConfig.subscriber.subscribe)).toHaveBeenCalledTimes(1)
+      expect(mocked(modelConfig.subscriber.unsubscribe)).toHaveBeenCalledWith(channel, subId)
+      expect(mocked(publisher.publish)).toHaveBeenCalledWith(channel, putResponse)
     })
     it('should give response properly populated from notification channel - ID not found', async () => {
       putResponse = mockData.accountsRequestError.payload
@@ -213,9 +213,9 @@ describe('PISPDiscoveryModel', () => {
         model.data.userId,
         model.data.toParticipantId
       )
-      expect(mocked(modelConfig.subscriber.subscribe)).toBeCalledTimes(1)
-      expect(mocked(modelConfig.subscriber.unsubscribe)).toBeCalledWith(channel, subId)
-      expect(mocked(publisher.publish)).toBeCalledWith(channel, putResponse)
+      expect(mocked(modelConfig.subscriber.subscribe)).toHaveBeenCalledTimes(1)
+      expect(mocked(modelConfig.subscriber.unsubscribe)).toHaveBeenCalledWith(channel, subId)
+      expect(mocked(publisher.publish)).toHaveBeenCalledWith(channel, putResponse)
     })
 
     it('should properly handle error from requests.getAccounts', async () => {
@@ -232,8 +232,8 @@ describe('PISPDiscoveryModel', () => {
         expect(err).toEqual(new Error('error from requests.getAccounts'))
         const result = model.getResponse()
         expect(result).toBeUndefined()
-        expect(mocked(modelConfig.subscriber.subscribe)).toBeCalledTimes(1)
-        expect(mocked(modelConfig.subscriber.unsubscribe)).toBeCalledWith(channel, subId)
+        expect(mocked(modelConfig.subscriber.subscribe)).toHaveBeenCalledTimes(1)
+        expect(mocked(modelConfig.subscriber.unsubscribe)).toHaveBeenCalledWith(channel, subId)
       }
     })
 
@@ -251,11 +251,11 @@ describe('PISPDiscoveryModel', () => {
           model.data.userId,
           model.data.toParticipantId
         )
-        expect(mocked(modelConfig.subscriber.subscribe)).toBeCalledTimes(1)
-        expect(mocked(modelConfig.subscriber.unsubscribe)).toBeCalledWith(channel, subId)
-        expect(mocked(publisher.publish)).toBeCalledWith(channel, putResponse)
+        expect(mocked(modelConfig.subscriber.subscribe)).toHaveBeenCalledTimes(1)
+        expect(mocked(modelConfig.subscriber.unsubscribe)).toHaveBeenCalledWith(channel, subId)
+        expect(mocked(publisher.publish)).toHaveBeenCalledWith(channel, putResponse)
 
-        expect(mocked(modelConfig.logger.info)).toBeCalledWith('getAccounts completed successfully')
+        expect(mocked(modelConfig.logger.info)).toHaveBeenCalledWith('getAccounts completed successfully')
         mocked(modelConfig.logger.info).mockReset()
 
         // check retrieving state from 'succeeded'
@@ -266,7 +266,7 @@ describe('PISPDiscoveryModel', () => {
 
         expect(newResult).toEqual(result)
 
-        expect(mocked(modelConfig.logger.info)).toBeCalledWith('getAccounts completed successfully')
+        expect(mocked(modelConfig.logger.info)).toHaveBeenCalledWith('getAccounts completed successfully')
       })
 
       it('errored', async () => {
@@ -274,7 +274,7 @@ describe('PISPDiscoveryModel', () => {
 
         const result = await model.run()
 
-        expect(mocked(modelConfig.logger.info)).toBeCalledWith('State machine in errored state')
+        expect(mocked(modelConfig.logger.info)).toHaveBeenCalledWith('State machine in errored state')
 
         expect(result).toBeUndefined()
       })

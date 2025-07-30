@@ -62,15 +62,15 @@ jest.mock(
 describe('shared/logger', (): void => {
   it('should do nothing if no request', (): void => {
     logResponse(null as unknown as RequestLogged)
-    expect(logger.info).not.toBeCalled()
+    expect(logger.info).not.toHaveBeenCalled()
   })
 
   it('should log response via JSON.stringify', (): void => {
     const spyStringify = jest.spyOn(JSON, 'stringify')
     const request = { response: { source: 'abc', statusCode: 200 } }
     logResponse(request as RequestLogged)
-    expect(spyStringify).toBeCalledWith('abc')
-    expect(logger.info).toBeCalledWith(
+    expect(spyStringify).toHaveBeenCalledWith('abc')
+    expect(logger.info).toHaveBeenCalledWith(
       `AS-Trace - Response: ${JSON.stringify(request.response.source)} Status: ${request.response.statusCode}`
     )
   })
@@ -86,8 +86,8 @@ describe('shared/logger', (): void => {
 
     const request = { response: { source: 'abc', statusCode: 200 } }
     logResponse(request as RequestLogged)
-    expect(spyStringify).toBeCalled()
-    expect(logger.info).toBeCalledWith(
+    expect(spyStringify).toHaveBeenCalled()
+    expect(logger.info).toHaveBeenCalledWith(
       `AS-Trace - Response: ${inspect(request.response.source)} Status: ${request.response.statusCode}`
     )
   })
@@ -97,8 +97,8 @@ describe('shared/logger', (): void => {
     const spyStringify = jest.spyOn(JSON, 'stringify').mockImplementationOnce(() => null as unknown as string)
     const request = { response: { source: 'abc', statusCode: 200 } }
     logResponse(request as RequestLogged)
-    expect(spyStringify).toBeCalled()
-    expect(logger.info).toBeCalledWith(`AS-Trace - Response: ${request.response.toString()}`)
+    expect(spyStringify).toHaveBeenCalled()
+    expect(logger.info).toHaveBeenCalledWith(`AS-Trace - Response: ${request.response.toString()}`)
   })
 
   describe('Logger class', () => {

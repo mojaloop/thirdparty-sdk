@@ -92,7 +92,7 @@ describe('StatePlugin', () => {
     expect(ServerMock.decorate.mock.calls[8][1]).toEqual('getSDKOutgoingRequests')
 
     // check listener registration on 'stop' event
-    expect(ServerMock.events.on).toBeCalledTimes(1)
+    expect(ServerMock.events.on).toHaveBeenCalledTimes(1)
     expect(ServerMock.events.on.mock.calls[0][0]).toEqual('stop')
   })
 
@@ -103,7 +103,7 @@ describe('StatePlugin', () => {
 
     const mockExit = mockProcessExit()
     await StatePlugin.register(ServerMock as unknown as Server)
-    expect(mockExit).toBeCalledWith(1)
+    expect(mockExit).toHaveBeenCalledWith(1)
     mockExit.mockRestore()
   })
 
@@ -126,7 +126,7 @@ describe('StatePlugin', () => {
     OutboundServerMock.settings.app.api = ServerAPI.outbound
 
     await StatePlugin.register(ServerMock as unknown as Server)
-    expect(spyWSO2Auth).toBeCalledWith({
+    expect(spyWSO2Auth).toHaveBeenCalledWith({
       ...config.wso2,
       logger,
       tlsCreds: config.outbound.tls.creds

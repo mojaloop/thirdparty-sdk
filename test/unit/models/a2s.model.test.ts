@@ -193,7 +193,7 @@ describe('A2SModel', () => {
         },
         the: 'injected-property'
       })
-      expect(deferredJob).toBeCalled()
+      expect(deferredJob).toHaveBeenCalled()
     })
 
     it('should handle the exception from reformatMessage', async () => {
@@ -209,7 +209,7 @@ describe('A2SModel', () => {
         await m.run({ first: 'I am the first', second: 234 })
       } catch (err: any) {
         expect(err.message).toEqual('from-reformat-message')
-        expect(spyReformatMessage).toBeCalledWith({
+        expect(spyReformatMessage).toHaveBeenCalledWith({
           the: 'message-listening-on'
         })
       }
@@ -229,7 +229,7 @@ describe('A2SModel', () => {
         await m.run({ first: 'I am the first', second: 234 })
       } catch (err: any) {
         expect(err.message).toEqual('from-requestAction')
-        expect(spyRequestAction).toBeCalledWith({ first: 'I am the first', second: 234 })
+        expect(spyRequestAction).toHaveBeenCalledWith({ first: 'I am the first', second: 234 })
       }
       expect(m.data.currentState).toEqual('errored')
     })
