@@ -186,7 +186,7 @@
     },
     "@mojaloop/sdk-scheme-adapter": {
       "@koa/cors": "5.0.0",
-      "axios": "1.12.2",
+      "axios": "1.7.9",
       "koa": "2.15.4"
     },
     "@mojaloop/event-sdk": {
