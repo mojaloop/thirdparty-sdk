@@ -87,7 +87,7 @@
     "@hapi/inert": "7.1.0",
     "@hapi/vision": "7.0.3",
     "@mojaloop/api-snippets": "17.8.0",
-    "@mojaloop/central-services-error-handling": "13.x.x",
+    "@mojaloop/central-services-error-handling": "13.2.0",
     "@mojaloop/central-services-metrics": "12.4.5",
     "@mojaloop/central-services-shared": "18.19.0",
     "@mojaloop/sdk-scheme-adapter": "18.0.2",
