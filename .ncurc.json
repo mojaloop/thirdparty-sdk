@@ -1,0 +1,21 @@
+{
+  "reject": [
+    "redis-mock",
+    "redis",
+    "@types/redis",
+    "why-redis: carried over from the js config - the v4+ client API is a breaking change for this suite",
+    "commander",
+    "why-commander: newer majors resolve to an ESM entry this CommonJS suite cannot require (carried over from the js config)",
+    "@mojaloop/sdk-scheme-adapter",
+    "@mojaloop/sdk-standard-components",
+    "why-sdk-libs: carried over from the js config",
+    "@types/node",
+    "why-types-node: its major must match the Node runtime major in .nvmrc (24); a higher major only weakens type checking; bump together with the runtime",
+    "ts-jest",
+    "why-ts-jest: 29.4.10 started honouring moduleResolution nodeNext with per-import resolutionMode, which makes namespace-style type references resolve to a package's ESM d.ts and fail with TS2503 (reproduced 2026-09-18 in inter-scheme-proxy-adapter)",
+    "jest",
+    "why-jest: held at 29.x with ts-jest; moving to 30 is a separate migration and this repo's suites rely on the 29 runtime",
+    "typescript",
+    "why-typescript: 7.0.2 fails npm install with ERESOLVE against the ts lint parser peer range and ships Go-built tsgo binaries that make the Grype source scan report High Go stdlib CVEs; stay on the 5.x line this repo pins (reproduced 2026-10-02)"
+  ]
+}
