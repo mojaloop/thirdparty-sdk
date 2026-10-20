@@ -41,7 +41,7 @@ import { Message } from '~/shared/pub-sub'
  * PUT /thirdpartyRequests/verifications/{ID}/error
  */
 async function put(_context: Context, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
-  const verificationRequestId = request.params.ID
+  const verificationRequestId = request.params.ID as string
   // This could be an error payload or ThirdpartyRequestsVerificationsIDPutResponse
   const verificationResponse = request.payload
   const publisher = h.getPublisher()

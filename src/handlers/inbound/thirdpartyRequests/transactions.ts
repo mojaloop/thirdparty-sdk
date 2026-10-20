@@ -41,7 +41,7 @@ import config from '~/shared/config'
  */
 async function post(_context: Context, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const transactionRequest = request.payload as tpAPI.Schemas.ThirdpartyRequestsTransactionsPostRequest
-  const participantId = request.headers['fspiop-source']
+  const participantId = request.headers['fspiop-source'] as string
 
   const modelConfig: DFSPTransactionModelConfig = {
     dfspId: h.getDFSPId(),

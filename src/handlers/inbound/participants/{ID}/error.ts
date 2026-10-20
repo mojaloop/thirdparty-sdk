@@ -39,7 +39,7 @@ import { Enum } from '@mojaloop/central-services-shared'
  * Handles an inbound `PUT /participants/{ID}/error` request
  */
 async function put(_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
-  const id = request.params.ID
+  const id = request.params.ID as string
   const payload = request.payload as tpAPI.Schemas.ErrorInformation
   // this is a inbound request coming from the ALS in response to
   // DFSPLinkingModel.onFinalizeConsentWithALS where a POST /participant

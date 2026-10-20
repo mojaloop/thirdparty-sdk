@@ -35,7 +35,7 @@ import { PISPTransactionModel } from '~/models/pispTransaction.model'
  * Handles a inbound PUT /thirdpartyRequests/transactions/{ID}/error request
  */
 async function put(_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
-  const channel = PISPTransactionModel.notificationChannel(PISPTransactionPhase.approval, request.params.ID)
+  const channel = PISPTransactionModel.notificationChannel(PISPTransactionPhase.approval, request.params.ID as string)
   // don't await on promise to resolve, let finish publish in background
   h.getPublisher().publish(channel, request.payload as unknown as Message)
   return h.response({}).code(200)

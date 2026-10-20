@@ -36,8 +36,7 @@ import { Message } from '~/shared/pub-sub'
 import { PISPLinkingPhase } from '~/models/outbound/pispLinking.interface'
 
 async function patch(_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
-  const consentRequestId = request.params.ID
-
+  const consentRequestId = request.params.ID as string
   DFSPLinkingModel.triggerWorkflow(
     DFSPLinkingPhase.waitOnAuthTokenFromPISPResponse,
     consentRequestId,
@@ -53,8 +52,7 @@ async function patch(_context: unknown, request: Request, h: StateResponseToolki
  * Handles an inbound `PUT /consentRequests/{ID}` request
  */
 async function put(_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
-  const consentRequestId = request.params.ID
-
+  const consentRequestId = request.params.ID as string
   PISPLinkingModel.triggerWorkflow(
     PISPLinkingPhase.requestConsent,
     consentRequestId,

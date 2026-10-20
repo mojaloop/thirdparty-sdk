@@ -63,7 +63,7 @@ async function post(_context: unknown, request: Request, h: StateResponseToolkit
  * PUT /thirdpartyRequests/authorizations/{ID}/error
  */
 async function put(_context: Context, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
-  const authorizationRequestId = request.params.ID
+  const authorizationRequestId = request.params.ID as string
   // This could be an error payload or ThirdpartyRequestsAuthorizationsIDPutResponse
   const authorizationResponse = request.payload
   const publisher = h.getPublisher()
