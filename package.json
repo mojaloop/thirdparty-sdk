@@ -192,9 +192,6 @@
     "@mojaloop/event-sdk": {
       "moment": "2.31.0"
     },
-    "@octokit/plugin-paginate-rest": "11.4.3",
-    "@octokit/request": "9.2.1",
-    "@octokit/request-error": "5.1.1",
     "ejs": "3.1.10",
     "jsonpointer": "5.0.0",
     "markdown-it": "14.3.1",
@@ -206,7 +203,6 @@
       "sanitize-html": "2.17.5"
     },
     "yaml": "2.9.1",
-    "yargs": "17.6.2",
     "moment": "2.31.0",
     "protobufjs@7": "7.6.5",
     "protobufjs@6": "7.6.5",
@@ -265,7 +261,6 @@
     "follow-redirects": "1.16.0",
     "prismjs": "1.30.0",
     "qs": "6.16.0",
-    "@opentelemetry/propagator-jaeger": "2.12.0",
     "@babel/helpers@7": "7.29.10",
     "@babel/runtime@7": "7.29.10",
     "@babel/core@7": "7.29.7",
