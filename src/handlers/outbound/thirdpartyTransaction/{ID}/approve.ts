@@ -40,7 +40,7 @@ async function post(_context: unknown, request: Request, h: StateResponseToolkit
   const modelConfig: PISPTransactionModelConfig = {
     kvs: h.getKVS(),
     subscriber: h.getSubscriber(),
-    key: request.params.ID,
+    key: request.params.ID as string,
     logger: h.getLogger(),
     thirdpartyRequests: h.getThirdpartyRequests(),
     mojaloopRequests: h.getMojaloopRequests(),

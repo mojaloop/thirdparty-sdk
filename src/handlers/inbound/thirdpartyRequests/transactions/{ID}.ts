@@ -42,7 +42,7 @@ async function patch(_context: unknown, request: Request, h: StateResponseToolki
   // don't await on promise to resolve, let finish publish in background
   PISPTransactionModel.triggerWorkflow(
     PISPTransactionPhase.approval,
-    request.params.ID,
+    (request.params.ID as string),
     h.getPublisher(),
     payload as unknown as Message
   )
@@ -57,7 +57,7 @@ async function put(_context: unknown, request: Request, h: StateResponseToolkit)
   // don't await on promise to resolve, let finish publish in background
   PISPTransactionModel.triggerWorkflow(
     PISPTransactionPhase.waitOnTransactionPut,
-    request.params.ID,
+    (request.params.ID as string),
     h.getPublisher(),
     payload as unknown as Message
   )

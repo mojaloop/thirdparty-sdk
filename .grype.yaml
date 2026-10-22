@@ -1,0 +1,26 @@
+# Source scan only - this repo's CircleCI config has no grype job; the file documents the
+# application-tree findings that cannot be fixed here so a local `grype dir:. -c .grype.yaml`
+# stays clean. The npm audit allowlist (audit-ci.jsonc) carries the same three entries.
+scan-type: source
+ignore:
+  - vulnerability: GHSA-vfj7-8cjw-p6xm
+    include-aliases: true
+    reason: 'braces 3.0.3 stack-exhaustion ReDoS - dev-only transitive via @mojaloop/api-snippets > ts-auto-mock > micromatch; no patched release of braces 3.x exists as of 2026-10-16'
+  - vulnerability: GHSA-g8qq-57p8-ggw5
+    include-aliases: true
+    reason: 'sanitize-html held at 2.17.5 under shins (API-doc generation only) - 2.17.7 pulls ESM-only htmlparser2 12 which ts-jest 29 cannot load'
+  - vulnerability: GHSA-jxwj-j7wr-gfrw
+    include-aliases: true
+    reason: 'sanitize-html - same hold as GHSA-g8qq-57p8-ggw5'
+  - vulnerability: GHSA-x3q4-9hxx-gx8m
+    include-aliases: true
+    reason: 'sanitize-html held at 2.17.5 under shins - the fix (2.18.0) is ESM-only and Node 18 cannot require() it; build-time API-doc path only (2026-10-22)'
+  - vulnerability: GHSA-cv27-6wvh-8x7j
+    include-aliases: true
+    reason: 'sanitize-html - same hold as GHSA-x3q4-9hxx-gx8m'
+output:
+  - table
+  - json
+search:
+  scope: squashed
+check-for-app-update: false

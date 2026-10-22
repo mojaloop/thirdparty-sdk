@@ -41,8 +41,7 @@ import { Enum } from '@mojaloop/central-services-shared'
  * Handles an inbound `PATCH /consents/{ID}` request
  */
 async function patch(_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
-  const consentId = request.params.ID
-
+  const consentId = request.params.ID as string
   PISPLinkingModel.triggerWorkflow(
     PISPLinkingPhase.registerCredential,
     consentId,
@@ -58,7 +57,7 @@ async function patch(_context: unknown, request: Request, h: StateResponseToolki
  * Handles an inbound `PUT /consents/{ID}` request
  */
 async function put(_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
-  const consentId = request.params.ID
+  const consentId = request.params.ID as string
   const payload = request.payload as
     | tpAPI.Schemas.ConsentsIDPutResponseSigned
     | tpAPI.Schemas.ConsentsIDPatchResponseVerified

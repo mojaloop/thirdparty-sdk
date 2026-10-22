@@ -44,7 +44,7 @@ async function post(_context: unknown, request: Request, h: StateResponseToolkit
   const payload = request.payload as tpAPI.Schemas.ConsentRequestsPostRequest
   const consentRequestId = payload.consentRequestId
   // pull the PISP's ID to send back the PUT /consentRequests/{ID}
-  const sourceFspId = request.headers['fspiop-source']
+  const sourceFspId = request.headers['fspiop-source'] as string
 
   const data: DFSPLinkingData = {
     dfspId: h.getDFSPId(),

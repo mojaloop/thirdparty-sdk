@@ -40,7 +40,7 @@ async function put(_context: unknown, request: Request, h: StateResponseToolkit)
   // PUT /consentsRequests/{ID}/error is a response to PATCH /consentRequests
   // when an OTP or secret failed to validate.
   // We publish the request on the PISPConsentRequestModel
-  const consentRequestId = request.params.ID
+  const consentRequestId = request.params.ID as string
   const payload = request.payload as fspiopAPI.Schemas.ErrorInformation
 
   PISPLinkingModel.triggerWorkflow(

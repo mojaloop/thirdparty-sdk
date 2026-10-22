@@ -38,8 +38,7 @@ import { ServiceType } from '~/models/outbound/pispPrelinking.interface'
  */
 async function put(_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const payload = request.payload as fspiopAPI.Schemas.ErrorInformation
-  const serviceType = request.params.ServiceType
-
+  const serviceType = request.params.ServiceType as string
   if (serviceType == ServiceType.THIRD_PARTY_DFSP) {
     PISPPrelinkingModel.triggerWorkflow(serviceType, h.getPublisher(), payload)
     h.getLogger().info(`Inbound received PUT /services/{ServiceType}/error response`)

@@ -34,7 +34,7 @@ import { PISPDiscoveryModel } from '~/models/outbound/pispDiscovery.model'
  * Handles an inbound PUT /accounts/{ID}/error request
  */
 async function put(_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
-  const userId: string = request.params.ID
+  const userId: string = request.params.ID as string
   const channel = PISPDiscoveryModel.notificationChannel(userId)
 
   // don't await on promise to resolve, let finish publish in background

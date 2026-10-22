@@ -40,10 +40,10 @@ import { PISPDiscoveryModel, create } from '~/models/outbound/pispDiscovery.mode
  * Handles outbound GET /linking/accounts/{fspId}/{userId} request
  */
 async function get(_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
-  const userId: string = request.params.userId
+  const userId: string = request.params.userId as string
   // prepare config
   const data: PISPDiscoveryData = {
-    toParticipantId: request.params.fspId,
+    toParticipantId: (request.params.fspId as string),
     userId: userId,
     currentState: 'start'
   }

@@ -3,6 +3,11 @@
     // audit-ci supports reading JSON, JSONC, and JSON5 config files.
     // Only use one of ["low": true, "moderate": true, "high": true, "critical": true]
     "moderate": true,
-    "allowlist": [
+    "allowlist": [ // NOTE: Please add as much information as possible to any items added to the allowList
+      "GHSA-vfj7-8cjw-p6xm", // braces stack-exhaustion ReDoS - dev-only transitive via @mojaloop/api-snippets > ts-auto-mock > micromatch; no patched release of braces 3.x exists (2026-10-16)
+      "GHSA-g8qq-57p8-ggw5", // sanitize-html held at 2.17.5 under shins (API-doc generation only): the fix (2.17.7) pulls ESM-only htmlparser2 12, which ts-jest 29 cannot load - 22 suites fail to parse. Revisit with the jest 30 upgrade.
+      "GHSA-jxwj-j7wr-gfrw", // sanitize-html, same hold as above
+      "GHSA-x3q4-9hxx-gx8m", // sanitize-html held at 2.17.5 under shins: the fix (2.18.0) is ESM-only and Node 18 cannot require() it at all; build-time API-doc path only, not runtime-exploitable; revisit with the Node 20+ runtime bump (2026-10-22)
+      "GHSA-cv27-6wvh-8x7j" // sanitize-html, same hold as above
     ]
-  }
+}

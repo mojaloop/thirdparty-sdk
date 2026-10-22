@@ -39,7 +39,7 @@ import { DFSPLinkingPhase } from '~/models/inbound/dfspLinking.interface'
  * Handles a inbound PUT /consents/{ID}/error request
  */
 async function put(_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
-  const consentId = request.params.ID
+  const consentId = request.params.ID as string
   const payload = request.payload as fspiopAPI.Schemas.ErrorInformation
   const publisher = h.getPublisher()
   // ideally we look at the status codes of the error message to determine

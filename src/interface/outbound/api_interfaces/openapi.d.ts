@@ -56,7 +56,6 @@ export interface paths {
         /**
          * Thirdparty transaction party lookup.
          * @description The HTTP request `POST /thirdpartyTransaction/partyLookup` is used to lookup information regarding the requested Party, defined by `Type`, `ID` and optionally `SubId`.
-         *
          */
         post: operations['ThirdpartyTransactionPartyLookup'];
         delete?: never;
@@ -77,7 +76,6 @@ export interface paths {
         /**
          * Initiates a third party transaction.
          * @description The HTTP request `POST /thirdpartyTransaction/{ID}/initiate` is sent to the Switch to initiate a third party request transaction.
-         *
          */
         post: operations['ThirdpartyTransactionIDInitiate'];
         delete?: never;
@@ -98,7 +96,6 @@ export interface paths {
         /**
          * Approve a third party transaction.
          * @description The HTTP request `POST /thirdpartyTransaction/{ID}/approve` is used to approve a third party transaction .
-         *
          */
         post: operations['ThirdpartyTransactionIDApprove'];
         delete?: never;
@@ -117,7 +114,6 @@ export interface paths {
         /**
          * GetLinkingProviders
          * @description The HTTP request `GET /linking/providers` is used to retrieve a list of thirdparty enabled DFSP identifiers.
-         *
          */
         get: operations['GetLinkingProviders'];
         put?: never;
@@ -138,7 +134,6 @@ export interface paths {
         /**
          * GetLinkingAccountsByUserId
          * @description The HTTP request `GET /linking/accounts/{fspId}/{userId}` is used to retrieve the list of potential accounts available for linking.
-         *
          */
         get: operations['GetLinkingAccountsByUserId'];
         put?: never;
@@ -166,7 +161,6 @@ export interface paths {
          *     - The PISP
          *     - The DFSP
          *     - A user presumed to be a customer of 'The DFSP'
-         *
          */
         post: operations['PostLinkingRequestConsent'];
         delete?: never;
@@ -192,7 +186,6 @@ export interface paths {
          * Outbound PATCH /linking/request-consent/{ID}/authenticate endpoint
          * @description Used in the authentication phase of account linking.
          *     Used by the PISP to pass an Auth token on behalf of the user to the DFSP to establish a chain of trust.
-         *
          */
         patch: operations['PatchLinkingRequestConsentIDAuthenticate'];
         trace?: never;
@@ -210,7 +203,6 @@ export interface paths {
          * Outbound POST /linking/request-consent/{ID}/pass-credential endpoint
          * @description Used in the credential registration phase of account linking.
          *     Used by the PISP to pass an credential on behalf of the user to the DFSP.
-         *
          */
         post: operations['PostLinkingRequestConsentIDPassCredential'];
         delete?: never;
@@ -321,7 +313,6 @@ export interface components {
          *     a DFSP, and a specific Customer's account at the DFSP. The content of the link
          *     is created by the DFSP at the time when it gives permission to the PISP for
          *     specific access to a given account.
-         *
          * @example PERSONAL_ID
          * @enum {string}
          */
@@ -450,7 +441,6 @@ export interface components {
         /**
          * PartyIdTypeTPLink
          * @description - THIRD_PARTY_LINK - is the DFSP's internal reference which allows DFSP to find out the corresponding consent
-         *
          * @example PERSONAL_ID
          * @enum {string}
          */
@@ -632,7 +622,6 @@ export interface components {
         /**
          * AuthorizationResponseType
          * @description The customer accepted the terms of the transfer
-         *
          * @enum {string}
          */
         AuthorizationResponseTypeAccepted: 'ACCEPTED';
@@ -674,31 +663,27 @@ export interface components {
          *     For this API, we represent ArrayBuffers as base64 encoded utf-8 strings.
          *
          *     https://github.com/mojaloop/documentation/blob/main/website/versioned_docs/v1.0.1/api/thirdparty/data-models.md#32128-fidopublickeycredentialassertion
-         *
          */
         FIDOPublicKeyCredentialAssertion: {
-            /** @description credential id: identifier of pair of keys, base64 encoded
+            /**
+             * @description credential id: identifier of pair of keys, base64 encoded
              *     https://w3c.github.io/webauthn/#ref-for-dom-credential-id
-             *      */
+             */
             id: string;
-            /** @description raw credential id: identifier of pair of keys, base64 encoded.
-             *      */
+            /** @description raw credential id: identifier of pair of keys, base64 encoded. */
             rawId: string;
-            /** @description AuthenticatorAssertionResponse
-             *      */
+            /** @description AuthenticatorAssertionResponse */
             response: {
-                /** @description Authenticator data object.
-                 *      */
+                /** @description Authenticator data object. */
                 authenticatorData: string;
-                /** @description JSON string with client data.
-                 *      */
+                /** @description JSON string with client data. */
                 clientDataJSON: string;
-                /** @description The signature generated by the private key associated with this credential.
-                 *      */
+                /** @description The signature generated by the private key associated with this credential. */
                 signature: string;
-                /** @description This field is optionally provided by the authenticator, and
+                /**
+                 * @description This field is optionally provided by the authenticator, and
                  *     represents the user.id that was supplied during registration.
-                 *      */
+                 */
                 userHandle?: string;
             };
             /**
@@ -827,7 +812,6 @@ export interface components {
          *     - ACCOUNTS_GET_BALANCE: PISP can request a balance for the linked account
          *     - ACCOUNTS_TRANSFER: PISP can request a transfer of funds from the linked account in the DFSP
          *     - ACCOUNTS_STATEMENT: PISP can request a statement of individual transactions on a user's account
-         *
          * @enum {string}
          */
         ScopeAction: 'ACCOUNTS_GET_BALANCE' | 'ACCOUNTS_TRANSFER' | 'ACCOUNTS_STATEMENT';
@@ -868,14 +852,12 @@ export interface components {
         /**
          * ConsentRequestChannelTypeWeb
          * @description The web auth channel being used for `PUT /consentRequest/{ID}` request.
-         *
          * @enum {string}
          */
         ConsentRequestChannelTypeWeb: 'WEB';
         /**
          * Uri
          * @description The API data type Uri is a JSON string in a canonical format that is restricted by a regular expression for interoperability reasons.
-         *
          */
         Uri: string;
         /**
@@ -886,7 +868,6 @@ export interface components {
          *     the result is the PISP being instructed on a specific URL where this
          *     supposed user should be redirected. This URL should be a place where
          *     the user can prove their identity (e.g., by logging in).
-         *
          */
         ConsentRequestsIDPutResponseWeb: {
             scopes: components['schemas']['Scope'][];
@@ -898,7 +879,6 @@ export interface components {
         /**
          * ConsentRequestChannelTypeOTP
          * @description The OTP auth channel being used for `PUT /consentRequests/{ID}` request.
-         *
          * @enum {string}
          */
         ConsentRequestChannelTypeOTP: 'OTP';
@@ -907,7 +887,6 @@ export interface components {
          * @description The object sent in a `PUT /consentRequests/{ID}` request.
          *
          *     Schema used in the request consent phase of the account linking OTP/SMS flow.
-         *
          */
         ConsentRequestsIDPutResponseOTP: {
             scopes: components['schemas']['Scope'][];
@@ -950,16 +929,15 @@ export interface components {
         /**
          * ConsentPostRequestPISP
          * @description The provisional Consent object sent by the DFSP in `POST /consents`.
-         *
          */
         ConsentsPostRequestPISP: {
-            /** @description Common ID between the PISP and the Payer DFSP for the consent object. The ID
+            /**
+             * @description Common ID between the PISP and the Payer DFSP for the consent object. The ID
              *     should be reused for re-sends of the same consent. A new ID should be generated
              *     for each new consent.
-             *      */
+             */
             consentId: components['schemas']['CorrelationId'];
-            /** @description The ID given to the original consent request on which this consent is based.
-             *      */
+            /** @description The ID given to the original consent request on which this consent is based. */
             consentRequestId: components['schemas']['CorrelationId'];
             scopes: components['schemas']['Scope'][];
             status: components['schemas']['ConsentStatus'];
@@ -980,24 +958,20 @@ export interface components {
          *     The `PublicKeyCredential` interface represents the below fields with
          *     a Type of Javascript [ArrayBuffer](https://heycam.github.io/webidl/#idl-ArrayBuffer).
          *     For this API, we represent ArrayBuffers as base64 encoded utf-8 strings.
-         *
          */
         FIDOPublicKeyCredentialAttestation: {
-            /** @description credential id: identifier of pair of keys, base64 encoded
+            /**
+             * @description credential id: identifier of pair of keys, base64 encoded
              *     https://w3c.github.io/webauthn/#ref-for-dom-credential-id
-             *      */
+             */
             id: string;
-            /** @description raw credential id: identifier of pair of keys, base64 encoded
-             *      */
+            /** @description raw credential id: identifier of pair of keys, base64 encoded */
             rawId?: string;
-            /** @description AuthenticatorAttestationResponse
-             *      */
+            /** @description AuthenticatorAttestationResponse */
             response: {
-                /** @description JSON string with client data
-                 *      */
+                /** @description JSON string with client data */
                 clientDataJSON: string;
-                /** @description CBOR.encoded attestation object
-                 *      */
+                /** @description CBOR.encoded attestation object */
                 attestationObject: string;
             };
             /**
@@ -1030,7 +1004,6 @@ export interface components {
          * CredentialStatusVerified
          * @description The status of the Credential.
          *     - "VERIFIED" - The Credential is valid and verified.
-         *
          * @enum {string}
          */
         CredentialStatusVerified: 'VERIFIED';
@@ -1145,6 +1118,19 @@ export interface components {
                 [name: string]: unknown;
             };
             content: {
+                /**
+                 * @example {
+                 *       "currentState": "partyLookupSuccess",
+                 *       "party": {
+                 *         "partyIdInfo": {
+                 *           "partyIdType": "MSISDN",
+                 *           "partyIdentifier": "16135551212",
+                 *           "fspId": "dfspb"
+                 *         },
+                 *         "name": "Bob bobbington"
+                 *       }
+                 *     }
+                 */
                 'application/json': components['schemas']['ThirdpartyTransactionPartyLookupResponse'];
             };
         };
@@ -1154,6 +1140,30 @@ export interface components {
                 [name: string]: unknown;
             };
             content: {
+                /**
+                 * @example {
+                 *       "currentState": "authorizationReceived",
+                 *       "authorization": {
+                 *         "authenticationType": "U2F",
+                 *         "retriesLeft": "1",
+                 *         "amount": {
+                 *           "currency": "USD",
+                 *           "amount": "10.00"
+                 *         },
+                 *         "transactionId": "1234-1234-1234-1234",
+                 *         "transactionRequestId": "1234-1234-1234-1234",
+                 *         "quote": {
+                 *           "transferAmount": {
+                 *             "currency": "USD",
+                 *             "amount": "10.00"
+                 *           },
+                 *           "expiration": "2022-01-01T08:38:08.699-04:00",
+                 *           "ilpPacket": "AYIBgQAAAAAAAASwNGxldmVsb25lLmRmc3AxLm1lci45T2RTOF81MDdqUUZERmZlakgyOVc4bXFmNEpLMHlGTFGCAUBQU0svMS4wCk5vbmNlOiB1SXlweUYzY3pYSXBFdzVVc05TYWh3CkVuY3J5cHRpb246IG5vbmUKUGF5bWVudC1JZDogMTMyMzZhM2ItOGZhOC00MTYzLTg0NDctNGMzZWQzZGE5OGE3CgpDb250ZW50LUxlbmd0aDogMTM1CkNvbnRlbnQtVHlwZTogYXBwbGljYXRpb24vanNvbgpTZW5kZXItSWRlbnRpZmllcjogOTI4MDYzOTEKCiJ7XCJmZWVcIjowLFwidHJhbnNmZXJDb2RlXCI6XCJpbnZvaWNlXCIsXCJkZWJpdE5hbWVcIjpcImFsaWNlIGNvb3BlclwiLFwiY3JlZGl0TmFtZVwiOlwibWVyIGNoYW50XCIsXCJkZWJpdElkZW50aWZpZXJcIjpcIjkyODA2MzkxXCJ9IgA",
+                 *           "condition": "f5sqb7tBTWPd5Y8BDFdMm9BJR_MNI4isf8p8n4D5pH"
+                 *         }
+                 *       }
+                 *     }
+                 */
                 'application/json': components['schemas']['ThirdpartyTransactionIDInitiateResponse'];
             };
         };
@@ -1163,37 +1173,96 @@ export interface components {
                 [name: string]: unknown;
             };
             content: {
+                /**
+                 * @example {
+                 *       "transactionStatus": {
+                 *         "transactionId": "8f6b2a9c-df32-4248-b115-799beada85ec",
+                 *         "transactionRequestState": "ACCEPTED"
+                 *       },
+                 *       "currentState": "transactionStatusReceived"
+                 *     }
+                 */
                 'application/json': components['schemas']['ThirdpartyTransactionIDApproveResponse'];
             };
         };
-        /** @description Response body of GET /linking/providers
-         *      */
+        /** @description Response body of GET /linking/providers */
         LinkingProvidersResponse: {
             headers: {
                 [name: string]: unknown;
             };
             content: {
+                /**
+                 * @example {
+                 *       "providers": [
+                 *         "dfspa",
+                 *         "dfspb"
+                 *       ],
+                 *       "currentState": "providersLookupSuccess"
+                 *     }
+                 */
                 'application/json': components['schemas']['LinkingProvidersResponse'];
             };
         };
-        /** @description response body of GET /accounts/{ID}
+        /**
+         * @description response body of GET /accounts/{ID}
          *     derived from UpdateAccountsByUserId by Inbound Service via Pub/Sub channel
-         *      */
+         */
         AccountsByUserIdResponse: {
             headers: {
                 [name: string]: unknown;
             };
             content: {
+                /**
+                 * @example [
+                 *       {
+                 *         "accountNickname": "dfspa.user.nickname1",
+                 *         "id": "dfspa.username.1234",
+                 *         "currency": "ZAR"
+                 *       },
+                 *       {
+                 *         "accountNickname": "dfspa.user.nickname2",
+                 *         "id": "dfspa.username.5678",
+                 *         "currency": "USD"
+                 *       }
+                 *     ]
+                 */
                 'application/json': components['schemas']['AccountsIDPutResponse'];
             };
         };
-        /** @description Response body of POST /linking/request-consent.
-         *      */
+        /** @description Response body of POST /linking/request-consent. */
         LinkingRequestConsentResponse: {
             headers: {
                 [name: string]: unknown;
             };
             content: {
+                /**
+                 * @example {
+                 *       "channelResponse": {
+                 *         "consentRequestId": "f6ab43b0-71cc-49f9-b763-2ac3f05ac8c1",
+                 *         "scopes": [
+                 *           {
+                 *             "address": "dfspa.username.1234",
+                 *             "actions": [
+                 *               "ACCOUNTS_GET_BALANCE",
+                 *               "ACCOUNTS_TRANSFER"
+                 *             ]
+                 *           },
+                 *           {
+                 *             "address": "dfspa.username.5678",
+                 *             "actions": [
+                 *               "ACCOUNTS_GET_BALANCE",
+                 *               "ACCOUNTS_TRANSFER"
+                 *             ]
+                 *           }
+                 *         ],
+                 *         "authChannels": [
+                 *           "OTP"
+                 *         ],
+                 *         "callbackUri": "pisp-app://callback..."
+                 *       },
+                 *       "currentState": "OTPAuthenticationChannelResponseReceived"
+                 *     }
+                 */
                 'application/json': components['schemas']['LinkingRequestConsentResponse'];
             };
         };
@@ -1203,6 +1272,24 @@ export interface components {
                 [name: string]: unknown;
             };
             content: {
+                /**
+                 * @example {
+                 *       "consent": {
+                 *         "consentId": "76059a0a-684f-4002-a880-b01159afe119",
+                 *         "consentRequestId": "f6ab43b0-71cc-49f9-b763-2ac3f05ac8c1",
+                 *         "scopes": [
+                 *           {
+                 *             "address": "dfspa.username.5678",
+                 *             "actions": [
+                 *               "ACCOUNTS_TRANSFER"
+                 *             ]
+                 *           }
+                 *         ]
+                 *       },
+                 *       "challenge": "c4adabb33e9306b038088132affcde556c50d82f603f47711a9510bf3beef6d6",
+                 *       "currentState": "consentReceivedAwaitingCredential"
+                 *     }
+                 */
                 'application/json': components['schemas']['LinkingRequestConsentIDAuthenticateResponse'];
             };
         };
@@ -1212,6 +1299,14 @@ export interface components {
                 [name: string]: unknown;
             };
             content: {
+                /**
+                 * @example {
+                 *       "credential": {
+                 *         "status": "VERIFIED"
+                 *       },
+                 *       "currentState": "accountsLinked"
+                 *     }
+                 */
                 'application/json': components['schemas']['LinkingRequestConsentIDPassCredentialResponse'];
             };
         };
@@ -1222,9 +1317,11 @@ export interface components {
     };
     requestBodies: never;
     headers: {
-        /** @description The `Content-Length` header field indicates the anticipated size of the payload body. Only sent if there is a body.
+        /**
+         * @description The `Content-Length` header field indicates the anticipated size of the payload body. Only sent if there is a body.
          *
-         *     **Note:** The API supports a maximum size of 5242880 bytes (5 Megabytes). */
+         *     **Note:** The API supports a maximum size of 5242880 bytes (5 Megabytes).
+         */
         'Content-Length': number;
         /** @description The `Content-Type` header indicates the specific version of the API used to send the payload body. */
         'Content-Type': string;
@@ -1283,13 +1380,15 @@ export interface operations {
         /** @description Thirdparty transaction party lookup body. */
         requestBody: {
             content: {
-                /** @example {
+                /**
+                 * @example {
                  *       "transactionRequestId": "b51ec534-ee48-4575-b6a9-ead2955b8069",
                  *       "payee": {
                  *         "partyIdType": "MSISDN",
                  *         "partyIdentifier": "16135551212"
                  *       }
-                 *     } */
+                 *     }
+                 */
                 'application/json': components['schemas']['ThirdpartyTransactionPartyLookupRequest'];
             };
         };
@@ -1311,7 +1410,8 @@ export interface operations {
         /** @description Thirdparty transaction initiate request body. */
         requestBody: {
             content: {
-                /** @example {
+                /**
+                 * @example {
                  *       "payee": {
                  *         "name": "Bob bobbington",
                  *         "partyIdInfo": {
@@ -1336,7 +1436,8 @@ export interface operations {
                  *         "initiatorType": "CONSUMER"
                  *       },
                  *       "expiration": "2021-05-24T08:38:08.699-04:00"
-                 *     } */
+                 *     }
+                 */
                 'application/json': components['schemas']['ThirdpartyTransactionIDInitiateRequest'];
             };
         };
@@ -1358,7 +1459,8 @@ export interface operations {
         /** @description Thirdparty transaction approve request body contains Authorization details */
         requestBody: {
             content: {
-                /** @example {
+                /**
+                 * @example {
                  *       "authorizationResponse": {
                  *         "authenticationInfo": {
                  *           "authentication": "U2F",
@@ -1369,7 +1471,8 @@ export interface operations {
                  *         },
                  *         "responseType": "ENTERED"
                  *       }
-                 *     } */
+                 *     }
+                 */
                 'application/json': components['schemas']['ThirdpartyTransactionIDApproveRequest'];
             };
         };
@@ -1417,7 +1520,8 @@ export interface operations {
         /** @description Consent requests validate request details */
         requestBody: {
             content: {
-                /** @example {
+                /**
+                 * @example {
                  *       "consentRequestId": "f6ab43b0-71cc-49f9-b763-2ac3f05ac8c1",
                  *       "toParticipantId": "dfspa",
                  *       "accounts": [
@@ -1432,7 +1536,8 @@ export interface operations {
                  *       ],
                  *       "userId": "username1234",
                  *       "callbackUri": "pisp-app://callback"
-                 *     } */
+                 *     }
+                 */
                 'application/json': components['schemas']['LinkingRequestConsentPostRequest'];
             };
         };
@@ -1453,9 +1558,11 @@ export interface operations {
         /** @description Linking request consent authenticate request details */
         requestBody: {
             content: {
-                /** @example {
+                /**
+                 * @example {
                  *       "authToken": "123456"
-                 *     } */
+                 *     }
+                 */
                 'application/json': components['schemas']['LinkingRequestConsentIDAuthenticateRequest'];
             };
         };
@@ -1476,7 +1583,8 @@ export interface operations {
         /** @description Linking request consent pass credential request details */
         requestBody: {
             content: {
-                /** @example {
+                /**
+                 * @example {
                  *       "credential": {
                  *         "credentialType": "FIDO",
                  *         "status": "PENDING",
@@ -1490,7 +1598,8 @@ export interface operations {
                  *           "type": "public-key"
                  *         }
                  *       }
-                 *     } */
+                 *     }
+                 */
                 'application/json': components['schemas']['LinkingRequestConsentIDPassCredentialRequest'];
             };
         };
