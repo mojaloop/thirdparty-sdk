@@ -12,6 +12,12 @@ ignore:
   - vulnerability: GHSA-jxwj-j7wr-gfrw
     include-aliases: true
     reason: 'sanitize-html - same hold as GHSA-g8qq-57p8-ggw5'
+  - vulnerability: GHSA-x3q4-9hxx-gx8m
+    include-aliases: true
+    reason: 'sanitize-html held at 2.17.5 under shins - the fix (2.18.0) is ESM-only and Node 18 cannot require() it; build-time API-doc path only (2026-10-22)'
+  - vulnerability: GHSA-cv27-6wvh-8x7j
+    include-aliases: true
+    reason: 'sanitize-html - same hold as GHSA-x3q4-9hxx-gx8m'
 output:
   - table
   - json
