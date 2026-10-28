@@ -3,9 +3,6 @@
 # stays clean. The npm audit allowlist (audit-ci.jsonc) carries the same three entries.
 scan-type: source
 ignore:
-  - vulnerability: GHSA-vfj7-8cjw-p6xm
-    include-aliases: true
-    reason: 'braces 3.0.3 stack-exhaustion ReDoS - dev-only transitive via @mojaloop/api-snippets > ts-auto-mock > micromatch; no patched release of braces 3.x exists as of 2026-10-16'
   - vulnerability: GHSA-g8qq-57p8-ggw5
     include-aliases: true
     reason: 'sanitize-html held at 2.17.5 under shins (API-doc generation only) - 2.17.7 pulls ESM-only htmlparser2 12 which ts-jest 29 cannot load'
@@ -18,6 +15,16 @@ ignore:
   - vulnerability: GHSA-cv27-6wvh-8x7j
     include-aliases: true
     reason: 'sanitize-html - same hold as GHSA-x3q4-9hxx-gx8m'
+  - vulnerability: GHSA-cg2g-xh64-v4q7
+    include-aliases: true
+    reason: >-
+      dompurify 3.4.16 (pulled in by redoc for API-doc rendering only): no patched release exists as of 2026-10-28,
+      3.4.16 is the latest; also allowlisted in audit-ci.jsonc
+  - vulnerability: GHSA-mrv2-3pqr-j5jr
+    include-aliases: true
+    reason: >-
+      dompurify 3.4.16 (pulled in by redoc for API-doc rendering only): no patched release exists as of 2026-10-28,
+      3.4.16 is the latest; also allowlisted in audit-ci.jsonc
 output:
   - table
   - json
