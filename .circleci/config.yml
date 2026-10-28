@@ -31,11 +31,19 @@ defaults_docker_Dependencies: &defaults_docker_Dependencies |
 defaults_awsCliDependencies: &defaults_awsCliDependencies |
     apk --no-cache add aws-cli
 
-defaults_license_scanner: &defaults_license_scanner
-  name: Install and set up license-scanner
+## The legacy make-based mojaloop/license-scanner was removed upstream; the gate is now the
+## published @mojaloop/license-scanner-tool run against a CycloneDX SBOM produced by Syft,
+## mirroring the mojaloop/build orb's generate_sbom + license_gate steps.
+defaults_install_syft: &defaults_install_syft
+  name: Install Syft (pinned) if missing
   command: |
-    git clone https://github.com/mojaloop/license-scanner /tmp/license-scanner
-    cd /tmp/license-scanner && make build default-files set-up
+    set -e
+    if command -v syft >/dev/null 2>&1; then syft version; exit 0; fi
+    if command -v apk >/dev/null 2>&1; then apk add --no-cache curl tar >/dev/null; fi
+    BINDIR=/usr/local/bin
+    if [ -w "$BINDIR" ]; then SUDO=; else SUDO=sudo; fi
+    curl -sSfL "https://raw.githubusercontent.com/anchore/syft/v1.45.0/install.sh" | $SUDO sh -s -- -b "$BINDIR" v1.45.0
+    syft version
 
 defaults_export_version_from_package: &defaults_export_version_from_package
   name: Format the changelog into the github release body and get release tag
@@ -448,17 +456,25 @@ jobs:
           name: Install general dependencies
           command: *defaults_docker_Dependencies
       - checkout
-      - run:
-          <<: *defaults_license_scanner
       - restore_cache:
           name: Restore npm Package Cache
           key: dependency-cache-{{ .Environment.CIRCLE_SHA1 }}
       - run:
-          name: Run the license-scanner
-          command: cd /tmp/license-scanner && pathToRepo=$CIRCLE_WORKING_DIRECTORY make run
+          <<: *defaults_install_syft
+      - run:
+          name: Generate CycloneDX SBOM for the source tree
+          command: |
+            set -e
+            syft dir:. -o cyclonedx-json=/tmp/sbom.cdx.json
+      # Stored before the gate so the SBOM is uploaded even when the gate fails.
       - store_artifacts:
-          path: /tmp/license-scanner/results
-          destination: licenses
+          path: /tmp/sbom.cdx.json
+          destination: sbom
+      - run:
+          name: License gate (@mojaloop/license-scanner-tool)
+          command: |
+            set -e
+            npx --yes @mojaloop/license-scanner-tool@1.1.2 /tmp/sbom.cdx.json
 
   license-scan:
     executor: default-machine
@@ -471,13 +487,23 @@ jobs:
           name: Load the pre-built docker image from workspace
           command: docker load -i /tmp/docker-image.tar
       - run:
-          <<: *defaults_license_scanner
+          <<: *defaults_install_syft
       - run:
-          name: Run the license-scanner
-          command: cd /tmp/license-scanner && mode=docker dockerImages=${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:local make run
+          name: Generate CycloneDX SBOM for the docker image
+          command: |
+            set -e
+            syft "${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:local" -o cyclonedx-json=/tmp/sbom.cdx.json
       - store_artifacts:
-          path: /tmp/license-scanner/results
-          destination: licenses
+          path: /tmp/sbom.cdx.json
+          destination: sbom
+      - run:
+          # The machine image's Node is older than the tool's Node >= 20 floor, so the gate runs in
+          # the node:lts-alpine image; the project dir is mounted so .license-scanner.json is found.
+          name: License gate (@mojaloop/license-scanner-tool)
+          command: |
+            set -e
+            docker run --rm -v /tmp/sbom.cdx.json:/sbom.cdx.json:ro -v "$PWD":/project:ro -w /project \
+              node:lts-alpine npx --yes @mojaloop/license-scanner-tool@1.1.2 /sbom.cdx.json
 
   image-scan:
     executor: anchore/anchore_engine
