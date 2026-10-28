@@ -38,8 +38,7 @@ import { thirdparty as tpAPI } from '@mojaloop/api-snippets'
  */
 async function put(_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const payload = request.payload as tpAPI.Schemas.ServicesServiceTypePutResponse
-  const serviceType = request.params.ServiceType
-
+  const serviceType = request.params.ServiceType as string
   if (serviceType == ServiceType.THIRD_PARTY_DFSP) {
     PISPPrelinkingModel.triggerWorkflow(serviceType, h.getPublisher(), payload)
     h.getLogger().info(`Inbound received PUT /services/{ServiceType} response`)

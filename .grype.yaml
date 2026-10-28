@@ -1,0 +1,127 @@
+scan-type: source
+ignore:
+  - vulnerability: GHSA-g8qq-57p8-ggw5
+    include-aliases: true
+    reason: >-
+      sanitize-html held at 2.17.5 under shins (API-doc generation only) - 2.17.7 pulls ESM-only htmlparser2 12 which
+      ts-jest 29 cannot load
+  - vulnerability: GHSA-jxwj-j7wr-gfrw
+    include-aliases: true
+    reason: sanitize-html - same hold as GHSA-g8qq-57p8-ggw5
+  - vulnerability: GHSA-x3q4-9hxx-gx8m
+    include-aliases: true
+    reason: >-
+      sanitize-html held at 2.17.5 under shins - the fix (2.18.0) is ESM-only and Node 18 cannot require() it;
+      build-time API-doc path only (2026-10-22)
+  - vulnerability: GHSA-cv27-6wvh-8x7j
+    include-aliases: true
+    reason: sanitize-html - same hold as GHSA-x3q4-9hxx-gx8m
+  - vulnerability: GHSA-cg2g-xh64-v4q7
+    include-aliases: true
+    reason: >-
+      dompurify 3.4.16 (pulled in by redoc for API-doc rendering only): no patched release exists as of 2026-10-28,
+      3.4.16 is the latest; also allowlisted in audit-ci.jsonc
+  - vulnerability: GHSA-mrv2-3pqr-j5jr
+    include-aliases: true
+    reason: >-
+      dompurify 3.4.16 (pulled in by redoc for API-doc rendering only): no patched release exists as of 2026-10-28,
+      3.4.16 is the latest; also allowlisted in audit-ci.jsonc
+  - vulnerability: GHSA-ch52-4w7c-c8xp
+    include-aliases: true
+    reason: >-
+      Base image npm package: http-cache-semantics - bundled in Node.js base image, not fixable via application
+      dependencies as of 2026-10-28 (high severity)
+  - vulnerability: GHSA-6j4f-fj2g-mc7p
+    include-aliases: true
+    reason: >-
+      Base image npm package: brace-expansion - bundled in Node.js base image, not fixable via application dependencies
+      as of 2026-10-28 (high severity)
+  - vulnerability: GHSA-qhr7-859c-m2p7
+    include-aliases: true
+    reason: >-
+      Base image npm package: brace-expansion - bundled in Node.js base image, not fixable via application dependencies
+      as of 2026-10-28 (high severity)
+  - vulnerability: GHSA-rfgv-xxqx-mfg5
+    include-aliases: true
+    reason: >-
+      Base image npm package: undici - bundled in Node.js base image, not fixable via application dependencies as of
+      2026-10-28 (high severity)
+  - vulnerability: GHSA-xjj6-f33q-929c
+    include-aliases: true
+    reason: >-
+      Base image npm package: undici - bundled in Node.js base image, not fixable via application dependencies as of
+      2026-10-28 (high severity)
+  - vulnerability: GHSA-2vr4-cq9g-pvrc
+    include-aliases: true
+    reason: >-
+      Base image npm package: ip-address - bundled in Node.js base image, not fixable via application dependencies as of
+      2026-10-28 (moderate severity)
+  - vulnerability: GHSA-3wwx-pv8p-q78v
+    include-aliases: true
+    reason: >-
+      Base image npm package: undici - bundled in Node.js base image, not fixable via application dependencies as of
+      2026-10-28 (moderate severity)
+  - vulnerability: GHSA-rpw4-54j3-4h4q
+    include-aliases: true
+    reason: >-
+      Base image npm package: ip-address - bundled in Node.js base image, not fixable via application dependencies as of
+      2026-10-28 (moderate severity)
+  - vulnerability: GHSA-h3mg-xc3c-68pw
+    include-aliases: true
+    reason: >-
+      Base image npm package: ip-address - bundled in Node.js base image, not fixable via application dependencies as of
+      2026-10-28 (moderate severity)
+  - vulnerability: GHSA-q2hr-2g5m-vwhr
+    include-aliases: true
+    reason: >-
+      Base image npm package: brace-expansion - bundled in Node.js base image, not fixable via application dependencies
+      as of 2026-10-28 (moderate severity)
+  - vulnerability: GHSA-rj75-hqrm-r3gf
+    include-aliases: true
+    reason: >-
+      Base image npm package: postcss-selector-parser - bundled in Node.js base image, not fixable via application
+      dependencies as of 2026-10-28 (moderate severity)
+  - vulnerability: GHSA-j6r3-76f7-8jcv
+    include-aliases: true
+    reason: >-
+      Base image npm package: ip-address - bundled in Node.js base image, not fixable via application dependencies as of
+      2026-10-28 (moderate severity)
+  - vulnerability: CVE-2025-60876
+    include-aliases: true
+    reason: 'Alpine base image package (apk): busybox - no npm fix available as of 2026-10-28 (moderate severity)'
+  - vulnerability: GHSA-rxp7-6hxx-x8q5
+    include-aliases: true
+    reason: >-
+      Base image npm package: ip-address - bundled in Node.js base image, not fixable via application dependencies as of
+      2026-10-28 (moderate severity)
+  - vulnerability: GHSA-4qv8-2p9j-2685
+    include-aliases: true
+    reason: >-
+      Base image npm package: undici - bundled in Node.js base image, not fixable via application dependencies as of
+      2026-10-28 (moderate severity)
+  - vulnerability: GHSA-9fm3-97px-rjf6
+    include-aliases: true
+    reason: >-
+      Base image npm package: undici - bundled in Node.js base image, not fixable via application dependencies as of
+      2026-10-28 (moderate severity)
+  - vulnerability: GHSA-qrxm-fqhp-jwvm
+    include-aliases: true
+    reason: >-
+      Base image npm package: undici - bundled in Node.js base image, not fixable via application dependencies as of
+      2026-10-28 (high severity)
+  - vulnerability: GHSA-2m5v-pch6-74hx
+    include-aliases: true
+    reason: >-
+      Base image npm package: undici - bundled in Node.js base image, not fixable via application dependencies as of
+      2026-10-28 (high severity)
+  - vulnerability: GHSA-r53p-7pc4-xj5r
+    include-aliases: true
+    reason: >-
+      Base image npm package: undici - bundled in Node.js base image, not fixable via application dependencies as of
+      2026-10-28 (low severity)
+output:
+  - table
+  - json
+search:
+  scope: squashed
+check-for-app-update: false

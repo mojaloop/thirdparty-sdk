@@ -42,7 +42,7 @@ import { Enum } from '@mojaloop/central-services-shared'
 //       since the flow triggers a PUT /consents/{ID}
 async function post(_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const payload = request.payload as OutboundAPI.Schemas.LinkingRequestConsentIDPassCredentialRequest
-  const consentRequestId = request.params.ID
+  const consentRequestId = request.params.ID as string
 
   const modelConfig: PISPLinkingModelConfig = {
     kvs: h.getKVS(),

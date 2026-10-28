@@ -39,7 +39,7 @@ import { Enum } from '@mojaloop/central-services-shared'
  * Handles an inbound `PUT /participants/{ID}` request
  */
 async function put(_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
-  const id = request.params.ID
+  const id = request.params.ID as string
   const payload = request.payload as tpAPI.Schemas.ParticipantsIDPutResponse
   const type = payload.partyList[0].partyId.partyIdType
   // this is a inbound request coming from the ALS in response to

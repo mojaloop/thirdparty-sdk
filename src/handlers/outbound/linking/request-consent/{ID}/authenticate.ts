@@ -39,7 +39,7 @@ import { Enum } from '@mojaloop/central-services-shared'
  */
 async function patch(_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const payload = request.payload as OutboundAPI.Schemas.LinkingRequestConsentIDAuthenticateRequest
-  const consentRequestId = request.params.ID
+  const consentRequestId = request.params.ID as string
 
   const modelConfig: PISPLinkingModelConfig = {
     kvs: h.getKVS(),

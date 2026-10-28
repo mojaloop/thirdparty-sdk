@@ -39,7 +39,7 @@ import { StateResponseToolkit } from '~/server/plugins/state'
  */
 async function put(_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
   const payload = request.payload as unknown as tpAPI.Schemas.AccountsIDPutResponse
-  const userId: string = request.params.ID
+  const userId: string = request.params.ID as string
   const channel = PISPDiscoveryModel.notificationChannel(userId)
   const publisher = h.getPublisher()
   // don't await on promise to resolve, let finish publish in background
@@ -52,9 +52,9 @@ async function put(_context: unknown, request: Request, h: StateResponseToolkit)
  */
 
 async function get(_context: unknown, request: Request, h: StateResponseToolkit): Promise<ResponseObject> {
-  const userId: string = request.params.ID
+  const userId: string = request.params.ID as string
   const logger = h.getLogger()
-  const sourceFspId = request.headers['fspiop-source']
+  const sourceFspId = request.headers['fspiop-source'] as string
   const config: InboundAccountsModelConfig = {
     logger,
     dfspBackendRequests: h.getDFSPBackendRequests(),
