@@ -1,0 +1,8 @@
+{
+  "exceptions": {
+    "only@0.0.2": {
+      "reason": "MIT per the 'License' section of the package README (visionmedia/node-only); the published package.json has no license field at all, so the scanner reads it as empty. Runtime transitive via @mojaloop/sdk-scheme-adapter > koa 2.16.4. Added 2026-10-28.",
+      "expires": "2027-04-30"
+    }
+  }
+}
