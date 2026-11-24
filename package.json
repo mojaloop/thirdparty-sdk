@@ -181,11 +181,14 @@
     "tsconfig-paths": "^4.2.0"
   },
   "overrides": {
+    "jwa@1": "1.4.2",
+    "jwa@2": "2.0.1",
     "@mojaloop/central-services-shared": {
       "axios": "1.7.9"
     },
     "@mojaloop/sdk-scheme-adapter": {
       "@koa/cors": "5.0.0",
+      "@mojaloop/central-services-shared": "18.19.0",
       "axios": "1.7.9",
       "koa": "2.15.4"
     },
