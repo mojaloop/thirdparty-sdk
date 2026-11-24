@@ -262,9 +262,6 @@ ignore:
   - vulnerability: GHSA-hfxv-24rg-xrqf
     include-aliases: true
     reason: 'Unfixable npm transitive vulnerability: unknown (unknown severity) as of 2026-11-24'
-  - vulnerability: GHSA-j3f2-48v5-ccww
-    include-aliases: true
-    reason: 'Unfixable npm transitive vulnerability: unknown (unknown severity) as of 2026-11-24'
   - vulnerability: GHSA-j5f8-grm9-p9fc
     include-aliases: true
     reason: 'Unfixable npm transitive vulnerability: unknown (unknown severity) as of 2026-11-24'

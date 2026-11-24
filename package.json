@@ -208,7 +208,7 @@
     "oas-validator": {
       "ajv": "6.12.6"
     },
-    "protobufjs": "7.6.3",
+    "protobufjs": "7.6.5",
     "shins": {
       "sanitize-html": "2.12.1"
     },
